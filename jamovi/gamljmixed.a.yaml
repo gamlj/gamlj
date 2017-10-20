@@ -1,0 +1,272 @@
+---
+name: gamljMixed
+title: Mixed Model
+menuGroup: Linear Models
+version: '0.1.0'
+jas: '1.1'
+completeWhenFilled: false
+description:
+    main: Mixed Linear Model
+    R:
+        dontrun: false
+        usage: |
+            data('ToothGrowth')
+
+            mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+
+
+options:
+    - name: data
+      type: Data
+      description:
+          R: the data as a data frame
+
+    - name: dep
+      title: Dependent Variable
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - continuous
+        - nominal
+        - ordinal
+      description:
+          R: >
+            a string naming the dependent variable from `data`, variable
+            must be numeric
+
+    - name: factors
+      title: Fixed Factors
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+        - nominaltext
+      permitted:
+        - nominal
+        - ordinal
+        - nominaltext
+      default:
+      description:
+          R: a vector of strings naming the fixed factors from `data`
+
+    - name: covs
+      title: Covariates
+      type: Variables
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - continuous
+        - nominal
+        - ordinal
+      default:
+      description:
+          R: a vector of strings naming the covariates from `data`
+
+    - name: cluster
+      title: Cluster variables
+      type: Variables
+      suggested:
+        - nominal
+      description:
+          R: a vector of strings naming the clustering variables from `data`
+
+    - name: randomTerms
+      title: Random Coefficients
+      type: Terms
+      default:  
+      description:
+          R: >
+            a list of character vectors describing random coefficients that
+            need to be computed
+    - name: correlatedEffects
+      title: Correlated Effects
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , include correlated random effects
+
+
+    - name: modelTerms
+      title: Model Terms
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing fixed effects terms
+
+    - name: fixedIntercept
+      title: Fixed Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept
+
+    - name: reml
+      title: REML
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, should the Restricted ML be used
+
+
+    - name: contrasts
+      title: Factors Coding
+      type: Array
+      items: (factors)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                  - deviation
+                  - simple
+                  - difference
+                  - helmert
+                  - repeated
+                  - polynomial
+      description:
+          R: >
+            a list of lists specifying the factor and type of contrast to use,
+            one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
+            `'repeated'` or `'polynomial'`
+
+    - name: showContrastsTable
+      title: Show contrasts definitions table
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
+    - name: showContrasts
+      title: Show contrasts in Estimates table
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
+
+
+
+    - name: scaling
+      title: Covariates Scaling
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                  - none
+                  - centered
+                  - standardized
+                  - cluster-based centered
+                  - cluster-based standardized
+      description:
+          R: >
+            a list of lists specifying the covariates scaling,
+            one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+
+
+    - name: plotHAxis
+      title: Horizontal axis
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable placed on the horizontal axis of the
+            plot
+
+    - name: plotSepLines
+      title: Separate lines
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable represented as separate lines on the
+            plot
+
+    - name: plotSepPlots
+      title: Separate plots
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable to separate over to form multiple plots
+
+    - name: postHoc
+      title: Post Hoc Tests
+      type: Terms
+      default:
+      description:
+          R: a list of terms to perform post-hoc tests on
+
+    - name: postHocCorr
+      title: Correction
+      type: List
+      options:
+          - name: none
+            title: No correction
+          - name: bonferroni
+            title: Bonferroni
+          - name: holm
+            title: Holm
+      default: bonferroni
+      description:
+          R: >
+            one or more of `'none'`,  `'bonf'`, or
+            `'holm'`; provide no,  Bonferroni, and
+            Holm Post Hoc corrections respectively
+
+    - name: descStats
+      title: Descriptive statistics
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+
+
+
+    - name: simpleVariable
+      title: Simple effects variable
+      type: Variable
+      default:
+      description:
+          R: >
+            The variable for which the simple effects (slopes) are computed
+
+    - name: simpleModerator
+      title: Moderator
+      type: Variable
+      default:
+      description:
+          R: >
+            the variable that provides the levels at which the simple effects computed
+
+    - name: simple3way
+      title: Breaking variable
+      type: Variable
+      default:
+      description:
+          R: >
+            a moderator of the two-way interaction which is probed
+
+
+...
+

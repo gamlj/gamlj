@@ -1,0 +1,351 @@
+---
+name:  gamljMixed
+title: Mixed Model
+jrs: '1.0'
+
+items:
+
+    - name: info
+      title: Model Info
+      type: Table
+      columns:
+       - name: info
+         type: text
+         title: "Info"
+       - name: value
+         type: text
+         title: ""
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - randomTerms
+        - modelTerms
+
+
+    - name: random
+      title: Random Components
+      type: Table
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - randomTerms
+      columns:
+        - name: groups
+          title: "Groups"
+          type: text
+        - name: name
+          title: "Name"
+          type: text
+        - name: std
+          title: "SD"
+          type: number
+        - name: var
+          title: "Variance"
+          type: number
+
+    - name: randomCov
+      title: Random Parameters correlations
+      type: Table
+      visible: false
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - randomTerms
+      columns:
+        - name: groups
+          title: "Groups"
+          type: text
+        - name: name1
+          title: "Param.1"
+          type: text
+        - name: name2
+          title: "Param.2"
+          type: text
+        - name: cov
+          title: "Corr."
+          type: number
+
+    - name: anova
+      title: Fixed Effect ANOVA
+      type: Table
+      description: a table of ANOVA results
+      clearWith:
+        - dep
+        - modelTerms
+      columns:
+        - name: name
+          title: ""
+          type: text
+        - name: ss
+          title: Sum of Squares
+          type: number
+        - name: df1
+          title: Num df
+          type: number
+        - name: df2
+          title: Den df
+          type: number
+
+        - name: F
+          title: F
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+
+
+    - name: fixed
+      title: Fixed Effects Parameter Estimates
+      type: Table
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - modelTerms
+      columns:
+        - name: source
+          title: "Effect"
+          type: text
+        - name: label
+          title: "Contrast"
+          visible: (showContrasts)
+          type: text
+        - name: estimate
+          title: "Estimate"
+          type: number
+        - name: std
+          title: "SE"
+          type: number
+        - name: df
+          title: "df"
+          type: number
+        - name: tvalue
+          title: "t"
+          type: number
+        - name: pvalue
+          title: "p."
+          type: number
+          format: zto,pvalue
+
+    - name: posthoc
+      title: Post-hoc tests
+      type: Table
+      visible: false
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - modelTerms
+      columns:
+        - name: label
+          title: "Comparison"
+          type: text
+        - name: estimate
+          title: "Estimate"
+          type: number
+        - name: se
+          title: "SE"
+          type: number
+        - name: z
+          title: "z"
+          type: number
+        - name: p
+          title: "p."
+          type: number
+          format: zto,pvalue
+
+
+
+
+    - name: postHoc
+      title: Post Hoc Tests
+      type: Array
+      description: an array of post-hoc tables
+      items: (postHoc)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: ""
+        type: Table
+        columns: []
+        clearWith:
+            - dep
+            - modelTerms
+    - name: simpleEffectsAnovas
+      title: Simple Effects ANOVA
+      type: Array
+      description: an array of simple Effects ANOVA tables
+      visible: (simpleVariable)
+      clearWith:
+        - dep
+        - modelTerms
+        - contrasts
+        - scaling
+      template:
+        title: Simple Effecs  $key 
+        type: Table
+        columns:
+          - name: variable
+            title: "Effect"
+            type: text
+          - name: term
+            title: "Moderator Levels"
+            type: text
+          - name: df1
+            title: df Num
+            type: number
+          - name: df2
+            title: df Den
+            type: number
+          - name: F
+            title: F
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+
+
+    - name: simpleEffects
+      title: Simple Effects Parameters 
+      type: Array
+      description: an array of simple Effects tables
+      visible: (simpleVariable)
+      clearWith:
+        - dep
+        - modelTerms
+        - contrasts
+        - scaling
+      template:
+        title: Simple Effects 
+        type: Table
+        clearWith:
+        columns:
+          - name: variable
+            title: "Effect"
+            type: text
+          - name: term
+            title: "Moderator Level"
+            type: text
+          - name: estimate
+            title: "Estimate"
+          - name: std
+            title: SE
+            type: number
+          - name: t
+            title: t
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+
+
+
+    - name: model
+      type: Property
+      description: The underlying `lmer` object
+
+
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
+
+
+    - name: desc
+      title: Descriptives
+      type: Table
+      description: a table of descriptives
+      visible: (descStats)
+      clearWith:
+        - dep
+        - modelTerms
+        - ss
+
+      columns:
+        - name: 'n'
+          title: 'N'
+          type: integer
+
+        - name: mean
+          title: Mean
+          type: text
+
+        - name: sd
+          title: SD
+          type: number
+
+
+
+    - name: descPlot
+      title: Fixed Effects Plots
+      visible: (plotHAxis)
+      type: Image
+      description: a descriptives plot
+      width: 500
+      height: 300
+      renderFun: .descPlot
+      clearWith:
+        - dep
+        - plotHAxis
+        - plotSepLines
+        - plotSepPlots
+        - plotError
+        - ciWidth
+        - scaling
+        - modelTerms
+
+    - name: descPlots
+      title: Results Plots
+      type: Array
+      description: an array of results plots
+      visible: (plotSepPlots)
+      template:
+          title: $key
+          type: Image
+          renderFun: .descPlot
+          clearWith:
+           - dep
+           - plotHAxis
+           - plotSepLines
+           - plotSepPlots
+           - plotError
+           - ciWidth
+           - scaling
+           - modelTerms
+
+
+
