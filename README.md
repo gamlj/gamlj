@@ -28,12 +28,6 @@ You will first need to download [Jamovi](https://www.jamovi.org/download.html).
 
 You can clone this repository and compile the module within R with 
 
-``` jmvtools::install() ```
-
-
-
-You can clone this repository and compile the module within R with 
-
 ```
 library(jmvtools)
 
