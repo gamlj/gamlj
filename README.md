@@ -43,7 +43,7 @@ jmvtools::install()
 
 # Troubleshooting
 
-The modules installs dependencies automatically, but in some R installation the installation process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
+The modules installs dependencies automatically, but in some R installations the installation process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
 
 
 ```
