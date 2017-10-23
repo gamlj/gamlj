@@ -19,8 +19,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
 
-As regards the GLM module, more informations can be found at [GAMLj_GLM page](https://mcfanda.github.io/gamlj_glm/)
-As regards the Mixed Models module, more informations can be found at [GAMLj_Mixed page](https://mcfanda.github.io/gamlj_mixed/)
+More informations can be found at [GAMLj page](https://mcfanda.github.io/gamlj/)
 
 # Installation
 

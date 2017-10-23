@@ -19,7 +19,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Type III estimation
 
 As regards the GLM module, more informations can be found at [GAMLj_GLM page](glm/index.html)
-As regards the Mixed Models module, more informations can be found at [GAMLj_Mixed page](glm/index.html)
+As regards the Mixed Models module, more informations can be found at [GAMLj_Mixed page](mixed/index.html)
 
 # Installation
 
