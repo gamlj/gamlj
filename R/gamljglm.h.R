@@ -12,6 +12,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             modelTerms = NULL,
             ss = "3",
             effectSize = NULL,
+            showParamsCI = TRUE,
+            paramCIWidth = 95,
             contrasts = NULL,
             showContrastsTable = FALSE,
             showContrasts = TRUE,
@@ -90,6 +92,16 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "omega",
                     "beta"),
                 default=NULL)
+            private$..showParamsCI <- jmvcore::OptionBool$new(
+                "showParamsCI",
+                showParamsCI,
+                default=TRUE)
+            private$..paramCIWidth <- jmvcore::OptionNumber$new(
+                "paramCIWidth",
+                paramCIWidth,
+                min=50,
+                max=99.9,
+                default=95)
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -214,6 +226,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..ss)
             self$.addOption(private$..effectSize)
+            self$.addOption(private$..showParamsCI)
+            self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showContrastsTable)
             self$.addOption(private$..showContrasts)
@@ -239,6 +253,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         modelTerms = function() private$..modelTerms$value,
         ss = function() private$..ss$value,
         effectSize = function() private$..effectSize$value,
+        showParamsCI = function() private$..showParamsCI$value,
+        paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showContrastsTable = function() private$..showContrastsTable$value,
         showContrasts = function() private$..showContrasts$value,
@@ -263,6 +279,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..modelTerms = NA,
         ..ss = NA,
         ..effectSize = NA,
+        ..showParamsCI = NA,
+        ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showContrastsTable = NA,
         ..showContrasts = NA,
@@ -393,6 +411,16 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="std", 
                         `title`="SE", 
                         `type`="number"),
+                    list(
+                        `name`="cilow", 
+                        `type`="number", 
+                        `title`="Lower", 
+                        `visible`="(showParamsCI)"),
+                    list(
+                        `name`="cihig", 
+                        `type`="number", 
+                        `title`="Upper", 
+                        `visible`="(showParamsCI)"),
                     list(
                         `name`="t", 
                         `title`="t", 
@@ -706,6 +734,10 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param effectSize one or more of \code{'eta'}, \code{'partEta'}, or 
 #'   \code{'omega'}; use eta², partial eta², and omega² effect sizes, 
 #'   respectively 
+#' @param showParamsCI \code{TRUE} or \code{FALSE} (default), parameters CI in 
+#'   table 
+#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying 
+#'   the confidence interval width for the parameter estimates 
 #' @param contrasts a list of lists specifying the factor and type of contrast 
 #'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'} 
@@ -773,6 +805,8 @@ gamljGLM <- function(
     modelTerms = NULL,
     ss = "3",
     effectSize = NULL,
+    showParamsCI = TRUE,
+    paramCIWidth = 95,
     contrasts = NULL,
     showContrastsTable = FALSE,
     showContrasts = TRUE,
@@ -802,6 +836,8 @@ gamljGLM <- function(
         modelTerms = modelTerms,
         ss = ss,
         effectSize = effectSize,
+        showParamsCI = showParamsCI,
+        paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showContrastsTable = showContrastsTable,
         showContrasts = showContrasts,

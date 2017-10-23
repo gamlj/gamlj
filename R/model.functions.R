@@ -85,3 +85,9 @@ mf.getModelMessages<-function(model) {
   message
 }
 
+mf.confint<-function(model,level) {
+  if (.which.class(model)=="lm") {
+    return(confint(model,level = level))
+  }
+  
+}

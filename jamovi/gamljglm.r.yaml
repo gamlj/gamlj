@@ -82,7 +82,14 @@ items:
         - name: std
           title: SE
           type: number
-
+        - name: cilow
+          type: number
+          title: Lower
+          visible: (showParamsCI)
+        - name: cihig
+          type: number
+          title: Upper
+          visible: (showParamsCI)
         - name: t
           title: t
           type: number
