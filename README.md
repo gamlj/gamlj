@@ -24,6 +24,14 @@ As regards the Mixed Models module, more informations can be found at [GAMLj_Mix
 
 # Installation
 
+## Linux
+
+If you are working in linux you can download [Jamovi](https://www.jamovi.org/download.html), then download the .jmo file in 
+"dist" folder and install it from within [Jamovi](https://www.jamovi.org/download.html).
+
+
+## Others
+
 You will first need to download [Jamovi](https://www.jamovi.org/download.html). 
 
 
