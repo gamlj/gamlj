@@ -82,8 +82,8 @@ items:
         - name: name
           title: ""
           type: text
-        - name: ss
-          title: Sum of Squares
+        - name: F
+          title: F
           type: number
         - name: df1
           title: Num df
@@ -91,11 +91,6 @@ items:
         - name: df2
           title: Den df
           type: number
-
-        - name: F
-          title: F
-          type: number
-
         - name: p
           title: p
           type: number

@@ -22,6 +22,7 @@ gamljMixedClass <- R6::R6Class(
       }
       if (length(self$options$randomTerms)==0) {
         infoTable$addRow(rowKey="gs3",list(info="Get started",value="Select at least one term in Random Effects"))
+        getout=TRUE
       }
       
       if (getout) {
@@ -45,6 +46,9 @@ gamljMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC"))
       infoTable$addRow(rowKey="log",list(info="LogLikel."))
       }
+      infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
+      infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
+      
       
       ## random table
       aTable<-self$results$random
@@ -165,14 +169,25 @@ gamljMixedClass <- R6::R6Class(
         }
         
         private$.model <- model
+        infoTable<-self$results$info
+        
         ### prepare info table #########       
         info.call<-as.character(model@call)[[2]]
-        info.title<-ss$methTitle
+        info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
         info.aic<-ss$AICtab[1]
         info.bic<-ss$AICtab[2]
         info.loglik<-ss$AICtab[3]
+        r2<-try(r.squared(model))
+        if (jmvcore::isError(r2)){
+          info.r2m<-"NA"        
+          info.r2c<-"NA"
+          infoTable$setNote("r2","R-squared cannot be computed.")  
+        } else {
+          info.r2m<-r2[[4]]        
+          info.r2c<-r2[[5]]     
+        }
         
-        infoTable<-self$results$info
+        print(r2)
         infoTable$setRow(rowKey="est", list(value=info.title))
         infoTable$setRow(rowKey="call",list(value=info.call))
         infoTable$setRow(rowKey="aic",list(value=info.aic))
@@ -180,7 +195,9 @@ gamljMixedClass <- R6::R6Class(
             infoTable$setRow(rowKey="bic",list(value=info.bic))
             infoTable$setRow(rowKey="log",list(value=info.loglik))
         }
-
+        infoTable$setRow(rowKey="r2m",list(value=info.r2m))
+        infoTable$setRow(rowKey="r2c",list(value=info.r2c))
+        
         ### end of info table ###
         
         
@@ -214,29 +231,28 @@ gamljMixedClass <- R6::R6Class(
         
         # anova table ##
         suppressWarnings({
-          anova <- try(lmerTest::anova(model), silent=TRUE) # end suppressWarnings
+          anova <- try(mf.lmeranova(model), silent=TRUE) # end suppressWarnings
         })
-        if (jmvcore::isError(model)) 
-          jmvcore::reject(jmvcore::extractErrorMessage(model), code='error')
+        if (jmvcore::isError(anova)) 
+          jmvcore::reject(jmvcore::extractErrorMessage(anova), code='error')
         labels<-rownames(anova)
-        
         aTable<-self$results$anova
         for (i in seq_len(dim(anova)[1])) {
-        r<-anova[i,]  
-        row<-list(name=labels[i],
-                  ss=r$`Sum Sq`,
-                  df1=r$NumDF,
-                  df2=r$DenDF,
-                  F=r$`F.value`,
-                  p=r$`Pr(>F)`)
-                  aTable$setRow(rowNo=i,row)
+        tableRow<-anova[i,]  
+        aTable$setRow(rowNo=i,tableRow)
+        aTable$setRow(rowNo=i,list(name=labels[i]))
         }
-         
+        aTable$setNote("df",paste(attr(anova,"method"),"method for degrees of freedom"))
+        
         messages<-mf.getModelMessages(model)
         for (i in seq_along(messages)) {
                  aTable$setNote(names(messages)[i],messages[[i]])
                  infoTable$setNote(names(messages)[i],messages[[i]])
-         }
+        }
+        if (length(messages)>0) {
+          aTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+          infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+        }
           ### parameter table ####
         
         fixedTable <- self$results$fixed
@@ -624,7 +640,8 @@ gamljMixedClass <- R6::R6Class(
        data<-mf.getModelData(model)
        simpleEffectsTables<-self$results$simpleEffects
        simpleEffectsAnovas<-self$results$simpleEffectsAnovas
-  
+       reml<-self$options$reml
+       
       .fillTheFTable<-function(results,aTable) {
           ftests<-results[[2]]
           ### ftests      
@@ -638,8 +655,8 @@ gamljMixedClass <- R6::R6Class(
             p=r$`Pr(>F)`)
             aTable$setRow(rowNo=i,row)
           }
-  } #### end of .fillTheFTable
-  
+        } #### end of .fillTheFTable
+             
       .fillThePTable<-function(results,aTable) {
           params<-results[[1]]
           what<-params$level
@@ -667,8 +684,12 @@ gamljMixedClass <- R6::R6Class(
     ### ftests
     key=paste(variable,1,sep="")
     ftable<-simpleEffectsAnovas$get(key=key)
-    .fillTheFTable(results,ftable)  
-    ftable$setNote("df",WARNS["se.df"])
+    if (reml) {
+      .fillTheFTable(results,ftable)  
+      ftable$setNote("df",WARNS["se.df"])
+    } else 
+      ftable$setNote("lmer.roreml",WARNS["lmer.noreml"])
+    
     
     ### parameters
     ptable<-simpleEffectsTables$get(key=key)
@@ -708,9 +729,12 @@ gamljMixedClass <- R6::R6Class(
       key=paste(variable,i,sep="")
       ### F table
       ftable<-simpleEffectsAnovas$get(key=key)
+      if (reml) {     
       ftable$setTitle(title)
       .fillTheFTable(results,ftable)      
       ftable$setNote("df",WARNS["se.df"])
+      } else
+        ftable$setNote("lmer.noreml",WARNS["lmer.noreml"])
       
       ### parameters
       ptable<-simpleEffectsTables$get(key=key)
