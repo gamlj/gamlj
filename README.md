@@ -5,7 +5,7 @@ General, Mixed and Generalized Models module for Jamovi
 <img src="docs/i1.png" class="img-responsive" alt="">
 
 
-Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Model (the later yet to be implemented) with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
+Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Model (the latter yet to be implemented) with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
 
 * Continuous and categorical independent variables
@@ -28,16 +28,24 @@ You will first need to download [Jamovi](https://www.jamovi.org/download.html).
 
 You can clone this repository and compile the module within R with 
 
-``` jmvtools::install() ```
-
-
-
-You can clone this repository and compile the module within R with 
-
 ```
 library(jmvtools)
 
 jmvtools::install()
+
+```
+
+# Troubleshooting
+
+The modules installs dependencies automatically, but in some R installations the process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
+
+
+```
+package<-"pbkrtest"
+dirroot<-YOURCLONEFOLDER
+instdir<-paste0(dirroot,"/build/R")
+install.packages(package,lib = instdir)
+
 
 ```
 

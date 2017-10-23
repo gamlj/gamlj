@@ -26,6 +26,7 @@ temp/
 
 # Output files from R CMD check
 /*.Rcheck/
+*.Rproj
 
 # RStudio files
 .Rproj.user/
@@ -45,4 +46,3 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 .Rproj.user
-*.Rproj
