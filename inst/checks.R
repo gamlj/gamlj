@@ -15,7 +15,16 @@ dat$wfac3<-factor(dat$wfac3)
 contrasts(dat$wfac)<-contr.sum(2)
 contrasts(dat$wfac3)<-contr.sum(3)
 
-model<-lmer(y~(1|cluster)+wfac*wfac3,data=dat,REML = F)
-
-ci<-confint(model,method="Wald",)
-ci[!is.na(ci[,1]),]
+model1<-lmer(y~(1|cluster)+wfac*wfac3,data=dat,REML = F)
+model2<-lmer(y~(1|cluster),data=dat,REML = F)
+model<-model2
+ss<-summary(model)
+eresults<-ss[['coefficients']]
+ci<-confint(model,method="Wald")
+ci<-ci[!is.na(ci[,1]),]
+if (is.null(dim(ci)))
+  ci<-matrix(ci,ncol=2)
+ci
+cbind(eresults,ci)
+dim(ci)
+dim(eresults)
