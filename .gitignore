@@ -9,13 +9,8 @@
 # jamovi
 build/
 temp/
-*.jmo
+./*.jmo
 
-||||||| merged common ancestors
-=======
-# jamovi compiled module
-
-.jmo
 
 >>>>>>> e3f3ba5413d8a75491317129af3d7fb3a798f8b4
 # Example code in package build process

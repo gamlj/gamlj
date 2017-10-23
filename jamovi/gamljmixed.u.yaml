@@ -46,6 +46,7 @@ children:
               change: './mixed.events::onChange_cluster'
   - type: LayoutBox
     margin: large
+    style: inline
     children:
       - type: Label
         label: Estimation
@@ -53,6 +54,21 @@ children:
         children:
           - type: CheckBox
             name: reml
+      - type: Label
+        label: Confidence Intervals
+        margin: large
+        style: list-inline
+        children:
+          - name: showParamsCI
+            type: CheckBox
+          - type: TextBox
+            name: paramCIWidth
+            label: Interval
+            suffix: '%'
+            format: number
+            inputPattern: '[0-9]+'
+            enable: (showParamsCI)
+
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true

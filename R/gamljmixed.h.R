@@ -15,6 +15,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             modelTerms = NULL,
             fixedIntercept = TRUE,
             reml = TRUE,
+            showParamsCI = TRUE,
+            paramCIWidth = 95,
             contrasts = NULL,
             showContrastsTable = FALSE,
             showContrasts = TRUE,
@@ -92,6 +94,16 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "reml",
                 reml,
                 default=TRUE)
+            private$..showParamsCI <- jmvcore::OptionBool$new(
+                "showParamsCI",
+                showParamsCI,
+                default=TRUE)
+            private$..paramCIWidth <- jmvcore::OptionNumber$new(
+                "paramCIWidth",
+                paramCIWidth,
+                min=50,
+                max=99.9,
+                default=95)
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -195,6 +207,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..reml)
+            self$.addOption(private$..showParamsCI)
+            self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showContrastsTable)
             self$.addOption(private$..showContrasts)
@@ -219,6 +233,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         reml = function() private$..reml$value,
+        showParamsCI = function() private$..showParamsCI$value,
+        paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showContrastsTable = function() private$..showContrastsTable$value,
         showContrasts = function() private$..showContrasts$value,
@@ -242,6 +258,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..modelTerms = NA,
         ..fixedIntercept = NA,
         ..reml = NA,
+        ..showParamsCI = NA,
+        ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showContrastsTable = NA,
         ..showContrasts = NA,
@@ -370,8 +388,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="", 
                         `type`="text"),
                     list(
-                        `name`="ss", 
-                        `title`="Sum of Squares", 
+                        `name`="F", 
+                        `title`="F", 
                         `type`="number"),
                     list(
                         `name`="df1", 
@@ -380,10 +398,6 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     list(
                         `name`="df2", 
                         `title`="Den df", 
-                        `type`="number"),
-                    list(
-                        `name`="F", 
-                        `title`="F", 
                         `type`="number"),
                     list(
                         `name`="p", 
@@ -419,16 +433,26 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="SE", 
                         `type`="number"),
                     list(
+                        `name`="cilow", 
+                        `type`="number", 
+                        `title`="Lower", 
+                        `visible`="(showParamsCI)"),
+                    list(
+                        `name`="cihig", 
+                        `type`="number", 
+                        `title`="Upper", 
+                        `visible`="(showParamsCI)"),
+                    list(
                         `name`="df", 
                         `title`="df", 
                         `type`="number"),
                     list(
-                        `name`="tvalue", 
+                        `name`="t", 
                         `title`="t", 
                         `type`="number"),
                     list(
-                        `name`="pvalue", 
-                        `title`="p.", 
+                        `name`="p", 
+                        `title`="p", 
                         `type`="number", 
                         `format`="zto,pvalue"))))
             self$add(jmvcore::Table$new(
@@ -688,6 +712,10 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   fixed intercept 
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML 
 #'   be used 
+#' @param showParamsCI \code{TRUE} or \code{FALSE} (default), parameters CI in 
+#'   table 
+#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying 
+#'   the confidence interval width for the parameter estimates 
 #' @param contrasts a list of lists specifying the factor and type of contrast 
 #'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'} 
@@ -751,6 +779,8 @@ gamljMixed <- function(
     modelTerms = NULL,
     fixedIntercept = TRUE,
     reml = TRUE,
+    showParamsCI = TRUE,
+    paramCIWidth = 95,
     contrasts = NULL,
     showContrastsTable = FALSE,
     showContrasts = TRUE,
@@ -778,6 +808,8 @@ gamljMixed <- function(
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
         reml = reml,
+        showParamsCI = showParamsCI,
+        paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showContrastsTable = showContrastsTable,
         showContrasts = showContrasts,

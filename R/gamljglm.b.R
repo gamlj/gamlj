@@ -90,6 +90,10 @@ gamljGLMClass <- R6::R6Class(
            formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
            terms<-colnames(model.matrix(formula,data))  
            labels<-.getFormulaContrastsLabels(self$options$contrasts,formula,data) 
+           ciWidth<-self$options$paramCIWidth
+           estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           
            for (i in seq_along(terms)) 
                 estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
       
@@ -276,10 +280,15 @@ gamljGLMClass <- R6::R6Class(
         } else beta<-1:nrow(eresults)
         
         eresults<-cbind(eresults,beta) 
+        #### confidence intervals ######
+        ciWidth<-self$options$paramCIWidth/100
+        ci<-mf.confint(model,level=ciWidth)
+        eresults<-cbind(eresults,ci) 
+        
         labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
         for (i in 1:nrow(eresults)) {
           tableRow=eresults[i,]
-          names(tableRow)<-c("estimate","std","t","p","beta")
+          names(tableRow)<-c("estimate","std","t","p","beta","cilow","cihig")
           estimatesTable$setRow(rowNo=i,tableRow)
           estimatesTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
           

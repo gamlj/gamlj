@@ -61,6 +61,21 @@ children:
             type: CheckBox
             optionPart: omega
             optionName: effectSize
+      - type: Label
+        label: Confidence Intervals
+        margin: large
+        style: list-inline
+        children:
+          - name: showParamsCI
+            type: CheckBox
+          - type: TextBox
+            name: paramCIWidth
+            label: Interval
+            suffix: '%'
+            format: number
+            inputPattern: '[0-9]+'
+            enable: (showParamsCI)
+
   - type: CollapseBox
     label: Model
     collapsed: true

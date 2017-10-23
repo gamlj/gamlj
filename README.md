@@ -10,6 +10,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 
 * Continuous and categorical independent variables
 * F-test and parameter estimates
+* Confidence intervals
 * Moderation made easy
 * Simple slopes analysis
 * Simple effects
@@ -22,6 +23,14 @@ As regards the GLM module, more informations can be found at [GAMLj_GLM page](ht
 As regards the Mixed Models module, more informations can be found at [GAMLj_Mixed page](https://mcfanda.github.io/gamlj_mixed/)
 
 # Installation
+
+## Linux
+
+If you are working in linux you can download [Jamovi](https://www.jamovi.org/download.html), then download the .jmo file in 
+"dist" folder and install it from within [Jamovi](https://www.jamovi.org/download.html).
+
+
+## Others
 
 You will first need to download [Jamovi](https://www.jamovi.org/download.html). 
 
