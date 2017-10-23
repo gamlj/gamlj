@@ -9,7 +9,7 @@
 # jamovi
 build/
 temp/
-./*.jmo
+gamlj.jmo
 
 
 >>>>>>> e3f3ba5413d8a75491317129af3d7fb3a798f8b4
