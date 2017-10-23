@@ -14,11 +14,27 @@ dat$wfac<-factor(dat$wfac)
 dat$wfac3<-factor(dat$wfac3)
 contrasts(dat$wfac)<-contr.sum(2)
 contrasts(dat$wfac3)<-contr.sum(3)
+dat$bfac<-factor(dat$bfac)
+contrasts(dat$bfac)<-contr.sum(2)
+dat$cluster<-factor(dat$cluster)
 r.squared(model1)
-model1<-lmer(y~(1|cluster)+wfac*wfac3,data=dat,REML = F)
-model2<-lmer(y~(1|cluster),data=dat,REML = F)
-model<-model2
-ss<-summary(model)
+dat$x<-as.numeric(scale(dat$x))
+model1<-lmer(y~(1|cluster)+bfac*wfac,data=dat,REML = F)
+model2<-lmer(y~(1|cluster),data=dat,REML = T)
+q<-mf.lmeranova(model1)
+str(q)
+model<-model1
+ss<-summary(model2)
+drop1(model,.~.,test="Chisq")
+str(ano)
+
+
+attr(ano,"method")
+th <- getME(model1,"theta")
+which(th==0)
+summary(model)
+library(car)
+car::Anova(model,type=3,test="F")
 eresults<-ss[['coefficients']]
 ci<-confint(model,method="Wald")
 ci<-ci[!is.na(ci[,1]),]

@@ -300,6 +300,9 @@
   
   extractF<-function(model,variable,moderator,level) {
     ### get the ANOVA
+    if (.which.class(model)=="lmer")
+       if (!lme4::getME(model,"is_REML"))
+          return(FALSE)
     ano<-mf.anova(model)
     ano<-ano[rownames(ano)==variable,]
     if (is.numeric(level)) level<-round(level,digits=2)

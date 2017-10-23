@@ -401,8 +401,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="", 
                         `type`="text"),
                     list(
-                        `name`="ss", 
-                        `title`="Sum of Squares", 
+                        `name`="F", 
+                        `title`="F", 
                         `type`="number"),
                     list(
                         `name`="df1", 
@@ -411,10 +411,6 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     list(
                         `name`="df2", 
                         `title`="Den df", 
-                        `type`="number"),
-                    list(
-                        `name`="F", 
-                        `title`="F", 
                         `type`="number"),
                     list(
                         `name`="p", 
