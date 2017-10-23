@@ -186,6 +186,7 @@ gamljMixedClass <- R6::R6Class(
           info.r2m<-r2[[4]]        
           info.r2c<-r2[[5]]     
         }
+        
         print(r2)
         infoTable$setRow(rowKey="est", list(value=info.title))
         infoTable$setRow(rowKey="call",list(value=info.call))
