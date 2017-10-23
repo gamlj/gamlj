@@ -29,5 +29,8 @@ WARNS["lmer.init"]<-"Specify at least one cluster variable: A random intecepts m
 will be estimated"
 
 
+WARNS["lmer.nogood"]<-"Results may be uninterpretable or misleading. Try to refine your model."
+
+
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 #WARNS<-sapply(WARNS,function(a) gsub("  ","",a,fixed=T))

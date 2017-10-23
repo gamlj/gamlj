@@ -22,6 +22,7 @@ gamljMixedClass <- R6::R6Class(
       }
       if (length(self$options$randomTerms)==0) {
         infoTable$addRow(rowKey="gs3",list(info="Get started",value="Select at least one term in Random Effects"))
+        getout=TRUE
       }
       
       if (getout) {
@@ -45,6 +46,9 @@ gamljMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC"))
       infoTable$addRow(rowKey="log",list(info="LogLikel."))
       }
+      infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
+      infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
+      
       
       ## random table
       aTable<-self$results$random
@@ -165,14 +169,24 @@ gamljMixedClass <- R6::R6Class(
         }
         
         private$.model <- model
+        infoTable<-self$results$info
+        
         ### prepare info table #########       
         info.call<-as.character(model@call)[[2]]
         info.title<-ss$methTitle
         info.aic<-ss$AICtab[1]
         info.bic<-ss$AICtab[2]
         info.loglik<-ss$AICtab[3]
-        
-        infoTable<-self$results$info
+        r2<-try(r.squared(model))
+        if (jmvcore::isError(r2)){
+          info.r2m<-"NA"        
+          info.r2c<-"NA"
+          infoTable$setNote("r2","R-squared cannot be computed.")  
+        } else {
+          info.r2m<-r2[[4]]        
+          info.r2c<-r2[[5]]     
+        }
+        print(r2)
         infoTable$setRow(rowKey="est", list(value=info.title))
         infoTable$setRow(rowKey="call",list(value=info.call))
         infoTable$setRow(rowKey="aic",list(value=info.aic))
@@ -180,7 +194,9 @@ gamljMixedClass <- R6::R6Class(
             infoTable$setRow(rowKey="bic",list(value=info.bic))
             infoTable$setRow(rowKey="log",list(value=info.loglik))
         }
-
+        infoTable$setRow(rowKey="r2m",list(value=info.r2m))
+        infoTable$setRow(rowKey="r2c",list(value=info.r2c))
+        
         ### end of info table ###
         
         
@@ -236,7 +252,11 @@ gamljMixedClass <- R6::R6Class(
         for (i in seq_along(messages)) {
                  aTable$setNote(names(messages)[i],messages[[i]])
                  infoTable$setNote(names(messages)[i],messages[[i]])
-         }
+        }
+        if (length(messages)>0) {
+          aTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+          infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+        }
           ### parameter table ####
         
         fixedTable <- self$results$fixed

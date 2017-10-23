@@ -14,7 +14,7 @@ dat$wfac<-factor(dat$wfac)
 dat$wfac3<-factor(dat$wfac3)
 contrasts(dat$wfac)<-contr.sum(2)
 contrasts(dat$wfac3)<-contr.sum(3)
-
+r.squared(model1)
 model1<-lmer(y~(1|cluster)+wfac*wfac3,data=dat,REML = F)
 model2<-lmer(y~(1|cluster),data=dat,REML = F)
 model<-model2
