@@ -284,6 +284,7 @@ gamljGLMClass <- R6::R6Class(
         ciWidth<-self$options$paramCIWidth/100
         ci<-mf.confint(model,level=ciWidth)
         eresults<-cbind(eresults,ci) 
+        
         labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
         for (i in 1:nrow(eresults)) {
           tableRow=eresults[i,]

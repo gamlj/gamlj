@@ -74,11 +74,9 @@ items:
           title: "Contrast"
           type: text
           visible: (showContrasts)
-
         - name: estimate
           title: Estimate
           type: number
-
         - name: std
           title: SE
           type: number

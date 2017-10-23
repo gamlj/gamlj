@@ -75,6 +75,10 @@ gamljMixedClass <- R6::R6Class(
       formula<-as.formula(private$.constructFormula(self$options$dep, modelTerms))
       terms<-colnames(model.matrix(formula,data))  
       labels<-.getFormulaContrastsLabels(self$options$contrasts,formula,data) 
+      ciWidth<-self$options$paramCIWidth
+      aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
 
@@ -236,24 +240,34 @@ gamljMixedClass <- R6::R6Class(
           ### parameter table ####
         
         fixedTable <- self$results$fixed
-        ssc<-ss$coefficients
-        if (dim(ssc)[2]<4) { 
-          for (i in 1:dim(ssc)[1])
-                fixedTable$setRow(rowNo=i,list(source=.nicifyTerms(rownames(ssc)[i]),estimate=ssc[i,1],std=ssc[i,2],tvalue=ssc[i,3]))
-          if (dim(ssc)[1]<2)
-                fixedTable$setNote("warning",WARNS["lmer.df"])
-          else
-                fixedTable$setNote("warning",WARNS["lmer.zerovariance"])
-          
-        } else {
-          for (i in 1:dim(ssc)[1])
-            fixedTable$setRow(rowNo=i,list(source=.nicifyTerms(rownames(ssc)[i]),contrast=.nicifyTerms(labels[i]),estimate=ssc[i,1],std=ssc[i,2],df=ssc[i,3],tvalue=ssc[i,4],pvalue=ssc[i,5]))
+        eresults<-ss[['coefficients']]
+        #### confidence intervals ######
+        ciWidth<-self$options$paramCIWidth/100
+        ci<-mf.confint(model,level=ciWidth)
+        eresults<-cbind(eresults,ci) 
+
+        if (dim(eresults)[2]==5) {
+           colnames(eresults)<-c("estimate","std","t","cilow","cihig")
+           if (dim(eresults)[1]<2)
+                    fixedTable$setNote("warning",WARNS["lmer.df"])
+           else
+                    fixedTable$setNote("warning",WARNS["lmer.zerovariance"])
         }
-           
-        if (mf.aliased(model)) {
+        else      
+          colnames(eresults)<-c("estimate","std","df","t","p","cilow","cihig")
+        
+        for (i in 1:nrow(eresults)) {
+                tableRow=eresults[i,]
+#                fixedTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
+                fixedTable$setRow(rowNo=i,tableRow)
+          }
+
+        
+       if (mf.aliased(model)) {
           fixedTable$setNote("aliased",WARNS["ano.aliased"])
           infoTable$setNote("aliased",WARNS["ano.aliased"])
         }
+        
         
       ####### filling in contrast table definition ##############
         contrastsTables <- self$results$contrasts

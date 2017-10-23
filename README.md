@@ -10,6 +10,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 
 * Continuous and categorical independent variables
 * F-test and parameter estimates
+* Confidence intervals
 * Moderation made easy
 * Simple slopes analysis
 * Simple effects

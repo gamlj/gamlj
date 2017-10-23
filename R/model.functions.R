@@ -89,5 +89,12 @@ mf.confint<-function(model,level) {
   if (.which.class(model)=="lm") {
     return(confint(model,level = level))
   }
+  if (.which.class(model)=="lmer") {
+    ci<-confint(model,method="Wald")
+    ci<-ci[!is.na(ci[,1]),]
+    if (is.null(dim(ci)))
+      ci<-matrix(ci,ncol=2)
+    return(ci)
+  }
   
 }

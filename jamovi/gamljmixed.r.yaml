@@ -126,14 +126,23 @@ items:
         - name: std
           title: "SE"
           type: number
+        - name: cilow
+          type: number
+          title: Lower
+          visible: (showParamsCI)
+        - name: cihig
+          type: number
+          title: Upper
+          visible: (showParamsCI)
+
         - name: df
           title: "df"
           type: number
-        - name: tvalue
+        - name: t
           title: "t"
           type: number
-        - name: pvalue
-          title: "p."
+        - name: p
+          title: "p"
           type: number
           format: zto,pvalue
 
