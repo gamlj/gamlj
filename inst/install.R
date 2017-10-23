@@ -10,8 +10,8 @@ if (length(ff)==0)
 #jmvtools::create('galmjglm')
 install.packages("lmerTest",lib = instdir)
 install.packages("Hmisc",lib = instdir)
-
+ 
 
 install(debug = F)
-
-    
+VarCorr
+lme4::VarCorr()    
