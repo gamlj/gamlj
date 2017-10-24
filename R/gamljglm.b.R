@@ -480,6 +480,8 @@ gamljGLMClass <- R6::R6Class(
       
       if ( ! self$options$descStats)
         return()
+      if (length(self$options$factors)==0)
+        return()
       
       descTable <- self$results$desc
       dep <- self$options$dep
@@ -841,7 +843,6 @@ gamljGLMClass <- R6::R6Class(
         if (length(value) == 0)
           return('')
       }
-      
       super$.sourcifyOption(option)
     })
 )

@@ -6,5 +6,3 @@
 
 #render your sweet site. 
 rmarkdown::render_site(input = "./docssource/")
-output_dir<-"docssource/docs/"
-file.copy(from = file.path("./docssource/", "*.html"), to = output_dir, recursive = TRUE) :  

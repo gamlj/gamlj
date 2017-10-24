@@ -77,6 +77,13 @@ mf.lmeranova=function(model) {
   if (.which.class(model)=="lmer") {   
     
   ano<-lmerTest::anova(model)
+  if (dim(ano)[1]==0)
+    return(ano)
+  if (dim(ano)[2]==4) {
+    ano<-car::Anova(model,type=3,test="F")
+    attr(ano,"method")<-"Kenward-Roger"
+    return(ano)
+  }
   ano<-ano[,c(5,3,4,6)]
   names(ano)<-c("F","df1","df2","p")
   attr(ano,"method")<-"Satterthwaite"

@@ -16,6 +16,7 @@ const events = {
     },
 
     onChange_modelTerms: function(ui) {
+       
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
@@ -126,7 +127,6 @@ var updateSimpleSupplier = function(ui, context) {
             }
         }
         varList=context.valuesToItems(varList, FormatDef.variable);
-        console.log(varList);
         ui.simpleSupplier.setValue(varList);
         ui.plotsSupplier.setValue(varList);
 

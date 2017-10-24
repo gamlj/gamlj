@@ -34,6 +34,8 @@ const events = {
     onChange_modelTerms: function(ui) {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
+        updateSimpleSupplier(ui, this);
+
     },
 
     onChange_plotsSupplier: function(ui) {
@@ -44,6 +46,7 @@ const events = {
     },
     
         onChange_simpleSupplier: function(ui) {
+          console.log("updating simple");
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
         this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
@@ -276,8 +279,6 @@ var updateRandomSupplier = function(ui, context) {
 //    var xunique = formatted.filter(function(val) {
 //         return busyForm.indexOf(val) == -1;
 //            });    
-    console.log("correct");
-    console.log(formatted);
     ui.randomSupplier.setValue(formatted);
 };
 
