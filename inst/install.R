@@ -5,7 +5,6 @@ install.packages("nloptr",lib = instdir)
 install.packages("pbkrtest",lib = instdir)
 #jmvtools::create('galmjglm')
 install.packages("Hmisc",lib = instdir)
-<<<<<<< HEAD
 install.packages("lme4",type="source",lib = instdir)
 
 install.packages("lmerTest",type="source",lib = instdir)

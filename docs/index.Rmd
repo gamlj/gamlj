@@ -1,15 +1,19 @@
-# GAMLj Suite for Linear Models in Jamovi
+---
+title: "GAMLj: Generale Analyses for the Linear Model in Jamovi"
+---
+  
 
 General, Mixed and Generalized Models module for Jamovi
 
-<img src="docs/glm/i1.png" class="img-responsive" alt="">
+<img src="docs/i1.png" class="img-responsive" alt="">
 
 
 Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Model (the latter yet to be implemented) with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
-
+* ANOVA and Regression approach
 * Continuous and categorical independent variables
 * F-test and parameter estimates
+* Confidence intervals
 * Moderation made easy
 * Simple slopes analysis
 * Simple effects
@@ -18,10 +22,19 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
 
-As regards the GLM module, more informations can be found at [GAMLj_GLM page](glm/index.html)
-As regards the Mixed Models module, more informations can be found at [GAMLj_Mixed page](mixed/index.html)
+## [GAMLj GLM](glm.html)
+## [GAMLj Mixed models](mixed.html)
+## [GAMLj Generalized Models](gzlm.html)
 
 # Installation
+
+## Linux
+
+If you are working in linux you can download [Jamovi](https://www.jamovi.org/download.html), then download the .jmo file in 
+"dist" folder and install it from within [Jamovi](https://www.jamovi.org/download.html).
+
+
+## Others
 
 You will first need to download [Jamovi](https://www.jamovi.org/download.html). 
 
@@ -48,3 +61,5 @@ install.packages(package,lib = instdir)
 
 
 ```
+
+
