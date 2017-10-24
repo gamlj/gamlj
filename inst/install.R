@@ -18,10 +18,3 @@ install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
 
 #jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library"    
 #install.packages("stats",lib = jpath)
-=======
- 
-
-install(debug = F)
-VarCorr
-lme4::VarCorr()    
->>>>>>> 2e975584bc37e58ef6260ab2e43dbd0d616d7c9a
