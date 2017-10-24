@@ -30,3 +30,4 @@ install()
 #jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library"    
 #install.packages("stats",lib = jpath)
 R.version
+

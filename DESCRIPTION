@@ -13,4 +13,4 @@ Encoding: UTF-8
 LazyData: true
 Imports: jmvcore (>= 0.8.0), R6 ,multcomp, ggplot2, lmerTest, car , lsmeans, Hmisc
 Depends: jmvcore
-Exports: gamljMixed, gamljGLM
+Exports: gamljMixed, gamljGLM, gamljGzml

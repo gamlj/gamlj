@@ -1,3 +1,7 @@
+TCONV<-list()
+TCONV[["glm.f"]]<-c("test","df","p")
+
+
 WARNS<-list()
 
 WARNS["ph.covariates"]<-"Post-hocs means are estimated keeping constant

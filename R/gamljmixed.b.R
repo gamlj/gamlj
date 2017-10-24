@@ -8,7 +8,6 @@ gamljMixedClass <- R6::R6Class(
     .init=function() {
       print("init")
       reml<-self$options$reml
-      print(reml)
       infoTable<-self$results$info
 
       getout<-FALSE
@@ -585,7 +584,7 @@ gamljMixedClass <- R6::R6Class(
     plotData<-.preparePlotData(model,groupName,linesName,plotsName)
     
     if (error != 'none') {
-      yAxisRange <- pretty(c(plotData$lower, plotData$upper))
+      yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
     } else {
       yAxisRange <- plotData$mean
     }

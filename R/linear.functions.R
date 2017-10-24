@@ -289,20 +289,20 @@
     ##### get the summary of the model
     ss<-mf.summary(model)
     ##### extract only the estimates of the x-axis variable
-    
     a<-as.logical(apply(sapply(varname, function(a) a==rownames(ss)),1,sum))
     ss<-ss[a,] 
     if (is.numeric(level)) level<-round(level,digits=2)
     ss$level<-paste(moderator,level,sep=" at ")
-    ss$variable<-rownames(ss)
+    ss$variable<-variable
     ss
   }
   
   extractF<-function(model,variable,moderator,level) {
     ### get the ANOVA
-    if (.which.class(model)=="lmer")
+    if (.which.class(model)=="lmer") {
        if (!lme4::getME(model,"is_REML"))
           return(FALSE)
+    }
     ano<-mf.anova(model)
     ano<-ano[rownames(ano)==variable,]
     if (is.numeric(level)) level<-round(level,digits=2)
@@ -326,4 +326,5 @@
   }
   list(params,ftests)
 }
+
 

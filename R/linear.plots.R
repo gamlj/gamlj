@@ -3,7 +3,7 @@
 #### tracing factor "lines" (in any)
 #### errorType is an option for plotting error bars or CI. It can either  "" (empty) which
 #### means no bars or CI or any other string. The string will be used as
-#### the legend name and the function assumes that the data contains "lower" and "upper" varianbles
+#### the legend name and the function assumes that the data contains "lwr" and "upr" varianbles
 #### "theme" is passed from jmv plot function
 
 .twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none") {
@@ -17,7 +17,7 @@
   }
   
   
-    p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=mean, group=factor(lines), colour=lines)) +
+    p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=lines)) +
        geom_line(size=.8, position=dodge) +
        labs(x=groupName, y=depName, colour=paste(linesName, errorType,sep="\n")) +
        scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
@@ -25,10 +25,10 @@
     if (is.factor(image$state$data$group)) {
       p <- p + geom_point(shape=21, fill='white', size=3, position=dodge)
       if (errorType != '')
-          p <- p + geom_errorbar(aes(x=group, ymin=lower, ymax=upper, width=.1, group=lines), size=.8, position=dodge)
+          p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, width=.1, group=lines), size=.8, position=dodge)
    } else {
     if (errorType != '')
-     p <- p + geom_ribbon(aes(x=group, ymin=lower, ymax=upper,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
+     p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
    }
  p   
 }
@@ -42,8 +42,7 @@
     errorType<-""
     dodge <- ggplot2::position_dodge(0)
   }
-  
-  
+   print(image$state$data)
    p <- ggplot2::ggplot(data=image$state$data) +
         labs(x=groupName, y=depName, colour=paste("", errorType)) +
         scale_colour_manual(name=paste("", errorType), values=c(colour=theme$color[1]), labels='') +
@@ -51,14 +50,14 @@
 
 
   if (is.factor(image$state$data$group)) {
-      p <- p + geom_point(aes(x=group, y=mean, colour='colour'), shape=21, fill=theme$fill[1], size=3)
+      p <- p + geom_point(aes(x=group, y=fit, colour='colour'), shape=21, fill=theme$fill[1], size=3)
       p <- p+geom_line(aes(x=group,y=mean,group = 1)) 
       if (errorType != '')
-           p <- p + geom_errorbar(aes(x=group, ymin=lower, ymax=upper, colour='colour', width=.1), size=.8)
+           p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, colour='colour', width=.1), size=.8)
   }  else { 
-      p <- p+geom_line(aes(x=group,y=mean)) 
+      p <- p+geom_line(aes(x=group,y=fit)) 
       if (errorType != '')
-      p <- p + geom_ribbon(aes(x=group, ymin=lower, ymax=upper),show.legend=F, alpha=.3)
+      p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=F, alpha=.3)
   
   }
    p
@@ -77,13 +76,14 @@
         else {
              if (v %in% selected) {
                 if (v==groupName)
-                    ll[v]<-list(c(-2,-1,0,1,2)*sd(data[,v])+mean(data[,v]))
+                    ll[v]<-list(seq(-2,2,by = .1)*sd(data[,v])+mean(data[,v]))
                 else
                     ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
              } else 
                    ll[v]<-list(0)
         }
     }
+    
      dm<-expand.grid(ll)
      for (v in vars) {
          if (is.factor(data[,v]))
@@ -110,3 +110,57 @@
       }
       dm
 }
+
+
+lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none") {
+
+     selected<-c(groupName,linesName,plotsName)  
+     vars<-all.vars(terms(model))[-1]
+     data<-mf.getModelData(model)  
+     ll<-list()
+     for (v in vars) {
+          if (is.factor(data[,v])) 
+              ll[v]<-list(levels(data[,v]))
+          else {
+               if (v %in% selected) {
+                   if (v==groupName)
+                       ll[v]<-list(seq(-2,2,by=.05)*sd(data[,v])+mean(data[,v]))
+                   else
+                       ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
+               }
+               else 
+                   ll[v]<-list(0)
+          }
+     }
+     eg<-expand.grid(ll)
+     for (v in names(model$contrasts)) {
+          eg[,v]<-factor(eg[,v])
+     }
+     mm<-mf.predict(model,eg,bars)
+     dm<-as.data.frame(cbind(mm,eg))
+     print(names(mm))
+     print(names(eg))
+     names(dm)<-c(names(mm),names(eg))
+     if (length(selected)==1) 
+          by<-list(dm[,selected])
+     else 
+          by<-dm[,selected]
+     
+     what<-"fit"
+     if (bars!="none")
+        what<-c("fit","lwr","upr")
+     dm<-aggregate(dm[,what],by,mean)
+     lnames<-c("group","lines","plots")
+     names(dm)<-c(lnames[1:length(selected)],what)
+          
+     if (!is.null(dm$plots) & !is.factor(data[,plotsName])) {
+           dm$plots<-factor(dm$plots)
+       levels(dm$plots)<-c("-SD","Mean","+SD")
+       }
+  
+      if (!is.null(dm$lines) & !is.factor(data[,linesName])) {
+            dm$lines<-factor(dm$lines)
+            levels(dm$lines)<-c("-SD","Mean","+SD")
+        }
+        dm
+   } # end of .preparePlotData()
