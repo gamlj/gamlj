@@ -2,7 +2,7 @@
 name: gamljMixed
 title: Mixed Model
 menuGroup: Linear Models
-version: '0.1.0'
+version: '0.0.2'
 jas: '1.1'
 completeWhenFilled: false
 description:
