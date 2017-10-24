@@ -1,12 +1,12 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 0.0.2
+version: 0.0.3
 jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: '2017-10-10'
+date: '2017-10-25'
 type: R
 description: >-
   A suite for estimation of linear model, such as the general linear model,
