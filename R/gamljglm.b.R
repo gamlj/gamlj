@@ -2,7 +2,7 @@ library(ggplot2)
 
 #' @import ggplot2
 gamljGLMClass <- R6::R6Class(
-  "gamljGLM",
+  "gamljGLMClass",
   inherit = gamljGLMBase,
   private=list(
     .model=NA,
@@ -602,10 +602,10 @@ gamljGLMClass <- R6::R6Class(
 },
     .modelTerms=function() {
       modelTerms <- self$options$modelTerms
-# i removed the option of computing a full model if modelterm empty
-# because I need the the model to be well specified
-#      if (length(modelTerms) == 0)
-#        modelTerms <- as.formula(~1)
+      if (class(modelTerms)!="list")
+          modelTerms<-private$.ff()
+      # If we are in interactive mode the model should be well specified, otherwise (if R mode)
+      # no modelTerms means full model
       modelTerms
     },
     .ff=function() {
