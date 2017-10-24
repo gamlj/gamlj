@@ -11,7 +11,7 @@
 
 
 
-<title>GAMLj: Generale Analyses for the Linear Model in Jamovi</title>
+<title>Mixed Models module technical details</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,6 +19,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-1.1/highlight.js"></script>
@@ -162,6 +165,107 @@ $(document).ready(function () {
 
 
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -202,62 +306,25 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">GAMLj: Generale Analyses for the Linear Model in Jamovi</h1>
+<h1 class="title toc-ignore">Mixed Models module technical details</h1>
 
 </div>
 
 
-<p>General, Mixed and Generalized Models module for Jamovi</p>
-<p><img src="docs/i1.png" class="img-responsive" alt=""></p>
-<p>Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Model (the latter yet to be implemented) with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.</p>
+<div id="degrees-of-freedom" class="section level1">
+<h1>Degrees of freedom</h1>
+<p>As far as it is possible, inferential tests are based on an automatic selection of the degrees of freedom for the t-tests and the F-tests.</p>
 <ul>
-<li>ANOVA and Regression approach</li>
-<li>Continuous and categorical independent variables</li>
-<li>F-test and parameter estimates</li>
-<li>Confidence intervals</li>
-<li>Moderation made easy</li>
-<li>Simple slopes analysis</li>
-<li>Simple effects</li>
-<li>post-hocs analysis</li>
-<li>Plots for up two three-way interactions</li>
-<li>Automatic selection of best estimation methods and degrees of freedom selection</li>
-<li>Type III estimation</li>
+<li><p>For the t-tests the module relies on the Satherwaite approximation of degrees of freedom as it is implemented by the <a href="https://cran.r-project.org/web/packages/lmerTest/index.html">lmerTest package</a>. <code>Lmertest::summary()</code> produces t-test DF and p-values in the majority of cases. When the model does not converge, or some problems with the model occurs, the DF cannot be estimated and thus the p-values are not reported in the GLM parameter estimates table. A warning note is displayed in those cases. See details in <a href="https://cran.r-project.org/web/packages/lmerTest/index.html">lmerTest package</a>.</p></li>
+<li><p>For the F-tests of the main model (“Fixed Effects ANOVA”), the module relies again on the Satherwaite approximation of degrees of freedom as it is implemented by the <a href="https://cran.r-project.org/web/packages/lmerTest/index.html">lmerTest package</a>. <code>Lmertest::anova()</code> has difficulties in calculating F-test DF and p-values when the model does not converge, there are problems with the model random variances, or when numerical independent variables appear in interactions. When the <code>Lmertest::anova()</code> does not produce the DF and p-values, the module switches to <code>car::Anova(..,type=3, test=&quot;F&quot;)</code> function of the R <a href="https://cran.r-project.org/web/packages/car/index.html">car package</a>. <code>car::Anova(..,type=3, test=&quot;F&quot;)</code> implements the Kenward-Roger method for degrees of freedom. A warning note is displayed in those cases.</p></li>
+<li><p>For F-tests of simple effects the <code>car::Anova(..,type=3, test=&quot;F&quot;)</code> is always used, thus the the Kenward-Roger method for degrees of freedom is employed. This is because the <code>Lmertest::anova()</code> requires the factors contrasts to be <code>contr.sum()</code>, which does not allow to estimate simple effects. <code>car::Anova(..,type=3, test=&quot;F&quot;)</code> has not such a limitations, so it works fine for the purpose.</p></li>
 </ul>
-<p>Please visit the sub-mudule pages for details:</p>
-<ul>
-<li><a href="glm.html">GAMLj GLM</a></li>
-<li><a href="mixed.html">GAMLj Mixed models</a></li>
-<li><a href="gzlm.html">GAMLj Generalized Models</a></li>
-</ul>
-<div id="installation" class="section level1">
-<h1>Installation</h1>
-<div id="linux" class="section level2">
-<h2>Linux</h2>
-<p>If you are working in linux you can download <a href="https://www.jamovi.org/download.html">Jamovi</a>, then download the .jmo file in “dist” folder and install it from within <a href="https://www.jamovi.org/download.html">Jamovi</a>.</p>
-</div>
-<div id="others" class="section level2">
-<h2>Others</h2>
-<p>You will first need to download <a href="https://www.jamovi.org/download.html">Jamovi</a>.</p>
-<p>You can clone this repository and compile the module within R with</p>
-<pre><code>library(jmvtools)
-
-jmvtools::install()
-</code></pre>
-</div>
-</div>
-<div id="troubleshooting" class="section level1">
-<h1>Troubleshooting</h1>
-<p>The modules installs dependencies automatically, but in some R installations the process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if “pbkrtest” fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.</p>
-<pre><code>package&lt;-&quot;pbkrtest&quot;
-dirroot&lt;-YOURCLONEFOLDER
-instdir&lt;-paste0(dirroot,&quot;/build/R&quot;)
-install.packages(package,lib = instdir)
-
-</code></pre>
 </div>
 
 
 
+</div>
+</div>
 
 </div>
 
