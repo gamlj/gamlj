@@ -1,0 +1,17 @@
+.section h1 {
+  margin-top: -10px !important; 
+}
+
+.img-responsive {
+  padding: 15px;
+}
+
+.navbar-right a {
+    background-image: url("pics/GitHub-Mark-120px-plus.png");
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-position-y: center;
+    padding-right: 50px !important;
+}
+}

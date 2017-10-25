@@ -1,0 +1,8 @@
+---
+title: "Generalized linear models"
+output: html_document
+---
+
+Generalized Linear Model for jamovi
+
+yet to be implemented
