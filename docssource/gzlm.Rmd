@@ -5,4 +5,7 @@ output: html_document
 
 Generalized Linear Model for jamovi
 
-yet to be implemented
+<img src="gzlm/i1.png" class="img-responsive" alt="">
+
+
+Implemented but no documentation yet

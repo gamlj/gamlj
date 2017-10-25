@@ -95,26 +95,5 @@ Simple effects are computed following the same logic of the plots. They correspo
 
 print the means for the estimated values by groups (needs development)
 
-# Installation
 
-## Linux
-If you are working in linux, you can download the .jmo module file and install it from within  [Jamovi](https://www.jamovi.org/download.html)
-
-## Other
-
-You can clone this repository and compile the module within R with 
-
-```{r eval=FALSE}
-
-jmvtools::install() 
-
-```
-
-or, without cloning anything, just run this within R
-
-
-```{r eval=FALSE}
-library("devtools")
-install_github("mcfanda/gamlj_glm")
-```
 
