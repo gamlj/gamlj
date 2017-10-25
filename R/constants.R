@@ -1,6 +1,16 @@
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 
+MINFO<-list()
+MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
+                         "link"=c("Indentiy","Coefficients in the same scale of y"),
+                         "distribution"=c("Gaussian","Normal distribution of residual"))
+MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
+                        "link"=c("log","Coefficients are in the log(y) scale"),
+                        "distribution"=c("Poisson","Rare events distribution of y"))
+MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
+                         "link"=c("logit","Log of the odd of y=1 over y=0"),
+                         "distribution"=c("Bonomial","Dicotomous event distribution of y"))
 
 WARNS<-list()
 

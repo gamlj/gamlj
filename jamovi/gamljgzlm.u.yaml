@@ -80,22 +80,8 @@ children:
         margin: large
         style: list-inline
         children:
-          - name: effectSize_beta
+          - name: expb
             type: CheckBox
-            optionPart: beta
-            optionName: effectSize
-          - name: effectSize_eta
-            type: CheckBox
-            optionPart: eta
-            optionName: effectSize
-          - name: effectSize_partEta
-            type: CheckBox
-            optionPart: partEta
-            optionName: effectSize
-          - name: effectSize_omega
-            type: CheckBox
-            optionPart: omega
-            optionName: effectSize
       - type: Label
         label: Confidence Intervals
         margin: large

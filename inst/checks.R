@@ -21,9 +21,23 @@ dat$counts
 
 mm<-glm(counts~x,data = dat,family = poisson())
 summary(mm)
+mm$converged
 mm<-glm(dic~x,data = dat,family = binomial(link = "identity"))
 str(mm)
-glm(dic~x,data = dat,family = "binomial")
+dat$dic<-factor(dat$dic)
+dat$fc<-factor(dat$counts)
+dat$bfac<-factor(dat$bfac)
+model<-glm(dic~x+bfac*fc,data = dat,family = binomial())
+car::Anova(model,type=3,singular.ok=T)
+r.squared(mm)
+summary(model)
+mm$aic
+mm$deviance
+info<-MINFO[["linear"]]
+q$name
+q[["name"]][[1]]
+mm$converged
+
 mm$family$family
 a<-binomial()
 a$link

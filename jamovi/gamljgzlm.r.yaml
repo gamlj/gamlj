@@ -14,7 +14,11 @@ items:
          title: "Info"
        - name: value
          type: text
-         title: ""
+         title: "Value"
+       - name: comm
+         type: text
+         title: "Comment"
+         
       clearWith:
         - dep
         - factors
@@ -84,6 +88,8 @@ items:
         - name: expb
           title: exp(B)
           type: number
+          visible: (expb)
+
         - name: z
           title: z
           type: number
@@ -91,10 +97,6 @@ items:
           title: p
           type: number
           format: zto,pvalue
-        - name: beta
-          title: Beta
-          type: number
-          visible: (effectSize:beta)
 
     - name: simpleEffectsAnovas
       title: Simple Effects Analysis of Deviance

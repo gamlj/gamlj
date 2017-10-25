@@ -53,11 +53,16 @@ gamljGzlmClass <- R6::R6Class(
         factors <- self$options$factors
         modelTerms <- private$.modelTerms()
         infoTable<-self$results$info
-
-        infoTable$addRow(rowKey="mod",list(info="Model Type",value=modelType))
-        infoTable$addRow(rowKey="link",list(info="Link function",value=afamily$link))
-        infoTable$addRow(rowKey="family",list(info="Distribution",value=afamily$family))
+        info<-MINFO[[modelType]]
+        infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
+        infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
+        infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
+        infoTable$addRow(rowKey="r2",list(info="R-squared",comm="Proportion of reduction of error"))
         
+        infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
+        infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
+        infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
+                                          
         print(dep)
         if (length(modelTerms) == 0 | is.null(dep))
             return()
@@ -199,6 +204,8 @@ gamljGzlmClass <- R6::R6Class(
       private$.initDescPlots(data)
     },
     .run=function() {
+
+      STOP=FALSE
       print(".run")
       suppressWarnings({
         
@@ -228,7 +235,13 @@ gamljGzlmClass <- R6::R6Class(
           else if (length(lvls) == 0)
             reject("Factor '{}' contains no data", factorName=factorName)
         }
-        print(head(data[[dep]]))
+        
+        ### get the tables ####
+        anovaTable <- self$results$main
+        estimatesTable <- self$results$estimates
+        infoTable<-self$results$info
+        
+        ### estimate stuff
         formula <- jmvcore::constructFormula(dep, modelTerms)
         formula <- stats::as.formula(formula)
         model <- try(private$.estimate(formula, data))
@@ -237,17 +250,23 @@ gamljGzlmClass <- R6::R6Class(
           reject(message)
         }
         
+        
         private$.model <- model
         self$results$.setModel(model)
-
-          
+        
+        
+        infoTable$setRow(rowKey="r2",list(value=1-(model$deviance/model$null.deviance)))
+        infoTable$setRow(rowKey="aic",list(value=model$aic))
+        infoTable$setRow(rowKey="dev",list(value=model$deviance))
+        infoTable$setRow(rowKey="conv",list(value=ifelse(model$converged,"yes","no"),comm=ifelse(model$converged,"A solution was found","Results may be misleading")))
+        
           anovaResults <- try(mf.anova(model))
           if (isError(anovaResults)) {
             message <- extractErrorMessage(anovaResults)
-            reject(message)
+            anovaTable$setNote("anocrash",message)
+            STOP<-TRUE
           }
 
-        anovaTable <- self$results$main
         rowNames<-rownames(anovaResults)
         for (i in seq_along(rowNames)) {
           rowName <- rowNames[i]
@@ -261,32 +280,44 @@ gamljGzlmClass <- R6::R6Class(
 #        anovaTable$setRow(rowKey='',list(variable="Residuals",term="",ss=errSS,df=errdf,ms=errMS,F="",etaSqP="",etaSq="",omegaSq="",p=""))
 #        anovaTable$setNote("r2",paste("R-squared=",indices[[1]],", adjusted R-squared=",indices[[2]]))
 
-        estimatesTable <- self$results$estimates
+        
+        if (mf.aliased(model)) {
+          infoTable$setRow(rowKey="conv",list(comm="Results may be misleading because of aliased coefficients. See Tables notes"))
+          anovaTable$setNote("aliased",WARNS["ano.aliased"])    
+          estimatesTable$setNote("aliased",WARNS["ano.aliased"])    
+        }          
         
         parameters<-try(mf.summary(model))
         if (isError(parameters)) {
           message <- extractErrorMessage(parameters)
-          reject(parameters)
+          estimatesTable$setNote("sumcrash",message)
+          STOP<-T
         }
-        
+
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
-        ci<-mf.confint(model,level=ciWidth)
-        colnames(ci)<-c("cilow","cihig")
-        parameters<-cbind(parameters,ci) 
+        if (self$options$showParamsCI) {
+        citry<-try({
+          ci<-mf.confint(model,level=ciWidth)
+          colnames(ci)<-c("cilow","cihig")
+          parameters<-cbind(parameters,ci) 
+           })
+        if (isError(citry)) {
+          message <- extractErrorMessage(ci)
+          infoTable$setRow(rowKey="conv",list(value="no"))
+          estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+          STOP<-TRUE
+        }
+        }
+        
         labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
         for (i in 1:nrow(parameters)) {
           tableRow=parameters[i,]
           estimatesTable$setRow(rowNo=i,tableRow)
           estimatesTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
-          
           }
-        if (mf.aliased(model)) {
-          anovaTable$setNote("aliased",WARNS["ano.aliased"])    
-          estimatesTable$setNote("aliased",WARNS["ano.aliased"])    
-          
-        }          
-        
+        if (STOP)
+            return()
         private$.populateSimple(private$.model)
         private$.prepareDescPlots(private$.model)
         private$.populateLevenes(private$.model)

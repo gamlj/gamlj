@@ -128,24 +128,13 @@ options:
             `'1'`, `'2'` or `'3'` (default), the sum of squares
             to use
 
-    - name: effectSize
-      title: Effect Size
-      type: NMXList
-      options:
-          - name: eta
-            title: η²
-          - name: partEta
-            title: partial η²
-          - name: omega
-            title: ω²
-          - name: beta
-            title: β  
-            
-      default: 
+    - name: expb
+      title: Odd Ratios (expB)
+      type: Bool
+      default: true
       description:
           R: >
-            one or more of `'eta'`, `'partEta'`, or `'omega'`;
-            use η², partial η², and ω² effect sizes, respectively
+            `TRUE` (default) or `FALSE` , show expB in table
 
     - name: showParamsCI
       title: Show CI
@@ -153,7 +142,7 @@ options:
       default: true
       description:
           R: >
-            `TRUE` or `FALSE` (default), parameters CI in table
+            `TRUE` (default) or `FALSE` , parameters CI in table
 
 
     - name: paramCIWidth

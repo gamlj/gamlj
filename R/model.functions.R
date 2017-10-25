@@ -13,7 +13,7 @@
 }
 
 mf.aliased<-function(model) {
-  if (.which.class(model)=="lm") {  
+  if (.which.class(model)=="lm" || .which.class(model)=="glm") {  
   aliased<-alias(model)
   if (!is.null(aliased$Complete))
     return(TRUE)
@@ -123,12 +123,12 @@ mf.summary=function(model) {
 
 mf.anova=function(model) {
   if (.which.class(model)=="glm") {
-     ano<-car::Anova(model,test="LR",type=3)
+     ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
      return(ano)
   }
      
   if (.which.class(model)=="lm")
-    return(car::Anova(model,test="F",type=3))
+    return(car::Anova(model,test="F",type=3, singular.ok=T))
 }
 
 mf.lmeranova=function(model) {
