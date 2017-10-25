@@ -1,0 +1,22 @@
+---
+title: "Mixed Models module technical details"
+output: 
+  html_document:
+     toc: true
+     toc_float:
+        collapsed: false
+
+---
+
+
+# Degrees of freedom
+
+As far as it is possible, inferential tests are based on an automatic selection of the degrees of freedom for the t-tests and the F-tests. 
+
+* For the t-tests the module relies on the Satherwaite approximation of degrees of freedom as it is implemented by the [lmerTest package](https://cran.r-project.org/web/packages/lmerTest/index.html). `Lmertest::summary()` produces t-test DF and p-values in the majority of cases. When the model does not converge, or some problems with the model occurs, the DF cannot be estimated and thus the p-values are not reported in the GLM parameter estimates table. A warning note is displayed in those cases. See details in [lmerTest package](https://cran.r-project.org/web/packages/lmerTest/index.html).
+
+* For the F-tests of the main model ("Fixed Effects ANOVA"), the module relies again on the Satherwaite approximation of degrees of freedom as it is implemented by the [lmerTest package](https://cran.r-project.org/web/packages/lmerTest/index.html). `Lmertest::anova()` has difficulties in calculating F-test DF and p-values when the model does not converge, there are problems with the model random variances, or when numerical independent variables appear in interactions. When the `Lmertest::anova()`  does not produce the DF and p-values, the module switches to `car::Anova(..,type=3, test="F")` function of the R [car package](https://cran.r-project.org/web/packages/car/index.html). `car::Anova(..,type=3, test="F")` implements the Kenward-Roger method for degrees of freedom. A warning note is displayed in those cases.
+
+* For F-tests of simple effects the `car::Anova(..,type=3, test="F")` is always used, thus the the Kenward-Roger method for degrees of freedom is employed. This is because the `Lmertest::anova()` requires the factors contrasts to be `contr.sum()`, which does not allow to estimate simple effects. `car::Anova(..,type=3, test="F")` has not such a limitations, so it works fine for the purpose. 
+
+ 
