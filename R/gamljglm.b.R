@@ -646,46 +646,45 @@ gamljGLMClass <- R6::R6Class(
           array$addItem(level)
       }
     },
-    .prepareDescPlots=function(model) {
-  
-      depName <- self$options$dep
-      groupName <- self$options$plotHAxis
-      linesName <- self$options$plotSepLines
-      plotsName <- self$options$plotSepPlots
-      
-      ciWidth   <- self$options$ciWidth
-      errorBarType <- self$options$plotError
-      if (length(depName) == 0 || length(groupName) == 0)
-        return()
-      
-      plotData<-private$.preparePlotData(model)
-      
-      if (self$options$plotError != 'none') {
-        yAxisRange <- pretty(c(plotData$lower, plotData$upper))
-      } else {
-        yAxisRange <- plotData$mean
-      }
-      if (is.null(plotsName)) {
-        
-        image <- self$results$get('descPlot')
-        image$setState(list(data=plotData, range=yAxisRange))
-        
-      } else {
-        sepPlotsLevels<-levels(plotData$plots)
-        array <- self$results$descPlots
-        for (level in sepPlotsLevels)
-          array$addItem(paste(plotsName,"=",level))
 
-        images <- self$results$descPlots
-        
-        for (level in images$itemKeys) {
-          image <- images$get(key=level)
-          real<-gsub(paste(plotsName,"= "),"",level)
-          image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
-          
-        }
-      }
-    },
+.prepareDescPlots=function(model) {
+  
+  depName <- self$options$dep
+  groupName <- self$options$plotHAxis
+  linesName <- self$options$plotSepLines
+  plotsName <- self$options$plotSepPlots
+  errorBarType <- self$options$plotError
+
+  if (length(depName) == 0 || length(groupName) == 0)
+    return()
+  
+  plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+  
+  if (self$options$plotError != 'none') {
+    yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
+  } else {
+    yAxisRange <- plotData$fit
+  }
+
+  if (is.null(plotsName)) {
+    image <- self$results$get('descPlot')
+    image$setState(list(data=plotData, range=yAxisRange))
+    
+  } else {
+    
+    images <- self$results$descPlots
+    i<-1
+    levels<-levels(plotData$plots)
+    
+    for (key in images$itemKeys) {
+      real<-levels[i]
+      i<-i+1
+      image <- images$get(key=key)
+      image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
+    }
+  }
+  
+},
 
 .descPlot=function(image, ggtheme, theme, ...) {
   library(ggplot2)
@@ -697,18 +696,21 @@ gamljGLMClass <- R6::R6Class(
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
   errorType <- self$options$plotError
+  ciWidth   <- self$options$ciWidth
+  
+  if (errorType=="ci")
+    errorType<-paste0(ciWidth,"% ",toupper(errorType))
   
   if ( ! is.null(linesName)) {
     p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
   } else {
     p<-.oneWayPlot(image,theme,depName,groupName,errorType)
-  }      
+  }       
   p<-p+ggtheme
   print(p)
   TRUE
 },
-
-    .qqPlot=function(image, ggtheme, theme, ...) {
+.qqPlot=function(image, ggtheme, theme, ...) {
       library(ggplot2)
       dep <- self$options$dep
       factors <- self$options$factors
