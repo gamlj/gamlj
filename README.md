@@ -2,7 +2,7 @@
 
 General, Mixed and Generalized Models module for Jamovi
 
-version 0.0.3
+version 0.0.5
 
 <img src="docs/i1.png" class="img-responsive" alt="">
 

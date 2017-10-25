@@ -567,65 +567,73 @@ gamljMixedClass <- R6::R6Class(
          }
         }
   },
+.prepareDescPlots=function(model) {
   
-    .preparePlots=function(model) {
+  depName <- self$options$dep
+  groupName <- self$options$plotHAxis
+  linesName <- self$options$plotSepLines
+  plotsName <- self$options$plotSepPlots
+  errorBarType <- self$options$plotError
+  modelType <- self$options$modelSelection
+  
+  if (length(depName) == 0 || length(groupName) == 0)
+    return()
+  
+  plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+  
+  if (self$options$plotError != 'none') {
+    yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
+  } else {
+    yAxisRange <- plotData$fit
+  }
     
-       depName <- self$options$dep
-       groupName <- self$options$plotHAxis
-       linesName <- self$options$plotSepLines
-       plotsName <- self$options$plotSepPlots
-#    error<-self$options$plotError
-    error<-"none"
-    ciWidth   <- 0
-    errorBarType <- "none"
-    if (length(depName) == 0 || length(groupName) == 0)
-      return()
-    
-    plotData<-.preparePlotData(model,groupName,linesName,plotsName)
-    
-    if (error != 'none') {
-      yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
-    } else {
-      yAxisRange <- plotData$mean
-    }
+    errorBarType<-"none"
+
     if (is.null(plotsName)) {
-      image <- self$results$get('descPlot')
-      image$setState(list(data=plotData, range=yAxisRange))
-      
-    } else {
-
-      images <- self$results$descPlots
-      i<-1
-      levels<-levels(plotData$plots)
-
-      for (key in images$itemKeys) {
-        real<-levels[i]
-        i<-i+1
-        image <- images$get(key=key)
-        image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
-      }
-    }
-  },
-    .descPlot=function(image, ggtheme, theme, ...) {
-       library(ggplot2)
-         if (is.null(image$state))
-             return(FALSE)
+    image <- self$results$get('descPlot')
+    image$setState(list(data=plotData, range=yAxisRange))
     
-    depName <- self$options$dep
-    groupName <- self$options$plotHAxis
-    linesName <- self$options$plotSepLines
-    plotsName <- self$options$plotSepPlots
+  } else {
+    
+    images <- self$results$descPlots
+    i<-1
+    levels<-levels(plotData$plots)
+    
+    for (key in images$itemKeys) {
+      real<-levels[i]
+      i<-i+1
+      image <- images$get(key=key)
+      image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
+    }
+  }
+  
+},
 
-    if ( ! is.null(linesName)) {
-      p<-.twoWaysPlot(image,theme,depName,groupName,linesName)
-    } else {
-      p<-.oneWayPlot(image,theme,depName,groupName)
-    }      
-      p<-p+ggtheme
-      print(p)
-    TRUE
-  },
-    .populateSimple=function(model) {
+.descPlot=function(image, ggtheme, theme, ...) {
+  library(ggplot2)
+  if (is.null(image$state))
+    return(FALSE)
+  
+  depName <- self$options$dep
+  groupName <- self$options$plotHAxis
+  linesName <- self$options$plotSepLines
+  plotsName <- self$options$plotSepPlots
+  errorType <- self$options$plotError
+  ciWidth   <- self$options$ciWidth
+  
+  if (errorType=="ci")
+    errorType<-paste0(ciWidth,"% ",toupper(errorType))
+  
+  if ( ! is.null(linesName)) {
+    p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
+  } else {
+    p<-.oneWayPlot(image,theme,depName,groupName,errorType)
+  }       
+  p<-p+ggtheme
+  print(p)
+  TRUE
+},
+.populateSimple=function(model) {
       print(".populateSimple")
       ### This should be fairly automatic for linear models 
       ### but the columns of the F table should be updated
