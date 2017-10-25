@@ -17,6 +17,8 @@ dat<-read.csv2("data/dat3x2x2_mixed.csv")
 dat<-read.csv("data/generalized.csv")
 dat$counts<-factor(dat$counts)
 jmvcore::toNumeric(dat$counts)
+dat$counts
+
 mm<-glm(counts~x,data = dat,family = poisson())
 summary(mm)
 mm<-glm(dic~x,data = dat,family = binomial(link = "identity"))
