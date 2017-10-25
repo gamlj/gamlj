@@ -11,6 +11,7 @@ gamljGzlmClass <- R6::R6Class(
 
         print("cleandata")      
         dep <- self$options$dep
+        modelType<-self$options$modelSelection
 
         covs <- NULL
         if ('covs' %in% names(self$options))
@@ -21,13 +22,10 @@ gamljGzlmClass <- R6::R6Class(
            factors <- self$options$factors
       
         data <- self$data
- 
-#        if ( ! is.null(dep))
-#           data[[dep]] <- jmvcore::toNumeric(data[[dep]])
-
         for (factor in factors) {
-            data[[factor]] <- as.factor(data[[factor]])
+          data[[factor]] <- as.factor(data[[factor]])
         }
+        
       
         for (contrast in self$options$contrasts) {
             levels <- base::levels(data[[contrast$var]])
@@ -46,16 +44,21 @@ gamljGzlmClass <- R6::R6Class(
     .init=function() {
         
         print("init")      
-       
+        modelType<-self$options$modelSelection
+        afamily<-mf.give_family(modelType)
+        if (is.null(afamily))
+            return()
         dep <- self$options$dep
+        print(dep)
         factors <- self$options$factors
         modelTerms <- private$.modelTerms()
         infoTable<-self$results$info
 
-        infoTable$addRow(rowKey="mod",list(info="Model Type",value="Logistic Regression"))
-        infoTable$addRow(rowKey="link",list(info="Link function",value="Logit"))
-        infoTable$addRow(rowKey="family",list(info="Distribution",value="binomial"))
+        infoTable$addRow(rowKey="mod",list(info="Model Type",value=modelType))
+        infoTable$addRow(rowKey="link",list(info="Link function",value=afamily$link))
+        infoTable$addRow(rowKey="family",list(info="Distribution",value=afamily$family))
         
+        print(dep)
         if (length(modelTerms) == 0 | is.null(dep))
             return()
         
@@ -202,6 +205,8 @@ gamljGzlmClass <- R6::R6Class(
         dep <- self$options$dep
         factors <- self$options$factors
         covs<-self$options$covs
+        modelType<-self$options$modelSelection
+        
         modelTerms <- private$.modelTerms()
         
         if (is.null(dep) ||  length(modelTerms) == 0)
@@ -210,6 +215,10 @@ gamljGzlmClass <- R6::R6Class(
         base::options(contrasts = c("contr.sum","contr.poly"))
         
         data <- private$.cleanData()
+        #### more cleaning ####
+        data<-mf.checkData(dep,data,modelType)
+        if (!is.data.frame(data))
+               reject(data)
         
 
         for (factorName in factors) {
@@ -219,6 +228,7 @@ gamljGzlmClass <- R6::R6Class(
           else if (length(lvls) == 0)
             reject("Factor '{}' contains no data", factorName=factorName)
         }
+        print(head(data[[dep]]))
         formula <- jmvcore::constructFormula(dep, modelTerms)
         formula <- stats::as.formula(formula)
         model <- try(private$.estimate(formula, data))
@@ -567,7 +577,8 @@ gamljGzlmClass <- R6::R6Class(
 ##### model local function #########
 #### we need an .estimate() here ###
      .estimate=function(form,data) {
-        stats::glm(form,data,family=binomial(link = "logit"))
+        modelType<-self$options$modelSelection
+        stats::glm(form,data,family=mf.give_family(modelType))
       },
 
     .modelTerms=function() {
@@ -604,18 +615,21 @@ gamljGzlmClass <- R6::R6Class(
       
       self$results$get('descPlot')$setVisible( ! isMulti && isAxis)
       self$results$get('descPlots')$setVisible(isMulti)
-      
+
       if (isMulti) {
-        return()    
         sepPlotsName <- self$options$plotSepPlots
         sepPlotsVar <- data[[sepPlotsName]]
         if(is.factor(sepPlotsVar))
-             sepPlotsLevels <- 1:length(levels(sepPlotsVar))
-        else sepPlotsLevels <- c(1,2,3)   
+          sepPlotsLevels <- levels(sepPlotsVar)
+        else 
+          sepPlotsLevels <- c(1,2,3)   
         array <- self$results$descPlots
-        for (level in sepPlotsLevels)
-          array$addItem(level)
+        for (level in sepPlotsLevels) {
+          title<-paste(sepPlotsName,"=",level)
+          array$addItem(title)
+        }
       }
+      
     },
     .prepareDescPlots=function(model) {
   
@@ -623,9 +637,9 @@ gamljGzlmClass <- R6::R6Class(
       groupName <- self$options$plotHAxis
       linesName <- self$options$plotSepLines
       plotsName <- self$options$plotSepPlots
-      
-      ciWidth   <- self$options$ciWidth
       errorBarType <- self$options$plotError
+      modelType <- self$options$modelSelection
+      
       if (length(depName) == 0 || length(groupName) == 0)
         return()
       
@@ -636,27 +650,28 @@ gamljGzlmClass <- R6::R6Class(
       } else {
         yAxisRange <- plotData$fit
       }
-      yAxisRange<-c(0,1)
+      if (modelType=="logistic") 
+          yAxisRange<-c(0,1)
+
+      
       if (is.null(plotsName)) {
-        
         image <- self$results$get('descPlot')
         image$setState(list(data=plotData, range=yAxisRange))
         
       } else {
-        sepPlotsLevels<-levels(plotData$plots)
-        array <- self$results$descPlots
-        for (level in sepPlotsLevels)
-          array$addItem(paste(plotsName,"=",level))
-
-        images <- self$results$descPlots
         
-        for (level in images$itemKeys) {
-          image <- images$get(key=level)
-          real<-gsub(paste(plotsName,"= "),"",level)
+        images <- self$results$descPlots
+        i<-1
+        levels<-levels(plotData$plots)
+        
+        for (key in images$itemKeys) {
+          real<-levels[i]
+          i<-i+1
+          image <- images$get(key=key)
           image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
-          
         }
       }
+      
     },
     .descPlot=function(image, ggtheme, theme, ...) {
          library(ggplot2)
@@ -668,7 +683,11 @@ gamljGzlmClass <- R6::R6Class(
          linesName <- self$options$plotSepLines
          plotsName <- self$options$plotSepPlots
          errorType <- self$options$plotError
-         print(image$state$data)
+         ciWidth   <- self$options$ciWidth
+         
+         if (errorType=="ci")
+             errorType<-paste0(ciWidth,"% ",toupper(errorType))
+
          if ( ! is.null(linesName)) {
              p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
          } else {

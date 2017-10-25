@@ -11,33 +11,36 @@ confint(model,level = 0.95)
 
 dat<-read.csv2("data/dat3x2x2_mixed.csv")
 
-dat$wfac<-factor(dat$wfac)
-dat$wfac3<-factor(dat$wfac3)
-contrasts(dat$wfac)<-contr.sum(2)
-contrasts(dat$wfac3)<-contr.sum(3)
-dat$bfac<-factor(dat$bfac)
-contrasts(dat$bfac)<-contr.sum(2)
-dat$cluster<-factor(dat$cluster)
 
-model<-glm(bfac~wfac3*x,data=dat,family = binomial(link = "logit"))
-confint(model)
-(ss<-summary(model))
-ss$coefficients
-car::Anova(model,type=3,test="LR")
-car::Anova(model,type=3,test="Wald")
-glmmodel$model
-model$family
-model2<-glm(bfac~x,data=dat,family = binomial())
-.which.class(model)
-mf.anova(model)
-q<-mf.summary(model)
-class(q)
-qq<-car::Anova(model)
-class(qq)
-model<-lm(y~wfac,data=dat)
-qdat<-mf.predict(model2,bars="none")
-head(qdat)
-names(qdat)
-qdat<-mf.predict(model,bars="none")
-qdat<-mf.predict(lmer(y~(1|cluster)+x,data=dat),bars="ci")
-head(qdat)
+## model logistic #####
+
+dat<-read.csv("data/generalized.csv")
+dat$counts<-factor(dat$counts)
+jmvcore::toNumeric(dat$counts)
+mm<-glm(counts~x,data = dat,family = poisson())
+summary(mm)
+mm<-glm(dic~x,data = dat,family = binomial(link = "identity"))
+str(mm)
+glm(dic~x,data = dat,family = "binomial")
+mm$family$family
+a<-binomial()
+a$link
+# x<-rnorm(100,0,1)
+# w<-rnorm(100,0,1)
+# bfac<-replicate(100,sample(2,1))
+# bfac<-bfac-1.5
+# y<-bfac*x+w+x*w+rnorm(100,0,.7)
+# #y<-(y-min(y))/(max(y)-min(y))
+# hist(y)
+# summary(lm(y~x*w*bfac))
+# p<-exp(y)/(1+exp(y))
+# dic<-as.numeric(p>.5)
+# bfac<-factor(bfac)
+# contrasts(bfac)<-contr.sum(2)
+# model<-glm(dic~x*w*bfac,family = binomial())
+# summary(model)
+#x<-x+10
+#w<-(w)*13+100
+#dat<-cbind(dic,y,w,x,bfac)
+
+#write.csv(dat,"data/logistic.csv",row.names = F)

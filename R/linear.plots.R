@@ -15,11 +15,11 @@
     errorType<-""
     dodge <- ggplot2::position_dodge(0)
   }
-  
-  
+   
+    clabel<-paste(linesName, paste0("(",errorType,")"),sep="\n")
     p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=lines)) +
        geom_line(size=.8, position=dodge) +
-       labs(x=groupName, y=depName, colour=paste(linesName, errorType,sep="\n")) +
+       labs(x=groupName, y=depName, colour=paste0(linesName,"\n(",errorType,")")) +
        scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
 
     if (is.factor(image$state$data$group)) {
@@ -42,22 +42,22 @@
     errorType<-""
     dodge <- ggplot2::position_dodge(0)
   }
-   print(image$state$data)
-   p <- ggplot2::ggplot(data=image$state$data) +
-        labs(x=groupName, y=depName, colour=paste("", errorType)) +
-        scale_colour_manual(name=paste("", errorType), values=c(colour=theme$color[1]), labels='') +
+
+     p <- ggplot2::ggplot(data=image$state$data) +
+        labs(x=groupName, y=depName, colour=errorType) +
+        scale_colour_manual(name=errorType, values=c(colour=theme$color[1]), labels='') +
         scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
 
 
   if (is.factor(image$state$data$group)) {
       p <- p + geom_point(aes(x=group, y=fit, colour='colour'), shape=21, fill=theme$fill[1], size=3)
-      p <- p+geom_line(aes(x=group,y=mean,group = 1)) 
+      p <- p+geom_line(aes(x=group,y=fit,group = 1)) 
       if (errorType != '')
            p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, colour='colour', width=.1), size=.8)
   }  else { 
       p <- p+geom_line(aes(x=group,y=fit)) 
       if (errorType != '')
-      p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=F, alpha=.3)
+      p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=T, alpha=.3)
   
   }
    p
@@ -138,8 +138,6 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
      }
      mm<-mf.predict(model,eg,bars)
      dm<-as.data.frame(cbind(mm,eg))
-     print(names(mm))
-     print(names(eg))
      names(dm)<-c(names(mm),names(eg))
      if (length(selected)==1) 
           by<-list(dm[,selected])

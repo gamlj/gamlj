@@ -43,6 +43,24 @@ options:
       description:
           R: the data as a data frame
 
+
+    - name: modelSelection
+      title: Model Selection
+      type: List
+      options:
+        - name: linear
+          title: Linear
+        - name: poisson
+          title: Poisson
+        - name: logistic
+          title: Logistic
+        - name: multinomial
+          title: Multinomial
+      default: linear
+      description:
+          R: >
+            Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
+
     - name: dep
       title: Dependent Variable
       type: Variable

@@ -3,8 +3,43 @@ title: Generalized Linear Models
 jus: '2.0'
 compilerMode: tame
 events:
-  update: './glm.events::update'
+  update: './gzlm.events::update'
 children:
+  - type: LayoutBox
+    margin: large
+    style: inline
+    children:
+       - type: Label
+         label: Continuous dependent variable
+         children:
+             - type: RadioButton
+               name: modelSelection_linear
+               optionName: modelSelection
+               optionPart: linear
+               events:
+                 change: './gzlm.events::onChange_model'
+             - type: RadioButton
+               name: modelSelection_poisson
+               optionName: modelSelection
+               optionPart: poisson
+               events:
+                 change: './gzlm.events::onChange_model'
+
+       - type: Label
+         label: Categorical dependent variable
+         children:
+            - type: RadioButton
+              name: modelSelection_logistic
+              optionName: modelSelection
+              optionPart: logistic
+              events:
+                 change: './gzlm.events::onChange_model'
+            - type: RadioButton
+              name: modelSelection_multinomial
+              optionName: modelSelection
+              optionPart: multinomial
+      
+
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -27,7 +62,7 @@ children:
             name: factors
             isTarget: true
             events:
-              change: './glm.events::onChange_factors'
+              change: './gzlm.events::onChange_factors'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
@@ -35,7 +70,7 @@ children:
             height: small
             isTarget: true
             events:
-              change: './glm.events::onChange_covariates'
+              change: './gzlm.events::onChange_covariates'
   - type: LayoutBox
     margin: large
     style: inline
@@ -97,7 +132,7 @@ children:
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './glm.events::onChange_modelTerms'
+                  change: './gzlm.events::onChange_modelTerms'
                 template:
                   type: TermLabel
       - type: Label
@@ -181,7 +216,7 @@ children:
         stretchFactor: 1
         format: term
         events:
-          change: './glm.events::onChange_postHocSupplier'
+          change: './gzlm.events::onChange_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
@@ -229,7 +264,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './glm.events::onChange_plotsSupplier'
+          change: './gzlm.events::onChange_plotsSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -286,7 +321,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './glm.events::onChange_simpleSupplier'
+          change: './gzlm.events::onChange_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:

@@ -200,3 +200,38 @@ mf.confint<-function(model,level) {
   }
   
 }
+
+mf.give_family<-function(modelSelection) {
+  
+  if (modelSelection=="linear")
+       return(gaussian())
+  if (modelSelection=="logistic")
+       return(binomial())
+  if (modelSelection=="poisson")
+    return(poisson())
+  
+  
+  NULL  
+}
+
+mf.checkData<-function(dep,data,modelType) {
+  
+     if (modelType=="linear")
+       ### here I need the dv to be really numeric
+       data[[dep]] <- as.numeric(as.character(data[[dep]]))  
+     
+     if  (modelType=="poisson") {
+         ### here I need the dv to be really numeric
+       data[[dep]] <- as.numeric(as.character(data[[dep]]))
+       if (any(data[[dep]]<0))
+             return("Poisson model requires all positive numbers in the dependent variable")
+     }
+      if (modelType=="logistic") {
+          data[[dep]] <- factor(data[[dep]])
+          if (length(levels(data[[dep]]))!=2)
+               return("Logistic model requires two levels in the dependent variable")
+      } 
+     if (modelType=="multinomial")
+            data[[dep]] <- factor(data[[dep]])
+     data
+}

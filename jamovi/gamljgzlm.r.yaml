@@ -20,6 +20,7 @@ items:
         - factors
         - cov
         - modelTerms
+        - modelSelection
 
     - name: main
       title: "Analisys of Deviance: Omnibus Tests"
