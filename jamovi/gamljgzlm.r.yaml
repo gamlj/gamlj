@@ -1,13 +1,35 @@
 ---
-name:  gamljGLM
-title: GLM
+name:  gamljGzml
+title: Generalized Linear Models
 jrs: '1.0'
 
 items:
-    - name: main
-      title: ANOVA
+
+    - name: info
+      title: Model Info
       type: Table
-      description: a table of ANOVA results
+      columns:
+       - name: info
+         type: text
+         title: "Info"
+       - name: value
+         type: text
+         title: "Value"
+       - name: comm
+         type: text
+         title: "Comment"
+         
+      clearWith:
+        - dep
+        - factors
+        - cov
+        - modelTerms
+        - modelSelection
+
+    - name: main
+      title: "Analisys of Deviance: Omnibus Tests"
+      type: Table
+      description: a table of Chi-square tests results
       clearWith:
         - dep
         - modelTerms
@@ -18,44 +40,19 @@ items:
           title: ""
           type: text
 
-        - name: ss
-          title: Sum of Squares
+        - name: test
+          title: X²
           type: number
 
         - name: df
           title: df
           type: integer
 
-        - name: ms
-          title: Mean Square
-          type: number
-
-        - name: F
-          title: F
-          type: number
-
         - name: p
           title: p
           type: number
           format: zto,pvalue
 
-        - name: etaSq
-          title: η²
-          type: number
-          visible: (effectSize:eta)
-          format: zto
-
-        - name: etaSqP
-          title: η²p
-          type: number
-          visible: (effectSize:partEta)
-          format: zto
-
-        - name: omegaSq
-          title: ω²
-          type: number
-          visible: (effectSize:omega)
-          format: zto
 
     - name: estimates
       title: Model Coefficients (Parameter Estimates)
@@ -77,7 +74,7 @@ items:
         - name: estimate
           title: Estimate
           type: number
-        - name: std
+        - name: se
           title: SE
           type: number
         - name: cilow
@@ -88,23 +85,23 @@ items:
           type: number
           title: Upper
           visible: (showParamsCI)
-        - name: t
-          title: t
+        - name: expb
+          title: exp(B)
           type: number
+          visible: (expb)
 
+        - name: z
+          title: z
+          type: number
         - name: p
           title: p
           type: number
           format: zto,pvalue
-        - name: beta
-          title: Beta
-          type: number
-          visible: (effectSize:beta)
 
     - name: simpleEffectsAnovas
-      title: Simple Effects ANOVA
+      title: Simple Effects Analysis of Deviance
       type: Array
-      description: an array of simple Effects ANOVA tables
+      description: an array of simple Effects Chisquared test tables
       visible: (simpleVariable)
       clearWith:
         - dep
@@ -118,18 +115,15 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
-          - name: ss
-            title: Sum of Squares
+          - name: test
+            title: X² 
             type: number
-          - name: df
+          - name: df 
             title: df
             type: integer
-          - name: F
-            title: F
-            type: number
           - name: p
             title: p
             type: number
@@ -154,16 +148,19 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: estimate
             title: "Estimate"
-          - name: std
+          - name: se
             title: SE
             type: number
-          - name: t
-            title: t
+          - name: expb
+            title: exp(B)
+            type: number
+          - name: z
+            title: z
             type: number
           - name: p
             title: p

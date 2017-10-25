@@ -9,38 +9,54 @@ contrasts(dat$threegroups)<-contr.sum(3)
 model<-lm(y~threegroups*twogroups,data=dat)
 confint(model,level = 0.95)
 
-dat<-read.csv("data/dat3x2x2_mixed.csv")
-dat$wfac<-factor(dat$wfac)
-dat$wfac3<-factor(dat$wfac3)
-contrasts(dat$wfac)<-contr.sum(2)
-contrasts(dat$wfac3)<-contr.sum(3)
+dat<-read.csv2("data/dat3x2x2_mixed.csv")
+
+
+## model logistic #####
+
+dat<-read.csv("data/generalized.csv")
+dat$counts<-factor(dat$counts)
+jmvcore::toNumeric(dat$counts)
+dat$counts
+
+mm<-glm(counts~x,data = dat,family = poisson())
+summary(mm)
+mm$converged
+mm<-glm(dic~x,data = dat,family = binomial(link = "identity"))
+str(mm)
+dat$dic<-factor(dat$dic)
+dat$fc<-factor(dat$counts)
 dat$bfac<-factor(dat$bfac)
-contrasts(dat$bfac)<-contr.sum(2)
-dat$cluster<-factor(dat$cluster)
-r.squared(model1)
-dat$x<-as.numeric(scale(dat$x))
-model1<-lmer(y~(1|cluster)+bfac*wfac,data=dat,REML = F)
-model2<-lmer(y~(1|cluster),data=dat,REML = T)
-q<-mf.lmeranova(model1)
-str(q)
-model<-model1
-ss<-summary(model2)
-drop1(model,.~.,test="Chisq")
-str(ano)
-
-
-attr(ano,"method")
-th <- getME(model1,"theta")
-which(th==0)
+model<-glm(dic~x+bfac*fc,data = dat,family = binomial())
+car::Anova(model,type=3,singular.ok=T)
+r.squared(mm)
 summary(model)
-library(car)
-car::Anova(model,type=3,test="F")
-eresults<-ss[['coefficients']]
-ci<-confint(model,method="Wald")
-ci<-ci[!is.na(ci[,1]),]
-if (is.null(dim(ci)))
-  ci<-matrix(ci,ncol=2)
-ci
-cbind(eresults,ci)
-dim(ci)
-dim(eresults)
+mm$aic
+mm$deviance
+info<-MINFO[["linear"]]
+q$name
+q[["name"]][[1]]
+mm$converged
+
+mm$family$family
+a<-binomial()
+a$link
+# x<-rnorm(100,0,1)
+# w<-rnorm(100,0,1)
+# bfac<-replicate(100,sample(2,1))
+# bfac<-bfac-1.5
+# y<-bfac*x+w+x*w+rnorm(100,0,.7)
+# #y<-(y-min(y))/(max(y)-min(y))
+# hist(y)
+# summary(lm(y~x*w*bfac))
+# p<-exp(y)/(1+exp(y))
+# dic<-as.numeric(p>.5)
+# bfac<-factor(bfac)
+# contrasts(bfac)<-contr.sum(2)
+# model<-glm(dic~x*w*bfac,family = binomial())
+# summary(model)
+#x<-x+10
+#w<-(w)*13+100
+#dat<-cbind(dic,y,w,x,bfac)
+
+#write.csv(dat,"data/logistic.csv",row.names = F)

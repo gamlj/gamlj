@@ -22,11 +22,12 @@ install.packages("htmltools",lib = instdir)
 install.packages("data.table",lib = instdir)
 
 install.packages("car",lib = instdir)
-#jmvtools::check("/home/marcello/LocalForge/jamovi/")
-#install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
+jmvtools::check("/home/marcello/LocalForge/jamovi/")
+install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
 
-jmvtools::check()
-install()
+#jmvtools::check()
+#install()
 #jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library"    
 #install.packages("stats",lib = jpath)
 R.version
+
