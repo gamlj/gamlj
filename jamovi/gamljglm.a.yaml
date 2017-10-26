@@ -273,13 +273,36 @@ options:
             `'holm'`; provide no, Tukey, Scheffe, Bonferroni, and
             Holm Post Hoc corrections respectively
 
-    - name: descStats
-      title: Descriptive statistics
+    - name: odescMain
+      title: main effects
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide descriptive statistics
+    - name: odescInter
+      title: interaction effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+
+    - name: edescMain
+      title: main effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+    - name: edescInter
+      title: interaction effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+
 
     - name: homo
       title: Residual Variances Homogeneity tests

@@ -303,7 +303,7 @@ gamljGLMClass <- R6::R6Class(
         private$.prepareDescPlots(private$.model)
         private$.populateLevenes(private$.model)
         private$.populatePostHoc(data)
-        private$.populateDescriptives(data)
+        private$.populateDescriptives(model)
         
       }) # suppressWarnings
     },
@@ -476,31 +476,45 @@ gamljGLMClass <- R6::R6Class(
         df2=result[2,'Df'],
         p=result[1,'Pr(>F)']))
     },
-    .populateDescriptives=function(data) {
+    .populateDescriptives=function(model) {
+      data<-mf.getModelData(model)
+      dep<-self$options$dep
+      terms<-private$.modelTerms()
       
-      if ( ! self$options$descStats)
-        return()
-      if (length(self$options$factors)==0)
-        return()
+      lf.meansTablesMain<-function(dep,model,terms) {
+        data<-mf.getModelData(model)
+        factorsAvailable<-mf.getModelFactors(model)
+        dependent <- data[[dep]]
+        tables<-list()
+        for (term in terms)
+           if (term %in% factorsAvailable) {
+              factor <- lapply(term, function(t) data[,t])
+              means <- aggregate(dependent, by=factor, base::mean)
+              mean<-means$x
+              sds <- aggregate(dependent, by=factor, stats::sd)
+              sd<- sds$x
+              ns <- aggregate(dependent, by=factor, base::length)
+              ns<-ns$x
+              stat <- data.frame(cbind(mean,sd, ns),stringsAsFactors = F)
+              tables[[length(tables)+1]]<-stat
+            }    
+        tables
+    }
+
+      meanTables<-self$results$omeansTables
+      tables<-lf.meansTablesMain(dep,model,terms)  
+            for (table in tables)  {
+              aTable<-meanTables$addItem(key="a")
+              for (i in seq_len(nrow(table))) {
+                  values<-as.data.frame(table[i,])
+                  print(values)
+                  aTable$addRow(rowKey=i,values)
+              }
+            }
+              
       
-      descTable <- self$results$desc
-      dep <- self$options$dep
-      dependent <- data[[dep]]
-      factorNames <- rev(self$options$factors)
-      factors <- as.list(select(data, factorNames))
-      
-      means <- aggregate(dependent, by=factors, base::mean)
-      sds    <- aggregate(dependent, by=factors, stats::sd)
-      ns <- aggregate(dependent, by=factors, base::length)
-      
-      stat <- data.frame(mean=means$x, sd=sds$x, n=ns$x)
-      
-      for (i in seq_len(nrow(stat))) {
-        values <- stat[i,]
-        values[is.na(values)] <- NaN
-        descTable$setRow(rowNo=i, values)
-      }
-      
+
+
     },
     .populateSimple=function(model) {
         variable<-self$options$simpleVariable
@@ -640,7 +654,7 @@ gamljGLMClass <- R6::R6Class(
         sepPlotsVar <- data[[sepPlotsName]]
         if(is.factor(sepPlotsVar))
              sepPlotsLevels <- 1:length(levels(sepPlotsVar))
-        else sepPlotsLevels <- c(1,2,3)   
+        else sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
         array <- self$results$descPlots
         for (level in sepPlotsLevels)
           array$addItem(level)
@@ -675,7 +689,7 @@ gamljGLMClass <- R6::R6Class(
     images <- self$results$descPlots
     i<-1
     levels<-levels(plotData$plots)
-    
+  
     for (key in images$itemKeys) {
       real<-levels[i]
       i<-i+1

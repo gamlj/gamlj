@@ -255,11 +255,34 @@ items:
             - dep
             - modelTerms
 
+    - name: omeansTables
+      title: Observed Means 
+      type: Array
+      description: an array of observed mean main effects tables
+      visible: (odescMain)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Main effects of - $key
+        type: Table
+        columns:
+        - name: 'n'
+          title: 'N'
+          type: integer
+
+        - name: mean
+          title: Mean
+          type: text
+
+        - name: sd
+          title: SD
+          type: number
+
     - name: desc
       title: Descriptives
       type: Table
       description: a table of descriptives
-      visible: (descStats)
       clearWith:
         - dep
         - modelTerms
@@ -277,7 +300,6 @@ items:
         - name: sd
           title: SD
           type: number
-
 
 
     - name: descPlot

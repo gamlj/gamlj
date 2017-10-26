@@ -653,7 +653,8 @@ gamljGzlmClass <- R6::R6Class(
         if(is.factor(sepPlotsVar))
           sepPlotsLevels <- levels(sepPlotsVar)
         else 
-          sepPlotsLevels <- c(1,2,3)   
+          sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
+        
         array <- self$results$descPlots
         for (level in sepPlotsLevels) {
           title<-paste(sepPlotsName,"=",level)

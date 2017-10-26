@@ -309,12 +309,25 @@ children:
 
 
   - type: CollapseBox
-    label: Additional Options
+    label: Means Tables
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: Display
-        children:
-          - type: CheckBox
-            name: descStats
+     - type: LayoutBox
+       margin: large
+       style: inline
+       children:
+        - type: Label
+          label: Observed means for
+          children:
+           - type: CheckBox
+             name: odescMain
+           - type: CheckBox
+             name: odescInter
+        - type: Label
+          label: Estimated means for
+          children:
+           - type: CheckBox
+             name: edescMain
+           - type: CheckBox
+             name: edescInter
