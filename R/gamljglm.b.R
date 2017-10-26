@@ -286,7 +286,7 @@ gamljGLMClass <- R6::R6Class(
      },
      .initMeanTables=function(data) {
        
-       omeansTables <- self$results$ameanTables
+       omeansTables <- self$results$omeansTables
        factorsAvailable <- self$options$factors
        
        if (length(factorNames) > 0) {
@@ -481,6 +481,7 @@ gamljGLMClass <- R6::R6Class(
         p=result[1,'Pr(>F)']))
     },
     .populateDescriptives=function(model) {
+      
       data<-mf.getModelData(model)
       dep<-self$options$dep
       terms<-private$.modelTerms()
