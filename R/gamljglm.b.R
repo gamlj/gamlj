@@ -161,33 +161,7 @@ gamljGLMClass <- R6::R6Class(
       private$.initPostHoc(data)
       
       # descriptives
-      
-      descTable <- self$results$desc
-      factorNames <- self$options$factors
-      
-      if (length(factorNames) > 0) {
-        
-        data <- select(data, rev(factorNames))
-        al <- as.list(data)
-        names(al) <- rev(paste0('f', seq_len(length(al))))
-        ll <- sapply(al, base::levels, simplify=FALSE)
-        ll$stringsAsFactors <- FALSE
-        grid <- do.call(base::expand.grid, ll)
-        grid <- rev(grid)
-        
-        for (i in seq_len(ncol(grid))) {
-          colName <- colnames(grid)[[i]]
-          descTable$addColumn(name=colName, title=factorNames[[i]], index=i)
-        }
-        
-        for (rowNo in seq_len(nrow(grid))) {
-          row <- grid[rowNo,]
-          if ( ! is.list(row))
-            row <- list(f1=row)
-          descTable$addRow(rowKey=row, values=row)
-        }
-      }
-      # descriptives plots
+      private$.initMeanTables(data)
       private$.initDescPlots(data)
     },
     .run=function() {
@@ -310,6 +284,36 @@ gamljGLMClass <- R6::R6Class(
     .estimate=function(form,data) {
        stats::lm(form,data)
      },
+     .initMeanTables=function(data) {
+       
+       omeansTables <- self$results$ameanTables
+       factorsAvailable <- self$options$factors
+       
+       if (length(factorNames) > 0) {
+         
+         data <- select(data, rev(factorNames))
+         al <- as.list(data)
+         names(al) <- rev(paste0('f', seq_len(length(al))))
+         ll <- sapply(al, base::levels, simplify=FALSE)
+         ll$stringsAsFactors <- FALSE
+         grid <- do.call(base::expand.grid, ll)
+         grid <- rev(grid)
+         
+         for (i in seq_len(ncol(grid))) {
+           colName <- colnames(grid)[[i]]
+           descTable$addColumn(name=colName, title=factorNames[[i]], index=i)
+         }
+         
+         for (rowNo in seq_len(nrow(grid))) {
+           row <- grid[rowNo,]
+           if ( ! is.list(row))
+             row <- list(f1=row)
+           descTable$addRow(rowKey=row, values=row)
+         }
+       }
+       # descriptives plots
+       
+     }
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
@@ -507,7 +511,6 @@ gamljGLMClass <- R6::R6Class(
               aTable<-meanTables$addItem(key="a")
               for (i in seq_len(nrow(table))) {
                   values<-as.data.frame(table[i,])
-                  print(values)
                   aTable$addRow(rowKey=i,values)
               }
             }

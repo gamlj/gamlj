@@ -264,7 +264,7 @@ items:
         - dep
         - modelTerms
       template:
-        title: Main effects of - $key
+        title:  $key
         type: Table
         columns:
         - name: 'n'
