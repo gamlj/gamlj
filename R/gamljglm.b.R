@@ -313,7 +313,7 @@ gamljGLMClass <- R6::R6Class(
        }
        # descriptives plots
        
-     }
+     },
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
