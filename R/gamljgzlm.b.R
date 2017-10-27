@@ -62,8 +62,13 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
         infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
         infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
-                                          
-        print(dep)
+        print(names(info))
+        if ("note" %in% names(info))
+           infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
+        
+        if (afamily=="not yet")
+           return()
+        
         if (length(modelTerms) == 0 | is.null(dep))
             return()
         
@@ -174,33 +179,7 @@ gamljGzlmClass <- R6::R6Class(
       private$.initPostHoc(data)
       
       # descriptives
-      
-      descTable <- self$results$desc
-      factorNames <- self$options$factors
-      
-      if (length(factorNames) > 0) {
-        
-        data <- select(data, rev(factorNames))
-        al <- as.list(data)
-        names(al) <- rev(paste0('f', seq_len(length(al))))
-        ll <- sapply(al, base::levels, simplify=FALSE)
-        ll$stringsAsFactors <- FALSE
-        grid <- do.call(base::expand.grid, ll)
-        grid <- rev(grid)
-        
-        for (i in seq_len(ncol(grid))) {
-          colName <- colnames(grid)[[i]]
-          descTable$addColumn(name=colName, title=factorNames[[i]], index=i)
-        }
-        
-        for (rowNo in seq_len(nrow(grid))) {
-          row <- grid[rowNo,]
-          if ( ! is.list(row))
-            row <- list(f1=row)
-          descTable$addRow(rowKey=row, values=row)
-        }
-      }
-      # descriptives plots
+      private$.initMeanTables(data)
       private$.initDescPlots(data)
     },
     .run=function() {
@@ -320,12 +299,51 @@ gamljGzlmClass <- R6::R6Class(
             return()
         private$.populateSimple(private$.model)
         private$.prepareDescPlots(private$.model)
-        private$.populateLevenes(private$.model)
         private$.populatePostHoc(data)
-        private$.populateDescriptives(data)
+        private$.populateDescriptives(model)
         
       }) # suppressWarnings
     },
+ 
+.initMeanTables=function(data) {
+
+  #### expected means ####
+  if (self$options$eDesc) {
+    emeansTables <- self$results$emeansTables
+    factorsAvailable <- self$options$factors
+    modelTerms<-private$.modelTerms()
+    if (length(factorsAvailable) == 0) 
+      return()
+    for (term in modelTerms)
+      if (all(term %in% factorsAvailable)) {
+        aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        ldata <- data[,term]
+        ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
+        ll$stringsAsFactors <- FALSE
+        grid <- do.call(base::expand.grid, ll)
+        grid <- as.data.frame(grid,stringsAsFactors=F)
+        for (i in seq_len(ncol(grid))) {
+          colName <- colnames(grid)[[i]]
+          aTable$addColumn(name=colName, title=term[i], index=i)
+        }
+        if (self$options$modelSelection=="logistic")
+            aTable$addColumn(name="prob", title="Prob", index=i+1)
+        if (self$options$modelSelection=="poisson")
+          aTable$addColumn(name="rate", title="Mean Count", index=i+1)
+        if (self$options$modelSelection=="linear")
+          aTable$addColumn(name="lsmean", title="Mean", index=i+1)
+        
+        for (rowNo in seq_len(nrow(grid))) {
+          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(row)<-term
+          tableRow<-row
+          aTable$addRow(rowKey=row, values=tableRow)
+        }
+      }
+  } # end of observed means
+  
+},     
+
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
@@ -472,51 +490,29 @@ gamljGzlmClass <- R6::R6Class(
         table$setStatus('complete')
       }
     },
-    .populateLevenes=function(model) {
-      
-      if ( ! self$options$homo)
-        return()
-      data<-model$model
-      data$res<-residuals(model)
-      factors <- mf.getModelFactors(model)
-      rhs <- paste0('`', factors, '`', collapse=':')
-      formula <- as.formula(paste0('`res`~', rhs))
-      result <- car::leveneTest(formula, data, center="mean")
-      
-      table <- self$results$get('assump')$get('homo')
-      
-      table$setRow(rowNo=1, values=list(
-        F=result[1,'F value'],
-        df1=result[1,'Df'],
-        df2=result[2,'Df'],
-        p=result[1,'Pr(>F)']))
-    },
-    .populateDescriptives=function(data) {
-      
-      if ( ! self$options$descStats)
-        return()
-      if (length(self$options$factors)==0)
-        return()
-      
-      descTable <- self$results$desc
-      dep <- self$options$dep
-      dependent <- data[[dep]]
-      factorNames <- rev(self$options$factors)
-      factors <- as.list(select(data, factorNames))
-      
-      means <- aggregate(dependent, by=factors, base::mean)
-      sds    <- aggregate(dependent, by=factors, stats::sd)
-      ns <- aggregate(dependent, by=factors, base::length)
-      
-      stat <- data.frame(mean=means$x, sd=sds$x, n=ns$x)
-      
-      for (i in seq_len(nrow(stat))) {
-        values <- stat[i,]
-        values[is.na(values)] <- NaN
-        descTable$setRow(rowNo=i, values)
+.populateDescriptives=function(model) {
+  
+  terms<-private$.modelTerms()
+  
+  if (self$options$eDesc) {
+    meanTables<-self$results$emeansTables
+    tables<-lf.meansTables(model,terms)  
+    for (table in tables)  {
+      key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
+      aTable<-meanTables$get(key=key)
+      for (i in seq_len(nrow(table))) {
+        values<-as.data.frame(table[i,])
+        aTable$setRow(rowNo=i,values)
       }
-      
-    },
+      note<-attr(table,"note")
+      if (!is.null(note)) aTable$setNote(note,WARNS[note])
+    }
+  } # end of eDesc              
+  
+  
+  
+},
+
     .populateSimple=function(model) {
         variable<-self$options$simpleVariable
         moderator<-self$options$simpleModerator

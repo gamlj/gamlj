@@ -185,7 +185,7 @@ var updateContrasts = function(ui, variableList, context) {
             }
         }
         if (found === null)
-            list3.push({ var: variableList[i], type: "default" });
+            list3.push({ var: variableList[i], type: "deviation" });
         else
             list3.push(found);
     }
@@ -206,7 +206,7 @@ var updateScaling = function(ui, variableList, context) {
             }
         }
         if (found === null)
-            list3.push({ var: variableList[i], type: "none" });
+            list3.push({ var: variableList[i], type: "centered" });
         else
             list3.push(found);
     }

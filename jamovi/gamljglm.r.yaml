@@ -255,11 +255,12 @@ items:
             - dep
             - modelTerms
 
-    - name: omeansTables
-      title: Observed Means 
+
+    - name: emeansTables
+      title: Estimated Marginal Means 
       type: Array
-      description: an array of observed mean main effects tables
-      visible: (odescMain)
+      description: an array of predicted means tables
+      visible: (eDesc)
       clearWith:
         - dep
         - modelTerms
@@ -267,39 +268,24 @@ items:
         title:  $key
         type: Table
         columns:
-        - name: 'n'
-          title: 'N'
-          type: integer
-
-        - name: mean
-          title: Mean
-          type: text
-
-        - name: sd
-          title: SD
+        - name: lsmean
+          title: 'Mean'
           type: number
 
-    - name: desc
-      title: Descriptives
-      type: Table
-      description: a table of descriptives
-      clearWith:
-        - dep
-        - modelTerms
-        - ss
-
-      columns:
-        - name: 'n'
-          title: 'N'
-          type: integer
-
-        - name: mean
-          title: Mean
-          type: text
-
-        - name: sd
-          title: SD
+        - name: SE
+          title: SE
           type: number
+
+        - name: df
+          title: df
+          type: number
+        - name: lower.CL
+          title: lower CL
+          type: number
+        - name: upper.CL
+          title: upper CL
+          type: number
+
 
 
     - name: descPlot

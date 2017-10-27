@@ -211,6 +211,7 @@ options:
                   - none
                   - centered
                   - standardized
+                default: centered  
       description:
           R: >
             a list of lists specifying the covariates scaling,
@@ -273,30 +274,9 @@ options:
             `'holm'`; provide no, Tukey, Scheffe, Bonferroni, and
             Holm Post Hoc corrections respectively
 
-    - name: odescMain
-      title: main effects
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
-    - name: odescInter
-      title: interaction effects
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
 
-    - name: edescMain
-      title: main effects
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
-    - name: edescInter
-      title: interaction effects
+    - name: eDesc
+      title: Estimated Marginal Means
       type: Bool
       default: false
       description:

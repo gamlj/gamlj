@@ -132,6 +132,8 @@ gamljMixedClass <- R6::R6Class(
         private$.initPlots(data)
         postHocTables   <- self$results$postHoc
         private$.initPostHoc(data)
+        private$.initMeanTables(data)
+        
         
     },
     .run=function() {
@@ -186,7 +188,6 @@ gamljMixedClass <- R6::R6Class(
           info.r2c<-r2[[5]]     
         }
         
-        print(r2)
         infoTable$setRow(rowKey="est", list(value=info.title))
         infoTable$setRow(rowKey="call",list(value=info.call))
         infoTable$setRow(rowKey="aic",list(value=info.aic))
@@ -242,7 +243,6 @@ gamljMixedClass <- R6::R6Class(
         aTable$setRow(rowNo=i,list(name=labels[i]))
         }
         aTable$setNote("df",paste(attr(anova,"method"),"method for degrees of freedom"))
-        
         messages<-mf.getModelMessages(model)
         for (i in seq_along(messages)) {
                  aTable$setNote(names(messages)[i],messages[[i]])
@@ -304,6 +304,8 @@ gamljMixedClass <- R6::R6Class(
         private$.preparePlots(private$.model)
         private$.populateSimple(private$.model)
         private$.populatePostHoc(private$.model)
+        private$.populateDescriptives(private$.model)
+        
         
   }
 
@@ -398,6 +400,40 @@ gamljMixedClass <- R6::R6Class(
       }
       paste(dep,rands,fixs,sep = " ")
     },
+
+.initMeanTables=function(data) {
+  
+  
+  #### expected means ####
+  if (self$options$eDesc) {
+    emeansTables <- self$results$emeansTables
+    factorsAvailable <- self$options$factors
+    modelTerms<-private$.modelTerms()
+    if (length(factorsAvailable) == 0) 
+      return()
+    for (term in modelTerms)
+      if (all(term %in% factorsAvailable)) {
+        aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        ldata <- data[,term]
+        ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
+        ll$stringsAsFactors <- FALSE
+        grid <- do.call(base::expand.grid, ll)
+        grid <- as.data.frame(grid,stringsAsFactors=F)
+        for (i in seq_len(ncol(grid))) {
+          colName <- colnames(grid)[[i]]
+          aTable$addColumn(name=colName, title=term[i], index=i)
+        }
+        for (rowNo in seq_len(nrow(grid))) {
+          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(row)<-term
+          tableRow<-row
+          aTable$addRow(rowKey=row, values=tableRow)
+        }
+      }
+  } # end of  means
+  
+},     
+
     .initPostHoc=function(data) {
     
     bs <- self$options$factors
@@ -567,27 +603,20 @@ gamljMixedClass <- R6::R6Class(
          }
         }
   },
-.prepareDescPlots=function(model) {
+    .preparePlots=function(model) {
   
-  depName <- self$options$dep
-  groupName <- self$options$plotHAxis
-  linesName <- self$options$plotSepLines
-  plotsName <- self$options$plotSepPlots
-  errorBarType <- self$options$plotError
-  modelType <- self$options$modelSelection
+        depName <- self$options$dep
+        groupName <- self$options$plotHAxis
+        linesName <- self$options$plotSepLines
+        plotsName <- self$options$plotSepPlots
+        errorBarType <- "none"
+
+        if (length(depName) == 0 || length(groupName) == 0)
+          return()
   
-  if (length(depName) == 0 || length(groupName) == 0)
-    return()
+       plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
   
-  plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
-  
-  if (self$options$plotError != 'none') {
-    yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
-  } else {
-    yAxisRange <- plotData$fit
-  }
-    
-    errorBarType<-"none"
+       yAxisRange <- plotData$fit
 
     if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
@@ -618,8 +647,8 @@ gamljMixedClass <- R6::R6Class(
   groupName <- self$options$plotHAxis
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
-  errorType <- self$options$plotError
-  ciWidth   <- self$options$ciWidth
+  errorType <- "none"
+  ciWidth   <- 0
   
   if (errorType=="ci")
     errorType<-paste0(ciWidth,"% ",toupper(errorType))
@@ -633,6 +662,28 @@ gamljMixedClass <- R6::R6Class(
   print(p)
   TRUE
 },
+.populateDescriptives=function(model) {
+
+  terms<-private$.modelTerms()
+  if (self$options$eDesc) {
+    meanTables<-self$results$emeansTables
+    tables<-lf.meansTables(model,terms)  
+    for (table in tables)  {
+      key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
+      aTable<-meanTables$get(key=key)
+      for (i in seq_len(nrow(table))) {
+        values<-as.data.frame(table[i,])
+        aTable$setRow(rowNo=i,values)
+      }
+      note<-attr(table,"note")
+      if (!is.null(note)) aTable$setNote(note,WARNS[note])
+    }
+  } # end of eDesc              
+  
+  
+  
+},
+
 .populateSimple=function(model) {
       print(".populateSimple")
       ### This should be fairly automatic for linear models 

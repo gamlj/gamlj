@@ -92,7 +92,7 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
           }
      }
      eg<-expand.grid(ll)
-     for (v in names(model$contrasts)) {
+     for (v in mf.getModelFactors(model)) {
           eg[,v]<-factor(eg[,v])
      }
      mm<-mf.predict(model,eg,bars)

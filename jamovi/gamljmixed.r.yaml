@@ -289,28 +289,37 @@ items:
 
 
 
-    - name: desc
-      title: Descriptives
-      type: Table
-      description: a table of descriptives
-      visible: (descStats)
+    - name: emeansTables
+      title: Estimated Marginal Means 
+      type: Array
+      description: an array of predicted means tables
+      visible: (eDesc)
       clearWith:
         - dep
         - modelTerms
-        - ss
-
-      columns:
-        - name: 'n'
-          title: 'N'
-          type: integer
-
-        - name: mean
-          title: Mean
-          type: text
-
-        - name: sd
-          title: SD
+      template:
+        title:  $key
+        type: Table
+        columns:
+        - name: lsmean
+          title: 'Mean'
           type: number
+
+        - name: SE
+          title: SE
+          type: number
+
+        - name: df
+          title: df
+          type: number
+        - name: lower.CL
+          title: lower CL
+          type: number
+        - name: upper.CL
+          title: upper CL
+          type: number
+
+
 
 
 
