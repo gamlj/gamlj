@@ -28,6 +28,17 @@ mf.aliased<-function(model) {
   FALSE
 }
 
+mf.predict_response<-function(model) {
+  print("using predicted")
+  if (.which.class(model)=="glm" || .which.class(model)=="lm") {
+  return(  predict(model,type="response"))    
+  }
+  if (.which.class(model)=="lmer") {
+    return(  predict(model,re.form=~0))    
+  }
+} 
+  
+
 mf.predict<-function(model,data=NULL,bars="none") {
   if (.which.class(model)=="lm"){
     preds<-predict(model,data,se.fit = T,interval="confidence",type="response")
@@ -136,6 +147,7 @@ mf.lmeranova=function(model) {
   if (.which.class(model)=="lmer") {   
     
   ano<-lmerTest::anova(model)
+  print(dim(ano))
   if (dim(ano)[1]==0)
     return(ano)
   if (dim(ano)[2]==4) {
@@ -169,7 +181,7 @@ mf.lmeranova=function(model) {
 
 
 mf.getModelFactors<-function(model) {
-  names(model$contrasts)
+  names(attr(model.matrix(model),"contrasts"))
 } 
 
 
@@ -209,6 +221,8 @@ mf.give_family<-function(modelSelection) {
        return(binomial())
   if (modelSelection=="poisson")
     return(poisson())
+  if (modelSelection=="multinomial")
+    return("not yet")
   
   
   NULL  

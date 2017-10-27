@@ -26,7 +26,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             plotSepPlots = NULL,
             postHoc = NULL,
             postHocCorr = "bonferroni",
-            descStats = FALSE,
+            eDesc = FALSE,
             simpleVariable = NULL,
             simpleModerator = NULL,
             simple3way = NULL, ...) {
@@ -108,7 +108,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "contrasts",
                 contrasts,
                 items="(factors)",
-                default=NULL,
                 template=jmvcore::OptionGroup$new(
                     "contrasts",
                     NULL,
@@ -152,11 +151,12 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             "type",
                             NULL,
                             options=list(
-                                "none",
                                 "centered",
                                 "standardized",
                                 "cluster-based centered",
-                                "cluster-based standardized")))))
+                                "cluster-based standardized",
+                                "none"),
+                            default="centered"))))
             private$..plotHAxis <- jmvcore::OptionVariable$new(
                 "plotHAxis",
                 plotHAxis,
@@ -181,9 +181,9 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "bonferroni",
                     "holm"),
                 default="bonferroni")
-            private$..descStats <- jmvcore::OptionBool$new(
-                "descStats",
-                descStats,
+            private$..eDesc <- jmvcore::OptionBool$new(
+                "eDesc",
+                eDesc,
                 default=FALSE)
             private$..simpleVariable <- jmvcore::OptionVariable$new(
                 "simpleVariable",
@@ -218,7 +218,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..postHoc)
             self$.addOption(private$..postHocCorr)
-            self$.addOption(private$..descStats)
+            self$.addOption(private$..eDesc)
             self$.addOption(private$..simpleVariable)
             self$.addOption(private$..simpleModerator)
             self$.addOption(private$..simple3way)
@@ -244,7 +244,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         plotSepPlots = function() private$..plotSepPlots$value,
         postHoc = function() private$..postHoc$value,
         postHocCorr = function() private$..postHocCorr$value,
-        descStats = function() private$..descStats$value,
+        eDesc = function() private$..eDesc$value,
         simpleVariable = function() private$..simpleVariable$value,
         simpleModerator = function() private$..simpleModerator$value,
         simple3way = function() private$..simple3way$value),
@@ -269,7 +269,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..plotSepPlots = NA,
         ..postHoc = NA,
         ..postHocCorr = NA,
-        ..descStats = NA,
+        ..eDesc = NA,
         ..simpleVariable = NA,
         ..simpleModerator = NA,
         ..simple3way = NA)
@@ -289,7 +289,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         simpleEffects = function() private$..simpleEffects,
         model = function() private$..model,
         contrasts = function() private$..contrasts,
-        desc = function() private$..desc,
+        emeansTables = function() private$..emeansTables,
         descPlot = function() private$..descPlot,
         descPlots = function() private$..descPlots),
     private = list(
@@ -304,7 +304,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..simpleEffects = NA,
         ..model = NA,
         ..contrasts = NA,
-        ..desc = NA,
+        ..emeansTables = NA,
         ..descPlot = NA,
         ..descPlots = NA),
     public=list(
@@ -620,28 +620,38 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="groups", 
                             `title`="Groups to levels", 
                             `type`="text"))))
-            private$..desc <- jmvcore::Table$new(
+            private$..emeansTables <- jmvcore::Array$new(
                 options=options,
-                name="desc",
-                title="Descriptives",
-                visible="(descStats)",
+                name="emeansTables",
+                title="Estimated Marginal Means",
+                visible="(eDesc)",
                 clearWith=list(
                     "dep",
-                    "modelTerms",
-                    "ss"),
-                columns=list(
-                    list(
-                        `name`="n", 
-                        `title`="N", 
-                        `type`="integer"),
-                    list(
-                        `name`="mean", 
-                        `title`="Mean", 
-                        `type`="text"),
-                    list(
-                        `name`="sd", 
-                        `title`="SD", 
-                        `type`="number")))
+                    "modelTerms"),
+                template=jmvcore::Table$new(
+                    options=options,
+                    title="$key",
+                    columns=list(
+                        list(
+                            `name`="lsmean", 
+                            `title`="Mean", 
+                            `type`="number"),
+                        list(
+                            `name`="SE", 
+                            `title`="SE", 
+                            `type`="number"),
+                        list(
+                            `name`="df", 
+                            `title`="df", 
+                            `type`="number"),
+                        list(
+                            `name`="lower.CL", 
+                            `title`="lower CL", 
+                            `type`="number"),
+                        list(
+                            `name`="upper.CL", 
+                            `title`="upper CL", 
+                            `type`="number"))))
             private$..descPlot <- jmvcore::Image$new(
                 options=options,
                 name="descPlot",
@@ -687,7 +697,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(private$..simpleEffectsAnovas)
             self$add(private$..simpleEffects)
             self$add(private$..contrasts)
-            self$add(private$..desc)
+            self$add(private$..emeansTables)
             self$add(private$..descPlot)
             self$add(private$..descPlots)},
         .setModel=function(x) private$..model <- x))
@@ -762,7 +772,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or 
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections 
 #'   respectively 
-#' @param descStats \code{TRUE} or \code{FALSE} (default), provide descriptive 
+#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans 
 #'   statistics 
 #' @param simpleVariable The variable for which the simple effects (slopes) 
 #'   are computed 
@@ -782,7 +792,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
 #'   \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
-#'   \code{results$desc} \tab \tab \tab \tab \tab a table of descriptives \cr
+#'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #' }
@@ -807,7 +817,7 @@ gamljMixed <- function(
     reml = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
-    contrasts = NULL,
+    contrasts,
     showContrastsTable = FALSE,
     showContrasts = TRUE,
     scaling = NULL,
@@ -816,7 +826,7 @@ gamljMixed <- function(
     plotSepPlots = NULL,
     postHoc = NULL,
     postHocCorr = "bonferroni",
-    descStats = FALSE,
+    eDesc = FALSE,
     simpleVariable = NULL,
     simpleModerator = NULL,
     simple3way = NULL) {
@@ -845,7 +855,7 @@ gamljMixed <- function(
         plotSepPlots = plotSepPlots,
         postHoc = postHoc,
         postHocCorr = postHocCorr,
-        descStats = descStats,
+        eDesc = eDesc,
         simpleVariable = simpleVariable,
         simpleModerator = simpleModerator,
         simple3way = simple3way)

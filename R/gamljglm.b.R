@@ -161,33 +161,7 @@ gamljGLMClass <- R6::R6Class(
       private$.initPostHoc(data)
       
       # descriptives
-      
-      descTable <- self$results$desc
-      factorNames <- self$options$factors
-      
-      if (length(factorNames) > 0) {
-        
-        data <- select(data, rev(factorNames))
-        al <- as.list(data)
-        names(al) <- rev(paste0('f', seq_len(length(al))))
-        ll <- sapply(al, base::levels, simplify=FALSE)
-        ll$stringsAsFactors <- FALSE
-        grid <- do.call(base::expand.grid, ll)
-        grid <- rev(grid)
-        
-        for (i in seq_len(ncol(grid))) {
-          colName <- colnames(grid)[[i]]
-          descTable$addColumn(name=colName, title=factorNames[[i]], index=i)
-        }
-        
-        for (rowNo in seq_len(nrow(grid))) {
-          row <- grid[rowNo,]
-          if ( ! is.list(row))
-            row <- list(f1=row)
-          descTable$addRow(rowKey=row, values=row)
-        }
-      }
-      # descriptives plots
+      private$.initMeanTables(data)
       private$.initDescPlots(data)
     },
     .run=function() {
@@ -303,13 +277,47 @@ gamljGLMClass <- R6::R6Class(
         private$.prepareDescPlots(private$.model)
         private$.populateLevenes(private$.model)
         private$.populatePostHoc(data)
-        private$.populateDescriptives(data)
+        private$.populateDescriptives(model)
         
       }) # suppressWarnings
     },
     .estimate=function(form,data) {
        stats::lm(form,data)
      },
+     .initMeanTables=function(data) {
+       
+
+       #### expected means ####
+       if (self$options$eDesc) {
+         emeansTables <- self$results$emeansTables
+         factorsAvailable <- self$options$factors
+         modelTerms<-private$.modelTerms()
+         if (length(factorsAvailable) == 0) 
+           return()
+         for (term in modelTerms)
+           if (all(term %in% factorsAvailable)) {
+             aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+             ldata <- data[,term]
+             ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
+             ll$stringsAsFactors <- FALSE
+             grid <- do.call(base::expand.grid, ll)
+             grid <- as.data.frame(grid,stringsAsFactors=F)
+             for (i in seq_len(ncol(grid))) {
+               colName <- colnames(grid)[[i]]
+               aTable$addColumn(name=colName, title=term[i], index=i)
+             }
+             for (rowNo in seq_len(nrow(grid))) {
+               row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+               colnames(row)<-term
+               tableRow<-row
+               aTable$addRow(rowKey=row, values=tableRow)
+             }
+           }
+       } # end of  means
+       
+     },     
+           
+        
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
@@ -476,31 +484,27 @@ gamljGLMClass <- R6::R6Class(
         df2=result[2,'Df'],
         p=result[1,'Pr(>F)']))
     },
-    .populateDescriptives=function(data) {
+    .populateDescriptives=function(model) {
       
-      if ( ! self$options$descStats)
-        return()
-      if (length(self$options$factors)==0)
-        return()
+      terms<-private$.modelTerms()
       
-      descTable <- self$results$desc
-      dep <- self$options$dep
-      dependent <- data[[dep]]
-      factorNames <- rev(self$options$factors)
-      factors <- as.list(select(data, factorNames))
+      if (self$options$eDesc) {
+        meanTables<-self$results$emeansTables
+        tables<-lf.meansTables(model,terms)  
+        for (table in tables)  {
+          key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
+          aTable<-meanTables$get(key=key)
+          for (i in seq_len(nrow(table))) {
+            values<-as.data.frame(table[i,])
+            aTable$setRow(rowNo=i,values)
+          }
+          note<-attr(table,"note")
+          if (!is.null(note)) aTable$setNote(note,WARNS[note])
+        }
+      } # end of eDesc              
       
-      means <- aggregate(dependent, by=factors, base::mean)
-      sds    <- aggregate(dependent, by=factors, stats::sd)
-      ns <- aggregate(dependent, by=factors, base::length)
-      
-      stat <- data.frame(mean=means$x, sd=sds$x, n=ns$x)
-      
-      for (i in seq_len(nrow(stat))) {
-        values <- stat[i,]
-        values[is.na(values)] <- NaN
-        descTable$setRow(rowNo=i, values)
-      }
-      
+            
+
     },
     .populateSimple=function(model) {
         variable<-self$options$simpleVariable
@@ -640,7 +644,7 @@ gamljGLMClass <- R6::R6Class(
         sepPlotsVar <- data[[sepPlotsName]]
         if(is.factor(sepPlotsVar))
              sepPlotsLevels <- 1:length(levels(sepPlotsVar))
-        else sepPlotsLevels <- c(1,2,3)   
+        else sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
         array <- self$results$descPlots
         for (level in sepPlotsLevels)
           array$addItem(level)
@@ -675,7 +679,7 @@ gamljGLMClass <- R6::R6Class(
     images <- self$results$descPlots
     i<-1
     levels<-levels(plotData$plots)
-    
+  
     for (key in images$itemKeys) {
       real<-levels[i]
       i<-i+1

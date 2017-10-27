@@ -25,9 +25,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             postHoc = NULL,
             postHocCorr = list(
                 "tukey"),
-            descStats = FALSE,
-            homo = FALSE,
-            qq = FALSE,
+            eDesc = FALSE,
             plotError = "ci",
             ciWidth = 95,
             simpleVariable = NULL,
@@ -186,17 +184,9 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "holm"),
                 default=list(
                     "tukey"))
-            private$..descStats <- jmvcore::OptionBool$new(
-                "descStats",
-                descStats,
-                default=FALSE)
-            private$..homo <- jmvcore::OptionBool$new(
-                "homo",
-                homo,
-                default=FALSE)
-            private$..qq <- jmvcore::OptionBool$new(
-                "qq",
-                qq,
+            private$..eDesc <- jmvcore::OptionBool$new(
+                "eDesc",
+                eDesc,
                 default=FALSE)
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
@@ -243,9 +233,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..postHoc)
             self$.addOption(private$..postHocCorr)
-            self$.addOption(private$..descStats)
-            self$.addOption(private$..homo)
-            self$.addOption(private$..qq)
+            self$.addOption(private$..eDesc)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..simpleVariable)
@@ -271,9 +259,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         plotSepPlots = function() private$..plotSepPlots$value,
         postHoc = function() private$..postHoc$value,
         postHocCorr = function() private$..postHocCorr$value,
-        descStats = function() private$..descStats$value,
-        homo = function() private$..homo$value,
-        qq = function() private$..qq$value,
+        eDesc = function() private$..eDesc$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         simpleVariable = function() private$..simpleVariable$value,
@@ -298,9 +284,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..plotSepPlots = NA,
         ..postHoc = NA,
         ..postHocCorr = NA,
-        ..descStats = NA,
-        ..homo = NA,
-        ..qq = NA,
+        ..eDesc = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..simpleVariable = NA,
@@ -317,10 +301,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         simpleEffectsAnovas = function() private$..simpleEffectsAnovas,
         simpleEffects = function() private$..simpleEffects,
         model = function() private$..model,
-        assump = function() private$..assump,
         contrasts = function() private$..contrasts,
         postHoc = function() private$..postHoc,
-        desc = function() private$..desc,
+        emeansTables = function() private$..emeansTables,
         descPlot = function() private$..descPlot,
         descPlots = function() private$..descPlots),
     private = list(
@@ -330,10 +313,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..simpleEffectsAnovas = NA,
         ..simpleEffects = NA,
         ..model = NA,
-        ..assump = NA,
         ..contrasts = NA,
         ..postHoc = NA,
-        ..desc = NA,
+        ..emeansTables = NA,
         ..descPlot = NA,
         ..descPlots = NA),
     public=list(
@@ -521,54 +503,6 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `type`="number", 
                             `format`="zto,pvalue"))))
             private$..model <- NULL
-            private$..assump <- R6::R6Class(
-                inherit = jmvcore::Group,
-                active = list(
-                    homo = function() private$..homo,
-                    qq = function() private$..qq),
-                private = list(
-                    ..homo = NA,
-                    ..qq = NA),
-                public=list(
-                    initialize=function(options) {
-                        super$initialize(
-                            options=options,
-                            name="assump",
-                            title="Assumption Checks")
-                        private$..homo <- jmvcore::Table$new(
-                            options=options,
-                            name="homo",
-                            title="Test for Homogeneity of Residual Variances (Levene's)",
-                            visible="(homo)",
-                            rows=1,
-                            columns=list(
-                                list(
-                                    `name`="F", 
-                                    `type`="number"),
-                                list(
-                                    `name`="df1", 
-                                    `type`="integer"),
-                                list(
-                                    `name`="df2", 
-                                    `type`="integer"),
-                                list(
-                                    `name`="p", 
-                                    `type`="number", 
-                                    `format`="zto,pvalue")))
-                        private$..qq <- jmvcore::Image$new(
-                            options=options,
-                            name="qq",
-                            title="Q-Q Plot",
-                            visible="(qq)",
-                            width=450,
-                            height=400,
-                            renderFun=".qqPlot",
-                            requiresData=TRUE,
-                            clearWith=list(
-                                "dep",
-                                "modelTerms"))
-                        self$add(private$..homo)
-                        self$add(private$..qq)}))$new(options=options)
             private$..contrasts <- jmvcore::Array$new(
                 options=options,
                 name="contrasts",
@@ -609,28 +543,30 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     clearWith=list(
                         "dep",
                         "modelTerms")))
-            private$..desc <- jmvcore::Table$new(
+            private$..emeansTables <- jmvcore::Array$new(
                 options=options,
-                name="desc",
-                title="Descriptives",
-                visible="(descStats)",
+                name="emeansTables",
+                title="Estimated Marginal Means",
+                visible="(eDesc)",
                 clearWith=list(
                     "dep",
-                    "modelTerms",
-                    "ss"),
-                columns=list(
-                    list(
-                        `name`="n", 
-                        `title`="N", 
-                        `type`="integer"),
-                    list(
-                        `name`="mean", 
-                        `title`="Mean", 
-                        `type`="text"),
-                    list(
-                        `name`="sd", 
-                        `title`="SD", 
-                        `type`="number")))
+                    "modelTerms"),
+                template=jmvcore::Table$new(
+                    options=options,
+                    title="$key",
+                    columns=list(
+                        list(
+                            `name`="SE", 
+                            `title`="SE", 
+                            `type`="number"),
+                        list(
+                            `name`="asymp.LCL", 
+                            `title`="lower CL", 
+                            `type`="number"),
+                        list(
+                            `name`="asymp.UCL", 
+                            `title`="upper CL", 
+                            `type`="number"))))
             private$..descPlot <- jmvcore::Image$new(
                 options=options,
                 name="descPlot",
@@ -671,10 +607,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(private$..estimates)
             self$add(private$..simpleEffectsAnovas)
             self$add(private$..simpleEffects)
-            self$add(private$..assump)
             self$add(private$..contrasts)
             self$add(private$..postHoc)
-            self$add(private$..desc)
+            self$add(private$..emeansTables)
             self$add(private$..descPlot)
             self$add(private$..descPlots)},
         .setModel=function(x) private$..model <- x))
@@ -766,12 +701,8 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param postHocCorr one or more of \code{'none'}, \code{'tukey'}, 
 #'   \code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey, 
 #'   Scheffe, Bonferroni, and Holm Post Hoc corrections respectively 
-#' @param descStats \code{TRUE} or \code{FALSE} (default), provide descriptive 
+#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive 
 #'   statistics 
-#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity 
-#'   tests 
-#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of 
-#'   residuals 
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
 #'   no error bars, use confidence intervals, or use standard errors on the 
 #'   plots, respectively 
@@ -789,12 +720,10 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$estimates} \tab \tab \tab \tab \tab a table of Coefficients \cr
 #'   \code{results$simpleEffectsAnovas} \tab \tab \tab \tab \tab an array of simple Effects Chisquared test tables \cr
 #'   \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
-#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
-#'   \code{results$assump$homo} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-#'   \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glm} object \cr
 #'   \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
 #'   \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-#'   \code{results$desc} \tab \tab \tab \tab \tab a table of descriptives \cr
+#'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #' }
@@ -827,9 +756,7 @@ gamljGzlm <- function(
     postHoc = NULL,
     postHocCorr = list(
                 "tukey"),
-    descStats = FALSE,
-    homo = FALSE,
-    qq = FALSE,
+    eDesc = FALSE,
     plotError = "ci",
     ciWidth = 95,
     simpleVariable = NULL,
@@ -858,9 +785,7 @@ gamljGzlm <- function(
         plotSepPlots = plotSepPlots,
         postHoc = postHoc,
         postHocCorr = postHocCorr,
-        descStats = descStats,
-        homo = homo,
-        qq = qq,
+        eDesc = eDesc,
         plotError = plotError,
         ciWidth = ciWidth,
         simpleVariable = simpleVariable,

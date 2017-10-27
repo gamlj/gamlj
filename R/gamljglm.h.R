@@ -24,7 +24,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             postHoc = NULL,
             postHocCorr = list(
                 "tukey"),
-            descStats = FALSE,
+            eDesc = FALSE,
             homo = FALSE,
             qq = FALSE,
             plotError = "ci",
@@ -153,7 +153,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             options=list(
                                 "none",
                                 "centered",
-                                "standardized")))))
+                                "standardized"),
+                            default="centered"))))
             private$..plotHAxis <- jmvcore::OptionVariable$new(
                 "plotHAxis",
                 plotHAxis,
@@ -181,9 +182,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "holm"),
                 default=list(
                     "tukey"))
-            private$..descStats <- jmvcore::OptionBool$new(
-                "descStats",
-                descStats,
+            private$..eDesc <- jmvcore::OptionBool$new(
+                "eDesc",
+                eDesc,
                 default=FALSE)
             private$..homo <- jmvcore::OptionBool$new(
                 "homo",
@@ -237,7 +238,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..postHoc)
             self$.addOption(private$..postHocCorr)
-            self$.addOption(private$..descStats)
+            self$.addOption(private$..eDesc)
             self$.addOption(private$..homo)
             self$.addOption(private$..qq)
             self$.addOption(private$..plotError)
@@ -264,7 +265,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         plotSepPlots = function() private$..plotSepPlots$value,
         postHoc = function() private$..postHoc$value,
         postHocCorr = function() private$..postHocCorr$value,
-        descStats = function() private$..descStats$value,
+        eDesc = function() private$..eDesc$value,
         homo = function() private$..homo$value,
         qq = function() private$..qq$value,
         plotError = function() private$..plotError$value,
@@ -290,7 +291,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..plotSepPlots = NA,
         ..postHoc = NA,
         ..postHocCorr = NA,
-        ..descStats = NA,
+        ..eDesc = NA,
         ..homo = NA,
         ..qq = NA,
         ..plotError = NA,
@@ -311,7 +312,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         assump = function() private$..assump,
         contrasts = function() private$..contrasts,
         postHoc = function() private$..postHoc,
-        desc = function() private$..desc,
+        emeansTables = function() private$..emeansTables,
         descPlot = function() private$..descPlot,
         descPlots = function() private$..descPlots),
     private = list(
@@ -323,7 +324,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..assump = NA,
         ..contrasts = NA,
         ..postHoc = NA,
-        ..desc = NA,
+        ..emeansTables = NA,
         ..descPlot = NA,
         ..descPlots = NA),
     public=list(
@@ -602,28 +603,38 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     clearWith=list(
                         "dep",
                         "modelTerms")))
-            private$..desc <- jmvcore::Table$new(
+            private$..emeansTables <- jmvcore::Array$new(
                 options=options,
-                name="desc",
-                title="Descriptives",
-                visible="(descStats)",
+                name="emeansTables",
+                title="Estimated Marginal Means",
+                visible="(eDesc)",
                 clearWith=list(
                     "dep",
-                    "modelTerms",
-                    "ss"),
-                columns=list(
-                    list(
-                        `name`="n", 
-                        `title`="N", 
-                        `type`="integer"),
-                    list(
-                        `name`="mean", 
-                        `title`="Mean", 
-                        `type`="text"),
-                    list(
-                        `name`="sd", 
-                        `title`="SD", 
-                        `type`="number")))
+                    "modelTerms"),
+                template=jmvcore::Table$new(
+                    options=options,
+                    title="$key",
+                    columns=list(
+                        list(
+                            `name`="lsmean", 
+                            `title`="Mean", 
+                            `type`="number"),
+                        list(
+                            `name`="SE", 
+                            `title`="SE", 
+                            `type`="number"),
+                        list(
+                            `name`="df", 
+                            `title`="df", 
+                            `type`="number"),
+                        list(
+                            `name`="lower.CL", 
+                            `title`="lower CL", 
+                            `type`="number"),
+                        list(
+                            `name`="upper.CL", 
+                            `title`="upper CL", 
+                            `type`="number"))))
             private$..descPlot <- jmvcore::Image$new(
                 options=options,
                 name="descPlot",
@@ -666,7 +677,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(private$..assump)
             self$add(private$..contrasts)
             self$add(private$..postHoc)
-            self$add(private$..desc)
+            self$add(private$..emeansTables)
             self$add(private$..descPlot)
             self$add(private$..descPlots)},
         .setModel=function(x) private$..model <- x))
@@ -758,7 +769,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param postHocCorr one or more of \code{'none'}, \code{'tukey'}, 
 #'   \code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey, 
 #'   Scheffe, Bonferroni, and Holm Post Hoc corrections respectively 
-#' @param descStats \code{TRUE} or \code{FALSE} (default), provide descriptive 
+#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive 
 #'   statistics 
 #' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity 
 #'   tests 
@@ -785,7 +796,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
 #'   \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-#'   \code{results$desc} \tab \tab \tab \tab \tab a table of descriptives \cr
+#'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #' }
@@ -817,7 +828,7 @@ gamljGLM <- function(
     postHoc = NULL,
     postHocCorr = list(
                 "tukey"),
-    descStats = FALSE,
+    eDesc = FALSE,
     homo = FALSE,
     qq = FALSE,
     plotError = "ci",
@@ -847,7 +858,7 @@ gamljGLM <- function(
         plotSepPlots = plotSepPlots,
         postHoc = postHoc,
         postHocCorr = postHocCorr,
-        descStats = descStats,
+        eDesc = eDesc,
         homo = homo,
         qq = qq,
         plotError = plotError,

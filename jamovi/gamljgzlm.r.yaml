@@ -171,44 +171,8 @@ items:
 
     - name: model
       type: Property
-      description: The underlying `lm` object
+      description: The underlying `glm` object
 
-    - name: assump
-      title: Assumption Checks
-      type: Group
-      items:
-        - name: homo
-          title: Test for Homogeneity of Residual Variances (Levene's)
-          type: Table
-          description: a table of homogeneity tests
-          visible: (homo)
-          rows: 1
-          columns:
-            - name: F
-              type: number
-
-            - name: df1
-              type: integer
-
-            - name: df2
-              type: integer
-
-            - name: p
-              type: number
-              format: zto,pvalue
-
-        - name: qq
-          title: Q-Q Plot
-          visible: (qq)
-          type: Image
-          description: a q-q plot
-          width: 450
-          height: 400
-          renderFun: .qqPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - modelTerms
 
     - name: contrasts
       title: Contrasts Coding 
@@ -252,27 +216,27 @@ items:
             - dep
             - modelTerms
 
-    - name: desc
-      title: Descriptives
-      type: Table
-      description: a table of descriptives
-      visible: (descStats)
+    - name: emeansTables
+      title: Estimated Marginal Means 
+      type: Array
+      description: an array of predicted means tables
+      visible: (eDesc)
       clearWith:
         - dep
         - modelTerms
-        - ss
+      template:
+        title:  $key
+        type: Table
+        columns:
 
-      columns:
-        - name: 'n'
-          title: 'N'
-          type: integer
-
-        - name: mean
-          title: Mean
-          type: text
-
-        - name: sd
-          title: SD
+        - name: SE
+          title: SE
+          type: number
+        - name: asymp.LCL
+          title: lower CL
+          type: number
+        - name: asymp.UCL
+          title: upper CL
           type: number
 
 

@@ -130,17 +130,6 @@ children:
             name: ss
 
   - type: CollapseBox
-    label: Assumption Checks
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: CheckBox
-        name: homo
-        label: Homogeneity tests
-      - type: CheckBox
-        name: qq
-        label: Q-Q plot of residuals
-  - type: CollapseBox
     label: Factors Coding
     collapsed: true
     stretchFactor: 1
@@ -330,12 +319,12 @@ children:
 
 
   - type: CollapseBox
-    label: Additional Options
+    label: Means Tables
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: Display
-        children:
-          - type: CheckBox
-            name: descStats
+        - type: Label
+          label: Display
+          children:
+           - type: CheckBox
+             name: eDesc

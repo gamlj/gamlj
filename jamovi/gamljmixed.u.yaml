@@ -281,7 +281,7 @@ children:
                 isTarget: true
                 maxItemCount: 1
   - type: CollapseBox
-    label: Additional Options
+    label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
@@ -289,4 +289,4 @@ children:
         label: Display
         children:
           - type: CheckBox
-            name: descStats
+            name: eDesc
