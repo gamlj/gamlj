@@ -328,3 +328,30 @@
 }
 
 
+lf.dependencies<-function(model,term,modelTerms,what) {
+  if (.is.scaleDependent(model,term))
+    return(paste(what,"interactions",sep="."))
+   else if (.term.develop(term)<length(modelTerms))
+       return(paste(what,"covariates",sep="."))
+  FALSE
+  }
+
+
+lf.meansTables<-function(model,terms) {
+  factorsAvailable<-mf.getModelFactors(model)
+  tables<-list()
+  for (term in terms)
+    if (all(term %in% factorsAvailable)) {
+      table<-lsmeans::lsmeans(model,term,transform = "response")
+      table<-as.data.frame(summary(table))
+      print(table)
+      table<-table[,-(1:length(term))]
+      attr(table,"title")<-term
+      depend<-lf.dependencies(model,term,terms,"means")
+      if (depend!=FALSE) {
+        attr(table,"note")<-depend
+      }
+      tables[[length(tables)+1]]<-table
+    }
+  tables
+}

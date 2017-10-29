@@ -139,7 +139,6 @@ options:
       title: Factors Coding
       type: Array
       items: (factors)
-      default:
       template:
           type: Group
           elements:
@@ -192,11 +191,13 @@ options:
               - name: type
                 type: List
                 options:
-                  - none
                   - centered
                   - standardized
                   - cluster-based centered
                   - cluster-based standardized
+                  - none
+
+                default: centered 
       description:
           R: >
             a list of lists specifying the covariates scaling,
@@ -254,13 +255,13 @@ options:
             `'holm'`; provide no,  Bonferroni, and
             Holm Post Hoc corrections respectively
 
-    - name: descStats
-      title: Descriptive statistics
+    - name: eDesc
+      title: Estimated Marginal Means
       type: Bool
       default: false
       description:
           R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
+            `TRUE` or `FALSE` (default), provide lsmeans statistics
 
 
 

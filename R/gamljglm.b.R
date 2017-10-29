@@ -286,6 +286,7 @@ gamljGLMClass <- R6::R6Class(
      },
      .initMeanTables=function(data) {
        
+<<<<<<< HEAD
        omeansTables <- self$results$omeansTables
        factorsAvailable <- self$options$factors
        modelTerms<-private$.modelTerms()
@@ -310,6 +311,40 @@ gamljGLMClass <- R6::R6Class(
          }
 
      },
+=======
+
+       #### expected means ####
+       if (self$options$eDesc) {
+         emeansTables <- self$results$emeansTables
+         factorsAvailable <- self$options$factors
+         modelTerms<-private$.modelTerms()
+         if (length(factorsAvailable) == 0) 
+           return()
+         for (term in modelTerms)
+           if (all(term %in% factorsAvailable)) {
+             aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+             ldata <- data[,term]
+             ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
+             ll$stringsAsFactors <- FALSE
+             grid <- do.call(base::expand.grid, ll)
+             grid <- as.data.frame(grid,stringsAsFactors=F)
+             for (i in seq_len(ncol(grid))) {
+               colName <- colnames(grid)[[i]]
+               aTable$addColumn(name=colName, title=term[i], index=i)
+             }
+             for (rowNo in seq_len(nrow(grid))) {
+               row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+               colnames(row)<-term
+               tableRow<-row
+               aTable$addRow(rowKey=row, values=tableRow)
+             }
+           }
+       } # end of  means
+       
+     },     
+           
+        
+>>>>>>> 285d3ad00e924044136b8ca35801c277d1607f31
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
@@ -478,42 +513,24 @@ gamljGLMClass <- R6::R6Class(
     },
     .populateDescriptives=function(model) {
       
-      data<-mf.getModelData(model)
-      dep<-self$options$dep
       terms<-private$.modelTerms()
       
-      lf.meansTablesMain<-function(dep,model,terms) {
-        data<-mf.getModelData(model)
-        factorsAvailable<-mf.getModelFactors(model)
-        dependent <- data[[dep]]
-        tables<-list()
-        for (term in terms)
-           if (term %in% factorsAvailable) {
-              factor <- lapply(term, function(t) data[,t])
-              means <- aggregate(dependent, by=factor, base::mean)
-              mean<-means$x
-              sds <- aggregate(dependent, by=factor, stats::sd)
-              sd<- sds$x
-              ns <- aggregate(dependent, by=factor, base::length)
-              ns<-ns$x
-              stat <- data.frame(cbind(mean,sd, ns),stringsAsFactors = F)
-              tables[[length(tables)+1]]<-stat
-            }    
-        tables
-    }
-
-      meanTables<-self$results$omeansTables
-      tables<-lf.meansTablesMain(dep,model,terms)  
-            for (table in tables)  {
-              aTable<-meanTables$addItem(key="a")
-              for (i in seq_len(nrow(table))) {
-                  values<-as.data.frame(table[i,])
-                  aTable$addRow(rowKey=i,values)
-              }
-            }
-              
+      if (self$options$eDesc) {
+        meanTables<-self$results$emeansTables
+        tables<-lf.meansTables(model,terms)  
+        for (table in tables)  {
+          key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
+          aTable<-meanTables$get(key=key)
+          for (i in seq_len(nrow(table))) {
+            values<-as.data.frame(table[i,])
+            aTable$setRow(rowNo=i,values)
+          }
+          note<-attr(table,"note")
+          if (!is.null(note)) aTable$setNote(note,WARNS[note])
+        }
+      } # end of eDesc              
       
-
+            
 
     },
     .populateSimple=function(model) {

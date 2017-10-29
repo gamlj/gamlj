@@ -280,30 +280,15 @@ options:
             `'holm'`; provide no, Tukey, Scheffe, Bonferroni, and
             Holm Post Hoc corrections respectively
 
-    - name: descStats
-      title: Descriptive statistics
+    - name: eDesc
+      title: Estimated Marginal Means
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide descriptive statistics
 
-    - name: homo
-      title: Residual Variances Homogeneity tests
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), perform homogeneity tests
 
-    - name: qq
-      title: Q-Q plot of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
- 
     - name: plotError
       title: Error Bar Definition
       type: List

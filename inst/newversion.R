@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 library(yaml)
 check.version<-function() {
@@ -15,7 +14,6 @@ if (j000$version!=desc$Version) {
 desc$Version
 }
 
-=======
 library(yaml)
 #rmarkdown::render_site(input = "./docssource/")
 getVersion<-function() {
@@ -35,4 +33,3 @@ version<-getVersion()
 
 cmdz<-paste0("gitversion ",version)
 system(cmdz)
->>>>>>> b32813d866de113bc7509de6e9c030199af88090
