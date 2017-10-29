@@ -259,7 +259,6 @@ items:
       title: Observed Means 
       type: Array
       description: an array of observed mean main effects tables
-      visible: (odescMain)
       clearWith:
         - dep
         - modelTerms

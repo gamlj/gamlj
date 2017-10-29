@@ -179,7 +179,7 @@ gamljGzlmClass <- R6::R6Class(
       factorNames <- self$options$factors
       
       if (length(factorNames) > 0) {
-        
+
         data <- select(data, rev(factorNames))
         al <- as.list(data)
         names(al) <- rev(paste0('f', seq_len(length(al))))
@@ -187,7 +187,7 @@ gamljGzlmClass <- R6::R6Class(
         ll$stringsAsFactors <- FALSE
         grid <- do.call(base::expand.grid, ll)
         grid <- rev(grid)
-        
+
         for (i in seq_len(ncol(grid))) {
           colName <- colnames(grid)[[i]]
           descTable$addColumn(name=colName, title=factorNames[[i]], index=i)

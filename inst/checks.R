@@ -6,6 +6,20 @@ dat$threegroups<-factor(dat$threegroups)
 contrasts(dat$twogroups)<-contr.sum(2)
 contrasts(dat$threegroups)<-contr.sum(3)
 
+factors<-c("twogroups","threegroups")
+print(factors)
+factors<-c("twogroups")
+data<-dat[0,]
+(levs<-sapply(factors,function(f) levels(data[[f]]),simplify=F))
+class(levs)
+gg<-expand.grid(levs,stringsAsFactors = F)
+ff<-function(a) base::expand.grid(a,stringsAsFactors = F)
+ff(levs)
+grid<-do.call(expand.grid, as.list(levs))
+str(grid)
+q<-grid[1, drop=T]
+as.list(q)
+sapply(colnames(q),function(x) q[x])
 model<-lm(y~threegroups*twogroups,data=dat)
 confint(model,level = 0.95)
 

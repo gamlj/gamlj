@@ -617,7 +617,6 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 options=options,
                 name="omeansTables",
                 title="Observed Means",
-                visible="(odescMain)",
                 clearWith=list(
                     "dep",
                     "modelTerms"),

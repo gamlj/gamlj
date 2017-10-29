@@ -288,31 +288,27 @@ gamljGLMClass <- R6::R6Class(
        
        omeansTables <- self$results$omeansTables
        factorsAvailable <- self$options$factors
-       
-       if (length(factorNames) > 0) {
+       modelTerms<-private$.modelTerms()
+       if (length(modelTerms)==0)
+             return()
          
-         data <- select(data, rev(factorNames))
-         al <- as.list(data)
-         names(al) <- rev(paste0('f', seq_len(length(al))))
-         ll <- sapply(al, base::levels, simplify=FALSE)
-         ll$stringsAsFactors <- FALSE
-         grid <- do.call(base::expand.grid, ll)
-         grid <- rev(grid)
-         
-         for (i in seq_len(ncol(grid))) {
-           colName <- colnames(grid)[[i]]
-           descTable$addColumn(name=colName, title=factorNames[[i]], index=i)
+         data <-data[,factorsAvailable]
+         for (term in modelTerms) {
+            levs<-sapply(term,function(f) levels(data[[f]]),simplify=F)
+            grid<-do.call(base::expand.grid,list(levs))
+            aTable<-omeansTables$addItem(key=.nicifyTerms(term))
+            for (i in seq_along(term)) 
+                  aTable$addColumn(name=term[i], title=term[i], index=i)
+            
+            for (rowNo in seq_len(nrow(grid))) {
+                row <- grid[rowNo,]
+                if ( ! is.list(row))
+                    row <- as.list(row)
+                print(row)
+                aTable$addRow(rowKey=rowNo, values=row)
          }
-         
-         for (rowNo in seq_len(nrow(grid))) {
-           row <- grid[rowNo,]
-           if ( ! is.list(row))
-             row <- list(f1=row)
-           descTable$addRow(rowKey=row, values=row)
          }
-       }
-       # descriptives plots
-       
+
      },
     .initPostHoc=function(data) {
       
