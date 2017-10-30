@@ -259,12 +259,8 @@ items:
     - name: emeansTables
       title: Estimated Marginal Means 
       type: Array
-<<<<<<< HEAD
-      description: an array of observed mean main effects tables
-=======
       description: an array of predicted means tables
       visible: (eDesc)
->>>>>>> 285d3ad00e924044136b8ca35801c277d1607f31
       clearWith:
         - dep
         - modelTerms

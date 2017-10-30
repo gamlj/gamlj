@@ -285,33 +285,6 @@ gamljGLMClass <- R6::R6Class(
        stats::lm(form,data)
      },
      .initMeanTables=function(data) {
-       
-<<<<<<< HEAD
-       omeansTables <- self$results$omeansTables
-       factorsAvailable <- self$options$factors
-       modelTerms<-private$.modelTerms()
-       if (length(modelTerms)==0)
-             return()
-         
-         data <-data[,factorsAvailable]
-         for (term in modelTerms) {
-            levs<-sapply(term,function(f) levels(data[[f]]),simplify=F)
-            grid<-do.call(base::expand.grid,list(levs))
-            aTable<-omeansTables$addItem(key=.nicifyTerms(term))
-            for (i in seq_along(term)) 
-                  aTable$addColumn(name=term[i], title=term[i], index=i)
-            
-            for (rowNo in seq_len(nrow(grid))) {
-                row <- grid[rowNo,]
-                if ( ! is.list(row))
-                    row <- as.list(row)
-                print(row)
-                aTable$addRow(rowKey=rowNo, values=row)
-         }
-         }
-
-     },
-=======
 
        #### expected means ####
        if (self$options$eDesc) {
@@ -343,8 +316,6 @@ gamljGLMClass <- R6::R6Class(
        
      },     
            
-        
->>>>>>> 285d3ad00e924044136b8ca35801c277d1607f31
     .initPostHoc=function(data) {
       
       bs <- self$options$factors

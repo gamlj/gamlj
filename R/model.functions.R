@@ -9,7 +9,9 @@
       return("lmer")
   if ("lmerMod" %in% class(model))
       return("lmer")
-      
+  if ("multinom" %in% class(model))
+    return("multinomial")
+  
 }
 
 mf.aliased<-function(model) {
@@ -29,7 +31,6 @@ mf.aliased<-function(model) {
 }
 
 mf.predict_response<-function(model) {
-  print("using predicted")
   if (.which.class(model)=="glm" || .which.class(model)=="lm") {
   return(  predict(model,type="response"))    
   }
@@ -113,11 +114,16 @@ mf.estimate<-function(model) {
     return(function(form,data)
       stats::glm(form,data,family=model$family))
   }  
+  if (.which.class(model)=="multinomial") {  
+    return(function(form,data)
+       nnet::multinom(form,data))
+  }  
   
   
 }
 
 mf.summary=function(model) {
+
   if (.which.class(model)=="lm")   
      ss<-summary(model)$coefficients
   if (.which.class(model)=="lmer")   
@@ -128,6 +134,20 @@ mf.summary=function(model) {
     ss<-cbind(ss,expb)
     colnames(ss)<-c("estimate","se","z","p","expb")
   }
+  if (.which.class(model)=="multinomial") {
+    sumr<-summary(model)
+    rcof<-sumr$coefficients
+    cof<-as.data.frame(matrix(rcof,ncol=1))
+    names(cof)<-"estimate"
+    cof$dep<-rownames(rcof)
+    cof$variable<-rep(colnames(rcof),each=nrow(rcof))
+    se<-matrix(sumr$standard.errors,ncol=1)
+    cof$se<-as.numeric(se)
+    cof$expb<-exp(cof$estimate)  
+    cof$z<-cof$estimate/cof$se
+    cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
+    ss<-cof[order(cof$dep),]
+  }
   
   as.data.frame(ss)
 }
@@ -137,7 +157,11 @@ mf.anova=function(model) {
      ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
      return(ano)
   }
-     
+  if (.which.class(model)=="multinomial") {
+    ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+    return(ano)
+  }
+  
   if (.which.class(model)=="lm")
     return(car::Anova(model,test="F",type=3, singular.ok=T))
 }
@@ -147,7 +171,6 @@ mf.lmeranova=function(model) {
   if (.which.class(model)=="lmer") {   
     
   ano<-lmerTest::anova(model)
-  print(dim(ano))
   if (dim(ano)[1]==0)
     return(ano)
   if (dim(ano)[2]==4) {
@@ -195,23 +218,6 @@ mf.getModelMessages<-function(model) {
   message
 }
 
-mf.confint<-function(model,level) {
-  if (.which.class(model)=="lm") {
-    return(confint(model,level = level))
-  }
-  if (.which.class(model)=="glm") {
-    return(confint(model,level = level))
-  }
-  
-  if (.which.class(model)=="lmer") {
-    ci<-confint(model,method="Wald")
-    ci<-ci[!is.na(ci[,1]),]
-    if (is.null(dim(ci)))
-      ci<-matrix(ci,ncol=2)
-    return(ci)
-  }
-  
-}
 
 mf.give_family<-function(modelSelection) {
   
@@ -222,7 +228,7 @@ mf.give_family<-function(modelSelection) {
   if (modelSelection=="poisson")
     return(poisson())
   if (modelSelection=="multinomial")
-    return("not yet")
+    return("multinomial")
   
   
   NULL  
@@ -247,5 +253,70 @@ mf.checkData<-function(dep,data,modelType) {
       } 
      if (modelType=="multinomial")
             data[[dep]] <- factor(data[[dep]])
+
      data
 }
+
+
+###### confidence intervals ##########
+mf.confint<- function(x,...) UseMethod(".confint")
+
+.confint.default<-function(model,level) 
+  return(FALSE)
+
+### this comes from https://github.com/cran/nnet/blob/master/R/multinom.R becaue
+### the version of nnet that I have now (7.3-13) gives an error with confint.multinom
+
+.confint.lm<-function(model,level) 
+    return(confint(model,level = level))
+  
+.confint.glm<-function(model,level)  
+    return(confint(model,level = level))
+
+.confint.lmer<-function(model,level)  {
+
+      ci<-confint(model,method="Wald")
+      ci<-ci[!is.na(ci[,1]),]
+      if (is.null(dim(ci)))
+          ci<-matrix(ci,ncol=2)
+      return(ci)
+  }
+
+.confint.multinom <- function (object, level = 0.95, ...) 
+  {
+  ci<-confint(object,level)
+  print(ci)
+  return(ci)
+  cf <- coef(object)
+  ## matrix case covers e.g. multinom.
+  pnames <- if(is.matrix(cf)) colnames(cf) else names(cf)
+  parm <- seq_along(pnames)
+  a <- (1 - level)/2
+  a <- c(a, 1 - a)
+  pct <- paste(round(100*a, 1), "%")
+  fac <- qnorm(a)
+  if(is.matrix(cf)) {
+    
+    ses <- matrix(sqrt(diag(vcov(object))), ncol=ncol(cf),
+                  byrow=TRUE)[, parm, drop = FALSE]
+    
+    cf <- cf[, parm, drop = FALSE]
+    ci <- array(NA, dim = c(dim(cf), 2L),
+                dimnames = c(dimnames(cf), list(pct)))
+    ci[,,1L] <- cf + ses*fac[1L]
+    ci[,,2L] <- cf + ses*fac[2L]
+    aperm(ci, c(2L,3L,1L))
+  } else {
+    ci <- array(NA, dim = c(length(parm), 2L),
+                dimnames = list(pnames[parm], pct))
+    ses <- sqrt(diag(vcov(object)))[parm]
+    ci[] <- cf[parm] + ses %o% fac
+    
+    ci
+  }
+  cim<-NULL
+  for (i in seq_len(dim(ci)[3]))
+    cim<-rbind(cim,(ci[,,i]))
+  return(cim)
+}
+

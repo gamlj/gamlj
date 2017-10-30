@@ -1,5 +1,4 @@
 library(ggplot2)
-
 #' @import ggplot2
 gamljGzlmClass <- R6::R6Class(
   "gamljGzlmClass",
@@ -49,7 +48,6 @@ gamljGzlmClass <- R6::R6Class(
         if (is.null(afamily))
             return()
         dep <- self$options$dep
-        print(dep)
         factors <- self$options$factors
         modelTerms <- private$.modelTerms()
         infoTable<-self$results$info
@@ -62,7 +60,6 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
         infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
         infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
-        print(names(info))
         if ("note" %in% names(info))
            infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
         
@@ -87,12 +84,9 @@ gamljGzlmClass <- R6::R6Class(
         modelTerms <- private$.modelTerms()
       
         if (length(modelTerms) > 0) {
-#           anovaTable$addRow(rowKey="r2model", list(name="Model"))
-#           anovaTable$addFormat(col=1, rowNo=1, format=Cell.BEGIN_END_GROUP)
-           
-           for (term in modelTerms) {
+             for (term in modelTerms) {
                anovaTable$addRow(rowKey=term, list(name=jmvcore::stringifyTerm(term)))
-           }  
+            }  
         
            anovaTable$addFormat(col=1, rowNo=1,format=Cell.BEGIN_GROUP)
            anovaTable$addFormat(col=1, rowNo=length(modelTerms), format=Cell.END_GROUP)
@@ -111,10 +105,17 @@ gamljGzlmClass <- R6::R6Class(
            ciWidth<-self$options$paramCIWidth
            estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           if (afamily=="multinomial") {
+             estimatesTable$addColumn(name="dep",title="Response",index=1)
+             levels<-levels(data[[dep]])[-1]
+             for (level in levels) {
+                 for (i in seq_along(terms)) 
+                     estimatesTable$addRow(rowKey=i, list(dep=level,name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
+             }
+           } else
+                for (i in seq_along(terms)) 
+                  estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
            
-           for (i in seq_along(terms)) 
-                estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
-      
        # contrasts
       
            for (contrast in self$options$contrasts) {
@@ -179,37 +180,7 @@ gamljGzlmClass <- R6::R6Class(
       private$.initPostHoc(data)
       
       # descriptives
-<<<<<<< HEAD
-      
-      descTable <- self$results$desc
-      factorNames <- self$options$factors
-      
-      if (length(factorNames) > 0) {
-
-        data <- select(data, rev(factorNames))
-        al <- as.list(data)
-        names(al) <- rev(paste0('f', seq_len(length(al))))
-        ll <- sapply(al, base::levels, simplify=FALSE)
-        ll$stringsAsFactors <- FALSE
-        grid <- do.call(base::expand.grid, ll)
-        grid <- rev(grid)
-
-        for (i in seq_len(ncol(grid))) {
-          colName <- colnames(grid)[[i]]
-          descTable$addColumn(name=colName, title=factorNames[[i]], index=i)
-        }
-        
-        for (rowNo in seq_len(nrow(grid))) {
-          row <- grid[rowNo,]
-          if ( ! is.list(row))
-            row <- list(f1=row)
-          descTable$addRow(rowKey=row, values=row)
-        }
-      }
-      # descriptives plots
-=======
       private$.initMeanTables(data)
->>>>>>> 285d3ad00e924044136b8ca35801c277d1607f31
       private$.initDescPlots(data)
     },
     .run=function() {
@@ -259,17 +230,15 @@ gamljGzlmClass <- R6::R6Class(
           reject(message)
         }
         
-        
         private$.model <- model
         self$results$.setModel(model)
-        
-        
-        infoTable$setRow(rowKey="r2",list(value=1-(model$deviance/model$null.deviance)))
+
+        infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=model$aic))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
-        infoTable$setRow(rowKey="conv",list(value=ifelse(model$converged,"yes","no"),comm=ifelse(model$converged,"A solution was found","Results may be misleading")))
+        infoTable$setRow(rowKey="conv",mi.converged(model))
         
-          anovaResults <- try(mf.anova(model))
+        anovaResults <- try(mf.anova(model))
           if (isError(anovaResults)) {
             message <- extractErrorMessage(anovaResults)
             anovaTable$setNote("anocrash",message)
@@ -282,27 +251,20 @@ gamljGzlmClass <- R6::R6Class(
           tableRow<-anovaResults[i,]
           colnames(tableRow)<-TCONV[["glm.f"]]
           anovaTable$setRow(rowNo=i, tableRow)
-#          anovaTable$setRow(rowNo=i, list(name=rowName))
           }
-        ## residual variance
-#        indices<-private$.r2indices(model)
-#        anovaTable$setRow(rowKey='',list(variable="Residuals",term="",ss=errSS,df=errdf,ms=errMS,F="",etaSqP="",etaSq="",omegaSq="",p=""))
-#        anovaTable$setNote("r2",paste("R-squared=",indices[[1]],", adjusted R-squared=",indices[[2]]))
 
-        
-        if (mf.aliased(model)) {
+        if (mi.aliased(model)) {
           infoTable$setRow(rowKey="conv",list(comm="Results may be misleading because of aliased coefficients. See Tables notes"))
           anovaTable$setNote("aliased",WARNS["ano.aliased"])    
           estimatesTable$setNote("aliased",WARNS["ano.aliased"])    
         }          
-        
         parameters<-try(mf.summary(model))
         if (isError(parameters)) {
           message <- extractErrorMessage(parameters)
           estimatesTable$setNote("sumcrash",message)
           STOP<-T
         }
-
+        
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
         if (self$options$showParamsCI) {
@@ -318,8 +280,8 @@ gamljGzlmClass <- R6::R6Class(
           STOP<-TRUE
         }
         }
-        
         labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
+        labels<-rep(labels,length(levels(data[[dep]])))
         for (i in 1:nrow(parameters)) {
           tableRow=parameters[i,]
           estimatesTable$setRow(rowNo=i,tableRow)
@@ -635,6 +597,10 @@ gamljGzlmClass <- R6::R6Class(
 #### we need an .estimate() here ###
      .estimate=function(form,data) {
         modelType<-self$options$modelSelection
+        if (modelType=="multinomial") {
+          mod<-nnet::multinom(form,data,model = T)
+          return(mod)
+        }
         stats::glm(form,data,family=mf.give_family(modelType))
       },
 
