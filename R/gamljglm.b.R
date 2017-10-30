@@ -285,7 +285,6 @@ gamljGLMClass <- R6::R6Class(
        stats::lm(form,data)
      },
      .initMeanTables=function(data) {
-       
 
        #### expected means ####
        if (self$options$eDesc) {
@@ -317,7 +316,6 @@ gamljGLMClass <- R6::R6Class(
        
      },     
            
-        
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
