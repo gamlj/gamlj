@@ -163,7 +163,6 @@
 
 
 .getFormulaContrastsLabels<-function(contrasts,formula,data) {
-  
   contrasts<-as.data.frame(do.call(rbind,contrasts))
   modelmatrix<-model.matrix(formula,data)
   facts<-names(attr(modelmatrix,"contrasts"))
@@ -317,8 +316,8 @@
   } else {
     .levels<-c(mean(mod)+sd(mod),mean(mod),mean(mod)-sd(mod))
   }
-  params<-data.frame()
-  ftests<-data.frame()
+  params<-data.frame(stringsAsFactors = F)
+  ftests<-data.frame(stringsAsFactors = F)
   for (i in .levels) {
     mod<-atSomeLevel(moderator,i,data)
     params<-rbind(params,extractEffect(mod,variable,moderator,i))

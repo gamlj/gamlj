@@ -82,10 +82,12 @@ gamljGzlmClass <- R6::R6Class(
 
       
         modelTerms <- private$.modelTerms()
-      
-        if (length(modelTerms) > 0) {
-             for (term in modelTerms) {
-               anovaTable$addRow(rowKey=term, list(name=jmvcore::stringifyTerm(term)))
+        formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
+        terms<-colnames(attr(terms(formula),"factors"))
+        
+        if (length(terms) > 0) {
+             for (term in terms) {
+               anovaTable$addRow(rowKey=term, list(name=.nicifyTerms(term)))
             }  
         
            anovaTable$addFormat(col=1, rowNo=1,format=Cell.BEGIN_GROUP)
@@ -105,7 +107,8 @@ gamljGzlmClass <- R6::R6Class(
            ciWidth<-self$options$paramCIWidth
            estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-           if (afamily=="multinomial") {
+
+          if (afamily=="multinomial") {
              estimatesTable$addColumn(name="dep",title="Response",index=1)
              levels<-levels(data[[dep]])[-1]
              for (level in levels) {
@@ -274,7 +277,7 @@ gamljGzlmClass <- R6::R6Class(
           parameters<-cbind(parameters,ci) 
            })
         if (isError(citry)) {
-          message <- extractErrorMessage(ci)
+          message <- extractErrorMessage(citry)
           infoTable$setRow(rowKey="conv",list(value="no"))
           estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
           STOP<-TRUE
@@ -635,7 +638,7 @@ gamljGzlmClass <- R6::R6Class(
     .initDescPlots=function(data) {
       isAxis <- ! is.null(self$options$plotHAxis)
       isMulti <- ! is.null(self$options$plotSepPlots)
-      
+
       self$results$get('descPlot')$setVisible( ! isMulti && isAxis)
       self$results$get('descPlots')$setVisible(isMulti)
 

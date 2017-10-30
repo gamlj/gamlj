@@ -126,8 +126,19 @@ mf.summary=function(model) {
 
   if (.which.class(model)=="lm")   
      ss<-summary(model)$coefficients
-  if (.which.class(model)=="lmer")   
+  if (.which.class(model)=="lmer") {   
     ss<-lmerTest::summary(model)$coefficients
+    if (dim(ss)[2]==3) {
+      colnames(ss)<-c("estimate","se","t")
+      if (dim(ss)[1]==1)
+         attr(ss,"warning")<-"lmer.df"
+      else
+        attr(ss,"warning")<-"lmer.zerovariance"
+    }
+    else
+      colnames(ss)<-c("estimate","se","df","t","p")
+    return(ss)
+   }
   if (.which.class(model)=="glm") {   
     ss<-summary(model)$coefficients
     expb<-exp(ss[,"Estimate"])  
@@ -164,6 +175,10 @@ mf.anova=function(model) {
   
   if (.which.class(model)=="lm")
     return(car::Anova(model,test="F",type=3, singular.ok=T))
+  
+  if (.which.class(model)=="lmer") {
+   return(car::Anova(model,type=3,test="F",singular.ok=T))
+  }  
 }
 
 mf.lmeranova=function(model) {
@@ -273,6 +288,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
 .confint.glm<-function(model,level)  
     return(confint(model,level = level))
 
+.confint.merModLmerTest<-function(model,level) 
+                                return(.confint.lmer(model,level))
+
 .confint.lmer<-function(model,level)  {
 
       ci<-confint(model,method="Wald")
@@ -285,38 +303,10 @@ mf.confint<- function(x,...) UseMethod(".confint")
 .confint.multinom <- function (object, level = 0.95, ...) 
   {
   ci<-confint(object,level)
-  print(ci)
   return(ci)
-  cf <- coef(object)
-  ## matrix case covers e.g. multinom.
-  pnames <- if(is.matrix(cf)) colnames(cf) else names(cf)
-  parm <- seq_along(pnames)
-  a <- (1 - level)/2
-  a <- c(a, 1 - a)
-  pct <- paste(round(100*a, 1), "%")
-  fac <- qnorm(a)
-  if(is.matrix(cf)) {
-    
-    ses <- matrix(sqrt(diag(vcov(object))), ncol=ncol(cf),
-                  byrow=TRUE)[, parm, drop = FALSE]
-    
-    cf <- cf[, parm, drop = FALSE]
-    ci <- array(NA, dim = c(dim(cf), 2L),
-                dimnames = c(dimnames(cf), list(pct)))
-    ci[,,1L] <- cf + ses*fac[1L]
-    ci[,,2L] <- cf + ses*fac[2L]
-    aperm(ci, c(2L,3L,1L))
-  } else {
-    ci <- array(NA, dim = c(length(parm), 2L),
-                dimnames = list(pnames[parm], pct))
-    ses <- sqrt(diag(vcov(object)))[parm]
-    ci[] <- cf[parm] + ses %o% fac
-    
-    ci
-  }
-  cim<-NULL
-  for (i in seq_len(dim(ci)[3]))
-    cim<-rbind(cim,(ci[,,i]))
-  return(cim)
+  # cim<-NULL
+  # for (i in seq_len(dim(ci)[3]))
+  #   cim<-rbind(cim,(ci[,,i]))
+  # return(cim)
 }
 

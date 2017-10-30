@@ -64,13 +64,15 @@ gamljGLMClass <- R6::R6Class(
         # main table
       
         modelTerms <- private$.modelTerms()
-      
-        if (length(modelTerms) > 0) {
+        formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
+        terms<-colnames(attr(terms(formula),"factors"))
+        
+        if (length(terms) > 0) {
            anovaTable$addRow(rowKey="r2model", list(name="Model"))
            anovaTable$addFormat(col=1, rowNo=1, format=Cell.BEGIN_END_GROUP)
            
-           for (term in modelTerms) {
-               anovaTable$addRow(rowKey=term, list(name=jmvcore::stringifyTerm(term)))
+           for (term in terms) {
+               anovaTable$addRow(rowKey=term, list(name=.nicifyTerms(term)))
            }  
         
            anovaTable$addFormat(col=1, rowNo=2,format=Cell.BEGIN_GROUP)
@@ -87,7 +89,6 @@ gamljGLMClass <- R6::R6Class(
            anovaTable$setNote("r2",paste("R-squared= 0.000, adjusted R-squared= 0.000"))
            
       # estimates
-           formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
            terms<-colnames(model.matrix(formula,data))  
            labels<-.getFormulaContrastsLabels(self$options$contrasts,formula,data) 
            ciWidth<-self$options$paramCIWidth
@@ -180,12 +181,6 @@ gamljGLMClass <- R6::R6Class(
         
         data <- private$.cleanData()
         
-        # data <- lapply(data, function(x) {
-        #   if (is.factor(x))
-        #     levels(x) <- toB64(levels(x))
-        #   return(x)
-        # })
-        
         if (is.factor(data[[dep]]))
           reject('Dependent variable must be numeric')
         
@@ -258,7 +253,6 @@ gamljGLMClass <- R6::R6Class(
         ciWidth<-self$options$paramCIWidth/100
         ci<-mf.confint(model,level=ciWidth)
         eresults<-cbind(eresults,ci) 
-        
         labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
         for (i in 1:nrow(eresults)) {
           tableRow=eresults[i,]
@@ -467,7 +461,6 @@ gamljGLMClass <- R6::R6Class(
       if ( ! self$options$homo)
         return()
       data<-model$model
-      print(str(model))
       data$res<-residuals(model)
       factors <- mf.getModelFactors(model)
       rhs <- paste0('`', factors, '`', collapse=':')
@@ -626,7 +619,6 @@ gamljGLMClass <- R6::R6Class(
         term[quoted] <- substring(term[quoted], 2, nchar(term[quoted])-1)
         modelTerms[[i]] <- term
       }
-      
       modelTerms
     },
     .initDescPlots=function(data) {
@@ -637,15 +629,18 @@ gamljGLMClass <- R6::R6Class(
       self$results$get('descPlots')$setVisible(isMulti)
       
       if (isMulti) {
-        return()    
         sepPlotsName <- self$options$plotSepPlots
         sepPlotsVar <- data[[sepPlotsName]]
         if(is.factor(sepPlotsVar))
-             sepPlotsLevels <- 1:length(levels(sepPlotsVar))
-        else sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
+          sepPlotsLevels <- levels(sepPlotsVar)
+        else 
+          sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
+        
         array <- self$results$descPlots
-        for (level in sepPlotsLevels)
-          array$addItem(level)
+        for (level in sepPlotsLevels) {
+          title<-paste(sepPlotsName,"=",level)
+          array$addItem(title)
+        }
       }
     },
 

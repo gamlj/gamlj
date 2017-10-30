@@ -1,5 +1,6 @@
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
+TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
 MINFO<-list()
 MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),

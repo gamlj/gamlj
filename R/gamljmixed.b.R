@@ -9,7 +9,8 @@ gamljMixedClass <- R6::R6Class(
       print("init")
       reml<-self$options$reml
       infoTable<-self$results$info
-
+      modelTerms<-private$.modelTerms()
+      
       getout<-FALSE
       if (is.null(self$options$dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -65,11 +66,13 @@ gamljMixedClass <- R6::R6Class(
       }
       
       ## anova Table 
-      aTable<- self$results$anova
-      modelTerms<-self$options$modelTerms
-      if (length(modelTerms) > 0) {
-        for (i in seq_along(modelTerms)) 
-            aTable$addRow(rowKey=i, list(name=" "))
+      if (length(modelTerms)>0) {
+          aTable<- self$results$anova
+          modelTerms<-self$options$modelTerms
+          if (length(modelTerms) > 0) {
+              for (i in seq_along(modelTerms)) 
+                  aTable$addRow(rowKey=i, list(name=" "))
+          }
       }
       
       ## fixed effects parameters
@@ -85,48 +88,48 @@ gamljMixedClass <- R6::R6Class(
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
 
-        ######### simple effects tables ##############
+      ######### simple effects tables ##############
+      
+      variable<-self$options$simpleVariable
+      moderator<-self$options$simpleModerator
+      threeway<-self$options$simple3way
+      if (!is.null(variable) & !is.null(moderator)) {
+        # N dummies in X-axis
+        xlevels<-length(levels(data[[variable]]))
+        xlevels<-ifelse(xlevels>1,(xlevels-1),1)
+        # N levels of moderator
+        modlevels<-length(levels(data[[moderator]]))
+        modlevels<-ifelse(modlevels>1,modlevels,3)
+        nrows<-modlevels*xlevels  
+        # create the tables with right rows
+        simpleEffectsTables<-self$results$simpleEffects
+        simpleEffectsAnovas<-self$results$simpleEffectsAnovas
+        if (!is.null(threeway)) {
+          mod2levels<-length(levels(data[[threeway]]))
+          mod2levels<-ifelse(mod2levels>1,mod2levels,3)
+        } else
+          mod2levels<-1
         
-        variable<-self$options$simpleVariable
-        moderator<-self$options$simpleModerator
-        threeway<-self$options$simple3way
-        if (!is.null(variable) & !is.null(moderator)) {
-          # N dummies in X-axis
-          xlevels<-length(levels(data[[variable]]))
-          xlevels<-ifelse(xlevels>1,(xlevels-1),1)
-          # N levels of moderator
-          modlevels<-length(levels(data[[moderator]]))
-          modlevels<-ifelse(modlevels>1,modlevels,3)
-          nrows<-modlevels*xlevels  
-          # create the tables with right rows
-          simpleEffectsTables<-self$results$simpleEffects
-          simpleEffectsAnovas<-self$results$simpleEffectsAnovas
-          if (!is.null(threeway)) {
-            mod2levels<-length(levels(data[[threeway]]))
-            mod2levels<-ifelse(mod2levels>1,mod2levels,3)
-          } else
-            mod2levels<-1
+        for (j in 1:mod2levels) {
+          title<-paste("Simple effects of",variable)
+          key<-paste(variable,j,sep="")
           
-          for (j in 1:mod2levels) {
-            title<-paste("Simple effects of",variable)
-            key<-paste(variable,j,sep="")
-            
-            ## init simple ANOVA tables
-            ftable<-simpleEffectsAnovas$addItem(key=key)
-            ftable$setTitle(title)
-            
-            for (i in 1:modlevels) 
-              ftable$addRow(rowKey=i,list(variable=" "))        
-            
-            ## init simple parameters tables
-            ptable<-simpleEffectsTables$addItem(key=key)
-            ptable$setTitle(title)
-            for (i in 1:nrows) 
-              ptable$addRow(rowKey=i,list(variable=" "))        
-            
-          }  
-        }  # end of simple effects tables
-        
+          ## init simple ANOVA tables
+          ftable<-simpleEffectsAnovas$addItem(key=key)
+          ftable$setTitle(title)
+          
+          for (i in 1:modlevels) 
+            ftable$addRow(rowKey=i,list(variable=" "))        
+          
+          ## init simple parameters tables
+          ptable<-simpleEffectsTables$addItem(key=key)
+          ptable$setTitle(title)
+          for (i in 1:nrows) 
+            ptable$addRow(rowKey=i,list(variable=" "))        
+          
+        }  
+      }  # end of simple effects tables
+      
         
         # other inits
         private$.initPlots(data)
@@ -144,34 +147,45 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       reml<-self$options$reml
+      modelTerms<-private$.modelTerms()
+      
+      ### collect the tables #######
+      infoTable<-self$results$info
+      fixedTable <- self$results$fixed
+      randomTable <- self$results$random
+      randomCovTable<-self$results$randomCov
+      aTable<-self$results$anova
       
       ####  prepare the model formula              ####      
             
       modelFormula<-private$.checkModel()
+      
       if (modelFormula!=FALSE)    {
         
         data<-private$.cleandata() 
+      
         for (scaling in self$options$scaling) {
           cluster<-clusters[[1]]
           data[[scaling$var]]<-.scaleContinuous(data[[scaling$var]],scaling$type,data[[cluster]])  
         }
         
-          aRun <- try({
+        aRun <- try({
             model<-private$.estimate(modelFormula, data=data,REML = reml)
             wars<-warnings()
             })
         if (jmvcore::isError(aRun)) 
           jmvcore::reject(jmvcore::extractErrorMessage(aRun), code='error')
-        ss <- try(lmerTest::summary(model), silent=TRUE)
-        noPvalue=FALSE
-        if (jmvcore::isError(ss)) {
-          noPvalue=TRUE
-          nopnote<-jmvcore::extractErrorMessage(ss)
-        }
+        
+        test_parameters<-try(parameters<-mf.summary(model))
+          if (isError(test_parameters)) {
+            message <- extractErrorMessage(test_parameters)
+          }
+        if (!is.null(attr(parameters,"warning"))) 
+            fixedTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
+
         
         private$.model <- model
-        infoTable<-self$results$info
-        
+        ss<-summary(model)
         ### prepare info table #########       
         info.call<-as.character(model@call)[[2]]
         info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
@@ -180,8 +194,8 @@ gamljMixedClass <- R6::R6Class(
         info.loglik<-ss$AICtab[3]
         r2<-try(r.squared(model))
         if (jmvcore::isError(r2)){
-          info.r2m<-"NA"        
-          info.r2c<-"NA"
+          info.r2m<-NaN        
+          info.r2c<-NaN
           infoTable$setNote("r2","R-squared cannot be computed.")  
         } else {
           info.r2m<-r2[[4]]        
@@ -200,8 +214,7 @@ gamljMixedClass <- R6::R6Class(
         
         ### end of info table ###
         
-        
-        randomTable <- self$results$random
+        ### random table ######        
         vc<-as.data.frame(ss$varcor)
         vcv<-vc[is.na(vc[,3]),]
         vcv$var1[is.na(vcv$var1)]<-""
@@ -212,14 +225,10 @@ gamljMixedClass <- R6::R6Class(
             randomTable$addRow(rowKey=i, list(groups=vcv$grp[i],name=vcv$var1[i],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
         }
         info<-    paste("Numer of Obs:", ss$devcomp$dims["n"],", groups:",names(ss$ngrps),",",ss$ngrps,collapse = "")
-#        print(class(info))
         randomTable$setNote('info', info)
         
 
         ### Covariance among random effects ###
-        
-        randomCovTable<-self$results$randomCov
-        
         vcv<-vc[!is.na(vc[,3]),]
         if (dim(vcv)[1]>0) {
           for (i in 1:dim(vcv)[1]) {
@@ -230,18 +239,19 @@ gamljMixedClass <- R6::R6Class(
         ### ### ### ### ###
         
         # anova table ##
-        suppressWarnings({
-          anova <- try(mf.lmeranova(model), silent=TRUE) # end suppressWarnings
-        })
+        if (length(modelTerms)>0) {
+          suppressWarnings({
+                          anova <- try(mf.lmeranova(model), silent=TRUE) # end suppressWarnings
+           })
         if (jmvcore::isError(anova)) 
           jmvcore::reject(jmvcore::extractErrorMessage(anova), code='error')
+        
         labels<-rownames(anova)
-        aTable<-self$results$anova
         for (i in seq_len(dim(anova)[1])) {
-        tableRow<-anova[i,]  
-        aTable$setRow(rowNo=i,tableRow)
-        aTable$setRow(rowNo=i,list(name=labels[i]))
-        }
+            tableRow<-anova[i,]  
+            aTable$setRow(rowNo=i,tableRow)
+            aTable$setRow(rowNo=i,list(name=labels[i]))
+         }
         aTable$setNote("df",paste(attr(anova,"method"),"method for degrees of freedom"))
         messages<-mf.getModelMessages(model)
         for (i in seq_along(messages)) {
@@ -252,28 +262,34 @@ gamljMixedClass <- R6::R6Class(
           aTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
           infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
         }
-          ### parameter table ####
+        }
+        ### parameter table ####
         
-        fixedTable <- self$results$fixed
-        eresults<-ss[['coefficients']]
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
-        ci<-mf.confint(model,level=ciWidth)
-        eresults<-cbind(eresults,ci) 
-
-        if (dim(eresults)[2]==5) {
-           colnames(eresults)<-c("estimate","std","t","cilow","cihig")
-           if (dim(eresults)[1]<2)
-                    fixedTable$setNote("warning",WARNS["lmer.df"])
-           else
-                    fixedTable$setNote("warning",WARNS["lmer.zerovariance"])
+        if (self$options$showParamsCI) {
+          citry<-try({
+            ci<-mf.confint(model,level=ciWidth)
+            colnames(ci)<-c("cilow","cihig")
+            parameters<-cbind(parameters,ci) 
+          })
+          if (isError(citry)) {
+            message <- extractErrorMessage(citry)
+            fixedTable$setNote("warning",WARNS["lmer.df"])
+            fixedTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+          }
         }
-        else      
-          colnames(eresults)<-c("estimate","std","df","t","p","cilow","cihig")
-        
-        for (i in 1:nrow(eresults)) {
-                tableRow=eresults[i,]
-#                fixedTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
+        # if (dim(eresults)[2]==5) {
+        #    colnames(eresults)<-c("estimate","std","t","cilow","cihig")
+        #    if (dim(eresults)[1]<2)
+        #             fixedTable$setNote("warning",WARNS["lmer.df"])
+        #    else
+        #             fixedTable$setNote("warning",WARNS["lmer.zerovariance"])
+        # }
+        # else      
+        #   colnames(eresults)<-c("estimate","std","df","t","p","cilow","cihig")
+        for (i in 1:nrow(parameters)) {
+                tableRow=parameters[i,]
                 fixedTable$setRow(rowNo=i,tableRow)
           }
 
@@ -683,54 +699,35 @@ gamljMixedClass <- R6::R6Class(
   
   
 },
-
 .populateSimple=function(model) {
-      print(".populateSimple")
-      ### This should be fairly automatic for linear models 
-      ### but the columns of the F table should be updated
-      ### depending on the linear model one is estimating
-      ### because lm(), glm() and lmer() anovas gives different 
-      ### columns for the F table
+  variable<-self$options$simpleVariable
+  moderator<-self$options$simpleModerator
+  threeway<-self$options$simple3way
+  data<-mf.getModelData(model)
+  simpleEffectsTables<-self$results$simpleEffects
+  simpleEffectsAnovas<-self$results$simpleEffectsAnovas
+  
+  .fillTheFTable<-function(results,aTable) {
+    ftests<-results[[2]]
+    ### ftests      
+    for (i in seq_len(dim(ftests)[1])) {
+      tableRow<-ftests[i,]
+      colnames(tableRow)<-c(TCONV[["mixed.f"]],c("level","variable")) 
+      aTable$setRow(rowNo=i,tableRow)
       
-       variable<-self$options$simpleVariable
-       moderator<-self$options$simpleModerator
-       threeway<-self$options$simple3way
-       data<-mf.getModelData(model)
-       simpleEffectsTables<-self$results$simpleEffects
-       simpleEffectsAnovas<-self$results$simpleEffectsAnovas
-       reml<-self$options$reml
-       
-      .fillTheFTable<-function(results,aTable) {
-          ftests<-results[[2]]
-          ### ftests      
-          for (i in seq_len(dim(ftests)[1])) {
-            r<-ftests[i,]
-            row<-list(variable=r$variable,
-            term=r$level,
-            df1=r$Df,
-            df2=r$Df.res,
-            F=r$`F`,
-            p=r$`Pr(>F)`)
-            aTable$setRow(rowNo=i,row)
-          }
-        } #### end of .fillTheFTable
-             
-      .fillThePTable<-function(results,aTable) {
-          params<-results[[1]]
-          what<-params$level
-          for (i in seq_len(dim(params)[1])) {
-             r<-params[i,]
-             row<-list(variable=r$variable,
-             term=r$level,
-             estimate=r$Estimate,
-             std=r$`Std. Error`,
-             t=r$`t value`,
-             p=r$`Pr(>|t|)`)
-             aTable$setRow(rowNo=i,row)
-             if (what!=r$level)  
-                aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
-             what<-r$level
-          }
+    }
+  } #### end of .fillTheFTable
+  
+  .fillThePTable<-function(results,aTable) {
+    params<-results[[1]]
+    what<-params$level
+    for (i in seq_len(dim(params)[1])) {
+      tableRow<-params[i,]
+      aTable$setRow(rowNo=i,tableRow)
+      if (what!=tableRow$level)  
+        aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
+      what<-tableRow$level
+    }
   } ##### end of .fillThePTable
   
   if (is.null(variable) | is.null(moderator)) 
@@ -742,13 +739,7 @@ gamljMixedClass <- R6::R6Class(
     ### ftests
     key=paste(variable,1,sep="")
     ftable<-simpleEffectsAnovas$get(key=key)
-    if (reml) {
-      .fillTheFTable(results,ftable)  
-      ftable$setNote("df",WARNS["se.df"])
-    } else 
-      ftable$setNote("lmer.roreml",WARNS["lmer.noreml"])
-    
-    
+    .fillTheFTable(results,ftable)      
     ### parameters
     ptable<-simpleEffectsTables$get(key=key)
     .fillThePTable(results,ptable)
@@ -759,10 +750,9 @@ gamljMixedClass <- R6::R6Class(
         ptable$setNote("inter",WARNS["se.interactions"])
       else if (.term.develop(term)<length(private$.modelTerms()))
         ptable$setNote("covs",WARNS["se.covariates"])
-    } else {
-           ptable$setNote("noint",WARNS["se.noint"])
-           ftable$setNote("noint",WARNS["se.noint"])
-    }
+    } else 
+      ptable$setNote("noint",WARNS["se.noint"])
+    
     ### end of warnings ###
   } else {
     data$mod2<-data[,threeway]
@@ -787,13 +777,8 @@ gamljMixedClass <- R6::R6Class(
       key=paste(variable,i,sep="")
       ### F table
       ftable<-simpleEffectsAnovas$get(key=key)
-      if (reml) {     
       ftable$setTitle(title)
       .fillTheFTable(results,ftable)      
-      ftable$setNote("df",WARNS["se.df"])
-      } else
-        ftable$setNote("lmer.noreml",WARNS["lmer.noreml"])
-      
       ### parameters
       ptable<-simpleEffectsTables$get(key=key)
       ptable$setTitle(title)
@@ -802,10 +787,13 @@ gamljMixedClass <- R6::R6Class(
   } # end of if (is.null(threeway)) 
   
 },
-    .modelTerms=function() {
+
+  .modelTerms=function() {
   modelTerms <- self$options$modelTerms
-  if (length(modelTerms) == 0)
-    modelTerms <- private$.ff()
+  if (class(modelTerms)!="list")
+      modelTerms<-private$.ff()
+  # If we are in interactive mode the model should be well specified, otherwise (if R mode)
+  # no modelTerms means full model
   modelTerms
 },
     .ff=function() {

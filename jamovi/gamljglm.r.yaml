@@ -1,6 +1,6 @@
 ---
 name:  gamljGLM
-title: GLM
+title: General Linear Model
 jrs: '1.0'
 
 items:
@@ -100,6 +100,31 @@ items:
           title: Beta
           type: number
           visible: (effectSize:beta)
+
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
 
     - name: simpleEffectsAnovas
       title: Simple Effects ANOVA
@@ -212,30 +237,6 @@ items:
           clearWith:
             - dep
             - modelTerms
-
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
 
 
     - name: postHoc

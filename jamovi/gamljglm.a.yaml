@@ -46,12 +46,8 @@ options:
     - name: dep
       title: Dependent Variable
       type: Variable
-      suggested:
-        - continuous
       permitted:
         - continuous
-        - nominal
-        - ordinal
       description:
           R: >
             a string naming the dependent variable from `data`, variable
@@ -60,10 +56,6 @@ options:
     - name: factors
       title: Fixed Factors
       type: Variables
-      suggested:
-        - nominal
-        - ordinal
-        - nominaltext
       permitted:
         - nominal
         - ordinal
@@ -75,9 +67,6 @@ options:
     - name: covs
       title: Covariates
       type: Variables
-      suggested:
-        - continuous
-        - ordinal
       permitted:
         - continuous
         - nominal

@@ -98,6 +98,31 @@ items:
           type: number
           format: zto,pvalue
 
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
+
     - name: simpleEffectsAnovas
       title: Simple Effects Analysis of Deviance
       type: Array
@@ -174,29 +199,6 @@ items:
       description: The underlying `glm` object
 
 
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
 
 
     - name: postHoc
