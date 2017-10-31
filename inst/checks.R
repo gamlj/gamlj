@@ -35,7 +35,8 @@ a$estimate
 ####### multinomial ########à
 library(nnet)
 names(dat)
-dat$q<-dat$bfac
+dat$groups3<-factor(group3)
 model<-multinom(groups3 ~bfac*x, data = dat, model = TRUE)
-qq<-lf.simpleEffects(model,"bfac","x")
-mf.confint(model,level=0.95)
+lf.simpleEffects(model,"bfac","x")
+#mf.confint(model,level=0.95)
+terms(model)
