@@ -378,7 +378,7 @@ lf.meansTables<-function(model,terms) {
          long<-reshape(data,varying=pnames,idvar="id",direction = "long",v.names = "fit")
          tab<-aggregate(long$fit,as.list(long[,c("time",term)]),mean)
          names(tab)<-c("dep",term,"lsmean")
-         as.data.frame(tab)
+         as.data.frame(tab,stringsAsFactors=F)
        } else {
        table<-lsmeans::lsmeans(model,term,transform = "response")
        table<-as.data.frame(summary(table))

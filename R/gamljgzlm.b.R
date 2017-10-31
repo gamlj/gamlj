@@ -312,9 +312,9 @@ gamljGzlmClass <- R6::R6Class(
 
   #### expected means ####
   if (self$options$eDesc) {
-    dep<-self$options$dep
     emeansTables <- self$results$emeansTables
     factorsAvailable <- self$options$factors
+    dep<-self$options$dep
     modelTerms<-private$.modelTerms()
     if (length(factorsAvailable) == 0) 
       return()
@@ -327,32 +327,33 @@ gamljGzlmClass <- R6::R6Class(
         grid <- do.call(base::expand.grid, ll)
         grid <- as.data.frame(grid,stringsAsFactors=F)
         for (i in seq_len(ncol(grid))) {
-             colName <- colnames(grid)[[i]]
-             aTable$addColumn(name=colName, title=term[i], index=i)
+          colName <- colnames(grid)[[i]]
+          aTable$addColumn(name=colName, title=term[i], index=i)
         }
-        
-        deplevel<-1
-        
+        for (rowNo in seq_len(nrow(grid))) {
+          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(row)<-term
+          tableRow<-row
+          aTable$addRow(rowKey=row, values=tableRow)
+        }
         if (self$options$modelSelection=="logistic")
-            aTable$addColumn(name="prob", title="Prob", index=i+1)
+          aTable$addColumn(name="prob", title="Prob", index=i+1)
         if (self$options$modelSelection=="poisson")
           aTable$addColumn(name="rate", title="Mean Count", index=i+1)
         if (self$options$modelSelection=="linear")
           aTable$addColumn(name="lsmean", title="Mean", index=i+1)
         if (self$options$modelSelection=="multinomial") {
-            deplevel<-length(levels(data[[dep]]))
-            aTable$addColumn(name="lsmean", title="Prob", index=i+1)
-        }
-        for (j in seq_len(deplevel)) 
-           for (rowNo in seq_len(nrow(grid))) {
-               row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
-               colnames(row)<-term
-               tableRow<-row
-               aTable$addRow(rowKey=(i+j), values=tableRow)
+          aTable$addColumn(name="lsmean", title="Prob", index=i+1)
+          aTable$addColumn(name="dep", title="Response group", index=1)
+          for (q in 1:10) aTable$addRow(rowKey=q)
+          
+          
         }
       }
-  } # end of observed means
+  } # end of  means
   
+  
+
 },     
 
     .initPostHoc=function(data) {
@@ -514,7 +515,6 @@ gamljGzlmClass <- R6::R6Class(
       aTable<-meanTables$get(key=key)
       for (i in seq_len(nrow(table))) {
         values<-as.data.frame(table[i,])
-        print(values)
         aTable$setRow(rowNo=i,values)
       }
       note<-attr(table,"note")
