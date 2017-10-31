@@ -109,7 +109,6 @@ gamljGzlmClass <- R6::R6Class(
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
 
           if (afamily=="multinomial") {
-#             estimatesTable$addColumn(name="dep",title="Response Groups",index=1)
              levels<-levels(data[[dep]])[-1]
              labels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
              for (j in seq_along(levels)) {
@@ -330,12 +329,7 @@ gamljGzlmClass <- R6::R6Class(
           colName <- colnames(grid)[[i]]
           aTable$addColumn(name=colName, title=term[i], index=i)
         }
-        for (rowNo in seq_len(nrow(grid))) {
-          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
-          colnames(row)<-term
-          tableRow<-row
-          aTable$addRow(rowKey=row, values=tableRow)
-        }
+        depLevel<-1
         if (self$options$modelSelection=="logistic")
           aTable$addColumn(name="prob", title="Prob", index=i+1)
         if (self$options$modelSelection=="poisson")
@@ -345,9 +339,18 @@ gamljGzlmClass <- R6::R6Class(
         if (self$options$modelSelection=="multinomial") {
           aTable$addColumn(name="lsmean", title="Prob", index=i+1)
           aTable$addColumn(name="dep", title="Response group", index=1)
-          for (q in 1:10) aTable$addRow(rowKey=q)
+          aTable$getColumn('SE')$setVisible(F)
+          aTable$getColumn('asymp.LCL')$setVisible(F)
+          aTable$getColumn('asymp.UCL')$setVisible(F)
           
-          
+          depLevel<-length(levels(data[[dep]]))
+        }
+        for(j in seq_len(depLevel))
+        for (rowNo in seq_len(nrow(grid))) {
+          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(row)<-term
+          tableRow<-row
+          aTable$addRow(rowKey=(i+j), values=tableRow)
         }
       }
   } # end of  means
