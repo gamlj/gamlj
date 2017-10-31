@@ -39,9 +39,12 @@ mf.predict_response<-function(model) {
   }
 } 
   
+##### predictions for the plots #######
 
-mf.predict<-function(model,data=NULL,bars="none") {
-  if (.which.class(model)=="lm"){
+mf.predict<- function(x,...) UseMethod(".predict")
+
+
+.predict.lm<-function(model,data=NULL,bars="none") {
     preds<-predict(model,data,se.fit = T,interval="confidence",type="response")
     if (bars=="none")
       return(data.frame(fit=preds$fit[,1]))
@@ -58,8 +61,8 @@ mf.predict<-function(model,data=NULL,bars="none") {
     return(as.data.frame(cbind(fit=fit,lwr=lwr,upr=upr)))
   }
   
+.predict.glm<-function(model,data=NULL,bars="none") {
   
-  if (.which.class(model)=="glm"){
     preds<-predict(model,data,se.fit = T,type="link")
     if (bars=="none")
       return(data.frame(fit=model$family$linkinv(preds$fit)))
@@ -75,13 +78,19 @@ mf.predict<-function(model,data=NULL,bars="none") {
     lwr <- model$family$linkinv(lwr)
     return(as.data.frame(cbind(fit,lwr,upr)))
   }
-  
-  if (.which.class(model)=="lmer"){
-    return(data.frame(fit=predict(model,data,re.form=~0)))
-  }
 
+.predict.merModLmerTest<-function(model,data=NULL,bars="none") 
+             return(.predict.lmer(model,data,bars))
+  
+.predict.lmer<-function(model,data=NULL,bars="none") {
+
+      return(data.frame(fit=predict(model,data,re.form=~0)))
 }
 
+.predict.multinom<-function(model,data=NULL,bars="none") {
+  
+  return(data.frame(fit=predict(model,data,type="probs")))
+}
 
 ##### get model data #########
 
@@ -128,7 +137,6 @@ mf.estimate<-function(model) {
 mf.summary<- function(x,...) UseMethod(".mf.summary")
 
 .mf.summary.default<-function(model) {
-      print(class(model))
       return(FALSE)
 }
   
@@ -169,7 +177,6 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
      
      sumr<-summary(model)
      rcof<-sumr$coefficients
-     print("inside")
      cof<-as.data.frame(matrix(rcof,ncol=1))
      names(cof)<-"estimate"
      cof$dep<-rownames(rcof)

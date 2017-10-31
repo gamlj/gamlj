@@ -312,6 +312,7 @@ gamljGzlmClass <- R6::R6Class(
 
   #### expected means ####
   if (self$options$eDesc) {
+    dep<-self$options$dep
     emeansTables <- self$results$emeansTables
     factorsAvailable <- self$options$factors
     modelTerms<-private$.modelTerms()
@@ -326,21 +327,28 @@ gamljGzlmClass <- R6::R6Class(
         grid <- do.call(base::expand.grid, ll)
         grid <- as.data.frame(grid,stringsAsFactors=F)
         for (i in seq_len(ncol(grid))) {
-          colName <- colnames(grid)[[i]]
-          aTable$addColumn(name=colName, title=term[i], index=i)
+             colName <- colnames(grid)[[i]]
+             aTable$addColumn(name=colName, title=term[i], index=i)
         }
+        
+        deplevel<-1
+        
         if (self$options$modelSelection=="logistic")
             aTable$addColumn(name="prob", title="Prob", index=i+1)
         if (self$options$modelSelection=="poisson")
           aTable$addColumn(name="rate", title="Mean Count", index=i+1)
         if (self$options$modelSelection=="linear")
           aTable$addColumn(name="lsmean", title="Mean", index=i+1)
-        
-        for (rowNo in seq_len(nrow(grid))) {
-          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
-          colnames(row)<-term
-          tableRow<-row
-          aTable$addRow(rowKey=row, values=tableRow)
+        if (self$options$modelSelection=="multinomial") {
+            deplevel<-length(levels(data[[dep]]))
+            aTable$addColumn(name="lsmean", title="Prob", index=i+1)
+        }
+        for (j in seq_len(deplevel)) 
+           for (rowNo in seq_len(nrow(grid))) {
+               row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+               colnames(row)<-term
+               tableRow<-row
+               aTable$addRow(rowKey=(i+j), values=tableRow)
         }
       }
   } # end of observed means
@@ -500,11 +508,13 @@ gamljGzlmClass <- R6::R6Class(
   if (self$options$eDesc) {
     meanTables<-self$results$emeansTables
     tables<-lf.meansTables(model,terms)  
+    print(tables)
     for (table in tables)  {
       key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
       aTable<-meanTables$get(key=key)
       for (i in seq_len(nrow(table))) {
         values<-as.data.frame(table[i,])
+        print(values)
         aTable$setRow(rowNo=i,values)
       }
       note<-attr(table,"note")
@@ -682,10 +692,12 @@ gamljGzlmClass <- R6::R6Class(
       
       if (length(depName) == 0 || length(groupName) == 0)
         return()
+      if (modelType=="multinomial")
+        errorBarType="none"
       
       plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
       
-      if (self$options$plotError != 'none') {
+      if (errorBarType != 'none') {
         yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
       } else {
         yAxisRange <- plotData$fit
@@ -697,7 +709,10 @@ gamljGzlmClass <- R6::R6Class(
       if (is.null(plotsName)) {
         image <- self$results$get('descPlot')
         image$setState(list(data=plotData, range=yAxisRange))
-        
+        if (modelType=="multinomial" && !is.null(linesName)) {
+          n<-length(levels(plotData[,"lines"]))
+            image$setSize(500,(250*n))
+        }
       } else {
         
         images <- self$results$descPlots
@@ -709,6 +724,11 @@ gamljGzlmClass <- R6::R6Class(
           i<-i+1
           image <- images$get(key=key)
           image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
+          if (modelType=="multinomial" && !is.null(linesName)) {
+            n<-length(levels(plotData[["lines"]]))
+            image$setSize(500,(250*n))
+          }
+          
         }
       }
       
@@ -724,16 +744,20 @@ gamljGzlmClass <- R6::R6Class(
          plotsName <- self$options$plotSepPlots
          errorType <- self$options$plotError
          ciWidth   <- self$options$ciWidth
+         modelType <- self$options$modelSelection
          
          if (errorType=="ci")
              errorType<-paste0(ciWidth,"% ",toupper(errorType))
+         
+         if (modelType=="multinomial")
+                   p<-lp.linesMultiPlot(image$state$data,theme,depName,groupName,linesName)
+         else  if ( ! is.null(linesName)) {
+                   p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
+               } else {
+                      p<-.oneWayPlot(image,theme,depName,groupName,errorType)
+               }       
+#         p<-p+ggtheme
 
-         if ( ! is.null(linesName)) {
-             p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
-         } else {
-             p<-.oneWayPlot(image,theme,depName,groupName,errorType)
-         }       
-         p<-p+ggtheme
          print(p)
          TRUE
       },

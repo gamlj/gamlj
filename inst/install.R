@@ -23,12 +23,12 @@ install.packages("viridis",lib = instdir)
 
 devtools::install_github(repo = "cran/nnet",subdir = instdir)
 
-jmvtools::check("/home/marcello/LocalForge/jamovi/")
-install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
+#jmvtools::check("/home/marcello/LocalForge/jamovi/")
+#install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
 
 
-#jmvtools::check()
-#install()
+jmvtools::check()
+install()
 #jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library"    
 #install.packages("stats",lib = jpath)
 R.version

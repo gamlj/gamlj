@@ -366,15 +366,31 @@ lf.dependencies<-function(model,term,modelTerms,what) {
 
 
 lf.meansTables<-function(model,terms) {
-
+    
+     .maketable<-function(term) {
+       if ("multinom" %in% class(model)) {
+         tterm<-as.formula(paste("~",paste(term,collapse = ":")))
+         data<-model$model ## we need this for update.nnet calls parent for data
+         preds<-predict(update(model,tterm,model$model),type="probs")
+         pnames<-colnames(preds)
+         data<-cbind(preds,model$model)
+         data$id<-seq_len(dim(data)[1])
+         long<-reshape(data,varying=pnames,idvar="id",direction = "long",v.names = "fit")
+         tab<-aggregate(long$fit,as.list(long[,c("time",term)]),mean)
+         names(tab)<-c("dep",term,"lsmean")
+         as.data.frame(tab)
+       } else {
+       table<-lsmeans::lsmeans(model,term,transform = "response")
+       table<-as.data.frame(summary(table))
+       table<-table[,-(1:length(term))]
+       table
+     }
+     }
     factorsAvailable<-mf.getModelFactors(model)
   tables<-list()
   for (term in terms)
     if (all(term %in% factorsAvailable)) {
-      table<-lsmeans::lsmeans(model,term,transform = "response")
-      table<-as.data.frame(summary(table))
-      print(table)
-      table<-table[,-(1:length(term))]
+      table<-.maketable(term)
       attr(table,"title")<-term
       depend<-lf.dependencies(model,term,terms,"means")
       if (depend!=FALSE) {
