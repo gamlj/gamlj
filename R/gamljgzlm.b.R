@@ -109,11 +109,12 @@ gamljGzlmClass <- R6::R6Class(
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
 
           if (afamily=="multinomial") {
-             estimatesTable$addColumn(name="dep",title="Response",index=1)
+#             estimatesTable$addColumn(name="dep",title="Response Groups",index=1)
              levels<-levels(data[[dep]])[-1]
-             for (level in levels) {
+             labels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
+             for (j in seq_along(levels)) {
                  for (i in seq_along(terms)) 
-                     estimatesTable$addRow(rowKey=i, list(dep=level,name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
+                     estimatesTable$addRow(rowKey=i, list(dep=labels[[j]],name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
              }
            } else
                 for (i in seq_along(terms)) 
@@ -151,6 +152,9 @@ gamljGzlmClass <- R6::R6Class(
                modlevels<-length(levels(data[[moderator]]))
                modlevels<-ifelse(modlevels>1,modlevels,3)
                nrows<-modlevels*xlevels  
+               if (afamily=="multinomial") 
+                    nrows<-modlevels*xlevels*(length(levels(data[[dep]]))-1)
+               
                # create the tables with right rows
                simpleEffectsTables<-self$results$simpleEffects
                simpleEffectsAnovas<-self$results$simpleEffectsAnovas
@@ -280,11 +284,15 @@ gamljGzlmClass <- R6::R6Class(
           message <- extractErrorMessage(citry)
           infoTable$setRow(rowKey="conv",list(value="no"))
           estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-          STOP<-TRUE
         }
         }
-        labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
-        labels<-rep(labels,length(levels(data[[dep]])))
+        .labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
+        labels<-rep(.labels,length(levels(data[[dep]])))
+        .deplabels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
+        deplabels<-rep(.deplabels,each=length(.labels))
+                       
+        if ("dep" %in% colnames(parameters))
+                   parameters$dep<-unlist(deplabels)
         for (i in 1:nrow(parameters)) {
           tableRow=parameters[i,]
           estimatesTable$setRow(rowNo=i,tableRow)
@@ -508,27 +516,31 @@ gamljGzlmClass <- R6::R6Class(
   
 },
 
-    .populateSimple=function(model) {
-        variable<-self$options$simpleVariable
-        moderator<-self$options$simpleModerator
-        threeway<-self$options$simple3way
-        data<-mf.getModelData(model)
-        simpleEffectsTables<-self$results$simpleEffects
-        simpleEffectsAnovas<-self$results$simpleEffectsAnovas
-        
-        .fillTheFTable<-function(results,aTable) {
-          ftests<-results[[2]]
-          ### ftests      
-          for (i in seq_len(dim(ftests)[1])) {
-              tableRow<-ftests[i,]
-              colnames(tableRow)<-c(TCONV[["glm.f"]],c("level","variable")) 
-              aTable$setRow(rowNo=i,tableRow)
-
-          }
-         } #### end of .fillTheFTable
+.populateSimple=function(model) {
+  variable<-self$options$simpleVariable
+  moderator<-self$options$simpleModerator
+  threeway<-self$options$simple3way
+  dep<-self$options$dep
+  data<-mf.getModelData(model)
+  simpleEffectsTables<-self$results$simpleEffects
+  simpleEffectsAnovas<-self$results$simpleEffectsAnovas
+  
+  .fillTheFTable<-function(results,aTable) {
+    ftests<-results[[2]]
+    ### ftests      
+    for (i in seq_len(dim(ftests)[1])) {
+      tableRow<-ftests[i,]
+      aTable$setRow(rowNo=i,tableRow)
+    }
+  } #### end of .fillTheFTable
   
   .fillThePTable<-function(results,aTable) {
     params<-results[[1]]
+    if ("dep" %in% colnames(params)) {
+      params<-params[order(params$dep),]
+      base<-levels(data[[dep]])[1]
+      params$dep<-paste(params$dep,base,sep="-")
+    }
     what<-params$level
     for (i in seq_len(dim(params)[1])) {
       tableRow<-params[i,]
@@ -537,14 +549,14 @@ gamljGzlmClass <- R6::R6Class(
         aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
       what<-tableRow$level
     }
-  } ##### end of .fillThePTable
+  }  ##### end of .fillThePTable
   
   if (is.null(variable) | is.null(moderator)) 
     return()
   
   if (is.null(threeway)) {
-    results<-.simpleEffects(model,data,variable,moderator)
-    
+
+    results<-lf.simpleEffects(model,variable,moderator)
     ### ftests
     key=paste(variable,1,sep="")
     ftable<-simpleEffectsAnovas$get(key=key)
@@ -555,12 +567,12 @@ gamljGzlmClass <- R6::R6Class(
     #### add some warning ####
     term<-.interaction.term(private$.model,c(variable,moderator))
     if (!is.null(term)) {
-       if (.is.scaleDependent(private$.model,term))
-           ptable$setNote("inter",WARNS["se.interactions"])
+      if (.is.scaleDependent(private$.model,term))
+        ptable$setNote("inter",WARNS["se.interactions"])
       else if (.term.develop(term)<length(private$.modelTerms()))
-               ptable$setNote("covs",WARNS["se.covariates"])
+        ptable$setNote("covs",WARNS["se.covariates"])
     } else 
-         ptable$setNote("noint",WARNS["se.noint"])
+      ptable$setNote("noint",WARNS["se.noint"])
     
     ### end of warnings ###
   } else {
@@ -578,9 +590,9 @@ gamljGzlmClass <- R6::R6Class(
       ## make nice labels and titles
       lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
       title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
-
+      
       #### populate the R table       
-      results<-.simpleEffects(model,data,variable,moderator)
+      results<-lf.simpleEffects(model,variable,moderator)
       
       ### populate the Jamovi table
       key=paste(variable,i,sep="")
@@ -596,6 +608,7 @@ gamljGzlmClass <- R6::R6Class(
   } # end of if (is.null(threeway)) 
   
 },
+
 ##### model local function #########
 #### we need an .estimate() here ###
      .estimate=function(form,data) {

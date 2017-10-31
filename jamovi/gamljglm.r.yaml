@@ -143,7 +143,7 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: ss
@@ -152,7 +152,7 @@ items:
           - name: df
             title: df
             type: integer
-          - name: F
+          - name: f
             title: F
             type: number
           - name: p
@@ -179,12 +179,12 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: estimate
             title: "Estimate"
-          - name: std
+          - name: se
             title: SE
             type: number
           - name: t

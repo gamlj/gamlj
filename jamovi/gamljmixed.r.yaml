@@ -232,7 +232,7 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: df1
@@ -268,12 +268,12 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Level"
             type: text
           - name: estimate
             title: "Estimate"
-          - name: std
+          - name: se
             title: SE
             type: number
           - name: t

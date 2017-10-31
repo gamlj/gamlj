@@ -712,9 +712,7 @@ gamljMixedClass <- R6::R6Class(
     ### ftests      
     for (i in seq_len(dim(ftests)[1])) {
       tableRow<-ftests[i,]
-      colnames(tableRow)<-c(TCONV[["mixed.f"]],c("level","variable")) 
       aTable$setRow(rowNo=i,tableRow)
-      
     }
   } #### end of .fillTheFTable
   
@@ -728,13 +726,14 @@ gamljMixedClass <- R6::R6Class(
         aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
       what<-tableRow$level
     }
-  } ##### end of .fillThePTable
+  }  ##### end of .fillThePTable
   
   if (is.null(variable) | is.null(moderator)) 
     return()
   
   if (is.null(threeway)) {
-    results<-.simpleEffects(model,data,variable,moderator)
+    
+    results<-lf.simpleEffects(model,variable,moderator)
     
     ### ftests
     key=paste(variable,1,sep="")
@@ -771,7 +770,7 @@ gamljMixedClass <- R6::R6Class(
       title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
       
       #### populate the R table       
-      results<-.simpleEffects(model,data,variable,moderator)
+      results<-lf.simpleEffects(model,variable,moderator)
       
       ### populate the Jamovi table
       key=paste(variable,i,sep="")
@@ -787,6 +786,7 @@ gamljMixedClass <- R6::R6Class(
   } # end of if (is.null(threeway)) 
   
 },
+
 
   .modelTerms=function() {
   modelTerms <- self$options$modelTerms

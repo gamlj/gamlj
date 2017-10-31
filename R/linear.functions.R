@@ -90,6 +90,15 @@
   if (length(levels) <= 1) {
     
     # do nothing
+  } else if (type == 'simple') {
+    
+    for (i in seq_len(nLevels-1))
+      labels[[i]] <- paste(levels[i+1], '-', levels[1])
+    
+  } else if (type == 'dummy') {
+
+    for (i in seq_len(nLevels-1))
+      labels[[i]] <- paste(levels[i+1], '-', levels[1])
     
   } else if (type == 'simple') {
     
@@ -250,7 +259,73 @@
 
 
 ########## simple effects computation #########
-.simpleEffects<-function(model,data,variable,moderator){
+
+#### this estimates a model at some level of the moderator
+
+.atSomeLevel<-function(model,moderator,level) {
+
+    data<-mf.getModelData(model)
+    
+    if (is.factor(data[,moderator])) {
+          .levels<-levels(data[,moderator])
+           index<-which(.levels==level,arr.ind = T)
+           ### we need the moderator to be treatment to condition the other effect to its reference groups
+           contrasts(data[,moderator])<-contr.treatment(length(.levels),base=index)
+      } else {
+           data[,moderator]<-data[,moderator]-level
+      }
+  
+      form<-formula(model)
+      FUN<-mf.estimate(model)
+      FUN(form,data)
+}
+
+.extractParameters<-function(model,variable,moderator,level) {
+  ### get the parameters
+  ##### understand how the dummies are named #####
+       data<-mf.getModelData(model)
+  
+        if (is.factor(data[[variable]])) {
+            varname<-paste(variable,seq_along(levels(data[,variable])),sep="")
+         }  else {
+            varname<-variable
+         }
+  ##### get the summary of the model. This must be a ...
+        ss<-mf.summary(model)
+        ##### extract only the estimates of the x-axis variable
+        if ("variable" %in% names(ss))
+             ss<-ss[ss$variable==varname,]
+        else {
+             a<-as.logical(apply(sapply(varname, function(a) a==rownames(ss)),1,sum))
+             ss<-ss[a,]
+        }
+        #### prettify the levels ####
+        if (is.numeric(level)) 
+            level<-round(level,digits=2)
+        
+        ss$level<-paste(moderator,level,sep=" at ")
+        ss$variable<-variable
+        as.data.frame(ss,stringsAsFactors=F)
+}
+
+
+.extractFtests<-function(model,variable,moderator,level) {
+  ### get the ANOVA
+  if (.which.class(model)=="lmer") {
+    if (!lme4::getME(model,"is_REML"))
+      return(FALSE)
+  }
+  ano<-mf.anova(model)
+  ano<-ano[rownames(ano)==variable,]
+  if (is.numeric(level)) level<-round(level,digits=2)
+  ano$level<-paste(moderator,level,sep=" at ")
+  ano$variable<-variable
+  as.data.frame(ano,stringsAsFactors=F)
+}
+
+
+
+lf.simpleEffects<-function(model,variable,moderator){
   
   # The simple effects function computes up to 3-ways simple effects
   # for any (hopefully) linear model. Given the different estimation
@@ -261,67 +336,21 @@
   #                      dataset (usually the model$coefficients table)
   # mf.anova() : should return the anova table or an equivalent
   
-  estimateFUN<-mf.estimate(model) 
+   
+  data<-mf.getModelData(model)
   
-  atSomeLevel<-function(moderator,level,data) {
-    if (is.factor(data[,moderator])) {
-      .levels<-levels(data[,moderator])
-      index<-which(.levels==level,arr.ind = T)
-      contrasts(data[,moderator])<-contr.treatment(length(.levels),base=index)
-    } else {
-      data[,moderator]<-data[,moderator]-level
-    }
-    form<-formula(model)
-    estimateFUN(form,data)
-  }
-  
-  extractEffect<-function(model,variable,moderator,level) {
-    ### get the parameters
-    ##### understand how the dummies are named #####
-    data<-mf.getModelData(model)
-    
-    if (is.factor(data[[variable]])) {
-      varname<-paste(variable,seq_along(levels(data[,variable])),sep="")
-    }  else {
-      varname<-variable
-    }
-    ##### get the summary of the model
-    ss<-mf.summary(model)
-    ##### extract only the estimates of the x-axis variable
-    a<-as.logical(apply(sapply(varname, function(a) a==rownames(ss)),1,sum))
-    ss<-ss[a,] 
-    if (is.numeric(level)) level<-round(level,digits=2)
-    ss$level<-paste(moderator,level,sep=" at ")
-    ss$variable<-variable
-    ss
-  }
-  
-  extractF<-function(model,variable,moderator,level) {
-    ### get the ANOVA
-    if (.which.class(model)=="lmer") {
-       if (!lme4::getME(model,"is_REML"))
-          return(FALSE)
-    }
-    ano<-mf.anova(model)
-    ano<-ano[rownames(ano)==variable,]
-    if (is.numeric(level)) level<-round(level,digits=2)
-    ano$level<-paste(moderator,level,sep=" at ")
-    ano$variable<-variable
-    ano        
-  }
-  
-  mod<-data[,moderator]
-  if (is.factor(mod)) {
-    .levels<-levels(mod)
+  modvar<-data[,moderator]
+  if (is.factor(modvar)) {
+    levels<-levels(modvar)
   } else {
-    .levels<-c(mean(mod)+sd(mod),mean(mod),mean(mod)-sd(mod))
+    levels<-c(mean(modvar)+sd(modvar),mean(modvar),mean(modvar)-sd(modvar))
   }
   params<-data.frame(stringsAsFactors = F)
   ftests<-data.frame(stringsAsFactors = F)
-  for (i in .levels) {
-    mod<-atSomeLevel(moderator,i,data)
-    params<-rbind(params,extractEffect(mod,variable,moderator,i))
-    ftests<-rbind(ftests,extractF(mod,variable,moderator,i))
+  for (i in levels) {
+       model0<-.atSomeLevel(model,moderator,i)
+       params<-rbind(params,.extractParameters(model0,variable,moderator,i))
+       ftests<-rbind(ftests,.extractFtests(model0,variable,moderator,i))
   }
   list(params,ftests)
 }

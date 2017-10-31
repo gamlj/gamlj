@@ -83,20 +83,22 @@ mf.predict<-function(model,data=NULL,bars="none") {
 }
 
 
-  
+##### get model data #########
 
-mf.getModelData<-function(model) {
-  if (.which.class(model)=="lm")
-           return(model$model)
-  
-  if (.which.class(model)=="lmer")
-           return(model@frame)
-  
-  if (.which.class(model)=="glm")
-           return(model$model)
-  
-  
-}
+mf.getModelData<- function(x,...) UseMethod(".getModelData")
+
+.getModelData.default<-function(model) 
+     return(model$model)
+
+.getModelData.merModLmerTest<-function(model) 
+     return(.getModelData.lmer(model))
+
+.getModelData.lmer<-function(model) 
+  return(model@frame)
+
+
+
+
 #### those function are needed for simple effects and plots. They get a model as imput and gives back a function
 #### to reestimate the same kind of model
 
@@ -116,69 +118,104 @@ mf.estimate<-function(model) {
   }  
   if (.which.class(model)=="multinomial") {  
     return(function(form,data)
-       nnet::multinom(form,data))
+       nnet::multinom(form,data,model = T))
   }  
-  
   
 }
 
-mf.summary=function(model) {
+############# produces summary in a somehow stadard format ##########
 
-  if (.which.class(model)=="lm")   
+mf.summary<- function(x,...) UseMethod(".mf.summary")
+
+.mf.summary.default<-function(model) {
+      print(class(model))
+      return(FALSE)
+}
+  
+.mf.summary.lm<-function(model){
+  ss<-summary(model)$coefficients
+  colnames(ss)<-c("estimate","se","t","p")
+  as.data.frame(ss,stringsAsFactors = F)
+}
+
+.mf.summary.merModLmerTest<-function(model)
+       .mf.summary.lmer(model)
+
+.mf.summary.lmer<-function(model) {
+  
+       ss<-lmerTest::summary(model)$coefficients
+      if (dim(ss)[2]==3) {
+          colnames(ss)<-c("estimate","se","t")
+          if (dim(ss)[1]==1)
+               attr(ss,"warning")<-"lmer.df"
+          else
+              attr(ss,"warning")<-"lmer.zerovariance"
+      }
+       else
+          colnames(ss)<-c("estimate","se","df","t","p")
+       as.data.frame(ss,stringsAsFactors = F)
+}
+
+.mf.summary.glm<-function(model) {
+     
      ss<-summary(model)$coefficients
-  if (.which.class(model)=="lmer") {   
-    ss<-lmerTest::summary(model)$coefficients
-    if (dim(ss)[2]==3) {
-      colnames(ss)<-c("estimate","se","t")
-      if (dim(ss)[1]==1)
-         attr(ss,"warning")<-"lmer.df"
-      else
-        attr(ss,"warning")<-"lmer.zerovariance"
-    }
-    else
-      colnames(ss)<-c("estimate","se","df","t","p")
-    return(ss)
-   }
-  if (.which.class(model)=="glm") {   
-    ss<-summary(model)$coefficients
-    expb<-exp(ss[,"Estimate"])  
-    ss<-cbind(ss,expb)
-    colnames(ss)<-c("estimate","se","z","p","expb")
-  }
-  if (.which.class(model)=="multinomial") {
-    sumr<-summary(model)
-    rcof<-sumr$coefficients
-    cof<-as.data.frame(matrix(rcof,ncol=1))
-    names(cof)<-"estimate"
-    cof$dep<-rownames(rcof)
-    cof$variable<-rep(colnames(rcof),each=nrow(rcof))
-    se<-matrix(sumr$standard.errors,ncol=1)
-    cof$se<-as.numeric(se)
-    cof$expb<-exp(cof$estimate)  
-    cof$z<-cof$estimate/cof$se
-    cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
-    ss<-cof[order(cof$dep),]
-  }
-  
-  as.data.frame(ss)
+     expb<-exp(ss[,"Estimate"])  
+     ss<-cbind(ss,expb)
+     colnames(ss)<-c("estimate","se","z","p","expb")
+     as.data.frame(ss,stringsAsFactors = F)
 }
 
-mf.anova=function(model) {
-  if (.which.class(model)=="glm") {
-     ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-     return(ano)
-  }
-  if (.which.class(model)=="multinomial") {
-    ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-    return(ano)
+.mf.summary.multinom<-function(model) {
+     
+     sumr<-summary(model)
+     rcof<-sumr$coefficients
+     print("inside")
+     cof<-as.data.frame(matrix(rcof,ncol=1))
+     names(cof)<-"estimate"
+     cof$dep<-rownames(rcof)
+     cof$variable<-rep(colnames(rcof),each=nrow(rcof))
+     se<-matrix(sumr$standard.errors,ncol=1)
+     cof$se<-as.numeric(se)
+     cof$expb<-exp(cof$estimate)  
+     cof$z<-cof$estimate/cof$se
+     cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
+     ss<-as.data.frame(cof,stringsAsFactors = F)
+     ss<-cof[order(ss$dep),]
+     ss
+}
+  
+############# produces anova/deviance table in a somehow stadard format ##########
+mf.anova<- function(x,...) UseMethod(".anova")
+
+.anova.glm<-function(model) {
+
+        ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+        colnames(ano)<-c("test","df","p")
+        as.data.frame(ano, stringsAsFactors = F)
+}
+
+.anova.multinom<-function(model) {
+
+      ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+      colnames(ano)<-c("test","df","p")
+      as.data.frame(ano, stringsAsFactors = F)
+      
   }
   
-  if (.which.class(model)=="lm")
-    return(car::Anova(model,test="F",type=3, singular.ok=T))
+.anova.lm<-function(model) {
   
-  if (.which.class(model)=="lmer") {
-   return(car::Anova(model,type=3,test="F",singular.ok=T))
-  }  
+    ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+    colnames(ano)<-c("ss","df","f","p")
+    ano
+}
+
+
+.anova.merModLmerTest<-function(model) {
+  
+  ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+  colnames(ano)<-c("test","df1","df2","p")
+  ano
+  
 }
 
 mf.lmeranova=function(model) {
@@ -302,11 +339,10 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.multinom <- function (object, level = 0.95, ...) 
   {
-  ci<-confint(object,level)
-  return(ci)
-  # cim<-NULL
-  # for (i in seq_len(dim(ci)[3]))
-  #   cim<-rbind(cim,(ci[,,i]))
-  # return(cim)
+  ci<-confint(object,level=level)
+  cim<-NULL
+  for (i in seq_len(dim(ci)[3]))
+     cim<-rbind(cim,(ci[,,i]))
+  return(cim)
 }
 

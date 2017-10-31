@@ -509,89 +509,78 @@ gamljGLMClass <- R6::R6Class(
           ftests<-results[[2]]
           ### ftests      
           for (i in seq_len(dim(ftests)[1])) {
-              r<-ftests[i,]
-              row<-list(variable=r$variable,
-              term=r$level,
-              df=r$Df,
-              ss=r$`Sum Sq`,
-              F=r$`F value`,
-              p=r$`Pr(>F)`)
-              aTable$setRow(rowNo=i,row)
+              tableRow<-ftests[i,]
+              aTable$setRow(rowNo=i,tableRow)
           }
          } #### end of .fillTheFTable
   
-  .fillThePTable<-function(results,aTable) {
-    params<-results[[1]]
-    what<-params$level
-    for (i in seq_len(dim(params)[1])) {
-      r<-params[i,]
-      row<-list(variable=r$variable,
-                term=r$level,
-                estimate=r$Estimate,
-                std=r$`Std. Error`,
-                t=r$`t value`,
-                p=r$`Pr(>|t|)`)
-      aTable$setRow(rowNo=i,row)
-      if (what!=r$level)  
-        aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
-      what<-r$level
-    }
-  } ##### end of .fillThePTable
+        .fillThePTable<-function(results,aTable) {
+             params<-results[[1]]
+             what<-params$level
+             for (i in seq_len(dim(params)[1])) {
+                 tableRow<-params[i,]
+                 aTable$setRow(rowNo=i,tableRow)
+                 if (what!=tableRow$level)  
+                       aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
+                 what<-tableRow$level
+             }
+         }  ##### end of .fillThePTable
   
-  if (is.null(variable) | is.null(moderator)) 
-    return()
+         if (is.null(variable) | is.null(moderator)) 
+              return()
   
-  if (is.null(threeway)) {
-    results<-.simpleEffects(model,data,variable,moderator)
+         if (is.null(threeway)) {
+       
+          results<-lf.simpleEffects(model,variable,moderator)
     
-    ### ftests
-    key=paste(variable,1,sep="")
-    ftable<-simpleEffectsAnovas$get(key=key)
-    .fillTheFTable(results,ftable)      
-    ### parameters
-    ptable<-simpleEffectsTables$get(key=key)
-    .fillThePTable(results,ptable)
-    #### add some warning ####
-    term<-.interaction.term(private$.model,c(variable,moderator))
-    if (!is.null(term)) {
-       if (.is.scaleDependent(private$.model,term))
-           ptable$setNote("inter",WARNS["se.interactions"])
-      else if (.term.develop(term)<length(private$.modelTerms()))
-               ptable$setNote("covs",WARNS["se.covariates"])
-    } else 
-         ptable$setNote("noint",WARNS["se.noint"])
+          ### ftests
+          key=paste(variable,1,sep="")
+          ftable<-simpleEffectsAnovas$get(key=key)
+         .fillTheFTable(results,ftable)      
+          ### parameters
+          ptable<-simpleEffectsTables$get(key=key)
+         .fillThePTable(results,ptable)
+          #### add some warning ####
+          term<-.interaction.term(private$.model,c(variable,moderator))
+          if (!is.null(term)) {
+                if (.is.scaleDependent(private$.model,term))
+                  ptable$setNote("inter",WARNS["se.interactions"])
+                else if (.term.develop(term)<length(private$.modelTerms()))
+                        ptable$setNote("covs",WARNS["se.covariates"])
+          } else 
+                ptable$setNote("noint",WARNS["se.noint"])
     
-    ### end of warnings ###
-  } else {
-    data$mod2<-data[,threeway]
-    if (is.factor(data$mod2)) {
-      levs<-levels(data$mod2)
-    } else 
-      levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
-    for(i in seq_along(levs)) {
-      data[,threeway]<-data$mod2
-      if (is.factor(data$mod2))
-        contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
-      else
-        data[,threeway]<-data[,threeway]-levs[i]
-      ## make nice labels and titles
-      lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
-      title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
+           ### end of warnings ###
+       } else {
+              data$mod2<-data[,threeway]
+              if (is.factor(data$mod2)) {
+                  levs<-levels(data$mod2)
+              } else 
+                  levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
+              for(i in seq_along(levs)) {
+                  data[,threeway]<-data$mod2
+                  if (is.factor(data$mod2))
+                       contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
+                  else
+                     data[,threeway]<-data[,threeway]-levs[i]
+                 ## make nice labels and titles
+                 lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
+                 title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
 
-      #### populate the R table       
-      results<-.simpleEffects(model,data,variable,moderator)
+             #### populate the R table       
+                 results<-lf.simpleEffects(model,variable,moderator)
       
-      ### populate the Jamovi table
-      key=paste(variable,i,sep="")
-      ### F table
-      ftable<-simpleEffectsAnovas$get(key=key)
-      ftable$setTitle(title)
-      .fillTheFTable(results,ftable)      
-      ### parameters
-      ptable<-simpleEffectsTables$get(key=key)
-      ptable$setTitle(title)
-      .fillThePTable(results,ptable)
-    } 
+            ### populate the Jamovi table
+                 key=paste(variable,i,sep="")
+                 ### F table
+                 ftable<-simpleEffectsAnovas$get(key=key)
+                 ftable$setTitle(title)
+                .fillTheFTable(results,ftable)      
+                ### parameters
+                 ptable<-simpleEffectsTables$get(key=key)
+                 ptable$setTitle(title)
+                .fillThePTable(results,ptable)
+              } 
   } # end of if (is.null(threeway)) 
   
 },
