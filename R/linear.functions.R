@@ -366,7 +366,8 @@ lf.dependencies<-function(model,term,modelTerms,what) {
 
 
 lf.meansTables<-function(model,terms) {
-  factorsAvailable<-mf.getModelFactors(model)
+
+    factorsAvailable<-mf.getModelFactors(model)
   tables<-list()
   for (term in terms)
     if (all(term %in% factorsAvailable)) {

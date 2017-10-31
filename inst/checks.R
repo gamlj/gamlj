@@ -26,6 +26,7 @@ dat$dic<-factor(dat$dic)
 
 model<-glm(counts~x*bfac,data=dat,family = poisson())
 mf.confint(model,level=0.95)
+lf.meansTables(model,"bfac")
 
 qq<-lf.simpleEffects(model,"bfac","x")
 a<-qq[[1]]
