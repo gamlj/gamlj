@@ -233,30 +233,25 @@ mf.lmeranova=function(model) {
   if (dim(ano)[1]==0)
     return(ano)
   if (dim(ano)[2]==4) {
+    print("lmer anava uses car::Anova")
     ano<-car::Anova(model,type=3,test="F")
+    ano<-ano[-1,]
+    names(ano)<-c("F","df1","df2","p")
     attr(ano,"method")<-"Kenward-Roger"
     return(ano)
   }
   ano<-ano[,c(5,3,4,6)]
   names(ano)<-c("F","df1","df2","p")
   attr(ano,"method")<-"Satterthwaite"
-  
   if (!all(is.na(ano$df2)==F)) {
-    isone<-rownames(ano[is.na(ano$df2),])
-    ss<-summary(model)[['coefficients']]
-    rows<-matrix(ss[rownames(ss)==isone,],nrow = length(isone))
-    if (dim(rows)[1]>0) {
-      who<-is.na(ano$df2)
-      rows[,4]<-rows[,4]^2
-      ano[who,"F"]<-rows[,4]
-      ano[who,"p"]<-rows[,5]
-      ano[who,"df2"]<-rows[,3]
-    } else {
-      ano<-car::Anova(model,type=3,test="F")
-      attr(ano,"method")<-"Kenward-Roger"
-      
-    }
+    print("lmer anava uses car::Anova")
+    ano<-car::Anova(model,type=3,test="F")
+    ano<-ano[-1,]
+    names(ano)<-c("F","df1","df2","p")
+    attr(ano,"method")<-"Kenward-Roger"
+    return(ano)
   }
+  
   return(ano)
   }
 }
