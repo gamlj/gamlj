@@ -388,8 +388,8 @@ gamljGzlmClass <- R6::R6Class(
         
         table$addColumn(name='md', title='Mean Difference', type='number')
         table$addColumn(name='se', title='SE', type='number')
-        table$addColumn(name='df', title='df', type='number')
-        table$addColumn(name='t', title='t', type='number')
+        #table$addColumn(name='df', title='df', type='number')
+        table$addColumn(name='z', title='z', type='number')
         
         table$addColumn(name='pnone', title='p', type='number', format='zto,pvalue', visible="(postHocCorr:none)")
         table$addColumn(name='ptukey', title='p<sub>tukey</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:tukey)")
@@ -486,8 +486,8 @@ gamljGzlmClass <- R6::R6Class(
           row <- list()
           row[['md']] <- if(reverse) -none[index,'estimate'] else none[index,'estimate']
           row[['se']] <- none[index,'SE']
-          row[['df']] <- none[index,'df']
-          row[['t']] <- if(reverse) -none[index,'t.ratio'] else none[index,'t.ratio']
+#          row[['df']] <- none[index,'df']
+          row[['z']] <- if(reverse) -none[index,'z.ratio'] else none[index,'z.ratio']
           
           row[['pnone']] <- none[index,'p.value']
           row[['ptukey']] <- tukey[index,'p.value']
