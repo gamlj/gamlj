@@ -11,7 +11,6 @@ gamljGLMClass <- R6::R6Class(
 
         print("cleandata")      
         dep <- self$options$dep
-
         covs <- NULL
         if ('covs' %in% names(self$options))
             covs <- self$options$covs
@@ -40,7 +39,6 @@ gamljGLMClass <- R6::R6Class(
 
         for (scaling in self$options$scaling) 
             data[[scaling$var]]<-.scaleContinuous(data[[scaling$var]],scaling$type)
-
         na.omit(data)
     },
     .init=function() {
@@ -178,7 +176,6 @@ gamljGLMClass <- R6::R6Class(
           return()
         
         base::options(contrasts = c("contr.sum","contr.poly"))
-        
         data <- private$.cleanData()
         
         if (is.factor(data[[dep]]))
@@ -198,7 +195,8 @@ gamljGLMClass <- R6::R6Class(
         self$results$.setModel(model)
         singular <- NULL
         
-          
+        print("mark1")
+        
           results <- try({
             if (self$options$ss == '1') {
                ss<-stats::anova(model)
@@ -208,15 +206,18 @@ gamljGLMClass <- R6::R6Class(
             }
             if (self$options$ss == '3') {
                ss<-car::Anova(model,type=3,singular.ok=TRUE)
+               print("mark2")
+               
             }
           })
+          
           if (isError(results)) {
             message <- extractErrorMessage(results)
             reject(message)
           }
           anoFrame<-private$.cleanAnova(ss,type=self$options$ss)
           anoTable<-private$.anovaTable(model,anoFrame)
-
+          
         anovaTable <- self$results$main
         rowNames<-rownames(anoTable)
         rowNames[1]<-"Model"
