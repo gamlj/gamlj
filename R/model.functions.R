@@ -1,3 +1,4 @@
+
 ##### function to check results ####
 
 .which.class<-function(model) {
