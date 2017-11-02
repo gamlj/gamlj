@@ -319,7 +319,7 @@ gamljGzlmClass <- R6::R6Class(
       return()
     for (term in modelTerms)
       if (all(term %in% factorsAvailable)) {
-        aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        mTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
         ldata <- data[,term]
         ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -327,34 +327,32 @@ gamljGzlmClass <- R6::R6Class(
         grid <- as.data.frame(grid,stringsAsFactors=F)
         for (i in seq_len(ncol(grid))) {
           colName <- colnames(grid)[[i]]
-          aTable$addColumn(name=colName, title=term[i], index=i)
+          mTable$addColumn(name=colName, title=term[i], index=i)
         }
+        
         depLevel<-1
         if (self$options$modelSelection=="logistic")
-          aTable$addColumn(name="prob", title="Prob", index=i+1)
+          mTable$addColumn(name="prob", title="Prob", index=i+1)
         if (self$options$modelSelection=="poisson")
-          aTable$addColumn(name="rate", title="Mean Count", index=i+1)
+          mTable$addColumn(name="rate", title="Mean Count", index=i+1)
         if (self$options$modelSelection=="linear")
-          aTable$addColumn(name="lsmean", title="Mean", index=i+1)
+          mTable$addColumn(name="lsmean", title="Mean", index=i+1)
         if (self$options$modelSelection=="multinomial") {
-          aTable$addColumn(name="lsmean", title="Prob", index=i+1)
-          aTable$addColumn(name="dep", title="Response group", index=1)
-          aTable$getColumn('SE')$setVisible(F)
-          aTable$getColumn('asymp.LCL')$setVisible(F)
-          aTable$getColumn('asymp.UCL')$setVisible(F)
-          
+          mTable$addColumn(name="lsmean", title="Prob", index=i+1)
+          mTable$addColumn(name="dep", title="Response group", index=1)
+          mTable$getColumn('SE')$setVisible(F)
+          mTable$getColumn('asymp.LCL')$setVisible(F)
+          mTable$getColumn('asymp.UCL')$setVisible(F)
           depLevel<-length(levels(data[[dep]]))
         }
         for(j in seq_len(depLevel))
         for (rowNo in seq_len(nrow(grid))) {
-          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
-          colnames(row)<-term
-          tableRow<-row
-          aTable$addRow(rowKey=(i+j), values=tableRow)
+          tableRow <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(tableRow)<-term
+          mTable$addRow(rowKey=tableRow, values=tableRow)
         }
       }
   } # end of  means
-  
   
 
 },     
@@ -512,16 +510,15 @@ gamljGzlmClass <- R6::R6Class(
   if (self$options$eDesc) {
     meanTables<-self$results$emeansTables
     tables<-lf.meansTables(model,terms)  
-    print(tables)
     for (table in tables)  {
       key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
-      aTable<-meanTables$get(key=key)
+      mTable<-meanTables$get(key=key)
       for (i in seq_len(nrow(table))) {
         values<-as.data.frame(table[i,])
-        aTable$setRow(rowNo=i,values)
+        mTable$setRow(rowNo=i,values)
       }
       note<-attr(table,"note")
-      if (!is.null(note)) aTable$setNote(note,WARNS[note])
+      if (!is.null(note)) mTable$setNote(note,WARNS[note])
     }
   } # end of eDesc              
   

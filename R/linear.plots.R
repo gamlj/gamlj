@@ -1,3 +1,4 @@
+
 #### "image" should be from jomovi image object
 #### this function assumes that the y is called "mean", the x is "group" and the
 #### tracing factor "lines" (in any)
