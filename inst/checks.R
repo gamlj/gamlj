@@ -47,10 +47,7 @@ contrasts(dat$groups3)
 mult<-multinom(groups3 ~bfac*dic, data = dat, model = TRUE)
 ref.grid(mult)
 lsm = lsmeans::lsmeans(mult, ~ groups3|bfac:dic, mode = "latent")
-lsm = lsmeans::lsmeans(mult, ~ groups3|bfac, mode = "prob")
-options(scipen = 999)
-ss<-summary(lsm)
-pairwise.lsmc(lsm)
+#lsm = lsmeans::lsmeans(mult, ~ groups3|bfac, mode = "prob")
 cmp = pairs(lsm,  by="groups3",interaction=F) 
 cmp
 ########## this works ########
@@ -71,8 +68,6 @@ lsm = lsmeans::lsmeans(model, ~ bfac, mode = "prob")
 cmp = contrast(lsm, method="pairwise", ref=1) 
 test = test(cmp, joint=TRUE, by="contrast") 
 
-VA.tab <- table(dat[, c('groups3', 'bfac',"dic")])
-VA.tab
 
 g1<-dat[dat$groups3!=2,]
 contrasts(dat$dic)<-contr.treatment(2)

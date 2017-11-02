@@ -194,7 +194,7 @@ gamljGLMClass <- R6::R6Class(
         private$.model <- model
         self$results$.setModel(model)
         singular <- NULL
-        
+
         print("mark1")
         
           results <- try({

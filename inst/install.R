@@ -1,4 +1,4 @@
-install.packages('jmvtools', repos=c('https://repo.jamovi.org', 'https://cran.r-project.org'))
+#install.packages('jmvtools', repos=c('https://repo.jamovi.org', 'https://cran.r-project.org'))
 library(jmvtools)
 
 instdir<-"/home/marcello/LocalForge/gamlj/build/R"
@@ -32,8 +32,9 @@ install.packages(deps, lib = instdir,dependencies = c("Depends", "Imports", "Lin
 
 
 jmvtools::check()
-install()
-#jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library"    
-#install.packages("stats",lib = jpath)
+jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library/compiler/"    
+install(home = jpath)
+
+  #install.packages("stats",lib = jpath)
 R.version
 

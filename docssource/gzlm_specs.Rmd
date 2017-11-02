@@ -1,0 +1,42 @@
+---
+title: "Mixed Models module technical details"
+output: 
+  html_document:
+     toc: true
+     toc_float:
+        collapsed: false
+
+---
+
+
+
+# Post Hocs
+
+Post-hocs tests are performed as implemented in the [lsmeans package](https://cran.r-project.org/web/packages/lsmeans/index.html). For all GZLM models estimated with [glm function](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html) (all but multinomial model) post hoc are implemented as follows (for any given  `model` and `term` selected by the user) :
+
+```
+          referenceGrid <- lsmeans::lsmeans(model, formula)
+          none <- summary(pairs(referenceGrid, adjust='none'))
+          tukey <- summary(pairs(referenceGrid, adjust='tukey'))
+          scheffe <- summary(pairs(referenceGrid, adjust='scheffe'))
+          bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
+          holm <- summary(pairs(referenceGrid, adjust='holm'))
+      
+```
+
+
+For multinomial models, the estimation is slightly different. Following [lsmeans package](https://cran.r-project.org/web/packages/lsmeans/index.html) manual, the comparisons are carried out on the linear predictor recentered so that it averages to zero over the levels of the response variable (similar to sum-to-zero contrasts). Thus each latent variable can be regarded as the log probability at that level minus the average log probability over all levels.
+
+The comparisons are implemented as follows:
+```
+
+model<-multinom(dependent ~term*otherterms, data = dat, model = TRUE)
+
+lsm = lsmeans::lsmeans(model, ~ dependent|term, mode = "latent")
+
+cmp = pairs(lsm,  by="dependent",interaction=F) 
+
+
+```
+
+This implementation is based on [lsmeans package](https://cran.r-project.org/web/packages/lsmeans/index.html), which explains that because dependent variable categories probabilities sum to 1 (and the latent values sum to 0) over the multivariate-response levels, all sensible results from lsmeans must involve that response as one of the factors.
