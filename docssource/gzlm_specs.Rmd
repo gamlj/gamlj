@@ -30,10 +30,8 @@ For multinomial models, the estimation is slightly different. Following [lsmeans
 The comparisons are implemented as follows:
 ```
 
-model<-multinom(dependent ~term*otherterms, data = dat, model = TRUE)
-
+model<-multinom(dependent ~term*otherterms, data = data, model = TRUE)
 lsm = lsmeans::lsmeans(model, ~ dependent|term, mode = "latent")
-
 cmp = pairs(lsm,  by="dependent",interaction=F) 
 
 
