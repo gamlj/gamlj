@@ -161,7 +161,9 @@ lp.linesMultiPlot<-function(data,theme,depName,groupName,linesName=NULL) {
       sdata<-subset(data,lines==level)
       sdata$lines<-NULL
       title<-paste(linesName,"=",level)
-      plots[[level]]<-.linesPlot(sdata,theme,depName,groupName,title = title)        
+      aplot<-.linesPlot(sdata,theme,depName,groupName,title = title)        
+      aplot<-aplot+theme
+      plots[[level]]<-aplot
     }
     return(do.call(gridExtra::grid.arrange,plots))
   } else

@@ -750,14 +750,13 @@ gamljGzlmClass <- R6::R6Class(
              errorType<-paste0(ciWidth,"% ",toupper(errorType))
          
          if (modelType=="multinomial")
-                   p<-lp.linesMultiPlot(image$state$data,theme,depName,groupName,linesName)
+                   p<-lp.linesMultiPlot(image$state$data,ggtheme,depName,groupName,linesName)
          else  if ( ! is.null(linesName)) {
                    p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
                } else {
                       p<-.oneWayPlot(image,theme,depName,groupName,errorType)
                }       
-#         p<-p+ggtheme
-
+         p<-p+ggtheme
          print(p)
          TRUE
       },

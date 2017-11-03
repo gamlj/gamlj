@@ -31,9 +31,10 @@ install.packages(deps, lib = instdir,dependencies = c("Depends", "Imports", "Lin
 #install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
 
 
+#jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library/compiler/"    
+#install(home = jpath)
 jmvtools::check()
-jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library/compiler/"    
-install(home = jpath)
+install()
 
   #install.packages("stats",lib = jpath)
 R.version
