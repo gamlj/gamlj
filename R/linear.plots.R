@@ -82,7 +82,6 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
           else {
                if (v %in% selected) {
                    if (v==groupName)
-#                    ll[v]<-list(seq(-2,2,by = .1)*sd(data[,v])+mean(data[,v]))
                      ll[v]<-list(seq(min(data[,v]),max(data[,v]),length.out=100))
                    else
                        ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
@@ -109,7 +108,11 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
      if (bars!="none")
         what<-c("fit","lwr","upr")
      dm<-aggregate(dm[,what],by,mean)
-     lnames<-c("group","lines","plots")
+     if (is.null(linesName))
+       lnames<-c("group","plots")
+     else
+       lnames<-c("group","lines","plots")
+
      names(dm)<-c(lnames[1:length(selected)],what)
           
      if (!is.null(dm$plots) & !is.factor(data[,plotsName])) {
@@ -120,7 +123,7 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
       if (!is.null(dm$lines) & !is.factor(data[,linesName])) {
             dm$lines<-factor(dm$lines)
             levels(dm$lines)<-c("-SD","Mean","+SD")
-        }
+      }
         dm
    } # end of .preparePlotData()
 

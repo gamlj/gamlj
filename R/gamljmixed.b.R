@@ -601,7 +601,7 @@ gamljMixedClass <- R6::R6Class(
     .initPlots=function(data) {
        isAxis <- ! is.null(self$options$plotHAxis)
        isMulti <- ! is.null(self$options$plotSepPlots)
-    
+       
          self$results$get('descPlot')$setVisible( ! isMulti && isAxis)
          self$results$get('descPlots')$setVisible(isMulti)
     
@@ -639,7 +639,6 @@ gamljMixedClass <- R6::R6Class(
     image$setState(list(data=plotData, range=yAxisRange))
     
   } else {
-    
     images <- self$results$descPlots
     i<-1
     levels<-levels(plotData$plots)

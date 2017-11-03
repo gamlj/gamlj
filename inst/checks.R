@@ -7,7 +7,10 @@ contrasts(dat$twogroups)<-contr.sum(2)
 contrasts(dat$threegroups)<-contr.sum(3)
 
 model<-lm(y~twogroups+x+twogroups:x,data=dat)
-lf.simpleEffects(model,"twogroups","x")
+groupName<-"twogroups"
+plotsName<-"x"
+linesName<-NULL
+lp.preparePlotData(model,groupName,linesName,plotsName)
 
 dat<-read.csv2("data/dat3x2x2_mixed.csv")
 dat$cluster<-factor(dat$cluster)
