@@ -244,6 +244,7 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
         infoTable$setRow(rowKey="conv",mi.converged(model))
         
+        
         anovaResults <- try(mf.anova(model))
           if (isError(anovaResults)) {
             message <- extractErrorMessage(anovaResults)
@@ -592,7 +593,6 @@ gamljGzlmClass <- R6::R6Class(
     } else 
       levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
     for(i in seq_along(levs)) {
-      data[,threeway]<-data$mod2
       if (is.factor(data$mod2))
         contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
       else
@@ -600,10 +600,12 @@ gamljGzlmClass <- R6::R6Class(
       ## make nice labels and titles
       lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
       title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
-      
+      # re-estimate the model
+      form<-formula(model)
+      FUN<-mf.estimate(model)
+      model0<-FUN(form,data)
       #### populate the R table       
-      results<-lf.simpleEffects(model,variable,moderator)
-      
+      results<-lf.simpleEffects(model0,variable,moderator)
       ### populate the Jamovi table
       key=paste(variable,i,sep="")
       ### F table

@@ -767,9 +767,12 @@ gamljMixedClass <- R6::R6Class(
       ## make nice labels and titles
       lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
       title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
-      
+      # re-estimate the model
+      form<-formula(model)
+      FUN<-mf.estimate(model)
+      model0<-FUN(form,data)
       #### populate the R table       
-      results<-lf.simpleEffects(model,variable,moderator)
+      results<-lf.simpleEffects(model0,variable,moderator)
       
       ### populate the Jamovi table
       key=paste(variable,i,sep="")

@@ -21,7 +21,7 @@ mi.converged<- function(x,...) UseMethod(".converged")
 .converged_test<-function(logicValue) {
   value<-ifelse(logicValue,"yes","no")
   comm<-ifelse(logicValue,"A solution was found","Results may be misleading")
-  as.list(value,comm)
+  list(value=value,comm=comm)
 }
 
 .converged.default<-function(model) {
@@ -30,8 +30,8 @@ mi.converged<- function(x,...) UseMethod(".converged")
   
 }
 .converged.multinom<-function(model) {
-  
-    .converged_test(model$convergence==0)
+
+      .converged_test(model$convergence==0)
   
 }
 
