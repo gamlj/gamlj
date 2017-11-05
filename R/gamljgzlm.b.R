@@ -300,7 +300,7 @@ gamljGzlmClass <- R6::R6Class(
             return()
         private$.populateSimple(private$.model)
         private$.prepareDescPlots(private$.model)
-        private$.populatePostHoc(data)
+        private$.populatePostHoc(model)
         private$.populateDescriptives(model)
         
       }) # suppressWarnings
@@ -331,13 +331,13 @@ gamljGzlmClass <- R6::R6Class(
         
         depLevel<-1
         if (self$options$modelSelection=="logistic")
-          mTable$addColumn(name="prob", title="Prob", index=i+1)
+          mTable$getColumn("lsmean")$setTitle("Prob")
         if (self$options$modelSelection=="poisson")
-          mTable$addColumn(name="rate", title="Mean Count", index=i+1)
+          mTable$getColumn("lsmean")$setTitle("Mean Count")
         if (self$options$modelSelection=="linear")
-          mTable$addColumn(name="lsmean", title="Mean", index=i+1)
+          mTable$getColumn("lsmean")$setTitle("Mean")
         if (self$options$modelSelection=="multinomial") {
-          mTable$addColumn(name="lsmean", title="Prob", index=i+1)
+          mTable$getColumn("lsmean")$setTitle("Prob")
           mTable$addColumn(name="dep", title="Response group", index=1)
           depLevel<-length(levels(data[[dep]]))
         }
@@ -387,8 +387,6 @@ gamljGzlmClass <- R6::R6Class(
         table$addColumn(name='z', title='z', type='number')
         
         table$addColumn(name='pnone', title='p', type='number', format='zto,pvalue', visible="(postHocCorr:none)")
-        table$addColumn(name='ptukey', title='p<sub>tukey</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:tukey)")
-        table$addColumn(name='pscheffe', title='p<sub>scheffe</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:scheffe)")
         table$addColumn(name='pbonferroni', title='p<sub>bonferroni</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:bonf)")
         table$addColumn(name='pholm', title='p<sub>holm</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:holm)")
         
@@ -430,7 +428,7 @@ gamljGzlmClass <- R6::R6Class(
       }
       private$.postHocRows <- postHocRows
     },
-    .populatePostHoc=function(data) {
+    .populatePostHoc=function(model) {
       
       terms <- self$options$postHoc
       modelType <- self$options$modelSelection
@@ -448,25 +446,16 @@ gamljGzlmClass <- R6::R6Class(
         
         term <- jmvcore::composeTerm(ph)
         termB64 <- jmvcore::composeTerm(toB64(ph))
-        formula <- as.formula(paste('~', term))
-        if (modelType=="multinomial") {
-                 dep<-self$options$dep
-                 formula<-as.formula(paste("~",paste(term,collapse = ":")))
-        }
-        print(modelType)
-        print(formula)
         suppressWarnings({
-          # table$setStatus('running')
-          referenceGrid <- lsmeans::lsmeans(private$.model, formula)
-          none <- summary(pairs(referenceGrid, adjust='none'))
-          tukey <- summary(pairs(referenceGrid, adjust='tukey'))
-          scheffe <- summary(pairs(referenceGrid, adjust='scheffe'))
-          bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
-          holm <- summary(pairs(referenceGrid, adjust='holm'))
+
+          none <- mf.posthoc(model,term,"none")
+          bonferroni <- mf.posthoc(model,term,"bonferroni")
+          holm <-mf.posthoc(model,term,"holm")
         }) # suppressWarnings
-        print(bonferroni)
         resultRows <- lapply(strsplit(as.character(none$contrast), ' - '), function(x) strsplit(x, ','))
         tableRows <- private$.postHocRows[[term]]
+        print(none)
+        print(as.data.frame(bonferroni))
         
         for (i in seq_along(tableRows)) {
           location <- lapply(resultRows, function(x) {
@@ -492,8 +481,6 @@ gamljGzlmClass <- R6::R6Class(
           row[['z']] <- if(reverse) -none[index,'z.ratio'] else none[index,'z.ratio']
           
           row[['pnone']] <- none[index,'p.value']
-          row[['ptukey']] <- tukey[index,'p.value']
-          row[['pscheffe']] <- scheffe[index,'p.value']
           row[['pbonferroni']] <- bonferroni[index,'p.value']
           row[['pholm']] <- holm[index,'p.value']
           

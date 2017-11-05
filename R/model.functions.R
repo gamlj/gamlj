@@ -318,9 +318,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
 .confint.default<-function(model,level) 
   return(FALSE)
 
-### this comes from https://github.com/cran/nnet/blob/master/R/multinom.R becaue
-### the version of nnet that I have now (7.3-13) gives an error with confint.multinom
-
 .confint.lm<-function(model,level) 
     return(confint(model,level = level))
   
@@ -350,3 +347,46 @@ mf.confint<- function(x,...) UseMethod(".confint")
   return(cim)
 }
 
+###### post hoc ##########
+mf.posthoc<- function(x,...) UseMethod(".posthoc")
+
+.posthoc.default<-function(model,term,adjust) {
+  
+  referenceGrid<-lsmeans::lsmeans(model,term,transform = "response")
+  summary(pairs(referenceGrid, adjust=adjust))
+}
+
+.posthoc.multinom<-function(model,term,adjust) {
+  
+  dep<-names(attr(terms(model),"dataClass"))[1]
+  terms<-paste(term,collapse = ":")
+  tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
+  referenceGrid<-lsmeans::lsmeans(model,tterm,transform = "response")
+  summary(pairs(referenceGrid, by=dep, adjust=adjust))
+  }
+
+###### means tabòe ##########
+mf.means<- function(x,...) UseMethod(".means")
+
+.means.default<-function(model,term) {
+  table<-lsmeans::lsmeans(model,term,transform = "response")
+  table<-as.data.frame(summary(table))
+  table<-table[,-(1:length(term))]
+  colnames(table)<-c("lsmean","se","df","lower","upper")
+  table
+  
+}
+
+.means.multinom<-function(model,term) {
+
+  dep<-names(attr(terms(model),"dataClass"))[1]
+  terms<-paste(term,collapse = ":")
+  tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
+  table<-lsmeans::lsmeans(model,tterm,transform = "response")
+  table<-as.data.frame(summary(table))
+  table<-table[,-(2:(1+length(term)))]
+  colnames(table)<-c("dep","lsmean","se","df","lower","upper")
+  table<-table[order(table$dep),]
+  table$dep<-as.character(table$dep)
+  table
+}

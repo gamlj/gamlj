@@ -238,15 +238,17 @@ items:
         title:  $key
         type: Table
         columns:
-
-        - name: SE
+        - name: lsmean
+          title: Mean
+          type: number
+        - name: se
           title: SE
           type: number
-        - name: asymp.LCL
-          title: lower CL
+        - name: lower
+          title: Lower
           type: number
-        - name: asymp.UCL
-          title: upper CL
+        - name: upper
+          title: Upper
           type: number
 
 

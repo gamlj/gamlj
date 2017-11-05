@@ -536,16 +536,20 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     title="$key",
                     columns=list(
                         list(
-                            `name`="SE", 
+                            `name`="lsmean", 
+                            `title`="Mean", 
+                            `type`="number"),
+                        list(
+                            `name`="se", 
                             `title`="SE", 
                             `type`="number"),
                         list(
-                            `name`="asymp.LCL", 
-                            `title`="lower CL", 
+                            `name`="lower", 
+                            `title`="Lower", 
                             `type`="number"),
                         list(
-                            `name`="asymp.UCL", 
-                            `title`="upper CL", 
+                            `name`="upper", 
+                            `title`="Upper", 
                             `type`="number")))))
             self$add(jmvcore::Image$new(
                 options=options,
