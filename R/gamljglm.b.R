@@ -557,21 +557,23 @@ gamljGLMClass <- R6::R6Class(
               if (is.factor(data$mod2)) {
                   levs<-levels(data$mod2)
               } else 
-                  levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
+                  levs<-c(mean(data$mod2)-sd(data$mod2),mean(data$mod2),mean(data$mod2)+sd(data$mod2))
               for(i in seq_along(levs)) {
-                  if (is.factor(data$mod2))
-                       contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
-                  else
-                     data[,threeway]<-data[,threeway]-levs[i]
-                 ## make nice labels and titles
-                 lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
-                 title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
-                 # re-estimate the model
-                 form<-formula(model)
-                 FUN<-mf.estimate(model)
-                 model0<-FUN(form,data)
-                 #### populate the R table       
-                 results<-lf.simpleEffects(model0,variable,moderator)
+                newdata<-data
+                if (is.factor(data$mod2))
+                  contrasts(newdata[,threeway])<-contr.treatment(length(levs),base=i)
+                else
+                  newdata[,threeway]<-newdata[,threeway]-levs[i]
+                
+                ## make nice labels and titles
+                lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
+                title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
+                # re-estimate the model
+                form<-formula(model)
+                FUN<-mf.estimate(model)
+                model0<-FUN(form,newdata)
+                #### populate the R table       
+                results<-lf.simpleEffects(model0,variable,moderator)
                  
 
             ### populate the Jamovi table

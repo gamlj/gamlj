@@ -294,7 +294,7 @@
         ss<-mf.summary(model)
         ##### extract only the estimates of the x-axis variable
         if ("variable" %in% names(ss))
-             ss<-ss[ss$variable==varname,]
+             ss<-ss[ss$variable %in% varname,]
         else {
              a<-as.logical(apply(sapply(varname, function(a) a==rownames(ss)),1,sum))
              ss<-ss[a,]
@@ -343,7 +343,7 @@ lf.simpleEffects<-function(model,variable,moderator){
   if (is.factor(modvar)) {
     levels<-levels(modvar)
   } else {
-    levels<-c(mean(modvar)+sd(modvar),mean(modvar),mean(modvar)-sd(modvar))
+    levels<-c(mean(modvar)-sd(modvar),mean(modvar),mean(modvar)+sd(modvar))
   }
   params<-data.frame(stringsAsFactors = F)
   ftests<-data.frame(stringsAsFactors = F)

@@ -114,8 +114,7 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 mf.estimate<-function(model) {
   if (.which.class(model)=="lm") {  
-     return(function(form,data)
-       stats::lm(form,data))
+     return(function(form,data) stats::lm(form,data))
   }  
 
   if (.which.class(model)=="lmer") {  
@@ -175,7 +174,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .mf.summary.multinom<-function(model) {
-     
+  
      sumr<-summary(model)
      rcof<-sumr$coefficients
      cof<-as.data.frame(matrix(rcof,ncol=1))
@@ -325,8 +324,10 @@ mf.confint<- function(x,...) UseMethod(".confint")
 .confint.lm<-function(model,level) 
     return(confint(model,level = level))
   
-.confint.glm<-function(model,level)  
-    return(confint(model,level = level))
+.confint.glm<-function(model,level) {  
+    ci<-confint(model,level = level)
+    return(ci)
+}
 
 .confint.merModLmerTest<-function(model,level) 
                                 return(.confint.lmer(model,level))

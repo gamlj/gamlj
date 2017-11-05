@@ -11,6 +11,6 @@ Description: A suite for estimation of linear model, such as the general linear 
 License: GPL
 Encoding: UTF-8
 LazyData: true
-Imports: jmvcore (>= 0.8.0), 
+Imports: jmvcore (>= 0.8.0), car, lsmeans
 Depends: jmvcore
 Exports: gamljMixed, gamljGLM, gamljGzml

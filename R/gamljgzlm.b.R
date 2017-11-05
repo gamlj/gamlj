@@ -41,7 +41,6 @@ gamljGzlmClass <- R6::R6Class(
         na.omit(data)
     },
     .init=function() {
-        
         print("init")      
         modelType<-self$options$modelSelection
         afamily<-mf.give_family(modelType)
@@ -235,7 +234,6 @@ gamljGzlmClass <- R6::R6Class(
           message <- extractErrorMessage(model)
           reject(message)
         }
-        
         private$.model <- model
         self$results$.setModel(model)
 
@@ -271,7 +269,6 @@ gamljGzlmClass <- R6::R6Class(
           estimatesTable$setNote("sumcrash",message)
           STOP<-T
         }
-        
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
         if (self$options$showParamsCI) {
@@ -297,7 +294,8 @@ gamljGzlmClass <- R6::R6Class(
           tableRow=parameters[i,]
           estimatesTable$setRow(rowNo=i,tableRow)
           estimatesTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
-          }
+        }
+
         if (STOP)
             return()
         private$.populateSimple(private$.model)
@@ -341,9 +339,6 @@ gamljGzlmClass <- R6::R6Class(
         if (self$options$modelSelection=="multinomial") {
           mTable$addColumn(name="lsmean", title="Prob", index=i+1)
           mTable$addColumn(name="dep", title="Response group", index=1)
-          mTable$getColumn('SE')$setVisible(F)
-          mTable$getColumn('asymp.LCL')$setVisible(F)
-          mTable$getColumn('asymp.UCL')$setVisible(F)
           depLevel<-length(levels(data[[dep]]))
         }
         for(j in seq_len(depLevel))
@@ -362,6 +357,7 @@ gamljGzlmClass <- R6::R6Class(
       
       bs <- self$options$factors
       phTerms <- self$options$postHoc
+      modelType <- self$options$modelSelection
       
       bsLevels <- list()
       for (i in seq_along(bs))
@@ -435,7 +431,9 @@ gamljGzlmClass <- R6::R6Class(
       private$.postHocRows <- postHocRows
     },
     .populatePostHoc=function(data) {
+      
       terms <- self$options$postHoc
+      modelType <- self$options$modelSelection
       
       if (length(terms) == 0)
         return()
@@ -451,7 +449,12 @@ gamljGzlmClass <- R6::R6Class(
         term <- jmvcore::composeTerm(ph)
         termB64 <- jmvcore::composeTerm(toB64(ph))
         formula <- as.formula(paste('~', term))
-        
+        if (modelType=="multinomial") {
+                 dep<-self$options$dep
+                 formula<-as.formula(paste("~",paste(term,collapse = ":")))
+        }
+        print(modelType)
+        print(formula)
         suppressWarnings({
           # table$setStatus('running')
           referenceGrid <- lsmeans::lsmeans(private$.model, formula)
@@ -461,7 +464,7 @@ gamljGzlmClass <- R6::R6Class(
           bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
           holm <- summary(pairs(referenceGrid, adjust='holm'))
         }) # suppressWarnings
-        
+        print(bonferroni)
         resultRows <- lapply(strsplit(as.character(none$contrast), ' - '), function(x) strsplit(x, ','))
         tableRows <- private$.postHocRows[[term]]
         
@@ -591,20 +594,23 @@ gamljGzlmClass <- R6::R6Class(
     if (is.factor(data$mod2)) {
       levs<-levels(data$mod2)
     } else 
-      levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
+      levs<-c(mean(data$mod2)-sd(data$mod2),mean(data$mod2),mean(data$mod2)+sd(data$mod2))
     for(i in seq_along(levs)) {
+      newdata<-data
       if (is.factor(data$mod2))
-        contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
+        contrasts(newdata[,threeway])<-contr.treatment(length(levs),base=i)
       else
-        data[,threeway]<-data[,threeway]-levs[i]
+        newdata[,threeway]<-newdata[,threeway]-levs[i]
+      
       ## make nice labels and titles
       lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
       title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
       # re-estimate the model
       form<-formula(model)
       FUN<-mf.estimate(model)
-      model0<-FUN(form,data)
-      #### populate the R table       
+      model0<-FUN(form,newdata)
+
+      #### populate the R table
       results<-lf.simpleEffects(model0,variable,moderator)
       ### populate the Jamovi table
       key=paste(variable,i,sep="")
@@ -627,6 +633,7 @@ gamljGzlmClass <- R6::R6Class(
         modelType<-self$options$modelSelection
         if (modelType=="multinomial") {
           mod<-nnet::multinom(form,data,model = T)
+          mod$call$formula<-form
           return(mod)
         }
         stats::glm(form,data,family=mf.give_family(modelType))
