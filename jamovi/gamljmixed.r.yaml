@@ -309,18 +309,18 @@ items:
           title: 'Mean'
           type: number
 
-        - name: SE
+        - name: se
           title: SE
           type: number
 
         - name: df
           title: df
           type: number
-        - name: lower.CL
-          title: lower CL
+        - name: lower
+          title: Lower 
           type: number
-        - name: upper.CL
-          title: upper CL
+        - name: upper
+          title: Upper
           type: number
 
 

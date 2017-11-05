@@ -217,14 +217,38 @@ items:
       clearWith:
         - dep
         - modelTerms
-
       template:
-        title: ""
+        title:  ""
         type: Table
-        columns: []
-        clearWith:
-            - dep
-            - modelTerms
+        columns:
+        - name: contrast
+          title: ""
+          type: number
+
+        - name: estimate
+          title: Difference
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: test
+          title: test
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:none)
+        - name: pbonf
+          title: p<sub>bonferroni</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:bonf)
+        - name: pholm
+          title: p<sub>holm</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:holm)
 
     - name: emeansTables
       title: Estimated Marginal Means 

@@ -242,16 +242,12 @@ options:
       options:
           - name: none
             title: No correction
-          - name: tukey
-            title: Tukey
-          - name: scheffe
-            title: Scheffe
           - name: bonf
             title: Bonferroni
           - name: holm
             title: Holm
       default:
-          - tukey
+          - bonf
       description:
           R: >
             one or more of `'none'`, `'tukey'`, `'scheffe'`, `'bonf'`, or

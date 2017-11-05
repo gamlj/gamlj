@@ -351,7 +351,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
 mf.posthoc<- function(x,...) UseMethod(".posthoc")
 
 .posthoc.default<-function(model,term,adjust) {
-  
   referenceGrid<-lsmeans::lsmeans(model,term,transform = "response")
   summary(pairs(referenceGrid, adjust=adjust))
 }
@@ -374,7 +373,6 @@ mf.means<- function(x,...) UseMethod(".means")
   table<-table[,-(1:length(term))]
   colnames(table)<-c("lsmean","se","df","lower","upper")
   table
-  
 }
 
 .means.multinom<-function(model,term) {

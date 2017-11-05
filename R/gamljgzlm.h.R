@@ -23,7 +23,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             plotSepPlots = NULL,
             postHoc = NULL,
             postHocCorr = list(
-                "tukey"),
+                "bonf"),
             eDesc = FALSE,
             plotError = "ci",
             ciWidth = 95,
@@ -161,12 +161,10 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 postHocCorr,
                 options=list(
                     "none",
-                    "tukey",
-                    "scheffe",
                     "bonf",
                     "holm"),
                 default=list(
-                    "tukey"))
+                    "bonf"))
             private$..eDesc <- jmvcore::OptionBool$new(
                 "eDesc",
                 eDesc,
@@ -519,10 +517,41 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 template=jmvcore::Table$new(
                     options=options,
                     title="",
-                    columns=list(),
-                    clearWith=list(
-                        "dep",
-                        "modelTerms"))))
+                    columns=list(
+                        list(
+                            `name`="contrast", 
+                            `title`="", 
+                            `type`="number"),
+                        list(
+                            `name`="estimate", 
+                            `title`="Difference", 
+                            `type`="number"),
+                        list(
+                            `name`="se", 
+                            `title`="SE", 
+                            `type`="number"),
+                        list(
+                            `name`="test", 
+                            `title`="test", 
+                            `type`="number"),
+                        list(
+                            `name`="p", 
+                            `title`="p", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:none)"),
+                        list(
+                            `name`="pbonf", 
+                            `title`="p<sub>bonferroni</sub>", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:bonf)"),
+                        list(
+                            `name`="pholm", 
+                            `title`="p<sub>holm</sub>", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:holm)")))))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="emeansTables",
@@ -726,7 +755,7 @@ gamljGzlm <- function(
     plotSepPlots = NULL,
     postHoc = NULL,
     postHocCorr = list(
-                "tukey"),
+                "bonf"),
     eDesc = FALSE,
     plotError = "ci",
     ciWidth = 95,

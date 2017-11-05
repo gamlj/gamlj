@@ -23,17 +23,21 @@ mf.confint(model,level=0.95)
 
 ## model logistic #####
 
+
 dat<-read.csv("data/generalized.csv")
 dat$bfac<-factor(dat$bfac)
 dat$dic<-factor(dat$dic)
 contrasts(dat$dic)<-contr.sum(2)
 contrasts(dat$bfac)<-contr.sum(2)
 dat$groups3<-factor(dat$groups3)
-model<-glm(counts~x*bfac,data=dat,family = poisson())
+model<-glm(counts~groups3*bfac*dic,data=dat,family = poisson())
+ex<-c("groups3","bfac","dic")
+lab<-paste(paste(ex,collapse = ","),paste(ex,collapse = ","),sep=" - ")
+mf.posthoc(model,ex)
 #mf.confint(model,level=0.95)
 #lf.meansTables(model,"bfac")
 formula<-formula(~bfac)
-q<-lsmeans::lsmeans(model, formula)
+lsmeans::lsmeans(model, c("bfac","dic"))
 summary(pairs(q, adjust='tukey'))
 
 qq<-lf.simpleEffects(model,"bfac","x")
@@ -48,7 +52,10 @@ names(dat)
 dat$groups3<-factor(dat$group3)
 contrasts(dat$groups3)
 model<-multinom(groups3 ~bfac*dic, data = dat, model = TRUE)
-lsm = lsmeans::lsmeans(model, ~ groups3|bfac:dic, mode = "latent")
+lsm<-mf.means(model,"bfac")
+mf.means(model,"bfac")
+lsm = lsmeans::lsmeans(model, ~ groups3|bfac, mode = "latent")
+as.data.frame(summary(lsm))
 #lsm = lsmeans::lsmeans(mult, ~ groups3|bfac, mode = "prob")
 cmp = pairs(lsm,  by="groups3",interaction=F) 
 cmp
@@ -81,14 +88,19 @@ summary(mult)
 
 
 model<-glm(Freq ~ groups3 * bfac *dic, data=VA.tab, family=poisson)
-summary(model)
-means<-lsmeans::lsmeans(model,~groups3:bfac)
-cc<-contrast(means,by="groups3")
-summary(pairs(cc, adjust='tukey'))
 
-VA.tab
-data(VA,package = "MASS")
-VA[,c("cell","treat")]
-VA.tab <- table(VA[, c('cell', 'treat')])
-model<-glm(Freq ~ cell * treat, data=VA.tab, family=poisson)
+ex<-c("bfac","dic")
+  
+paste(ex,"-")
+res<-mf.posthoc(model,c("bfac","dic"))
+.names<-as.character(res$contrast)
+q<-sapply(.names, function(a) {
+  strsplit(a,"-")
+  })
+as.matrix(q)
+data<-data.frame(id=1:40)
+data$fac<-rep(c(0,1),20)
+data$bac<-rep(c(10,20),each=20)
+data$y<-data$fac+data$bac+rnorm(40,0,1)
 
+write.csv(data,"twobytwo.csv")

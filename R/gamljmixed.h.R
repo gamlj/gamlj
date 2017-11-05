@@ -615,7 +615,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="Mean", 
                             `type`="number"),
                         list(
-                            `name`="SE", 
+                            `name`="se", 
                             `title`="SE", 
                             `type`="number"),
                         list(
@@ -623,12 +623,12 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="df", 
                             `type`="number"),
                         list(
-                            `name`="lower.CL", 
-                            `title`="lower CL", 
+                            `name`="lower", 
+                            `title`="Lower", 
                             `type`="number"),
                         list(
-                            `name`="upper.CL", 
-                            `title`="upper CL", 
+                            `name`="upper", 
+                            `title`="Upper", 
                             `type`="number")))))
             self$add(jmvcore::Image$new(
                 options=options,

@@ -358,81 +358,39 @@ gamljGzlmClass <- R6::R6Class(
       bs <- self$options$factors
       phTerms <- self$options$postHoc
       modelType <- self$options$modelSelection
-      
+
       bsLevels <- list()
       for (i in seq_along(bs))
         bsLevels[[bs[i]]] <- levels(data[[bs[i]]])
       
       tables <- self$results$postHoc
-      
-      postHocRows <- list()
-      
-      for (ph in phTerms) {
+      nDepLevels<-1
         
+      if (modelType=='multinomial') {
+      dep<-self$options$dep
+      nDepLevels<-length(levels(data[[dep]]))
+      }
+      for (j in seq_len(nDepLevels))
+       for (ph in phTerms) {
         table <- tables$get(key=ph)
+        if (modelType=='multinomial') 
+                  table$addColumn(name="dep",title=dep,index=1)
         
         table$setTitle(paste0('Post Hoc Comparisons - ', stringifyTerm(ph)))
-        
-        for (i in seq_along(ph))
-          table$addColumn(name=paste0(ph[i],'1'), title=ph[i], type='text', superTitle='Comparison', combineBelow=TRUE)
-        
-        table$addColumn(name='sep', title='', type='text', content='-', superTitle='Comparison', format='narrow')
-        
-        for (i in seq_along(ph))
-          table$addColumn(name=paste0(ph[i],'2'), title=ph[i], type='text', superTitle='Comparison')
-        
-        table$addColumn(name='md', title='Mean Difference', type='number')
-        table$addColumn(name='se', title='SE', type='number')
-        #table$addColumn(name='df', title='df', type='number')
-        table$addColumn(name='z', title='z', type='number')
-        
-        table$addColumn(name='pnone', title='p', type='number', format='zto,pvalue', visible="(postHocCorr:none)")
-        table$addColumn(name='pbonferroni', title='p<sub>bonferroni</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:bonf)")
-        table$addColumn(name='pholm', title='p<sub>holm</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:holm)")
-        
-        combin <- expand.grid(bsLevels[rev(ph)])
-        combin <- sapply(combin, as.character, simplify = 'matrix')
-        if (length(ph) > 1)
-          combin <- combin[,rev(1:length(combin[1,]))]
-        
-        comp <- list()
-        iter <- 1
-        for (i in 1:(length(combin[,1]) - 1)) {
-          for (j in (i+1):length(combin[,1])) {
-            comp[[iter]] <- list()
-            comp[[iter]][[1]] <- combin[i,]
-            comp[[iter]][[2]] <- combin[j,]
-            
-            if (j == length(combin[,1]))
-              comp[[iter]][[3]] <- TRUE
-            else
-              comp[[iter]][[3]] <- FALSE
-            
-            iter <- iter + 1
-          }
-        }
-        
-        postHocRows[[composeTerm(ph)]] <- comp
-        
-        for (i in seq_along(comp)) {
-          row <- list()
-          for (c in seq_along(comp[[i]][[1]]))
-            row[[paste0(names(comp[[i]][[1]][c]),'1')]] <- as.character(comp[[i]][[1]][c])
-          for (c in seq_along(comp[[i]][[2]]))
-            row[[paste0(names(comp[[i]][[2]][c]),'2')]] <- as.character(comp[[i]][[2]][c])
-          
-          table$addRow(rowKey=i, row)
-          if (comp[[i]][[3]] == TRUE)
-            table$addFormat(rowNo=i, col=1, Cell.END_GROUP)
-        }
-      }
-      private$.postHocRows <- postHocRows
-    },
-    .populatePostHoc=function(model) {
-      
+        lab<-paste(paste(ph,collapse = ","),paste(ph,collapse = ","),sep=" - ")
+        table$getColumn("contrast")$setTitle(lab)
+        eg<-nrow(expand.grid(bsLevels[ph]))
+        for (i in seq_len((eg*(eg-1))/2))
+                table$addRow(rowKey=i+j)
+
+            }
+      },
+
+
+     .populatePostHoc=function(model) {
       terms <- self$options$postHoc
       modelType <- self$options$modelSelection
-      
+      dep<-self$options$dep
       if (length(terms) == 0)
         return()
       
@@ -447,53 +405,32 @@ gamljGzlmClass <- R6::R6Class(
         term <- jmvcore::composeTerm(ph)
         termB64 <- jmvcore::composeTerm(toB64(ph))
         suppressWarnings({
-
-          none <- mf.posthoc(model,term,"none")
-          bonferroni <- mf.posthoc(model,term,"bonferroni")
-          holm <-mf.posthoc(model,term,"holm")
+          none <- mf.posthoc(model,ph,"none")
+          bonferroni <- mf.posthoc(model,ph,"bonferroni")
+          holm <-mf.posthoc(model,ph,"holm")
         }) # suppressWarnings
-        resultRows <- lapply(strsplit(as.character(none$contrast), ' - '), function(x) strsplit(x, ','))
-        tableRows <- private$.postHocRows[[term]]
-        print(none)
-        print(as.data.frame(bonferroni))
-        
-        for (i in seq_along(tableRows)) {
-          location <- lapply(resultRows, function(x) {
+        tableData<-as.data.frame(none)
+        tableData$contrast<-as.character(tableData$contrast)
+        if (modelType=="multinomial") {
+            colnames(tableData)<-c("contrast","dep","estimate","se","df","test","p")
+            tableData$dep<-as.character(tableData$dep)
+            tableData$pbonf<-bonferroni[,7]
+            tableData$pholm<-holm[,7]
             
-            c1 <- identical(x[[1]], as.character(tableRows[[i]][[1]]))
-            c2 <- identical(x[[1]], as.character(tableRows[[i]][[2]]))
-            c3 <- identical(x[[2]], as.character(tableRows[[i]][[1]]))
-            c4 <- identical(x[[2]], as.character(tableRows[[i]][[2]]))
-            if (c1 && c4)
-              return(list(TRUE,FALSE))
-            else if (c2 && c3)
-              return(list(TRUE,TRUE))
-            else
-              return(list(FALSE,FALSE))
-          })
-          index <- which(sapply(location, function(x) return(x[[1]])))
-          reverse <- location[[index]][[2]]
-
-          row <- list()
-          row[['md']] <- if(reverse) -none[index,'estimate'] else none[index,'estimate']
-          row[['se']] <- none[index,'SE']
-#          row[['df']] <- none[index,'df']
-          row[['z']] <- if(reverse) -none[index,'z.ratio'] else none[index,'z.ratio']
-          
-          row[['pnone']] <- none[index,'p.value']
-          row[['pbonferroni']] <- bonferroni[index,'p.value']
-          row[['pholm']] <- holm[index,'p.value']
-          
-          table$setRow(rowNo=i, values=row)
-          private$.checkpoint()
         }
-        if (.is.scaleDependent(private$.model,ph))
-          table$setNote("covs",WARNS["ph.interactions"])
-        else if (.term.develop(ph)<length(private$.modelTerms()))
-          table$setNote("covs",WARNS["ph.covariates"])
-        table$setStatus('complete')
+        else {
+            colnames(tableData)<-c("contrast","estimate","se","df","test","p")
+            tableData$pbonf<-bonferroni[,6]
+            tableData$pholm<-holm[,6]
+            
+        }
+
+        for (i in 1:nrow(tableData)) {
+          row<-tableData[i,]
+          table$setRow(rowNo=i, values=row)
+        }
       }
-    },
+},
 .populateDescriptives=function(model) {
   
   terms<-private$.modelTerms()

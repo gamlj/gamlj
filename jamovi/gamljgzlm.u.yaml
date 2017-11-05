@@ -198,14 +198,6 @@ children:
                 type: CheckBox
                 optionPart: none
                 optionName: postHocCorr
-              - name: postHocCorr_tukey
-                type: CheckBox
-                optionPart: tukey
-                optionName: postHocCorr
-              - name: postHocCorr_scheffe
-                type: CheckBox
-                optionPart: scheffe
-                optionName: postHocCorr
               - name: postHocCorr_bonf
                 type: CheckBox
                 optionPart: bonf
