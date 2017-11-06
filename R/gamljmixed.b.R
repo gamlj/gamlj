@@ -136,8 +136,6 @@ gamljMixedClass <- R6::R6Class(
         postHocTables   <- self$results$postHoc
         private$.initPostHoc(data)
         private$.initMeanTables(data)
-        
-        
     },
     .run=function() {
       print("run")
@@ -183,7 +181,6 @@ gamljMixedClass <- R6::R6Class(
         if (!is.null(attr(parameters,"warning"))) 
             fixedTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
 
-        
         private$.model <- model
         ss<-summary(model)
         ### prepare info table #########       
@@ -711,8 +708,11 @@ gamljMixedClass <- R6::R6Class(
   
   .fillTheFTable<-function(results,aTable) {
     ftests<-results[[2]]
-    ### ftests      
-    for (i in seq_len(dim(ftests)[1])) {
+    ### ftests  
+    if (any(ftests==FALSE))
+      aTable$setNote("dffail",WARNS["lmer.norelm"])
+    else
+      for (i in seq_len(dim(ftests)[1])) {
       tableRow<-ftests[i,]
       aTable$setRow(rowNo=i,tableRow)
     }
