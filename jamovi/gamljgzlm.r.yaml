@@ -64,6 +64,10 @@ items:
         - scaling:type
         - contrasts:type
       columns:
+        - name: dep
+          title: "Response Groups"
+          type: text
+          visible: (modelSelection:multinomial)
         - name: name
           title: ""
           type: text
@@ -97,6 +101,31 @@ items:
           title: p
           type: number
           format: zto,pvalue
+
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
 
     - name: simpleEffectsAnovas
       title: Simple Effects Analysis of Deviance
@@ -145,6 +174,10 @@ items:
         type: Table
         clearWith:
         columns:
+          - name: dep
+            title: "Response Groups"
+            type: text
+            visible: (modelSelection:multinomial)
           - name: variable
             title: "Effect"
             type: text
@@ -174,29 +207,6 @@ items:
       description: The underlying `glm` object
 
 
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
 
 
     - name: postHoc
@@ -207,14 +217,38 @@ items:
       clearWith:
         - dep
         - modelTerms
-
       template:
-        title: ""
+        title:  ""
         type: Table
-        columns: []
-        clearWith:
-            - dep
-            - modelTerms
+        columns:
+        - name: contrast
+          title: ""
+          type: number
+
+        - name: estimate
+          title: Difference
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: test
+          title: test
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:none)
+        - name: pbonf
+          title: p<sub>bonferroni</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:bonf)
+        - name: pholm
+          title: p<sub>holm</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:holm)
 
     - name: emeansTables
       title: Estimated Marginal Means 
@@ -228,15 +262,17 @@ items:
         title:  $key
         type: Table
         columns:
-
-        - name: SE
+        - name: lsmean
+          title: Mean
+          type: number
+        - name: se
           title: SE
           type: number
-        - name: asymp.LCL
-          title: lower CL
+        - name: lower
+          title: Lower
           type: number
-        - name: asymp.UCL
-          title: upper CL
+        - name: upper
+          title: Upper
           type: number
 
 

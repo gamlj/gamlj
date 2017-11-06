@@ -1,6 +1,6 @@
 ---
 name:  gamljGLM
-title: GLM
+title: General Linear Model
 jrs: '1.0'
 
 items:
@@ -101,6 +101,31 @@ items:
           type: number
           visible: (effectSize:beta)
 
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
+
     - name: simpleEffectsAnovas
       title: Simple Effects ANOVA
       type: Array
@@ -118,7 +143,7 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: ss
@@ -127,7 +152,7 @@ items:
           - name: df
             title: df
             type: integer
-          - name: F
+          - name: f
             title: F
             type: number
           - name: p
@@ -154,12 +179,12 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: estimate
             title: "Estimate"
-          - name: std
+          - name: se
             title: SE
             type: number
           - name: t
@@ -213,30 +238,6 @@ items:
             - dep
             - modelTerms
 
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
-
 
     - name: postHoc
       title: Post Hoc Tests
@@ -272,18 +273,18 @@ items:
           title: 'Mean'
           type: number
 
-        - name: SE
+        - name: se
           title: SE
           type: number
 
         - name: df
           title: df
           type: number
-        - name: lower.CL
-          title: lower CL
+        - name: lower
+          title: Lower 
           type: number
-        - name: upper.CL
-          title: upper CL
+        - name: upper
+          title: Upper
           type: number
 
 

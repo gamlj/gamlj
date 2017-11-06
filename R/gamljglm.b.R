@@ -11,7 +11,6 @@ gamljGLMClass <- R6::R6Class(
 
         print("cleandata")      
         dep <- self$options$dep
-
         covs <- NULL
         if ('covs' %in% names(self$options))
             covs <- self$options$covs
@@ -40,7 +39,6 @@ gamljGLMClass <- R6::R6Class(
 
         for (scaling in self$options$scaling) 
             data[[scaling$var]]<-.scaleContinuous(data[[scaling$var]],scaling$type)
-
         na.omit(data)
     },
     .init=function() {
@@ -64,13 +62,15 @@ gamljGLMClass <- R6::R6Class(
         # main table
       
         modelTerms <- private$.modelTerms()
-      
-        if (length(modelTerms) > 0) {
+        formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
+        terms<-colnames(attr(terms(formula),"factors"))
+        
+        if (length(terms) > 0) {
            anovaTable$addRow(rowKey="r2model", list(name="Model"))
            anovaTable$addFormat(col=1, rowNo=1, format=Cell.BEGIN_END_GROUP)
            
-           for (term in modelTerms) {
-               anovaTable$addRow(rowKey=term, list(name=jmvcore::stringifyTerm(term)))
+           for (term in terms) {
+               anovaTable$addRow(rowKey=term, list(name=.nicifyTerms(term)))
            }  
         
            anovaTable$addFormat(col=1, rowNo=2,format=Cell.BEGIN_GROUP)
@@ -87,7 +87,6 @@ gamljGLMClass <- R6::R6Class(
            anovaTable$setNote("r2",paste("R-squared= 0.000, adjusted R-squared= 0.000"))
            
       # estimates
-           formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
            terms<-colnames(model.matrix(formula,data))  
            labels<-.getFormulaContrastsLabels(self$options$contrasts,formula,data) 
            ciWidth<-self$options$paramCIWidth
@@ -177,14 +176,7 @@ gamljGLMClass <- R6::R6Class(
           return()
         
         base::options(contrasts = c("contr.sum","contr.poly"))
-        
         data <- private$.cleanData()
-        
-        # data <- lapply(data, function(x) {
-        #   if (is.factor(x))
-        #     levels(x) <- toB64(levels(x))
-        #   return(x)
-        # })
         
         if (is.factor(data[[dep]]))
           reject('Dependent variable must be numeric')
@@ -202,8 +194,9 @@ gamljGLMClass <- R6::R6Class(
         private$.model <- model
         self$results$.setModel(model)
         singular <- NULL
+
+        print("mark1")
         
-          
           results <- try({
             if (self$options$ss == '1') {
                ss<-stats::anova(model)
@@ -213,15 +206,18 @@ gamljGLMClass <- R6::R6Class(
             }
             if (self$options$ss == '3') {
                ss<-car::Anova(model,type=3,singular.ok=TRUE)
+               print("mark2")
+               
             }
           })
+          
           if (isError(results)) {
             message <- extractErrorMessage(results)
             reject(message)
           }
           anoFrame<-private$.cleanAnova(ss,type=self$options$ss)
           anoTable<-private$.anovaTable(model,anoFrame)
-
+          
         anovaTable <- self$results$main
         rowNames<-rownames(anoTable)
         rowNames[1]<-"Model"
@@ -258,7 +254,6 @@ gamljGLMClass <- R6::R6Class(
         ciWidth<-self$options$paramCIWidth/100
         ci<-mf.confint(model,level=ciWidth)
         eresults<-cbind(eresults,ci) 
-        
         labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
         for (i in 1:nrow(eresults)) {
           tableRow=eresults[i,]
@@ -285,7 +280,6 @@ gamljGLMClass <- R6::R6Class(
        stats::lm(form,data)
      },
      .initMeanTables=function(data) {
-       
 
        #### expected means ####
        if (self$options$eDesc) {
@@ -297,6 +291,9 @@ gamljGLMClass <- R6::R6Class(
          for (term in modelTerms)
            if (all(term %in% factorsAvailable)) {
              aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+             aTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+             aTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+             
              ldata <- data[,term]
              ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
              ll$stringsAsFactors <- FALSE
@@ -317,7 +314,6 @@ gamljGLMClass <- R6::R6Class(
        
      },     
            
-        
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
@@ -469,7 +465,6 @@ gamljGLMClass <- R6::R6Class(
       if ( ! self$options$homo)
         return()
       data<-model$model
-      print(str(model))
       data$res<-residuals(model)
       factors <- mf.getModelFactors(model)
       rhs <- paste0('`', factors, '`', collapse=':')
@@ -518,89 +513,83 @@ gamljGLMClass <- R6::R6Class(
           ftests<-results[[2]]
           ### ftests      
           for (i in seq_len(dim(ftests)[1])) {
-              r<-ftests[i,]
-              row<-list(variable=r$variable,
-              term=r$level,
-              df=r$Df,
-              ss=r$`Sum Sq`,
-              F=r$`F value`,
-              p=r$`Pr(>F)`)
-              aTable$setRow(rowNo=i,row)
+              tableRow<-ftests[i,]
+              aTable$setRow(rowNo=i,tableRow)
           }
          } #### end of .fillTheFTable
   
-  .fillThePTable<-function(results,aTable) {
-    params<-results[[1]]
-    what<-params$level
-    for (i in seq_len(dim(params)[1])) {
-      r<-params[i,]
-      row<-list(variable=r$variable,
-                term=r$level,
-                estimate=r$Estimate,
-                std=r$`Std. Error`,
-                t=r$`t value`,
-                p=r$`Pr(>|t|)`)
-      aTable$setRow(rowNo=i,row)
-      if (what!=r$level)  
-        aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
-      what<-r$level
-    }
-  } ##### end of .fillThePTable
+        .fillThePTable<-function(results,aTable) {
+             params<-results[[1]]
+             what<-params$level
+             for (i in seq_len(dim(params)[1])) {
+                 tableRow<-params[i,]
+                 aTable$setRow(rowNo=i,tableRow)
+                 if (what!=tableRow$level)  
+                       aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
+                 what<-tableRow$level
+             }
+         }  ##### end of .fillThePTable
   
-  if (is.null(variable) | is.null(moderator)) 
-    return()
+         if (is.null(variable) | is.null(moderator)) 
+              return()
   
-  if (is.null(threeway)) {
-    results<-.simpleEffects(model,data,variable,moderator)
+         if (is.null(threeway)) {
+       
+          results<-lf.simpleEffects(model,variable,moderator)
     
-    ### ftests
-    key=paste(variable,1,sep="")
-    ftable<-simpleEffectsAnovas$get(key=key)
-    .fillTheFTable(results,ftable)      
-    ### parameters
-    ptable<-simpleEffectsTables$get(key=key)
-    .fillThePTable(results,ptable)
-    #### add some warning ####
-    term<-.interaction.term(private$.model,c(variable,moderator))
-    if (!is.null(term)) {
-       if (.is.scaleDependent(private$.model,term))
-           ptable$setNote("inter",WARNS["se.interactions"])
-      else if (.term.develop(term)<length(private$.modelTerms()))
-               ptable$setNote("covs",WARNS["se.covariates"])
-    } else 
-         ptable$setNote("noint",WARNS["se.noint"])
+          ### ftests
+          key=paste(variable,1,sep="")
+          ftable<-simpleEffectsAnovas$get(key=key)
+         .fillTheFTable(results,ftable)      
+          ### parameters
+          ptable<-simpleEffectsTables$get(key=key)
+         .fillThePTable(results,ptable)
+          #### add some warning ####
+          term<-.interaction.term(private$.model,c(variable,moderator))
+          if (!is.null(term)) {
+                if (.is.scaleDependent(private$.model,term))
+                  ptable$setNote("inter",WARNS["se.interactions"])
+                else if (.term.develop(term)<length(private$.modelTerms()))
+                        ptable$setNote("covs",WARNS["se.covariates"])
+          } else 
+                ptable$setNote("noint",WARNS["se.noint"])
     
-    ### end of warnings ###
-  } else {
-    data$mod2<-data[,threeway]
-    if (is.factor(data$mod2)) {
-      levs<-levels(data$mod2)
-    } else 
-      levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
-    for(i in seq_along(levs)) {
-      data[,threeway]<-data$mod2
-      if (is.factor(data$mod2))
-        contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
-      else
-        data[,threeway]<-data[,threeway]-levs[i]
-      ## make nice labels and titles
-      lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
-      title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
+           ### end of warnings ###
+       } else {
+              data$mod2<-data[,threeway]
+              if (is.factor(data$mod2)) {
+                  levs<-levels(data$mod2)
+              } else 
+                  levs<-c(mean(data$mod2)-sd(data$mod2),mean(data$mod2),mean(data$mod2)+sd(data$mod2))
+              for(i in seq_along(levs)) {
+                newdata<-data
+                if (is.factor(data$mod2))
+                  contrasts(newdata[,threeway])<-contr.treatment(length(levs),base=i)
+                else
+                  newdata[,threeway]<-newdata[,threeway]-levs[i]
+                
+                ## make nice labels and titles
+                lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
+                title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
+                # re-estimate the model
+                form<-formula(model)
+                FUN<-mf.estimate(model)
+                model0<-FUN(form,newdata)
+                #### populate the R table       
+                results<-lf.simpleEffects(model0,variable,moderator)
+                 
 
-      #### populate the R table       
-      results<-.simpleEffects(model,data,variable,moderator)
-      
-      ### populate the Jamovi table
-      key=paste(variable,i,sep="")
-      ### F table
-      ftable<-simpleEffectsAnovas$get(key=key)
-      ftable$setTitle(title)
-      .fillTheFTable(results,ftable)      
-      ### parameters
-      ptable<-simpleEffectsTables$get(key=key)
-      ptable$setTitle(title)
-      .fillThePTable(results,ptable)
-    } 
+            ### populate the Jamovi table
+                 key=paste(variable,i,sep="")
+                 ### F table
+                 ftable<-simpleEffectsAnovas$get(key=key)
+                 ftable$setTitle(title)
+                .fillTheFTable(results,ftable)      
+                ### parameters
+                 ptable<-simpleEffectsTables$get(key=key)
+                 ptable$setTitle(title)
+                .fillThePTable(results,ptable)
+              } 
   } # end of if (is.null(threeway)) 
   
 },
@@ -628,7 +617,6 @@ gamljGLMClass <- R6::R6Class(
         term[quoted] <- substring(term[quoted], 2, nchar(term[quoted])-1)
         modelTerms[[i]] <- term
       }
-      
       modelTerms
     },
     .initDescPlots=function(data) {
@@ -639,15 +627,18 @@ gamljGLMClass <- R6::R6Class(
       self$results$get('descPlots')$setVisible(isMulti)
       
       if (isMulti) {
-        return()    
         sepPlotsName <- self$options$plotSepPlots
         sepPlotsVar <- data[[sepPlotsName]]
         if(is.factor(sepPlotsVar))
-             sepPlotsLevels <- 1:length(levels(sepPlotsVar))
-        else sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
+          sepPlotsLevels <- levels(sepPlotsVar)
+        else 
+          sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
+        
         array <- self$results$descPlots
-        for (level in sepPlotsLevels)
-          array$addItem(level)
+        for (level in sepPlotsLevels) {
+          title<-paste(sepPlotsName,"=",level)
+          array$addItem(title)
+        }
       }
     },
 

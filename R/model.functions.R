@@ -1,3 +1,4 @@
+
 ##### function to check results ####
 
 .which.class<-function(model) {
@@ -9,7 +10,9 @@
       return("lmer")
   if ("lmerMod" %in% class(model))
       return("lmer")
-      
+  if ("multinom" %in% class(model))
+    return("multinomial")
+  
 }
 
 mf.aliased<-function(model) {
@@ -29,7 +32,6 @@ mf.aliased<-function(model) {
 }
 
 mf.predict_response<-function(model) {
-  print("using predicted")
   if (.which.class(model)=="glm" || .which.class(model)=="lm") {
   return(  predict(model,type="response"))    
   }
@@ -38,9 +40,12 @@ mf.predict_response<-function(model) {
   }
 } 
   
+##### predictions for the plots #######
 
-mf.predict<-function(model,data=NULL,bars="none") {
-  if (.which.class(model)=="lm"){
+mf.predict<- function(x,...) UseMethod(".predict")
+
+
+.predict.lm<-function(model,data=NULL,bars="none") {
     preds<-predict(model,data,se.fit = T,interval="confidence",type="response")
     if (bars=="none")
       return(data.frame(fit=preds$fit[,1]))
@@ -57,8 +62,8 @@ mf.predict<-function(model,data=NULL,bars="none") {
     return(as.data.frame(cbind(fit=fit,lwr=lwr,upr=upr)))
   }
   
+.predict.glm<-function(model,data=NULL,bars="none") {
   
-  if (.which.class(model)=="glm"){
     preds<-predict(model,data,se.fit = T,type="link")
     if (bars=="none")
       return(data.frame(fit=model$family$linkinv(preds$fit)))
@@ -74,35 +79,42 @@ mf.predict<-function(model,data=NULL,bars="none") {
     lwr <- model$family$linkinv(lwr)
     return(as.data.frame(cbind(fit,lwr,upr)))
   }
-  
-  if (.which.class(model)=="lmer"){
-    return(data.frame(fit=predict(model,data,re.form=~0)))
-  }
 
+.predict.merModLmerTest<-function(model,data=NULL,bars="none") 
+             return(.predict.lmer(model,data,bars))
+  
+.predict.lmer<-function(model,data=NULL,bars="none") {
+
+      return(data.frame(fit=predict(model,data,re.form=~0)))
 }
 
-
+.predict.multinom<-function(model,data=NULL,bars="none") {
   
-
-mf.getModelData<-function(model) {
-  if (.which.class(model)=="lm")
-           return(model$model)
-  
-  if (.which.class(model)=="lmer")
-           return(model@frame)
-  
-  if (.which.class(model)=="glm")
-           return(model$model)
-  
-  
+  return(data.frame(fit=predict(model,data,type="probs")))
 }
+
+##### get model data #########
+
+mf.getModelData<- function(x,...) UseMethod(".getModelData")
+
+.getModelData.default<-function(model) 
+     return(model$model)
+
+.getModelData.merModLmerTest<-function(model) 
+     return(.getModelData.lmer(model))
+
+.getModelData.lmer<-function(model) 
+  return(model@frame)
+
+
+
+
 #### those function are needed for simple effects and plots. They get a model as imput and gives back a function
 #### to reestimate the same kind of model
 
 mf.estimate<-function(model) {
   if (.which.class(model)=="lm") {  
-     return(function(form,data)
-       stats::lm(form,data))
+     return(function(form,data) stats::lm(form,data))
   }  
 
   if (.which.class(model)=="lmer") {  
@@ -113,33 +125,104 @@ mf.estimate<-function(model) {
     return(function(form,data)
       stats::glm(form,data,family=model$family))
   }  
-  
+  if (.which.class(model)=="multinomial") {  
+    return(function(form,data)
+       nnet::multinom(form,data,model = T))
+  }  
   
 }
 
-mf.summary=function(model) {
-  if (.which.class(model)=="lm")   
-     ss<-summary(model)$coefficients
-  if (.which.class(model)=="lmer")   
-    ss<-lmerTest::summary(model)$coefficients
-  if (.which.class(model)=="glm") {   
-    ss<-summary(model)$coefficients
-    expb<-exp(ss[,"Estimate"])  
-    ss<-cbind(ss,expb)
-    colnames(ss)<-c("estimate","se","z","p","expb")
-  }
+############# produces summary in a somehow stadard format ##########
+
+mf.summary<- function(x,...) UseMethod(".mf.summary")
+
+.mf.summary.default<-function(model) {
+      return(FALSE)
+}
   
-  as.data.frame(ss)
+.mf.summary.lm<-function(model){
+  ss<-summary(model)$coefficients
+  colnames(ss)<-c("estimate","se","t","p")
+  as.data.frame(ss,stringsAsFactors = F)
 }
 
-mf.anova=function(model) {
-  if (.which.class(model)=="glm") {
-     ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-     return(ano)
-  }
+.mf.summary.merModLmerTest<-function(model)
+       .mf.summary.lmer(model)
+
+.mf.summary.lmer<-function(model) {
+  
+       ss<-lmerTest::summary(model)$coefficients
+      if (dim(ss)[2]==3) {
+          colnames(ss)<-c("estimate","se","t")
+          if (dim(ss)[1]==1)
+               attr(ss,"warning")<-"lmer.df"
+          else
+              attr(ss,"warning")<-"lmer.zerovariance"
+      }
+       else
+          colnames(ss)<-c("estimate","se","df","t","p")
+       as.data.frame(ss,stringsAsFactors = F)
+}
+
+.mf.summary.glm<-function(model) {
      
-  if (.which.class(model)=="lm")
-    return(car::Anova(model,test="F",type=3, singular.ok=T))
+     ss<-summary(model)$coefficients
+     expb<-exp(ss[,"Estimate"])  
+     ss<-cbind(ss,expb)
+     colnames(ss)<-c("estimate","se","z","p","expb")
+     as.data.frame(ss,stringsAsFactors = F)
+}
+
+.mf.summary.multinom<-function(model) {
+  
+     sumr<-summary(model)
+     rcof<-sumr$coefficients
+     cof<-as.data.frame(matrix(rcof,ncol=1))
+     names(cof)<-"estimate"
+     cof$dep<-rownames(rcof)
+     cof$variable<-rep(colnames(rcof),each=nrow(rcof))
+     se<-matrix(sumr$standard.errors,ncol=1)
+     cof$se<-as.numeric(se)
+     cof$expb<-exp(cof$estimate)  
+     cof$z<-cof$estimate/cof$se
+     cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
+     ss<-as.data.frame(cof,stringsAsFactors = F)
+     ss<-cof[order(ss$dep),]
+     ss
+}
+  
+############# produces anova/deviance table in a somehow stadard format ##########
+mf.anova<- function(x,...) UseMethod(".anova")
+
+.anova.glm<-function(model) {
+
+        ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+        colnames(ano)<-c("test","df","p")
+        as.data.frame(ano, stringsAsFactors = F)
+}
+
+.anova.multinom<-function(model) {
+
+      ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+      colnames(ano)<-c("test","df","p")
+      as.data.frame(ano, stringsAsFactors = F)
+      
+  }
+  
+.anova.lm<-function(model) {
+  
+    ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+    colnames(ano)<-c("ss","df","f","p")
+    ano
+}
+
+
+.anova.merModLmerTest<-function(model) {
+  
+  ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+  colnames(ano)<-c("test","df1","df2","p")
+  ano
+  
 }
 
 mf.lmeranova=function(model) {
@@ -147,34 +230,28 @@ mf.lmeranova=function(model) {
   if (.which.class(model)=="lmer") {   
     
   ano<-lmerTest::anova(model)
-  print(dim(ano))
   if (dim(ano)[1]==0)
     return(ano)
   if (dim(ano)[2]==4) {
+    print("lmer anava uses car::Anova")
     ano<-car::Anova(model,type=3,test="F")
+    ano<-ano[-1,]
+    names(ano)<-c("F","df1","df2","p")
     attr(ano,"method")<-"Kenward-Roger"
     return(ano)
   }
   ano<-ano[,c(5,3,4,6)]
   names(ano)<-c("F","df1","df2","p")
   attr(ano,"method")<-"Satterthwaite"
-  
   if (!all(is.na(ano$df2)==F)) {
-    isone<-rownames(ano[is.na(ano$df2),])
-    ss<-summary(model)[['coefficients']]
-    rows<-matrix(ss[rownames(ss)==isone,],nrow = length(isone))
-    if (dim(rows)[1]>0) {
-      who<-is.na(ano$df2)
-      rows[,4]<-rows[,4]^2
-      ano[who,"F"]<-rows[,4]
-      ano[who,"p"]<-rows[,5]
-      ano[who,"df2"]<-rows[,3]
-    } else {
-      ano<-car::Anova(model,type=3,test="F")
-      attr(ano,"method")<-"Kenward-Roger"
-      
-    }
+    print("lmer anava uses car::Anova")
+    ano<-car::Anova(model,type=3,test="F")
+    ano<-ano[-1,]
+    names(ano)<-c("F","df1","df2","p")
+    attr(ano,"method")<-"Kenward-Roger"
+    return(ano)
   }
+  
   return(ano)
   }
 }
@@ -195,23 +272,6 @@ mf.getModelMessages<-function(model) {
   message
 }
 
-mf.confint<-function(model,level) {
-  if (.which.class(model)=="lm") {
-    return(confint(model,level = level))
-  }
-  if (.which.class(model)=="glm") {
-    return(confint(model,level = level))
-  }
-  
-  if (.which.class(model)=="lmer") {
-    ci<-confint(model,method="Wald")
-    ci<-ci[!is.na(ci[,1]),]
-    if (is.null(dim(ci)))
-      ci<-matrix(ci,ncol=2)
-    return(ci)
-  }
-  
-}
 
 mf.give_family<-function(modelSelection) {
   
@@ -222,7 +282,7 @@ mf.give_family<-function(modelSelection) {
   if (modelSelection=="poisson")
     return(poisson())
   if (modelSelection=="multinomial")
-    return("not yet")
+    return("multinomial")
   
   
   NULL  
@@ -247,5 +307,84 @@ mf.checkData<-function(dep,data,modelType) {
       } 
      if (modelType=="multinomial")
             data[[dep]] <- factor(data[[dep]])
+
      data
+}
+
+
+###### confidence intervals ##########
+mf.confint<- function(x,...) UseMethod(".confint")
+
+.confint.default<-function(model,level) 
+  return(FALSE)
+
+.confint.lm<-function(model,level) 
+    return(confint(model,level = level))
+  
+.confint.glm<-function(model,level) {  
+    ci<-confint(model,level = level)
+    return(ci)
+}
+
+.confint.merModLmerTest<-function(model,level) 
+                                return(.confint.lmer(model,level))
+
+.confint.lmer<-function(model,level)  {
+
+      ci<-confint(model,method="Wald")
+      ci<-ci[!is.na(ci[,1]),]
+      if (is.null(dim(ci)))
+          ci<-matrix(ci,ncol=2)
+      return(ci)
+  }
+
+.confint.multinom <- function (object, level = 0.95, ...) 
+  {
+  ci<-confint(object,level=level)
+  cim<-NULL
+  for (i in seq_len(dim(ci)[3]))
+     cim<-rbind(cim,(ci[,,i]))
+  return(cim)
+}
+
+###### post hoc ##########
+mf.posthoc<- function(x,...) UseMethod(".posthoc")
+
+.posthoc.default<-function(model,term,adjust) {
+  referenceGrid<-emmeans::emmeans(model,term,transform = "response")
+  summary(pairs(referenceGrid, adjust=adjust))
+}
+
+.posthoc.multinom<-function(model,term,adjust) {
+  
+  dep<-names(attr(terms(model),"dataClass"))[1]
+  terms<-paste(term,collapse = ":")
+  tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
+  referenceGrid<-emmeans::emmeans(model,tterm,transform = "response")
+  summary(pairs(referenceGrid, by=dep, adjust=adjust))
+  }
+
+###### means tabòe ##########
+mf.means<- function(x,...) UseMethod(".means")
+
+.means.default<-function(model,term) {
+  table<-emmeans::emmeans(model,term,transform = "response")
+  table<-as.data.frame(summary(table))
+  table<-table[,-(1:length(term))]
+  colnames(table)<-c("lsmean","se","df","lower","upper")
+  table
+}
+
+.means.multinom<-function(model,term) {
+
+  dep<-names(attr(terms(model),"dataClass"))[1]
+  terms<-paste(term,collapse = ":")
+  tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
+  table<-emmeans::emmeans(model,tterm,transform = "response")
+  table<-as.data.frame(summary(table))
+  table<-table[,-(2:(1+length(term)))]
+  colnames(table)<-c("dep","lsmean","se","df","lower","upper")
+  table<-table[order(table$dep),]
+  table$dep<-as.character(table$dep)
+  table
 }

@@ -1,5 +1,6 @@
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
+TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
 MINFO<-list()
 MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
@@ -13,8 +14,7 @@ MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
                          "distribution"=c("Binomial","Dicotomous event distribution of y"))
 MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
                           "link"=c("logit","Log of the odd of each category over y=0"),
-                          "distribution"=c("Multinomial","Multi-event distribution of y"),
-                          "note"=c("Warning","Not yet implemented"))
+                          "distribution"=c("Multinomial","Multi-event distribution of y"))
 
 WARNS<-list()
 

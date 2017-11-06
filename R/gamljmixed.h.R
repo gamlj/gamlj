@@ -40,8 +40,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
-                suggested=list(
-                    "continuous"),
                 permitted=list(
                     "continuous",
                     "nominal",
@@ -49,10 +47,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
-                suggested=list(
-                    "nominal",
-                    "ordinal",
-                    "nominaltext"),
                 permitted=list(
                     "nominal",
                     "ordinal",
@@ -61,9 +55,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..covs <- jmvcore::OptionVariables$new(
                 "covs",
                 covs,
-                suggested=list(
-                    "continuous",
-                    "ordinal"),
                 permitted=list(
                     "continuous",
                     "nominal",
@@ -279,31 +270,31 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
         info = function() private$..info,
-        random = function() private$..random,
-        randomCov = function() private$..randomCov,
         anova = function() private$..anova,
         fixed = function() private$..fixed,
+        contrasts = function() private$..contrasts,
+        random = function() private$..random,
+        randomCov = function() private$..randomCov,
         posthoc = function() private$..posthoc,
         postHoc = function() private$..postHoc,
         simpleEffectsAnovas = function() private$..simpleEffectsAnovas,
         simpleEffects = function() private$..simpleEffects,
         model = function() private$..model,
-        contrasts = function() private$..contrasts,
         emeansTables = function() private$..emeansTables,
         descPlot = function() private$..descPlot,
         descPlots = function() private$..descPlots),
     private = list(
         ..info = NA,
-        ..random = NA,
-        ..randomCov = NA,
         ..anova = NA,
         ..fixed = NA,
+        ..contrasts = NA,
+        ..random = NA,
+        ..randomCov = NA,
         ..posthoc = NA,
         ..postHoc = NA,
         ..simpleEffectsAnovas = NA,
         ..simpleEffects = NA,
         ..model = NA,
-        ..contrasts = NA,
         ..emeansTables = NA,
         ..descPlot = NA,
         ..descPlots = NA),
@@ -333,6 +324,111 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "cov",
                     "randomTerms",
                     "modelTerms"))
+            private$..anova <- jmvcore::Table$new(
+                options=options,
+                name="anova",
+                title="Fixed Effect ANOVA",
+                clearWith=list(
+                    "dep",
+                    "modelTerms"),
+                columns=list(
+                    list(
+                        `name`="name", 
+                        `title`="", 
+                        `type`="text"),
+                    list(
+                        `name`="F", 
+                        `title`="F", 
+                        `type`="number"),
+                    list(
+                        `name`="df1", 
+                        `title`="Num df", 
+                        `type`="number"),
+                    list(
+                        `name`="df2", 
+                        `title`="Den df", 
+                        `type`="number"),
+                    list(
+                        `name`="p", 
+                        `title`="p", 
+                        `type`="number", 
+                        `format`="zto,pvalue")))
+            private$..fixed <- jmvcore::Table$new(
+                options=options,
+                name="fixed",
+                title="Fixed Effects Parameter Estimates",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "cluster",
+                    "cov",
+                    "modelTerms"),
+                columns=list(
+                    list(
+                        `name`="source", 
+                        `title`="Effect", 
+                        `type`="text"),
+                    list(
+                        `name`="label", 
+                        `title`="Contrast", 
+                        `visible`="(showContrasts)", 
+                        `type`="text"),
+                    list(
+                        `name`="estimate", 
+                        `title`="Estimate", 
+                        `type`="number"),
+                    list(
+                        `name`="se", 
+                        `title`="SE", 
+                        `type`="number"),
+                    list(
+                        `name`="cilow", 
+                        `type`="number", 
+                        `title`="Lower", 
+                        `visible`="(showParamsCI)"),
+                    list(
+                        `name`="cihig", 
+                        `type`="number", 
+                        `title`="Upper", 
+                        `visible`="(showParamsCI)"),
+                    list(
+                        `name`="df", 
+                        `title`="df", 
+                        `type`="number"),
+                    list(
+                        `name`="t", 
+                        `title`="t", 
+                        `type`="number"),
+                    list(
+                        `name`="p", 
+                        `title`="p", 
+                        `type`="number", 
+                        `format`="zto,pvalue")))
+            private$..contrasts <- jmvcore::Array$new(
+                options=options,
+                name="contrasts",
+                title="Contrasts Coding",
+                visible="(showContrastsTable)",
+                clearWith=list(
+                    "dep",
+                    "modelTerms"),
+                template=jmvcore::Table$new(
+                    options=options,
+                    title="Contrasts - $key",
+                    clearWith=NULL,
+                    columns=list(
+                        list(
+                            `name`="term", 
+                            `title`="Term", 
+                            `type`="text"),
+                        list(
+                            `name`="contrast", 
+                            `title`="Contrast", 
+                            `type`="text"),
+                        list(
+                            `name`="groups", 
+                            `title`="Groups to levels", 
+                            `type`="text"))))
             private$..random <- jmvcore::Table$new(
                 options=options,
                 name="random",
@@ -388,86 +484,6 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="cov", 
                         `title`="Corr.", 
                         `type`="number")))
-            private$..anova <- jmvcore::Table$new(
-                options=options,
-                name="anova",
-                title="Fixed Effect ANOVA",
-                clearWith=list(
-                    "dep",
-                    "modelTerms"),
-                columns=list(
-                    list(
-                        `name`="name", 
-                        `title`="", 
-                        `type`="text"),
-                    list(
-                        `name`="F", 
-                        `title`="F", 
-                        `type`="number"),
-                    list(
-                        `name`="df1", 
-                        `title`="Num df", 
-                        `type`="number"),
-                    list(
-                        `name`="df2", 
-                        `title`="Den df", 
-                        `type`="number"),
-                    list(
-                        `name`="p", 
-                        `title`="p", 
-                        `type`="number", 
-                        `format`="zto,pvalue")))
-            private$..fixed <- jmvcore::Table$new(
-                options=options,
-                name="fixed",
-                title="Fixed Effects Parameter Estimates",
-                clearWith=list(
-                    "dep",
-                    "factors",
-                    "cluster",
-                    "cov",
-                    "modelTerms"),
-                columns=list(
-                    list(
-                        `name`="source", 
-                        `title`="Effect", 
-                        `type`="text"),
-                    list(
-                        `name`="label", 
-                        `title`="Contrast", 
-                        `visible`="(showContrasts)", 
-                        `type`="text"),
-                    list(
-                        `name`="estimate", 
-                        `title`="Estimate", 
-                        `type`="number"),
-                    list(
-                        `name`="std", 
-                        `title`="SE", 
-                        `type`="number"),
-                    list(
-                        `name`="cilow", 
-                        `type`="number", 
-                        `title`="Lower", 
-                        `visible`="(showParamsCI)"),
-                    list(
-                        `name`="cihig", 
-                        `type`="number", 
-                        `title`="Upper", 
-                        `visible`="(showParamsCI)"),
-                    list(
-                        `name`="df", 
-                        `title`="df", 
-                        `type`="number"),
-                    list(
-                        `name`="t", 
-                        `title`="t", 
-                        `type`="number"),
-                    list(
-                        `name`="p", 
-                        `title`="p", 
-                        `type`="number", 
-                        `format`="zto,pvalue")))
             private$..posthoc <- jmvcore::Table$new(
                 options=options,
                 name="posthoc",
@@ -535,7 +551,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="Effect", 
                             `type`="text"),
                         list(
-                            `name`="term", 
+                            `name`="level", 
                             `title`="Moderator Levels", 
                             `type`="text"),
                         list(
@@ -547,7 +563,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="df Den", 
                             `type`="number"),
                         list(
-                            `name`="F", 
+                            `name`="test", 
                             `title`="F", 
                             `type`="number"),
                         list(
@@ -575,14 +591,14 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="Effect", 
                             `type`="text"),
                         list(
-                            `name`="term", 
+                            `name`="level", 
                             `title`="Moderator Level", 
                             `type`="text"),
                         list(
                             `name`="estimate", 
                             `title`="Estimate"),
                         list(
-                            `name`="std", 
+                            `name`="se", 
                             `title`="SE", 
                             `type`="number"),
                         list(
@@ -595,31 +611,6 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `type`="number", 
                             `format`="zto,pvalue"))))
             private$..model <- NULL
-            private$..contrasts <- jmvcore::Array$new(
-                options=options,
-                name="contrasts",
-                title="Contrasts Coding",
-                visible="(showContrastsTable)",
-                clearWith=list(
-                    "dep",
-                    "modelTerms"),
-                template=jmvcore::Table$new(
-                    options=options,
-                    title="Contrasts - $key",
-                    clearWith=NULL,
-                    columns=list(
-                        list(
-                            `name`="term", 
-                            `title`="Term", 
-                            `type`="text"),
-                        list(
-                            `name`="contrast", 
-                            `title`="Contrast", 
-                            `type`="text"),
-                        list(
-                            `name`="groups", 
-                            `title`="Groups to levels", 
-                            `type`="text"))))
             private$..emeansTables <- jmvcore::Array$new(
                 options=options,
                 name="emeansTables",
@@ -637,7 +628,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="Mean", 
                             `type`="number"),
                         list(
-                            `name`="SE", 
+                            `name`="se", 
                             `title`="SE", 
                             `type`="number"),
                         list(
@@ -645,12 +636,12 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="df", 
                             `type`="number"),
                         list(
-                            `name`="lower.CL", 
-                            `title`="lower CL", 
+                            `name`="lower", 
+                            `title`="Lower", 
                             `type`="number"),
                         list(
-                            `name`="upper.CL", 
-                            `title`="upper CL", 
+                            `name`="upper", 
+                            `title`="Upper", 
                             `type`="number"))))
             private$..descPlot <- jmvcore::Image$new(
                 options=options,
@@ -688,15 +679,15 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "scaling",
                         "modelTerms")))
             self$add(private$..info)
-            self$add(private$..random)
-            self$add(private$..randomCov)
             self$add(private$..anova)
             self$add(private$..fixed)
+            self$add(private$..contrasts)
+            self$add(private$..random)
+            self$add(private$..randomCov)
             self$add(private$..posthoc)
             self$add(private$..postHoc)
             self$add(private$..simpleEffectsAnovas)
             self$add(private$..simpleEffects)
-            self$add(private$..contrasts)
             self$add(private$..emeansTables)
             self$add(private$..descPlot)
             self$add(private$..descPlots)},
@@ -782,16 +773,16 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$random} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$randomCov} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$fixed} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
+#'   \code{results$random} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$randomCov} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffectsAnovas} \tab \tab \tab \tab \tab an array of simple Effects ANOVA tables \cr
 #'   \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
-#'   \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr

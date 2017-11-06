@@ -1,5 +1,4 @@
 library(ggplot2)
-
 #' @import ggplot2
 gamljGzlmClass <- R6::R6Class(
   "gamljGzlmClass",
@@ -42,14 +41,12 @@ gamljGzlmClass <- R6::R6Class(
         na.omit(data)
     },
     .init=function() {
-        
         print("init")      
         modelType<-self$options$modelSelection
         afamily<-mf.give_family(modelType)
         if (is.null(afamily))
             return()
         dep <- self$options$dep
-        print(dep)
         factors <- self$options$factors
         modelTerms <- private$.modelTerms()
         infoTable<-self$results$info
@@ -62,7 +59,6 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
         infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
         infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
-        print(names(info))
         if ("note" %in% names(info))
            infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
         
@@ -85,14 +81,13 @@ gamljGzlmClass <- R6::R6Class(
 
       
         modelTerms <- private$.modelTerms()
-      
-        if (length(modelTerms) > 0) {
-#           anovaTable$addRow(rowKey="r2model", list(name="Model"))
-#           anovaTable$addFormat(col=1, rowNo=1, format=Cell.BEGIN_END_GROUP)
-           
-           for (term in modelTerms) {
-               anovaTable$addRow(rowKey=term, list(name=jmvcore::stringifyTerm(term)))
-           }  
+        formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
+        terms<-colnames(attr(terms(formula),"factors"))
+        
+        if (length(terms) > 0) {
+             for (term in terms) {
+               anovaTable$addRow(rowKey=term, list(name=.nicifyTerms(term)))
+            }  
         
            anovaTable$addFormat(col=1, rowNo=1,format=Cell.BEGIN_GROUP)
            anovaTable$addFormat(col=1, rowNo=length(modelTerms), format=Cell.END_GROUP)
@@ -112,9 +107,17 @@ gamljGzlmClass <- R6::R6Class(
            estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            
-           for (i in seq_along(terms)) 
-                estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
-      
+          if (afamily=="multinomial") {
+             deplevels<-levels(data[[dep]])[-1]
+             deplabels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
+             for (j in seq_along(deplevels)) {
+                 for (i in seq_along(terms)) 
+                     estimatesTable$addRow(rowKey=i, list(dep=deplabels[[j]],name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
+             }
+           } else
+                for (i in seq_along(terms)) {
+                  estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
+                }
        # contrasts
       
            for (contrast in self$options$contrasts) {
@@ -147,6 +150,9 @@ gamljGzlmClass <- R6::R6Class(
                modlevels<-length(levels(data[[moderator]]))
                modlevels<-ifelse(modlevels>1,modlevels,3)
                nrows<-modlevels*xlevels  
+               if (afamily=="multinomial") 
+                    nrows<-modlevels*xlevels*(length(levels(data[[dep]]))-1)
+               
                # create the tables with right rows
                simpleEffectsTables<-self$results$simpleEffects
                simpleEffectsAnovas<-self$results$simpleEffectsAnovas
@@ -228,18 +234,16 @@ gamljGzlmClass <- R6::R6Class(
           message <- extractErrorMessage(model)
           reject(message)
         }
-        
-        
         private$.model <- model
         self$results$.setModel(model)
-        
-        
-        infoTable$setRow(rowKey="r2",list(value=1-(model$deviance/model$null.deviance)))
+
+        infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=model$aic))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
-        infoTable$setRow(rowKey="conv",list(value=ifelse(model$converged,"yes","no"),comm=ifelse(model$converged,"A solution was found","Results may be misleading")))
+        infoTable$setRow(rowKey="conv",mi.converged(model))
         
-          anovaResults <- try(mf.anova(model))
+        
+        anovaResults <- try(mf.anova(model))
           if (isError(anovaResults)) {
             message <- extractErrorMessage(anovaResults)
             anovaTable$setNote("anocrash",message)
@@ -252,27 +256,19 @@ gamljGzlmClass <- R6::R6Class(
           tableRow<-anovaResults[i,]
           colnames(tableRow)<-TCONV[["glm.f"]]
           anovaTable$setRow(rowNo=i, tableRow)
-#          anovaTable$setRow(rowNo=i, list(name=rowName))
           }
-        ## residual variance
-#        indices<-private$.r2indices(model)
-#        anovaTable$setRow(rowKey='',list(variable="Residuals",term="",ss=errSS,df=errdf,ms=errMS,F="",etaSqP="",etaSq="",omegaSq="",p=""))
-#        anovaTable$setNote("r2",paste("R-squared=",indices[[1]],", adjusted R-squared=",indices[[2]]))
 
-        
-        if (mf.aliased(model)) {
+        if (mi.aliased(model)) {
           infoTable$setRow(rowKey="conv",list(comm="Results may be misleading because of aliased coefficients. See Tables notes"))
           anovaTable$setNote("aliased",WARNS["ano.aliased"])    
           estimatesTable$setNote("aliased",WARNS["ano.aliased"])    
         }          
-        
         parameters<-try(mf.summary(model))
         if (isError(parameters)) {
           message <- extractErrorMessage(parameters)
           estimatesTable$setNote("sumcrash",message)
           STOP<-T
         }
-
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
         if (self$options$showParamsCI) {
@@ -282,24 +278,20 @@ gamljGzlmClass <- R6::R6Class(
           parameters<-cbind(parameters,ci) 
            })
         if (isError(citry)) {
-          message <- extractErrorMessage(ci)
+          message <- extractErrorMessage(citry)
           infoTable$setRow(rowKey="conv",list(value="no"))
           estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-          STOP<-TRUE
         }
         }
-        
-        labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
         for (i in 1:nrow(parameters)) {
-          tableRow=parameters[i,]
-          estimatesTable$setRow(rowNo=i,tableRow)
-          estimatesTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
-          }
+          estimatesTable$setRow(rowNo=i,parameters[i,])
+        }
+
         if (STOP)
             return()
         private$.populateSimple(private$.model)
         private$.prepareDescPlots(private$.model)
-        private$.populatePostHoc(data)
+        private$.populatePostHoc(model)
         private$.populateDescriptives(model)
         
       }) # suppressWarnings
@@ -311,12 +303,16 @@ gamljGzlmClass <- R6::R6Class(
   if (self$options$eDesc) {
     emeansTables <- self$results$emeansTables
     factorsAvailable <- self$options$factors
+    dep<-self$options$dep
     modelTerms<-private$.modelTerms()
     if (length(factorsAvailable) == 0) 
       return()
     for (term in modelTerms)
       if (all(term %in% factorsAvailable)) {
-        aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        mTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        mTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+        mTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+        
         ldata <- data[,term]
         ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -324,105 +320,71 @@ gamljGzlmClass <- R6::R6Class(
         grid <- as.data.frame(grid,stringsAsFactors=F)
         for (i in seq_len(ncol(grid))) {
           colName <- colnames(grid)[[i]]
-          aTable$addColumn(name=colName, title=term[i], index=i)
+          mTable$addColumn(name=colName, title=term[i], index=i)
         }
-        if (self$options$modelSelection=="logistic")
-            aTable$addColumn(name="prob", title="Prob", index=i+1)
-        if (self$options$modelSelection=="poisson")
-          aTable$addColumn(name="rate", title="Mean Count", index=i+1)
-        if (self$options$modelSelection=="linear")
-          aTable$addColumn(name="lsmean", title="Mean", index=i+1)
         
+        depLevel<-1
+        if (self$options$modelSelection=="logistic")
+          mTable$getColumn("lsmean")$setTitle("Prob")
+        if (self$options$modelSelection=="poisson")
+          mTable$getColumn("lsmean")$setTitle("Mean Count")
+        if (self$options$modelSelection=="linear")
+          mTable$getColumn("lsmean")$setTitle("Mean")
+        if (self$options$modelSelection=="multinomial") {
+          mTable$getColumn("lsmean")$setTitle("Prob")
+          mTable$addColumn(name="dep", title="Response group", index=1)
+          depLevel<-length(levels(data[[dep]]))
+        }
+        for(j in seq_len(depLevel))
         for (rowNo in seq_len(nrow(grid))) {
-          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
-          colnames(row)<-term
-          tableRow<-row
-          aTable$addRow(rowKey=row, values=tableRow)
+          tableRow <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(tableRow)<-term
+          mTable$addRow(rowKey=tableRow, values=tableRow)
         }
       }
-  } # end of observed means
+  } # end of  means
   
+
 },     
 
     .initPostHoc=function(data) {
       
       bs <- self$options$factors
       phTerms <- self$options$postHoc
-      
+      modelType <- self$options$modelSelection
+
       bsLevels <- list()
       for (i in seq_along(bs))
         bsLevels[[bs[i]]] <- levels(data[[bs[i]]])
       
       tables <- self$results$postHoc
-      
-      postHocRows <- list()
-      
-      for (ph in phTerms) {
+      nDepLevels<-1
         
+      if (modelType=='multinomial') {
+      dep<-self$options$dep
+      nDepLevels<-length(levels(data[[dep]]))
+      }
+      for (j in seq_len(nDepLevels))
+       for (ph in phTerms) {
         table <- tables$get(key=ph)
+        if (modelType=='multinomial') 
+                  table$addColumn(name="dep",title=dep,index=1)
         
         table$setTitle(paste0('Post Hoc Comparisons - ', stringifyTerm(ph)))
-        
-        for (i in seq_along(ph))
-          table$addColumn(name=paste0(ph[i],'1'), title=ph[i], type='text', superTitle='Comparison', combineBelow=TRUE)
-        
-        table$addColumn(name='sep', title='', type='text', content='-', superTitle='Comparison', format='narrow')
-        
-        for (i in seq_along(ph))
-          table$addColumn(name=paste0(ph[i],'2'), title=ph[i], type='text', superTitle='Comparison')
-        
-        table$addColumn(name='md', title='Mean Difference', type='number')
-        table$addColumn(name='se', title='SE', type='number')
-        table$addColumn(name='df', title='df', type='number')
-        table$addColumn(name='t', title='t', type='number')
-        
-        table$addColumn(name='pnone', title='p', type='number', format='zto,pvalue', visible="(postHocCorr:none)")
-        table$addColumn(name='ptukey', title='p<sub>tukey</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:tukey)")
-        table$addColumn(name='pscheffe', title='p<sub>scheffe</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:scheffe)")
-        table$addColumn(name='pbonferroni', title='p<sub>bonferroni</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:bonf)")
-        table$addColumn(name='pholm', title='p<sub>holm</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:holm)")
-        
-        combin <- expand.grid(bsLevels[rev(ph)])
-        combin <- sapply(combin, as.character, simplify = 'matrix')
-        if (length(ph) > 1)
-          combin <- combin[,rev(1:length(combin[1,]))]
-        
-        comp <- list()
-        iter <- 1
-        for (i in 1:(length(combin[,1]) - 1)) {
-          for (j in (i+1):length(combin[,1])) {
-            comp[[iter]] <- list()
-            comp[[iter]][[1]] <- combin[i,]
-            comp[[iter]][[2]] <- combin[j,]
-            
-            if (j == length(combin[,1]))
-              comp[[iter]][[3]] <- TRUE
-            else
-              comp[[iter]][[3]] <- FALSE
-            
-            iter <- iter + 1
-          }
-        }
-        
-        postHocRows[[composeTerm(ph)]] <- comp
-        
-        for (i in seq_along(comp)) {
-          row <- list()
-          for (c in seq_along(comp[[i]][[1]]))
-            row[[paste0(names(comp[[i]][[1]][c]),'1')]] <- as.character(comp[[i]][[1]][c])
-          for (c in seq_along(comp[[i]][[2]]))
-            row[[paste0(names(comp[[i]][[2]][c]),'2')]] <- as.character(comp[[i]][[2]][c])
-          
-          table$addRow(rowKey=i, row)
-          if (comp[[i]][[3]] == TRUE)
-            table$addFormat(rowNo=i, col=1, Cell.END_GROUP)
-        }
-      }
-      private$.postHocRows <- postHocRows
-    },
-    .populatePostHoc=function(data) {
+        lab<-paste(paste(ph,collapse = ","),paste(ph,collapse = ","),sep=" - ")
+        table$getColumn("contrast")$setTitle(lab)
+        eg<-nrow(expand.grid(bsLevels[ph]))
+        for (i in seq_len((eg*(eg-1))/2))
+                table$addRow(rowKey=i+j)
+
+            }
+      },
+
+
+     .populatePostHoc=function(model) {
       terms <- self$options$postHoc
-      
+      modelType <- self$options$modelSelection
+      dep<-self$options$dep
       if (length(terms) == 0)
         return()
       
@@ -436,60 +398,33 @@ gamljGzlmClass <- R6::R6Class(
         
         term <- jmvcore::composeTerm(ph)
         termB64 <- jmvcore::composeTerm(toB64(ph))
-        formula <- as.formula(paste('~', term))
-        
         suppressWarnings({
-          # table$setStatus('running')
-          referenceGrid <- lsmeans::lsmeans(private$.model, formula)
-          none <- summary(pairs(referenceGrid, adjust='none'))
-          tukey <- summary(pairs(referenceGrid, adjust='tukey'))
-          scheffe <- summary(pairs(referenceGrid, adjust='scheffe'))
-          bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
-          holm <- summary(pairs(referenceGrid, adjust='holm'))
+          none <- mf.posthoc(model,ph,"none")
+          bonferroni <- mf.posthoc(model,ph,"bonferroni")
+          holm <-mf.posthoc(model,ph,"holm")
         }) # suppressWarnings
-        
-        resultRows <- lapply(strsplit(as.character(none$contrast), ' - '), function(x) strsplit(x, ','))
-        tableRows <- private$.postHocRows[[term]]
-        
-        for (i in seq_along(tableRows)) {
-          location <- lapply(resultRows, function(x) {
+        tableData<-as.data.frame(none)
+        tableData$contrast<-as.character(tableData$contrast)
+        if (modelType=="multinomial") {
+            colnames(tableData)<-c("contrast","dep","estimate","se","df","test","p")
+            tableData$dep<-as.character(tableData$dep)
+            tableData$pbonf<-bonferroni[,7]
+            tableData$pholm<-holm[,7]
             
-            c1 <- identical(x[[1]], as.character(tableRows[[i]][[1]]))
-            c2 <- identical(x[[1]], as.character(tableRows[[i]][[2]]))
-            c3 <- identical(x[[2]], as.character(tableRows[[i]][[1]]))
-            c4 <- identical(x[[2]], as.character(tableRows[[i]][[2]]))
-            if (c1 && c4)
-              return(list(TRUE,FALSE))
-            else if (c2 && c3)
-              return(list(TRUE,TRUE))
-            else
-              return(list(FALSE,FALSE))
-          })
-          index <- which(sapply(location, function(x) return(x[[1]])))
-          reverse <- location[[index]][[2]]
-
-          row <- list()
-          row[['md']] <- if(reverse) -none[index,'estimate'] else none[index,'estimate']
-          row[['se']] <- none[index,'SE']
-          row[['df']] <- none[index,'df']
-          row[['t']] <- if(reverse) -none[index,'t.ratio'] else none[index,'t.ratio']
-          
-          row[['pnone']] <- none[index,'p.value']
-          row[['ptukey']] <- tukey[index,'p.value']
-          row[['pscheffe']] <- scheffe[index,'p.value']
-          row[['pbonferroni']] <- bonferroni[index,'p.value']
-          row[['pholm']] <- holm[index,'p.value']
-          
-          table$setRow(rowNo=i, values=row)
-          private$.checkpoint()
         }
-        if (.is.scaleDependent(private$.model,ph))
-          table$setNote("covs",WARNS["ph.interactions"])
-        else if (.term.develop(ph)<length(private$.modelTerms()))
-          table$setNote("covs",WARNS["ph.covariates"])
-        table$setStatus('complete')
+        else {
+            colnames(tableData)<-c("contrast","estimate","se","df","test","p")
+            tableData$pbonf<-bonferroni[,6]
+            tableData$pholm<-holm[,6]
+            
+        }
+
+        for (i in 1:nrow(tableData)) {
+          row<-tableData[i,]
+          table$setRow(rowNo=i, values=row)
+        }
       }
-    },
+},
 .populateDescriptives=function(model) {
   
   terms<-private$.modelTerms()
@@ -499,13 +434,13 @@ gamljGzlmClass <- R6::R6Class(
     tables<-lf.meansTables(model,terms)  
     for (table in tables)  {
       key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
-      aTable<-meanTables$get(key=key)
+      mTable<-meanTables$get(key=key)
       for (i in seq_len(nrow(table))) {
         values<-as.data.frame(table[i,])
-        aTable$setRow(rowNo=i,values)
+        mTable$setRow(rowNo=i,values)
       }
       note<-attr(table,"note")
-      if (!is.null(note)) aTable$setNote(note,WARNS[note])
+      if (!is.null(note)) mTable$setNote(note,WARNS[note])
     }
   } # end of eDesc              
   
@@ -513,27 +448,31 @@ gamljGzlmClass <- R6::R6Class(
   
 },
 
-    .populateSimple=function(model) {
-        variable<-self$options$simpleVariable
-        moderator<-self$options$simpleModerator
-        threeway<-self$options$simple3way
-        data<-mf.getModelData(model)
-        simpleEffectsTables<-self$results$simpleEffects
-        simpleEffectsAnovas<-self$results$simpleEffectsAnovas
-        
-        .fillTheFTable<-function(results,aTable) {
-          ftests<-results[[2]]
-          ### ftests      
-          for (i in seq_len(dim(ftests)[1])) {
-              tableRow<-ftests[i,]
-              colnames(tableRow)<-c(TCONV[["glm.f"]],c("level","variable")) 
-              aTable$setRow(rowNo=i,tableRow)
-
-          }
-         } #### end of .fillTheFTable
+.populateSimple=function(model) {
+  variable<-self$options$simpleVariable
+  moderator<-self$options$simpleModerator
+  threeway<-self$options$simple3way
+  dep<-self$options$dep
+  data<-mf.getModelData(model)
+  simpleEffectsTables<-self$results$simpleEffects
+  simpleEffectsAnovas<-self$results$simpleEffectsAnovas
+  
+  .fillTheFTable<-function(results,aTable) {
+    ftests<-results[[2]]
+    ### ftests      
+    for (i in seq_len(dim(ftests)[1])) {
+      tableRow<-ftests[i,]
+      aTable$setRow(rowNo=i,tableRow)
+    }
+  } #### end of .fillTheFTable
   
   .fillThePTable<-function(results,aTable) {
     params<-results[[1]]
+    if ("dep" %in% colnames(params)) {
+      params<-params[order(params$dep),]
+      base<-levels(data[[dep]])[1]
+      params$dep<-paste(params$dep,base,sep="-")
+    }
     what<-params$level
     for (i in seq_len(dim(params)[1])) {
       tableRow<-params[i,]
@@ -542,14 +481,14 @@ gamljGzlmClass <- R6::R6Class(
         aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
       what<-tableRow$level
     }
-  } ##### end of .fillThePTable
+  }  ##### end of .fillThePTable
   
   if (is.null(variable) | is.null(moderator)) 
     return()
   
   if (is.null(threeway)) {
-    results<-.simpleEffects(model,data,variable,moderator)
-    
+
+    results<-lf.simpleEffects(model,variable,moderator)
     ### ftests
     key=paste(variable,1,sep="")
     ftable<-simpleEffectsAnovas$get(key=key)
@@ -560,12 +499,12 @@ gamljGzlmClass <- R6::R6Class(
     #### add some warning ####
     term<-.interaction.term(private$.model,c(variable,moderator))
     if (!is.null(term)) {
-       if (.is.scaleDependent(private$.model,term))
-           ptable$setNote("inter",WARNS["se.interactions"])
+      if (.is.scaleDependent(private$.model,term))
+        ptable$setNote("inter",WARNS["se.interactions"])
       else if (.term.develop(term)<length(private$.modelTerms()))
-               ptable$setNote("covs",WARNS["se.covariates"])
+        ptable$setNote("covs",WARNS["se.covariates"])
     } else 
-         ptable$setNote("noint",WARNS["se.noint"])
+      ptable$setNote("noint",WARNS["se.noint"])
     
     ### end of warnings ###
   } else {
@@ -573,20 +512,24 @@ gamljGzlmClass <- R6::R6Class(
     if (is.factor(data$mod2)) {
       levs<-levels(data$mod2)
     } else 
-      levs<-c(mean(data$mod2)+sd(data$mod2),mean(data$mod2),mean(data$mod2)-sd(data$mod2))
+      levs<-c(mean(data$mod2)-sd(data$mod2),mean(data$mod2),mean(data$mod2)+sd(data$mod2))
     for(i in seq_along(levs)) {
-      data[,threeway]<-data$mod2
+      newdata<-data
       if (is.factor(data$mod2))
-        contrasts(data[,threeway])<-contr.treatment(length(levs),base=i)
+        contrasts(newdata[,threeway])<-contr.treatment(length(levs),base=i)
       else
-        data[,threeway]<-data[,threeway]-levs[i]
+        newdata[,threeway]<-newdata[,threeway]-levs[i]
+      
       ## make nice labels and titles
       lev<-ifelse(is.numeric(levs[i]),round(levs[i],digits=2),levs[i])
       title<-paste("Simple effects of ",variable," computed for",threeway,"at",lev)
+      # re-estimate the model
+      form<-formula(model)
+      FUN<-mf.estimate(model)
+      model0<-FUN(form,newdata)
 
-      #### populate the R table       
-      results<-.simpleEffects(model,data,variable,moderator)
-      
+      #### populate the R table
+      results<-lf.simpleEffects(model0,variable,moderator)
       ### populate the Jamovi table
       key=paste(variable,i,sep="")
       ### F table
@@ -601,10 +544,16 @@ gamljGzlmClass <- R6::R6Class(
   } # end of if (is.null(threeway)) 
   
 },
+
 ##### model local function #########
 #### we need an .estimate() here ###
      .estimate=function(form,data) {
         modelType<-self$options$modelSelection
+        if (modelType=="multinomial") {
+          mod<-nnet::multinom(form,data,model = T)
+          mod$call$formula<-form
+          return(mod)
+        }
         stats::glm(form,data,family=mf.give_family(modelType))
       },
 
@@ -639,7 +588,7 @@ gamljGzlmClass <- R6::R6Class(
     .initDescPlots=function(data) {
       isAxis <- ! is.null(self$options$plotHAxis)
       isMulti <- ! is.null(self$options$plotSepPlots)
-      
+
       self$results$get('descPlot')$setVisible( ! isMulti && isAxis)
       self$results$get('descPlots')$setVisible(isMulti)
 
@@ -670,10 +619,12 @@ gamljGzlmClass <- R6::R6Class(
       
       if (length(depName) == 0 || length(groupName) == 0)
         return()
+      if (modelType=="multinomial")
+        errorBarType="none"
       
       plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
       
-      if (self$options$plotError != 'none') {
+      if (errorBarType != 'none') {
         yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
       } else {
         yAxisRange <- plotData$fit
@@ -685,7 +636,10 @@ gamljGzlmClass <- R6::R6Class(
       if (is.null(plotsName)) {
         image <- self$results$get('descPlot')
         image$setState(list(data=plotData, range=yAxisRange))
-        
+        if (modelType=="multinomial" && !is.null(linesName)) {
+          n<-length(levels(plotData[,"lines"]))
+            image$setSize(500,(250*n))
+        }
       } else {
         
         images <- self$results$descPlots
@@ -697,6 +651,11 @@ gamljGzlmClass <- R6::R6Class(
           i<-i+1
           image <- images$get(key=key)
           image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
+          if (modelType=="multinomial" && !is.null(linesName)) {
+            n<-length(levels(plotData[["lines"]]))
+            image$setSize(500,(250*n))
+          }
+          
         }
       }
       
@@ -712,15 +671,18 @@ gamljGzlmClass <- R6::R6Class(
          plotsName <- self$options$plotSepPlots
          errorType <- self$options$plotError
          ciWidth   <- self$options$ciWidth
+         modelType <- self$options$modelSelection
          
          if (errorType=="ci")
              errorType<-paste0(ciWidth,"% ",toupper(errorType))
-
-         if ( ! is.null(linesName)) {
-             p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
-         } else {
-             p<-.oneWayPlot(image,theme,depName,groupName,errorType)
-         }       
+         
+         if (modelType=="multinomial")
+                   p<-lp.linesMultiPlot(image$state$data,ggtheme,depName,groupName,linesName)
+         else  if ( ! is.null(linesName)) {
+                   p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
+               } else {
+                      p<-.oneWayPlot(image,theme,depName,groupName,errorType)
+               }       
          p<-p+ggtheme
          print(p)
          TRUE
@@ -748,7 +710,7 @@ gamljGzlmClass <- R6::R6Class(
           return('')
       } else if (name == 'postHoc') {
         if (length(value) == 0)
-          return('')
+          return('none')
       }
       super$.sourcifyOption(option)
     })

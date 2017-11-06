@@ -14,8 +14,8 @@ if (j000$version!=desc$Version) {
 desc$Version
 }
 
-library(yaml)
 #rmarkdown::render_site(input = "./docssource/")
+
 getVersion<-function() {
   desc<-yaml.load_file("DESCRIPTION")  
   j000<-yaml.load_file("jamovi/0000.yaml")
@@ -30,6 +30,8 @@ getVersion<-function() {
 }
 
 version<-getVersion()
+target="/home/marcello/LocalForge/gamlj/"
+cp<-system(paste("cp -r . ",target))
+cmdz<-paste("gitversion",version,target)
 
-cmdz<-paste0("gitversion ",version)
 system(cmdz)

@@ -82,7 +82,6 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
           else {
                if (v %in% selected) {
                    if (v==groupName)
-#                    ll[v]<-list(seq(-2,2,by = .1)*sd(data[,v])+mean(data[,v]))
                      ll[v]<-list(seq(min(data[,v]),max(data[,v]),length.out=100))
                    else
                        ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
@@ -96,6 +95,7 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
           eg[,v]<-factor(eg[,v])
      }
      mm<-mf.predict(model,eg,bars)
+     pnames<-names(mm)
      dm<-as.data.frame(cbind(mm,eg))
      names(dm)<-c(names(mm),names(eg))
      if (length(selected)==1) 
@@ -103,11 +103,16 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
      else 
           by<-dm[,selected]
      
-     what<-"fit"
+#     what<-"fit"
+     what<-pnames
      if (bars!="none")
         what<-c("fit","lwr","upr")
      dm<-aggregate(dm[,what],by,mean)
-     lnames<-c("group","lines","plots")
+     if (is.null(linesName))
+       lnames<-c("group","plots")
+     else
+       lnames<-c("group","lines","plots")
+
      names(dm)<-c(lnames[1:length(selected)],what)
           
      if (!is.null(dm$plots) & !is.factor(data[,plotsName])) {
@@ -118,6 +123,49 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
       if (!is.null(dm$lines) & !is.factor(data[,linesName])) {
             dm$lines<-factor(dm$lines)
             levels(dm$lines)<-c("-SD","Mean","+SD")
-        }
+      }
         dm
    } # end of .preparePlotData()
+
+
+
+.linesPlot<-function(data,theme,depName,groupName,title=NULL) {
+  
+  data$plots<-NULL
+  data$lines<-NULL
+  pnames<-names(data)[-1]
+  data$id<-seq_len(length(data$group))
+  long<-reshape(data,varying=pnames,idvar="id",direction = "long",v.names = "fit")
+  depLabs<-paste(depName,"category",sep="\n")
+  yLab<-paste("prob. of",depName,"category")
+  dodge <- ggplot2::position_dodge(0)
+  p <- ggplot2::ggplot(data=long, aes(x=group, y=fit, group=factor(time),colour=factor(time))) +
+    geom_line(size=.8, position=dodge)+
+    scale_y_continuous(limits=c(0,1)) 
+  if (is.factor(long$group)) 
+    p <- p + geom_point(shape=21, fill='white', size=3, position=dodge)
+  
+  p<-p+labs(x=groupName, y=yLab, colour=depLabs)   
+  if (!is.null(title))
+    p<-p+ ggtitle(title)
+  p
+}
+
+
+lp.linesMultiPlot<-function(data,theme,depName,groupName,linesName=NULL) {
+  
+  if (!is.null(linesName)) {
+    plots<-list()
+    levels<-levels(data[["lines"]])
+    for (level in levels) {
+      sdata<-subset(data,lines==level)
+      sdata$lines<-NULL
+      title<-paste(linesName,"=",level)
+      aplot<-.linesPlot(sdata,theme,depName,groupName,title = title)        
+      aplot<-aplot+theme
+      plots[[level]]<-aplot
+    }
+    return(do.call(gridExtra::grid.arrange,plots))
+  } else
+    return(.linesPlot(data,theme,depName,groupName))
+}

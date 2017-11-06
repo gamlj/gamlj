@@ -24,8 +24,6 @@ options:
     - name: dep
       title: Dependent Variable
       type: Variable
-      suggested:
-        - continuous
       permitted:
         - continuous
         - nominal
@@ -38,10 +36,6 @@ options:
     - name: factors
       title: Fixed Factors
       type: Variables
-      suggested:
-        - nominal
-        - ordinal
-        - nominaltext
       permitted:
         - nominal
         - ordinal
@@ -53,9 +47,6 @@ options:
     - name: covs
       title: Covariates
       type: Variables
-      suggested:
-        - continuous
-        - ordinal
       permitted:
         - continuous
         - nominal

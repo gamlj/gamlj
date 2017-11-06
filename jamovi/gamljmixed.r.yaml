@@ -24,52 +24,6 @@ items:
         - modelTerms
 
 
-    - name: random
-      title: Random Components
-      type: Table
-      clearWith:
-        - dep
-        - factors
-        - cluster
-        - cov
-        - randomTerms
-      columns:
-        - name: groups
-          title: "Groups"
-          type: text
-        - name: name
-          title: "Name"
-          type: text
-        - name: std
-          title: "SD"
-          type: number
-        - name: var
-          title: "Variance"
-          type: number
-
-    - name: randomCov
-      title: Random Parameters correlations
-      type: Table
-      visible: false
-      clearWith:
-        - dep
-        - factors
-        - cluster
-        - cov
-        - randomTerms
-      columns:
-        - name: groups
-          title: "Groups"
-          type: text
-        - name: name1
-          title: "Param.1"
-          type: text
-        - name: name2
-          title: "Param.2"
-          type: text
-        - name: cov
-          title: "Corr."
-          type: number
 
     - name: anova
       title: Fixed Effect ANOVA
@@ -118,7 +72,7 @@ items:
         - name: estimate
           title: "Estimate"
           type: number
-        - name: std
+        - name: se
           title: "SE"
           type: number
         - name: cilow
@@ -140,6 +94,80 @@ items:
           title: "p"
           type: number
           format: zto,pvalue
+
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
+
+
+    - name: random
+      title: Random Components
+      type: Table
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - randomTerms
+      columns:
+        - name: groups
+          title: "Groups"
+          type: text
+        - name: name
+          title: "Name"
+          type: text
+        - name: std
+          title: "SD"
+          type: number
+        - name: var
+          title: "Variance"
+          type: number
+
+    - name: randomCov
+      title: Random Parameters correlations
+      type: Table
+      visible: false
+      clearWith:
+        - dep
+        - factors
+        - cluster
+        - cov
+        - randomTerms
+      columns:
+        - name: groups
+          title: "Groups"
+          type: text
+        - name: name1
+          title: "Param.1"
+          type: text
+        - name: name2
+          title: "Param.2"
+          type: text
+        - name: cov
+          title: "Corr."
+          type: number
+
 
     - name: posthoc
       title: Post-hoc tests
@@ -204,7 +232,7 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Levels"
             type: text
           - name: df1
@@ -213,7 +241,7 @@ items:
           - name: df2
             title: df Den
             type: number
-          - name: F
+          - name: test
             title: F
             type: number
           - name: p
@@ -240,12 +268,12 @@ items:
           - name: variable
             title: "Effect"
             type: text
-          - name: term
+          - name: level
             title: "Moderator Level"
             type: text
           - name: estimate
             title: "Estimate"
-          - name: std
+          - name: se
             title: SE
             type: number
           - name: t
@@ -262,30 +290,6 @@ items:
       type: Property
       description: The underlying `lmer` object
 
-
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
 
 
 
@@ -305,18 +309,18 @@ items:
           title: 'Mean'
           type: number
 
-        - name: SE
+        - name: se
           title: SE
           type: number
 
         - name: df
           title: df
           type: number
-        - name: lower.CL
-          title: lower CL
+        - name: lower
+          title: Lower 
           type: number
-        - name: upper.CL
-          title: upper CL
+        - name: upper
+          title: Upper
           type: number
 
 
