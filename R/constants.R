@@ -55,6 +55,7 @@ will be estimated"
 
 WARNS["lmer.nogood"]<-"Results may be uninterpretable or misleading. Try to refine your model."
 
+WARNS["lmer.norelm"]<-"Simple effects F-Tests require REML estimation. Please select REML option."
 
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 #WARNS<-sapply(WARNS,function(a) gsub("  ","",a,fixed=T))
