@@ -1,4 +1,4 @@
-install.packages('jmvtools', repos=c('https://repo.jamovi.org', 'https://cran.r-project.org'))
+#install.packages('jmvtools', repos=c('https://repo.jamovi.org', 'https://cran.r-project.org'))
 library(jmvtools)
 
 instdir<-"/home/marcello/LocalForge/gamlj/build/R"

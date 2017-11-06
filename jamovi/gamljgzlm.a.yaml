@@ -250,8 +250,8 @@ options:
           - bonf
       description:
           R: >
-            one or more of `'none'`, `'tukey'`, `'scheffe'`, `'bonf'`, or
-            `'holm'`; provide no, Tukey, Scheffe, Bonferroni, and
+            one or more of `'none'`,  `'bonf'`, or
+            `'holm'`; provide no,  Bonferroni, and
             Holm Post Hoc corrections respectively
 
     - name: eDesc

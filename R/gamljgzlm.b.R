@@ -106,18 +106,18 @@ gamljGzlmClass <- R6::R6Class(
            ciWidth<-self$options$paramCIWidth
            estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-
+           
           if (afamily=="multinomial") {
-             levels<-levels(data[[dep]])[-1]
-             labels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
-             for (j in seq_along(levels)) {
+             deplevels<-levels(data[[dep]])[-1]
+             deplabels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
+             for (j in seq_along(deplevels)) {
                  for (i in seq_along(terms)) 
-                     estimatesTable$addRow(rowKey=i, list(dep=labels[[j]],name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
+                     estimatesTable$addRow(rowKey=i, list(dep=deplabels[[j]],name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
              }
            } else
-                for (i in seq_along(terms)) 
+                for (i in seq_along(terms)) {
                   estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
-           
+                }
        # contrasts
       
            for (contrast in self$options$contrasts) {
@@ -283,17 +283,8 @@ gamljGzlmClass <- R6::R6Class(
           estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
         }
         }
-        .labels<-.getFormulaContrastsLabels(self$options$contrasts,formula(model),data)
-        labels<-rep(.labels,length(levels(data[[dep]])))
-        .deplabels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
-        deplabels<-rep(.deplabels,each=length(.labels))
-                       
-        if ("dep" %in% colnames(parameters))
-                   parameters$dep<-unlist(deplabels)
         for (i in 1:nrow(parameters)) {
-          tableRow=parameters[i,]
-          estimatesTable$setRow(rowNo=i,tableRow)
-          estimatesTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
+          estimatesTable$setRow(rowNo=i,parameters[i,])
         }
 
         if (STOP)
@@ -319,6 +310,9 @@ gamljGzlmClass <- R6::R6Class(
     for (term in modelTerms)
       if (all(term %in% factorsAvailable)) {
         mTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        mTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+        mTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+        
         ldata <- data[,term]
         ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -716,7 +710,7 @@ gamljGzlmClass <- R6::R6Class(
           return('')
       } else if (name == 'postHoc') {
         if (length(value) == 0)
-          return('')
+          return('none')
       }
       super$.sourcifyOption(option)
     })

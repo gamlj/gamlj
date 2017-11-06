@@ -351,7 +351,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 mf.posthoc<- function(x,...) UseMethod(".posthoc")
 
 .posthoc.default<-function(model,term,adjust) {
-  referenceGrid<-lsmeans::lsmeans(model,term,transform = "response")
+  referenceGrid<-emmeans::emmeans(model,term,transform = "response")
   summary(pairs(referenceGrid, adjust=adjust))
 }
 
@@ -360,7 +360,7 @@ mf.posthoc<- function(x,...) UseMethod(".posthoc")
   dep<-names(attr(terms(model),"dataClass"))[1]
   terms<-paste(term,collapse = ":")
   tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  referenceGrid<-lsmeans::lsmeans(model,tterm,transform = "response")
+  referenceGrid<-emmeans::emmeans(model,tterm,transform = "response")
   summary(pairs(referenceGrid, by=dep, adjust=adjust))
   }
 
@@ -368,7 +368,7 @@ mf.posthoc<- function(x,...) UseMethod(".posthoc")
 mf.means<- function(x,...) UseMethod(".means")
 
 .means.default<-function(model,term) {
-  table<-lsmeans::lsmeans(model,term,transform = "response")
+  table<-emmeans::emmeans(model,term,transform = "response")
   table<-as.data.frame(summary(table))
   table<-table[,-(1:length(term))]
   colnames(table)<-c("lsmean","se","df","lower","upper")
@@ -380,7 +380,7 @@ mf.means<- function(x,...) UseMethod(".means")
   dep<-names(attr(terms(model),"dataClass"))[1]
   terms<-paste(term,collapse = ":")
   tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  table<-lsmeans::lsmeans(model,tterm,transform = "response")
+  table<-emmeans::emmeans(model,tterm,transform = "response")
   table<-as.data.frame(summary(table))
   table<-table[,-(2:(1+length(term)))]
   colnames(table)<-c("dep","lsmean","se","df","lower","upper")

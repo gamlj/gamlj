@@ -291,6 +291,9 @@ gamljGLMClass <- R6::R6Class(
          for (term in modelTerms)
            if (all(term %in% factorsAvailable)) {
              aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+             aTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+             aTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
+             
              ldata <- data[,term]
              ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
              ll$stringsAsFactors <- FALSE
