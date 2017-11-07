@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 0.0.8
+version: 0.0.9
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -15,12 +15,12 @@ description: >-
   facilitate estimation of  interactions, simple slopes, simple effects,
   post-hoc tests, contrast analysis and visualization of the results.
 analyses:
-  - title: GLM
+  - title: General Linear Model
     name: gamljGLM
     ns: gamlj
     menuGroup: Linear Models
     menuSubgroup: GAMLj
-    menuTitle: GLM
+    menuTitle: General Linear Model
     description: General Linear Model
   - title: Mixed Model
     name: gamljMixed

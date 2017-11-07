@@ -269,42 +269,29 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
 gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
-        info = function() private$..info,
-        anova = function() private$..anova,
-        fixed = function() private$..fixed,
-        contrasts = function() private$..contrasts,
-        random = function() private$..random,
-        randomCov = function() private$..randomCov,
-        posthoc = function() private$..posthoc,
-        postHoc = function() private$..postHoc,
-        simpleEffectsAnovas = function() private$..simpleEffectsAnovas,
-        simpleEffects = function() private$..simpleEffects,
+        info = function() private$.items[["info"]],
+        anova = function() private$.items[["anova"]],
+        fixed = function() private$.items[["fixed"]],
+        contrasts = function() private$.items[["contrasts"]],
+        random = function() private$.items[["random"]],
+        randomCov = function() private$.items[["randomCov"]],
+        posthoc = function() private$.items[["posthoc"]],
+        postHoc = function() private$.items[["postHoc"]],
+        simpleEffectsAnovas = function() private$.items[["simpleEffectsAnovas"]],
+        simpleEffects = function() private$.items[["simpleEffects"]],
         model = function() private$..model,
-        emeansTables = function() private$..emeansTables,
-        descPlot = function() private$..descPlot,
-        descPlots = function() private$..descPlots),
+        emeansTables = function() private$.items[["emeansTables"]],
+        descPlot = function() private$.items[["descPlot"]],
+        descPlots = function() private$.items[["descPlots"]]),
     private = list(
-        ..info = NA,
-        ..anova = NA,
-        ..fixed = NA,
-        ..contrasts = NA,
-        ..random = NA,
-        ..randomCov = NA,
-        ..posthoc = NA,
-        ..postHoc = NA,
-        ..simpleEffectsAnovas = NA,
-        ..simpleEffects = NA,
-        ..model = NA,
-        ..emeansTables = NA,
-        ..descPlot = NA,
-        ..descPlots = NA),
+        ..model = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="Mixed Model")
-            private$..info <- jmvcore::Table$new(
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
                 title="Model Info",
@@ -323,8 +310,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "cluster",
                     "cov",
                     "randomTerms",
-                    "modelTerms"))
-            private$..anova <- jmvcore::Table$new(
+                    "modelTerms")))
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="anova",
                 title="Fixed Effect ANOVA",
@@ -352,8 +339,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="p", 
                         `title`="p", 
                         `type`="number", 
-                        `format`="zto,pvalue")))
-            private$..fixed <- jmvcore::Table$new(
+                        `format`="zto,pvalue"))))
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="fixed",
                 title="Fixed Effects Parameter Estimates",
@@ -362,7 +349,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "factors",
                     "cluster",
                     "cov",
-                    "modelTerms"),
+                    "modelTerms",
+                    "contrasts"),
                 columns=list(
                     list(
                         `name`="source", 
@@ -403,8 +391,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="p", 
                         `title`="p", 
                         `type`="number", 
-                        `format`="zto,pvalue")))
-            private$..contrasts <- jmvcore::Array$new(
+                        `format`="zto,pvalue"))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="contrasts",
                 title="Contrasts Coding",
@@ -428,8 +416,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="groups", 
                             `title`="Groups to levels", 
-                            `type`="text"))))
-            private$..random <- jmvcore::Table$new(
+                            `type`="text")))))
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="random",
                 title="Random Components",
@@ -455,8 +443,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     list(
                         `name`="var", 
                         `title`="Variance", 
-                        `type`="number")))
-            private$..randomCov <- jmvcore::Table$new(
+                        `type`="number"))))
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="randomCov",
                 title="Random Parameters correlations",
@@ -483,8 +471,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     list(
                         `name`="cov", 
                         `title`="Corr.", 
-                        `type`="number")))
-            private$..posthoc <- jmvcore::Table$new(
+                        `type`="number"))))
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="posthoc",
                 title="Post-hoc tests",
@@ -516,8 +504,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="p", 
                         `title`="p.", 
                         `type`="number", 
-                        `format`="zto,pvalue")))
-            private$..postHoc <- jmvcore::Array$new(
+                        `format`="zto,pvalue"))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="postHoc",
                 title="Post Hoc Tests",
@@ -531,8 +519,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     columns=list(),
                     clearWith=list(
                         "dep",
-                        "modelTerms")))
-            private$..simpleEffectsAnovas <- jmvcore::Array$new(
+                        "modelTerms"))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleEffectsAnovas",
                 title="Simple Effects ANOVA",
@@ -570,8 +558,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue"))))
-            private$..simpleEffects <- jmvcore::Array$new(
+                            `format`="zto,pvalue")))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleEffects",
                 title="Simple Effects Parameters",
@@ -609,9 +597,9 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue"))))
+                            `format`="zto,pvalue")))))
             private$..model <- NULL
-            private$..emeansTables <- jmvcore::Array$new(
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="emeansTables",
                 title="Estimated Marginal Means",
@@ -642,8 +630,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="upper", 
                             `title`="Upper", 
-                            `type`="number"))))
-            private$..descPlot <- jmvcore::Image$new(
+                            `type`="number")))))
+            self$add(jmvcore::Image$new(
                 options=options,
                 name="descPlot",
                 title="Fixed Effects Plots",
@@ -659,8 +647,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "plotError",
                     "ciWidth",
                     "scaling",
-                    "modelTerms"))
-            private$..descPlots <- jmvcore::Array$new(
+                    "modelTerms")))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
                 title="Results Plots",
@@ -677,20 +665,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotError",
                         "ciWidth",
                         "scaling",
-                        "modelTerms")))
-            self$add(private$..info)
-            self$add(private$..anova)
-            self$add(private$..fixed)
-            self$add(private$..contrasts)
-            self$add(private$..random)
-            self$add(private$..randomCov)
-            self$add(private$..posthoc)
-            self$add(private$..postHoc)
-            self$add(private$..simpleEffectsAnovas)
-            self$add(private$..simpleEffects)
-            self$add(private$..emeansTables)
-            self$add(private$..descPlot)
-            self$add(private$..descPlots)},
+                        "modelTerms"))))},
         .setModel=function(x) private$..model <- x))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(

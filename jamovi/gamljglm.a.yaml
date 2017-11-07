@@ -1,6 +1,6 @@
 ---
 name: gamljGLM
-title: GLM
+title: General Linear Model
 menuGroup: Linear Models
 version: '0.0.2'
 jas: '1.1'
