@@ -52,6 +52,18 @@ names(dat)
 dat$groups3<-factor(dat$group3)
 contrasts(dat$groups3)
 model<-multinom(groups3 ~bfac*dic, data = dat, model = TRUE)
+labs<-sapply(model$lab, function(a) paste0(a,"-",model$lab[1]))[-1]
+labs
+ss<-summary(model)
+ss$coefficients
+q<-c(1:18)
+q
+r<-q %% 0.1
+r
+
+r[1]
+if (any(r==1)) print("")
+   is.numeric(r)
 lsm<-mf.means(model,"bfac")
 mf.means(model,"bfac")
 lsm = lsmeans::lsmeans(model, ~ groups3|bfac, mode = "latent")

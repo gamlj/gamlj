@@ -30,8 +30,10 @@ getVersion<-function() {
 }
 
 version<-getVersion()
+setwd("~/Skinner/Forge/jamovi/gamlj")
 target="/home/marcello/LocalForge/gamlj/"
 cp<-system(paste("cp -r . ",target))
+setwd(target)
 cmdz<-paste("gitversion",version,target)
-
 system(cmdz)
+setwd("~/Skinner/Forge/jamovi/gamlj")

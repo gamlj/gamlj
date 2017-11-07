@@ -43,7 +43,6 @@ they are perfectly correlated with other coefficients in the model.
 This can be due to empty cells in the design or perfectly correlated covariates.
 The results may be uninterpretable."
 
-WARNS["lmer.noreml"]<-"Simple effects F test available only for linear mixed model fit by REML"
 
 WARNS["lmer.df"]<-"DF and p-values cannot be computed without fixed effects"
 
