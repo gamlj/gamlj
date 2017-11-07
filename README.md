@@ -2,13 +2,12 @@
 
 General, Mixed and Generalized Models module for Jamovi
 
-version 0.0.7
-
+version 0.0.8
 
 <img src="docs/i1.png" class="img-responsive" alt="">
 
 
-Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Models  with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
+Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Model (the latter yet to be implemented) with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
 
 * Continuous and categorical independent variables

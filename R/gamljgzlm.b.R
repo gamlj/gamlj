@@ -110,10 +110,18 @@ gamljGzlmClass <- R6::R6Class(
           if (afamily=="multinomial") {
              deplevels<-levels(data[[dep]])[-1]
              deplabels<-.contrastLabels(levels =levels(data[[dep]]),type = "dummy")
-             for (j in seq_along(deplevels)) {
-                 for (i in seq_along(terms)) 
-                     estimatesTable$addRow(rowKey=i, list(dep=deplabels[[j]],name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
-             }
+             old=1
+             for (j in seq_along(deplevels)) 
+                 for (i in seq_along(terms)) {
+                     estimatesTable$addRow(rowKey=(10*i)+j, list(dep=deplabels[[j]],name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
+                   #### make rows look nicer  ###
+                     if (i==1)
+                           estimatesTable$addFormat(rowKey=(10*i)+j, col=1, Cell.BEGIN_GROUP)
+
+                     if (i==length(terms))
+                       estimatesTable$addFormat(rowKey=(10*i)+j, col=1, Cell.END_GROUP)
+
+                 }
            } else
                 for (i in seq_along(terms)) {
                   estimatesTable$addRow(rowKey=i, list(name=.nicifyTerms(terms[i]),label=.nicifyTerms(labels[i])))
@@ -150,9 +158,11 @@ gamljGzlmClass <- R6::R6Class(
                modlevels<-length(levels(data[[moderator]]))
                modlevels<-ifelse(modlevels>1,modlevels,3)
                nrows<-modlevels*xlevels  
-               if (afamily=="multinomial") 
+               div<-0.1
+               if (afamily=="multinomial") {
                     nrows<-modlevels*xlevels*(length(levels(data[[dep]]))-1)
-               
+                    div<-(length(levels(data[[dep]]))-1)
+               }
                # create the tables with right rows
                simpleEffectsTables<-self$results$simpleEffects
                simpleEffectsAnovas<-self$results$simpleEffectsAnovas
@@ -172,13 +182,17 @@ gamljGzlmClass <- R6::R6Class(
                    
                    for (i in 1:modlevels) 
                        ftable$addRow(rowKey=i,list(variable=" "))        
-          
+                   
                    ## init simple parameters tables
                    ptable<-simpleEffectsTables$addItem(key=key)
                    ptable$setTitle(title)
-                   for (i in 1:nrows) 
-                       ptable$addRow(rowKey=i,list(variable=" "))        
-          
+                   for (i in 1:nrows) { 
+                       ptable$addRow(rowKey=i,list(variable=" "))
+                       sw<-(i %% div)
+                       if (sw==1)
+                       ptable$addFormat(rowKey=i,col=1,Cell.BEGIN_GROUP)
+                   }
+
                 }  
       }  # end of simple effects tables
       # post hoc
@@ -236,9 +250,8 @@ gamljGzlmClass <- R6::R6Class(
         }
         private$.model <- model
         self$results$.setModel(model)
-
         infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
-        infoTable$setRow(rowKey="aic",list(value=model$aic))
+        infoTable$setRow(rowKey="aic",list(value=mf.getAIC(model)))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
         infoTable$setRow(rowKey="conv",mi.converged(model))
         
@@ -313,17 +326,8 @@ gamljGzlmClass <- R6::R6Class(
         mTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
         mTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
         
-        ldata <- data[,term]
-        ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
-        ll$stringsAsFactors <- FALSE
-        grid <- do.call(base::expand.grid, ll)
-        grid <- as.data.frame(grid,stringsAsFactors=F)
-        for (i in seq_len(ncol(grid))) {
-          colName <- colnames(grid)[[i]]
-          mTable$addColumn(name=colName, title=term[i], index=i)
-        }
-        
         depLevel<-1
+        istart<-0
         if (self$options$modelSelection=="logistic")
           mTable$getColumn("lsmean")$setTitle("Prob")
         if (self$options$modelSelection=="poisson")
@@ -332,14 +336,34 @@ gamljGzlmClass <- R6::R6Class(
           mTable$getColumn("lsmean")$setTitle("Mean")
         if (self$options$modelSelection=="multinomial") {
           mTable$getColumn("lsmean")$setTitle("Prob")
-          mTable$addColumn(name="dep", title="Response group", index=1)
+          # mTable$addColumn(name="dep", title="Response group", index=1)
           depLevel<-length(levels(data[[dep]]))
+          istart<-1
         }
+        
+        
+        ldata <- data[,term]
+        ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
+        ll$stringsAsFactors <- FALSE
+        grid <- do.call(base::expand.grid, ll)
+        grid <- as.data.frame(grid,stringsAsFactors=F)
+        for (i in seq_len(ncol(grid))) {
+          colName <- colnames(grid)[[i]]
+          mTable$addColumn(name=colName, title=term[i], index=i+istart)
+        }
+        
         for(j in seq_len(depLevel))
-        for (rowNo in seq_len(nrow(grid))) {
-          tableRow <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+        for (i in seq_len(nrow(grid))) {
+          tableRow <- as.data.frame(grid[i,],stringsAsFactors=F)
           colnames(tableRow)<-term
-          mTable$addRow(rowKey=tableRow, values=tableRow)
+          mTable$addRow(rowKey=(j*10)+i, values=tableRow)
+          #### make rows look nicer  ###
+          if (i==1)
+            mTable$addFormat(rowKey=(j*10)+i, col=1, Cell.BEGIN_GROUP)
+          
+          if (i==nrow(grid))
+            mTable$addFormat(rowKey=(j*10)+i, col=1, Cell.END_GROUP)
+          
         }
       }
   } # end of  means
@@ -362,22 +386,32 @@ gamljGzlmClass <- R6::R6Class(
         
       if (modelType=='multinomial') {
       dep<-self$options$dep
-      nDepLevels<-length(levels(data[[dep]]))
+      depLevels<-levels(data[[dep]])
+      nDepLevels<-length(depLevels)
+      
       }
       for (j in seq_len(nDepLevels))
        for (ph in phTerms) {
         table <- tables$get(key=ph)
-        if (modelType=='multinomial') 
-                  table$addColumn(name="dep",title=dep,index=1)
-        
         table$setTitle(paste0('Post Hoc Comparisons - ', stringifyTerm(ph)))
         lab<-paste(paste(ph,collapse = ","),paste(ph,collapse = ","),sep=" - ")
         table$getColumn("contrast")$setTitle(lab)
         eg<-nrow(expand.grid(bsLevels[ph]))
-        for (i in seq_len((eg*(eg-1))/2))
-                table$addRow(rowKey=i+j)
+        nRows<-(eg*(eg-1))/2
+        for (i in seq_len(nRows)) {
+                table$addRow(rowKey=((j*10)+i))
+                if (modelType=='multinomial')
+                   table$setRow(rowKey=((j*10)+i),list(dep=depLevels[j]))
+          #### make rows look nicer  ###
+                if (i==1)
+                   table$addFormat(rowKey=((j*10)+i), col=1, Cell.BEGIN_GROUP)
 
-            }
+                if (i==nRows)
+                   table$addFormat(rowKey=((j*10)+i), col=1, Cell.END_GROUP)
+          
+          
+        }
+       }
       },
 
 
@@ -410,7 +444,6 @@ gamljGzlmClass <- R6::R6Class(
             tableData$dep<-as.character(tableData$dep)
             tableData$pbonf<-bonferroni[,7]
             tableData$pholm<-holm[,7]
-            
         }
         else {
             colnames(tableData)<-c("contrast","estimate","se","df","test","p")
@@ -418,7 +451,6 @@ gamljGzlmClass <- R6::R6Class(
             tableData$pholm<-holm[,6]
             
         }
-
         for (i in 1:nrow(tableData)) {
           row<-tableData[i,]
           table$setRow(rowNo=i, values=row)
@@ -470,17 +502,12 @@ gamljGzlmClass <- R6::R6Class(
     params<-results[[1]]
     if ("dep" %in% colnames(params)) {
       params<-params[order(params$dep),]
-      base<-levels(data[[dep]])[1]
-      params$dep<-paste(params$dep,base,sep="-")
+#      base<-levels(data[[dep]])[1]
+#      params$dep<-paste(params$dep,base,sep="-")
     }
-    what<-params$level
-    for (i in seq_len(dim(params)[1])) {
-      tableRow<-params[i,]
-      aTable$setRow(rowNo=i,tableRow)
-      if (what!=tableRow$level)  
-        aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)
-      what<-tableRow$level
-    }
+    for (i in seq_len(dim(params)[1])) 
+         aTable$setRow(rowNo=i,params[i,])
+    
   }  ##### end of .fillThePTable
   
   if (is.null(variable) | is.null(moderator)) 

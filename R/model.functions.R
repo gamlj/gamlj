@@ -152,6 +152,8 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 .mf.summary.lmer<-function(model) {
   
        ss<-lmerTest::summary(model)$coefficients
+       ss<-as.data.frame(ss,stringsAsFactors = F)
+       
       if (dim(ss)[2]==3) {
           colnames(ss)<-c("estimate","se","t")
           if (dim(ss)[1]==1)
@@ -161,7 +163,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
       }
        else
           colnames(ss)<-c("estimate","se","df","t","p")
-       as.data.frame(ss,stringsAsFactors = F)
+       ss
 }
 
 .mf.summary.glm<-function(model) {
@@ -188,6 +190,8 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
      cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
      ss<-as.data.frame(cof,stringsAsFactors = F)
      ss<-cof[order(ss$dep),]
+     lab<-model$lab[1]
+     ss$dep<-sapply(ss$dep, function(a) paste(a,"-",lab))
      ss
 }
   
@@ -388,3 +392,12 @@ mf.means<- function(x,...) UseMethod(".means")
   table$dep<-as.character(table$dep)
   table
 }
+
+mf.getAIC<- function(x,...) UseMethod(".getAIC")
+
+.getAIC.default<-function(model)
+     return(model$aic)
+
+.getAIC.multinom<-function(model)
+    return(model$AIC)
+

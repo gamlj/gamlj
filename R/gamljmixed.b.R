@@ -136,8 +136,6 @@ gamljMixedClass <- R6::R6Class(
         postHocTables   <- self$results$postHoc
         private$.initPostHoc(data)
         private$.initMeanTables(data)
-        
-        
     },
     .run=function() {
       print("run")
@@ -183,7 +181,6 @@ gamljMixedClass <- R6::R6Class(
         if (!is.null(attr(parameters,"warning"))) 
             fixedTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
 
-        
         private$.model <- model
         ss<-summary(model)
         ### prepare info table #########       
@@ -239,7 +236,9 @@ gamljMixedClass <- R6::R6Class(
         ### ### ### ### ###
         
         # anova table ##
-        if (length(modelTerms)>0) {
+        if (length(modelTerms)==0) {
+          aTable$setNote("warning","F-Tests cannot be computed without fixed effects")
+        } else {
           suppressWarnings({
                           anova <- try(mf.lmeranova(model), silent=TRUE) # end suppressWarnings
            })
@@ -275,19 +274,9 @@ gamljMixedClass <- R6::R6Class(
           })
           if (isError(citry)) {
             message <- extractErrorMessage(citry)
-            fixedTable$setNote("warning",WARNS["lmer.df"])
             fixedTable$setNote("cicrash",paste(message,". CI cannot be computed"))
           }
         }
-        # if (dim(eresults)[2]==5) {
-        #    colnames(eresults)<-c("estimate","std","t","cilow","cihig")
-        #    if (dim(eresults)[1]<2)
-        #             fixedTable$setNote("warning",WARNS["lmer.df"])
-        #    else
-        #             fixedTable$setNote("warning",WARNS["lmer.zerovariance"])
-        # }
-        # else      
-        #   colnames(eresults)<-c("estimate","std","df","t","p","cilow","cihig")
         for (i in 1:nrow(parameters)) {
                 tableRow=parameters[i,]
                 fixedTable$setRow(rowNo=i,tableRow)
@@ -711,8 +700,11 @@ gamljMixedClass <- R6::R6Class(
   
   .fillTheFTable<-function(results,aTable) {
     ftests<-results[[2]]
-    ### ftests      
-    for (i in seq_len(dim(ftests)[1])) {
+    ### ftests  
+    if (any(ftests==FALSE))
+      aTable$setNote("dffail",WARNS["lmer.norelm"])
+    else
+      for (i in seq_len(dim(ftests)[1])) {
       tableRow<-ftests[i,]
       aTable$setRow(rowNo=i,tableRow)
     }

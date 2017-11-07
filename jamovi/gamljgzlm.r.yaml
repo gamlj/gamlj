@@ -68,6 +68,7 @@ items:
           title: "Response Groups"
           type: text
           visible: (modelSelection:multinomial)
+          combineBelow: true
         - name: name
           title: ""
           type: text
@@ -178,6 +179,8 @@ items:
             title: "Response Groups"
             type: text
             visible: (modelSelection:multinomial)
+            combineBelow: true
+
           - name: variable
             title: "Effect"
             type: text
@@ -221,10 +224,14 @@ items:
         title:  ""
         type: Table
         columns:
+        - name: dep
+          title: "Response Groups"
+          type: text
+          visible: (modelSelection:multinomial)
+          combineBelow: true
         - name: contrast
           title: ""
           type: number
-
         - name: estimate
           title: Difference
           type: number
@@ -262,6 +269,11 @@ items:
         title:  $key
         type: Table
         columns:
+        - name: dep
+          title: "Response Groups"
+          type: text
+          visible: (modelSelection:multinomial)
+          combineBelow: true
         - name: lsmean
           title: Mean
           type: number

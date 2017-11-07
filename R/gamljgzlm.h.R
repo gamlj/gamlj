@@ -365,7 +365,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="dep", 
                         `title`="Response Groups", 
                         `type`="text", 
-                        `visible`="(modelSelection:multinomial)"),
+                        `visible`="(modelSelection:multinomial)", 
+                        `combineBelow`=TRUE),
                     list(
                         `name`="name", 
                         `title`="", 
@@ -486,7 +487,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="dep", 
                             `title`="Response Groups", 
                             `type`="text", 
-                            `visible`="(modelSelection:multinomial)"),
+                            `visible`="(modelSelection:multinomial)", 
+                            `combineBelow`=TRUE),
                         list(
                             `name`="variable", 
                             `title`="Effect", 
@@ -528,6 +530,12 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     options=options,
                     title="",
                     columns=list(
+                        list(
+                            `name`="dep", 
+                            `title`="Response Groups", 
+                            `type`="text", 
+                            `visible`="(modelSelection:multinomial)", 
+                            `combineBelow`=TRUE),
                         list(
                             `name`="contrast", 
                             `title`="", 
@@ -574,6 +582,12 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     options=options,
                     title="$key",
                     columns=list(
+                        list(
+                            `name`="dep", 
+                            `title`="Response Groups", 
+                            `type`="text", 
+                            `visible`="(modelSelection:multinomial)", 
+                            `combineBelow`=TRUE),
                         list(
                             `name`="lsmean", 
                             `title`="Mean", 

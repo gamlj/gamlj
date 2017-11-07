@@ -30,8 +30,8 @@ getVersion<-function() {
 }
 
 version<-getVersion()
+
 target="/home/marcello/LocalForge/gamlj/"
 cp<-system(paste("cp -r . ",target))
-cmdz<-paste("gitversion",version,target)
-
-system(cmdz)
+#cmdz<-paste("gitversion",version,target)
+#system(cmdz)
