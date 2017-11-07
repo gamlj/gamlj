@@ -5,14 +5,13 @@
 # Session Data files
 .RData
 
-<<<<<<< HEAD
 # jamovi
 build/
 temp/
 gamlj.jmo
+newversion.R
 
 
->>>>>>> e3f3ba5413d8a75491317129af3d7fb3a798f8b4
 # Example code in package build process
 *-Ex.R
 
