@@ -21,7 +21,7 @@ As far as it is possible, inferential tests are based on an automatic selection 
 
 # Post Hocs
 
-Post-hocs tests are performed as implemented in the [lsmeans package](https://cran.r-project.org/web/packages/lsmeans/index.html). In particular, the actual implementation is as follows (for any given model term selected by the user) :
+Post-hocs tests are performed as implemented in the [emmeans package](https://cran.r-project.org/web/packages/emmeans/index.html). In particular, the actual implementation is as follows (for any given model term selected by the user) :
 
 ```
       formula <- as.formula(paste('~', term))

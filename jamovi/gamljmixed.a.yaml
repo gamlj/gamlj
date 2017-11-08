@@ -105,7 +105,7 @@ options:
             `TRUE` (default) or `FALSE`, should the Restricted ML be used
 
     - name: showParamsCI
-      title: Show CI
+      title: Confidence intervals
       type: Bool
       default: true
       description:
@@ -152,14 +152,14 @@ options:
             `'repeated'` or `'polynomial'`
 
     - name: showContrastsTable
-      title: Show contrasts definitions table
+      title: Contrasts definition table
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
     - name: showContrasts
-      title: Show contrasts in Estimates table
+      title: Contrasts in estimates table
       type: Bool
       default: true
       description:

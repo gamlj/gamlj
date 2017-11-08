@@ -10,14 +10,14 @@ version 0.0.9
 Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Model (the latter yet to be implemented) with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
 
-* Continuous and categorical independent variables
+* Continuous and categorical independent and dependent variables
 * F-test and parameter estimates
 * Confidence intervals
 * Moderation made easy
 * Simple slopes analysis
 * Simple effects
 * post-hocs analysis
-* Plots for up two three-way interactions
+* Plots up to three-way interactions
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
 

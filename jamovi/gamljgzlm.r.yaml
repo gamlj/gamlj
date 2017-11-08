@@ -27,7 +27,7 @@ items:
         - modelSelection
 
     - name: main
-      title: "Analisys of Deviance: Omnibus Tests"
+      title: "Analysis of Deviance: Omnibus Tests"
       type: Table
       description: a table of Chi-square tests results
       clearWith:

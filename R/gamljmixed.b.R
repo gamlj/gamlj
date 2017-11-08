@@ -540,7 +540,7 @@ gamljMixedClass <- R6::R6Class(
       
       suppressWarnings({
         # table$setStatus('running')
-        referenceGrid <- lsmeans::lsmeans(private$.model, formula)
+        referenceGrid <- emmeans::emmeans(private$.model, formula)
         none <- summary(pairs(referenceGrid, adjust='none'))
         tukey <- summary(pairs(referenceGrid, adjust='tukey'))
         scheffe <- summary(pairs(referenceGrid, adjust='scheffe'))

@@ -313,23 +313,23 @@ div.tocify {
 
 <div id="post-hocs" class="section level1">
 <h1>Post Hocs</h1>
-<p>Post-hocs tests are performed as implemented in the <a href="https://cran.r-project.org/web/packages/lsmeans/index.html">lsmeans package</a>. For all GZLM models estimated with <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html">glm function</a> (all but multinomial model) post hoc are implemented as follows (for any given <code>model</code> and <code>term</code> selected by the user) :</p>
-<pre><code>          referenceGrid &lt;- lsmeans::lsmeans(model, formula)
+<p>Post-hocs tests are performed as implemented in the <a href="https://cran.r-project.org/web/packages/emmeans/index.html">emmeans package</a>. For all GZLM models estimated with <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html">glm function</a> (all but multinomial model) post hoc are implemented as follows (for any given <code>model</code> and <code>term</code> selected by the user) :</p>
+<pre><code>          referenceGrid &lt;- emmeans::emmeans(model, formula)
           none &lt;- summary(pairs(referenceGrid, adjust=&#39;none&#39;))
           tukey &lt;- summary(pairs(referenceGrid, adjust=&#39;tukey&#39;))
           scheffe &lt;- summary(pairs(referenceGrid, adjust=&#39;scheffe&#39;))
           bonferroni &lt;- summary(pairs(referenceGrid, adjust=&#39;bonferroni&#39;))
           holm &lt;- summary(pairs(referenceGrid, adjust=&#39;holm&#39;))
       </code></pre>
-<p>For multinomial models, the estimation is slightly different. Following <a href="https://cran.r-project.org/web/packages/lsmeans/index.html">lsmeans package</a> manual, the comparisons are carried out on the linear predictor recentered so that it averages to zero over the levels of the response variable (similar to sum-to-zero contrasts). Thus each latent variable can be regarded as the log probability at that level minus the average log probability over all levels.</p>
+<p>For multinomial models, the estimation is slightly different. Following <a href="https://cran.r-project.org/web/packages/emmeans/index.html">emmeans package</a> manual, the comparisons are carried out on the linear predictor recentered so that it averages to zero over the levels of the response variable (similar to sum-to-zero contrasts). Thus each latent variable can be regarded as the log probability at that level minus the average log probability over all levels.</p>
 <p>The comparisons are implemented as follows:</p>
 <pre><code>
 model&lt;-multinom(dependent ~term*otherterms, data = data, model = TRUE)
-lsm = lsmeans::lsmeans(model, ~ dependent|term, mode = &quot;latent&quot;)
+lsm = emmeans::emmeans(model, ~ dependent|term, mode = &quot;latent&quot;)
 cmp = pairs(lsm,  by=&quot;dependent&quot;,interaction=F) 
 
 </code></pre>
-<p>This implementation is based on <a href="https://cran.r-project.org/web/packages/lsmeans/index.html">lsmeans package</a>, which explains that because dependent variable categories probabilities sum to 1 (and the latent values sum to 0) over the multivariate-response levels, all sensible results from lsmeans must involve that response as one of the factors.</p>
+<p>This implementation is based on <a href="https://cran.r-project.org/web/packages/emmeans/index.html">emmeans package</a>, which explains that because dependent variable categories probabilities sum to 1 (and the latent values sum to 0) over the multivariate-response levels, all sensible results from lsmeans must involve that response as one of the factors.</p>
 </div>
 
 

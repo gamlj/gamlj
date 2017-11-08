@@ -4,14 +4,14 @@ TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
 MINFO<-list()
 MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
-                         "link"=c("Indentiy","Coefficients in the same scale of y"),
+                         "link"=c("Identity","Coefficients in the same scale of y"),
                          "distribution"=c("Gaussian","Normal distribution of residual"))
 MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
                         "link"=c("log","Coefficients are in the log(y) scale"),
                         "distribution"=c("Poisson","Rare events distribution of y"))
 MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
                          "link"=c("logit","Log of the odd of y=1 over y=0"),
-                         "distribution"=c("Binomial","Dicotomous event distribution of y"))
+                         "distribution"=c("Binomial","Dichotomous event distribution of y"))
 MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
                           "link"=c("logit","Log of the odd of each category over y=0"),
                           "distribution"=c("Multinomial","Multi-event distribution of y"))

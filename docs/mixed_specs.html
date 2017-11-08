@@ -322,7 +322,7 @@ div.tocify {
 </div>
 <div id="post-hocs" class="section level1">
 <h1>Post Hocs</h1>
-<p>Post-hocs tests are performed as implemented in the <a href="https://cran.r-project.org/web/packages/lsmeans/index.html">lsmeans package</a>. In particular, the actual implementation is as follows (for any given model term selected by the user) :</p>
+<p>Post-hocs tests are performed as implemented in the <a href="https://cran.r-project.org/web/packages/emmeans/index.html">emmeans package</a>. In particular, the actual implementation is as follows (for any given model term selected by the user) :</p>
 <pre><code>      formula &lt;- as.formula(paste(&#39;~&#39;, term))
       referenceGrid &lt;- lsmeans::lsmeans(private$.model, formula)
       bonferroni &lt;- summary(pairs(referenceGrid, adjust=&#39;bonferroni&#39;))

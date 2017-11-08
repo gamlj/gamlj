@@ -72,7 +72,7 @@ Continuous variables can be centered, standardized or used as they are ("none", 
 
 Major post-hoc tests can be accomplished for the categorical variables groups by selecting the appropriated factor and tick the required tests
 
-Post-hoc are always computed on the expected means (LSMEANS). 
+Post-hoc are always computed on the expected means (EMMEANS). 
 
 # Fixed Effects Plots
 
