@@ -25,7 +25,7 @@ Post-hocs tests are performed as implemented in the [emmeans package](https://cr
 
 ```
       formula <- as.formula(paste('~', term))
-      referenceGrid <- lsmeans::lsmeans(private$.model, formula)
+      referenceGrid <- emmeans::emmeans(private$.model, formula)
       bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
       holm <- summary(pairs(referenceGrid, adjust='holm'))
 ```
