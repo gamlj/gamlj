@@ -312,16 +312,16 @@ div.tocify {
 
 
 <p><strong>General Linear Model</strong> module of the GAMLj suite for jamovi</p>
-<p><img src="glm/i1.png" class="img-responsive" alt=""></p>
+<p><img src="glm/main.png  " class="img-responsive" alt=""></p>
 <p>The module estimate a general linear model with categorial and/or continuous variables, with options to facilitate estimation ofinteractions, simple slopes, simple effects, etc.</p>
 <div id="module" class="section level1">
 <h1>Module</h1>
 <p>The module can estimates OLS linear models for any combination of categorical and continuous variables, thus providing an easy way for multiple regression, ANOVA, ANCOVA and moderation analysis.</p>
-<p><img src="i2.png" class="img-responsive" alt=""></p>
 </div>
 <div id="estimates" class="section level1">
 <h1>Estimates</h1>
 <p>The module provides ANOVA tables and parameter estimates for any estimated model. Effect size (eta, omega, and beta) are optionally computed Variables definition follows jamovi standards, with categorical independent variables defined in “fixed factors” and continuous independent variables in “covariates”.</p>
+<p><img src="glm/variables.png" class="img-responsive" alt=""></p>
 <p>Effect size index are optionally computed by selecting the following options:</p>
 <ul>
 <li><strong>beta</strong> : standardized regression coefficients. Continuous variables are standardized and categorical ones are contrast coded (-1 0 1) before estimating the parameters.</li>
@@ -332,21 +332,21 @@ div.tocify {
 </div>
 <div id="model" class="section level1">
 <h1>Model</h1>
-<p><img src="glm/i3.png" class="img-responsive" alt=""></p>
 <p>By default, the model terms are filled in automatically for main effects and for interactions with categorical variables.</p>
-<p><img src="glm/i4.png" class="img-responsive" alt=""></p>
+<p><img src="glm/model.png" class="img-responsive" alt=""></p>
 <p>Interactions between continuous variables or categorical and continuous can be set by clicking the second arrow icon.</p>
 </div>
 <div id="assumptions-checks" class="section level1">
 <h1>Assumptions checks</h1>
-<p><img src="glm/i5.png" class="img-responsive" alt=""></p>
+<p><img src="glm/assumption.png" class="img-responsive" alt=""></p>
 <p>Provides Levene’s test of variance homegeneity for categorical independent variables groups and Q-Q plots for model residuals</p>
 </div>
 <div id="factors-coding" class="section level1">
 <h1>Factors coding</h1>
-<p><img src="glm/i6.png" class="img-responsive" alt=""></p>
+<p><img src="glm/factorcoding.png" class="img-responsive" alt=""></p>
 <p>It allows to code the categorical variables accoring to different coding schemes. The coding scheme applies to the parameter estimates, simple effects and plots. The ANOVA table uses always the “deviation” scheme, that is “-1 0 1” coding. <em>default</em> uses the factor coding “contr.sum”, that is the -1 0 1 coding which results in appropriated Type III Sum of Squares.</p>
-<p>Contrasts definitions are provided in the estimates table. More detailed definitions of the comparisons operated by the contrasts can be obtained by selecting “Show contrast definition table”.</p>
+<p>Contrasts definitions are provided in the estimates table. More detailed definitions of the comparisons operated by the contrasts can be obtained by selecting “Contrasts definition table”.</p>
+<p>Details of the contrasts definition can be found <a href="https://stats.idre.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/">here</a></p>
 </div>
 <div id="contrasts-naming-scheme" class="section level1">
 <h1>Contrasts Naming scheme</h1>
@@ -354,17 +354,17 @@ div.tocify {
 </div>
 <div id="covariates-scaling" class="section level1">
 <h1>Covariates Scaling</h1>
-<p><img src="glm/i7.png" class="img-responsive" alt=""></p>
+<p><img src="glm/xscoring.png" class="img-responsive" alt=""></p>
 <p>Continuous variables can be centered, standardized or used as they are (“none”, the default)</p>
 </div>
 <div id="post-hocs" class="section level1">
 <h1>Post-hocs</h1>
-<p><img src="glm/i8.png" class="img-responsive" alt=""></p>
+<p><img src="glm/posthoc.png" class="img-responsive" alt=""></p>
 <p>Major post-hoc tests can be accomplished for the categorical variables groups by selecting the appropriated factor and tick the required tests</p>
 </div>
 <div id="plots" class="section level1">
 <h1>Plots</h1>
-<p><img src="glm/i9.png" class="img-responsive" alt=""></p>
+<p><img src="glm/plots.png" class="img-responsive" alt=""></p>
 <p>The “plots” menu allows for plotting main effects and interactions for any combination of types of variables, making it easy to plot interaction means plots, simple slopes, and combinations of them. The best plot is chosen automatically.</p>
 <p>By filling in “Horizontal axis” one obtains the group means of the selected factor or the regression line for the selected covariate</p>
 <p>By filling in “Horizontal axis” and “Separated lines” one a different plot depending on the type of variables selected: - “Horizontal axis” and “Separated lines” are both factos, one obtains the interaction plot of group means. - “Horizontal axis”=factor and “Separated lines”=covariate. One obtains the plot of group means of the factor estimated at three different levels of the covariate. +1 SD, the mean, and -1 SD. - “Horizontal axis”=covariate and “Separated lines”=covariate. One obtains the simple slopes graph of the simple slope of the variable in horizontal axis estimated at three different levels of the covariate. +1 SD, the mean, and -1 SD.</p>
@@ -373,12 +373,13 @@ div.tocify {
 </div>
 <div id="simple-effects" class="section level1">
 <h1>Simple effects</h1>
+<p><img src="glm/simple.png" class="img-responsive" alt=""></p>
 <p>Simple effects can be computed for any combination of types of variables, making it easy to proble interaction, simple slopes, and combinations of them. Simple effects can estimated up to a three-way interaction.</p>
 <p>Simple effects are computed following the same logic of the plots. They correspond to the plotted effects as defined above.</p>
 </div>
 <div id="estimated-marginal-means" class="section level1">
 <h1>Estimated marginal means</h1>
-<p><img src="mixed/i9.png" class="img-responsive" alt=""></p>
+<p><img src="mixed/emmeans.png" class="img-responsive" alt=""></p>
 <p>Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.</p>
 </div>
 
