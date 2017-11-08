@@ -91,9 +91,11 @@ Simple effects can estimated  up to a three-way interaction.
 
 Simple effects are computed following the same logic of the plots. They correspond to the plotted effects as defined above.
 
-# Additional options
+# Estimated marginal means
 
-print the means for the estimated values by groups (needs development)
+<img src="mixed/i9.png" class="img-responsive" alt="">
+
+Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.
 
 
 

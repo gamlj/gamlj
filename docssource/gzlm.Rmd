@@ -9,3 +9,11 @@ Generalized Linear Model for jamovi
 
 
 Implemented but no documentation yet
+
+
+
+# Estimated marginal means
+
+<img src="mixed/i9.png" class="img-responsive" alt="">
+
+Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.

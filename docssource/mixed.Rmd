@@ -49,7 +49,7 @@ By default, the model fixed effects terms are filled in automatically for main e
 Interactions between continuous variables or categorical and continuous can be set by clicking the second arrow icon.
 
 # Factors coding
-<img src="mixed/i6.png" class="img-responsive" alt="">
+<img src="mixed/i5.png" class="img-responsive" alt="">
 
 It allows to code the categorical variables accoring to different coding schemes. The coding scheme applies to the parameter estimates, simple effects and plots. The ANOVA table uses always the "deviation" scheme, that is "-1 0 1" coding. _default_ uses the factor coding "contr.sum", that is the -1 0 1 coding which results in appropriated Type III Sum of Squares.
 
@@ -102,11 +102,11 @@ Simple effects can estimated  up to a three-way interaction.
 
 Simple effects are computed following the same logic of the plots. They correspond to the plotted effects as defined above.
 
-# Additional options
+# Estimated marginal means
 
 <img src="mixed/i9.png" class="img-responsive" alt="">
 
-Print the means for the estimated values by groups (needs development)
+Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.
 
 
 
