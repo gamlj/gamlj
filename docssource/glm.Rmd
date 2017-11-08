@@ -98,7 +98,7 @@ Simple effects are computed following the same logic of the plots. They correspo
 
 # Estimated marginal means
 
-<img src="mixed/emmeans.png" class="img-responsive" alt="">
+<img src="glm/emmeans.png" class="img-responsive" alt="">
 
 Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.
 

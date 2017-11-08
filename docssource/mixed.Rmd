@@ -27,9 +27,12 @@ The module provides a parameter estimates of the fixed effects, the random varia
 
 Variables definition follows jamovi standards, with categorical independent variables defined in "fixed factors" and continuous independent variables in "covariates".
 
-The grouping variable is simply set by putting the corresponding variable(s) into "cluster". In this version, multiple clustering variables are possible, but not nested classifications. 
+<img src="mixed/variables.png" class="img-responsive" alt="">
 
-REML or ML can be chosen.
+
+The grouping variable is simply set by putting the corresponding variable(s) into "cluster". In this version, multiple clustering variables are possible, but not combinations of classifications ( see [Technical Details](mixed_specs.html) ). 
+
+Confidence intervals for the parameters estimates and  REML or ML can be chosen.
 
 The actual estimation occurs when the dependent variable, the clustering variable and at least one random coefficient (random effect) has been selected.
 
