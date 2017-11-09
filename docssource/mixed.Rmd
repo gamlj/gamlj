@@ -111,6 +111,7 @@ Simple effects are computed following the same logic of the plots. They correspo
 
 Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.
 
+# More Info
 
-
-# [Technical Details](mixed_specs.html)
+* [Technical Details](mixed_specs.html)
+* [Random regresion with GAMLj Mixed Model](mixed_example1.html)
