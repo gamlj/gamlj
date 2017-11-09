@@ -28,6 +28,11 @@ Please visit the sub-mudule pages for details:
 * [GAMLj Mixed models](mixed.html)
 * [GAMLj Generalized Models](gzlm.html)
 
+# Examples
+
+Some worked out examples of the analyses carried out with jamovi GAMLj are posted here (more to come)
+
+* [Random regresion with GAMLj Mixed Model](mixed_example1.html)
 # Installation
 
 ## Linux
