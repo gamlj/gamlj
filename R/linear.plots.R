@@ -71,7 +71,7 @@
 
 
 lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none") {
-
+     
      selected<-c(groupName,linesName,plotsName)  
      vars<-all.vars(terms(model))[-1]
      data<-mf.getModelData(model)  

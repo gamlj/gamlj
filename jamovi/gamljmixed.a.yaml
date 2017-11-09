@@ -34,7 +34,7 @@ options:
             must be numeric
 
     - name: factors
-      title: Fixed Factors
+      title: Factors
       type: Variables
       permitted:
         - nominal

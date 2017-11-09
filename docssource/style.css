@@ -14,4 +14,24 @@
     background-position-y: center;
     padding-right: 50px !important;
 }
+
+h1.title {
+  font-size: 28px;
+  font-weight: bold;
+  color:  #2C3E50  ;
+}
+
+.section h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color:  #2C3E50  ;
+}
+.section h2 {
+  font-size: 20px;
+  font-weight: bold;
+  color:  #2C3E50  ;
+}
+
+a, a:hover, a:focus {
+  color: DodgerBlue;
 }

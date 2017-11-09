@@ -36,8 +36,11 @@ dat$groups3<-factor(dat$group3)
 contrasts(dat$groups3)
 model<-multinom(groups3 ~bfac*dic, data = dat, model = TRUE)
 
-
-dat<-read.csv("data/bars2.csv")
+library(lmerTest)
+dat<-read.csv("data/beers_bars.csv")
+plot(dat$smile~dat$beer)
+lmodel<-lm(smile~beer,data=dat)
+summary(lmodel)
 model<-lmer(smile~(1|bar)+beer,data=dat)
 summary(model)
 coef(model)
@@ -45,7 +48,17 @@ ranef(model)
 plot(predict(model)~dat$beer)
 ggplot(dat)
 library(ggplot2)
+
+p <- ggplot(dat, aes(x = beer, y = smile)) +
+  geom_point(size=3) +
+  theme(panel.background = element_blank()) +
+  theme(axis.line = element_line(colour = "black"))
+#  geom_line(aes(y = predict(model)),size=1) 
+print(p)
+
 p <- ggplot(dat, aes(x = beer, y = smile, colour = bar)) +
   geom_point(size=3) +
+  theme(panel.background = element_blank()) +
+  theme(axis.line = element_line(colour = "black")) +
   geom_line(aes(y = predict(model)),size=1) 
 print(p)
