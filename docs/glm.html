@@ -313,7 +313,7 @@ div.tocify {
 
 <p><strong>General Linear Model</strong> module of the GAMLj suite for jamovi</p>
 <p><img src="glm/main.png  " class="img-responsive" alt=""></p>
-<p>The module estimate a general linear model with categorial and/or continuous variables, with options to facilitate estimation ofinteractions, simple slopes, simple effects, etc.</p>
+<p>The module estimates a general linear model with categorial and/or continuous variables, with options to facilitate estimation ofinteractions, simple slopes, simple effects, etc.</p>
 <div id="module" class="section level1">
 <h1>Module</h1>
 <p>The module can estimates OLS linear models for any combination of categorical and continuous variables, thus providing an easy way for multiple regression, ANOVA, ANCOVA and moderation analysis.</p>
@@ -322,13 +322,14 @@ div.tocify {
 <h1>Estimates</h1>
 <p>The module provides ANOVA tables and parameter estimates for any estimated model. Effect size (eta, omega, and beta) are optionally computed Variables definition follows jamovi standards, with categorical independent variables defined in “fixed factors” and continuous independent variables in “covariates”.</p>
 <p><img src="glm/variables.png" class="img-responsive" alt=""></p>
-<p>Effect size index are optionally computed by selecting the following options:</p>
+<p>Effect size indices are optionally computed by selecting the following options:</p>
 <ul>
 <li><strong>beta</strong> : standardized regression coefficients. Continuous variables are standardized and categorical ones are contrast coded (-1 0 1) before estimating the parameters.</li>
 <li><strong>eta^2</strong>: “semi-partial” eta-squared computed as the sum-of-squares of the effect divided by the total sum-of-square.</li>
 <li>partial <strong>eta^2</strong>: partial eta-squared computed as the sum-of-squares of the effect divided by the sum-of-squares of the effect plus the sum-of-squares of error.</li>
 <li><strong>omega^2</strong>: omega-squared</li>
 </ul>
+<p>Confidence intervals of the parameters can be also selected.</p>
 </div>
 <div id="model" class="section level1">
 <h1>Model</h1>

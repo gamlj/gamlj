@@ -13,6 +13,12 @@ dat$cluster<-factor(dat$cluster)
 dat$wfac<-factor(dat$wfac)
 dat$bfac<-factor(dat$bfac)
 model<-lmer(y~(1|cluster)+wfac*bfac*x,data=dat)
+coef(model)
+p <- ggplot(dat, aes(x = bfac, y = y, group=cluster, colour = cluster)) +
+  geom_point(size=3,alpha=.2) +
+  geom_line(aes(y = predict(model),x=bfac,group=cluster),size=1.01) 
+p<-p+ geom_smooth(aes(group = cluster), size = 2, method = "lm")
+print(p)
 
 dat<-read.csv("data/generalized.csv")
 dat$bfac<-factor(dat$bfac)
@@ -29,3 +35,17 @@ names(dat)
 dat$groups3<-factor(dat$group3)
 contrasts(dat$groups3)
 model<-multinom(groups3 ~bfac*dic, data = dat, model = TRUE)
+
+
+dat<-read.csv("data/bars2.csv")
+model<-lmer(smile~(1|bar)+beer,data=dat)
+summary(model)
+coef(model)
+ranef(model)
+plot(predict(model)~dat$beer)
+ggplot(dat)
+library(ggplot2)
+p <- ggplot(dat, aes(x = beer, y = smile, colour = bar)) +
+  geom_point(size=3) +
+  geom_line(aes(y = predict(model)),size=1) 
+print(p)

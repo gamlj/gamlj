@@ -12,7 +12,7 @@ output:
 
 <img src="glm/main.png  " class="img-responsive" alt="">
 
-The module estimate a general linear model with categorial and/or continuous variables, with options to facilitate estimation ofinteractions, simple slopes, simple effects, etc.
+The module estimates a general linear model with categorial and/or continuous variables, with options to facilitate estimation ofinteractions, simple slopes, simple effects, etc.
 
 # Module
 The module can estimates OLS linear models for any combination of categorical and continuous variables, thus providing an easy way for multiple regression, ANOVA, ANCOVA and moderation analysis. 
@@ -23,13 +23,14 @@ Variables definition follows jamovi standards, with categorical independent vari
 
 <img src="glm/variables.png" class="img-responsive" alt="">
 
-Effect size index are optionally computed by selecting the following options:
+Effect size indices are optionally computed by selecting the following options:
 
   - __beta__ : standardized regression coefficients. Continuous variables are standardized and categorical ones are contrast coded (-1 0 1) before estimating the parameters.
   - __eta^2__: "semi-partial" eta-squared computed as the sum-of-squares of the effect divided by the total sum-of-square.
   - partial __eta^2__: partial eta-squared computed as the sum-of-squares of the effect divided by the  sum-of-squares of the effect plus the sum-of-squares of error.
   - __omega^2__: omega-squared 
 
+Confidence intervals of the parameters can be also selected.
 
 # Model 
 
