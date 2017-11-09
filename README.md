@@ -25,6 +25,11 @@ More informations can be found at [GAMLj page](https://mcfanda.github.io/gamlj/)
 
 # Installation
 
+Please install [Jamovi](https://www.jamovi.org/download.html) and run it. Select the jamovi modules library and install GAMLj from there
+
+<img src="glm/install.png" class="img-responsive" alt="">
+
+
 ## Linux
 
 If you are working in linux you can download [Jamovi](https://www.jamovi.org/download.html), then download the .jmo from this link [gamlj binaries](https://github.com/mcfanda/binaries/blob/master/gamlj_linux.jmo).
