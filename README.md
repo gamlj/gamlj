@@ -27,7 +27,7 @@ More informations can be found at [GAMLj page](https://mcfanda.github.io/gamlj/)
 
 Please install [Jamovi](https://www.jamovi.org/download.html) and run it. Select the jamovi modules library and install GAMLj from there
 
-<img src="glm/install.png" class="img-responsive" alt="">
+<img src="docs/glm/install.png" class="img-responsive" alt="">
 
 
 ## Linux

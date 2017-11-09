@@ -32,7 +32,7 @@ Please visit the sub-mudule pages for details:
 
 Some worked out examples of the analyses carried out with jamovi GAMLj are posted here (more to come)
 
-* [Random regresion with GAMLj Mixed Model](mixed_example1.html)
+* [Random regression with GAMLj Mixed Model](mixed_example1.html)
 
 
 # Installation
