@@ -29,6 +29,7 @@ Please install [Jamovi](https://www.jamovi.org/download.html) and run it. Select
 
 <img src="docs/glm/install.png" class="img-responsive" alt="">
 
+## From source
 
 ## Linux
 
@@ -50,6 +51,13 @@ jmvtools::install()
 ```
 
 # Troubleshooting
+
+## While using the module
+
+Please check out the  [troubleshooting page](https://mcfanda.github.io/gamlj_docs/troubles.html). 
+
+
+## Installing from source
 
 The modules installs dependencies automatically, but in some R installations the process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
 
