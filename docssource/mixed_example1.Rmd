@@ -1,12 +1,11 @@
 ---
 title: "Mixed Models in Jamovi"
-output:
-  pdf_document:
-    toc: yes
+output: 
   html_document:
-    toc: yes
-    toc_float:
-      collapsed: no
+     toc: true
+     toc_float:
+        collapsed: false
+
 ---
 
 # Mixed models example: Random coefficients regression

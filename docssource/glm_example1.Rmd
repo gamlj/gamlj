@@ -1,12 +1,10 @@
 ---
 title: "GLM in Jamovi"
-output:
-  pdf_document:
-    toc: yes
+output: 
   html_document:
-    toc: yes
-    toc_float:
-      collapsed: no
+     toc: true
+     toc_float:
+        collapsed: false
 ---
 
 # General Linear Model example: Multiple regression, moderated regression, and simple slopes
