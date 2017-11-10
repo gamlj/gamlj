@@ -62,3 +62,8 @@ p <- ggplot(dat, aes(x = beer, y = smile, colour = bar)) +
   theme(axis.line = element_line(colour = "black")) +
   geom_line(aes(y = predict(model)),size=1) 
 print(p)
+
+
+dat<-read.csv("data/exercise.csv")
+summary(dat)
+dat

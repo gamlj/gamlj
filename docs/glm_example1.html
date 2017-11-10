@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>GLM in Jamovi</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">GAMLj</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="glm.html">GLM</a>
+</li>
+<li>
+  <a href="mixed.html">Mixed</a>
+</li>
+<li>
+  <a href="gzlm.html">Generalized Models</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mcfanda/gamlj">View on Github</a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">GLM in Jamovi</h1>
+
+</div>
+
+
+<div id="general-linear-model-example-multiple-regression-moderated-regression-and-simple-slopes" class="section level1">
+<h1>General Linear Model example: Multiple regression, moderated regression, and simple slopes</h1>
+<p>In this example we tackle a moderated regression analysis with simple slopes analysis and simple slopes graphs. Data are from <a href="http://psycnet.apa.org/record/2002-18109-000">Cohen et al 2003</a> and can be downloaded <a href="https://github.com/mcfanda/gamlj/blob/master/data/exercise.csv">here</a></p>
+</div>
+<div id="the-research-design" class="section level1">
+<h1>The research design</h1>
+<p>The research is about physical endurance associated with age and physical exercise. 245 participants were measured while jogging on a treadmill. Edurance was measured in minutes (‘yendu’ in the file). Participants’ age (<code>xage</code> in years) and number of years of physical exercise (<code>zexer</code> in years) were recorded as well (in jamovi <code>Exploration</code> -&gt; <code>Descriptive</code>)</p>
+<p><img src="examples/glm1/desc.png" class="img-responsive" alt=""></p>
+<p>The researcher is interested in studying the relationships between endurance, age, and exercising, with the hypothesis that the effect of age (expectedly negative) is moderated by exercise, such that the more participants work out (higher levels of <code>exer</code>) the less age negatively affects endurance.</p>
+</div>
+<div id="understanding-the-problem" class="section level1">
+<h1>Understanding the problem</h1>
+<p>We can think about this analytic problem as a multiple regression, where the effect of age and exercise can be estimated while keeping constant the other variable. However, the researcher puts forward a <em>moderation hypothesis</em>, because s/he expects the effect of age to change for different levels of exercising. We than need an interaction between age and exercise.</p>
+<p>We first run a multiple regression (to warm up), then we estimate a multiple regression with an interaction (moderated regression) and we probe the interaction with a simple slope analysis and simple slope graphs. Technical details can be found in <a href="http://psycnet.apa.org/record/2002-18109-000">Cohen et al 2003</a>, or in <a href="http://quantpsy.org/interact/interactions.htm">Preacher website</a>.</p>
+</div>
+<div id="glm" class="section level1">
+<h1>GLM</h1>
+<div id="multiple-regression" class="section level2">
+<h2>Multiple regression</h2>
+<p>Jamovi GAMLj module for GLM requires to set the variables in the right field depending on their role in the model and their type.</p>
+<p><img src="examples/glm1/variables.png" class="img-responsive" alt=""></p>
+<p>Thus, we push <code>yendu</code> in the <code>Dependent Variable</code> field and both <code>xage</code> and <code>zexer</code> in the <code>Covariates</code> field, being both variables quantitative.</p>
+<p>As soon as the variables are set, jamovi fills in the tables in the output panel with the estimation results. However, it is worth noticing that the statistical model has been defined by default by the software: We can see that in the <code>Model</code> tab.</p>
+<p><img src="examples/glm1/model.png" class="img-responsive" alt=""></p>
+<p>Jamovi, following a somehow old tradition established by SPSS, automatically includes continuous independent variables in the model without their interaction. For categorical variables the default behavior is to include both main effects and interactions.</p>
+<p>Thus, the model we are estimating now is <code>yendu~xage+zexer</code>.</p>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p><img src="examples/glm1/resultsmr1.png" class="img-responsive" alt=""></p>
+<p>Results show that both age and exercising have an effect on endurance while keeping constant the other variable. The ANOVA table shows also the R-squared, R-squared=.166, indicating the the two independent variables together explain around 16% of the dependent variable variance.</p>
+<p>The <code>Model Coefficients</code> table reports the B coefficients estimates. We can interpret the B coefficients (under <code>Estimate</code> column of <code>Model Coefficients</code> table) because the units of the variables are intuitively clear:</p>
+<ul>
+<li><code>xage</code> B=-.257: While keeping exercise constant, one year more in age corresponds on average to a decrease in endurance of .257 minutes.</li>
+<li><code>zexer</code> B=-.916: While keeping age constant, one year more of exercising corresponds on average to an increase in endurance of .916 minutes.</li>
+</ul>
+<p>For each coefficient the condidence interavals are also reported.</p>
+<p>A special note should be made for the intercept (nobody interpret intercepts, but we do now). The intercept is the expected value (the mean) of the dependent variable, estimated for all independent variables equal to zero. In jamovi GLM, however, continuous variables are centered to their mean by default (this will prove very helpful later on), thus the interpretation of the intercept should be: the expected value of the dependent variable estimated for the average values of the independent variables. This is not bad, afterall, because 26.5 is actually the mean of the dependent variables (see descriptives above), thus a plot of the effects will be centered around the dependent variable means. In case we want the independent variables not to be centered, we can select a different scaling in the `Covariates Scaling’ tab.</p>
+<p>In general, we want to report standardized effect size indeces, for the sake of comparisons, meta-analyses, APA task forces (and probably the Marvel Avengers league). Jamovi GLM offers a plethora of them:</p>
+<ul>
+<li>betas: standardized coefficients.</li>
+<li>eta-squared: proportion of variance explained over the total variance of the dependent variable.</li>
+<li>partial eta-squared: proportion of variance explained over the variance not explained by other effects.</li>
+<li>omega-squared: expected proportion of variance explained over the variance not explained by other effects, expected in the population.</li>
+</ul>
+<p>By ticking the options in the variable definition panel, we obtain the ES indeces as follows.</p>
+<p><img src="examples/glm1/resultsmr2.png" class="img-responsive" alt=""></p>
+</div>
+<div id="moderated-regression" class="section level2">
+<h2>Moderated regression</h2>
+<p>To include the interaction we simply add the interaction effect in the <code>Model Terms</code> under the <code>Model</code> tab.</p>
+<p><img src="examples/glm1/model2.png" class="img-responsive" alt=""></p>
+<p>The interaction is pushed in the <code>Model Terms</code> by selecting the variables on the left and click <code>interaction</code> in the “arrow” cascade menu.</p>
+<p><img src="glm/interactions.png" class="img-responsive" alt=""></p>
+</div>
+<div id="results-1" class="section level2">
+<h2>Results</h2>
+<p>Let’s us first focus on the parameters estimates, the B coefficients.</p>
+<p><img src="examples/glm1/resultsmoderate.png" class="img-responsive" alt=""></p>
+<p>The interaction term appears to be statistically significant, B=0.047, t(241)=3.48,p&lt;.001,eta^2=0.048, justifying interpreting the first-order effects as conditional effects. Because we have centered the variables to their means, we can interpret the first-order effect as “average” effects. On average:</p>
+<ul>
+<li><code>xage</code> B=-.261: one year more in age corresponds on average to a decrease in endurance of .26 minutes.</li>
+<li><code>zexer</code> B=-.972: one year more of exercising corresponds on average to an increase in endurance of .97 minutes.</li>
+</ul>
+<p>One can also report the betas (last column in the <code>Model Coefficients</code> table). Please notice that Jamovi GLM the estimates of the betas are correct also in the presence of the interaction, because the variables are standardized before the interaction term is computed.</p>
+</div>
+<div id="simple-slopes" class="section level2">
+<h2>Simple Slopes</h2>
+<p>We can now probe the interaction. We go to <code>Simple effects</code> tab and select <code>xage</code> as <code>Simple effec variable</code> and <code>zexer</code> as <code>Moderator</code>. In this way we obtain the effect of age computed for high exercise (<code>zexer</code> centered to 1 SD above average), the main effect of age (<code>zexer</code> centered to 1 SD above average) and the effect of age computed for low exercise (<code>zexer</code> centered to -1 SD above average).</p>
+<p>Jamovi GLM produces both the F-tests and the parameter estimates for the simple slopes. We focus on the latter table now.</p>
+<p><img src="examples/glm1/resultssimple.png" class="img-responsive" alt=""></p>
+<p>The first row of the table shows the simple slope of age (the effect of age) computed for exercise equal to minus one standard deviation (-4.78). The effect of age is negative and strong ,B=-.487, t(241)=-5.289,p&lt;.001. Going down the table we find the simple slope of age (the effect of age) computed for average exercise (0). The effect of age is negative and but weaker than for high exercise ,B=-.261, t(241)=-4.085,p&lt;.001. Finally, for high exercise (+4.78), the effect is weak and not significant, B=-.036, t(241)=-0.400,p=.690.</p>
+</div>
+<div id="simple-slopes-plot" class="section level2">
+<h2>Simple Slopes Plot</h2>
+<p>We can get a clear picture of the interaction by asking for a plot. Also the plot module takes care of centering the variables in a way that makes the plot clearly understandable.</p>
+<p><img src="examples/glm1/plots.png" class="img-responsive" alt=""></p>
+<p>It plots the effect of the <code>Horizontal axis</code> variable for three levels (-1 SD, mean, +1 SD) of the <code>Separate Lines</code> variable.</p>
+<p><img src="examples/glm1/resultsplot.png" class="img-responsive" alt=""></p>
+<p>The nice plot we get shows the simple effects (simple equations to be precise) with the prediction confidence intervals indicated by the colored shades around the lines. If needed, the confidence intervals can be substitute with the standard errors of the estimates or removed completely.</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
