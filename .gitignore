@@ -10,7 +10,7 @@ build/
 temp/
 gamlj.jmo
 newversion.R
-
+problems/
 
 # Example code in package build process
 *-Ex.R
