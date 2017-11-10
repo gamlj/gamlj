@@ -104,4 +104,7 @@ Simple effects are computed following the same logic of the plots. They correspo
 Print the estimate expected means, SE, df and confidence intervals of the dependent variable by factors in the model.
 
 
+# More Info
+
+* [Moderated regresion with GAMLj GLM](glm_example1.html)
 
