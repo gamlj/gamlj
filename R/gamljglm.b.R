@@ -407,7 +407,6 @@ gamljGLMClass <- R6::R6Class(
         term <- jmvcore::composeTerm(ph)
         termB64 <- jmvcore::composeTerm(toB64(ph))
         formula <- as.formula(paste('~', term))
-        
         suppressWarnings({
           # table$setStatus('running')
           referenceGrid <- emmeans::emmeans(private$.model, formula)
