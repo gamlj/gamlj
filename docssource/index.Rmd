@@ -18,7 +18,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Simple slopes analysis
 * Simple effects
 * post-hocs analysis
-* Plots for up two three-way interactions
+* Plots for up to three-way interactions
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
 
