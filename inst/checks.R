@@ -62,8 +62,50 @@ p <- ggplot(dat, aes(x = beer, y = smile, colour = bar)) +
   theme(axis.line = element_line(colour = "black")) +
   geom_line(aes(y = predict(model)),size=1) 
 print(p)
-
-
+dat<-read.csv2("problems/Exp2.csv")
+dat$Group..1tennis..2calcio.
+dat$`group (male=1?)`<-1
+names(dat)
+jmvcore::toB64(names(dat))
+jmvcore::constructFormula("(dd /",list("ciao () ciao","dla"))
+model<-lm(Delta~`group (male=?)`,data=dat)
+mt<-terms(model)
+an<-names(attr(mt,"dataClass"))[2]
+dat[,an]
+attributes(model)
+make.names(names(dat))
+names(dat)
 dat<-read.csv("data/exercise.csv")
+dat$
 summary(dat)
-dat
+summary(lm(yendu~xage*zexer,data = dat))
+
+library(foreign)
+dat<-read.spss("data/bambini_aggressivi.sav",to.data.frame = T)
+dat2<-data.frame(1:length(dat$id))
+dat2$counts<-dat$numero_atti
+dat2$agg_test<-dat$test_aggress
+dat2$age<-dat$eta
+dat2$X1.length.dat.id.<-NULL
+write.csv(dat2,"data/aggression_test.csv",row.names = F)
+dat<-read.csv("data/aggression_test.csv")
+dat$age<-factor(dat$age)
+contrasts(dat$age)<-contr.sum(3)
+model<-glm(counts~agg_test*age,data = dat,family = poisson())
+summary(model)
+
+test<-round(rnorm(100,15,2),digits = 2)
+
+y<-(test+rnorm(100,0,1))/5
+summary(y)
+ey<-exp(y)
+hist(y)
+
+hist(ey)
+p<-(test-min(test))/(max(test)-min(test))
+counts<-sapply(p, function(a) rpois(1,a))
+cor(counts,p)
+hist(counts)
+model<-glm(counts~test,family = poisson())
+summary(model)
+

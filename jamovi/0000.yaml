@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 0.9.0
+version: 0.9.1
 jms: '1.0'
 authors:
   - Marcello Gallucci
