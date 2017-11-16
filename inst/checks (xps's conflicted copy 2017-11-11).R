@@ -26,50 +26,15 @@ dat$dic<-factor(dat$dic)
 contrasts(dat$dic)<-contr.sum(2)
 contrasts(dat$bfac)<-contr.sum(2)
 dat$groups3<-factor(dat$groups3)
-model<-glm(counts~groups3,data=dat,family = poisson())
+model<-glm(counts~groups3*bfac*dic,data=dat,family = poisson())
 
-ss<-summary(model)
-1-(model$deviance/ss$null.deviance)
-car::Anova(model,test="LR")
-ss$null.deviance
-ss$deviance
-ss$aic
-car::Anova(model)
-2*(f-r)
-
-llful<-logLik(model)
-llnull<<-llful-((ss$null.deviance-ss$deviance)/2)
-1-(llful/llnull)
-
-ss$null.deviance
-aa<-car::Anova(model,test="LR")
-drop1(model,scope = ~groups3 )
-drop1(model0)
-
-aa$`LR Chisq`
-logLik(model0)
-
-model$aic-(2*2)
-
-model0<-glm(counts~1,data=dat,family = poisson())
-r<-logLik(model0)
-1-(f/r)
-summary(model)
 ####### multinomial ########à
 library(nnet)
 library(lsmeans)
 names(dat)
+dat$groups3<-factor(dat$group3)
 contrasts(dat$groups3)
-model<-multinom(groups3 ~bfac, data = dat, model = TRUE)
-model$deviance
-model$deviance/model1$deviance
-
-logLik(model)
-ss$value
-ss<-summary(model)
-ss$wts
-model0<-multinom(groups3 ~1, data = dat, model = TRUE)
-model0$value
+model<-multinom(groups3 ~bfac*dic, data = dat, model = TRUE)
 
 library(lmerTest)
 dat<-read.csv("data/beers_bars.csv")
@@ -97,21 +62,9 @@ p <- ggplot(dat, aes(x = beer, y = smile, colour = bar)) +
   theme(axis.line = element_line(colour = "black")) +
   geom_line(aes(y = predict(model)),size=1) 
 print(p)
-dat<-read.csv2("problems/Exp2.csv")
-dat$Group..1tennis..2calcio.
-dat$`group (male=1?)`<-1
-names(dat)
-jmvcore::toB64(names(dat))
-jmvcore::constructFormula("(dd /",list("ciao () ciao","dla"))
-model<-lm(Delta~`group (male=?)`,data=dat)
-mt<-terms(model)
-an<-names(attr(mt,"dataClass"))[2]
-dat[,an]
-attributes(model)
-make.names(names(dat))
-names(dat)
+
+
 dat<-read.csv("data/exercise.csv")
-dat$
 summary(dat)
 summary(lm(yendu~xage*zexer,data = dat))
 
@@ -128,19 +81,31 @@ dat$age<-factor(dat$age)
 contrasts(dat$age)<-contr.sum(3)
 model<-glm(counts~agg_test*age,data = dat,family = poisson())
 summary(model)
+hist(dat$counts)
+test<-round(rnorm(100,10,2),digits = 2)
 
-test<-round(rnorm(100,15,2),digits = 2)
-
-y<-(test+rnorm(100,0,1))/5
+y<-test/10
 summary(y)
-ey<-exp(y)
+ey<-exp(y)+ rpois(100,.3)
 hist(y)
-
 hist(ey)
 p<-(test-min(test))/(max(test)-min(test))
 counts<-sapply(p, function(a) rpois(1,a))
 cor(counts,p)
 hist(counts)
-model<-glm(counts~test,family = poisson())
+
+B0 <-  1                # intercept
+B1 <-  6.5                # slope for x1
+n=100
+mu<-2
+y <- rpois(100, mu)
+x1 <- (log(y+0.0001) - B0 -rnorm(100,0,1) ) / B1
+x1<-round( (x1-min(x1))*10,digits=2)
+hist(x1)
+hist(y)
+
+model <- glm(y ~ x1 , family = poisson(link = log))
 summary(model)
+plot(predict(model,type = "response")~x1)
+plot(y~x1)
 
