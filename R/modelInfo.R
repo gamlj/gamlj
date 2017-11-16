@@ -3,14 +3,20 @@
 mi.rsquared<- function(x,...) UseMethod(".rsquared")
 
 .rsquared.default<-function(model) {
-    ss<-summary(model)
-    1-(model$deviance/ss$null.deviance)
+   sumr<-summary(model)
+    ### McFadden’s model #####
+    llfull<-logLik(model)  ### model loglikelihood
+    print(llfull)
+    llnull<<-llfull-((sumr$null.deviance-sumr$deviance)/2) ## intercept only loglikelihood
+    as.numeric(1-(llfull/llnull))
 }
 
 .rsquared.multinom<-function(model) {
+  llfull<-logLik(model)  ### model loglikelihood
   nobject <- update(model, ~ 1,  evaluate = FALSE)
   nobject <- eval.parent(nobject)
-  1-(model$deviance/nobject$deviance)
+  llnull<-logLik(nobject)
+  as.numeric(1-(llfull/llnull))
 }
 
 
