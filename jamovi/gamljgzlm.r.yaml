@@ -232,6 +232,7 @@ items:
         - name: contrast
           title: ""
           type: number
+          visible: false
         - name: estimate
           title: Difference
           type: number

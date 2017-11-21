@@ -68,7 +68,6 @@ children:
             format: number
             inputPattern: '[0-9]+'
             enable: (showParamsCI)
-
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -110,7 +109,6 @@ children:
         stretchFactor: 1
         events:
           change: './mixed.events::onChange_randomSupplier'
-
         children:
           - type: TargetLayoutBox
             label: Random Coefficients
@@ -124,7 +122,7 @@ children:
                   preprocess: './mixed.events::onEvent_randomTerms_preprocess'
                 template:
                   type: Label
-                  format: './rtermFormat'
+                  format: ./rtermFormat
       - type: LayoutBox
         margin: large
         children:
@@ -157,7 +155,6 @@ children:
         name: showContrasts
       - type: CheckBox
         name: showContrastsTable
-
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -210,13 +207,13 @@ children:
             optionName: postHocCorr
             optionPart: none
           - type: RadioButton
-            name: postHocCorr_bonferroni
-            optionName: postHocCorr
-            optionPart: bonferroni
-          - type: RadioButton
             name: postHocCorr_holm
             optionName: postHocCorr
             optionPart: holm
+          - name: postHocCorr_bonf
+            type: RadioButton
+            optionName: postHocCorr
+            optionPart: bonf
   - type: CollapseBox
     label: Fixed Effects Plots
     collapsed: true
@@ -248,7 +245,6 @@ children:
                 name: plotSepPlots
                 isTarget: true
                 maxItemCount: 1
-
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

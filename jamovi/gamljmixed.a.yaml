@@ -235,11 +235,11 @@ options:
       options:
           - name: none
             title: No correction
-          - name: bonferroni
+          - name: bonf
             title: Bonferroni
           - name: holm
             title: Holm
-      default: bonferroni
+      default: bonf
       description:
           R: >
             one or more of `'none'`,  `'bonf'`, or

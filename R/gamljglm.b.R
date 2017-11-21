@@ -48,7 +48,6 @@ gamljGLMClass <- R6::R6Class(
         dep <- self$options$dep
         factors <- self$options$factors
         modelTerms <- private$.modelTerms()
-        
         if (length(modelTerms) == 0 | is.null(dep))
             return()
         
@@ -157,8 +156,9 @@ gamljGLMClass <- R6::R6Class(
                 }  
       }  # end of simple effects tables
       # post hoc
-      private$.initPostHoc(data)
-      
+#      private$.initPostHoc(data)
+      tables<-self$results$postHoc
+      tables<-rf.initPostHoc(data,self$options, tables,modelType="linear")     
       # descriptives
       private$.initMeanTables(data)
       private$.initDescPlots(data)
@@ -195,8 +195,7 @@ gamljGLMClass <- R6::R6Class(
         self$results$.setModel(model)
         singular <- NULL
 
-        print("mark1")
-        
+
           results <- try({
             if (self$options$ss == '1') {
                ss<-stats::anova(model)
@@ -206,8 +205,6 @@ gamljGLMClass <- R6::R6Class(
             }
             if (self$options$ss == '3') {
                ss<-car::Anova(model,type=3,singular.ok=TRUE)
-               print("mark2")
-               
             }
           })
           
@@ -260,7 +257,6 @@ gamljGLMClass <- R6::R6Class(
           names(tableRow)<-c("estimate","std","t","p","beta","cilow","cihig")
           estimatesTable$setRow(rowNo=i,tableRow)
           estimatesTable$setRow(rowNo=i,list(label=.nicifyTerms(labels[i])))
-          
           }
         if (mf.aliased(model)) {
           anovaTable$setNote("aliased",WARNS["ano.aliased"])    
@@ -268,10 +264,10 @@ gamljGLMClass <- R6::R6Class(
           
         }          
         
-        private$.populateSimple(private$.model)
-        private$.prepareDescPlots(private$.model)
-        private$.populateLevenes(private$.model)
-        private$.populatePostHoc(data)
+        private$.populateSimple(model)
+        private$.prepareDescPlots(model)
+        private$.populateLevenes(model)
+        private$.populatePostHoc(model)
         private$.populateDescriptives(model)
         
       }) # suppressWarnings
@@ -332,25 +328,18 @@ gamljGLMClass <- R6::R6Class(
         table <- tables$get(key=ph)
         
         table$setTitle(paste0('Post Hoc Comparisons - ', stringifyTerm(ph)))
+        nc<-0
+        for (i in seq_along(ph)) {
+          nc<-nc+1
+          table$addColumn(name=paste0("c",nc), title=ph[i], type='text', superTitle='Comparison', combineBelow=TRUE,index=nc)
+        }
+        nc<-nc+1
+        table$addColumn(name='sep', title='', type='text', content='-', superTitle='Comparison', format='narrow',index=nc)
         
-        for (i in seq_along(ph))
-          table$addColumn(name=paste0(ph[i],'1'), title=ph[i], type='text', superTitle='Comparison', combineBelow=TRUE)
-        
-        table$addColumn(name='sep', title='', type='text', content='-', superTitle='Comparison', format='narrow')
-        
-        for (i in seq_along(ph))
-          table$addColumn(name=paste0(ph[i],'2'), title=ph[i], type='text', superTitle='Comparison')
-        
-        table$addColumn(name='md', title='Mean Difference', type='number')
-        table$addColumn(name='se', title='SE', type='number')
-        table$addColumn(name='df', title='df', type='number')
-        table$addColumn(name='t', title='t', type='number')
-        
-        table$addColumn(name='pnone', title='p', type='number', format='zto,pvalue', visible="(postHocCorr:none)")
-        table$addColumn(name='ptukey', title='p<sub>tukey</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:tukey)")
-        table$addColumn(name='pscheffe', title='p<sub>scheffe</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:scheffe)")
-        table$addColumn(name='pbonferroni', title='p<sub>bonferroni</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:bonf)")
-        table$addColumn(name='pholm', title='p<sub>holm</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:holm)")
+        for (i in seq_along(ph)) {
+          nc<-nc+1
+          table$addColumn(name=paste0("c",nc), title=ph[i], type='text', superTitle='Comparison',index=nc)
+        }
         
         combin <- expand.grid(bsLevels[rev(ph)])
         combin <- sapply(combin, as.character, simplify = 'matrix')
@@ -390,75 +379,51 @@ gamljGLMClass <- R6::R6Class(
       }
       private$.postHocRows <- postHocRows
     },
-    .populatePostHoc=function(data) {
-      terms <- self$options$postHoc
+.populatePostHoc=function(model) {
+  terms <- self$options$postHoc
+  dep<-self$options$dep
+  if (length(terms) == 0)
+    return()
+  
+  tables <- self$results$postHoc
+  
+  postHocRows <- list()
+  
+  for (ph in terms) {
+    
+    table <- tables$get(key=ph)
+    term <- jmvcore::composeTerm(ph)
+    termB64 <- jmvcore::composeTerm(toB64(ph))
+    suppressWarnings({
+      none <- mf.posthoc(model,ph,"none")
+      bonferroni <- mf.posthoc(model,ph,"bonferroni")
+      holm <-mf.posthoc(model,ph,"holm")
+      tukey <-mf.posthoc(model,ph,"tukey")
       
-      if (length(terms) == 0)
-        return()
-      
-      tables <- self$results$postHoc
-      
-      postHocRows <- list()
-      
-      for (ph in terms) {
-        
-        table <- tables$get(key=ph)
-        
-        term <- jmvcore::composeTerm(ph)
-        termB64 <- jmvcore::composeTerm(toB64(ph))
-        formula <- as.formula(paste('~', term))
-        suppressWarnings({
-          # table$setStatus('running')
-          referenceGrid <- emmeans::emmeans(private$.model, formula)
-          none <- summary(pairs(referenceGrid, adjust='none'))
-          tukey <- summary(pairs(referenceGrid, adjust='tukey'))
-          scheffe <- summary(pairs(referenceGrid, adjust='scheffe'))
-          bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
-          holm <- summary(pairs(referenceGrid, adjust='holm'))
-        }) # suppressWarnings
-        
-        resultRows <- lapply(strsplit(as.character(none$contrast), ' - '), function(x) strsplit(x, ','))
-        tableRows <- private$.postHocRows[[term]]
-        
-        for (i in seq_along(tableRows)) {
-          location <- lapply(resultRows, function(x) {
-            
-            c1 <- identical(x[[1]], as.character(tableRows[[i]][[1]]))
-            c2 <- identical(x[[1]], as.character(tableRows[[i]][[2]]))
-            c3 <- identical(x[[2]], as.character(tableRows[[i]][[1]]))
-            c4 <- identical(x[[2]], as.character(tableRows[[i]][[2]]))
-            if (c1 && c4)
-              return(list(TRUE,FALSE))
-            else if (c2 && c3)
-              return(list(TRUE,TRUE))
-            else
-              return(list(FALSE,FALSE))
-          })
-          index <- which(sapply(location, function(x) return(x[[1]])))
-          reverse <- location[[index]][[2]]
-
-          row <- list()
-          row[['md']] <- if(reverse) -none[index,'estimate'] else none[index,'estimate']
-          row[['se']] <- none[index,'SE']
-          row[['df']] <- none[index,'df']
-          row[['t']] <- if(reverse) -none[index,'t.ratio'] else none[index,'t.ratio']
-          
-          row[['pnone']] <- none[index,'p.value']
-          row[['ptukey']] <- tukey[index,'p.value']
-          row[['pscheffe']] <- scheffe[index,'p.value']
-          row[['pbonferroni']] <- bonferroni[index,'p.value']
-          row[['pholm']] <- holm[index,'p.value']
-          
-          table$setRow(rowNo=i, values=row)
-          private$.checkpoint()
-        }
-        if (.is.scaleDependent(private$.model,ph))
-          table$setNote("covs",WARNS["ph.interactions"])
-        else if (.term.develop(ph)<length(private$.modelTerms()))
-          table$setNote("covs",WARNS["ph.covariates"])
-        table$setStatus('complete')
+    }) # suppressWarnings
+    if (is.character(none))
+      table$setNote("nojoy",WARNS["ph.nojoy"])
+    else {        
+      tableData<-as.data.frame(none)
+      tableData$contrast<-as.character(tableData$contrast)
+      colnames(tableData)<-c("contrast","estimate","se","df","test","p")
+      tableData$pbonf<-bonferroni[,6]
+      tableData$pholm<-holm[,6]
+      tableData$ptukey<-tukey[,6]
       }
-    },
+      .labs<-sapply(tableData$contrast, function(a) {
+         strsplit(a,"[-,]")
+         })
+      labs<-do.call("rbind",.labs)   
+      colnames(labs)<-paste0("c",1:ncol(labs))
+      for (i in 1:nrow(tableData)) {
+        row<-tableData[i,]
+        l<-labs[i,]
+        table$setRow(rowNo=i, values=c(row,l))
+      }
+    }
+},
+
     .populateLevenes=function(model) {
       
       if ( ! self$options$homo)
@@ -507,9 +472,10 @@ gamljGLMClass <- R6::R6Class(
         data<-mf.getModelData(model)
         simpleEffectsTables<-self$results$simpleEffects
         simpleEffectsAnovas<-self$results$simpleEffectsAnovas
-  
+         
         .fillTheFTable<-function(results,aTable) {
           ftests<-results[[2]]
+          
           ### ftests      
           for (i in seq_len(dim(ftests)[1])) {
               tableRow<-ftests[i,]

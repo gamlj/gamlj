@@ -31,9 +31,8 @@ gamljGzlmClass <- R6::R6Class(
             stats::contrasts(data[[contrast$var]]) <- .createContrasts(levels, contrast$type)
         }
       
-        for (covariate in covs)
-            data[[covariate]] <- jmvcore::toNumeric(data[[covariate]])
-      
+        for (covariate in covs) 
+            data[[covariate]] <- as.numeric(as.character(data[[covariate]]))
 
         for (scaling in self$options$scaling) 
             data[[scaling$var]]<-.scaleContinuous(data[[scaling$var]],scaling$type)
@@ -49,6 +48,7 @@ gamljGzlmClass <- R6::R6Class(
         dep <- self$options$dep
         factors <- self$options$factors
         modelTerms <- private$.modelTerms()
+        
         infoTable<-self$results$info
         info<-MINFO[[modelType]]
         infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
@@ -69,7 +69,9 @@ gamljGzlmClass <- R6::R6Class(
             return()
         
         data <- private$.cleanData()
-
+        if (!is.data.frame(data))
+            reject(data)
+        
         anovaTable      <- self$results$main
         postHocTables   <- self$results$postHoc
         contrastsTables <- self$results$contrasts
@@ -196,8 +198,9 @@ gamljGzlmClass <- R6::R6Class(
                 }  
       }  # end of simple effects tables
       # post hoc
-      private$.initPostHoc(data)
-      
+      tables<-self$results$postHoc
+      tables<-rf.initPostHoc(data,self$options, tables,modelType=modelType)     
+
       # descriptives
       private$.initMeanTables(data)
       private$.initDescPlots(data)
@@ -222,18 +225,12 @@ gamljGzlmClass <- R6::R6Class(
         
         data <- private$.cleanData()
         #### more cleaning ####
-        data<-mf.checkData(dep,data,modelType)
+        data<-mf.checkData(self$options,data,modelType)
+        
         if (!is.data.frame(data))
                reject(data)
         
 
-        for (factorName in factors) {
-          lvls <- base::levels(data[[factorName]])
-          if (length(lvls) == 1)
-            reject("Factor '{}' contains only a single level", factorName=factorName)
-          else if (length(lvls) == 0)
-            reject("Factor '{}' contains no data", factorName=factorName)
-        }
         
         ### get the tables ####
         anovaTable <- self$results$main
@@ -341,7 +338,6 @@ gamljGzlmClass <- R6::R6Class(
           istart<-1
         }
         
-        
         ldata <- data[,term]
         ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -349,6 +345,7 @@ gamljGzlmClass <- R6::R6Class(
         grid <- as.data.frame(grid,stringsAsFactors=F)
         for (i in seq_len(ncol(grid))) {
           colName <- colnames(grid)[[i]]
+          colName<-paste0("c",i)
           mTable$addColumn(name=colName, title=term[i], index=i+istart)
         }
         
@@ -405,11 +402,8 @@ gamljGzlmClass <- R6::R6Class(
           #### make rows look nicer  ###
                 if (i==1)
                    table$addFormat(rowKey=((j*10)+i), col=1, Cell.BEGIN_GROUP)
-
                 if (i==nRows)
                    table$addFormat(rowKey=((j*10)+i), col=1, Cell.END_GROUP)
-          
-          
         }
        }
       },
@@ -421,7 +415,6 @@ gamljGzlmClass <- R6::R6Class(
       dep<-self$options$dep
       if (length(terms) == 0)
         return()
-      
       tables <- self$results$postHoc
       
       postHocRows <- list()
@@ -429,7 +422,7 @@ gamljGzlmClass <- R6::R6Class(
       for (ph in terms) {
         
         table <- tables$get(key=ph)
-        
+                 
         term <- jmvcore::composeTerm(ph)
         termB64 <- jmvcore::composeTerm(toB64(ph))
         suppressWarnings({
@@ -437,23 +430,33 @@ gamljGzlmClass <- R6::R6Class(
           bonferroni <- mf.posthoc(model,ph,"bonferroni")
           holm <-mf.posthoc(model,ph,"holm")
         }) # suppressWarnings
-        tableData<-as.data.frame(none)
-        tableData$contrast<-as.character(tableData$contrast)
-        if (modelType=="multinomial") {
-            colnames(tableData)<-c("contrast","dep","estimate","se","df","test","p")
-            tableData$dep<-as.character(tableData$dep)
-            tableData$pbonf<-bonferroni[,7]
-            tableData$pholm<-holm[,7]
-        }
-        else {
-            colnames(tableData)<-c("contrast","estimate","se","df","test","p")
-            tableData$pbonf<-bonferroni[,6]
-            tableData$pholm<-holm[,6]
-            
-        }
-        for (i in 1:nrow(tableData)) {
-          row<-tableData[i,]
-          table$setRow(rowNo=i, values=row)
+        if (is.character(none))
+             table$setNote("nojoy",WARNS["ph.nojoy"])
+        else {        
+            tableData<-as.data.frame(none)
+            tableData$contrast<-as.character(tableData$contrast)
+            if (modelType=="multinomial") {
+               colnames(tableData)<-c("contrast","dep","estimate","se","df","test","p")
+               tableData$dep<-as.character(tableData$dep)
+               tableData$pbonf<-bonferroni[,7]
+               tableData$pholm<-holm[,7]
+              }
+            else {
+               colnames(tableData)<-c("contrast","estimate","se","df","test","p")
+               tableData$pbonf<-bonferroni[,6]
+               tableData$pholm<-holm[,6]
+            }
+            print(tableData)
+            .labs<-sapply(tableData$contrast, function(a) {
+              strsplit(a,"[/,]")
+            })
+            labs<-do.call("rbind",.labs)   
+            colnames(labs)<-paste0("c",1:ncol(labs))
+            for (i in 1:nrow(tableData)) {
+              row<-tableData[i,]
+              l<-labs[i,]
+              table$setRow(rowNo=i, values=c(row,l))
+            }
         }
       }
 },
@@ -587,7 +590,7 @@ gamljGzlmClass <- R6::R6Class(
     .modelTerms=function() {
       modelTerms <- self$options$modelTerms
       if (class(modelTerms)!="list")
-          modelTerms<-private$.ff()
+      modelTerms<-private$.ff()
       # If we are in interactive mode the model should be well specified, otherwise (if R mode)
       # no modelTerms means full model
       modelTerms

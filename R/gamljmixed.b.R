@@ -9,7 +9,6 @@ gamljMixedClass <- R6::R6Class(
       print("init")
       reml<-self$options$reml
       infoTable<-self$results$info
-      modelTerms<-private$.modelTerms()
       
       getout<-FALSE
       if (is.null(self$options$dep)) {
@@ -26,13 +25,12 @@ gamljMixedClass <- R6::R6Class(
       }
       
       if (getout) {
-        modelTerms<-self$options$modelTerms
-        if (length(modelTerms) == 0) {
+        if (length(self$options$modelTerms) == 0) {
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
         }
         return(FALSE)
       }
-      
+      modelTerms<-private$.modelTerms()
       data<-private$.cleandata()
       
       
@@ -133,8 +131,8 @@ gamljMixedClass <- R6::R6Class(
         
         # other inits
         private$.initPlots(data)
-        postHocTables   <- self$results$postHoc
-        private$.initPostHoc(data)
+        tables   <- self$results$postHoc
+        tables<-rf.initPostHoc(data,self$options, tables,modelType="linear")     
         private$.initMeanTables(data)
     },
     .run=function() {
@@ -145,6 +143,9 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       reml<-self$options$reml
+      
+      if (length(self$options$modelTerms)==0)
+        return()
       modelTerms<-private$.modelTerms()
       
       ### collect the tables #######
@@ -157,11 +158,14 @@ gamljMixedClass <- R6::R6Class(
       ####  prepare the model formula              ####      
             
       modelFormula<-private$.checkModel()
-      
       if (modelFormula!=FALSE)    {
         
         data<-private$.cleandata() 
-      
+        data<-mf.checkData(self$options,data,"mixed")
+        
+        if (!is.data.frame(data))
+          reject(data)
+        
         for (scaling in self$options$scaling) {
           cluster<-clusters[[1]]
           data[[scaling$var]]<-.scaleContinuous(data[[scaling$var]],scaling$type,data[[cluster]])  
@@ -315,24 +319,26 @@ gamljMixedClass <- R6::R6Class(
   }
 
     },
-    .coreffects=function(llist) {
-#      res<-sapply(llist,function(x) strsplit(x,"|",fixed=T))
-      res<-do.call("rbind",llist)
-      res<-tapply(res[,1],res[,2],paste)
+  .buildreffects=function(terms,correl=TRUE) {
+    terms<-lapply(terms,function(x) unlist(sapply(x,function(z) paste0("`",z,"`"))))
+    flatterms<-lapply(terms,function(x) c(paste0(head(x,-1),collapse = ":"),tail(x,1)))
+    res<-do.call("rbind",flatterms)
+    res<-tapply(res[,1],res[,2],paste)
+    if (correl) {
       res<-sapply(res, function(x) paste(x,collapse = " + "))
-      paste(res,names(res),sep="|")
-      
-    },
-    .buildreffects=function(llist) {
-      newlist=NULL
-      for (a in llist) {
-        ch<-grep("Intercept",fixed=T,a)
-        if (length(ch)>0) res<-gsub("Intercept","1",fixed=T,a)
-        else res<-paste("0 +",a)
-        newlist<-c(newlist,res)
-      }
-      paste(" + ", paste("(",newlist,")",collapse = "+" ))
-    },
+      form<-paste(res,names(res),sep="|")
+      form<-paste("(",form,")")
+    } else {
+      form<-sapply(names(res), function(x) sapply(res[[x]], function(z) paste0("(0+",paste(z,x,sep = "|"),")")))
+      form<-sapply(form, function(x) paste(x,collapse = "+"))
+    } 
+    
+    form<-gsub('`Intercept`',1,form,fixed = T)
+    form<-gsub('0+1',1,form,fixed = T)
+    form=paste(form,collapse = "+")
+    form
+  },
+  
     .cleandata=function() {
       dep <- self$options$dep
       factors <- self$options$factors
@@ -375,33 +381,31 @@ gamljMixedClass <- R6::R6Class(
       return(lm)
     },
     .constructFormula=function(dep,terms) {
-      terms<-c("1",terms)
+#      terms<-c("1",terms)
       form<-jmvcore::constructFormula(dep,terms)
-      gsub('`',"",form)
+#      gsub('`',"",form)
+      form
     },
     .checkModel=function() {
       print("checking the model")
+      modelTerms<-private$.modelTerms()
       if (length(self$options$randomTerms)>0)  {
         rands<-self$options$randomTerms
-        if (self$options$correlatedEffects) 
-          rands<-private$.coreffects(self$options$randomTerms)
-        
-        rands<-private$.buildreffects(rands)
+        rands<-private$.buildreffects(rands,self$options$correlatedEffects)
       } else return(FALSE)
       
       intercept<-as.numeric(self$options$fixedIntercept)
       
       if (!is.null(self$options$dep)) {
-        dep<-paste(self$options$dep," ~ ", intercept)
+        dep<-paste(self$options$dep," ~ ", intercept,"+")
       } else return(FALSE)
       
       fixs<-""
-      if (length(self$options$modelTerms)>0)  {
-        pre<-self$options$modelTerms
-        for (i in 1:length(pre)) {
-          if (length(pre[[i]])>1)  pre[i]<-paste(pre[[i]],collapse = ":")
+      if (length(modelTerms)>0)  {
+        for (i in 1:length(modelTerms)) {
+          if (length(modelTerms[[i]])>1)  modelTerms[i]<-paste(modelTerms[[i]],collapse = ":")
         }
-        fixs<-paste(" + ",paste(pre,collapse = " + " ))
+        fixs<-paste(" + ",paste(modelTerms,collapse = " + " ))
       }
       paste(dep,rands,fixs,sep = " ")
     },
@@ -413,15 +417,15 @@ gamljMixedClass <- R6::R6Class(
   if (self$options$eDesc) {
     emeansTables <- self$results$emeansTables
     factorsAvailable <- self$options$factors
-    modelTerms<-private$.modelTerms()
-    if (length(factorsAvailable) == 0) 
+    modelTerms<-self$options$modelTerms
+    if (length(factorsAvailable) == 0)
       return()
     for (term in modelTerms)
       if (all(term %in% factorsAvailable)) {
         aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
         aTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
         aTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
-        
+
         ldata <- data[,term]
         ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -442,154 +446,51 @@ gamljMixedClass <- R6::R6Class(
   
 },     
 
-    .initPostHoc=function(data) {
+.populatePostHoc=function(model) {
+  terms <- self$options$postHoc
+  dep<-self$options$dep
+  if (length(terms) == 0)
+    return()
+  
+  tables <- self$results$postHoc
+  
+  postHocRows <- list()
+  
+  for (ph in terms) {
     
-    bs <- self$options$factors
-    phTerms <- self$options$postHoc
-    
-    bsLevels <- list()
-    for (i in seq_along(bs))
-      bsLevels[[bs[i]]] <- levels(data[[bs[i]]])
-    
-    tables <- self$results$postHoc
-    
-    postHocRows <- list()
-    
-    for (ph in phTerms) {
+    table <- tables$get(key=ph)
+    term <- jmvcore::composeTerm(ph)
+    termB64 <- jmvcore::composeTerm(toB64(ph))
+    suppressWarnings({
+      none <- mf.posthoc(model,ph,"none")
+      bonferroni <- mf.posthoc(model,ph,"bonferroni")
+      holm <-mf.posthoc(model,ph,"holm")
+      tukey <-mf.posthoc(model,ph,"tukey")
       
-      table <- tables$get(key=ph)
-      
-      table$setTitle(paste0('Post Hoc Comparisons - ', stringifyTerm(ph)))
-      
-      for (i in seq_along(ph))
-        table$addColumn(name=paste0(ph[i],'1'), title=ph[i], type='text', superTitle='Comparison', combineBelow=TRUE)
-      
-      table$addColumn(name='sep', title='', type='text', content='-', superTitle='Comparison', format='narrow')
-      
-      for (i in seq_along(ph))
-        table$addColumn(name=paste0(ph[i],'2'), title=ph[i], type='text', superTitle='Comparison')
-      
-      table$addColumn(name='md', title='Mean Difference', type='number')
-      table$addColumn(name='se', title='SE', type='number')
-      table$addColumn(name='df', title='df', type='number')
-      table$addColumn(name='t', title='t', type='number')
-      
-      table$addColumn(name='pnone', title='p', type='number', format='zto,pvalue', visible="(postHocCorr:none)")
-      table$addColumn(name='ptukey', title='p<sub>tukey</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:tukey)")
-      table$addColumn(name='pscheffe', title='p<sub>scheffe</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:scheffe)")
-      table$addColumn(name='pbonferroni', title='p<sub>bonferroni</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:bonf)")
-      table$addColumn(name='pholm', title='p<sub>holm</sub>', type='number', format='zto,pvalue', visible="(postHocCorr:holm)")
-      
-      combin <- expand.grid(bsLevels[rev(ph)])
-      combin <- sapply(combin, as.character, simplify = 'matrix')
-      if (length(ph) > 1)
-        combin <- combin[,rev(1:length(combin[1,]))]
-      
-      comp <- list()
-      iter <- 1
-      for (i in 1:(length(combin[,1]) - 1)) {
-        for (j in (i+1):length(combin[,1])) {
-          comp[[iter]] <- list()
-          comp[[iter]][[1]] <- combin[i,]
-          comp[[iter]][[2]] <- combin[j,]
-          
-          if (j == length(combin[,1]))
-            comp[[iter]][[3]] <- TRUE
-          else
-            comp[[iter]][[3]] <- FALSE
-          
-          iter <- iter + 1
-        }
-      }
-      
-      postHocRows[[composeTerm(ph)]] <- comp
-      
-      for (i in seq_along(comp)) {
-        row <- list()
-        for (c in seq_along(comp[[i]][[1]]))
-          row[[paste0(names(comp[[i]][[1]][c]),'1')]] <- as.character(comp[[i]][[1]][c])
-        for (c in seq_along(comp[[i]][[2]]))
-          row[[paste0(names(comp[[i]][[2]][c]),'2')]] <- as.character(comp[[i]][[2]][c])
-        
-        table$addRow(rowKey=i, row)
-        if (comp[[i]][[3]] == TRUE)
-          table$addFormat(rowNo=i, col=1, Cell.END_GROUP)
-      }
+    }) # suppressWarnings
+    if (is.character(none))
+      table$setNote("nojoy",WARNS["ph.nojoy"])
+    else {        
+      tableData<-as.data.frame(none)
+      tableData$contrast<-as.character(tableData$contrast)
+      colnames(tableData)<-c("contrast","estimate","se","df","test","p")
+      tableData$pbonf<-bonferroni[,6]
+      tableData$pholm<-holm[,6]
+      tableData$ptukey<-tukey[,6]
     }
-    private$.postHocRows <- postHocRows
-  },
-    .populatePostHoc=function(data) {
-      print("populatePostHoc")
-      
-      terms <- self$options$postHoc
-    
-    if (length(terms) == 0)
-      return()
-    
-    tables <- self$results$postHoc
-    
-    postHocRows <- list()
-    
-    for (ph in terms) {
-      
-      table <- tables$get(key=ph)
-      
-      term <- jmvcore::composeTerm(ph)
-      termB64 <- jmvcore::composeTerm(toB64(ph))
-      formula <- as.formula(paste('~', term))
-      
-      suppressWarnings({
-        # table$setStatus('running')
-        referenceGrid <- emmeans::emmeans(private$.model, formula)
-        none <- summary(pairs(referenceGrid, adjust='none'))
-        tukey <- summary(pairs(referenceGrid, adjust='tukey'))
-        scheffe <- summary(pairs(referenceGrid, adjust='scheffe'))
-        bonferroni <- summary(pairs(referenceGrid, adjust='bonferroni'))
-        holm <- summary(pairs(referenceGrid, adjust='holm'))
-      }) # suppressWarnings
-      
-      resultRows <- lapply(strsplit(as.character(none$contrast), ' - '), function(x) strsplit(x, ','))
-      tableRows <- private$.postHocRows[[term]]
-      
-      for (i in seq_along(tableRows)) {
-        location <- lapply(resultRows, function(x) {
-          
-          c1 <- identical(x[[1]], as.character(tableRows[[i]][[1]]))
-          c2 <- identical(x[[1]], as.character(tableRows[[i]][[2]]))
-          c3 <- identical(x[[2]], as.character(tableRows[[i]][[1]]))
-          c4 <- identical(x[[2]], as.character(tableRows[[i]][[2]]))
-          if (c1 && c4)
-            return(list(TRUE,FALSE))
-          else if (c2 && c3)
-            return(list(TRUE,TRUE))
-          else
-            return(list(FALSE,FALSE))
-        })
-        index <- which(sapply(location, function(x) return(x[[1]])))
-        reverse <- location[[index]][[2]]
-        
-        row <- list()
-        row[['md']] <- if(reverse) -none[index,'estimate'] else none[index,'estimate']
-        row[['se']] <- none[index,'SE']
-        row[['df']] <- none[index,'df']
-        row[['t']] <- if(reverse) -none[index,'t.ratio'] else none[index,'t.ratio']
-        
-        row[['pnone']] <- none[index,'p.value']
-        row[['ptukey']] <- tukey[index,'p.value']
-        row[['pscheffe']] <- scheffe[index,'p.value']
-        row[['pbonferroni']] <- bonferroni[index,'p.value']
-        row[['pholm']] <- holm[index,'p.value']
-        
-        table$setRow(rowNo=i, values=row)
-        private$.checkpoint()
-      }
-      if (.is.scaleDependent(private$.model,ph))
-        table$setNote("covs",WARNS[["ph.interactions"]])
-      else if (.term.develop(ph)<length(private$.modelTerms()))
-        table$setNote("covs",WARNS[["ph.covariates"]])
-      table$setStatus('complete')
+    .labs<-sapply(tableData$contrast, function(a) {
+      strsplit(a,"[-,]")
+    })
+    labs<-do.call("rbind",.labs)   
+    colnames(labs)<-paste0("c",1:ncol(labs))
+    for (i in 1:nrow(tableData)) {
+      row<-tableData[i,]
+      l<-labs[i,]
+      table$setRow(rowNo=i, values=c(row,l))
     }
-  },
+  }
+},
+
     .initPlots=function(data) {
        isAxis <- ! is.null(self$options$plotHAxis)
        isMulti <- ! is.null(self$options$plotSepPlots)
@@ -672,6 +573,7 @@ gamljMixedClass <- R6::R6Class(
 .populateDescriptives=function(model) {
 
   terms<-private$.modelTerms()
+  terms<-self$options$modelTerms
   if (self$options$eDesc) {
     meanTables<-self$results$emeansTables
     tables<-lf.meansTables(model,terms)  
@@ -789,7 +691,10 @@ gamljMixedClass <- R6::R6Class(
   .modelTerms=function() {
   modelTerms <- self$options$modelTerms
   if (class(modelTerms)!="list")
-      modelTerms<-private$.ff()
+       modelTerms<-private$.ff()
+  for (i in 1:length(modelTerms)) {
+    modelTerms[[i]]<-unlist(sapply(modelTerms[[i]],function(x) paste0("`",x,"`")))
+  }
   # If we are in interactive mode the model should be well specified, otherwise (if R mode)
   # no modelTerms means full model
   modelTerms

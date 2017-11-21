@@ -135,11 +135,14 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
   data$lines<-NULL
   pnames<-names(data)[-1]
   data$id<-seq_len(length(data$group))
+  levs<-gsub("fit.","",names(data)[2:4])
   long<-reshape(data,varying=pnames,idvar="id",direction = "long",v.names = "fit")
+  long$time<-factor(long$time)
+  levels(long$time)<-levs
   depLabs<-paste(depName,"category",sep="\n")
   yLab<-paste("prob. of",depName,"category")
   dodge <- ggplot2::position_dodge(0)
-  p <- ggplot2::ggplot(data=long, aes(x=group, y=fit, group=factor(time),colour=factor(time))) +
+  p <- ggplot2::ggplot(data=long, aes(x=group, y=fit, group=time,colour=time)) +
     geom_line(size=.8, position=dodge)+
     scale_y_continuous(limits=c(0,1)) 
   if (is.factor(long$group)) 
