@@ -175,7 +175,6 @@
   contrasts<-as.data.frame(do.call(rbind,contrasts))
   modelmatrix<-model.matrix(formula,data)
   facts<-names(attr(modelmatrix,"contrasts"))
-  
   labels<-sapply(facts, function(varname) {
     if (varname %in% contrasts$var) {
       contrasttype<-contrasts[contrasts$var==varname,"type"]
@@ -187,16 +186,19 @@
     levels <- base::levels(var)
     .contrastLabels(levels, contrasttype)
   },simplify = F)
-  
   layout<-attr(terms.formula(formula),"term.labels")
+  for (i in seq_along(layout))
+     layout[i]<-gsub("`","",layout[i],fixed=T)
+  laylist<-sapply(layout,function(a) jmvcore::decomposeTerm(a))
   vars<-as.character(attr(terms.formula(formula),"variables"))
   vars<-vars[c(-1,-2)]
-  laylist<-sapply(layout,function(a) strsplit(a,":",fixed = T))
-  
-  for (i in seq_along(vars)) {
-    if (vars[i] %in% names(labels)) {
+#  laylist<-sapply(layout,function(a) strsplit(a,":",fixed = T))
+
+    for (i in seq_along(vars)) {
+      var<-jmvcore::decomposeTerm(vars[i])
+    if (var %in% names(labels)) {
       laylist<-sapply(laylist, function(a) {
-        a[which(a == vars[i])]<-paste(unlist(labels[vars[i]]),collapse = "#")
+        a[which(a == var)]<-paste(unlist(labels[var]),collapse = "#")
         a
       })
     }
@@ -222,16 +224,17 @@
 .is.scaleDependent<-function(model,term) {
     if (is.null(term))
       return(FALSE)
+    try({
     modelterms<-terms(model)
     ff<-as.data.frame(attr(modelterms,"factors"))
+    rownames(ff)<-jmvcore::decomposeTerms(rownames(ff))
     termorder<-.term.order(term)
-    terms<-unlist(strsplit(term,":",fixed=T))
-  
+    terms<-jmvcore::decomposeTerms(term)
     for (aterm in terms) {
          if(sum(ff[rownames(ff)==aterm,])>termorder)
             return(TRUE)
     }
-    
+    })
     FALSE
 }
 
@@ -250,7 +253,7 @@
 .interaction.term<-function(model,aList) {
   
     ff<-colnames(attr(terms(model),"factors"))
-    ff<-strsplit(ff,":")
+    ff<-jmvcore::decomposeTerms(ff)
     for(f in ff)
         if(all(f %in% aList) & all(aList %in% f) )
            return(paste(f,collapse = ":"))
@@ -284,11 +287,12 @@
   ### get the parameters
   ##### understand how the dummies are named #####
        data<-mf.getModelData(model)
-  
+       qvariable<-jmvcore::composeTerm(variable)
+
         if (is.factor(data[[variable]])) {
-            varname<-paste(variable,seq_along(levels(data[,variable])),sep="")
+            varname<-paste(qvariable,seq_along(levels(data[,variable])),sep="")
          }  else {
-            varname<-variable
+            varname<-qvariable
          }
   ##### get the summary of the model. This must be a ...
         ss<-mf.summary(model)
@@ -302,9 +306,8 @@
         #### prettify the levels ####
         if (is.numeric(level)) 
             level<-round(level,digits=2)
-        
         ss$level<-paste(moderator,level,sep=" at ")
-        ss$variable<-variable
+        ss$variable<-rownames(ss)
         as.data.frame(ss,stringsAsFactors=F)
 }
 
@@ -316,6 +319,7 @@
       return(FALSE)
   }
   ano<-mf.anova(model)
+  variable<-jmvcore::composeTerm(variable)
   ano<-ano[rownames(ano)==variable,]
   if (is.numeric(level)) level<-round(level,digits=2)
   ano$level<-paste(moderator,level,sep=" at ")

@@ -170,37 +170,6 @@ items:
           type: number
 
 
-    - name: posthoc
-      title: Post-hoc tests
-      type: Table
-      visible: false
-      clearWith:
-        - dep
-        - factors
-        - cluster
-        - cov
-        - modelTerms
-      columns:
-        - name: label
-          title: "Comparison"
-          type: text
-        - name: estimate
-          title: "Estimate"
-          type: number
-        - name: se
-          title: "SE"
-          type: number
-        - name: z
-          title: "z"
-          type: number
-        - name: p
-          title: "p."
-          type: number
-          format: zto,pvalue
-
-
-
-
     - name: postHoc
       title: Post Hoc Tests
       type: Array
@@ -210,12 +179,42 @@ items:
         - dep
         - modelTerms
       template:
-        title: ""
+        title:  ""
         type: Table
-        columns: []
-        clearWith:
-            - dep
-            - modelTerms
+        columns:
+        - name: contrast
+          title: ""
+          type: number
+          visible: false
+        - name: estimate
+          title: Difference
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: test
+          title: test
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:none)
+        - name: pbonf
+          title: p<sub>bonferroni</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:bonf)
+        - name: pholm
+          title: p<sub>holm</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:holm)
+
+
+
+
+
     - name: simpleEffectsAnovas
       title: Simple Effects ANOVA
       type: Array

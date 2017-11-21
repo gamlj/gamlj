@@ -18,9 +18,6 @@ MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
 
 WARNS<-list()
 
-WARNS["ph.covariates"]<-"Post-hocs means are estimated keeping constant
-other independent variable(s) in the model"
-WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across interacting factors (if any) and setting interacting covariates to zero (if any)"
 
 
 WARNS["means.covariates"]<-"Estimated means are estimated keeping constant
@@ -55,6 +52,14 @@ will be estimated"
 WARNS["lmer.nogood"]<-"Results may be uninterpretable or misleading. Try to refine your model."
 
 WARNS["lmer.norelm"]<-"Simple effects F-Tests require REML estimation. Please select REML option."
+
+######### posst hoc ###################
+WARNS["ph.nojoy"]<-"Post-hoc tests cannot be estimated. Try simplifying your model removing interactions or covariates"
+WARNS["ph.covariates"]<-"Post-hocs means are estimated keeping constant
+other independent variable(s) in the model"
+WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across interacting factors (if any) and setting interacting covariates to zero (if any)"
+
+
 
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 #WARNS<-sapply(WARNS,function(a) gsub("  ","",a,fixed=T))

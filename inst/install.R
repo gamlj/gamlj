@@ -4,18 +4,13 @@ library(jmvtools)
 instdir<-"build/R/"
 install.packages("viridisLite",lib = instdir)
 install.packages("viridis",lib = instdir)
-
-#devtools::install_github(repo = "cran/nnet",subdir = instdir)
-
+library(devtools)
 #jmvtools::check("/home/marcello/LocalForge/jamovi/")
 #install(debug = F,home = "/home/marcello/LocalForge/jamovi/")
-
+withr::with_libpaths(new = instdir, install_github("rvlenth/emmeans"))
 
 #jpath<-"/home/marcello/LocalForge/jamovi/lib/R/library/compiler/"    
 #install(home = jpath)
-jmvtools::check()
-install()
-
-  #install.packages("stats",lib = jpath)
-R.version
-
+#jmvtools::check()
+jmvtools::install()
+    

@@ -292,12 +292,17 @@ mf.give_family<-function(modelSelection) {
   NULL  
 }
 
-mf.checkData<-function(dep,data,modelType) {
-  
-     if (modelType=="linear")
+mf.checkData<-function(options,data,modelType) {
+     dep=options$dep
+     ########## check the dependent variable ##########
+     if (modelType %in% c("linear","mixed"))
        ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))  
-     
+       if ( any(is.na(data[[dep]])) ) {
+          nice=paste0(toupper(substring(model,1,1)),substring(model,2,nchar(model)))
+          return(paste(nice,"model requires a numeric dependent variable"))
+       }
+               
      if  (modelType=="poisson") {
          ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))
@@ -309,9 +314,30 @@ mf.checkData<-function(dep,data,modelType) {
           if (length(levels(data[[dep]]))!=2)
                return("Logistic model requires two levels in the dependent variable")
       } 
-     if (modelType=="multinomial")
+     if (modelType=="multinomial") {
             data[[dep]] <- factor(data[[dep]])
-
+            if (length(levels(data[[dep]]))<3)
+                   return("For 2-levels factors please use a logistic model")
+     }
+     ####### check the covariates usability ##########
+     covs=options$covs
+     
+     for (cov in covs) {
+       data[[cov]]<-as.numeric(as.character(data[[cov]]))
+       if (any(is.na(data[[cov]])))
+          return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
+     }
+     # check factors
+     factors=options$factors
+     
+     for (factorName in factors) {
+       lvls <- base::levels(data[[factorName]])
+       if (length(lvls) == 1)
+         return(paste("Factor ",factorName,"contains only a single level"))
+       else if (length(lvls) == 0)
+         return(paste("Factor ",factorName,"contains no data"))
+     }
+     
      data
 }
 
@@ -355,41 +381,61 @@ mf.confint<- function(x,...) UseMethod(".confint")
 mf.posthoc<- function(x,...) UseMethod(".posthoc")
 
 .posthoc.default<-function(model,term,adjust) {
-  referenceGrid<-emmeans::emmeans(model,term,transform = "response")
-  summary(pairs(referenceGrid, adjust=adjust))
+  print("post-hoc")
+  term<-jmvcore::composeTerm(term)
+  term<-as.formula(paste("~",term))
+  data<-mf.getModelData(model)
+  referenceGrid<-emmeans::emmeans(model, term,type = "response",data=data)
+  table<-summary(pairs(referenceGrid))
+  table[order(table$contrast),]
 }
 
 .posthoc.multinom<-function(model,term,adjust) {
-  
+  results<-try({
   dep<-names(attr(terms(model),"dataClass"))[1]
+  dep<-jmvcore::composeTerm(dep)
+  term<-jmvcore::composeTerm(term)
   terms<-paste(term,collapse = ":")
   tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  referenceGrid<-emmeans::emmeans(model,tterm,transform = "response")
+  data<-mf.getModelData(model)
+  referenceGrid<-emmeans::emmeans(model,tterm,transform = "response",data=data)
   summary(pairs(referenceGrid, by=dep, adjust=adjust))
+  })
+  return(results)
   }
 
 ###### means tabòe ##########
 mf.means<- function(x,...) UseMethod(".means")
 
 .means.default<-function(model,term) {
-  table<-emmeans::emmeans(model,term,transform = "response")
+  data=mf.getModelData(model)
+  nvar<-length(term)
+  table<-emmeans::emmeans(model,term,transform = "response",data=data)
   table<-as.data.frame(summary(table))
-  table<-table[,-(1:length(term))]
-  colnames(table)<-c("lsmean","se","df","lower","upper")
+  ff<-paste0("c",1:nvar)
+  colnames(table)<-c(ff,"lsmean","se","df","lower","upper")
+  for (f in ff)
+    table[[f]]<-as.character(table[[f]])
+  table<-table[order(table$c1),]
   table
 }
 
 .means.multinom<-function(model,term) {
-
+  data<-mf.getModelData(model)
   dep<-names(attr(terms(model),"dataClass"))[1]
+  dep<-jmvcore::composeTerm(dep)
+  nvar<-length(term)
+  term<-jmvcore::composeTerm(term)
   terms<-paste(term,collapse = ":")
   tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  table<-emmeans::emmeans(model,tterm,transform = "response")
+  table<-emmeans::emmeans(model,tterm,transform = "response",data=data)
   table<-as.data.frame(summary(table))
-  table<-table[,-(2:(1+length(term)))]
-  colnames(table)<-c("dep","lsmean","se","df","lower","upper")
+  ff<-paste0("c",1:nvar)
+  colnames(table)<-c("dep",ff,"lsmean","se","df","lower","upper")
   table<-table[order(table$dep),]
   table$dep<-as.character(table$dep)
+  for (f in ff)
+       table[[f]]<-as.character(table[[f]])
   table
 }
 
