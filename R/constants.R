@@ -23,7 +23,7 @@ WARNS<-list()
 WARNS["means.covariates"]<-"Estimated means are estimated keeping constant
 other independent variable(s) in the model to the mean"
 WARNS["means.interactions"]<-"Estimated means are estimated averaging across interacting variables"
-
+WARNS["means.noemms"]<-"Estimated marginal means cannot be estimated. Please try to simplify your model"
 WARNS["se.interactions"]<-"Simple effects are estimated setting higher order
  moderator (if any) in covariates to zero and averaging
  across moderating factors levels (if any)"

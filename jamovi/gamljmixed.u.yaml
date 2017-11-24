@@ -202,18 +202,22 @@ children:
       - type: LayoutBox
         margin: large
         children:
-          - type: RadioButton
-            name: postHocCorr_none
-            optionName: postHocCorr
-            optionPart: none
-          - type: RadioButton
-            name: postHocCorr_holm
-            optionName: postHocCorr
-            optionPart: holm
-          - name: postHocCorr_bonf
-            type: RadioButton
-            optionName: postHocCorr
-            optionPart: bonf
+          - type: Label
+            label: Correction
+            children:
+              - name: postHocCorr_none
+                type: CheckBox
+                optionPart: none
+                optionName: postHocCorr
+              - name: postHocCorr_bonf
+                type: CheckBox
+                optionPart: bonf
+                optionName: postHocCorr
+              - name: postHocCorr_holm
+                type: CheckBox
+                optionPart: holm
+                optionName: postHocCorr
+
   - type: CollapseBox
     label: Fixed Effects Plots
     collapsed: true
@@ -245,6 +249,17 @@ children:
                 name: plotSepPlots
                 isTarget: true
                 maxItemCount: 1
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+          - type: Label
+            label: Plot
+            children:
+              - type: CheckBox
+                name: plotRaw
+              - type: CheckBox
+                name: plotDvScale
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

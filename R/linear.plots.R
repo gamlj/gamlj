@@ -24,14 +24,22 @@
        labs(x=groupName, y=depName, colour=clabel) +
        scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
 
+    if (!is.null(image$state$raw)) {
+      rawData=image$state$raw
+      p <- p + geom_point(data=rawData,aes(x=x, y=y, colour=factor(z), group=factor(z)), alpha=.5,show.legend=F,shape=16, size=2)
+    }
+    
+    
     if (is.factor(image$state$data$group)) {
-      p <- p + geom_point(shape=21, fill='white', size=3, position=dodge)
+      p <- p + geom_point(shape=16, size=3, position=dodge)
       if (errorType != '')
           p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, width=.1, group=lines), size=.8, position=dodge)
    } else {
     if (errorType != '')
      p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
    }
+    
+    
  p   
 }
 
@@ -52,81 +60,26 @@
         scale_colour_manual(name=clabel, values=c(colour=theme$color[1]), labels='') +
         scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
 
+     if (!is.null(image$state$raw)) {
+       rawData=image$state$raw
+       p <- p + geom_point(data=rawData,aes(x=x, y=y), colour="grey42", shape=16,alpha=.5, size=2)
+     }
+     
 
   if (is.factor(image$state$data$group)) {
-      p <- p + geom_point(aes(x=group, y=fit, colour='colour'), shape=21, fill=theme$fill[1], size=3)
+      p <- p + geom_point(aes(x=group, y=fit, colour='colour'), shape=16,  size=4,show.legend=F)
       p <- p+geom_line(aes(x=group,y=fit,group = 1)) 
       if (errorType != '')
            p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, colour='colour', width=.1), size=.8)
   }  else { 
-      p <- p+geom_line(aes(x=group,y=fit)) 
+      p <- p+geom_line(aes(x=group,y=fit),size=1.5) 
       if (errorType != '')
       p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=T, alpha=.3)
   
   }
+     
    p
 }
-
-##### This function prepare the plots #########
-
-
-lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none") {
-     
-     selected<-c(groupName,linesName,plotsName)  
-     vars<-all.vars(terms(model))[-1]
-     data<-mf.getModelData(model)  
-     ll<-list()
-     for (v in vars) {
-          if (is.factor(data[,v])) 
-              ll[v]<-list(levels(data[,v]))
-          else {
-               if (v %in% selected) {
-                   if (v==groupName)
-                     ll[v]<-list(seq(min(data[,v]),max(data[,v]),length.out=100))
-                   else
-                       ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
-               }
-               else 
-                   ll[v]<-list(0)
-          }
-     }
-     eg<-expand.grid(ll)
-     for (v in mf.getModelFactors(model)) {
-          eg[,v]<-factor(eg[,v])
-     }
-     mm<-mf.predict(model,eg,bars)
-     pnames<-names(mm)
-     dm<-as.data.frame(cbind(mm,eg))
-     names(dm)<-c(names(mm),names(eg))
-     if (length(selected)==1) 
-          by<-list(dm[,selected])
-     else 
-          by<-dm[,selected]
-     
-#     what<-"fit"
-     what<-pnames
-     if (bars!="none")
-        what<-c("fit","lwr","upr")
-     dm<-aggregate(dm[,what],by,mean)
-     if (is.null(linesName))
-       lnames<-c("group","plots")
-     else
-       lnames<-c("group","lines","plots")
-
-     names(dm)<-c(lnames[1:length(selected)],what)
-          
-     if (!is.null(dm$plots) & !is.factor(data[,plotsName])) {
-           dm$plots<-factor(dm$plots)
-       levels(dm$plots)<-c("-SD","Mean","+SD")
-       }
-  
-      if (!is.null(dm$lines) & !is.factor(data[,linesName])) {
-            dm$lines<-factor(dm$lines)
-            levels(dm$lines)<-c("-SD","Mean","+SD")
-      }
-        dm
-   } # end of .preparePlotData()
-
 
 
 .linesPlot<-function(data,theme,depName,groupName,title=NULL) {
@@ -134,8 +87,8 @@ lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="
   data$plots<-NULL
   data$lines<-NULL
   pnames<-names(data)[-1]
+  levs<-gsub("fit.","",pnames)
   data$id<-seq_len(length(data$group))
-  levs<-gsub("fit.","",names(data)[2:4])
   long<-reshape(data,varying=pnames,idvar="id",direction = "long",v.names = "fit")
   long$time<-factor(long$time)
   levels(long$time)<-levs
@@ -172,3 +125,143 @@ lp.linesMultiPlot<-function(data,theme,depName,groupName,linesName=NULL) {
   } else
     return(.linesPlot(data,theme,depName,groupName))
 }
+
+###### gives the appropriated range of the plot  ############
+
+lp.range<- function(x,...) UseMethod(".range")
+
+.range.default<-function(model,depName,predictions,rawData=NULL) {
+ 
+  if (!is.null(rawData)) {
+    rawRange <- pretty(rawData[[depName]])
+    
+  } else {
+    
+    rawRange<-NULL
+    rawData<-NULL
+    
+  }
+  
+  if ("lwr" %in% names(predictions))
+       yAxisRange <- pretty(c(predictions$lwr, predictions$upr,rawRange))
+  else 
+       yAxisRange <- pretty(c(predictions$fit,rawRange))
+  
+  return(yAxisRange)
+}
+
+.range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
+
+    if (model$family[1] %in% c("poisson","gaussian"))
+        return(.range.default(model,depName,predictions,rawData))
+
+  return(c(0,1))
+}
+       
+##### This function prepares the plot predicted data #########
+
+
+lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none") {
+  
+  selected<-c(groupName,linesName,plotsName)  
+  vars<-all.vars(terms(model))[-1]
+  data<-mf.getModelData(model)  
+  ll<-list()
+  for (v in vars) {
+    if (is.factor(data[,v])) 
+      ll[v]<-list(levels(data[,v]))
+    else {
+      if (v %in% selected) {
+        if (v==groupName)
+          ll[v]<-list(seq(min(data[,v]),max(data[,v]),length.out=100))
+        else
+          ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
+      }
+      else 
+        ll[v]<-list(0)
+    }
+  }
+  eg<-expand.grid(ll)
+  for (v in mf.getModelFactors(model)) {
+    eg[,v]<-factor(eg[,v])
+    contrasts(eg[,v])<-contrasts(data[,v])
+  }
+  mm<-mf.predict(model,eg,bars)
+  pnames<-names(mm)
+  dm<-as.data.frame(cbind(mm,eg))
+  names(dm)<-c(names(mm),names(eg))
+  if (length(selected)==1) 
+    by<-list(dm[,selected])
+  else 
+    by<-dm[,selected]
+  
+  #     what<-"fit"
+  what<-pnames
+  if (bars!="none")
+    what<-c("fit","lwr","upr")
+  dm<-aggregate(dm[,what],by,mean)
+  if (is.null(linesName))
+    lnames<-c("group","plots")
+  else
+    lnames<-c("group","lines","plots")
+  
+  names(dm)<-c(lnames[1:length(selected)],what)
+  
+  if (!is.null(dm$plots) & !is.factor(data[,plotsName])) {
+    dm$plots<-factor(dm$plots)
+    levels(dm$plots)<-c("-SD","Mean","+SD")
+  }
+  
+  if (!is.null(dm$lines) & !is.factor(data[,linesName])) {
+    dm$lines<-factor(dm$lines)
+    levels(dm$lines)<-c("-SD","Mean","+SD")
+  }
+  dm
+} # end of .preparePlotData()
+
+###### gives the raw date for the plot  ############
+
+lp.rawData<- function(x,...) UseMethod(".rawData")
+
+.rawData.default<-function(model,depName,groupName,linesName=NULL) {
+  data=mf.getModelData(model)
+  data$y<-data[[depName]]
+  data$x<-data[[groupName]]
+  
+  if (is.null(linesName) || !is.factor(data[[linesName]]))
+    data$z<-NA
+  else
+    data$z<-data[,linesName]
+  
+  return(data[,c("y","x","z")])
+
+  }  
+
+.rawData.glm<-function(model,depName,groupName,linesName=NULL) {
+  
+  if (model$family[1] %in% c("poisson","gaussian"))
+    return(.rawData.default(model,depName,groupName,linesName))
+  
+  if (model$family[1] %in% c("binomial")) {
+      data=mf.getModelData(model)
+      data$y<-ifelse(data[[depName]]==levels(data[[depName]])[1],1,0)
+      data$x<-data[[groupName]]
+      if (is.null(linesName) || !is.factor(data[[linesName]]))
+           data$z<-NA
+      else
+           data$z<-data[,linesName]
+      
+      return(data[,c("y","x","z")])
+  }
+  
+  
+  return(NULL)
+  } 
+
+.rawData.multinom<-function(model,depName,groupName,linesName=NULL) {
+    return(NULL)
+   }
+    
+  
+
+

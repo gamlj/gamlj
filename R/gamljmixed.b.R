@@ -512,35 +512,46 @@ gamljMixedClass <- R6::R6Class(
          }
         }
   },
-    .preparePlots=function(model) {
+.preparePlots=function(model) {
   
-        depName <- self$options$dep
-        groupName <- self$options$plotHAxis
-        linesName <- self$options$plotSepLines
-        plotsName <- self$options$plotSepPlots
-        errorBarType <- "none"
-
-        if (length(depName) == 0 || length(groupName) == 0)
-          return()
+  depName <- self$options$dep
+  groupName <- self$options$plotHAxis
+  if (length(depName) == 0 || length(groupName) == 0)
+    return()
   
-       plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+  linesName <- self$options$plotSepLines
+  plotsName <- self$options$plotSepPlots
+  errorBarType="none"
+  optionRaw<-self$options$plotRaw
+  optionRange<-self$options$plotDvScale
+  referToData<-(optionRaw || optionRange)
   
-       yAxisRange <- plotData$fit
-
-    if (is.null(plotsName)) {
+  
+  if (referToData)
+    rawData=lp.rawData(model,depName,groupName,linesName)
+  else 
+    rawData<-NULL
+  
+  predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+  yAxisRange <- lp.range(model,depName,predData,rawData)
+  
+  if (!optionRaw)
+    rawData<-NULL
+  
+  
+  if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
-    image$setState(list(data=plotData, range=yAxisRange))
-    
+    image$setState(list(data=predData, raw=rawData, range=yAxisRange))
   } else {
     images <- self$results$descPlots
     i<-1
-    levels<-levels(plotData$plots)
+    levels<-levels(predData$plots)
     
     for (key in images$itemKeys) {
       real<-levels[i]
       i<-i+1
       image <- images$get(key=key)
-      image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
+      image$setState(list(data=subset(predData,plots==real),raw=rawData, range=yAxisRange))
     }
   }
   
@@ -617,6 +628,7 @@ gamljMixedClass <- R6::R6Class(
     what<-params$level
     for (i in seq_len(dim(params)[1])) {
       tableRow<-params[i,]
+        
       aTable$setRow(rowNo=i,tableRow)
       if (what!=tableRow$level)  
         aTable$addFormat(col=1, rowNo=i,format=Cell.BEGIN_GROUP)

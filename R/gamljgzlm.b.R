@@ -467,15 +467,21 @@ gamljGzlmClass <- R6::R6Class(
   if (self$options$eDesc) {
     meanTables<-self$results$emeansTables
     tables<-lf.meansTables(model,terms)  
+    
     for (table in tables)  {
       key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
       mTable<-meanTables$get(key=key)
+      
+      if (isError(table)) {
+        mTable$setNote("noemms",WARNS["means.noemms"])
+      } else {
       for (i in seq_len(nrow(table))) {
         values<-as.data.frame(table[i,])
         mTable$setRow(rowNo=i,values)
       }
       note<-attr(table,"note")
       if (!is.null(note)) mTable$setNote(note,WARNS[note])
+      }
     }
   } # end of eDesc              
   
@@ -642,52 +648,56 @@ gamljGzlmClass <- R6::R6Class(
   
       depName <- self$options$dep
       groupName <- self$options$plotHAxis
+      
+      if (length(depName) == 0 || length(groupName) == 0)
+        return()
+      
       linesName <- self$options$plotSepLines
       plotsName <- self$options$plotSepPlots
       errorBarType <- self$options$plotError
       modelType <- self$options$modelSelection
+      plotRaw<-self$options$plotRaw
       
-      if (length(depName) == 0 || length(groupName) == 0)
-        return()
-      if (modelType=="multinomial")
-        errorBarType="none"
       
-      plotData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
       
-      if (errorBarType != 'none') {
-        yAxisRange <- pretty(c(plotData$lwr, plotData$upr))
-      } else {
-        yAxisRange <- plotData$fit
+      if (modelType=="multinomial") {
+          errorBarType="none"
+          plotRaw=FALSE
+          
       }
-      if (modelType=="logistic") 
-          yAxisRange<-c(0,1)
-
+      if (plotRaw==TRUE)
+          rawData=lp.rawData(model,depName,groupName,linesName)
+      else 
+          rawData<-NULL
+      
+      predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+      yAxisRange <- lp.range(model,depName,predData,rawData)
       
       if (is.null(plotsName)) {
-        image <- self$results$get('descPlot')
-        image$setState(list(data=plotData, range=yAxisRange))
-        if (modelType=="multinomial" && !is.null(linesName)) {
-          n<-length(levels(plotData[,"lines"]))
-            image$setSize(500,(250*n))
-        }
-      } else {
-        
-        images <- self$results$descPlots
-        i<-1
-        levels<-levels(plotData$plots)
-        
-        for (key in images$itemKeys) {
-          real<-levels[i]
-          i<-i+1
-          image <- images$get(key=key)
-          image$setState(list(data=subset(plotData,plots==real), range=yAxisRange))
+          image <- self$results$get('descPlot')
+          image$setState(list(data=predData, raw=rawData, range=yAxisRange))
+         
           if (modelType=="multinomial" && !is.null(linesName)) {
-            n<-length(levels(plotData[["lines"]]))
-            image$setSize(500,(250*n))
-          }
+               n<-length(levels(predData[,"lines"]))
+               image$setSize(500,(250*n))
+           }
+      } else {
+          images <- self$results$descPlots
+          i<-1
+          levels<-levels(predData$plots)
+        
+          for (key in images$itemKeys) {
+               real<-levels[i]
+               i<-i+1
+               image <- images$get(key=key)
+               image$setState(list(data=subset(predData,plots==real), raw=rawData, range=yAxisRange))
+               if (modelType=="multinomial" && !is.null(linesName)) {
+                   n<-length(levels(predData[["lines"]]))
+                   image$setSize(500,(250*n))
+                    }
           
+           }
         }
-      }
       
     },
     .descPlot=function(image, ggtheme, theme, ...) {

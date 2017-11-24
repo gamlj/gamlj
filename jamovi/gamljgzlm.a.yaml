@@ -229,6 +229,21 @@ options:
           R: >
             a string naming the variable to separate over to form multiple plots
 
+    - name: plotRaw
+      title: Observed scores
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+    - name: plotDvScale
+      title: Y-axis observed scale
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+
     - name: postHoc
       title: Post Hoc Tests
       type: Terms
@@ -273,7 +288,7 @@ options:
           title: Confidence intervals
         - name: se
           title: Standard Error
-      default: ci
+      default: none
       description:
           R: >
             `'none'`, `'ci'` (default), or `'se'`. Use no error

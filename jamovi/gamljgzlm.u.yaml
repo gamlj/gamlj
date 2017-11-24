@@ -237,32 +237,46 @@ children:
                 name: plotSepPlots
                 isTarget: true
                 maxItemCount: 1
-      - type: Label
-        label: Display
+      - type: LayoutBox
+        margin: large
+        style: inline
         children:
-          - type: RadioButton
-            name: errBarDef_none
-            optionName: plotError
-            optionPart: none
-          - type: RadioButton
-            name: errBarDef_ci
-            optionName: plotError
-            optionPart: ci
+          - type: Label
+            label: Display
             children:
-              - type: TextBox
-                name: ciWidth
-                label: Interval
-                suffix: '%'
-                format: number
-                inputPattern: '[0-9]+'
-                enable: (errBarDef_ci)
-          - type: LayoutBox
-            margin: large
-            children:
+              - type: RadioButton
+                name: errBarDef_none
+                optionName: plotError
+                optionPart: none
+                enable: '(!modelSelection:multinomial)'
+              - type: RadioButton
+                name: errBarDef_ci
+                optionName: plotError
+                optionPart: ci
+                enable: '(!modelSelection:multinomial)'
+                children:
+                  - type: TextBox
+                    name: ciWidth
+                    label: Interval
+                    suffix: '%'
+                    format: number
+                    inputPattern: '[0-9]+'
+                    enable: '(errBarDef_ci && !modelSelection:multinomial)'
               - name: plotError_se
                 type: RadioButton
                 optionName: plotError
                 optionPart: se
+                enable: '(!modelSelection:multinomial)'
+          - type: Label
+            label: Plot
+            children:
+              - type: CheckBox
+                name: plotRaw
+                enable: '(!modelSelection:multinomial)'
+              - type: CheckBox
+                name: plotDvScale
+                enable: '(modelSelection:linear || modelSelection:poisson)'
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

@@ -234,6 +234,18 @@ options:
           R: >
             a string naming the variable to separate over to form multiple plots
 
+
+    - name: plotRaw
+      title: Observed scores
+      type: Bool
+      default: false
+
+    - name: plotDvScale
+      title: Y-axis observed range 
+      type: Bool
+      default: false
+
+
     - name: postHoc
       title: Post Hoc Tests
       type: Terms

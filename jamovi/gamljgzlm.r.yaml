@@ -307,7 +307,8 @@ items:
         - ciWidth
         - scaling
         - modelTerms
-
+        - plotRaw
+        
     - name: descPlots
       title: Results Plots
       type: Array
@@ -326,6 +327,8 @@ items:
            - ciWidth
            - scaling
            - modelTerms
+           - plotRaw
+           - plotDvScale
 
 
 

@@ -1,6 +1,6 @@
-# GAMLj Suite for Linear Models in Jamovi
+# GAMLj Suite for Linear Models in jamovi
 
-General, Mixed and Generalized Models module for Jamovi
+General, Mixed and Generalized Models module for jamovi
 
 version 0.9.*
 
@@ -25,7 +25,7 @@ More informations can be found at [GAMLj page](https://mcfanda.github.io/gamlj_d
 
 # Installation
 
-Please install [Jamovi](https://www.jamovi.org/download.html) and run it. Select the jamovi modules library and install GAMLj from there
+Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select the jamovi modules library and install GAMLj from there
 
 <img src="docs/glm/install.png" class="img-responsive" alt="">
 
@@ -33,12 +33,12 @@ Please install [Jamovi](https://www.jamovi.org/download.html) and run it. Select
 
 ## Linux
 
-If you are working in linux you can download [Jamovi](https://www.jamovi.org/download.html), then download the .jmo from this link [gamlj binaries](https://github.com/mcfanda/binaries/blob/master/gamlj_linux.jmo).
+If you are working in linux you can download [jamovi](https://www.jamovi.org/download.html), then download the .jmo from this link [gamlj binaries](https://github.com/mcfanda/binaries/blob/master/gamlj_linux.jmo).
 
 
 ## Others
 
-You will first need to download [Jamovi](https://www.jamovi.org/download.html). 
+You will first need to download [jamovi](https://www.jamovi.org/download.html). 
 
 
 You can clone this repository and compile the module within R with 

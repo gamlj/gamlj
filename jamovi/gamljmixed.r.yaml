@@ -195,6 +195,9 @@ items:
         - name: test
           title: test
           type: number
+        - name: df
+          title: df
+          type: number
         - name: p
           title: p
           type: number
@@ -344,6 +347,7 @@ items:
         - ciWidth
         - scaling
         - modelTerms
+        - plotRaw
 
     - name: descPlots
       title: Results Plots

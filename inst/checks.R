@@ -74,17 +74,56 @@ levs2<-levels(dat$twogroups)
 referenceGrid
 pairs(x = levs1)
 pairs()
-dat<-read.csv2("data/dat3x2x2_mixed.csv")
+
+library(lmerTest)
+dat<-read.csv("data/dat3x2x2_mixed.csv")
 dat$cluster<-factor(dat$cluster)
 dat$wfac<-factor(dat$wfac)
 dat$bfac<-factor(dat$bfac)
-model<-lmer(y~(1|cluster)+wfac*bfac*x,data=dat)
-coef(model)
-p <- ggplot(dat, aes(x = bfac, y = y, group=cluster, colour = cluster)) +
-  geom_point(size=3,alpha=.2) +
-  geom_line(aes(y = predict(model),x=bfac,group=cluster),size=1.01) 
-p<-p+ geom_smooth(aes(group = cluster), size = 2, method = "lm")
-print(p)
+contrasts(dat$wfac)<-contr.sum(2)
+model<-lmer(y~(1+x|cluster)+x,data=dat)
+summary(model)
+
+preds<-predict(model)
+library(ggplot2)
+preds<-cbind(preds,dat)
+cc<-coef(model)
+cc<-cc$cluster
+head(cc)
+ccl<-unique(dat$cluster)
+p <- ggplot(data=preds, aes(x=x, y=preds, group=factor(cluster))) +
+  geom_point(aes(colour=cluster))+
+  geom_abline(data = cc, aes(slope =x, intercept =`(Intercept)`,colour =ccl, alpha=ccl)) +
+  labs(x="groupName", y="depName") +
+  scale_y_continuous(limits=c(min(dat$y), max(dat$y))) +
+p
+iris$Petal.Width
+hist(dat$x)
+dat<-read.csv("inst/checdata.csv")
+dat$clu<-factor(dat$clu)
+dat$fac<-factor(dat$x)
+contrasts(dat$fac)<-contr.sum(2)/2
+dat$x<-dat$x/2
+#dat$y<-dat$y-mean(dat$y)
+model<-lmer(y~1+(1|clu)+(0+x|clu),data=dat)
+ranef(model)
+(cc<-coef(model))
+cor(cc$clu)
+summary(model)
+tapply(dat$y-mean(dat$y),dat$clu,mean)
+model<-lmer(y~1+(1+fac|clu),data=dat)
+ranef(model)
+(cc<-coef(model))
+cor(cc$clu)
+cc$clu[2]-cc$clu[1]
+summary(model)
+
+model<-lmer(y~1+(1+fac|clu),data=dat)
+ranef(model)
+(cc<-coef(model))
+cor(cc$clu)
+summary(model)
+
 
 dat<-read.csv("data/generalized.csv")
 dat$bfac<-factor(dat$bfac)
@@ -92,7 +131,9 @@ dat$dic<-factor(dat$dic)
 contrasts(dat$dic)<-contr.sum(2)
 contrasts(dat$bfac)<-contr.sum(2)
 dat$groups3<-factor(dat$groups3)
-model<-glm(counts~groups3,data=dat,family = poisson())
+model<-glm(counts~groups3,data=dat,family = gaussian())
+
+model$family=="gaussian"
 
 model<-glm(dic~groups3*bfac,data=dat,family = binomial())
 term="group3"
@@ -108,12 +149,22 @@ r<-logLik(model0)
 summary(model)
 ####### multinomial ########à
 library(nnet)
-library(lsmeans)
+library(emmeans)
 names(dat)
 contrasts(dat$groups3)
-model<-multinom(bfac ~groups3, data = dat, model = TRUE)
+
+model<-multinom(bfac ~groups3+counts, data = dat, model = TRUE)
+model<-multinom(groups3 ~bfac+y, data = dat, model = TRUE)
 summary(model)
-model0<-multinom(groups3 ~bfac, data = dat, model = TRUE)
+car::Anova(model)
+
+term<-"bfac"
+dep<-"groups3"
+terms<-paste(term,collapse = ":")
+tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
+table<-emmeans::emmeans(model,tterm,transform = "response",data=dat)
+table
+model$
 model0$value
 summary(model0)
 library(lmerTest)
@@ -122,3 +173,24 @@ plot(dat$smile~dat$beer)
 lmodel<-lm(smile~beer,data=dat)
 summary(lmodel)
 model<-lmer(smile~(1|bar)+beer,data=dat)
+
+
+
+dat<-read.csv("data/facXcont.csv")
+dat$x<-dat$x-mean(dat$x)
+#dat$y<-dat$x*(dat$fac3)+.5*dat$x*dat$x+rnorm(30,0,.5)
+dat$fac3<-factor(dat$fac3)
+dat$x2<-dat$x*dat$x
+write.csv(dat,"data/facXcont.csv",row.names = F)
+contrasts(dat$fac3)<-contr.sum(3)
+
+model<-lm(y~x*x2,data=dat)
+plot(predict(model)~dat$x)
+summary(model)
+model<-lm(y~x,data=dat)
+summary(model)
+contrasts(dat$fac3)
+
+
+
+
