@@ -422,6 +422,7 @@ mf.means<- function(x,...) UseMethod(".means")
 
 .means.multinom<-function(model,term) {
   data<-mf.getModelData(model)
+  try({
   dep<-names(attr(terms(model),"dataClass"))[1]
   dep<-jmvcore::composeTerm(dep)
   nvar<-length(term)
@@ -437,6 +438,7 @@ mf.means<- function(x,...) UseMethod(".means")
   for (f in ff)
        table[[f]]<-as.character(table[[f]])
   table
+  }) 
 }
 
 mf.getAIC<- function(x,...) UseMethod(".getAIC")

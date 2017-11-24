@@ -21,11 +21,13 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             plotHAxis = NULL,
             plotSepLines = NULL,
             plotSepPlots = NULL,
+            plotRaw = FALSE,
+            plotDvScale = FALSE,
             postHoc = NULL,
             postHocCorr = list(
                 "bonf"),
             eDesc = FALSE,
-            plotError = "ci",
+            plotError = "none",
             ciWidth = 95,
             simpleVariable = NULL,
             simpleModerator = NULL,
@@ -152,6 +154,14 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "plotSepPlots",
                 plotSepPlots,
                 default=NULL)
+            private$..plotRaw <- jmvcore::OptionBool$new(
+                "plotRaw",
+                plotRaw,
+                default=FALSE)
+            private$..plotDvScale <- jmvcore::OptionBool$new(
+                "plotDvScale",
+                plotDvScale,
+                default=FALSE)
             private$..postHoc <- jmvcore::OptionTerms$new(
                 "postHoc",
                 postHoc,
@@ -176,7 +186,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "none",
                     "ci",
                     "se"),
-                default="ci")
+                default="none")
             private$..ciWidth <- jmvcore::OptionNumber$new(
                 "ciWidth",
                 ciWidth,
@@ -211,6 +221,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
             self$.addOption(private$..plotSepPlots)
+            self$.addOption(private$..plotRaw)
+            self$.addOption(private$..plotDvScale)
             self$.addOption(private$..postHoc)
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..eDesc)
@@ -236,6 +248,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
         plotSepPlots = function() private$..plotSepPlots$value,
+        plotRaw = function() private$..plotRaw$value,
+        plotDvScale = function() private$..plotDvScale$value,
         postHoc = function() private$..postHoc$value,
         postHocCorr = function() private$..postHocCorr$value,
         eDesc = function() private$..eDesc$value,
@@ -260,6 +274,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..plotHAxis = NA,
         ..plotSepLines = NA,
         ..plotSepPlots = NA,
+        ..plotRaw = NA,
+        ..plotDvScale = NA,
         ..postHoc = NA,
         ..postHocCorr = NA,
         ..eDesc = NA,
@@ -273,26 +289,36 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
 gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
-        info = function() private$.items[["info"]],
-        main = function() private$.items[["main"]],
-        estimates = function() private$.items[["estimates"]],
-        contrasts = function() private$.items[["contrasts"]],
-        simpleEffectsAnovas = function() private$.items[["simpleEffectsAnovas"]],
-        simpleEffects = function() private$.items[["simpleEffects"]],
+        info = function() private$..info,
+        main = function() private$..main,
+        estimates = function() private$..estimates,
+        contrasts = function() private$..contrasts,
+        simpleEffectsAnovas = function() private$..simpleEffectsAnovas,
+        simpleEffects = function() private$..simpleEffects,
         model = function() private$..model,
-        postHoc = function() private$.items[["postHoc"]],
-        emeansTables = function() private$.items[["emeansTables"]],
-        descPlot = function() private$.items[["descPlot"]],
-        descPlots = function() private$.items[["descPlots"]]),
+        postHoc = function() private$..postHoc,
+        emeansTables = function() private$..emeansTables,
+        descPlot = function() private$..descPlot,
+        descPlots = function() private$..descPlots),
     private = list(
-        ..model = NA),
+        ..info = NA,
+        ..main = NA,
+        ..estimates = NA,
+        ..contrasts = NA,
+        ..simpleEffectsAnovas = NA,
+        ..simpleEffects = NA,
+        ..model = NA,
+        ..postHoc = NA,
+        ..emeansTables = NA,
+        ..descPlot = NA,
+        ..descPlots = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="Generalized Linear Models")
-            self$add(jmvcore::Table$new(
+            private$..info <- jmvcore::Table$new(
                 options=options,
                 name="info",
                 title="Model Info",
@@ -314,8 +340,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "factors",
                     "cov",
                     "modelTerms",
-                    "modelSelection")))
-            self$add(jmvcore::Table$new(
+                    "modelSelection"))
+            private$..main <- jmvcore::Table$new(
                 options=options,
                 name="main",
                 title="Analysis of Deviance: Omnibus Tests",
@@ -340,8 +366,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="p", 
                         `title`="p", 
                         `type`="number", 
-                        `format`="zto,pvalue"))))
-            self$add(jmvcore::Table$new(
+                        `format`="zto,pvalue")))
+            private$..estimates <- jmvcore::Table$new(
                 options=options,
                 name="estimates",
                 title="Model Coefficients (Parameter Estimates)",
@@ -397,8 +423,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="p", 
                         `title`="p", 
                         `type`="number", 
-                        `format`="zto,pvalue"))))
-            self$add(jmvcore::Array$new(
+                        `format`="zto,pvalue")))
+            private$..contrasts <- jmvcore::Array$new(
                 options=options,
                 name="contrasts",
                 title="Contrasts Coding",
@@ -422,8 +448,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="groups", 
                             `title`="Groups to levels", 
-                            `type`="text")))))
-            self$add(jmvcore::Array$new(
+                            `type`="text"))))
+            private$..simpleEffectsAnovas <- jmvcore::Array$new(
                 options=options,
                 name="simpleEffectsAnovas",
                 title="Simple Effects Analysis of Deviance",
@@ -457,8 +483,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue")))))
-            self$add(jmvcore::Array$new(
+                            `format`="zto,pvalue"))))
+            private$..simpleEffects <- jmvcore::Array$new(
                 options=options,
                 name="simpleEffects",
                 title="Simple Effects Parameters",
@@ -506,9 +532,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue")))))
+                            `format`="zto,pvalue"))))
             private$..model <- NULL
-            self$add(jmvcore::Array$new(
+            private$..postHoc <- jmvcore::Array$new(
                 options=options,
                 name="postHoc",
                 title="Post Hoc Tests",
@@ -560,8 +586,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(postHocCorr:holm)")))))
-            self$add(jmvcore::Array$new(
+                            `visible`="(postHocCorr:holm)"))))
+            private$..emeansTables <- jmvcore::Array$new(
                 options=options,
                 name="emeansTables",
                 title="Estimated Marginal Means",
@@ -594,8 +620,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="upper", 
                             `title`="Upper", 
-                            `type`="number")))))
-            self$add(jmvcore::Image$new(
+                            `type`="number"))))
+            private$..descPlot <- jmvcore::Image$new(
                 options=options,
                 name="descPlot",
                 title="Effects Plots",
@@ -611,8 +637,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "plotError",
                     "ciWidth",
                     "scaling",
-                    "modelTerms")))
-            self$add(jmvcore::Array$new(
+                    "modelTerms",
+                    "plotRaw"))
+            private$..descPlots <- jmvcore::Array$new(
                 options=options,
                 name="descPlots",
                 title="Results Plots",
@@ -629,7 +656,19 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotError",
                         "ciWidth",
                         "scaling",
-                        "modelTerms"))))},
+                        "modelTerms",
+                        "plotRaw",
+                        "plotDvScale")))
+            self$add(private$..info)
+            self$add(private$..main)
+            self$add(private$..estimates)
+            self$add(private$..contrasts)
+            self$add(private$..simpleEffectsAnovas)
+            self$add(private$..simpleEffects)
+            self$add(private$..postHoc)
+            self$add(private$..emeansTables)
+            self$add(private$..descPlot)
+            self$add(private$..descPlots)},
         .setModel=function(x) private$..model <- x))
 
 gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -713,6 +752,10 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   lines on the plot 
 #' @param plotSepPlots a string naming the variable to separate over to form 
 #'   multiple plots 
+#' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive 
+#'   statistics 
+#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), provide 
+#'   descriptive statistics 
 #' @param postHoc a list of terms to perform post-hoc tests on
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or 
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections 
@@ -768,11 +811,13 @@ gamljGzlm <- function(
     plotHAxis = NULL,
     plotSepLines = NULL,
     plotSepPlots = NULL,
+    plotRaw = FALSE,
+    plotDvScale = FALSE,
     postHoc = NULL,
     postHocCorr = list(
                 "bonf"),
     eDesc = FALSE,
-    plotError = "ci",
+    plotError = "none",
     ciWidth = 95,
     simpleVariable = NULL,
     simpleModerator = NULL,
@@ -797,6 +842,8 @@ gamljGzlm <- function(
         plotHAxis = plotHAxis,
         plotSepLines = plotSepLines,
         plotSepPlots = plotSepPlots,
+        plotRaw = plotRaw,
+        plotDvScale = plotDvScale,
         postHoc = postHoc,
         postHocCorr = postHocCorr,
         eDesc = eDesc,

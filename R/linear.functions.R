@@ -164,6 +164,8 @@
   as.numeric(var)
 }
 
+
+
 # This is a crazy piece of software to extract labels of contrasts and
 # merge them to the names of the terms of a summary.lm(). Before thinking
 # that it is too elaborated, please consider that this would attach the right
@@ -366,8 +368,7 @@ lf.dependencies<-function(model,term,modelTerms,what) {
    else if (.term.develop(term)<length(modelTerms))
        return(paste(what,"covariates",sep="."))
   FALSE
-  }
-
+}
 
 lf.meansTables<-function(model,terms) {
     
@@ -385,3 +386,4 @@ lf.meansTables<-function(model,terms) {
     }
   tables
 }
+

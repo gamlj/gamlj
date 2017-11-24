@@ -222,6 +222,19 @@ options:
           R: >
             a string naming the variable to separate over to form multiple plots
 
+    - name: plotRaw
+      title: Observed scores
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+
+    - name: plotDvScale
+      title: Y-axis observed range 
+      type: Bool
+      default: false
+
     - name: postHoc
       title: Post Hoc Tests
       type: Terms
@@ -231,7 +244,7 @@ options:
 
     - name: postHocCorr
       title: Correction
-      type: List
+      type: NMXList
       options:
           - name: none
             title: No correction
@@ -239,7 +252,8 @@ options:
             title: Bonferroni
           - name: holm
             title: Holm
-      default: bonf
+      default:
+          - bonf
       description:
           R: >
             one or more of `'none'`,  `'bonf'`, or

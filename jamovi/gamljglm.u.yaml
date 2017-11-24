@@ -75,7 +75,6 @@ children:
             format: number
             inputPattern: '[0-9]+'
             enable: (showParamsCI)
-
   - type: CollapseBox
     label: Model
     collapsed: true
@@ -107,7 +106,6 @@ children:
         children:
           - type: ComboBox
             name: ss
-
   - type: CollapseBox
     label: Assumption Checks
     collapsed: true
@@ -146,7 +144,6 @@ children:
         name: showContrasts
       - type: CheckBox
         name: showContrastsTable
-            
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -217,7 +214,6 @@ children:
                 type: CheckBox
                 optionPart: holm
                 optionName: postHocCorr
-
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -249,32 +245,45 @@ children:
                 name: plotSepPlots
                 isTarget: true
                 maxItemCount: 1
-      - type: Label
-        label: Display
+      - type: LayoutBox
+        margin: large
+        style: inline
         children:
-          - type: RadioButton
-            name: errBarDef_none
-            optionName: plotError
-            optionPart: none
-          - type: RadioButton
-            name: errBarDef_ci
-            optionName: plotError
-            optionPart: ci
-            children:
-              - type: TextBox
-                name: ciWidth
-                label: Interval
-                suffix: '%'
-                format: number
-                inputPattern: '[0-9]+'
-                enable: (errBarDef_ci)
-          - type: LayoutBox
-            margin: large
-            children:
-               - name: plotError_se
-                 type: RadioButton
-                 optionName: plotError
-                 optionPart: se
+             - type: Label
+               label: Display
+               children:
+                             - type: RadioButton
+                               name: errBarDef_none
+                               optionName: plotError
+                               optionPart: none
+                             - type: RadioButton
+                               name: errBarDef_ci
+                               optionName: plotError
+                               optionPart: ci
+                               children:
+                                  - type: TextBox
+                                    name: ciWidth
+                                    label: Interval
+                                    suffix: '%'
+                                    format: number
+                                    inputPattern: '[0-9]+'
+                                    enable: (errBarDef_ci)
+                             - name: plotError_se
+                               type: RadioButton
+                               optionName: plotError
+                               optionPart: se
+                
+             - type: Label
+               label: Plot
+               children:
+                             - type: CheckBox
+                               name: plotRaw
+                             - type: CheckBox
+                               name: plotDvScale
+
+
+
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -306,15 +315,13 @@ children:
                 name: simple3way
                 isTarget: true
                 maxItemCount: 1
-
-
   - type: CollapseBox
     label: Means Tables
     collapsed: true
     stretchFactor: 1
     children:
-        - type: Label
-          label: Display
-          children:
-           - type: CheckBox
-             name: eDesc
+      - type: Label
+        label: Display
+        children:
+          - type: CheckBox
+            name: eDesc

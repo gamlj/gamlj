@@ -14,3 +14,4 @@ withr::with_libpaths(new = instdir, install_github("rvlenth/emmeans"))
 #jmvtools::check()
 jmvtools::install()
     
+  
