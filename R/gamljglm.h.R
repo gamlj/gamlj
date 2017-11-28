@@ -309,36 +309,26 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
 gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
-        main = function() private$..main,
-        estimates = function() private$..estimates,
-        contrasts = function() private$..contrasts,
-        simpleEffectsAnovas = function() private$..simpleEffectsAnovas,
-        simpleEffects = function() private$..simpleEffects,
+        main = function() private$.items[["main"]],
+        estimates = function() private$.items[["estimates"]],
+        contrasts = function() private$.items[["contrasts"]],
+        simpleEffectsAnovas = function() private$.items[["simpleEffectsAnovas"]],
+        simpleEffects = function() private$.items[["simpleEffects"]],
         model = function() private$..model,
-        assump = function() private$..assump,
-        postHoc = function() private$..postHoc,
-        emeansTables = function() private$..emeansTables,
-        descPlot = function() private$..descPlot,
-        descPlots = function() private$..descPlots),
+        assump = function() private$.items[["assump"]],
+        postHoc = function() private$.items[["postHoc"]],
+        emeansTables = function() private$.items[["emeansTables"]],
+        descPlot = function() private$.items[["descPlot"]],
+        descPlots = function() private$.items[["descPlots"]]),
     private = list(
-        ..main = NA,
-        ..estimates = NA,
-        ..contrasts = NA,
-        ..simpleEffectsAnovas = NA,
-        ..simpleEffects = NA,
-        ..model = NA,
-        ..assump = NA,
-        ..postHoc = NA,
-        ..emeansTables = NA,
-        ..descPlot = NA,
-        ..descPlots = NA),
+        ..model = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="General Linear Model")
-            private$..main <- jmvcore::Table$new(
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="main",
                 title="ANOVA",
@@ -389,8 +379,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="\u03C9\u00B2", 
                         `type`="number", 
                         `visible`="(effectSize:omega)", 
-                        `format`="zto")))
-            private$..estimates <- jmvcore::Table$new(
+                        `format`="zto"))))
+            self$add(jmvcore::Table$new(
                 options=options,
                 name="estimates",
                 title="Model Coefficients (Parameter Estimates)",
@@ -440,8 +430,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="beta", 
                         `title`="Beta", 
                         `type`="number", 
-                        `visible`="(effectSize:beta)")))
-            private$..contrasts <- jmvcore::Array$new(
+                        `visible`="(effectSize:beta)"))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="contrasts",
                 title="Contrasts Coding",
@@ -465,8 +455,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="groups", 
                             `title`="Groups to levels", 
-                            `type`="text"))))
-            private$..simpleEffectsAnovas <- jmvcore::Array$new(
+                            `type`="text")))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleEffectsAnovas",
                 title="Simple Effects ANOVA",
@@ -504,8 +494,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue"))))
-            private$..simpleEffects <- jmvcore::Array$new(
+                            `format`="zto,pvalue")))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleEffects",
                 title="Simple Effects Parameters",
@@ -543,23 +533,21 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue"))))
+                            `format`="zto,pvalue")))))
             private$..model <- NULL
-            private$..assump <- R6::R6Class(
+            self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    homo = function() private$..homo,
-                    qq = function() private$..qq),
-                private = list(
-                    ..homo = NA,
-                    ..qq = NA),
+                    homo = function() private$.items[["homo"]],
+                    qq = function() private$.items[["qq"]]),
+                private = list(),
                 public=list(
                     initialize=function(options) {
                         super$initialize(
                             options=options,
                             name="assump",
                             title="Assumption Checks")
-                        private$..homo <- jmvcore::Table$new(
+                        self$add(jmvcore::Table$new(
                             options=options,
                             name="homo",
                             title="Test for Homogeneity of Residual Variances (Levene's)",
@@ -578,8 +566,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 list(
                                     `name`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue")))
-                        private$..qq <- jmvcore::Image$new(
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Image$new(
                             options=options,
                             name="qq",
                             title="Q-Q Plot",
@@ -590,10 +578,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms"))
-                        self$add(private$..homo)
-                        self$add(private$..qq)}))$new(options=options)
-            private$..postHoc <- jmvcore::Array$new(
+                                "modelTerms")))}))$new(options=options))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="postHoc",
                 title="Post Hoc Tests",
@@ -645,8 +631,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `title`="p<sub>Tukey</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(postHocCorr:tukey)"))))
-            private$..emeansTables <- jmvcore::Array$new(
+                            `visible`="(postHocCorr:tukey)")))))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="emeansTables",
                 title="Estimated Marginal Means",
@@ -677,8 +663,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="upper", 
                             `title`="Upper", 
-                            `type`="number"))))
-            private$..descPlot <- jmvcore::Image$new(
+                            `type`="number")))))
+            self$add(jmvcore::Image$new(
                 options=options,
                 name="descPlot",
                 title="Effects Plots",
@@ -696,8 +682,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "scaling",
                     "modelTerms",
                     "plotRaw",
-                    "plotDvScale"))
-            private$..descPlots <- jmvcore::Array$new(
+                    "plotDvScale")))
+            self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
                 title="Results Plots",
@@ -715,17 +701,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "ciWidth",
                         "scaling",
                         "modelTerms",
-                        "plotRaw")))
-            self$add(private$..main)
-            self$add(private$..estimates)
-            self$add(private$..contrasts)
-            self$add(private$..simpleEffectsAnovas)
-            self$add(private$..simpleEffects)
-            self$add(private$..assump)
-            self$add(private$..postHoc)
-            self$add(private$..emeansTables)
-            self$add(private$..descPlot)
-            self$add(private$..descPlots)},
+                        "plotRaw"))))},
         .setModel=function(x) private$..model <- x))
 
 gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(

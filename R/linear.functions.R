@@ -309,7 +309,9 @@
         if (is.numeric(level)) 
             level<-round(level,digits=2)
         ss$level<-paste(moderator,level,sep=" at ")
-        ss$variable<-rownames(ss)
+        if (!("variable" %in% names(ss)))
+              ss$variable<-rownames(ss)
+        
         as.data.frame(ss,stringsAsFactors=F)
 }
 

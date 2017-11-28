@@ -71,6 +71,8 @@ gamljGzlmClass <- R6::R6Class(
         data <- private$.cleanData()
         if (!is.data.frame(data))
             reject(data)
+        # update info table based on data
+        mi.update(infoTable,modelType,data,dep)
         
         anovaTable      <- self$results$main
         postHocTables   <- self$results$postHoc
@@ -105,6 +107,7 @@ gamljGzlmClass <- R6::R6Class(
            formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
            terms<-colnames(model.matrix(formula,data))  
            labels<-.getFormulaContrastsLabels(self$options$contrasts,formula,data) 
+           print(labels)
            ciWidth<-self$options$paramCIWidth
            estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
@@ -162,8 +165,8 @@ gamljGzlmClass <- R6::R6Class(
                nrows<-modlevels*xlevels  
                div<-0.1
                if (afamily=="multinomial") {
+                    div<-nrows
                     nrows<-modlevels*xlevels*(length(levels(data[[dep]]))-1)
-                    div<-(length(levels(data[[dep]]))-1)
                }
                # create the tables with right rows
                simpleEffectsTables<-self$results$simpleEffects
@@ -338,6 +341,7 @@ gamljGzlmClass <- R6::R6Class(
           istart<-1
         }
         
+        
         ldata <- data[,term]
         ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -345,7 +349,6 @@ gamljGzlmClass <- R6::R6Class(
         grid <- as.data.frame(grid,stringsAsFactors=F)
         for (i in seq_len(ncol(grid))) {
           colName <- colnames(grid)[[i]]
-          colName<-paste0("c",i)
           mTable$addColumn(name=colName, title=term[i], index=i+istart)
         }
         
@@ -446,9 +449,8 @@ gamljGzlmClass <- R6::R6Class(
                tableData$pbonf<-bonferroni[,6]
                tableData$pholm<-holm[,6]
             }
-            print(tableData)
             .labs<-sapply(tableData$contrast, function(a) {
-              strsplit(a,"[/,]")
+              strsplit(a,"[-/,]")
             })
             labs<-do.call("rbind",.labs)   
             colnames(labs)<-paste0("c",1:ncol(labs))
@@ -467,21 +469,15 @@ gamljGzlmClass <- R6::R6Class(
   if (self$options$eDesc) {
     meanTables<-self$results$emeansTables
     tables<-lf.meansTables(model,terms)  
-    
     for (table in tables)  {
       key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
       mTable<-meanTables$get(key=key)
-      
-      if (isError(table)) {
-        mTable$setNote("noemms",WARNS["means.noemms"])
-      } else {
       for (i in seq_len(nrow(table))) {
         values<-as.data.frame(table[i,])
         mTable$setRow(rowNo=i,values)
       }
       note<-attr(table,"note")
       if (!is.null(note)) mTable$setNote(note,WARNS[note])
-      }
     }
   } # end of eDesc              
   
@@ -644,62 +640,70 @@ gamljGzlmClass <- R6::R6Class(
       }
       
     },
-    .prepareDescPlots=function(model) {
+
+.prepareDescPlots=function(model) {
   
-      depName <- self$options$dep
-      groupName <- self$options$plotHAxis
-      
-      if (length(depName) == 0 || length(groupName) == 0)
-        return()
-      
-      linesName <- self$options$plotSepLines
-      plotsName <- self$options$plotSepPlots
-      errorBarType <- self$options$plotError
-      modelType <- self$options$modelSelection
-      plotRaw<-self$options$plotRaw
-      
-      
-      
-      if (modelType=="multinomial") {
-          errorBarType="none"
-          plotRaw=FALSE
-          
-      }
-      if (plotRaw==TRUE)
-          rawData=lp.rawData(model,depName,groupName,linesName)
-      else 
-          rawData<-NULL
-      
-      predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
-      yAxisRange <- lp.range(model,depName,predData,rawData)
-      
-      if (is.null(plotsName)) {
-          image <- self$results$get('descPlot')
-          image$setState(list(data=predData, raw=rawData, range=yAxisRange))
-         
-          if (modelType=="multinomial" && !is.null(linesName)) {
-               n<-length(levels(predData[,"lines"]))
-               image$setSize(500,(250*n))
-           }
-      } else {
-          images <- self$results$descPlots
-          i<-1
+  depName <- self$options$dep
+  groupName <- self$options$plotHAxis
+  
+  if (length(depName) == 0 || length(groupName) == 0)
+    return()
+  
+  linesName <- self$options$plotSepLines
+  plotsName <- self$options$plotSepPlots
+  errorBarType <- self$options$plotError
+  optionRaw<-self$options$plotRaw
+  optionRange<-self$options$plotDvScale
+  referToData<-(optionRaw || optionRange)
+  modelType <- self$options$modelSelection
+  ciWidth   <- self$options$ciWidth
+  
+  if (referToData)
+    rawData=lp.rawData(model,depName,groupName,linesName)
+  else 
+    rawData<-NULL
+  
+  predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType,ciWidth)
+  yAxisRange <- lp.range(model,depName,predData,rawData)
+  
+  if (!optionRaw)
+    rawData<-NULL
+  
+  
+  if (is.null(plotsName)) {
+    image <- self$results$get('descPlot')
+    image$setState(list(data=predData, raw=rawData, range=yAxisRange))
+    if (modelType=="multinomial" && !is.null(linesName)) {
+      n<-length(levels(predData[,"plots"]))
+      image$setSize(500,(250*n))
+    }
+    
+  } else {
+    images <- self$results$descPlots
+    i<-1
+    if (modelType=="multinomial" && !is.null(linesName)) 
+          levels<-levels(predData$plots2)
+    else
           levels<-levels(predData$plots)
-        
-          for (key in images$itemKeys) {
-               real<-levels[i]
-               i<-i+1
-               image <- images$get(key=key)
-               image$setState(list(data=subset(predData,plots==real), raw=rawData, range=yAxisRange))
-               if (modelType=="multinomial" && !is.null(linesName)) {
-                   n<-length(levels(predData[["lines"]]))
-                   image$setSize(500,(250*n))
-                    }
-          
-           }
-        }
-      
-    },
+    for (key in images$itemKeys) {
+      real<-levels[i]
+      i<-i+1
+      image <- images$get(key=key)
+ 
+      if (modelType=="multinomial" && !is.null(linesName)) {
+        n<-length(levels(predData[["plots"]]))
+        image$setSize(500,(250*n))
+        plotData=subset(predData,plots2==real)
+      } else 
+        plotData=subset(predData,plots==real)
+
+      image$setState(list(data=plotData,raw=rawData, range=yAxisRange))
+    }
+  }
+  
+},
+
+
     .descPlot=function(image, ggtheme, theme, ...) {
          library(ggplot2)
          if (is.null(image$state))
@@ -710,14 +714,14 @@ gamljGzlmClass <- R6::R6Class(
          linesName <- self$options$plotSepLines
          plotsName <- self$options$plotSepPlots
          errorType <- self$options$plotError
-         ciWidth   <- self$options$ciWidth
          modelType <- self$options$modelSelection
+         ciWidth   <- self$options$ciWidth
          
          if (errorType=="ci")
              errorType<-paste0(ciWidth,"% ",toupper(errorType))
          
          if (modelType=="multinomial")
-                   p<-lp.linesMultiPlot(image$state$data,ggtheme,depName,groupName,linesName)
+                   p<-lp.linesMultiPlot(image,ggtheme,depName,groupName,linesName,errorType=errorType)
          else  if ( ! is.null(linesName)) {
                    p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
                } else {

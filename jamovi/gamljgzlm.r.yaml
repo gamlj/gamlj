@@ -61,8 +61,9 @@ items:
       clearWith:
         - dep
         - modelTerms
-        - scaling:type
-        - contrasts:type
+        - scaling
+        - contrasts
+        - expb
       columns:
         - name: dep
           title: "Response Groups"

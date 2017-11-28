@@ -254,6 +254,30 @@ children:
         style: inline
         children:
           - type: Label
+            label: Display
+            children:
+                             - type: RadioButton
+                               name: errBarDef_none
+                               optionName: plotError
+                               optionPart: none
+                             - type: RadioButton
+                               name: errBarDef_ci
+                               optionName: plotError
+                               optionPart: ci
+                               children:
+                                  - type: TextBox
+                                    name: ciWidth
+                                    label: Interval
+                                    suffix: '%'
+                                    format: number
+                                    inputPattern: '[0-9]+'
+                                    enable: (errBarDef_ci)
+                             - name: plotError_se
+                               type: RadioButton
+                               optionName: plotError
+                               optionPart: se
+        
+          - type: Label
             label: Plot
             children:
               - type: CheckBox

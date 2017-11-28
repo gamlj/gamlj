@@ -410,9 +410,10 @@ gamljGLMClass <- R6::R6Class(
       tableData$pbonf<-bonferroni[,6]
       tableData$pholm<-holm[,6]
       tableData$ptukey<-tukey[,6]
-      }
+    }
+     print(tableData)
       .labs<-sapply(tableData$contrast, function(a) {
-         strsplit(a,"[-,]")
+         strsplit(a,"[-/,]")
          })
       labs<-do.call("rbind",.labs)   
       colnames(labs)<-paste0("c",1:ncol(labs))
@@ -621,6 +622,7 @@ gamljGLMClass <- R6::R6Class(
   optionRaw<-self$options$plotRaw
   optionRange<-self$options$plotDvScale
   referToData<-(optionRaw || optionRange)
+  ciWidth   <- self$options$ciWidth
   
   
   if (referToData)
@@ -628,7 +630,7 @@ gamljGLMClass <- R6::R6Class(
   else 
       rawData<-NULL
   
-  predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+  predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType, ciWidth)
   yAxisRange <- lp.range(model,depName,predData,rawData)
   
   if (!optionRaw)

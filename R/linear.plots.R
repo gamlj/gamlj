@@ -6,9 +6,8 @@
 #### the legend name and the function assumes that the data contains "lwr" and "upr" varianbles
 #### "theme" is passed from jmv plot function
 
-.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none") {
-
-  if (errorType != 'none') {
+.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none",title=NULL) {
+    if (errorType != 'none') {
     dodge <- ggplot2::position_dodge(0.2)
     clabel<-paste(linesName, paste0("(",toupper(errorType),")"),sep="\n")
   }
@@ -18,7 +17,7 @@
     dodge <- ggplot2::position_dodge(0)
   }
    
-
+    
     p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=lines)) +
        geom_line(size=.8, position=dodge) +
        labs(x=groupName, y=depName, colour=clabel) +
@@ -39,6 +38,8 @@
      p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
    }
     
+    if (!is.null(title))
+      p<-p+ ggtitle(title)
     
  p   
 }
@@ -84,21 +85,13 @@
 
 .linesPlot<-function(data,theme,depName,groupName,title=NULL) {
   
-  data$plots<-NULL
-  data$lines<-NULL
-  pnames<-names(data)[-1]
-  levs<-gsub("fit.","",pnames)
-  data$id<-seq_len(length(data$group))
-  long<-reshape(data,varying=pnames,idvar="id",direction = "long",v.names = "fit")
-  long$time<-factor(long$time)
-  levels(long$time)<-levs
   depLabs<-paste(depName,"category",sep="\n")
   yLab<-paste("prob. of",depName,"category")
   dodge <- ggplot2::position_dodge(0)
-  p <- ggplot2::ggplot(data=long, aes(x=group, y=fit, group=time,colour=time)) +
+  p <- ggplot2::ggplot(data=long, aes(x=group, y=fit, group=dep,colour=dep)) +
     geom_line(size=.8, position=dodge)+
     scale_y_continuous(limits=c(0,1)) 
-  if (is.factor(long$group)) 
+  if (is.factor(data$group)) 
     p <- p + geom_point(shape=21, fill='white', size=3, position=dodge)
   
   p<-p+labs(x=groupName, y=yLab, colour=depLabs)   
@@ -108,22 +101,26 @@
 }
 
 
-lp.linesMultiPlot<-function(data,theme,depName,groupName,linesName=NULL) {
+lp.linesMultiPlot<-function(image,theme,depName,groupName,linesName=NULL,errorType="none",title=NULL) {
   
+  data<-image$state$data
+  depLabs<-paste("Prob.",depName,"categories")
   if (!is.null(linesName)) {
     plots<-list()
-    levels<-levels(data[["lines"]])
+    levels<-levels(data[["plots"]])
     for (level in levels) {
-      sdata<-subset(data,lines==level)
-      sdata$lines<-NULL
+      sdata<-subset(data,plots==level)
+      sdata$plots<-NULL
       title<-paste(linesName,"=",level)
-      aplot<-.linesPlot(sdata,theme,depName,groupName,title = title)        
+      image$setState(list(data=sdata,range=c(0,1)))
+      aplot<-.twoWaysPlot(image,theme,depLabs,groupName,depName,errorType=errorType,title = title)
       aplot<-aplot+theme
       plots[[level]]<-aplot
     }
-    return(do.call(gridExtra::grid.arrange,plots))
+    thegrid<-do.call(gridExtra::grid.arrange,plots)
+    return(thegrid)
   } else
-    return(.linesPlot(data,theme,depName,groupName))
+    return(.twoWaysPlot(image,theme,depLabs,groupName,depName,errorType=errorType))
 }
 
 ###### gives the appropriated range of the plot  ############
@@ -160,64 +157,110 @@ lp.range<- function(x,...) UseMethod(".range")
        
 ##### This function prepares the plot predicted data #########
 
+lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
 
-lp.preparePlotData=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none") {
-  
+.lp.preparePlotData.default=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none",ciwidth=95) {
+
   selected<-c(groupName,linesName,plotsName)  
-  vars<-all.vars(terms(model))[-1]
+  nsel<-length(selected)
+  varnames<-c("group","lines","plots")[1:nsel]
   data<-mf.getModelData(model)  
-  ll<-list()
-  for (v in vars) {
-    if (is.factor(data[,v])) 
-      ll[v]<-list(levels(data[,v]))
-    else {
-      if (v %in% selected) {
-        if (v==groupName)
-          ll[v]<-list(seq(min(data[,v]),max(data[,v]),length.out=100))
-        else
-          ll[v]<-list(c(-1,0,1)*sd(data[,v])+mean(data[,v]))
-      }
-      else 
-        ll[v]<-list(0)
-    }
+  covs<-NULL
+  FUN=list(TRUE)  
+  if (!is.factor(data[[groupName]])) {
+    FUN[[groupName]]<-function(x)  pretty(x,25) 
+  } 
+  if (!is.null(linesName) && !is.factor(data[[linesName]])) {
+    FUN[[linesName]]<-function(x)  c(mean(x)+sd(x),mean(x),mean(x)-sd(x))
+    covs<-linesName
+    covslevels<-c("-SD","Mean","+SD")
+  } 
+  if (!is.null(plotsName) && !is.factor(data[[plotsName]])) {
+    FUN[[plotsName]]<-function(x)  c(mean(x)+sd(x),mean(x),mean(x)-sd(x))
+    covs<-c(covs,plotsName)
+    covslevels<-c("-SD","Mean","+SD")
+  } 
+
+  term<-c(groupName,linesName)
+  cilevel<-ciwidth/100
+  ss<-try({
+      mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=FUN,type="response",options=list(level=cilevel))
+      summary(mm)
+  })
+  if (isError(ss)) {
+    print("problems with emmeans in plot data")
   }
-  eg<-expand.grid(ll)
-  for (v in mf.getModelFactors(model)) {
-    eg[,v]<-factor(eg[,v])
-    contrasts(eg[,v])<-contrasts(data[,v])
+  ssdf<-as.data.frame(ss)
+  for (aname in covs) {
+       ssdf[[aname]]<-factor(ssdf[[aname]])
+       levels(ssdf[[aname]])<-covslevels
   }
-  mm<-mf.predict(model,eg,bars)
-  pnames<-names(mm)
-  dm<-as.data.frame(cbind(mm,eg))
-  names(dm)<-c(names(mm),names(eg))
-  if (length(selected)==1) 
-    by<-list(dm[,selected])
-  else 
-    by<-dm[,selected]
+  names(ssdf)<-c(varnames,c("fit","SE","df","lwr","upr"))  
+  if (bars=="se") {
+    ssdf$lwr<-ssdf$fit-ssdf$SE
+    ssdf$upr<-ssdf$fit+ssdf$SE
+  }
+
+  if ("glm" %in% class(model) && "binomial" %in% family(model)["family"]) {
+  ssdf$lwr<-ifelse(ssdf$lwr<0,0,ssdf$lwr)
+  ssdf$lwr<-ifelse(ssdf$lwr>1,1,ssdf$lwr)
+  ssdf$upr<-ifelse(ssdf$upr<0,0,ssdf$upr)
+  ssdf$upr<-ifelse(ssdf$upr>1,1,ssdf$upr)
+  }
+  return(ssdf)
+}
+
+.lp.preparePlotData.multinom=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none",ciwidth=95) {
   
-  #     what<-"fit"
-  what<-pnames
-  if (bars!="none")
-    what<-c("fit","lwr","upr")
-  dm<-aggregate(dm[,what],by,mean)
-  if (is.null(linesName))
-    lnames<-c("group","plots")
-  else
-    lnames<-c("group","lines","plots")
   
-  names(dm)<-c(lnames[1:length(selected)],what)
+  depName<-names(attr(terms(model),"dataClass"))[1]
+  selected<-c(depName,groupName,linesName,plotsName)  
+  nsel<-length(selected)
+  varnames<-c("group","lines","plots","plots2")[1:nsel]
+  data<-mf.getModelData(model)  
+  covs<-NULL
+  FUN=list()
+  if (!is.factor(data[[groupName]])) {
+    FUN[[groupName]]<-function(x)  pretty(x,25) 
+  } 
+  if (!is.null(linesName) && !is.factor(data[[linesName]])) {
+    FUN[[linesName]]<-function(x)  c(mean(x)+sd(x),mean(x),mean(x)-sd(x))
+    covs<-linesName
+    covslevels<-c("-SD","Mean","+SD")
+  } 
+  if (!is.null(plotsName) && !is.factor(data[[plotsName]])) {
+    FUN[[plotsName]]<-function(x)  c(mean(x)+sd(x),mean(x),mean(x)-sd(x))
+    covs<-c(covs,plotsName)
+    covslevels<-c("-SD","Mean","+SD")
+  } 
   
-  if (!is.null(dm$plots) & !is.factor(data[,plotsName])) {
-    dm$plots<-factor(dm$plots)
-    levels(dm$plots)<-c("-SD","Mean","+SD")
+  term<-c(depName,groupName,linesName)
+  cilevel<-ciwidth/100
+  ss<-try({
+    mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=FUN,type="response",options=list(level=cilevel))
+    summary(mm)
+  })
+  if (isError(ss)) {
+    print("problems with emmeans in plot data")
+  }
+  ssdf<-as.data.frame(ss)
+  for (aname in covs) {
+    ssdf[[aname]]<-factor(ssdf[[aname]])
+    levels(ssdf[[aname]])<-covslevels
+  }
+  names(ssdf)<-c(varnames,c("fit","SE","df","lwr","upr"))  
+  if (bars=="se") {
+    ssdf$lwr<-ssdf$fit-ssdf$SE
+    ssdf$upr<-ssdf$fit+ssdf$SE
   }
   
-  if (!is.null(dm$lines) & !is.factor(data[,linesName])) {
-    dm$lines<-factor(dm$lines)
-    levels(dm$lines)<-c("-SD","Mean","+SD")
-  }
-  dm
-} # end of .preparePlotData()
+    ssdf$lwr<-ifelse(ssdf$lwr<0,0,ssdf$lwr)
+    ssdf$lwr<-ifelse(ssdf$lwr>1,1,ssdf$lwr)
+    ssdf$upr<-ifelse(ssdf$upr<0,0,ssdf$upr)
+    ssdf$upr<-ifelse(ssdf$upr>1,1,ssdf$upr)
+    return(ssdf)
+}
+
 
 ###### gives the raw date for the plot  ############
 
