@@ -248,12 +248,10 @@ children:
                 name: errBarDef_none
                 optionName: plotError
                 optionPart: none
-                enable: '(!modelSelection:multinomial)'
               - type: RadioButton
                 name: errBarDef_ci
                 optionName: plotError
                 optionPart: ci
-                enable: '(!modelSelection:multinomial)'
                 children:
                   - type: TextBox
                     name: ciWidth
@@ -261,12 +259,10 @@ children:
                     suffix: '%'
                     format: number
                     inputPattern: '[0-9]+'
-                    enable: '(errBarDef_ci && !modelSelection:multinomial)'
               - name: plotError_se
                 type: RadioButton
                 optionName: plotError
                 optionPart: se
-                enable: '(!modelSelection:multinomial)'
           - type: Label
             label: Plot
             children:

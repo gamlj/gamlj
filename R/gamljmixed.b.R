@@ -521,7 +521,8 @@ gamljMixedClass <- R6::R6Class(
   
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
-  errorBarType="none"
+  errorBarType<-self$options$plotError
+  ciWidth   <- self$options$ciWidth
   optionRaw<-self$options$plotRaw
   optionRange<-self$options$plotDvScale
   referToData<-(optionRaw || optionRange)
@@ -532,7 +533,7 @@ gamljMixedClass <- R6::R6Class(
   else 
     rawData<-NULL
   
-  predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType)
+  predData<-lp.preparePlotData(model,groupName,linesName,plotsName,errorBarType,ciWidth)
   yAxisRange <- lp.range(model,depName,predData,rawData)
   
   if (!optionRaw)
@@ -566,8 +567,9 @@ gamljMixedClass <- R6::R6Class(
   groupName <- self$options$plotHAxis
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
-  errorType <- "none"
-  ciWidth   <- 0
+  errorType <- self$options$plotError
+  ciWidth   <- self$options$ciWidth
+  
   
   if (errorType=="ci")
     errorType<-paste0(ciWidth,"% ",toupper(errorType))

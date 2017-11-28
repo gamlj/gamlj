@@ -109,7 +109,7 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 
 
-#### those function are needed for simple effects and plots. They get a model as imput and gives back a function
+#### they are legacy now. Those function are needed for simple effects and plots. They get a model as imput and gives back a function
 #### to reestimate the same kind of model
 
 mf.estimate<-function(model) {
@@ -299,7 +299,7 @@ mf.checkData<-function(options,data,modelType) {
        ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))  
        if ( any(is.na(data[[dep]])) ) {
-          nice=paste0(toupper(substring(model,1,1)),substring(model,2,nchar(model)))
+          nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
           return(paste(nice,"model requires a numeric dependent variable"))
        }
                
@@ -386,7 +386,7 @@ mf.posthoc<- function(x,...) UseMethod(".posthoc")
   term<-as.formula(paste("~",term))
   data<-mf.getModelData(model)
   referenceGrid<-emmeans::emmeans(model, term,type = "response",data=data)
-  table<-summary(pairs(referenceGrid))
+  table<-summary(pairs(referenceGrid),adjust=adjust)
   table[order(table$contrast),]
 }
 
@@ -410,7 +410,7 @@ mf.means<- function(x,...) UseMethod(".means")
 .means.default<-function(model,term) {
   data=mf.getModelData(model)
   nvar<-length(term)
-  table<-emmeans::emmeans(model,term,transform = "response",data=data)
+  table<-emmeans::emmeans(model,term,type = "response",data=data)
   table<-as.data.frame(summary(table))
   ff<-paste0("c",1:nvar)
   colnames(table)<-c(ff,"lsmean","se","df","lower","upper")
@@ -429,7 +429,7 @@ mf.means<- function(x,...) UseMethod(".means")
   term<-jmvcore::composeTerm(term)
   terms<-paste(term,collapse = ":")
   tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  table<-emmeans::emmeans(model,tterm,transform = "response",data=data)
+  table<-emmeans::emmeans(model,tterm,type = "response",data=data)
   table<-as.data.frame(summary(table))
   ff<-paste0("c",1:nvar)
   colnames(table)<-c("dep",ff,"lsmean","se","df","lower","upper")

@@ -133,30 +133,43 @@ contrasts(dat$bfac)<-contr.sum(2)
 dat$groups3<-factor(dat$groups3)
 model<-glm(counts~groups3,data=dat,family = gaussian())
 
-model$family=="gaussian"
 
-model<-glm(dic~groups3*bfac,data=dat,family = binomial())
-term="group3"
-term<-jmvcore::composeTerm(term)
-referenceGrid<-emmeans::ref_grid(model, ~term,transform = "response")
-summary(pairs(referenceGrid))
-
-model$aic-(2*2)
-
+model<-glm(dic~bfac+x+w,data=dat,family = binomial())
+term=c("bfac")
+plotsName<-NULL
+mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=function(a) pretty(a))
 model0<-glm(counts~1,data=dat,family = poisson())
 r<-logLik(model0)
 1-(f/r)
 summary(model)
 ####### multinomial ########à
+dat<-read.csv("data/generalized.csv")
+dat$bfac<-factor(dat$bfac)
+dat$dic<-factor(dat$dic)
+contrasts(dat$dic)<-contr.sum(2)
+contrasts(dat$bfac)<-contr.sum(2)
+dat$groups3<-factor(dat$groups3)
+
+
 library(nnet)
 library(emmeans)
 names(dat)
 contrasts(dat$groups3)
 
-model<-multinom(bfac ~groups3+counts, data = dat, model = TRUE)
-model<-multinom(groups3 ~bfac+y, data = dat, model = TRUE)
+model<-multinom(groups3 ~dic+x+w, data = dat, model = TRUE)
 summary(model)
-car::Anova(model)
+term<-c("groups3", "dic")
+plotsName<-NULL
+FUN<-function(x) c(mean(x)-sd(x),mean(x)+sd(x))
+mm<-emmeans(model,term,by = plotsName,cov.reduce=FUN,type="response")
+mm
+
+qq<-emmeans::ref_grid(model,term)
+qq
+qq@grid
+summary(mm)
+dd<-as.data.frame(ss)
+simage<-list(state=list(data=dd))
 
 term<-"bfac"
 dep<-"groups3"

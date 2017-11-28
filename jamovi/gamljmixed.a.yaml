@@ -235,6 +235,36 @@ options:
       type: Bool
       default: false
 
+    - name: plotError
+      title: Error Bar Definition
+      type: List
+      options:
+        - name: none
+          title: None
+        - name: ci
+          title: Confidence intervals
+        - name: se
+          title: Standard Error
+      default: none
+      description:
+          R: >
+            `'none'`, `'ci'` (default), or `'se'`. Use no error
+            bars, use confidence intervals, or use standard errors on the
+            plots, respectively
+
+    - name: ciWidth
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width
+
+
+
     - name: postHoc
       title: Post Hoc Tests
       type: Terms
