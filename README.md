@@ -62,6 +62,12 @@ Please check out the  [troubleshooting page](https://mcfanda.github.io/gamlj_doc
 The modules installs dependencies automatically, but in some R installations the process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
 
 
+# Versions
+
+Please check out the  [release notes](https://mcfanda.github.io/gamlj_docs/release_notes.html). 
+
+
+
 ```
 package<-"pbkrtest"
 dirroot<-YOURCLONEFOLDER

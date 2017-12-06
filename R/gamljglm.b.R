@@ -195,7 +195,6 @@ gamljGLMClass <- R6::R6Class(
         self$results$.setModel(model)
         singular <- NULL
 
-
           results <- try({
             if (self$options$ss == '1') {
                ss<-stats::anova(model)
@@ -411,7 +410,6 @@ gamljGLMClass <- R6::R6Class(
       tableData$pholm<-holm[,6]
       tableData$ptukey<-tukey[,6]
     }
-     print(tableData)
       .labs<-sapply(tableData$contrast, function(a) {
          strsplit(a,"[-/,]")
          })

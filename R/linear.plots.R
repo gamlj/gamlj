@@ -128,32 +128,36 @@ lp.linesMultiPlot<-function(image,theme,depName,groupName,linesName=NULL,errorTy
 lp.range<- function(x,...) UseMethod(".range")
 
 .range.default<-function(model,depName,predictions,rawData=NULL) {
- 
+
   if (!is.null(rawData)) {
-    rawRange <- pretty(rawData[[depName]])
-    
+    rawRange <- pretty(rawData$y)
   } else {
-    
     rawRange<-NULL
-    rawData<-NULL
-    
   }
-  
+
   if ("lwr" %in% names(predictions))
        yAxisRange <- pretty(c(predictions$lwr, predictions$upr,rawRange))
   else 
        yAxisRange <- pretty(c(predictions$fit,rawRange))
-  
+
+
   return(yAxisRange)
 }
 
 .range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
 
-    if (model$family[1] %in% c("poisson","gaussian"))
+    if (model$family[1] %in% c("quasipoisson","poisson","gaussian"))
         return(.range.default(model,depName,predictions,rawData))
 
   return(c(0,1))
 }
+
+.range.negbin<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
+  
+    return(.range.default(model,depName,predictions,rawData))
+  
+}
+
        
 ##### This function prepares the plot predicted data #########
 
@@ -200,13 +204,17 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
     ssdf$lwr<-ssdf$fit-ssdf$SE
     ssdf$upr<-ssdf$fit+ssdf$SE
   }
-
-  if ("glm" %in% class(model) && "binomial" %in% family(model)["family"]) {
-  ssdf$lwr<-ifelse(ssdf$lwr<0,0,ssdf$lwr)
-  ssdf$lwr<-ifelse(ssdf$lwr>1,1,ssdf$lwr)
-  ssdf$upr<-ifelse(ssdf$upr<0,0,ssdf$upr)
-  ssdf$upr<-ifelse(ssdf$upr>1,1,ssdf$upr)
-  }
+  if (bars=="none") {
+    ssdf$lwr<-NULL
+    ssdf$upr<-NULL
+  } else
+       if ("glm" %in% class(model) && "binomial" %in% family(model)["family"]) {
+           ssdf$lwr<-ifelse(ssdf$lwr<0,0,ssdf$lwr)
+           ssdf$lwr<-ifelse(ssdf$lwr>1,1,ssdf$lwr)
+           ssdf$upr<-ifelse(ssdf$upr<0,0,ssdf$upr)
+           ssdf$upr<-ifelse(ssdf$upr>1,1,ssdf$upr)
+         }
+  
   return(ssdf)
 }
 
@@ -282,8 +290,6 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
 
 .rawData.glm<-function(model,depName,groupName,linesName=NULL) {
   
-  if (model$family[1] %in% c("poisson","gaussian"))
-    return(.rawData.default(model,depName,groupName,linesName))
   
   if (model$family[1] %in% c("binomial")) {
       data=mf.getModelData(model)
@@ -298,13 +304,14 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
   }
   
   
-  return(NULL)
+  return(.rawData.default(model,depName,groupName,linesName))
+  
   } 
 
 .rawData.multinom<-function(model,depName,groupName,linesName=NULL) {
     return(NULL)
    }
     
-  
+
 
 
