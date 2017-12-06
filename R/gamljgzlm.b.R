@@ -55,9 +55,13 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
         infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
         infoTable$addRow(rowKey="r2",list(info="R-squared",comm="Proportion of reduction of error"))
-        
         infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
         infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
+        infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
+        
+        if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
+             infoTable$addRow(rowKey="devdf",list(info="Value/DF",comm="Close to 1 is better"))
+        
         infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
         if ("note" %in% names(info))
            infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
@@ -107,7 +111,6 @@ gamljGzlmClass <- R6::R6Class(
            formula<-as.formula(jmvcore::constructFormula(dep, modelTerms))
            terms<-colnames(model.matrix(formula,data))  
            labels<-.getFormulaContrastsLabels(self$options$contrasts,formula,data) 
-           print(labels)
            ciWidth<-self$options$paramCIWidth
            estimatesTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            estimatesTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
@@ -253,6 +256,13 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=mf.getAIC(model)))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
+        infoTable$setRow(rowKey="resdf",list(value=mf.getResDf(model)))
+        if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
+             infoTable$setRow(rowKey="devdf",list(value=mf.getValueDf(model)))
+        if (modelType=="poiover") {
+          infoTable$setRow(rowKey="r2",list(comm="Not available for quasi-poisson"))
+          infoTable$setRow(rowKey="aic",list(comm="Not available for quasi-poisson"))
+        }
         infoTable$setRow(rowKey="conv",mi.converged(model))
         
         
@@ -586,6 +596,11 @@ gamljGzlmClass <- R6::R6Class(
           mod$call$formula<-form
           return(mod)
         }
+        if (modelType=="nb") {
+          mod<-MASS::glm.nb(form,data)
+          return(mod)
+        }
+        
         stats::glm(form,data,family=mf.give_family(modelType))
       },
 

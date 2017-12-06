@@ -287,6 +287,12 @@ mf.give_family<-function(modelSelection) {
     return(poisson())
   if (modelSelection=="multinomial")
     return("multinomial")
+  if (modelSelection=="nb")
+      return("nb")
+  if (modelSelection=="poiover")
+      return(quasipoisson())
+  if (modelSelection=="probit")
+    return(binomial("probit"))
   
   
   NULL  
@@ -298,21 +304,22 @@ mf.checkData<-function(options,data,modelType) {
      if (modelType %in% c("linear","mixed"))
        ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))  
+     
        if ( any(is.na(data[[dep]])) ) {
           nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
           return(paste(nice,"model requires a numeric dependent variable"))
        }
                
-     if  (modelType=="poisson") {
+     if  (modelType=="poisson" || modelType=="nb" || modelType=="poiover") {
          ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))
        if (any(data[[dep]]<0))
-             return("Poisson model requires all positive numbers in the dependent variable")
+             return("Poisson-like models require all positive numbers in the dependent variable")
      }
-      if (modelType=="logistic") {
+      if (modelType=="logistic" || modelType=="probit") {
           data[[dep]] <- factor(data[[dep]])
           if (length(levels(data[[dep]]))!=2)
-               return("Logistic model requires two levels in the dependent variable")
+               return(paste(modelType,"model requires two levels in the dependent variable"))
       } 
      if (modelType=="multinomial") {
             data[[dep]] <- factor(data[[dep]])
@@ -448,4 +455,24 @@ mf.getAIC<- function(x,...) UseMethod(".getAIC")
 
 .getAIC.multinom<-function(model)
     return(model$AIC)
+
+mf.getValueDf<- function(x,...) UseMethod(".getValueDf")
+
+.getValueDf.default<-function(model) {
+  value <- sum(residuals(model, type = "pearson")^2)
+  result <- value/model$df.residual
+  return(result)
+}
+.getValueDf.multinom<-function(model) {
+    return(NULL)
+}
+
+mf.getResDf<- function(x,...) UseMethod(".getResDf")
+
+.getResDf.default<-function(model) {
+  return(model$df.residual)
+}
+.getResDf.multinom<-function(model) {
+  return(model$edf)
+}
 

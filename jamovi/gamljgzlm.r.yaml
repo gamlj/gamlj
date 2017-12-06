@@ -94,7 +94,7 @@ items:
         - name: expb
           title: exp(B)
           type: number
-          visible: (expb)
+          visible: (expb && !modelSelection:probit)
 
         - name: z
           title: z
@@ -196,6 +196,8 @@ items:
           - name: expb
             title: exp(B)
             type: number
+            visible: (expb && !modelSelection:probit)
+
           - name: z
             title: z
             type: number

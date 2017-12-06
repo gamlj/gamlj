@@ -52,8 +52,15 @@ options:
           title: Linear
         - name: poisson
           title: Poisson
+        - name: poiover
+          title: Poisson (overdispersion)
+        - name : nb
+          title: Negative Binomial
         - name: logistic
           title: Logistic
+        - name: probit
+          title: Probit
+          
         - name: multinomial
           title: Multinomial
       default: linear
@@ -75,7 +82,7 @@ options:
             must be numeric
 
     - name: factors
-      title: Fixed Factors
+      title: Factors
       type: Variables
       permitted:
         - nominal

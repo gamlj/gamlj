@@ -5,76 +5,8 @@ dat$twogroups<-factor(dat$twogroups)
 dat$threegroups<-factor(dat$threegroups)
 contrasts(dat$twogroups)<-contr.sum(2)
 contrasts(dat$threegroups)<-contr.sum(3)
-names(dat)[2]<-"two groups"
 model<-lm(y~`two groups`+threegroups+`two groups`:threegroups+x*`two groups`,data=dat)
-mterms<-names(coef(model))
-modelmatrix<-model.matrix(model,data)
-(mlabs<-attr(terms(model),"term.label"))
-(conts<-attr(modelmatrix,"contrasts"))
-ndummy<-sapply(attr(model.matrix(model),"contrasts"),function(a) dim(a)[2])
-ndummy
-jmvcore::decomposeTerm("`c`:q")
-
-for (mlab in mlabs ) {
-   terms<-jmvcore::decomposeTerm(mlab)
-   for (term in terms) 
-     if (term %in% names(ndummy))
-         print(ndummy[term])
-}
-
-levs<-levels(dat$`two groups`)
-.contrastLabels(levs,"deviations")
-levs<-levels(dat$threegroups)
-.contrastLabels(levs,"deviations")
-for (term in mlabs) {
-   sterm<-strsplit(term,":",fixed = T)
-   for (s in sterm)
-      .contrastLabels(levels)
-   }
-ndummy
-
-jmvcore::composeTerm(c("a","b"))
-term<-jmvcore::composeTerm("two groups")
-term<-formula(paste("~",term))
-print(term)
-referenceGrid<-emmeans::emmeans(model, term,type = "response",)
-ss<-summary(pairs(referenceGrid))
-
-referenceGrid<-emmeans::emmeans(model, ~`two groups`,type = "response")
-
-
-summary(pairs(referenceGrid))
-
-bsLevels=list()
-for (i in seq_along(bs))
-  bsLevels[[bs[i]]] <- levels(dat[[bs[i]]])
-bsLevels
-combin <- expand.grid(bsLevels[rev(ph)])
-combin <- sapply(combin, as.character, simplify = 'matrix')
-nrow(combin)
-a<-NULL
-cbind(rep(combin[1,],nrow(combin)),combin)
-for(i in seq_len(nrow(combin)))
-    a<-rbind(a,(cbind(combin[i,],combin)))
-a
-unique(a)
-for (i in ncol(a):1)
-           a<-a[order((a[,i])),]
-unique(a)
-q<-expand.grid(levels(dat$threegroups),levels(dat$twogroups))
-do.call(expand.grid,as.list(q))
-for(i in seq_len(dim(q)[1]))
-   print(cbind(q[1,],q))
-do.call(expand.grid,a)
-referenceGrid<-emmeans::ref_grid(model, ~`twogroups`:`threegroups`,transform = "response")
-summary(pairs(referenceGrid))
-expand.grid(levels(dat$twogroups),levels(dat$threegroups))
-levs1<-levels(dat$threegroups)
-levs2<-levels(dat$twogroups)
-referenceGrid
-pairs(x = levs1)
-pairs()
-
+#### mixed ###########
 library(lmerTest)
 dat<-read.csv("data/dat3x2x2_mixed.csv")
 dat$cluster<-factor(dat$cluster)
@@ -84,44 +16,95 @@ contrasts(dat$wfac)<-contr.sum(2)
 model<-lmer(y~(1+x|cluster)+x,data=dat)
 summary(model)
 
-preds<-predict(model)
-library(ggplot2)
-preds<-cbind(preds,dat)
-cc<-coef(model)
-cc<-cc$cluster
-head(cc)
-ccl<-unique(dat$cluster)
-p <- ggplot(data=preds, aes(x=x, y=preds, group=factor(cluster))) +
-  geom_point(aes(colour=cluster))+
-  geom_abline(data = cc, aes(slope =x, intercept =`(Intercept)`,colour =ccl, alpha=ccl)) +
-  labs(x="groupName", y="depName") +
-  scale_y_continuous(limits=c(min(dat$y), max(dat$y))) +
-p
-iris$Petal.Width
-hist(dat$x)
-dat<-read.csv("inst/checdata.csv")
-dat$clu<-factor(dat$clu)
-dat$fac<-factor(dat$x)
-contrasts(dat$fac)<-contr.sum(2)/2
-dat$x<-dat$x/2
-#dat$y<-dat$y-mean(dat$y)
-model<-lmer(y~1+(1|clu)+(0+x|clu),data=dat)
-ranef(model)
-(cc<-coef(model))
-cor(cc$clu)
+
+################ count data poisson ############à
+
+dat<-read.csv("data/generalized.csv")
+names(dat)
+dat$bfac<-factor(dat$bfac)
+dat$dic<-factor(dat$dic)
+contrasts(dat$dic)<-contr.sum(2)
+contrasts(dat$bfac)<-contr.sum(2)
+dat$groups3<-factor(dat$groups3)
+contrasts(dat$groups3)<-contr.sum(3)
+table(dat$counts)
+library(jmvcore)
+library(emmeans )
+
+model<-glm(counts~x,data=dat,family = poisson(link = "log"))
 summary(model)
-tapply(dat$y-mean(dat$y),dat$clu,mean)
-model<-lmer(y~1+(1+fac|clu),data=dat)
-ranef(model)
-(cc<-coef(model))
-cor(cc$clu)
-cc$clu[2]-cc$clu[1]
+car::Anova(model,type=3)
+
+##### perfect poisson #####
+ n <- 10
+   #regression coefficients
+ beta0 <- 1
+ beta1 <- 0.2
+ #generate covariate values
+ x <- runif(n=n, min=0, max=1.5)
+ #compute mu's
+ mu <- exp(beta0 + beta1 * x)
+   #generate Y-values
+ y <- rpois(n=n, lambda=mu)
+   #data set
+ data <- data.frame(y=y, x=x)
+
+model<-glm(y~x,data=data,family = poisson())
+
+library(tweedie)
+library(statmod)
+
+model3<-glm(counts~x,data=dat,family =tweedie(var.power = 1))
+summary(model3)$dispersion
+
+AICtweedie(model,dispersion = 1)
+
+nobs(model)
+summary(model,dispersion = 1)
+car::Anova(model,type=3)
+emmeans(model,~bfac)
+library(MASS)
+model0<-glm(counts~x,data=dat,family =poisson())
+summary(model0)
+AIC(model0)
+AIC(model1)
+
+model1<-glm.nb(counts~x,data=dat,control=glm.control(maxit = 500))
+summary(model1)
+vuong(model0,model1)
+
+sd(model$residuals)
+class(model)
+summary(model)$dispersion
+summary.glm()
+model<-glm.nb(counts~w,data=dat)
+mean(dat$counts)
+sd(dat$counts)
+model$th.warn
+
+
+class(model)
+model$theta
+summary(model)
+car::Anova(model,type=3)
+mi.dispersion(model)
+
+model0<-glm(dic~bfac+x+w,data=dat,family = binomial())
 summary(model)
 
-model<-lmer(y~1+(1+fac|clu),data=dat)
-ranef(model)
-(cc<-coef(model))
-cor(cc$clu)
+model1<-glm(dic~bfac+x+w,data=dat,family = binomial("probit"))
+summary(model)
+
+q<-cbind(coef(model0),coef(model1))
+cbind(exp(q[,1]),coef(model1))
+
+term=c("bfac")
+plotsName<-NULL
+mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=function(a) pretty(a))
+
+model0<-glm(counts~1,data=dat,family = poisson())
+r<-logLik(model0)
+1-(f/r)
 summary(model)
 
 
@@ -132,17 +115,10 @@ contrasts(dat$dic)<-contr.sum(2)
 contrasts(dat$bfac)<-contr.sum(2)
 dat$groups3<-factor(dat$groups3)
 model<-glm(counts~groups3,data=dat,family = gaussian())
+model$df.residual
 
 
-model<-glm(dic~bfac+x+w,data=dat,family = binomial())
-term=c("bfac")
-plotsName<-NULL
-mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=function(a) pretty(a))
-model0<-glm(counts~1,data=dat,family = poisson())
-r<-logLik(model0)
-1-(f/r)
-summary(model)
-####### multinomial ########à
+####### multinomial ########
 dat<-read.csv("data/generalized.csv")
 dat$bfac<-factor(dat$bfac)
 dat$dic<-factor(dat$dic)
@@ -157,6 +133,9 @@ names(dat)
 contrasts(dat$groups3)
 
 model<-multinom(groups3 ~dic+x+w, data = dat, model = TRUE)
+model$residuals
+model$deviance
+model$edf
 summary(model)
 term<-c("groups3", "dic")
 plotsName<-NULL
@@ -204,6 +183,34 @@ model<-lm(y~x,data=dat)
 summary(model)
 contrasts(dat$fac3)
 
+########## gmlm #####################
+library(lmerTest)
+library(emmeans)
+hdp <- read.csv("https://stats.idre.ucla.edu/stat/data/hdp.csv")
+hdp <- within(hdp, {
+  Married <- factor(Married, levels = 0:1, labels = c("no", "yes"))
+  DID <- factor(DID)
+  HID <- factor(HID)
+})
+head(hdp)
+m <- glmer(remission ~ IL6 + CRP + CancerStage + LengthofStay + Experience +
+             (1 | DID), data = hdp, family = binomial, control = glmerControl(optimizer = "bobyqa"),
+           nAGQ = 10)
+m <- glmer(remission ~ CancerStage + (1 | DID), data = hdp, family = binomial, control = glmerControl(optimizer = "bobyqa"),
+           nAGQ = 10)
+
+summary(m)
+emmeans(m,~CancerStage)
+car::Anova(m,type=3)
+emm_s.t <- emmeans(m, ~ CancerStage, contr = "poly")
+test(emm_s.t,join=T)
+confint(m)
+class(m)
+
+
+a<-1:100
+b<--10:34
+pretty(c(a,b))
 
 
 

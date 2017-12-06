@@ -45,7 +45,10 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 options=list(
                     "linear",
                     "poisson",
+                    "poiover",
+                    "nb",
                     "logistic",
+                    "probit",
                     "multinomial"),
                 default="linear")
             private$..dep <- jmvcore::OptionVariable$new(
@@ -405,7 +408,7 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `name`="expb", 
                         `title`="exp(B)", 
                         `type`="number", 
-                        `visible`="(expb)"),
+                        `visible`="(expb && !modelSelection:probit)"),
                     list(
                         `name`="z", 
                         `title`="z", 
@@ -514,7 +517,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         list(
                             `name`="expb", 
                             `title`="exp(B)", 
-                            `type`="number"),
+                            `type`="number", 
+                            `visible`="(expb && !modelSelection:probit)"),
                         list(
                             `name`="z", 
                             `title`="z", 

@@ -12,9 +12,21 @@ MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
 MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
                          "link"=c("logit","Log of the odd of y=1 over y=0"),
                          "distribution"=c("Binomial","Dichotomous event distribution of y"))
+MINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
+                          "link"=c("probit","Inverse of normal CDF for P(y=1)"),
+                          "distribution"=c("Binomial","Dichotomous event distribution of y"))
+
 MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
                           "link"=c("logit","Log of the odd of each category over y=0"),
                           "distribution"=c("Multinomial","Multi-event distribution of y"))
+
+MINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
+                             "link"=c("log","Coefficients are in the log(y) scale"),
+                             "distribution"=c("Negative binomial","Rare event with overdispersion"))
+
+MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
+                    "link"=c("log","Coefficients are in the log(y) scale"),
+                    "distribution"=c("Quasi-Poisson","Rare event with overdispersion"))
 
 WARNS<-list()
 
