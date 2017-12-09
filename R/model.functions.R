@@ -423,7 +423,6 @@ mf.means<- function(x,...) UseMethod(".means")
   colnames(table)<-c(ff,"lsmean","se","df","lower","upper")
   for (f in ff)
     table[[f]]<-as.character(table[[f]])
-  table<-table[order(table$c1),]
   table
 }
 
