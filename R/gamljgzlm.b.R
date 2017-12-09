@@ -357,6 +357,7 @@ gamljGzlmClass <- R6::R6Class(
         ll$stringsAsFactors <- FALSE
         grid <- do.call(base::expand.grid, ll)
         grid <- as.data.frame(grid,stringsAsFactors=F)
+        print(grid)
         for (i in seq_len(ncol(grid))) {
           colName <- colnames(grid)[[i]]
           mTable$addColumn(name=colName, title=term[i], index=i+istart)
