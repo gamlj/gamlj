@@ -1,6 +1,6 @@
 .nicifyTerms<-function(term) {
   term<-gsub("`","",term,fixed = T)
-  gsub(":"," ✻ ",term)
+  gsub(":"," 	&#10045 ",term)
 }
 
 .getDummiesNames<-function(varname,data) {
