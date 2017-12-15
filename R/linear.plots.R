@@ -16,8 +16,6 @@
     clabel<-linesName
     dodge <- ggplot2::position_dodge(0)
   }
-   
-    
     p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=lines)) +
        geom_line(size=.8, position=dodge) +
        labs(x=groupName, y=depName, colour=clabel) +
@@ -224,7 +222,7 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
   depName<-names(attr(terms(model),"dataClass"))[1]
   selected<-c(depName,groupName,linesName,plotsName)  
   nsel<-length(selected)
-  varnames<-c("group","lines","plots","plots2")[1:nsel]
+  varnames<-c("lines","group","plots","plots2")[1:nsel]
   data<-mf.getModelData(model)  
   covs<-NULL
   FUN=list()
