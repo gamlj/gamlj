@@ -1,6 +1,7 @@
 .nicifyTerms<-function(term) {
-  term<-gsub("`","",term,fixed = T)
-  gsub(":"," 	&#10045 ",term)
+  term <- jmvcore::decomposeTerm(term)
+  term <- jmvcore::stringifyTerm(term)
+  term
 }
 
 .getDummiesNames<-function(varname,data) {
