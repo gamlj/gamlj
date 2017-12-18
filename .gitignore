@@ -11,7 +11,7 @@ temp/
 gamlj.jmo
 newversion.R
 problems/
-
+local/
 # Example code in package build process
 *-Ex.R
 
