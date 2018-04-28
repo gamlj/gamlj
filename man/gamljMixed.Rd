@@ -7,99 +7,114 @@
 gamljMixed(data, dep, factors = NULL, covs = NULL, cluster,
   randomTerms = NULL, correlatedEffects = TRUE, modelTerms = NULL,
   fixedIntercept = TRUE, reml = TRUE, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts, showContrastsTable = FALSE,
-  showContrasts = TRUE, scaling = NULL, plotHAxis = NULL,
-  plotSepLines = NULL, plotSepPlots = NULL, plotRaw = FALSE,
-  plotDvScale = FALSE, plotError = "none", ciWidth = 95, postHoc = NULL,
-  postHocCorr = list("bonf"), eDesc = FALSE, simpleVariable = NULL,
-  simpleModerator = NULL, simple3way = NULL)
+  paramCIWidth = 95, contrasts, showContrasts = TRUE, scaling = NULL,
+  plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
+  plotRaw = FALSE, plotDvScale = FALSE, plotError = "none",
+  ciWidth = 95, plotScale = "mean_sd", plotcvalue = 0,
+  plotpercvalue = 0, postHoc = NULL, postHocCorr = list("bonf"),
+  eDesc = FALSE, simpleVariable = NULL, simpleModerator = NULL,
+  simple3way = NULL, simpleScale = "mean_sd", cvalue = 0, percvalue = 0,
+  simpleScaleLabels = "labels")
 }
 \arguments{
 \item{data}{the data as a data frame}
 
-\item{dep}{a string naming the dependent variable from \code{data}, 
+\item{dep}{a string naming the dependent variable from \code{data},
 variable must be numeric}
 
-\item{factors}{a vector of strings naming the fixed factors from 
+\item{factors}{a vector of strings naming the fixed factors from
 \code{data}}
 
 \item{covs}{a vector of strings naming the covariates from \code{data}}
 
-\item{cluster}{a vector of strings naming the clustering variables from 
+\item{cluster}{a vector of strings naming the clustering variables from
 \code{data}}
 
-\item{randomTerms}{a list of character vectors describing random 
+\item{randomTerms}{a list of character vectors describing random
 coefficients that need to be computed}
 
-\item{correlatedEffects}{\code{TRUE} (default) or \code{FALSE} , include 
+\item{correlatedEffects}{\code{TRUE} (default) or \code{FALSE} , include
 correlated random effects}
 
-\item{modelTerms}{a list of character vectors describing fixed effects 
+\item{modelTerms}{a list of character vectors describing fixed effects
 terms}
 
-\item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates 
+\item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept}
 
-\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML 
+\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 be used}
 
-\item{showParamsCI}{\code{TRUE} or \code{FALSE} (default), parameters CI in 
+\item{showParamsCI}{\code{TRUE} or \code{FALSE} (default), parameters CI in
 table}
 
-\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying 
+\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
 
-\item{contrasts}{a list of lists specifying the factor and type of contrast 
-to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
+\item{contrasts}{a list of lists specifying the factor and type of contrast
+to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide 
+\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide
 definitions of the contrasts variables}
 
-\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide 
-definitions of the contrasts variables}
-
-\item{scaling}{a list of lists specifying the covariates scaling, one of 
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}. 
+\item{scaling}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
 
-\item{plotHAxis}{a string naming the variable placed on the horizontal axis 
+\item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
 
-\item{plotSepLines}{a string naming the variable represented as separate 
+\item{plotSepLines}{a string naming the variable represented as separate
 lines on the plot}
 
-\item{plotSepPlots}{a string naming the variable to separate over to form 
+\item{plotSepPlots}{a string naming the variable to separate over to form
 multiple plots}
 
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive 
+\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
 \item{plotDvScale}{.}
 
-\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
-no error bars, use confidence intervals, or use standard errors on the 
+\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+no error bars, use confidence intervals, or use standard errors on the
 plots, respectively}
 
-\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the 
+\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width}
+
+\item{plotScale}{\code{'mean_sd'} (default), \code{'custom'} , or
+\code{'custom_percent'}. Use to condition the covariates (if any)}
+
+\item{plotcvalue}{lower value for conditioning}
+
+\item{plotpercvalue}{lower value for conditioning}
 
 \item{postHoc}{a list of terms to perform post-hoc tests on}
 
-\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or 
-\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections 
+\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
+\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 respectively}
 
-\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans 
+\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
 statistics}
 
-\item{simpleVariable}{The variable for which the simple effects (slopes) 
+\item{simpleVariable}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simpleModerator}{the variable that provides the levels at which the 
+\item{simpleModerator}{the variable that provides the levels at which the
 simple effects computed}
 
 \item{simple3way}{a moderator of the two-way interaction which is probed}
+
+\item{simpleScale}{\code{'mean_sd'} (default), \code{'custom'} , or
+\code{'custom_percent'}. Use to condition the covariates (if any)}
+
+\item{cvalue}{offset value for conditioning}
+
+\item{percvalue}{offset value for conditioning}
+
+\item{simpleScaleLabels}{.}
 }
 \value{
 A results object containing:
@@ -107,12 +122,11 @@ A results object containing:
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
   \code{results$fixed} \tab \tab \tab \tab \tab a table \cr
-  \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
   \code{results$random} \tab \tab \tab \tab \tab a table \cr
   \code{results$randomCov} \tab \tab \tab \tab \tab a table \cr
   \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-  \code{results$simpleEffectsAnovas} \tab \tab \tab \tab \tab an array of simple Effects ANOVA tables \cr
-  \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
+  \code{results$simpleEffectsAnova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
+  \code{results$simpleEffectsParams} \tab \tab \tab \tab \tab a table \cr
   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr

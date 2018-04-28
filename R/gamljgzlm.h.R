@@ -38,7 +38,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 name='gamljGzlm',
                 requiresData=TRUE,
                 ...)
-        
+
             private$..modelSelection <- jmvcore::OptionList$new(
                 "modelSelection",
                 modelSelection,
@@ -208,7 +208,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "simple3way",
                 simple3way,
                 default=NULL)
-        
+
             self$.addOption(private$..modelSelection)
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -681,20 +681,20 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'
 #' @examples
 #' data('data3by2')
-#' 
+#'
 #' gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
-#' 
+#'
 #' #
-#' #  
+#' #
 #' #
 #' #  ANOVA
 #' #  -----------------------------------------------------------------------
 #' #                 Sum of Squares    df    Mean Square    F        p
 #' #  -----------------------------------------------------------------------
 #' #    x               115.19         1      115.19       20.07     < .001
-#' #    twogroups       31.36          1      31.36         5.46      0.021  
-#' #    x:twogroups     7.15          1       7.15         1.25      0.267  
-#' #    Residuals      551.13         96       5.74  
+#' #    twogroups       31.36          1      31.36         5.46      0.021
+#' #    x:twogroups     7.15          1       7.15         1.25      0.267
+#' #    Residuals      551.13         96       5.74
 #' #  -----------------------------------------------------------------------
 #' #
 #' #  _______________________________________________________________________
@@ -705,58 +705,58 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' #   x              0.596       0.133        4.48     < .001
 #' #   twogroups1    -0.574       0.245       -2.34      0.021
 #' #   x:twogroups1  -0.148       0.133       -1.12      0.267
-#' 
+#'
 #' @param data the data as a data frame
-#' @param modelSelection Select the generalized linear model: 
-#'   \code{linear},\code{poisson},\code{logistic},\code{multinomial} 
-#' @param dep a string naming the dependent variable from \code{data}, 
-#'   variable must be numeric 
-#' @param factors a vector of strings naming the fixed factors from 
+#' @param modelSelection Select the generalized linear model:
+#'   \code{linear},\code{poisson},\code{logistic},\code{multinomial}
+#' @param dep a string naming the dependent variable from \code{data},
+#'   variable must be numeric
+#' @param factors a vector of strings naming the fixed factors from
 #'   \code{data}
 #' @param covs a vector of strings naming the covariates from \code{data}
-#' @param modelTerms a list of character vectors describing the terms to go 
-#'   into the model 
-#' @param expb \code{TRUE} (default) or \code{FALSE} , show expB in table 
-#' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI 
-#'   in table 
-#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying 
-#'   the confidence interval width for the parameter estimates 
-#' @param contrasts a list of lists specifying the factor and type of contrast 
-#'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'} 
-#' @param showContrastsTable \code{TRUE} or \code{FALSE} (default), provide 
-#'   definitions of the contrasts variables 
-#' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide 
-#'   definitions of the contrasts variables 
-#' @param scaling a list of lists specifying the covariates scaling, one of 
-#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}. 
-#'   \code{'none'} leaves the variable as it is 
-#' @param plotHAxis a string naming the variable placed on the horizontal axis 
-#'   of the plot 
-#' @param plotSepLines a string naming the variable represented as separate 
-#'   lines on the plot 
-#' @param plotSepPlots a string naming the variable to separate over to form 
-#'   multiple plots 
-#' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive 
-#'   statistics 
-#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), provide 
-#'   descriptive statistics 
+#' @param modelTerms a list of character vectors describing the terms to go
+#'   into the model
+#' @param expb \code{TRUE} (default) or \code{FALSE} , show expB in table
+#' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
+#'   in table
+#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
+#'   the confidence interval width for the parameter estimates
+#' @param contrasts a list of lists specifying the factor and type of contrast
+#'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
+#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
+#' @param showContrastsTable \code{TRUE} or \code{FALSE} (default), provide
+#'   definitions of the contrasts variables
+#' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide
+#'   definitions of the contrasts variables
+#' @param scaling a list of lists specifying the covariates scaling, one of
+#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+#'   \code{'none'} leaves the variable as it is
+#' @param plotHAxis a string naming the variable placed on the horizontal axis
+#'   of the plot
+#' @param plotSepLines a string naming the variable represented as separate
+#'   lines on the plot
+#' @param plotSepPlots a string naming the variable to separate over to form
+#'   multiple plots
+#' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
+#'   statistics
+#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), provide
+#'   descriptive statistics
 #' @param postHoc a list of terms to perform post-hoc tests on
-#' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or 
-#'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections 
-#'   respectively 
-#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive 
-#'   statistics 
-#' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
-#'   no error bars, use confidence intervals, or use standard errors on the 
-#'   plots, respectively 
-#' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the 
-#'   confidence interval width 
-#' @param simpleVariable The variable for which the simple effects (slopes) 
-#'   are computed 
-#' @param simpleModerator the variable that provides the levels at which the 
-#'   simple effects computed 
-#' @param simple3way a moderator of the two-way interaction which is probed 
+#' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
+#'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
+#'   respectively
+#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive
+#'   statistics
+#' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+#'   no error bars, use confidence intervals, or use standard errors on the
+#'   plots, respectively
+#' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
+#'   confidence interval width
+#' @param simpleVariable The variable for which the simple effects (slopes)
+#'   are computed
+#' @param simpleModerator the variable that provides the levels at which the
+#'   simple effects computed
+#' @param simple3way a moderator of the two-way interaction which is probed
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr

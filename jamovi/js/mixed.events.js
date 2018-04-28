@@ -95,13 +95,6 @@ var calcModelTerms = function(ui, context) {
         }
     }
 
-    for (let i = 0; i < termsList.length; i++) {
-        if (termsList[i].length > 1 && containsCovariate(termsList[i], covariatesList)) {
-            termsList.splice(i, 1);
-            i -= 1;
-            termsChanged = true;
-        }
-    }
 
     for (var a = 0; a < diff.added.length; a++) {
         let item = diff.added[a];
@@ -219,7 +212,7 @@ var updateContrasts = function(ui, variableList, context) {
 };
 
 var updateScaling = function(ui, variableList, context) {
-    var currentList = context.cloneArray(ui.contrasts.value(), []);
+    var currentList = context.cloneArray(ui.scaling.value(), []);
 
     var list3 = [];
     for (let i = 0; i < variableList.length; i++) {

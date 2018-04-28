@@ -151,13 +151,6 @@ options:
             one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
             `'repeated'` or `'polynomial'`
 
-    - name: showContrastsTable
-      title: Contrasts definition table
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
     - name: showContrasts
       title: Contrasts in estimates table
       type: Bool
@@ -264,7 +257,6 @@ options:
             interval width
 
 
-
     - name: postHoc
       title: Post Hoc Tests
       type: Terms
@@ -324,6 +316,53 @@ options:
           R: >
             a moderator of the two-way interaction which is probed
 
+
+    - name: simpleScale
+      title: Covariates conditioning
+      type: List
+      options:
+        - name: mean_sd
+          title: Mean ± 1 SD
+        - name: mean_offset
+          title: Mean ± offset
+        - name: percent
+          title: "Percentiles (25,50,75)"
+        - name: percent_offset
+          title: Percentiles 50 ± offset 
+      default: mean_sd
+      description:
+          R: >
+            `'mean_sd'` (default), `'custom'` , or `'custom_percent'`. Use to condition the
+            covariates (if any)
+
+
+    - name: cvalue
+      type: Number
+      default: 0
+      description:
+          R: >
+            offset value for conditioning
+
+    - name: percvalue
+      type: Number
+      default: 0
+      min: 0
+      max: 50
+      description:
+          R: >
+            offset value for conditioning
+
+    - name: simpleScaleLabels
+      title: Moderators labeling
+      type: List
+      options:
+        - name: labels
+          title: Labels
+        - name: values
+          title: Values
+        - name: values_labels
+          title: Values + Labels
+      default: labels
 
 ...
 

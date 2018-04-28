@@ -6,62 +6,58 @@
 \usage{
 gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
   modelTerms = NULL, ss = "3", effectSize = NULL, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts = NULL, showContrastsTable = FALSE,
-  showContrasts = TRUE, scaling = NULL, plotHAxis = NULL,
-  plotSepLines = NULL, plotSepPlots = NULL, plotRaw = FALSE,
-  plotDvScale = FALSE, postHoc = NULL, postHocCorr = list("tukey"),
-  eDesc = FALSE, homo = FALSE, qq = FALSE, plotError = "ci",
-  ciWidth = 95, simpleVariable = NULL, simpleModerator = NULL,
-  simple3way = NULL)
+  paramCIWidth = 95, contrasts = NULL, showContrasts = TRUE,
+  scaling = NULL, plotHAxis = NULL, plotSepLines = NULL,
+  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
+  postHoc = NULL, postHocCorr = list("tukey"), eDesc = FALSE,
+  homo = FALSE, qq = FALSE, plotError = "ci", ciWidth = 95,
+  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL)
 }
 \arguments{
 \item{data}{the data as a data frame}
 
-\item{dep}{a string naming the dependent variable from \code{data}, 
+\item{dep}{a string naming the dependent variable from \code{data},
 variable must be numeric}
 
-\item{factors}{a vector of strings naming the fixed factors from 
+\item{factors}{a vector of strings naming the fixed factors from
 \code{data}}
 
 \item{covs}{a vector of strings naming the covariates from \code{data}}
 
-\item{modelTerms}{a list of character vectors describing the terms to go 
+\item{modelTerms}{a list of character vectors describing the terms to go
 into the model}
 
-\item{ss}{\code{'1'}, \code{'2'} or \code{'3'} (default), the sum of 
+\item{ss}{\code{'1'}, \code{'2'} or \code{'3'} (default), the sum of
 squares to use}
 
-\item{effectSize}{one or more of \code{'eta'}, \code{'partEta'}, or 
-\code{'omega'}; use eta², partial eta², and omega² effect sizes, 
+\item{effectSize}{one or more of \code{'eta'}, \code{'partEta'}, or
+\code{'omega'}; use eta², partial eta², and omega² effect sizes,
 respectively}
 
-\item{showParamsCI}{\code{TRUE} or \code{FALSE} (default), parameters CI in 
+\item{showParamsCI}{\code{TRUE} or \code{FALSE} (default), parameters CI in
 table}
 
-\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying 
+\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
 
-\item{contrasts}{a list of lists specifying the factor and type of contrast 
-to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
+\item{contrasts}{a list of lists specifying the factor and type of contrast
+to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide 
+\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide
 definitions of the contrasts variables}
 
-\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide 
-definitions of the contrasts variables}
-
-\item{scaling}{a list of lists specifying the covariates scaling, one of 
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}. 
+\item{scaling}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
 
-\item{plotHAxis}{a string naming the variable placed on the horizontal axis 
+\item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
 
-\item{plotSepLines}{a string naming the variable represented as separate 
+\item{plotSepLines}{a string naming the variable represented as separate
 lines on the plot}
 
-\item{plotSepPlots}{a string naming the variable to separate over to form 
+\item{plotSepPlots}{a string naming the variable to separate over to form
 multiple plots}
 
 \item{plotRaw}{.}
@@ -70,30 +66,30 @@ multiple plots}
 
 \item{postHoc}{a list of terms to perform post-hoc tests on}
 
-\item{postHocCorr}{one or more of \code{'none'}, \code{'tukey'}, 
-\code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey, 
+\item{postHocCorr}{one or more of \code{'none'}, \code{'tukey'},
+\code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey,
 Scheffe, Bonferroni, and Holm Post Hoc corrections respectively}
 
-\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide descriptive 
+\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
-\item{homo}{\code{TRUE} or \code{FALSE} (default), perform homogeneity 
+\item{homo}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
 tests}
 
-\item{qq}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of 
+\item{qq}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 residuals}
 
-\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
-no error bars, use confidence intervals, or use standard errors on the 
+\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+no error bars, use confidence intervals, or use standard errors on the
 plots, respectively}
 
-\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the 
+\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width}
 
-\item{simpleVariable}{The variable for which the simple effects (slopes) 
+\item{simpleVariable}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simpleModerator}{the variable that provides the levels at which the 
+\item{simpleModerator}{the variable that provides the levels at which the
 simple effects computed}
 
 \item{simple3way}{a moderator of the two-way interaction which is probed}
@@ -130,16 +126,16 @@ data('data3by2')
 gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
 
 #
-#  
+#
 #
 #  ANOVA
 #  -----------------------------------------------------------------------
 #                 Sum of Squares    df    Mean Square    F        p
 #  -----------------------------------------------------------------------
 #    x               115.19         1      115.19       20.07     < .001
-#    twogroups       31.36          1      31.36         5.46      0.021  
-#    x:twogroups     7.15          1       7.15         1.25      0.267  
-#    Residuals      551.13         96       5.74  
+#    twogroups       31.36          1      31.36         5.46      0.021
+#    x:twogroups     7.15          1       7.15         1.25      0.267
+#    Residuals      551.13         96       5.74
 #  -----------------------------------------------------------------------
 #
 #  _______________________________________________________________________

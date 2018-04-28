@@ -16,77 +16,77 @@ gamljGzlm(data, modelSelection = "linear", dep, factors = NULL,
 \arguments{
 \item{data}{the data as a data frame}
 
-\item{modelSelection}{Select the generalized linear model: 
+\item{modelSelection}{Select the generalized linear model:
 \code{linear},\code{poisson},\code{logistic},\code{multinomial}}
 
-\item{dep}{a string naming the dependent variable from \code{data}, 
+\item{dep}{a string naming the dependent variable from \code{data},
 variable must be numeric}
 
-\item{factors}{a vector of strings naming the fixed factors from 
+\item{factors}{a vector of strings naming the fixed factors from
 \code{data}}
 
 \item{covs}{a vector of strings naming the covariates from \code{data}}
 
-\item{modelTerms}{a list of character vectors describing the terms to go 
+\item{modelTerms}{a list of character vectors describing the terms to go
 into the model}
 
 \item{expb}{\code{TRUE} (default) or \code{FALSE} , show expB in table}
 
-\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI 
+\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
 
-\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying 
+\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
 
-\item{contrasts}{a list of lists specifying the factor and type of contrast 
-to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
+\item{contrasts}{a list of lists specifying the factor and type of contrast
+to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide 
+\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide
 definitions of the contrasts variables}
 
-\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide 
+\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide
 definitions of the contrasts variables}
 
-\item{scaling}{a list of lists specifying the covariates scaling, one of 
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}. 
+\item{scaling}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
 
-\item{plotHAxis}{a string naming the variable placed on the horizontal axis 
+\item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
 
-\item{plotSepLines}{a string naming the variable represented as separate 
+\item{plotSepLines}{a string naming the variable represented as separate
 lines on the plot}
 
-\item{plotSepPlots}{a string naming the variable to separate over to form 
+\item{plotSepPlots}{a string naming the variable to separate over to form
 multiple plots}
 
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive 
+\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
-\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), provide 
+\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), provide
 descriptive statistics}
 
 \item{postHoc}{a list of terms to perform post-hoc tests on}
 
-\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or 
-\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections 
+\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
+\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 respectively}
 
-\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide descriptive 
+\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
-\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
-no error bars, use confidence intervals, or use standard errors on the 
+\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+no error bars, use confidence intervals, or use standard errors on the
 plots, respectively}
 
-\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the 
+\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width}
 
-\item{simpleVariable}{The variable for which the simple effects (slopes) 
+\item{simpleVariable}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simpleModerator}{the variable that provides the levels at which the 
+\item{simpleModerator}{the variable that provides the levels at which the
 simple effects computed}
 
 \item{simple3way}{a moderator of the two-way interaction which is probed}
@@ -122,16 +122,16 @@ data('data3by2')
 gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
 
 #
-#  
+#
 #
 #  ANOVA
 #  -----------------------------------------------------------------------
 #                 Sum of Squares    df    Mean Square    F        p
 #  -----------------------------------------------------------------------
 #    x               115.19         1      115.19       20.07     < .001
-#    twogroups       31.36          1      31.36         5.46      0.021  
-#    x:twogroups     7.15          1       7.15         1.25      0.267  
-#    Residuals      551.13         96       5.74  
+#    twogroups       31.36          1      31.36         5.46      0.021
+#    x:twogroups     7.15          1       7.15         1.25      0.267
+#    Residuals      551.13         96       5.74
 #  -----------------------------------------------------------------------
 #
 #  _______________________________________________________________________

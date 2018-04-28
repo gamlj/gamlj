@@ -160,7 +160,8 @@ gamljGLMClass <- R6::R6Class(
       tables<-self$results$postHoc
       tables<-rf.initPostHoc(data,self$options, tables,modelType="linear")     
       # descriptives
-      private$.initMeanTables(data)
+      rf.initEMeans(data,self$options,self$results$emeansTables)
+      
       private$.initDescPlots(data)
     },
     .run=function() {
@@ -274,41 +275,7 @@ gamljGLMClass <- R6::R6Class(
     .estimate=function(form,data) {
        stats::lm(form,data)
      },
-     .initMeanTables=function(data) {
 
-       #### expected means ####
-       if (self$options$eDesc) {
-         emeansTables <- self$results$emeansTables
-         factorsAvailable <- self$options$factors
-         modelTerms<-private$.modelTerms()
-         if (length(factorsAvailable) == 0) 
-           return()
-         for (term in modelTerms)
-           if (all(term %in% factorsAvailable)) {
-             aTable<-emeansTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
-             aTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
-             aTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', 95))
-             
-             ldata <- data[,term]
-             ll <- sapply(term, function(a) base::levels(data[[a]]), simplify=F)
-             ll$stringsAsFactors <- FALSE
-             grid <- do.call(base::expand.grid, ll)
-             grid <- as.data.frame(grid,stringsAsFactors=F)
-             for (i in seq_len(ncol(grid))) {
-               colName <- colnames(grid)[[i]]
-               aTable$addColumn(name=colName, title=term[i], index=i)
-             }
-             for (rowNo in seq_len(nrow(grid))) {
-               row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
-               colnames(row)<-term
-               tableRow<-row
-               aTable$addRow(rowKey=row, values=tableRow)
-             }
-           }
-       } # end of  means
-       
-     },     
-           
     .initPostHoc=function(data) {
       
       bs <- self$options$factors

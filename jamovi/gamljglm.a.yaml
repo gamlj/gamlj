@@ -169,13 +169,7 @@ options:
             one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
             `'repeated'` or `'polynomial'`
 
-    - name: showContrastsTable
-      title: Contrasts definition table
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
+
     - name: showContrasts
       title: Contrasts in estimates table
       type: Bool
@@ -183,7 +177,6 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
-
 
     - name: scaling
       title: Covariates Scaling

@@ -73,3 +73,17 @@ mi.aliased<- function(x,...) UseMethod(".aliased")
   
 }
 
+
+
+mi.getDummiesNames<-function(varname,data) {
+  bname<-jmvcore::toB64(varname)
+  if (!(bname %in% names(data)))
+      return(varname)
+  if (is.factor(data[[bname]]))
+  {
+    paste(varname,1:length(levels(data[[bname]])[-1]),sep="")
+  } else 
+    varname
+}
+
+

@@ -26,7 +26,7 @@ items:
 
 
     - name: anova
-      title: Fixed Effect ANOVA
+      title: Fixed Effect Omnibus tests
       type: Table
       description: a table of ANOVA results
       clearWith:
@@ -36,7 +36,7 @@ items:
         - name: name
           title: ""
           type: text
-        - name: F
+        - name: test
           title: F
           type: number
         - name: df1
@@ -62,6 +62,7 @@ items:
         - cov
         - modelTerms
         - contrasts
+        - fixedIntercept
       columns:
         - name: source
           title: "Effect"
@@ -96,30 +97,6 @@ items:
           type: number
           format: zto,pvalue
 
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
-
 
 
     - name: random
@@ -135,6 +112,7 @@ items:
         - name: groups
           title: "Groups"
           type: text
+          combineBelow: true
         - name: name
           title: "Name"
           type: text
@@ -158,6 +136,8 @@ items:
       columns:
         - name: groups
           title: "Groups"
+          combineBelow: true
+
           type: text
         - name: name1
           title: "Param.1"
@@ -216,76 +196,91 @@ items:
 
 
 
-
-
-    - name: simpleEffectsAnovas
+    - name: simpleEffectsAnova
       title: Simple Effects ANOVA
-      type: Array
-      description: an array of simple Effects ANOVA tables
-      visible: (simpleVariable)
+      type: Table
+      description: a table of ANOVA for simple effects
+      visible: false
       clearWith:
         - dep
         - modelTerms
         - contrasts
         - scaling
-      template:
-        title: Simple Effecs  $key 
-        type: Table
-        columns:
-          - name: variable
-            title: "Effect"
-            type: text
-          - name: level
-            title: "Moderator Levels"
-            type: text
-          - name: df1
-            title: df Num
-            type: number
-          - name: df2
-            title: df Den
-            type: number
-          - name: test
-            title: F
-            type: number
-          - name: p
-            title: p
-            type: number
-            format: zto,pvalue
+        - fixedIntercept
+        - simpleScale
 
+      columns:
+        - name: threeway
+          title: ""
+          visible: (simple3way)
+          combineBelow: true
+        - name: moderator
+          title: ""
+          combineBelow: true
+        - name: F.ratio
+          title: F
+          type: number
+        - name: df1
+          title: Num df
+          type: number
+        - name: df2
+          title: Den df
+          type: number
+        - name: p.value
+          title: p
+          type: number
+          format: zto,pvalue
 
-    - name: simpleEffects
-      title: Simple Effects Parameters 
-      type: Array
-      description: an array of simple Effects tables
-      visible: (simpleVariable)
+    - name: simpleEffectsParams
+      title: Parameter Estimates for simple effects
+      type: Table
+      visible: false
       clearWith:
         - dep
+        - factors
+        - cluster
+        - cov
         - modelTerms
         - contrasts
-        - scaling
-      template:
-        title: Simple Effects 
-        type: Table
-        clearWith:
-        columns:
-          - name: variable
-            title: "Effect"
-            type: text
-          - name: level
-            title: "Moderator Level"
-            type: text
-          - name: estimate
-            title: "Estimate"
-          - name: se
-            title: SE
-            type: number
-          - name: t
-            title: t
-            type: number
-          - name: p
-            title: p
-            type: number
-            format: zto,pvalue
+        - fixedIntercept
+        - simpleScale
+      columns:
+        - name: threeway
+          title: " "
+          visible: (simple3way)
+          combineBelow: true
+        - name: moderator
+          title: " "
+          combineBelow: true
+        - name: contrast
+          title: "contrast"
+          visible: false
+          type: text
+        - name: estimate
+          title: "Estimate"
+          type: number
+        - name: SE
+          title: "SE"
+          type: number
+        - name: lower.CL
+          type: number
+          title: Lower
+          visible: (showParamsCI)
+        - name: upper.CL
+          type: number
+          title: Upper
+          visible: (showParamsCI)
+
+        - name: df
+          title: "df"
+          type: number
+        - name: t.ratio
+          title: "t"
+          type: number
+        - name: p.value
+          title: "p"
+          type: number
+          format: zto,pvalue
 
 
 
@@ -346,9 +341,11 @@ items:
         - plotError
         - ciWidth
         - scaling
-        - modelTerms
         - plotRaw
-
+        - plotDvScale
+        - fixedIntercept
+        - simpleScale
+        - simpleScaleLabels
     - name: descPlots
       title: Results Plots
       type: Array
@@ -367,6 +364,9 @@ items:
            - ciWidth
            - scaling
            - modelTerms
-
-
+           - fixedIntercept
+           - simpleScale
+           - simpleScaleLabels
+           - plotDvScale
+           - plotRaw
 

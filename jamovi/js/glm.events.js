@@ -194,7 +194,7 @@ var updateContrasts = function(ui, variableList, context) {
 };
 
 var updateScaling = function(ui, variableList, context) {
-    var currentList = context.cloneArray(ui.contrasts.value(), []);
+    var currentList = context.cloneArray(ui.scaling.value(), []);
 
     var list3 = [];
     for (let i = 0; i < variableList.length; i++) {

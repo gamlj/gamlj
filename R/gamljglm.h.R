@@ -15,7 +15,6 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             showParamsCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
-            showContrastsTable = FALSE,
             showContrasts = TRUE,
             scaling = NULL,
             plotHAxis = NULL,
@@ -40,7 +39,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 name='gamljGLM',
                 requiresData=TRUE,
                 ...)
-        
+
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
@@ -118,10 +117,6 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "helmert",
                                 "repeated",
                                 "polynomial")))))
-            private$..showContrastsTable <- jmvcore::OptionBool$new(
-                "showContrastsTable",
-                showContrastsTable,
-                default=FALSE)
             private$..showContrasts <- jmvcore::OptionBool$new(
                 "showContrasts",
                 showContrasts,
@@ -220,7 +215,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "simple3way",
                 simple3way,
                 default=NULL)
-        
+
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
@@ -230,7 +225,6 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
-            self$.addOption(private$..showContrastsTable)
             self$.addOption(private$..showContrasts)
             self$.addOption(private$..scaling)
             self$.addOption(private$..plotHAxis)
@@ -259,7 +253,6 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
-        showContrastsTable = function() private$..showContrastsTable$value,
         showContrasts = function() private$..showContrasts$value,
         scaling = function() private$..scaling$value,
         plotHAxis = function() private$..plotHAxis$value,
@@ -287,7 +280,6 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
-        ..showContrastsTable = NA,
         ..showContrasts = NA,
         ..scaling = NA,
         ..plotHAxis = NA,
@@ -730,20 +722,20 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'
 #' @examples
 #' data('data3by2')
-#' 
+#'
 #' gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
-#' 
+#'
 #' #
-#' #  
+#' #
 #' #
 #' #  ANOVA
 #' #  -----------------------------------------------------------------------
 #' #                 Sum of Squares    df    Mean Square    F        p
 #' #  -----------------------------------------------------------------------
 #' #    x               115.19         1      115.19       20.07     < .001
-#' #    twogroups       31.36          1      31.36         5.46      0.021  
-#' #    x:twogroups     7.15          1       7.15         1.25      0.267  
-#' #    Residuals      551.13         96       5.74  
+#' #    twogroups       31.36          1      31.36         5.46      0.021
+#' #    x:twogroups     7.15          1       7.15         1.25      0.267
+#' #    Residuals      551.13         96       5.74
 #' #  -----------------------------------------------------------------------
 #' #
 #' #  _______________________________________________________________________
@@ -754,62 +746,60 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' #   x              0.596       0.133        4.48     < .001
 #' #   twogroups1    -0.574       0.245       -2.34      0.021
 #' #   x:twogroups1  -0.148       0.133       -1.12      0.267
-#' 
+#'
 #' @param data the data as a data frame
-#' @param dep a string naming the dependent variable from \code{data}, 
-#'   variable must be numeric 
-#' @param factors a vector of strings naming the fixed factors from 
+#' @param dep a string naming the dependent variable from \code{data},
+#'   variable must be numeric
+#' @param factors a vector of strings naming the fixed factors from
 #'   \code{data}
 #' @param covs a vector of strings naming the covariates from \code{data}
-#' @param modelTerms a list of character vectors describing the terms to go 
-#'   into the model 
-#' @param ss \code{'1'}, \code{'2'} or \code{'3'} (default), the sum of 
-#'   squares to use 
-#' @param effectSize one or more of \code{'eta'}, \code{'partEta'}, or 
-#'   \code{'omega'}; use eta², partial eta², and omega² effect sizes, 
-#'   respectively 
-#' @param showParamsCI \code{TRUE} or \code{FALSE} (default), parameters CI in 
-#'   table 
-#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying 
-#'   the confidence interval width for the parameter estimates 
-#' @param contrasts a list of lists specifying the factor and type of contrast 
-#'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'} 
-#' @param showContrastsTable \code{TRUE} or \code{FALSE} (default), provide 
-#'   definitions of the contrasts variables 
-#' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide 
-#'   definitions of the contrasts variables 
-#' @param scaling a list of lists specifying the covariates scaling, one of 
-#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}. 
-#'   \code{'none'} leaves the variable as it is 
-#' @param plotHAxis a string naming the variable placed on the horizontal axis 
-#'   of the plot 
-#' @param plotSepLines a string naming the variable represented as separate 
-#'   lines on the plot 
-#' @param plotSepPlots a string naming the variable to separate over to form 
-#'   multiple plots 
+#' @param modelTerms a list of character vectors describing the terms to go
+#'   into the model
+#' @param ss \code{'1'}, \code{'2'} or \code{'3'} (default), the sum of
+#'   squares to use
+#' @param effectSize one or more of \code{'eta'}, \code{'partEta'}, or
+#'   \code{'omega'}; use eta², partial eta², and omega² effect sizes,
+#'   respectively
+#' @param showParamsCI \code{TRUE} or \code{FALSE} (default), parameters CI in
+#'   table
+#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
+#'   the confidence interval width for the parameter estimates
+#' @param contrasts a list of lists specifying the factor and type of contrast
+#'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
+#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
+#' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide
+#'   definitions of the contrasts variables
+#' @param scaling a list of lists specifying the covariates scaling, one of
+#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+#'   \code{'none'} leaves the variable as it is
+#' @param plotHAxis a string naming the variable placed on the horizontal axis
+#'   of the plot
+#' @param plotSepLines a string naming the variable represented as separate
+#'   lines on the plot
+#' @param plotSepPlots a string naming the variable to separate over to form
+#'   multiple plots
 #' @param plotRaw .
 #' @param plotDvScale .
 #' @param postHoc a list of terms to perform post-hoc tests on
-#' @param postHocCorr one or more of \code{'none'}, \code{'tukey'}, 
-#'   \code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey, 
-#'   Scheffe, Bonferroni, and Holm Post Hoc corrections respectively 
-#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive 
-#'   statistics 
-#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity 
-#'   tests 
-#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of 
-#'   residuals 
-#' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
-#'   no error bars, use confidence intervals, or use standard errors on the 
-#'   plots, respectively 
-#' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the 
-#'   confidence interval width 
-#' @param simpleVariable The variable for which the simple effects (slopes) 
-#'   are computed 
-#' @param simpleModerator the variable that provides the levels at which the 
-#'   simple effects computed 
-#' @param simple3way a moderator of the two-way interaction which is probed 
+#' @param postHocCorr one or more of \code{'none'}, \code{'tukey'},
+#'   \code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey,
+#'   Scheffe, Bonferroni, and Holm Post Hoc corrections respectively
+#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive
+#'   statistics
+#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#'   tests
+#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+#'   residuals
+#' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+#'   no error bars, use confidence intervals, or use standard errors on the
+#'   plots, respectively
+#' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
+#'   confidence interval width
+#' @param simpleVariable The variable for which the simple effects (slopes)
+#'   are computed
+#' @param simpleModerator the variable that provides the levels at which the
+#'   simple effects computed
+#' @param simple3way a moderator of the two-way interaction which is probed
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$main} \tab \tab \tab \tab \tab a table of ANOVA results \cr
@@ -844,7 +834,6 @@ gamljGLM <- function(
     showParamsCI = TRUE,
     paramCIWidth = 95,
     contrasts = NULL,
-    showContrastsTable = FALSE,
     showContrasts = TRUE,
     scaling = NULL,
     plotHAxis = NULL,
@@ -877,7 +866,6 @@ gamljGLM <- function(
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
-        showContrastsTable = showContrastsTable,
         showContrasts = showContrasts,
         scaling = scaling,
         plotHAxis = plotHAxis,

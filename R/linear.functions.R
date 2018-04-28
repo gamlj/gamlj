@@ -4,15 +4,6 @@
   term
 }
 
-.getDummiesNames<-function(varname,data) {
-  if (!(varname %in% names(data)))
-    return(varname)
-  if (is.factor(data[,varname]))
-  {
-    paste(varname,1:length(levels(data[,varname])[-1]),sep="")
-  } else 
-    varname
-}
 
 
 .scaleVariables=function(factors,covariates,data) {
@@ -23,12 +14,11 @@
   data
 }
 
-.createContrasts=function(levels, type) {
+lf.createContrasts=function(levels, type) {
   
   nLevels <- length(levels)
-  
+
   if (type == 'simple') {
-    
     dummy <- contr.treatment(levels)
     dimnames(dummy) <- NULL
     coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
@@ -79,77 +69,79 @@
         contrast[1, i] <- -1
       }
   }
-  
+  dimnames(contrast)<-list(NULL,paste0("_._._",1:(nLevels-1)))
   contrast
 }
 
-.contrastLabels=function(levels, type) {
-  
+lf.contrastLabels=function(levels, type) {
   nLevels <- length(levels)
   labels <- list()
-  
-  if (length(levels) <= 1) {
-    
-    # do nothing
-  } else if (type == 'simple') {
-    
-    for (i in seq_len(nLevels-1))
-      labels[[i]] <- paste(levels[i+1], '-', levels[1])
-    
-  } else if (type == 'dummy') {
 
+  if (type == 'simple') {
     for (i in seq_len(nLevels-1))
       labels[[i]] <- paste(levels[i+1], '-', levels[1])
-    
-  } else if (type == 'simple') {
-    
+      return(labels)
+  } 
+
+  if (type == 'dummy') {
     for (i in seq_len(nLevels-1))
       labels[[i]] <- paste(levels[i+1], '-', levels[1])
-    
-  } else if (type == 'deviation') {
-    
+    return(labels)
+  } 
+  
+  if (type == 'deviation') {
     all <- paste(levels, collapse=', ')
     for (i in seq_len(nLevels-1))
       labels[[i]] <- paste(levels[i+1], '- (', all,")")
+    return(labels)
     
-  } else if (type == 'difference') {
+  } 
+  
+  if (type == 'difference') {
     
     for (i in seq_len(nLevels-1)) {
       rhs <- paste0(levels[1:i], collapse=', ')
       if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
       labels[[i]] <- paste(levels[i + 1], '-', rhs)
     }
-    
-  } else if (type == 'helmert') {
+    return(labels)
+  }
+  
+  if (type == 'helmert') {
     
     for (i in seq_len(nLevels-1)) {
       rhs <- paste(levels[(i+1):nLevels], collapse=', ')
       if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
       labels[[i]] <- paste(levels[i], '-', rhs)
     }
+    return(labels)
+  }
+   
+     
     
-  } else if (type == 'repeated') {
+  if (type == 'repeated') {
     
     for (i in seq_len(nLevels-1))
       labels[[i]] <- paste(levels[i], '-', levels[i+1])
+    return(labels)
     
-  } else if (type == 'polynomial') {
-    
-    names <- c('linear', 'quadratic', 'cubic', 'quartic', 'quintic', 'sextic', 'septic', 'octic')
-    
-    for (i in seq_len(nLevels-1)) {
-      if (i <= length(names)) {
-        labels[[i]] <- names[i]
-      } else {
-        labels[[i]] <- paste('degree', i, 'polynomial')
-      }
-    }
-  } else {
+  } 
+     if (type == 'polynomial') {
+        names <- c('linear', 'quadratic', 'cubic', 'quartic', 'quintic', 'sextic', 'septic', 'octic')
+        for (i in seq_len(nLevels-1)) {
+            if (i <= length(names)) {
+               labels[[i]] <- names[i]
+           } else {
+               labels[[i]] <- paste('degree', i, 'polynomial')
+           }
+        }
+        return(labels)
+  }
+    mark("no contrast definition met")
     all <- paste(levels, collapse=', ')
     for (i in seq_len(nLevels-1))
       labels[[i]] <- paste(levels[i+1], '- (', all,")")
-  }
-  labels
+    return(labels)
 }
 
 .scaleContinuous<-function(var,method,by=NULL) {
@@ -175,9 +167,11 @@
 
 
 .getFormulaContrastsLabels<-function(contrasts,formula,data) {
+
   contrasts<-as.data.frame(do.call(rbind,contrasts))
   modelmatrix<-model.matrix(formula,data)
   facts<-names(attr(modelmatrix,"contrasts"))
+
   labels<-sapply(facts, function(varname) {
     if (varname %in% contrasts$var) {
       contrasttype<-contrasts[contrasts$var==varname,"type"]
@@ -189,6 +183,7 @@
     levels <- base::levels(var)
     .contrastLabels(levels, contrasttype)
   },simplify = F)
+  
   layout<-attr(terms.formula(formula),"term.labels")
   for (i in seq_along(layout))
      layout[i]<-gsub("`","",layout[i],fixed=T)
@@ -271,14 +266,14 @@
 .atSomeLevel<-function(model,moderator,level) {
 
     data<-mf.getModelData(model)
-    
-    if (is.factor(data[,moderator])) {
-          .levels<-levels(data[,moderator])
+    moderator64<-toB64(moderator)
+    if (is.factor(data[,moderator64])) {
+          .levels<-levels(data[,moderator64])
            index<-which(.levels==level,arr.ind = T)
            ### we need the moderator to be treatment to condition the other effect to its reference groups
-           contrasts(data[,moderator])<-contr.treatment(length(.levels),base=index)
+           contrasts(data[,moderator64])<-contr.treatment(length(.levels),base=index)
       } else {
-           data[,moderator]<-data[,moderator]-level
+           data[,moderator64]<-data[,moderator64]-level
       }
   
       form<-formula(model)
@@ -290,15 +285,17 @@
   ### get the parameters
   ##### understand how the dummies are named #####
        data<-mf.getModelData(model)
-       qvariable<-jmvcore::composeTerm(variable)
+       variable64<-toB64(variable)
+       qvariable<-jmvcore::composeTerm(variable64)
 
-        if (is.factor(data[[variable]])) {
-            varname<-paste(qvariable,seq_along(levels(data[,variable])),sep="")
+        if (is.factor(data[[variable64]])) {
+            varname<-paste(qvariable,seq_along(levels(data[,variable64])),sep="")
          }  else {
             varname<-qvariable
          }
   ##### get the summary of the model. This must be a ...
         ss<-mf.summary(model)
+        mark(ss)
         ##### extract only the estimates of the x-axis variable
         if ("variable" %in% names(ss))
              ss<-ss[ss$variable %in% varname,]
@@ -324,7 +321,7 @@
       return(FALSE)
   }
   ano<-mf.anova(model)
-  variable<-jmvcore::composeTerm(variable)
+  variable64<-toB64(jmvcore::composeTerm(variable))
   ano<-ano[rownames(ano)==variable,]
   if (is.numeric(level)) level<-round(level,digits=2)
   ano$level<-paste(moderator,level,sep=" at ")
@@ -347,8 +344,9 @@ lf.simpleEffects<-function(model,variable,moderator){
   
    
   data<-mf.getModelData(model)
-  
-  modvar<-data[,moderator]
+  moderator64<-toB64(moderator)
+
+  modvar<-data[,moderator64]
   if (is.factor(modvar)) {
     levels<-levels(modvar)
   } else {
@@ -360,6 +358,7 @@ lf.simpleEffects<-function(model,variable,moderator){
        model0<-.atSomeLevel(model,moderator,i)
        params<-rbind(params,.extractParameters(model0,variable,moderator,i))
        ftests<-rbind(ftests,.extractFtests(model0,variable,moderator,i))
+       
   }
   list(params,ftests)
 }
@@ -374,19 +373,25 @@ lf.dependencies<-function(model,term,modelTerms,what) {
 }
 
 lf.meansTables<-function(model,terms) {
-    
+  
   factorsAvailable<-mf.getModelFactors(model)
   tables<-list()
-  for (term in terms)
-    if (all(term %in% factorsAvailable)) {
-      table<-mf.means(model,term)
+  terms64<-toB64(terms)
+  for (term in terms) {
+    term64<-toB64(term)
+    if (all(term64 %in% factorsAvailable)) {
+      table<-mf.means(model,term64)
       attr(table,"title")<-term
-      depend<-lf.dependencies(model,term,terms,"means")
+      depend<-lf.dependencies(model,term64,terms64,"means")
       if (depend!=FALSE) {
         attr(table,"note")<-depend
       }
       tables[[length(tables)+1]]<-table
     }
+  }
   tables
 }
+
+
+
 

@@ -109,7 +109,7 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 
 
-#### they are legacy now. Those function are needed for simple effects and plots. They get a model as imput and gives back a function
+#### they are legacy now. Those function are not needed for simple effects and plots. They get a model as imput and gives back a function
 #### to reestimate the same kind of model
 
 mf.estimate<-function(model) {
@@ -132,7 +132,7 @@ mf.estimate<-function(model) {
   
 }
 
-############# produces summary in a somehow stadard format ##########
+############# produces summary in a somehow standard format ##########
 
 mf.summary<- function(x,...) UseMethod(".mf.summary")
 
@@ -155,15 +155,19 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
        ss<-as.data.frame(ss,stringsAsFactors = F)
        
       if (dim(ss)[2]==3) {
-          colnames(ss)<-c("estimate","se","t")
-          if (dim(ss)[1]==1)
+          ano<-car::Anova(model,test="F",type=3)
+          lnames<-rownames(ss)
+          matching<-which(lnames %in% rownames(ss))
+          ss$df<-NA
+          ss$df[matching]<-ano$Df.res[matching]
+          ss$p<-NA
+          ss$p[matching]<-ano$`Pr(>F)`[matching]
+          ss<-ss[,c(1,2,4,3,5)]          
+          if (any(is.null(ss$df)))
                attr(ss,"warning")<-"lmer.df"
-          else
-              attr(ss,"warning")<-"lmer.zerovariance"
       }
-       else
-          colnames(ss)<-c("estimate","se","df","t","p")
-       ss
+      colnames(ss)<-c("estimate","se","df","t","p")
+      ss
 }
 
 .mf.summary.glm<-function(model) {
@@ -221,43 +225,66 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 
-.anova.merModLmerTest<-function(model) {
+.anova.merModLmerTest<-function(model,df="Satterthwaite") {
+
+  ano<-lmerTest::anova(model,ddf=df)
+  if (dim(ano)[1]==0)
+    return(ano)
   
-  ano<-car::Anova(model,test="F",type=3, singular.ok=T)
-  colnames(ano)<-c("test","df1","df2","p")
-  ano
+  if (dim(ano)[2]==4) {
+    ano<-.car.anova(model,df)
+  } else {
+  ano<-ano[,c(5,3,4,6)]
+  attr(ano,"method")<-df
+  attr(ano,"statistic")<-"F"
+  }
+  if (!all(is.na(ano[,3])==F)) {
+    # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
+    # the factors. Here we try to fix it.
+    mark("lmerTest problems with df: try to fix it")
+    whichone<-is.na(ano[,3])
+    rn<-rownames(ano[whichone,])
+    smr<-lmerTest::summary(model,ddf=df)
+    coefz<-as.data.frame(smr$coefficients)
+    coefz<-coefz[rownames(smr$coefficients) %in% rn,3:5]
+
+    if (dim(coefz)[1]!=length(rn))
+      ano<-.car.anova(model,df)
+    else {
+        coefz<-data.frame(coefz)
+        
+        if (dim(coefz)[2]==1)
+        coefz<-as.data.frame(t(coefz))
+        rownames(coefz)<-rn
+        coefz[,2]<-coefz[,2]^2
+        coefz$df1<-1
+        coefz<-coefz[,c(2,4,1,3)]
+        ano[rownames(ano) %in% rownames(coefz),]<-coefz
+        attr(ano,"method")<-df
+        attr(ano,"statistic")<-"F"
+    }
+  }
+  # here we fix the column names depending on the estimation that succeeded
+  if (attr(ano,"statistic")=="Chisq")
+     names(ano)<-c("test","df1","p")
+  else 
+    names(ano)<-c("test","df1","df2","p")
+  
+  return(ano)
   
 }
 
-mf.lmeranova=function(model) {
-
-  if (.which.class(model)=="lmer") {   
-    
-  ano<-lmerTest::anova(model)
-  if (dim(ano)[1]==0)
-    return(ano)
-  if (dim(ano)[2]==4) {
-    print("lmer anava uses car::Anova")
-    ano<-car::Anova(model,type=3,test="F")
+.car.anova<-function(model,df) {
+  mark("lmerTest failed: anava uses car::Anova")
+  if (model@devcomp$dims["REML"]==0) 
+    test<-"Chisq"
+  else test<-"F"
+  ano<-car::Anova(model,type=3,test=test)
+  if (attr(terms(model),"intercept")==1)
     ano<-ano[-1,]
-    names(ano)<-c("F","df1","df2","p")
-    attr(ano,"method")<-"Kenward-Roger"
-    return(ano)
-  }
-  ano<-ano[,c(5,3,4,6)]
-  names(ano)<-c("F","df1","df2","p")
-  attr(ano,"method")<-"Satterthwaite"
-  if (!all(is.na(ano$df2)==F)) {
-    print("lmer anava uses car::Anova")
-    ano<-car::Anova(model,type=3,test="F")
-    ano<-ano[-1,]
-    names(ano)<-c("F","df1","df2","p")
-    attr(ano,"method")<-"Kenward-Roger"
-    return(ano)
-  }
-  
-  return(ano)
-  }
+  attr(ano,"method")<-"Kenward-Roger"
+  attr(ano,"statistic")<-test
+  ano
 }
 
 
@@ -299,7 +326,7 @@ mf.give_family<-function(modelSelection) {
 }
 
 mf.checkData<-function(options,data,modelType) {
-     dep=options$dep
+     dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
      if (modelType %in% c("linear","mixed"))
        ### here I need the dv to be really numeric
@@ -330,19 +357,21 @@ mf.checkData<-function(options,data,modelType) {
      covs=options$covs
      
      for (cov in covs) {
+       cov<-jmvcore::toB64(cov) 
        data[[cov]]<-as.numeric(as.character(data[[cov]]))
        if (any(is.na(data[[cov]])))
-          return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
+          return(paste("Covariate",jmvcore::fromB64(cov), "cannot be converted to a numeric variable"))
      }
      # check factors
      factors=options$factors
      
      for (factorName in factors) {
+       factorName<-jmvcore::toB64(factorName)
        lvls <- base::levels(data[[factorName]])
        if (length(lvls) == 1)
-         return(paste("Factor ",factorName,"contains only a single level"))
+         return(paste("Factor ",jmvcore::fromB64(factorName),"contains only a single level"))
        else if (length(lvls) == 0)
-         return(paste("Factor ",factorName,"contains no data"))
+         return(paste("Factor ",jmvcore::fromB64(factorName),"contains no data"))
      }
      
      data
@@ -368,7 +397,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.lmer<-function(model,level)  {
 
-      ci<-confint(model,method="Wald")
+      ci<-confint(model,method="Wald",level=level)
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
@@ -388,8 +417,8 @@ mf.confint<- function(x,...) UseMethod(".confint")
 mf.posthoc<- function(x,...) UseMethod(".posthoc")
 
 .posthoc.default<-function(model,term,adjust) {
-  print("post-hoc")
-  term<-jmvcore::composeTerm(term)
+  mark("post-hoc")
+#  term<-jmvcore::composeTerm(term)
   term<-as.formula(paste("~",term))
   data<-mf.getModelData(model)
   referenceGrid<-emmeans::emmeans(model, term,type = "response",data=data)

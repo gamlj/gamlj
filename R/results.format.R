@@ -5,13 +5,13 @@ rf.initPostHoc=function(data,options, tables,modelType="linear") {
   
   bsLevels <- list()
   for (i in seq_along(bs))
-    bsLevels[[bs[i]]] <- levels(data[[bs[i]]])
+    bsLevels[[bs[i]]] <- levels(data[[toB64(bs[i])]])
   
   nDepLevels<-1
   off<-0
   if (modelType=='multinomial') {
     dep<-options$dep
-    depLevels<-levels(data[[dep]])
+    depLevels<-levels(data[[toB64(dep)]])
     nDepLevels<-length(depLevels)
     off<-1
   }
@@ -52,3 +52,121 @@ rf.initPostHoc=function(data,options, tables,modelType="linear") {
     }
   return(tables)
 }
+
+rf.initEMeans<-function(data,options,theTables) {
+  interval<-options$paramCIWidth
+  if (options$eDesc) {
+    factorsAvailable <- options$factors
+    modelTerms<- options$modelTerms
+    if (length(factorsAvailable) == 0)
+      return()
+    for (term in modelTerms)
+      if (all(term %in% factorsAvailable)) {
+        aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+        aTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+        aTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+        
+        ll <- sapply(toB64(term), function(a) base::levels(data[[a]]), simplify=F)
+        ll$stringsAsFactors <- FALSE
+        grid <- do.call(base::expand.grid, ll)
+        grid <- as.data.frame(grid,stringsAsFactors=F)
+        for (i in seq_len(ncol(grid))) {
+          colName <- fromB64(colnames(grid)[[i]])
+          aTable$addColumn(name=colName, title=term[i], index=i)
+        }
+        for (rowNo in seq_len(nrow(grid))) {
+          row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
+          colnames(row)<-term
+          aTable$addRow(rowKey=row, values=row)
+        }
+      }
+    return(theTables)
+  } # end of  means
+  
+  
+  
+}
+
+rf.initSimpleEffects<-function(data,options,results) {
+
+variable<-options$simpleVariable
+moderator<-options$simpleModerator
+threeway<-options$simple3way
+interval<-options$paramCIWidth
+
+if (!is.null(variable) & !is.null(moderator)) {
+
+  variable64<-toB64(variable)
+  moderator64<-toB64(moderator)
+  threeway64<-toB64(threeway)
+
+  # determine dimensions of the table  
+  xlevels<-length(levels(data[[variable64]]))
+  xlevels<-ifelse(xlevels>1,(xlevels-1),1)
+  
+  modlevels<-length(levels(data[[moderator64]]))
+  modlevels<-ifelse(modlevels>1,modlevels,3)
+  
+  psteps<-ifelse(xlevels>1,xlevels,modlevels)
+  
+  if (!is.null(threeway)) {
+       threelevels<-length(levels(data[[threeway64]]))
+       threelevels<-ifelse(threelevels>1,threelevels,3)
+  } else 
+    threelevels<-1
+  
+  arows<-modlevels*threelevels
+  prows<-xlevels*modlevels*threelevels
+
+  # create Anova Table with right titles and rows
+  simpleEffectsAnova<-results$simpleEffectsAnova
+  title<-paste( "Simple effects of",variable,": Omnibus Tests")
+  simpleEffectsAnova$setTitle(title)
+  simpleEffectsAnova$getColumn('moderator')$setTitle(moderator)
+  simpleEffectsAnova$getColumn('moderator')$setSuperTitle("Moderator levels")
+  
+  if (!is.null(threeway)) {
+             simpleEffectsAnova$getColumn('threeway')$setTitle(threeway)
+             simpleEffectsAnova$getColumn('threeway')$setSuperTitle("Moderator levels")
+  }
+  
+  for (i in seq_len(arows)) {
+    simpleEffectsAnova$addRow(rowKey=i)
+    if ((i %% modlevels)==1) 
+       simpleEffectsAnova$addFormat(rowKey=i, col=1, Cell.BEGIN_GROUP)
+   }
+  simpleEffectsAnova$setVisible(visible=TRUE)
+  
+# create Params Table with right titles and rows
+simpleEffectsParams<-results$simpleEffectsParams
+title<-paste("Simple effects of",variable,": Parameter estimates")
+simpleEffectsParams$setTitle(title)
+
+simpleEffectsParams$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+simpleEffectsParams$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+
+simpleEffectsParams$getColumn('moderator')$setTitle(moderator)
+simpleEffectsParams$getColumn('moderator')$setSuperTitle("Moderator levels")
+
+if (is.factor(data[[variable64]]) & options$showContrasts)
+   simpleEffectsParams$getColumn('contrast')$setVisible(TRUE)
+
+
+if (!is.null(threeway)) {
+  simpleEffectsParams$getColumn('threeway')$setTitle(threeway)
+  simpleEffectsParams$getColumn('threeway')$setSuperTitle("Moderator levels")
+}
+for (i in seq_len(prows)) {
+  simpleEffectsParams$addRow(rowKey=i)
+  if ((i %% psteps)==1) {
+     simpleEffectsParams$addFormat(rowKey=i,col=1, Cell.BEGIN_GROUP)
+     simpleEffectsParams$addFormat(rowKey=i,col=2, Cell.BEGIN_GROUP)
+    
+    mark(i)
+  }
+}
+
+simpleEffectsParams$setVisible(visible=TRUE)
+
+} 
+}  # end of simple effects tables

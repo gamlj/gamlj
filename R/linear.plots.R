@@ -161,59 +161,56 @@ lp.range<- function(x,...) UseMethod(".range")
 
 lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
 
-.lp.preparePlotData.default=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none",ciwidth=95) {
+.lp.preparePlotData.default=function(model,
+                                     groupName,
+                                     linesName=NULL,
+                                     plotsName=NULL,
+                                     bars="none",
+                                     ciwidth=95,
+                                     conditioning="mean_sd",span=0,labels="values") {
+      selected<-c(groupName,linesName,plotsName)  
+      selected64<-toB64(selected)
+      preds<-unlist(toB64(c(linesName,plotsName)))
+      nsel<-length(selected)
+      varnames<-c("group","lines","plots")[1:nsel]
+      data<-mf.getModelData(model)
+      temp<-.condition_list(preds,data,conditioning,span) 
+      condlist<-temp[[1]]
+      lablist<-temp[[2]]
+      
+      if (!is.factor(data[[toB64(groupName)]])) {
+        lablist[[toB64(groupName)]]<-pretty(c(min(data[[toB64(groupName)]]),max(data[[toB64(groupName)]])),25) 
+      }
 
-  selected<-c(groupName,linesName,plotsName)  
-  nsel<-length(selected)
-  varnames<-c("group","lines","plots")[1:nsel]
-  data<-mf.getModelData(model)  
-  covs<-NULL
-  FUN=list(TRUE)  
-  if (!is.factor(data[[groupName]])) {
-    FUN[[groupName]]<-function(x)  pretty(x,25) 
-  } 
-  if (!is.null(linesName) && !is.factor(data[[linesName]])) {
-    FUN[[linesName]]<-function(x)  c(mean(x)+sd(x),mean(x),mean(x)-sd(x))
-    covs<-linesName
-    covslevels<-c("-SD","Mean","+SD")
-  } 
-  if (!is.null(plotsName) && !is.factor(data[[plotsName]])) {
-    FUN[[plotsName]]<-function(x)  c(mean(x)+sd(x),mean(x),mean(x)-sd(x))
-    covs<-c(covs,plotsName)
-    covslevels<-c("-SD","Mean","+SD")
-  } 
-
-  term<-c(groupName,linesName)
-  cilevel<-ciwidth/100
-  ss<-try({
-      mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=FUN,type="response",options=list(level=cilevel))
-      summary(mm)
+            
+  pdata<-try({
+      pred.means(model,selected64,lablist,span = span,labels = labels )
   })
-  if (isError(ss)) {
-    print("problems with emmeans in plot data")
+
+    
+  if (isError(pdata)) {
+    mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
+      jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
+    
   }
-  ssdf<-as.data.frame(ss)
-  for (aname in covs) {
-       ssdf[[aname]]<-factor(ssdf[[aname]])
-       levels(ssdf[[aname]])<-covslevels
-  }
-  names(ssdf)<-c(varnames,c("fit","SE","df","lwr","upr"))  
+
+  names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
+  
   if (bars=="se") {
-    ssdf$lwr<-ssdf$fit-ssdf$SE
-    ssdf$upr<-ssdf$fit+ssdf$SE
+    pdata$lwr<-pdata$fit-pdata$SE
+    pdata$upr<-pdata$fit+pdata$SE
   }
   if (bars=="none") {
-    ssdf$lwr<-NULL
-    ssdf$upr<-NULL
+    pdata$lwr<-NULL
+    pdata$upr<-NULL
   } else
        if ("glm" %in% class(model) && "binomial" %in% family(model)["family"]) {
-           ssdf$lwr<-ifelse(ssdf$lwr<0,0,ssdf$lwr)
-           ssdf$lwr<-ifelse(ssdf$lwr>1,1,ssdf$lwr)
-           ssdf$upr<-ifelse(ssdf$upr<0,0,ssdf$upr)
-           ssdf$upr<-ifelse(ssdf$upr>1,1,ssdf$upr)
+         pdata$lwr<-ifelse(pdata$lwr<0,0,ssdf$lwr)
+         pdata$lwr<-ifelse(pdata$lwr>1,1,ssdf$lwr)
+         pdata$upr<-ifelse(pdata$upr<0,0,ssdf$upr)
+         pdata$upr<-ifelse(pdata$upr>1,1,ssdf$upr)
          }
-  
-  return(ssdf)
+  return(pdata)
 }
 
 .lp.preparePlotData.multinom=function(model,groupName,linesName=NULL,plotsName=NULL,bars="none",ciwidth=95) {
@@ -274,13 +271,13 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
 
 .rawData.default<-function(model,depName,groupName,linesName=NULL) {
   data=mf.getModelData(model)
-  data$y<-data[[depName]]
-  data$x<-data[[groupName]]
+  data$y<-data[[toB64(depName)]]
+  data$x<-data[[toB64(groupName)]]
   
-  if (is.null(linesName) || !is.factor(data[[linesName]]))
+  if (is.null(linesName) || !is.factor(data[[toB64(linesName)]]))
     data$z<-NA
   else
-    data$z<-data[,linesName]
+    data$z<-data[,toB64(linesName)]
   
   return(data[,c("y","x","z")])
 
@@ -291,12 +288,12 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
   
   if (model$family[1] %in% c("binomial")) {
       data=mf.getModelData(model)
-      data$y<-ifelse(data[[depName]]==levels(data[[depName]])[1],1,0)
-      data$x<-data[[groupName]]
-      if (is.null(linesName) || !is.factor(data[[linesName]]))
+      data$y<-ifelse(data[[toB64(depName)]]==levels(data[[toB64(depName)]])[1],1,0)
+      data$x<-data[[toB64(groupName)]]
+      if (is.null(linesName) || !is.factor(data[[toB64(linesName)]]))
            data$z<-NA
       else
-           data$z<-data[,linesName]
+           data$z<-data[,toB64(linesName)]
       
       return(data[,c("y","x","z")])
   }

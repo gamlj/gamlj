@@ -117,7 +117,6 @@ children:
       - type: CheckBox
         name: qq
         label: Q-Q plot of residuals
-        
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -143,8 +142,6 @@ children:
               type: ComboBox
       - type: CheckBox
         name: showContrasts
-      - type: CheckBox
-        name: showContrastsTable
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
