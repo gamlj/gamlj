@@ -3,7 +3,7 @@ name: gamljMixed
 title: Mixed Model
 menuGroup: Linear Models
 version: '0.0.2'
-jas: '1.1'
+jas: '1.2'
 completeWhenFilled: false
 description:
     main: Mixed Linear Model
@@ -25,9 +25,7 @@ options:
       title: Dependent Variable
       type: Variable
       permitted:
-        - continuous
-        - nominal
-        - ordinal
+        - numeric
       description:
           R: >
             a string naming the dependent variable from `data`, variable
@@ -37,9 +35,7 @@ options:
       title: Factors
       type: Variables
       permitted:
-        - nominal
-        - ordinal
-        - nominaltext
+        - factor
       default:
       description:
           R: a vector of strings naming the fixed factors from `data`
@@ -48,9 +44,7 @@ options:
       title: Covariates
       type: Variables
       permitted:
-        - continuous
-        - nominal
-        - ordinal
+        - numeric
       default:
       description:
           R: a vector of strings naming the covariates from `data`
@@ -151,13 +145,13 @@ options:
             one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
             `'repeated'` or `'polynomial'`
 
-    - name: showContrasts
-      title: Contrasts in estimates table
+    - name: showRealNames
+      title: Names in estimates table
       type: Bool
-      default: true
+      default: false
       description:
           R: >
-            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
+            `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
 
 
 

@@ -152,7 +152,8 @@ children:
             template:
               type: ComboBox
       - type: CheckBox
-        name: showContrasts
+        name: showRealNames
+
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -183,63 +184,59 @@ children:
           - type: Label
             label: Covariates conditioning
             children:
-            - type: LayoutBox
-              margin: large
-              style: list
-              children:
-              - type: RadioButton
-                name: simpleScale_mean_sd
-                optionName: simpleScale
-                optionPart: mean_sd
-              - type: RadioButton
-                name: simpleScale_mean_offset
-                optionName: simpleScale
-                optionPart: mean_offset
+              - type: LayoutBox
+                margin: large
+                style: list
                 children:
-                  - type: TextBox
-                    name: cvalue
-                    label: null
-                    format: number
-                    inputPattern: '[0-9]+'
-                    enable: (simpleScale_mean_offset)
-              - name: simpleScale_percent
-                type: RadioButton
-                optionName: simpleScale
-                optionPart: percent
-              - name: simpleScale_percent_offset
-                type: RadioButton
-                optionName: simpleScale
-                optionPart: percent_offset
-                children:
-                  - type: TextBox
-                    name: percvalue
-                    label: null
-                    suffix: '%'
-                    format: number
-                    inputPattern: '[0-9]+'
-                    enable: (simpleScale_percent_offset)
+                  - type: RadioButton
+                    name: simpleScale_mean_sd
+                    optionName: simpleScale
+                    optionPart: mean_sd
+                  - type: RadioButton
+                    name: simpleScale_mean_offset
+                    optionName: simpleScale
+                    optionPart: mean_offset
+                    children:
+                      - type: TextBox
+                        name: cvalue
+                        label: null
+                        format: number
+                        inputPattern: '[0-9]+'
+                        enable: (simpleScale_mean_offset)
+                  - name: simpleScale_percent
+                    type: RadioButton
+                    optionName: simpleScale
+                    optionPart: percent
+                  - name: simpleScale_percent_offset
+                    type: RadioButton
+                    optionName: simpleScale
+                    optionPart: percent_offset
+                    children:
+                      - type: TextBox
+                        name: percvalue
+                        label: null
+                        suffix: '%'
+                        format: number
+                        inputPattern: '[0-9]+'
+                        enable: (simpleScale_percent_offset)
           - type: Label
             label: Covariates labeling
             children:
-            - type: LayoutBox
-              margin: large
-              children:
-              - type: RadioButton
-                name: simpleScaleLabels_labels
-                optionName: simpleScaleLabels
-                optionPart: labels
-              - type: RadioButton
-                name: simpleScaleLabels_numbers
-                optionName: simpleScaleLabels
-                optionPart: values
-              - type: RadioButton
-                name: simpleScaleLabels_numbers_labels
-                optionName: simpleScaleLabels
-                optionPart: values_labels
-
-
-
-
+              - type: LayoutBox
+                margin: large
+                children:
+                  - type: RadioButton
+                    name: simpleScaleLabels_labels
+                    optionName: simpleScaleLabels
+                    optionPart: labels
+                  - type: RadioButton
+                    name: simpleScaleLabels_numbers
+                    optionName: simpleScaleLabels
+                    optionPart: values
+                  - type: RadioButton
+                    name: simpleScaleLabels_numbers_labels
+                    optionName: simpleScaleLabels
+                    optionPart: values_labels
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -344,9 +341,6 @@ children:
                 name: plotRaw
               - type: CheckBox
                 name: plotDvScale
-
-
-          
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -378,7 +372,6 @@ children:
                 name: simple3way
                 isTarget: true
                 maxItemCount: 1
-
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true

@@ -144,8 +144,7 @@ lf.contrastLabels=function(levels, type) {
     return(labels)
 }
 
-.scaleContinuous<-function(var,method,by=NULL) {
-  
+lf.scaleContinuous<-function(var,method,by=NULL) {
   if (method=="centered") 
           var<-scale(var,scale = F)  
   if (method=="cluster-based centered")    

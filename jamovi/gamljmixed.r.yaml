@@ -65,11 +65,11 @@ items:
         - fixedIntercept
       columns:
         - name: source
-          title: "Effect"
+          title: "Names"
           type: text
+          visible: (showRealNames)
         - name: label
-          title: "Contrast"
-          visible: (showContrasts)
+          title: "Effect"
           type: text
         - name: estimate
           title: "Estimate"
@@ -254,7 +254,6 @@ items:
           combineBelow: true
         - name: contrast
           title: "contrast"
-          visible: false
           type: text
         - name: estimate
           title: "Estimate"

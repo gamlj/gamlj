@@ -76,7 +76,7 @@ gamljMixedClass <- R6::R6Class(
       ## fixed effects parameters
 
       aTable<-self$results$fixed
-      formula<-private$.fixedFormula()
+      formula<-as.formula(private$.fixedFormula())
       mynames64<-colnames(model.matrix(formula,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
@@ -107,8 +107,6 @@ gamljMixedClass <- R6::R6Class(
       clusters<-self$options$cluster
       reml<-self$options$reml
       
-      if (length(self$options$modelTerms)==0)
-        return()
       
       if (self$options$simpleScale=="mean_offset" && self$options$cvalue==0)
           return()
@@ -127,7 +125,6 @@ gamljMixedClass <- R6::R6Class(
       ####  prepare the model formula              ####      
             
       modelFormula<-private$.modelFormula()
-
       if (modelFormula!=FALSE)    {
         
         data<-private$.cleandata()
@@ -138,7 +135,7 @@ gamljMixedClass <- R6::R6Class(
 
         for (scaling in self$options$scaling) {
           cluster<-jmvcore::toB64(clusters[[1]])
-          data[[jmvcore::toB64(scaling$var)]]<-.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[jmvcore::toB64(cluster)]])  
+          data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
         }
         
         aRun <- try({
@@ -164,9 +161,10 @@ gamljMixedClass <- R6::R6Class(
         info.loglik<-ss$AICtab[3]
         r2<-try(r.squared(model))
         if (jmvcore::isError(r2)){
+          note<-"R-squared cannot be computed."
           info.r2m<-NaN        
           info.r2c<-NaN
-          infoTable$setNote("r2","R-squared cannot be computed.")  
+          infoTable$setNote("r2",note)  
         } else {
           info.r2m<-r2[[4]]        
           info.r2c<-r2[[5]]     
@@ -214,7 +212,6 @@ gamljMixedClass <- R6::R6Class(
           randomCovTable$setVisible(TRUE)
         }
         ### ### ### ### ###
-        
         # anova table ##
         if (length(modelTerms)==0) {
                     aTable$setNote("warning","F-Tests cannot be computed without fixed effects")
@@ -247,7 +244,7 @@ gamljMixedClass <- R6::R6Class(
         } else
              aTable$setNote("df",paste(attr(anova,"method"),"method for degrees of freedom"))
         
-        
+        }
         ### parameter table ####
         
         #### confidence intervals ######
@@ -264,7 +261,6 @@ gamljMixedClass <- R6::R6Class(
           }
         }
 
-        
         rownames(parameters)<-n64$nicenames(rownames(parameters))
         for (i in 1:nrow(parameters)) {
                 tableRow=parameters[i,]
@@ -276,7 +272,7 @@ gamljMixedClass <- R6::R6Class(
           fixedTable$setNote("aliased",WARNS["ano.aliased"])
           infoTable$setNote("aliased",WARNS["ano.aliased"])
        }
-        }
+        
         
         
         private$.preparePlots(private$.model)
@@ -298,11 +294,17 @@ gamljMixedClass <- R6::R6Class(
       form<-paste(res,names(res),sep="|")
       form<-paste("(",form,")")
     } else {
-      form<-sapply(names(res), function(x) sapply(res[[x]], function(z) paste0("(0+",paste(z,x,sep = "|"),")")))
+      form<-sapply(names(res), function(x) sapply(res[[x]], function(z) paste("(",paste(z,x,sep = "|"),")")))
       form<-sapply(form, function(x) paste(x,collapse = "+"))
     } 
     form<-gsub(jmvcore::toB64('Intercept'),1,form,fixed = T)
-    form<-gsub('0+1',1,form,fixed = T)
+    # fix the formula in case there is no intercept
+
+    form<-lapply(form, function(x) {
+              if(!grepl(" 1",x,fixed = T)) 
+                 gsub("(","(0+",x,fixed = T)
+              else
+                x})
     form=paste(form,collapse = "+")
     form
   },
@@ -370,10 +372,10 @@ gamljMixedClass <- R6::R6Class(
         dep<-jmvcore::toB64(self$options$dep)
       } else return(FALSE)
       
-      intercept<-as.numeric(self$options$fixedIntercept)
-      terms<-sapply(private$.modelTerms(),jmvcore::toB64)
-      fixs<-jmvcore::constructFormula(dep=NULL,terms) 
-      paste(paste(dep,intercept,sep="~"),rands,fixs,sep = "+")
+      fixed<-private$.fixedFormula()
+      mf<-paste(fixed,rands,sep =  "+")
+      mark(mf)
+      mf
     },
 
 
@@ -600,10 +602,12 @@ gamljMixedClass <- R6::R6Class(
   dep64 <- jmvcore::toB64(dep)
   intercept<-as.numeric(self$options$fixedIntercept)
   terms<-sapply(private$.modelTerms(),jmvcore::toB64)
+
   fixs<-jmvcore::constructFormula(dep=NULL,terms) 
-  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = "+")
+  sep<-ifelse(fixs!="","+"," ")
+  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = sep)
   
-  return(as.formula(lformula))
+  return(lformula)
 },
 
 

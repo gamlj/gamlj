@@ -18,7 +18,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             showParamsCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
-            showContrasts = TRUE,
+            showRealNames = FALSE,
             scaling = NULL,
             plotHAxis = NULL,
             plotSepLines = NULL,
@@ -49,24 +49,18 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "dep",
                 dep,
                 permitted=list(
-                    "continuous",
-                    "nominal",
-                    "ordinal"))
+                    "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
                 permitted=list(
-                    "nominal",
-                    "ordinal",
-                    "nominaltext"),
+                    "factor"),
                 default=NULL)
             private$..covs <- jmvcore::OptionVariables$new(
                 "covs",
                 covs,
                 permitted=list(
-                    "continuous",
-                    "nominal",
-                    "ordinal"),
+                    "numeric"),
                 default=NULL)
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
@@ -125,10 +119,10 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "helmert",
                                 "repeated",
                                 "polynomial")))))
-            private$..showContrasts <- jmvcore::OptionBool$new(
-                "showContrasts",
-                showContrasts,
-                default=TRUE)
+            private$..showRealNames <- jmvcore::OptionBool$new(
+                "showRealNames",
+                showRealNames,
+                default=FALSE)
             private$..scaling <- jmvcore::OptionArray$new(
                 "scaling",
                 scaling,
@@ -255,7 +249,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
-            self$.addOption(private$..showContrasts)
+            self$.addOption(private$..showRealNames)
             self$.addOption(private$..scaling)
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
@@ -288,7 +282,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
-        showContrasts = function() private$..showContrasts$value,
+        showRealNames = function() private$..showRealNames$value,
         scaling = function() private$..scaling$value,
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
@@ -320,7 +314,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
-        ..showContrasts = NA,
+        ..showRealNames = NA,
         ..scaling = NA,
         ..plotHAxis = NA,
         ..plotSepLines = NA,
@@ -428,12 +422,12 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 columns=list(
                     list(
                         `name`="source", 
-                        `title`="Effect", 
-                        `type`="text"),
+                        `title`="Names", 
+                        `type`="text", 
+                        `visible`="(showRealNames)"),
                     list(
                         `name`="label", 
-                        `title`="Contrast", 
-                        `visible`="(showContrasts)", 
+                        `title`="Effect", 
                         `type`="text"),
                     list(
                         `name`="estimate", 
@@ -640,7 +634,6 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     list(
                         `name`="contrast", 
                         `title`="contrast", 
-                        `visible`=FALSE, 
                         `type`="text"),
                     list(
                         `name`="estimate", 
@@ -805,8 +798,8 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param contrasts a list of lists specifying the factor and type of contrast
 #'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
-#' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide
-#'   definitions of the contrasts variables
+#' @param showRealNames \code{TRUE} or \code{FALSE} (default), provide raw
+#'   names of the contrasts variables
 #' @param scaling a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
@@ -877,7 +870,7 @@ gamljMixed <- function(
     showParamsCI = TRUE,
     paramCIWidth = 95,
     contrasts,
-    showContrasts = TRUE,
+    showRealNames = FALSE,
     scaling = NULL,
     plotHAxis = NULL,
     plotSepLines = NULL,
@@ -914,7 +907,7 @@ gamljMixed <- function(
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
-        showContrasts = showContrasts,
+        showRealNames = showRealNames,
         scaling = scaling,
         plotHAxis = plotHAxis,
         plotSepLines = plotSepLines,

@@ -3,7 +3,7 @@ name: gamljGLM
 title: General Linear Model
 menuGroup: Linear Models
 version: '0.0.2'
-jas: '1.1'
+jas: '1.2'
 
 description:
     main: General Linear Model
@@ -47,7 +47,7 @@ options:
       title: Dependent Variable
       type: Variable
       permitted:
-        - continuous
+        - numeric
       default:
       description:
           R: >
@@ -58,9 +58,7 @@ options:
       title: Fixed Factors
       type: Variables
       permitted:
-        - nominal
-        - ordinal
-        - nominaltext
+        - factor
       default:
       description:
           R: a vector of strings naming the fixed factors from `data`
@@ -69,9 +67,7 @@ options:
       title: Covariates
       type: Variables
       permitted:
-        - continuous
-        - nominal
-        - ordinal
+        - numeric
       default:
       description:
           R: a vector of strings naming the covariates from `data`
@@ -177,6 +173,14 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
+
+    - name: showContrastsTable
+      title: Contrasts definition table
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide long definitions of the contrasts variables
 
     - name: scaling
       title: Covariates Scaling

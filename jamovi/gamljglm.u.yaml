@@ -142,6 +142,9 @@ children:
               type: ComboBox
       - type: CheckBox
         name: showContrasts
+      - type: CheckBox
+        name: showContrastsTable
+
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true

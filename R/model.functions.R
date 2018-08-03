@@ -153,7 +153,6 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   
        ss<-lmerTest::summary(model)$coefficients
        ss<-as.data.frame(ss,stringsAsFactors = F)
-       
       if (dim(ss)[2]==3) {
           ano<-car::Anova(model,test="F",type=3)
           lnames<-rownames(ss)
@@ -162,7 +161,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
           ss$df[matching]<-ano$Df.res[matching]
           ss$p<-NA
           ss$p[matching]<-ano$`Pr(>F)`[matching]
-          ss<-ss[,c(1,2,4,3,5)]          
+          ss<-ss[,c(1,2,4,3,5)]       
           if (any(is.null(ss$df)))
                attr(ss,"warning")<-"lmer.df"
       }

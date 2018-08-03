@@ -16,6 +16,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             paramCIWidth = 95,
             contrasts = NULL,
             showContrasts = TRUE,
+            showContrastsTable = FALSE,
             scaling = NULL,
             plotHAxis = NULL,
             plotSepLines = NULL,
@@ -44,23 +45,19 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "dep",
                 dep,
                 permitted=list(
-                    "continuous"),
+                    "numeric"),
                 default=NULL)
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
                 permitted=list(
-                    "nominal",
-                    "ordinal",
-                    "nominaltext"),
+                    "factor"),
                 default=NULL)
             private$..covs <- jmvcore::OptionVariables$new(
                 "covs",
                 covs,
                 permitted=list(
-                    "continuous",
-                    "nominal",
-                    "ordinal"),
+                    "numeric"),
                 default=NULL)
             private$..modelTerms <- jmvcore::OptionTerms$new(
                 "modelTerms",
@@ -121,6 +118,10 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "showContrasts",
                 showContrasts,
                 default=TRUE)
+            private$..showContrastsTable <- jmvcore::OptionBool$new(
+                "showContrastsTable",
+                showContrastsTable,
+                default=FALSE)
             private$..scaling <- jmvcore::OptionArray$new(
                 "scaling",
                 scaling,
@@ -226,6 +227,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showContrasts)
+            self$.addOption(private$..showContrastsTable)
             self$.addOption(private$..scaling)
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
@@ -254,6 +256,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showContrasts = function() private$..showContrasts$value,
+        showContrastsTable = function() private$..showContrastsTable$value,
         scaling = function() private$..scaling$value,
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
@@ -281,6 +284,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showContrasts = NA,
+        ..showContrastsTable = NA,
         ..scaling = NA,
         ..plotHAxis = NA,
         ..plotSepLines = NA,
@@ -769,6 +773,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
 #' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide
 #'   definitions of the contrasts variables
+#' @param showContrastsTable \code{TRUE} or \code{FALSE} (default), provide
+#'   long definitions of the contrasts variables
 #' @param scaling a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
@@ -835,6 +841,7 @@ gamljGLM <- function(
     paramCIWidth = 95,
     contrasts = NULL,
     showContrasts = TRUE,
+    showContrastsTable = FALSE,
     scaling = NULL,
     plotHAxis = NULL,
     plotSepLines = NULL,
@@ -867,6 +874,7 @@ gamljGLM <- function(
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showContrasts = showContrasts,
+        showContrastsTable = showContrastsTable,
         scaling = scaling,
         plotHAxis = plotHAxis,
         plotSepLines = plotSepLines,

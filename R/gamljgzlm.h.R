@@ -55,25 +55,19 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "dep",
                 dep,
                 permitted=list(
-                    "continuous",
-                    "nominal",
-                    "ordinal",
-                    "nominaltext"))
+                    "numeric",
+                    "factor"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
                 permitted=list(
-                    "nominal",
-                    "ordinal",
-                    "nominaltext"),
+                    "factor"),
                 default=NULL)
             private$..covs <- jmvcore::OptionVariables$new(
                 "covs",
                 covs,
                 permitted=list(
-                    "continuous",
-                    "nominal",
-                    "ordinal"),
+                    "numeric"),
                 default=NULL)
             private$..modelTerms <- jmvcore::OptionTerms$new(
                 "modelTerms",

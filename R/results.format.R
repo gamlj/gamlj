@@ -148,9 +148,6 @@ simpleEffectsParams$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Con
 simpleEffectsParams$getColumn('moderator')$setTitle(moderator)
 simpleEffectsParams$getColumn('moderator')$setSuperTitle("Moderator levels")
 
-if (is.factor(data[[variable64]]) & options$showContrasts)
-   simpleEffectsParams$getColumn('contrast')$setVisible(TRUE)
-
 
 if (!is.null(threeway)) {
   simpleEffectsParams$getColumn('threeway')$setTitle(threeway)
