@@ -50,7 +50,7 @@ rf.initPostHoc=function(data,options, tables,modelType="linear") {
           table$addFormat(rowKey=((j*10)+i), col=1, Cell.END_GROUP)
       }
     }
-  return(tables)
+#  return(tables)
 }
 
 rf.initEMeans<-function(data,options,theTables) {
@@ -63,8 +63,8 @@ rf.initEMeans<-function(data,options,theTables) {
     for (term in modelTerms)
       if (all(term %in% factorsAvailable)) {
         aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
-        aTable$getColumn('upper')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
-        aTable$getColumn('lower')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+        aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+        aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
         
         ll <- sapply(toB64(term), function(a) base::levels(data[[a]]), simplify=F)
         ll$stringsAsFactors <- FALSE
@@ -95,7 +95,7 @@ threeway<-options$simple3way
 interval<-options$paramCIWidth
 
 if (!is.null(variable) & !is.null(moderator)) {
-
+  
   variable64<-toB64(variable)
   moderator64<-toB64(moderator)
   threeway64<-toB64(threeway)
@@ -119,11 +119,13 @@ if (!is.null(variable) & !is.null(moderator)) {
   prows<-xlevels*modlevels*threelevels
 
   # create Anova Table with right titles and rows
-  simpleEffectsAnova<-results$simpleEffectsAnova
+  simpleEffectsAnova<-results$simpleEffects$Anova
   title<-paste( "Simple effects of",variable,": Omnibus Tests")
   simpleEffectsAnova$setTitle(title)
   simpleEffectsAnova$getColumn('moderator')$setTitle(moderator)
   simpleEffectsAnova$getColumn('moderator')$setSuperTitle("Moderator levels")
+  
+      
   
   if (!is.null(threeway)) {
              simpleEffectsAnova$getColumn('threeway')$setTitle(threeway)
@@ -135,10 +137,10 @@ if (!is.null(variable) & !is.null(moderator)) {
     if ((i %% modlevels)==1) 
        simpleEffectsAnova$addFormat(rowKey=i, col=1, Cell.BEGIN_GROUP)
    }
-  simpleEffectsAnova$setVisible(visible=TRUE)
-  
+simpleEffectsAnova$setVisible(visible=TRUE)
+
 # create Params Table with right titles and rows
-simpleEffectsParams<-results$simpleEffectsParams
+simpleEffectsParams<-results$simpleEffects$Params
 title<-paste("Simple effects of",variable,": Parameter estimates")
 simpleEffectsParams$setTitle(title)
 
@@ -158,12 +160,12 @@ for (i in seq_len(prows)) {
   if ((i %% psteps)==1) {
      simpleEffectsParams$addFormat(rowKey=i,col=1, Cell.BEGIN_GROUP)
      simpleEffectsParams$addFormat(rowKey=i,col=2, Cell.BEGIN_GROUP)
-    
-    mark(i)
   }
 }
+if (!is.factor(data[[variable64]]))
+   simpleEffectsParams$getColumn('contrast')$setVisible(FALSE)
+
 
 simpleEffectsParams$setVisible(visible=TRUE)
-
 } 
 }  # end of simple effects tables

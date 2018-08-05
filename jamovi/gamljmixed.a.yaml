@@ -135,6 +135,7 @@ options:
                 options:
                   - deviation
                   - simple
+                  - dummy
                   - difference
                   - helmert
                   - repeated
@@ -148,7 +149,7 @@ options:
     - name: showRealNames
       title: Names in estimates table
       type: Bool
-      default: false
+      default: true
       description:
           R: >
             `TRUE` or `FALSE` (default), provide raw names of the contrasts variables

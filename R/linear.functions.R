@@ -61,6 +61,11 @@ lf.createContrasts=function(levels, type) {
       contrast[1:i,i] <- (nLevels-i) / nLevels
       contrast[(i+1):nLevels,i] <- -i / nLevels
     }
+
+  } else if (type == 'dummy') {
+
+    contrast <- stats::contr.treatment(levels)
+    dimnames(contrast) <- NULL
     
   } else {
       contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
@@ -138,6 +143,7 @@ lf.contrastLabels=function(levels, type) {
         return(labels)
   }
     mark("no contrast definition met")
+    
     all <- paste(levels, collapse=', ')
     for (i in seq_len(nLevels-1))
       labels[[i]] <- paste(levels[i+1], '- (', all,")")
@@ -294,7 +300,6 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
          }
   ##### get the summary of the model. This must be a ...
         ss<-mf.summary(model)
-        mark(ss)
         ##### extract only the estimates of the x-axis variable
         if ("variable" %in% names(ss))
              ss<-ss[ss$variable %in% varname,]
@@ -379,13 +384,15 @@ lf.meansTables<-function(model,terms) {
   for (term in terms) {
     term64<-toB64(term)
     if (all(term64 %in% factorsAvailable)) {
-      table<-mf.means(model,term64)
-      attr(table,"title")<-term
+      atab<-pred.means(model,term64,conditioning="mean")
+      names(atab)[1:length(term)]<-paste0("c",1:length(term))
+      mark(atab)
+      attr(atab,"title")<-term
       depend<-lf.dependencies(model,term64,terms64,"means")
       if (depend!=FALSE) {
-        attr(table,"note")<-depend
+        attr(atab,"note")<-depend
       }
-      tables[[length(tables)+1]]<-table
+      tables[[length(tables)+1]]<-atab
     }
   }
   tables

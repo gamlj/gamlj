@@ -439,7 +439,7 @@ mf.posthoc<- function(x,...) UseMethod(".posthoc")
   return(results)
   }
 
-###### means tabòe ##########
+###### means tables legacy: now done with predict.R ##########
 mf.means<- function(x,...) UseMethod(".means")
 
 .means.default<-function(model,term) {

@@ -8,7 +8,6 @@
     if (type=="labels") { 
          for (labvar in names(lablist)) {
               onevar<-lablist[[labvar]]
-              mark(labvar)
               if (!is.null(names(onevar))) {
                 for (i in seq_along(onevar)) {
                 grid[grid[,labvar]==onevar[i],labvar]<-names(onevar)[i]
@@ -127,6 +126,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 pred.means<-function(model,terms,conditioning="mean_sd",span=0,interval=95,labels="values") {
          est<-rawMeans(model,terms,conditioning,span = span ,labels = labels,interval=interval,type="response")
+
          dd<-as.data.frame(est)
 #         names(dd)[seq_along(terms)]<-paste0("c",length(terms):1)
 #         dd[,c(length(terms):1,(length(terms)+1):dim(dd)[2])]
@@ -171,7 +171,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
                           interval=interval,df=df)
        
       
-       est<-emmeans::contrast(emm,method = ".internal",by = preds,)
+       est<-emmeans::contrast(emm,method = ".internal",by = preds)
        ci<-confint(est,level = interval/100)
        params<-cbind(as.data.frame(est),ci[,c("lower.CL","upper.CL")])
        params$contrast<-as.character(params$contrast)
@@ -201,6 +201,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
                                    span=0,
                                    interval=95,
                                    labels="values") {
+  mark("simple effects estimation for merMod")
   data<-mf.getModelData(model)
   preds<-unlist(c(moderator,threeway))
   lnames<-c("moderator","threeway")[1:length(preds)]
