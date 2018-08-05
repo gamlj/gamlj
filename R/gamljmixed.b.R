@@ -622,7 +622,8 @@ gamljMixedClass <- R6::R6Class(
           if (jmvcore::isError(simple_test)) {
               anovaTable$setNote("se.noluck",WARNS[["se.noluck"]])
               return()
-              }
+          }
+         
           anovaTableData<-tables[[2]]
           anovaTable$setState(anovaTableData)
           parametersTableData<-tables[[1]]  
