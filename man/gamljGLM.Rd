@@ -5,12 +5,13 @@
 \title{General Linear Model}
 \usage{
 gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
-  modelTerms = NULL, ss = "3", effectSize = NULL, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts = NULL, showContrasts = TRUE,
-  scaling = NULL, plotHAxis = NULL, plotSepLines = NULL,
-  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
-  postHoc = NULL, postHocCorr = list("tukey"), eDesc = FALSE,
-  homo = FALSE, qq = FALSE, plotError = "ci", ciWidth = 95,
+  modelTerms = NULL, ss = "3", effectSize = NULL,
+  showParamsCI = TRUE, paramCIWidth = 95, contrasts = NULL,
+  showContrasts = TRUE, showContrastsTable = FALSE, scaling = NULL,
+  plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
+  plotRaw = FALSE, plotDvScale = FALSE, postHoc = NULL,
+  postHocCorr = list("tukey"), eDesc = FALSE, homo = FALSE,
+  qq = FALSE, plotError = "ci", ciWidth = 95,
   simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL)
 }
 \arguments{
@@ -46,6 +47,9 @@ to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 
 \item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide
 definitions of the contrasts variables}
+
+\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide
+long definitions of the contrasts variables}
 
 \item{scaling}{a list of lists specifying the covariates scaling, one of
 \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.

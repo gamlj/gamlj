@@ -1,5 +1,3 @@
-library(ggplot2)
-
 #' @import ggplot2
 gamljGLMClass <- R6::R6Class(
   "gamljGLMClass",

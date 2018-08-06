@@ -7,6 +7,8 @@
 gamlj_plot(gobj, haxis, seplines = NULL, sepplots = NULL)
 }
 \arguments{
+\item{gobj}{a gamlj results object of the class GAMLj*#'}
+
 \item{haxis}{horizontal axis variable}
 
 \item{seplines}{variable defining the levels for separate lines}

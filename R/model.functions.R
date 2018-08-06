@@ -6,6 +6,8 @@
     return("glm")
   if ("lm" %in% class(model))
       return("lm")
+  if ("lmerModLmerTest" %in% class(model))
+    return("lmer")
   if ("merModLmerTest" %in% class(model))
       return("lmer")
   if ("lmerMod" %in% class(model))
@@ -103,6 +105,9 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 .getModelData.merModLmerTest<-function(model) 
      return(.getModelData.lmer(model))
 
+.getModelData.lmerModLmerTest<-function(model) 
+  return(.getModelData.lmer(model))
+
 .getModelData.lmer<-function(model) 
   return(model@frame)
 
@@ -149,9 +154,15 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 .mf.summary.merModLmerTest<-function(model)
        .mf.summary.lmer(model)
 
+.mf.summary.lmerModLmerTest<-function(model)
+  .mf.summary.lmer(model)
+
+.mf.summary.lmerMod<-function(model)
+  .mf.summary.lmer(model)
+
 .mf.summary.lmer<-function(model) {
   
-       ss<-lmerTest::summary(model)$coefficients
+       ss<-summary(model)$coefficients
        ss<-as.data.frame(ss,stringsAsFactors = F)
       if (dim(ss)[2]==3) {
           ano<-car::Anova(model,test="F",type=3)
@@ -223,10 +234,23 @@ mf.anova<- function(x,...) UseMethod(".anova")
     ano
 }
 
-
+.anova.lmerModLmerTest<-function(model,df="Satterthwaite") 
+   .anova.merModLmerTest(model,df) 
+     
+.anova.lmerMod<-function(model,df) 
+       .anova.merModLmerTest(model,df) 
+         
+.anova.merMod<-function(model,df="Satterthwaite") 
+           .anova.merModLmerTest(model,df) 
+             
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
-  ano<-lmerTest::anova(model,ddf=df)
+  ### this check is needed for adjust to different versions of lmertest
+  if (class(model)=="merModLmerTest")
+        ano<-lmerTest::anova(model,ddf=df)
+  else
+        ano<-anova(model,ddf=df)
+        
   if (dim(ano)[1]==0)
     return(ano)
   
@@ -393,6 +417,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.merModLmerTest<-function(model,level) 
                                 return(.confint.lmer(model,level))
+
+.confint.lmerModLmerTest<-function(model,level) 
+  return(.confint.lmer(model,level))
 
 .confint.lmer<-function(model,level)  {
 

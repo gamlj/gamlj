@@ -169,8 +169,8 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
                                      ciwidth=95,
                                      conditioning="mean_sd",span=0,labels="values") {
       selected<-c(groupName,linesName,plotsName)  
-      selected64<-toB64(selected)
-      preds<-unlist(toB64(c(linesName,plotsName)))
+      selected64<-jmvcore::toB64(selected)
+      preds<-unlist(jmvcore::toB64(c(linesName,plotsName)))
       nsel<-length(selected)
       varnames<-c("group","lines","plots")[1:nsel]
       data<-mf.getModelData(model)
@@ -178,8 +178,8 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
       condlist<-temp[[1]]
       lablist<-temp[[2]]
       
-      if (!is.factor(data[[toB64(groupName)]])) {
-        lablist[[toB64(groupName)]]<-pretty(c(min(data[[toB64(groupName)]]),max(data[[toB64(groupName)]])),25) 
+      if (!is.factor(data[[jmvcore::toB64(groupName)]])) {
+        lablist[[jmvcore::toB64(groupName)]]<-pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25) 
       }
 
             
@@ -188,7 +188,7 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
   })
 
     
-  if (isError(pdata)) {
+  if (jmvcore::isError(pdata)) {
     mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
       jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
     
@@ -243,7 +243,7 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
     mm<-emmeans::emmeans(model,term,by = plotsName,cov.reduce=FUN,type="response",options=list(level=cilevel))
     summary(mm)
   })
-  if (isError(ss)) {
+  if (jmvcore::isError(ss)) {
     print("problems with emmeans in plot data")
   }
   ssdf<-as.data.frame(ss)
@@ -271,13 +271,13 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
 
 .rawData.default<-function(model,depName,groupName,linesName=NULL) {
   data=mf.getModelData(model)
-  data$y<-data[[toB64(depName)]]
-  data$x<-data[[toB64(groupName)]]
+  data$y<-data[[jmvcore::toB64(depName)]]
+  data$x<-data[[jmvcore::toB64(groupName)]]
   
-  if (is.null(linesName) || !is.factor(data[[toB64(linesName)]]))
+  if (is.null(linesName) || !is.factor(data[[jmvcore::toB64(linesName)]]))
     data$z<-NA
   else
-    data$z<-data[,toB64(linesName)]
+    data$z<-data[,jmvcore::toB64(linesName)]
   
   return(data[,c("y","x","z")])
 
@@ -288,12 +288,12 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
   
   if (model$family[1] %in% c("binomial")) {
       data=mf.getModelData(model)
-      data$y<-ifelse(data[[toB64(depName)]]==levels(data[[toB64(depName)]])[1],1,0)
-      data$x<-data[[toB64(groupName)]]
-      if (is.null(linesName) || !is.factor(data[[toB64(linesName)]]))
+      data$y<-ifelse(data[[jmvcore::toB64(depName)]]==levels(data[[jmvcore::toB64(depName)]])[1],1,0)
+      data$x<-data[[jmvcore::toB64(groupName)]]
+      if (is.null(linesName) || !is.factor(data[[jmvcore::toB64(linesName)]]))
            data$z<-NA
       else
-           data$z<-data[,toB64(linesName)]
+           data$z<-data[,jmvcore::toB64(linesName)]
       
       return(data[,c("y","x","z")])
   }

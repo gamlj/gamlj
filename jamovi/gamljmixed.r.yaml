@@ -145,6 +145,25 @@ items:
           title: "Corr."
           type: number
 
+    - name: contrastCodeTables
+      title: Contrast Coefficients 
+      type: Array
+      description: an array of contrast coefficients tables
+      visible: (showContrastCode)
+      clearWith:
+        - contrasts
+      template:
+        title:  $key
+        type: Table
+        columns:
+        - name: rnames
+          title: 'Name'
+          type: text
+          visible: (showRealNames)
+        - name: clabs
+          title: 'Contrast'
+          type: text
+
 
     - name: postHocs
       title: Post Hoc Tests
@@ -162,6 +181,7 @@ items:
         - postHoc
         - postHocCorr
       template:
+        clearWith: []
         title:  ""
         type: Table
         columns:
@@ -297,7 +317,6 @@ items:
     - name: model
       type: Property
       description: The underlying `lmer` object
-
 
 
 

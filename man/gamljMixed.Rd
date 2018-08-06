@@ -7,14 +7,13 @@
 gamljMixed(data, dep, factors = NULL, covs = NULL, cluster,
   randomTerms = NULL, correlatedEffects = TRUE, modelTerms = NULL,
   fixedIntercept = TRUE, reml = TRUE, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts, showContrasts = TRUE, scaling = NULL,
+  paramCIWidth = 95, contrasts, showRealNames = TRUE, scaling = NULL,
   plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
   plotRaw = FALSE, plotDvScale = FALSE, plotError = "none",
-  ciWidth = 95, plotScale = "mean_sd", plotcvalue = 0,
-  plotpercvalue = 0, postHoc = NULL, postHocCorr = list("bonf"),
+  ciWidth = 95, postHoc = NULL, postHocCorr = list("bonf"),
   eDesc = FALSE, simpleVariable = NULL, simpleModerator = NULL,
-  simple3way = NULL, simpleScale = "mean_sd", cvalue = 0, percvalue = 0,
-  simpleScaleLabels = "labels")
+  simple3way = NULL, simpleScale = "mean_sd", cvalue = 0,
+  percvalue = 0, simpleScaleLabels = "labels")
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -43,10 +42,10 @@ terms}
 fixed intercept}
 
 \item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-be used}
+be used rather than ML}
 
-\item{showParamsCI}{\code{TRUE} or \code{FALSE} (default), parameters CI in
-table}
+\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
+in table}
 
 \item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
@@ -55,8 +54,8 @@ the confidence interval width for the parameter estimates}
 to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide
-definitions of the contrasts variables}
+\item{showRealNames}{\code{TRUE} or \code{FALSE} (default), provide raw
+names of the contrasts variables}
 
 \item{scaling}{a list of lists specifying the covariates scaling, one of
 \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
@@ -82,13 +81,6 @@ plots, respectively}
 
 \item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width}
-
-\item{plotScale}{\code{'mean_sd'} (default), \code{'custom'} , or
-\code{'custom_percent'}. Use to condition the covariates (if any)}
-
-\item{plotcvalue}{lower value for conditioning}
-
-\item{plotpercvalue}{lower value for conditioning}
 
 \item{postHoc}{a list of terms to perform post-hoc tests on}
 
@@ -124,9 +116,9 @@ A results object containing:
   \code{results$fixed} \tab \tab \tab \tab \tab a table \cr
   \code{results$random} \tab \tab \tab \tab \tab a table \cr
   \code{results$randomCov} \tab \tab \tab \tab \tab a table \cr
-  \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-  \code{results$simpleEffectsAnova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
-  \code{results$simpleEffectsParams} \tab \tab \tab \tab \tab a table \cr
+  \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+  \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
+  \code{results$simpleEffects$Params} \tab \tab \tab \tab \tab a table \cr
   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr

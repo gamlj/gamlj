@@ -43,7 +43,8 @@ gamlj_update<-function(gobj,params) {
 #' Update a GAMLj model plots by passing new plots directives
 #'
 #' This function re-estimates a GAMLj model with a new plot
-#'
+
+#' @param gobj a gamlj results object of the class GAMLj*#'
 #' @param haxis horizontal axis variable
 #' @param seplines variable defining the levels for separate lines 
 #' @param sepplot variable defining the levels for which separate plots are produced 
@@ -55,3 +56,61 @@ gamlj_plot<-function(gobj,haxis,seplines=NULL,sepplots=NULL) {
  gamlj_update(gobj,news)  
 }
 
+#' Update a GAMLj results by passing new simple effects directives
+#'
+#' This function re-estimates a GAMLj model with new simple effects directives
+#'
+#' @param gobj a gamlj results object of the class GAMLj*
+#' @param variable the independent variable name
+#' @param moderator the moderator variable name 
+#' @param threeway the name of the additional moderator for three way interactions 
+#'  
+#' @return an object of class GAMLj* as the input object
+#' @author Marcello Gallucci
+
+gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL) {
+  args<-list(simpleVariable=variable,simpleModerator=moderator,simple3way=threeway)
+  gamlj_update(gobj,args)  
+}
+
+
+#' Update a GAMLj results by removing a block or results
+#'
+#' This function re-estimates a GAMLj model removing some of the directives passed to the orginal model
+#'
+#' @param gobj a gamlj results object of the class GAMLj*
+#' @param analysis which analysis needs to be removed. It can be `simpleEffects`, `emmans` (estimated means for factors),`plots`, or `posthoc`
+#'  
+#' @return an object of class GAMLj* as the input object
+#' @author Marcello Gallucci
+
+
+gamlj_drop<-function(gobj,analysis) {
+  if (analysis=="simpleEffects") {
+    args<-list(simpleVariable=NULL,simpleModerator=NULL,simple3way=NULL)
+  }
+  if (analysis=="emeans") {
+    args<-list(eDesc=FALSE)
+  }
+  if (analysis=="plots") {
+    args<-list(plotHAxis=NULL)
+  }
+  if (analysis=="posthoc") {
+    args<-list(postHoc=NULL)
+  }
+  
+  gamlj_update(gobj,args)  
+}
+
+#' Extract the R model fro  a GAMLj object
+#'
+#'
+#' @param gobj a gamlj results object of the class GAMLj*
+#'  
+#' @return an R object of class lmer, lm, or glm
+#' @author Marcello Gallucci
+
+
+gamlj_extractModel<-function(gobj) 
+    gobj$anova$state[[1]]
+  

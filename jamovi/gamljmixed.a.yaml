@@ -96,7 +96,7 @@ options:
       default: true
       description:
           R: >
-            `TRUE` (default) or `FALSE`, should the Restricted ML be used
+            `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
 
     - name: showParamsCI
       title: Confidence intervals
@@ -104,7 +104,7 @@ options:
       default: true
       description:
           R: >
-            `TRUE` or `FALSE` (default), parameters CI in table
+            `TRUE` (default) or `FALSE` , parameters CI in table
 
 
     - name: paramCIWidth
@@ -146,6 +146,7 @@ options:
             one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
             `'repeated'` or `'polynomial'`
 
+
     - name: showRealNames
       title: Names in estimates table
       type: Bool
@@ -154,6 +155,13 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
 
+    - name: showContrastCode
+      title: Contrast Coefficients tables
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide contrast coefficients tables
 
 
     - name: scaling
@@ -340,8 +348,8 @@ options:
 
     - name: percvalue
       type: Number
-      default: 0
-      min: 0
+      default: 25
+      min: 1
       max: 50
       description:
           R: >

@@ -229,14 +229,11 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
       return(FALSE)
     try({
     modelterms<-terms(model)
-    ff<-as.data.frame(attr(modelterms,"factors"))
-    rownames(ff)<-jmvcore::decomposeTerms(rownames(ff))
-    termorder<-.term.order(term)
-    terms<-jmvcore::decomposeTerms(term)
-    for (aterm in terms) {
-         if(sum(ff[rownames(ff)==aterm,])>termorder)
-            return(TRUE)
-    }
+    modelterms<-attr(modelterms,"term.labels")
+    nterm<-paste(term,collapse = ":")
+    count<-length(grep(nterm,modelterms,fixed=T))
+    if (count>1)
+      return(TRUE)
     })
     FALSE
 }
@@ -264,138 +261,18 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
 
 
 
-########## simple effects computation #########
-
-#### this estimates a model at some level of the moderator
-
-.atSomeLevel<-function(model,moderator,level) {
-
-    data<-mf.getModelData(model)
-    moderator64<-toB64(moderator)
-    if (is.factor(data[,moderator64])) {
-          .levels<-levels(data[,moderator64])
-           index<-which(.levels==level,arr.ind = T)
-           ### we need the moderator to be treatment to condition the other effect to its reference groups
-           contrasts(data[,moderator64])<-contr.treatment(length(.levels),base=index)
-      } else {
-           data[,moderator64]<-data[,moderator64]-level
-      }
-  
-      form<-formula(model)
-      FUN<-mf.estimate(model)
-      FUN(form,data)
-}
-
-.extractParameters<-function(model,variable,moderator,level) {
-  ### get the parameters
-  ##### understand how the dummies are named #####
-       data<-mf.getModelData(model)
-       variable64<-toB64(variable)
-       qvariable<-jmvcore::composeTerm(variable64)
-
-        if (is.factor(data[[variable64]])) {
-            varname<-paste(qvariable,seq_along(levels(data[,variable64])),sep="")
-         }  else {
-            varname<-qvariable
-         }
-  ##### get the summary of the model. This must be a ...
-        ss<-mf.summary(model)
-        ##### extract only the estimates of the x-axis variable
-        if ("variable" %in% names(ss))
-             ss<-ss[ss$variable %in% varname,]
-        else {
-             a<-as.logical(apply(sapply(varname, function(a) a==rownames(ss)),1,sum))
-             ss<-ss[a,]
-        }
-        #### prettify the levels ####
-        if (is.numeric(level)) 
-            level<-round(level,digits=2)
-        ss$level<-paste(moderator,level,sep=" at ")
-        if (!("variable" %in% names(ss)))
-              ss$variable<-rownames(ss)
-        
-        as.data.frame(ss,stringsAsFactors=F)
-}
 
 
-.extractFtests<-function(model,variable,moderator,level) {
-  ### get the ANOVA
-  if (.which.class(model)=="lmer") {
-    if (!lme4::getME(model,"is_REML"))
-      return(FALSE)
-  }
-  ano<-mf.anova(model)
-  variable64<-toB64(jmvcore::composeTerm(variable))
-  ano<-ano[rownames(ano)==variable,]
-  if (is.numeric(level)) level<-round(level,digits=2)
-  ano$level<-paste(moderator,level,sep=" at ")
-  ano$variable<-variable
-  as.data.frame(ano,stringsAsFactors=F)
-}
-
-
-
-lf.simpleEffects<-function(model,variable,moderator){
-  
-  # The simple effects function computes up to 3-ways simple effects
-  # for any (hopefully) linear model. Given the different estimation
-  # method of the linear models (lm(), glm(), lmer()), the module
-  # must have three functions: 
-  # mf.estimate() : should return the model estimate function
-  # mf.summary() : should return the model summary table as a 
-  #                      dataset (usually the model$coefficients table)
-  # mf.anova() : should return the anova table or an equivalent
-  
-   
-  data<-mf.getModelData(model)
-  moderator64<-toB64(moderator)
-
-  modvar<-data[,moderator64]
-  if (is.factor(modvar)) {
-    levels<-levels(modvar)
-  } else {
-    levels<-c(mean(modvar)-sd(modvar),mean(modvar),mean(modvar)+sd(modvar))
-  }
-  params<-data.frame(stringsAsFactors = F)
-  ftests<-data.frame(stringsAsFactors = F)
-  for (i in levels) {
-       model0<-.atSomeLevel(model,moderator,i)
-       params<-rbind(params,.extractParameters(model0,variable,moderator,i))
-       ftests<-rbind(ftests,.extractFtests(model0,variable,moderator,i))
-       
-  }
-  list(params,ftests)
-}
-
-
-lf.dependencies<-function(model,term,modelTerms,what) {
+lf.dependencies<-function(model,term,what) {
   if (.is.scaleDependent(model,term))
     return(paste(what,"interactions",sep="."))
-   else if (.term.develop(term)<length(modelTerms))
+   else {
+     modelterms<-terms(model)
+     modelterms<-attr(modelterms,"term.labels")
+     if (.term.develop(term)<length(modelterms))
        return(paste(what,"covariates",sep="."))
+   }
   FALSE
-}
-
-lf.meansTables<-function(model,terms) {
-  
-  factorsAvailable<-mf.getModelFactors(model)
-  tables<-list()
-  terms64<-toB64(terms)
-  for (term in terms) {
-    term64<-toB64(term)
-    if (all(term64 %in% factorsAvailable)) {
-      atab<-pred.means(model,term64,conditioning="mean")
-      names(atab)[1:length(term)]<-paste0("c",1:length(term))
-      mark(atab)
-      attr(atab,"title")<-term
-      depend<-lf.dependencies(model,term64,terms64,"means")
-      if (depend!=FALSE) {
-        attr(atab,"note")<-depend
-      }
-      tables[[length(tables)+1]]<-atab
-    }
-  }
-  tables
 }
 
 

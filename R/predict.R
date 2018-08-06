@@ -89,6 +89,12 @@
         else
                 .cond<-conditioning
         mlevels<-.condition_values(data[[name]],conditioning=.cond,span=span)
+        if (length(mlevels)>1 & (max(mlevels)-min(mlevels)==0))
+            stop(paste("Error in covariate scaling: conditioning levels for", 
+                       jmvcore::fromB64(name), 
+                       "are all equal. Conditioning was ",
+                       .cond, "and values were", 
+                       paste(mlevels,collapse = ",")))
         condlist[[name]]<-as.numeric(mlevels)
         lablist[[name]]<-mlevels
       }  
@@ -109,6 +115,10 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   est
 }
 
+.rawMeans.lmerModLmerTest<-function(model,terms,conditioning="mean_sd",span=0,interval=95,labels="values",type="link",df="Satterthwaite") 
+               .rawMeans.merModLmerTest(model,terms,conditioning,span,interval,labels,df) 
+    
+    
 .rawMeans.merModLmerTest<-function(model,terms,conditioning="mean_sd",span=0,interval=95,labels="values",type="link",df="Satterthwaite") {
 
   df<-tolower(df)
@@ -126,8 +136,10 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 pred.means<-function(model,terms,conditioning="mean_sd",span=0,interval=95,labels="values") {
          est<-rawMeans(model,terms,conditioning,span = span ,labels = labels,interval=interval,type="response")
-
          dd<-as.data.frame(est)
+         for (nn in names(dd))
+            if (is.factor(dd[[nn]]))
+               dd[[nn]]<-as.character(dd[[nn]])
 #         names(dd)[seq_along(terms)]<-paste0("c",length(terms):1)
 #         dd[,c(length(terms):1,(length(terms)+1):dim(dd)[2])]
          dd
@@ -196,6 +208,11 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
   list(params,ff)
 }
 
+.simpleEstimates.lmerModLmerTest<-function(model,variable,moderator,threeway=NULL,conditioning="mean_sd",span=0,interval=95,labels="values")
+       .simpleEstimates.merModLmerTest(model,variable,moderator,threeway, conditioning, span, interval, labels)
+    
+    
+    
 .simpleEstimates.merModLmerTest<-function(model,variable,moderator,threeway=NULL,
                                    conditioning="mean_sd",
                                    span=0,

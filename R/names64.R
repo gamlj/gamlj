@@ -1,21 +1,24 @@
-library(jmvcore)
 library(R6)
 
 names64 <- R6Class("names64",list(
                          .factors = list(),
                          .covs= list(),
                          .labels= list(),
+                         .contrasts=list(),
                          addFactor = function(variable,levels) {
-                           var64<-toB64(variable)
+                           var64<-jmvcore::toB64(variable)
                            self$.factors[[var64]]<-variable
-                           for(i in levels) {
+                           self$.contrasts[[var64]]<-list()
+                           for(i in seq_along(levels[-1])) {
                              name64<-paste0(var64,i)
                              name<-paste0(variable,i)
                              self$.factors[[name64]]<-name
+                             name<-paste0(var64,"_._._",i)
+                             self$.contrasts[[var64]][i]<-name
                            }
                          },
                          addLabel=function(variable,labels) {
-                           var64<-toB64(variable)
+                           var64<-jmvcore::toB64(variable)
                            for (i in seq_along(labels)) {
                              name<-paste0(var64,"_._._",i)
                              self$.labels[[name]]<-labels[[i]]
@@ -31,7 +34,7 @@ names64 <- R6Class("names64",list(
                          },
                          
                          addVar=function(variable) {
-                           var64<-toB64(variable)
+                           var64<-jmvcore::toB64(variable)
                            self$.covs[[var64]]<-variable
                          },
                          nicenames=function(obj) {
@@ -41,6 +44,14 @@ names64 <- R6Class("names64",list(
                                  paste(b,collapse = ":")    
                                  })
                                  },
+                         contrasts=function(var) {
+                           self$.contrasts[[jmvcore::toB64(var)]]
+                         },
+                         contrastsLabels=function(var) {
+                           conts<-self$.contrasts[[jmvcore::toB64(var)]]
+                           self$nicelabels(conts)
+                         },
+                         
                          translate=function(astring) {
                            res<-astring
                            for (a in names(self$.factors)) 
@@ -52,7 +63,7 @@ names64 <- R6Class("names64",list(
                          .onename=function(var64) {
                                   x<-unlist(strsplit(var64,"_._._",fixed = T))
                                   if (length(x)==2) 
-                                         return(paste0(fromB64(x[1]),x[2]))
+                                         return(paste0(jmvcore::fromB64(x[1]),x[2]))
                                   if (var64 %in% names(self$.factors))   
                                          return(self$.factors[[var64]])
                                   if (var64 %in% names(self$.covs))   
@@ -70,6 +81,8 @@ names64 <- R6Class("names64",list(
                            print(self$.factors)
                            print(self$.covs)
                            print(self$.labels)
+                           print(self$.contrasts)
+                           
                          }
                        )
 

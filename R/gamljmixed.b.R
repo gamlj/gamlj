@@ -1,4 +1,5 @@
-#' @import ggplot2
+#' @import lmerTest
+library(lmerTest)
 
 gamljMixedClass <- R6::R6Class(
   "gamljMixedClass",
@@ -81,6 +82,7 @@ gamljMixedClass <- R6::R6Class(
         rf.initPostHoc(data,self$options, self$results$postHocs,modelType="linear")     
         rf.initEMeans(data,self$options,self$results$emeansTables)
         rf.initSimpleEffects(data,self$options,self$results)
+        rf.initContrastCode(data,self$options,self$results,n64)
     },
     .run=function() {
       n64<-private$.names64
@@ -116,7 +118,7 @@ gamljMixedClass <- R6::R6Class(
       
              if (!is.null(anovaTable$state)) {
                model<-anovaTable$state[[1]]
-               anova<-anovaTable$state[[2]]
+               anova_res<-anovaTable$state[[2]]
                private$.model <- model
                model_summary<-estimatesTable$state[[1]]
                parameters<-estimatesTable$state[[2]]
@@ -128,9 +130,9 @@ gamljMixedClass <- R6::R6Class(
                ## model_summary: a summary of a model, full R summary
                ## parameters: a table of coefficients, produced by mf.summary() which understands the class of the model
                ## model_anova: a table of F or X^2, produced by mf.anova(), which undestands the class of the model
-               ## These four objects are saved in the tables states: model and model_anova in aTable, model_summary and parameters in estimatesTable
+               ## These four objects are saved in the tables states: model and model_anova in anovaTable, model_summary and parameters in estimatesTable
 
-               mark("the model has been re-estimate")
+               mark("the model has been estimated")
                ##### clean the data ####
                data<-private$.cleandata()
                data<-mf.checkData(self$options,data,"mixed")
@@ -154,23 +156,23 @@ gamljMixedClass <- R6::R6Class(
                }
 
                ### anova results ####
-               anova<-NULL
+               anova_res<-NULL
                if (length(modelTerms)==0) {
-                 aTable$setNote("warning","F-Tests cannot be computed without fixed effects")
+                 anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
                } else {
                  suppressWarnings({
-                   anova_test <- try(anova<-mf.anova(model), silent=TRUE) # end suppressWarnings
+                   anova_test <- try(anova_res<-mf.anova(model), silent=TRUE) # end suppressWarnings
                  })
                  if (jmvcore::isError(anova_test)) 
                       jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                }
-               anovaTable$setState(list(model,anova))
+               anovaTable$setState(list(model,anova_res))
                
                ### full summary results ####
                
                test_summary<-try(model_summary<-summary(model))
                
-               if (isError(test_summary)) {
+               if (jmvcore::isError(test_summary)) {
                    msg <- extractErrorMessage(test_summary)
                    msg<-n64$translate(msg)
                    jmvcore::reject(msg, code='error')
@@ -182,7 +184,6 @@ gamljMixedClass <- R6::R6Class(
                      estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
                private$.model <- model
                estimatesTable$setState(list(model_summary,parameters))
-               
              } # end of check state 
              
         ### prepare info table #########       
@@ -249,10 +250,10 @@ gamljMixedClass <- R6::R6Class(
                  if (length(modelTerms)==0) {
                      anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
                  } else {
-                       rawlabels<-rownames(anova)
+                       rawlabels<-rownames(anova_res)
                        labels<-n64$nicenames(rawlabels)
-                       for (i in seq_len(dim(anova)[1])) {
-                              tableRow<-anova[i,]  
+                       for (i in seq_len(dim(anova_res)[1])) {
+                              tableRow<-anova_res[i,]  
                               anovaTable$setRow(rowNo=i,tableRow)
                               anovaTable$setRow(rowNo=i,list(name=.nicifyTerms(labels[i])))
                        }
@@ -264,13 +265,13 @@ gamljMixedClass <- R6::R6Class(
                       if (length(messages)>0) {
                            infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
                       }
-                      if (attr(anova,"statistic")=="Chisq") {
+                      if (attr(anova_res,"statistic")=="Chisq") {
                           anovaTable$setNote("lmer.chisq",WARNS["lmer.chisq"])
                           anovaTable$getColumn('test')$setTitle("Chi-squared")
                           anovaTable$getColumn('df1')$setTitle("df")
                           anovaTable$getColumn('df2')$setVisible(FALSE)
                        } else
-                              anovaTable$setNote("df",paste(attr(anova,"method"),"method for degrees of freedom"))
+                              anovaTable$setNote("df",paste(attr(anova_res,"method"),"method for degrees of freedom"))
         
                  }
 
@@ -283,11 +284,10 @@ gamljMixedClass <- R6::R6Class(
             colnames(ci)<-c("cilow","cihig")
             parameters<-cbind(parameters,ci) 
           })
-          if (isError(citry)) {
+          if (jmvcore::isError(citry)) {
             message <- extractErrorMessage(citry)
             estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
           }
-
         rownames(parameters)<-n64$nicenames(rownames(parameters))
         for (i in 1:nrow(parameters)) {
                 tableRow=parameters[i,]
@@ -345,6 +345,11 @@ gamljMixedClass <- R6::R6Class(
       dataRaw <- self$data
       data <- list()
       for (factor in factors) {
+        ### we need this for Rinterface ####
+        if (!("factor" %in% class(dataRaw[[factor]]))) {
+          mark(paste("Warning, variable",factor," has been coerced to factor"))
+          dataRaw[[factor]]<-factor(dataRaw[[factor]])
+        }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
         stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
@@ -413,19 +418,17 @@ gamljMixedClass <- R6::R6Class(
   
   tables <- self$results$postHocs
   postHocRows <- list()
-  mark("tables",self$results$postHocs$state)
-  
+
   for (ph in terms) {
     
     table <- tables$get(key=ph)
-    mark("post",table$state)
     if (!is.null(table$state)) {
       mark("post-hoc recycled")
       return()
     }
     
     term <- jmvcore::composeTerm(ph)
-    termB64 <- jmvcore::composeTerm(toB64(ph))
+    termB64 <- jmvcore::composeTerm(jmvcore::toB64(ph))
     suppressWarnings({
       none <- mf.posthoc(model,termB64,"none")
       bonferroni <- mf.posthoc(model,termB64,"bonferroni")
@@ -570,24 +573,32 @@ gamljMixedClass <- R6::R6Class(
   TRUE
 },
 .populateDescriptives=function(model) {
-  
-  terms<-private$.modelTerms()
+
   if (self$options$eDesc) {
-    meanTables<-self$results$emeansTables
-    tables<-lf.meansTables(model,terms)  
-    for (table in tables)  {
-      key<-.nicifyTerms(jmvcore::composeTerm(attr(table,"title")))    
-      aTable<-meanTables$get(key=key)
-      for (i in seq_len(nrow(table))) {
-        values<-as.data.frame(table[i,])
-        aTable$setRow(rowNo=i,values)
-      }
-      note<-attr(table,"note")
-      if (!is.null(note)) aTable$setNote(note,WARNS[note])
-    }
+       
+       terms<-private$.modelTerms()
+       factorsAvailable<-mf.getModelFactors(model)
+       meanTables<-self$results$emeansTables
+      
+       for (term in terms) {
+         term64<-jmvcore::toB64(term)
+         if (all(term64 %in% factorsAvailable)) {
+           
+               table<-pred.means(model,term64)  
+               key<-.nicifyTerms(jmvcore::composeTerm(term))    
+               names(table)[1:length(term)]<-term
+               aTable<-meanTables$get(key=key)
+               
+               for (i in seq_len(nrow(table))) {
+                     values<-table[i,]
+                     aTable$setRow(rowNo=i,values)
+               }
+               depend<-lf.dependencies(model,term64,"means")
+               if (depend!=FALSE) 
+                 aTable$setNote(depend,WARNS[depend])
+         }
+       }
   } # end of eDesc              
-  
-  
   
 },
 .populateSimple=function(model) {
@@ -614,7 +625,7 @@ gamljMixedClass <- R6::R6Class(
   } else {
          simple_test <- try({
                             tables<-pred.simpleEstimates(model,
-                                 toB64(variable),toB64(moderator),toB64(threeway),
+                                 jmvcore::toB64(variable),jmvcore::toB64(moderator),jmvcore::toB64(threeway),
                                  conditioning=simpleScale,span=offset,
                                  interval=interval,
                                  labels=self$options$simpleScaleLabels) 
