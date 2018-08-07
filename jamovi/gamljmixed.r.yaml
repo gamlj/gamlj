@@ -5,17 +5,17 @@ jrs: '1.0'
 
 items:
 
-    - name: info
-      title: Model Info
-      type: Table
-      columns:
+  - name: info
+    title: Model Info
+    type: Table
+    columns:
        - name: info
          type: text
          title: "Info"
        - name: value
          type: text
          title: ""
-      clearWith:
+    clearWith:
         - dep
         - factors
         - cluster
@@ -24,12 +24,10 @@ items:
         - modelTerms
 
 
-
-    - name: anova
-      title: Fixed Effect Omnibus tests
-      type: Table
-      description: a table of ANOVA results
-      clearWith:
+  - name: main
+    type: Group
+    title: Model Results
+    clearWith:
         - dep
         - modelTerms
         - reml
@@ -38,31 +36,147 @@ items:
         - randomTerms
         - correlatedEffects
         - fixedIntercept
+    items:
+           - name: anova
+             title: Fixed Effect Omnibus tests
+             type: Table
+             description: a table of ANOVA results
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - reml
+                         - contrasts
+                         - scaling
+                         - randomTerms
+                         - correlatedEffects
+                         - fixedIntercept
+             columns:
+                    - name: name
+                      title: ""
+                      type: text
+                    - name: test
+                      title: F
+                      type: number
+                    - name: df1
+                      title: Num df
+                      type: number
+                    - name: df2
+                      title: Den df
+                      type: number
+                    - name: p
+                      title: p
+                      type: number
+                      format: zto,pvalue
 
-      columns:
-        - name: name
-          title: ""
-          type: text
-        - name: test
-          title: F
-          type: number
-        - name: df1
-          title: Num df
-          type: number
-        - name: df2
-          title: Den df
-          type: number
-        - name: p
-          title: p
-          type: number
-          format: zto,pvalue
+           - name: fixed
+             title: Fixed Effects Parameter Estimates
+             type: Table
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - reml
+                    - contrasts
+                    - scaling
+                    - randomTerms
+                    - correlatedEffects
+                    - fixedIntercept
+             columns:
+                    - name: source
+                      title: "Names"
+                      type: text
+                      visible: (showRealNames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (showParamsCI)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (showParamsCI)
+                    - name: df
+                      title: "df"
+                      type: number
+                    - name: t
+                      title: "t"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
 
+           - name: random
+             title: Random Components
+             type: Table
+             columns:
+                    - name: groups
+                      title: "Groups"
+                      type: text
+                      combineBelow: true
+                    - name: name
+                      title: "Name"
+                      type: text
+                    - name: std
+                      title: "SD"
+                      type: number
+                    - name: var
+                      title: "Variance"
+                      type: number
 
-    - name: fixed
-      title: Fixed Effects Parameter Estimates
-      type: Table
-      clearWith:
+           - name: randomCov
+             title: Random Parameters correlations
+             type: Table
+             visible: false
+             columns:
+                   - name: groups
+                     title: "Groups"
+                     combineBelow: true
+                     type: text
+                   - name: name1
+                     title: "Param.1"
+                     type: text
+                   - name: name2
+                     title: "Param.2"
+                     type: text
+                   - name: cov
+                     title: "Corr."
+                     type: number
+
+           - name: contrastCodeTables
+             title: Contrast Coefficients 
+             type: Array
+             description: an array of contrast coefficients tables
+             visible: (showContrastCode)
+             clearWith:
+                    - contrasts
+             template:
+                   title:  $key
+                   type: Table
+                   columns:
+                         - name: rnames
+                           title: 'Name'
+                           type: text
+                           visible: (showRealNames)
+                         - name: clabs
+                           title: 'Contrast'
+                           type: text
+
+
+  - name: postHocs
+    title: Post Hoc Tests
+    type: Array
+    description: an array of post-hoc tables
+    items: (postHoc)
+    clearWith:
         - dep
         - modelTerms
         - reml
@@ -70,117 +184,8 @@ items:
         - scaling
         - randomTerms
         - correlatedEffects
-        - fixedIntercept
-      columns:
-        - name: source
-          title: "Names"
-          type: text
-          visible: (showRealNames)
-        - name: label
-          title: "Effect"
-          type: text
-        - name: estimate
-          title: "Estimate"
-          type: number
-        - name: se
-          title: "SE"
-          type: number
-        - name: cilow
-          type: number
-          title: Lower
-          visible: (showParamsCI)
-        - name: cihig
-          type: number
-          title: Upper
-          visible: (showParamsCI)
-
-        - name: df
-          title: "df"
-          type: number
-        - name: t
-          title: "t"
-          type: number
-        - name: p
-          title: "p"
-          type: number
-          format: zto,pvalue
-
-
-
-    - name: random
-      title: Random Components
-      type: Table
-      columns:
-        - name: groups
-          title: "Groups"
-          type: text
-          combineBelow: true
-        - name: name
-          title: "Name"
-          type: text
-        - name: std
-          title: "SD"
-          type: number
-        - name: var
-          title: "Variance"
-          type: number
-
-    - name: randomCov
-      title: Random Parameters correlations
-      type: Table
-      visible: false
-      columns:
-        - name: groups
-          title: "Groups"
-          combineBelow: true
-
-          type: text
-        - name: name1
-          title: "Param.1"
-          type: text
-        - name: name2
-          title: "Param.2"
-          type: text
-        - name: cov
-          title: "Corr."
-          type: number
-
-    - name: contrastCodeTables
-      title: Contrast Coefficients 
-      type: Array
-      description: an array of contrast coefficients tables
-      visible: (showContrastCode)
-      clearWith:
-        - contrasts
-      template:
-        title:  $key
-        type: Table
-        columns:
-        - name: rnames
-          title: 'Name'
-          type: text
-          visible: (showRealNames)
-        - name: clabs
-          title: 'Contrast'
-          type: text
-
-
-    - name: postHocs
-      title: Post Hoc Tests
-      type: Array
-      description: an array of post-hoc tables
-      items: (postHoc)
-      clearWith:
-        - dep
-        - modelTerms
-        - reml
-        - contrasts
-        - scaling
-        - randomTerms
-        - correlatedEffects
-        - postHoc
         - postHocCorr
-      template:
+    template:
         clearWith: []
         title:  ""
         type: Table
@@ -218,10 +223,10 @@ items:
           visible: (postHocCorr:holm)
 
 
-    - name: simpleEffects
-      title: Simple Effects
-      type: Group
-      items:
+  - name: simpleEffects
+    title: Simple Effects
+    type: Group
+    items:
             - name: Anova
               title: Simple Effects ANOVA
               type: Table
@@ -314,32 +319,31 @@ items:
 
 
 
-    - name: model
-      type: Property
-      description: The underlying `lmer` object
-
-
-
-    - name: emeansTables
-      title: Estimated Marginal Means 
-      type: Array
-      description: an array of predicted means tables
-      visible: (eDesc)
-      clearWith:
+  - name: emeansTables
+    title: Estimated Marginal Means 
+    type: Array
+    description: an array of predicted means tables
+    visible: (eDesc)
+    clearWith:
         - dep
         - modelTerms
-      template:
+        - reml
+        - contrasts
+        - scaling
+        - randomTerms
+        - correlatedEffects
+        - fixedIntercept
+    template:
         title:  $key
         type: Table
+        clearWith: []
         columns:
         - name: emmean
           title: 'Mean'
           type: number
-
         - name: SE
           title: SE
           type: number
-
         - name: df
           title: df
           type: number
@@ -351,15 +355,15 @@ items:
           type: number
 
 
-    - name: descPlot
-      title: Fixed Effects Plots
-      visible: (plotHAxis)
-      type: Image
-      description: a descriptives plot
-      width: 500
-      height: 300
-      renderFun: .descPlot
-      clearWith:
+  - name: descPlot
+    title: Fixed Effects Plots
+    visible: (plotHAxis)
+    type: Image
+    description: a descriptives plot
+    width: 500
+    height: 300
+    renderFun: .descPlot
+    clearWith:
         - dep
         - plotHAxis
         - plotSepLines
@@ -373,12 +377,12 @@ items:
         - simpleScale
         - simpleScaleLabels
 
-    - name: descPlots
-      title: Results Plots
-      type: Array
-      description: an array of results plots
-      visible: (plotSepPlots)
-      template:
+  - name: descPlots
+    title: Results Plots
+    type: Array
+    description: an array of results plots
+    visible: (plotSepPlots)
+    template:
           title: $key
           type: Image
           renderFun: .descPlot

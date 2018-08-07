@@ -53,19 +53,19 @@ gamljMixedClass <- R6::R6Class(
       
       
       ## random table
-      aTable<-self$results$random
+      aTable<-self$results$main$random
       aTable$addRow(rowKey="res",list(groups="Residuals"))
 
       ## anova Table 
       if (length(modelTerms)>0) {
-          aTable<- self$results$anova
+          aTable<- self$results$main$anova
           for (i in seq_along(modelTerms)) 
                   aTable$addRow(rowKey=i, list(name=" "))
       }
       
       ## fixed effects parameters
 
-      aTable<-self$results$fixed
+      aTable<-self$results$main$fixed
       formula<-as.formula(private$.fixedFormula())
       mynames64<-colnames(model.matrix(formula,data))
       terms<-n64$nicenames(mynames64)  
@@ -108,10 +108,10 @@ gamljMixedClass <- R6::R6Class(
       
       ### collect the tables #######
       infoTable<-self$results$info
-      estimatesTable <- self$results$fixed
-      randomTable <- self$results$random
-      randomCovTable<-self$results$randomCov
-      anovaTable<-self$results$anova
+      estimatesTable <- self$results$main$fixed
+      randomTable <- self$results$main$random
+      randomCovTable<-self$results$main$randomCov
+      anovaTable<-self$results$main$anova
       
       
       ## check if changed: if not, retrieve the results, otherwise estimate them ####
@@ -306,7 +306,7 @@ gamljMixedClass <- R6::R6Class(
         private$.populatePostHoc(private$.model)
         private$.populateDescriptives(private$.model)
 
-  
+        mark(sessionInfo())
 
     },
   .buildreffects=function(terms,correl=TRUE) {
@@ -410,23 +410,31 @@ gamljMixedClass <- R6::R6Class(
 
 
 .populatePostHoc=function(model) {
-  terms <- self$options$postHoc
-  dep<-self$options$dep
 
-  if (length(terms) == 0)
-    return()
+    terms <- self$options$postHoc
+    dep<-self$options$dep
+
+     if (length(terms) == 0)
+         return()
   
-  tables <- self$results$postHocs
+  tables <- self$results$postHocs 
+  mark("ph state",tables$state)
+  if (!is.null(tables$state)) {
+    mark("post-hoc recycled")
+    return()
+  }
+  mark("post-hoc computed")
+  tables$setState(list(1:10))
+  mark("ph state 2",tables$state)
+  mark("ph FILL 2",tables$isFilled())
+  
   postHocRows <- list()
-
+  
   for (ph in terms) {
     
     table <- tables$get(key=ph)
-    if (!is.null(table$state)) {
-      mark("post-hoc recycled")
-      return()
-    }
-    
+    mark("table state",table$state)
+    table$setState(list(1:10))
     term <- jmvcore::composeTerm(ph)
     termB64 <- jmvcore::composeTerm(jmvcore::toB64(ph))
     suppressWarnings({
@@ -458,7 +466,6 @@ gamljMixedClass <- R6::R6Class(
       table$setRow(rowNo=i, values=c(row,l))
     }
   }
-  self$results$postHocs$setState(list(1,2,4))
 
 },
 
@@ -579,7 +586,13 @@ gamljMixedClass <- R6::R6Class(
        terms<-private$.modelTerms()
        factorsAvailable<-mf.getModelFactors(model)
        meanTables<-self$results$emeansTables
-      
+       
+       if (!is.null(meanTables$state)) {
+         mark("Estimated marginal means recycled")
+         return(FALSE)
+       }
+
+       mark("Estimated marginal means computed")
        for (term in terms) {
          term64<-jmvcore::toB64(term)
          if (all(term64 %in% factorsAvailable)) {
@@ -598,6 +611,7 @@ gamljMixedClass <- R6::R6Class(
                  aTable$setNote(depend,WARNS[depend])
          }
        }
+       meanTables$setState(TRUE)
   } # end of eDesc              
   
 },

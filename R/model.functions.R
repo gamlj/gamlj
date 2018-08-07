@@ -161,11 +161,14 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   .mf.summary.lmer(model)
 
 .mf.summary.lmer<-function(model) {
-  
        ss<-summary(model)$coefficients
        ss<-as.data.frame(ss,stringsAsFactors = F)
+       
       if (dim(ss)[2]==3) {
+        
           ano<-car::Anova(model,test="F",type=3)
+          mark(ano)
+          
           lnames<-rownames(ss)
           matching<-which(lnames %in% rownames(ss))
           ss$df<-NA
@@ -443,7 +446,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
 mf.posthoc<- function(x,...) UseMethod(".posthoc")
 
 .posthoc.default<-function(model,term,adjust) {
-  mark("post-hoc")
 #  term<-jmvcore::composeTerm(term)
   term<-as.formula(paste("~",term))
   data<-mf.getModelData(model)

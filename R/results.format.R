@@ -62,7 +62,7 @@ rf.initContrastCode<-function(data,options,results,n64) {
   factorsAvailable <- options$factors
   if (length(factorsAvailable)==0)
     return()
-  tables<-results$contrastCodeTables
+  tables<-results$main$contrastCodeTables
   for (fac in factorsAvailable) {
     rnames<-n64$nicenames(n64$contrasts(fac))
     clabs<-n64$contrastsLabels(fac)
