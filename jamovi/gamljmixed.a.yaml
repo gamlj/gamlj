@@ -140,6 +140,7 @@ options:
                   - helmert
                   - repeated
                   - polynomial
+                default: deviation
       description:
           R: >
             a list of lists specifying the factor and type of contrast to use,
@@ -154,6 +155,14 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
+
+    - name: lrtRandomEffects
+      title: LRT for Random Effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), LRT for the random effects
 
     - name: showContrastCode
       title: Contrast Coefficients tables
@@ -231,6 +240,11 @@ options:
       type: Bool
       default: false
 
+    - name: plotRandomEffects
+      title: Plot random effects 
+      type: Bool
+      default: false
+
     - name: plotError
       title: Error Bar Definition
       type: List
@@ -293,6 +307,13 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide lsmeans statistics
 
+    - name: eCovs
+      title: Include covariates
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide lsmeans statistics
 
 
     - name: simpleVariable
@@ -325,12 +346,8 @@ options:
       type: List
       options:
         - name: mean_sd
-          title: Mean ± 1 SD
-        - name: mean_offset
-          title: Mean ± offset
+          title: Mean ±  SD
         - name: percent
-          title: "Percentiles (25,50,75)"
-        - name: percent_offset
           title: Percentiles 50 ± offset 
       default: mean_sd
       description:
@@ -341,7 +358,7 @@ options:
 
     - name: cvalue
       type: Number
-      default: 0
+      default: 1
       description:
           R: >
             offset value for conditioning
@@ -349,7 +366,7 @@ options:
     - name: percvalue
       type: Number
       default: 25
-      min: 1
+      min: 5
       max: 50
       description:
           R: >

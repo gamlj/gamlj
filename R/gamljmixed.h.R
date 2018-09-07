@@ -19,6 +19,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             paramCIWidth = 95,
             contrasts = NULL,
             showRealNames = TRUE,
+            lrtRandomEffects = FALSE,
             showContrastCode = FALSE,
             scaling = NULL,
             plotHAxis = NULL,
@@ -26,17 +27,19 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             plotSepPlots = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
+            plotRandomEffects = FALSE,
             plotError = "none",
             ciWidth = 95,
             postHoc = NULL,
             postHocCorr = list(
                 "bonf"),
             eDesc = FALSE,
+            eCovs = FALSE,
             simpleVariable = NULL,
             simpleModerator = NULL,
             simple3way = NULL,
             simpleScale = "mean_sd",
-            cvalue = 0,
+            cvalue = 1,
             percvalue = 25,
             simpleScaleLabels = "labels", ...) {
 
@@ -120,11 +123,16 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "difference",
                                 "helmert",
                                 "repeated",
-                                "polynomial")))))
+                                "polynomial"),
+                            default="deviation"))))
             private$..showRealNames <- jmvcore::OptionBool$new(
                 "showRealNames",
                 showRealNames,
                 default=TRUE)
+            private$..lrtRandomEffects <- jmvcore::OptionBool$new(
+                "lrtRandomEffects",
+                lrtRandomEffects,
+                default=FALSE)
             private$..showContrastCode <- jmvcore::OptionBool$new(
                 "showContrastCode",
                 showContrastCode,
@@ -172,6 +180,10 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "plotDvScale",
                 plotDvScale,
                 default=FALSE)
+            private$..plotRandomEffects <- jmvcore::OptionBool$new(
+                "plotRandomEffects",
+                plotRandomEffects,
+                default=FALSE)
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
                 plotError,
@@ -203,6 +215,10 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "eDesc",
                 eDesc,
                 default=FALSE)
+            private$..eCovs <- jmvcore::OptionBool$new(
+                "eCovs",
+                eCovs,
+                default=FALSE)
             private$..simpleVariable <- jmvcore::OptionVariable$new(
                 "simpleVariable",
                 simpleVariable,
@@ -220,19 +236,17 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 simpleScale,
                 options=list(
                     "mean_sd",
-                    "mean_offset",
-                    "percent",
-                    "percent_offset"),
+                    "percent"),
                 default="mean_sd")
             private$..cvalue <- jmvcore::OptionNumber$new(
                 "cvalue",
                 cvalue,
-                default=0)
+                default=1)
             private$..percvalue <- jmvcore::OptionNumber$new(
                 "percvalue",
                 percvalue,
                 default=25,
-                min=1,
+                min=5,
                 max=50)
             private$..simpleScaleLabels <- jmvcore::OptionList$new(
                 "simpleScaleLabels",
@@ -256,6 +270,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
+            self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..showContrastCode)
             self$.addOption(private$..scaling)
             self$.addOption(private$..plotHAxis)
@@ -263,11 +278,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
+            self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..postHoc)
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..eDesc)
+            self$.addOption(private$..eCovs)
             self$.addOption(private$..simpleVariable)
             self$.addOption(private$..simpleModerator)
             self$.addOption(private$..simple3way)
@@ -290,6 +307,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
+        lrtRandomEffects = function() private$..lrtRandomEffects$value,
         showContrastCode = function() private$..showContrastCode$value,
         scaling = function() private$..scaling$value,
         plotHAxis = function() private$..plotHAxis$value,
@@ -297,11 +315,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         plotSepPlots = function() private$..plotSepPlots$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
+        plotRandomEffects = function() private$..plotRandomEffects$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         postHoc = function() private$..postHoc$value,
         postHocCorr = function() private$..postHocCorr$value,
         eDesc = function() private$..eDesc$value,
+        eCovs = function() private$..eCovs$value,
         simpleVariable = function() private$..simpleVariable$value,
         simpleModerator = function() private$..simpleModerator$value,
         simple3way = function() private$..simple3way$value,
@@ -323,6 +343,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
+        ..lrtRandomEffects = NA,
         ..showContrastCode = NA,
         ..scaling = NA,
         ..plotHAxis = NA,
@@ -330,11 +351,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..plotSepPlots = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
+        ..plotRandomEffects = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..postHoc = NA,
         ..postHocCorr = NA,
         ..eDesc = NA,
+        ..eCovs = NA,
         ..simpleVariable = NA,
         ..simpleModerator = NA,
         ..simple3way = NA,
@@ -388,6 +411,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     fixed = function() private$.items[["fixed"]],
                     random = function() private$.items[["random"]],
                     randomCov = function() private$.items[["randomCov"]],
+                    lrtRandomEffectsTable = function() private$.items[["lrtRandomEffectsTable"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
                 public=list(
@@ -489,6 +513,15 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             options=options,
                             name="random",
                             title="Random Components",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "reml",
+                                "contrasts",
+                                "scaling",
+                                "randomTerms",
+                                "correlatedEffects",
+                                "fixedIntercept"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -530,6 +563,47 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `name`="cov", 
                                     `title`="Corr.", 
                                     `type`="number"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="lrtRandomEffectsTable",
+                            title="Random Effect LRT",
+                            visible="(lrtRandomEffects)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "reml",
+                                "contrasts",
+                                "scaling",
+                                "randomTerms",
+                                "correlatedEffects",
+                                "fixedIntercept"),
+                            columns=list(
+                                list(
+                                    `name`="test", 
+                                    `title`="Test", 
+                                    `combineBelow`=TRUE, 
+                                    `type`="text"),
+                                list(
+                                    `name`="npar", 
+                                    `title`="N. par", 
+                                    `type`="number"),
+                                list(
+                                    `name`="AIC", 
+                                    `title`="AIC", 
+                                    `type`="number"),
+                                list(
+                                    `name`="LRT", 
+                                    `title`="LRT", 
+                                    `type`="number"),
+                                list(
+                                    `name`="Df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="Pr(>Chisq)", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",
@@ -784,7 +858,9 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "plotDvScale",
                     "fixedIntercept",
                     "simpleScale",
-                    "simpleScaleLabels")))
+                    "simpleScaleLabels",
+                    "plotRandomEffects",
+                    "randomTerms")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -864,6 +940,8 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
 #' @param showRealNames \code{TRUE} or \code{FALSE} (default), provide raw
 #'   names of the contrasts variables
+#' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
+#'   random effects
 #' @param showContrastCode \code{TRUE} or \code{FALSE} (default), provide
 #'   contrast coefficients tables
 #' @param scaling a list of lists specifying the covariates scaling, one of
@@ -878,6 +956,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
 #'   statistics
 #' @param plotDvScale .
+#' @param plotRandomEffects .
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
@@ -888,6 +967,8 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 #'   respectively
 #' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans
+#'   statistics
+#' @param eCovs \code{TRUE} or \code{FALSE} (default), provide lsmeans
 #'   statistics
 #' @param simpleVariable The variable for which the simple effects (slopes)
 #'   are computed
@@ -906,6 +987,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$lrtRandomEffectsTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
@@ -937,6 +1019,7 @@ gamljMixed <- function(
     paramCIWidth = 95,
     contrasts,
     showRealNames = TRUE,
+    lrtRandomEffects = FALSE,
     showContrastCode = FALSE,
     scaling = NULL,
     plotHAxis = NULL,
@@ -944,22 +1027,38 @@ gamljMixed <- function(
     plotSepPlots = NULL,
     plotRaw = FALSE,
     plotDvScale = FALSE,
+    plotRandomEffects = FALSE,
     plotError = "none",
     ciWidth = 95,
     postHoc = NULL,
     postHocCorr = list(
                 "bonf"),
     eDesc = FALSE,
+    eCovs = FALSE,
     simpleVariable = NULL,
     simpleModerator = NULL,
     simple3way = NULL,
     simpleScale = "mean_sd",
-    cvalue = 0,
+    cvalue = 1,
     percvalue = 25,
     simpleScaleLabels = "labels") {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljMixed requires jmvcore to be installed (restart may be required)')
+
+    if (missing(data))
+        data <- jmvcore:::marshalData(
+            parent.frame(),
+            `if`( ! missing(dep), dep, NULL),
+            `if`( ! missing(factors), factors, NULL),
+            `if`( ! missing(covs), covs, NULL),
+            `if`( ! missing(cluster), cluster, NULL),
+            `if`( ! missing(plotHAxis), plotHAxis, NULL),
+            `if`( ! missing(plotSepLines), plotSepLines, NULL),
+            `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
+            `if`( ! missing(simpleVariable), simpleVariable, NULL),
+            `if`( ! missing(simpleModerator), simpleModerator, NULL),
+            `if`( ! missing(simple3way), simple3way, NULL))
 
     options <- gamljMixedOptions$new(
         dep = dep,
@@ -975,6 +1074,7 @@ gamljMixed <- function(
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showRealNames = showRealNames,
+        lrtRandomEffects = lrtRandomEffects,
         showContrastCode = showContrastCode,
         scaling = scaling,
         plotHAxis = plotHAxis,
@@ -982,11 +1082,13 @@ gamljMixed <- function(
         plotSepPlots = plotSepPlots,
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
+        plotRandomEffects = plotRandomEffects,
         plotError = plotError,
         ciWidth = ciWidth,
         postHoc = postHoc,
         postHocCorr = postHocCorr,
         eDesc = eDesc,
+        eCovs = eCovs,
         simpleVariable = simpleVariable,
         simpleModerator = simpleModerator,
         simple3way = simple3way,

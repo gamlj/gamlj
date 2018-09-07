@@ -863,6 +863,19 @@ gamljGLM <- function(
     if ( ! requireNamespace('jmvcore'))
         stop('gamljGLM requires jmvcore to be installed (restart may be required)')
 
+    if (missing(data))
+        data <- jmvcore:::marshalData(
+            parent.frame(),
+            `if`( ! missing(dep), dep, NULL),
+            `if`( ! missing(factors), factors, NULL),
+            `if`( ! missing(covs), covs, NULL),
+            `if`( ! missing(plotHAxis), plotHAxis, NULL),
+            `if`( ! missing(plotSepLines), plotSepLines, NULL),
+            `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
+            `if`( ! missing(simpleVariable), simpleVariable, NULL),
+            `if`( ! missing(simpleModerator), simpleModerator, NULL),
+            `if`( ! missing(simple3way), simple3way, NULL))
+
     options <- gamljGLMOptions$new(
         dep = dep,
         factors = factors,

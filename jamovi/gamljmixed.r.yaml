@@ -117,6 +117,16 @@ items:
            - name: random
              title: Random Components
              type: Table
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - reml
+                    - contrasts
+                    - scaling
+                    - randomTerms
+                    - correlatedEffects
+                    - fixedIntercept
+
              columns:
                     - name: groups
                       title: "Groups"
@@ -150,6 +160,41 @@ items:
                    - name: cov
                      title: "Corr."
                      type: number
+
+           - name: lrtRandomEffectsTable
+             title: Random Effect LRT
+             type: Table
+             visible: (lrtRandomEffects)
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - reml
+                    - contrasts
+                    - scaling
+                    - randomTerms
+                    - correlatedEffects
+                    - fixedIntercept
+             columns:
+                   - name: test
+                     title: "Test"
+                     combineBelow: true
+                     type: text
+                   - name: npar
+                     title: "N. par"
+                     type: number
+                   - name: AIC
+                     title: "AIC"
+                     type: number
+                   - name: LRT
+                     title: "LRT"
+                     type: number
+                   - name: Df
+                     title: "df"
+                     type: number
+                   - name: Pr(>Chisq)
+                     title: "p"
+                     type: number
+                     format: zto,pvalue
 
            - name: contrastCodeTables
              title: Contrast Coefficients 
@@ -376,7 +421,9 @@ items:
         - fixedIntercept
         - simpleScale
         - simpleScaleLabels
-
+        - plotRandomEffects
+        - randomTerms
+        
   - name: descPlots
     title: Results Plots
     type: Array

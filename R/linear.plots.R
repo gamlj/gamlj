@@ -6,7 +6,7 @@
 #### the legend name and the function assumes that the data contains "lwr" and "upr" varianbles
 #### "theme" is passed from jmv plot function
 
-.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none",title=NULL) {
+lp.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none",title=NULL) {
     if (errorType != 'none') {
     dodge <- ggplot2::position_dodge(0.2)
     clabel<-paste(linesName, paste0("(",toupper(errorType),")"),sep="\n")
@@ -16,7 +16,8 @@
     clabel<-linesName
     dodge <- ggplot2::position_dodge(0)
   }
-    p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=lines)) +
+
+    p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=factor(lines))) +
        geom_line(size=.8, position=dodge) +
        labs(x=groupName, y=depName, colour=clabel) +
        scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
@@ -42,8 +43,7 @@
  p   
 }
 
-.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
-  
+lp.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
   if (errorType != 'none') {
     dodge <- ggplot2::position_dodge(0.2)
     clabel<-toupper(errorType)
@@ -52,7 +52,7 @@
     errorType<-""
     clabel<-""
     dodge <- ggplot2::position_dodge(0)
-  }
+    }
 
      p <- ggplot2::ggplot(data=image$state$data) +
         labs(x=groupName, y=depName, colour=errorType) +
@@ -66,17 +66,35 @@
      
 
   if (is.factor(image$state$data$group)) {
+      mark("for factors")
       p <- p + geom_point(aes(x=group, y=fit, colour='colour'), shape=16,  size=4,show.legend=F)
       p <- p+geom_line(aes(x=group,y=fit,group = 1)) 
       if (errorType != '')
-           p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, colour='colour', width=.1), size=.8)
+           p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, colour=theme$color[1], width=.1), size=.8)
+      
+      if (!is.null(image$state$randomData)) {
+        data<-image$state$randomData
+        mark("we are breaking by cluster")
+        p <- p + geom_point(data=data,aes(x=group, y=y,group=cluster, colour=theme$color[1]), shape=12,  size=3,show.legend=F)
+        p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster,colour=cluster),show.legend = F) 
+      }
+      
   }  else { 
+      mark("for cont")
       p <- p+geom_line(aes(x=group,y=fit),size=1.5) 
       if (errorType != '')
       p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=T, alpha=.3)
+      
+      if (!is.null(image$state$randomData)) {
+        data<-image$state$randomData
+        mark("we are smoothing")
+        mark(theme$color)
+        p<-p+geom_smooth(data=data,aes(y=y,x=group,group=cluster),colour=theme$color[2],method = "lm",se=FALSE)
+      }
+      
   
   }
-     
+
    p
 }
 
@@ -167,34 +185,31 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
                                      plotsName=NULL,
                                      bars="none",
                                      ciwidth=95,
-                                     conditioning="mean_sd",span=0,labels="values") {
+                                     conditioning=NULL) {
+  
       selected<-c(groupName,linesName,plotsName)  
       selected64<-jmvcore::toB64(selected)
       preds<-unlist(jmvcore::toB64(c(linesName,plotsName)))
       nsel<-length(selected)
       varnames<-c("group","lines","plots")[1:nsel]
       data<-mf.getModelData(model)
-      temp<-.condition_list(preds,data,conditioning,span) 
-      condlist<-temp[[1]]
-      lablist<-temp[[2]]
-      
-      if (!is.factor(data[[jmvcore::toB64(groupName)]])) {
-        lablist[[jmvcore::toB64(groupName)]]<-pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25) 
-      }
-
-            
+      mark(class(conditioning))
+      if (groupName %in% conditioning$vars)
+           conditioning$updateValues(groupName,pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25))
+  
   pdata<-try({
-      pred.means(model,selected64,lablist,span = span,labels = labels )
+      pred.means(model,selected64,conditioning)
   })
-
+  
     
   if (jmvcore::isError(pdata)) {
     mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
       jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
-    
   }
-
   names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
+
+  if (is.factor(data[[jmvcore::toB64(groupName)]])) 
+      pdata$group<-factor(pdata$group)
   
   if (bars=="se") {
     pdata$lwr<-pdata$fit-pdata$SE

@@ -7,6 +7,7 @@ gamljMixedClass <- R6::R6Class(
   private=list(
     .model=NA,
     .names64=NA,
+    .cov_condition=conditioning$new(),
     .postHocRows=NA,
     .init=function() {
       mark("init")
@@ -37,7 +38,14 @@ gamljMixedClass <- R6::R6Class(
       }
       modelTerms<-private$.modelTerms()
       data<-private$.cleandata()
-
+      
+      ### initialize conditioning of covariates
+      if (!is.null(self$options$covs)) {
+      span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
+      private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
+      }
+      #####################
+      
       #### info table #####
       infoTable<-self$results$info
       infoTable$addRow(rowKey="est",list(info="Estimate"))
@@ -78,9 +86,8 @@ gamljMixedClass <- R6::R6Class(
 
         # other inits
         private$.initPlots(data)
-#        tables   <- self$results$postHoc
         rf.initPostHoc(data,self$options, self$results$postHocs,modelType="linear")     
-        rf.initEMeans(data,self$options,self$results$emeansTables)
+        rf.initEMeans(data,self$options,self$results$emeansTables,private$.cov_condition)
         rf.initSimpleEffects(data,self$options,self$results)
         rf.initContrastCode(data,self$options,self$results,n64)
     },
@@ -94,12 +101,12 @@ gamljMixedClass <- R6::R6Class(
       clusters<-self$options$cluster
       reml<-self$options$reml
       
-      
-      if (self$options$simpleScale=="mean_offset" && self$options$cvalue==0)
+      if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
-      if (self$options$simpleScale=="percent_offset" && self$options$percvalue==0)
+      if (self$options$simpleScale=="percent" && self$options$percvalue==0)
          return()
-      
+ 
+      ###############      
       modelTerms<-private$.modelTerms()
       modelFormula<-private$.modelFormula()
       if (modelFormula==FALSE)  
@@ -112,6 +119,23 @@ gamljMixedClass <- R6::R6Class(
       randomTable <- self$results$main$random
       randomCovTable<-self$results$main$randomCov
       anovaTable<-self$results$main$anova
+
+      ##### clean the data ####
+      data<-private$.cleandata()
+      data<-mf.checkData(self$options,data,"mixed")
+      if (!is.data.frame(data))
+        reject(data)
+      for (scaling in self$options$scaling) {
+        cluster<-jmvcore::toB64(clusters[[1]])
+        data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
+      }
+      
+      if (!is.null(covs)) {
+        names(data)<-jmvcore::fromB64(names(data))
+        private$.cov_condition$storeValues(data)
+        names(data)<-jmvcore::toB64(names(data))
+        private$.cov_condition$labels_type=self$options$simpleScaleLabels
+      }
       
       
       ## check if changed: if not, retrieve the results, otherwise estimate them ####
@@ -133,16 +157,7 @@ gamljMixedClass <- R6::R6Class(
                ## These four objects are saved in the tables states: model and model_anova in anovaTable, model_summary and parameters in estimatesTable
 
                mark("the model has been estimated")
-               ##### clean the data ####
-               data<-private$.cleandata()
-               data<-mf.checkData(self$options,data,"mixed")
-               if (!is.data.frame(data))
-                   reject(data)
-               for (scaling in self$options$scaling) {
-                   cluster<-jmvcore::toB64(clusters[[1]])
-                   data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
-               }
-
+               
                ##### model ####
            
                model_test <- try({
@@ -237,7 +252,6 @@ gamljMixedClass <- R6::R6Class(
                 realgroups<-n64$nicenames(grp)
                 realnames1<-n64$nicenames(vcv$var1)
                 realnames2<-n64$nicenames(vcv$var2)
-
                 if (dim(vcv)[1]>0) {
                     for (i in 1:dim(vcv)[1]) {
                         randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
@@ -275,6 +289,21 @@ gamljMixedClass <- R6::R6Class(
         
                  }
 
+        #### LRT for random effects ####
+        if (self$options$lrtRandomEffects) {
+          
+          lrtTable<-self$results$main$lrtRandomEffectsTable
+          ranova_test<-try(res<-as.data.frame(lmerTest::ranova(model)[-1,]))
+          if (jmvcore::isError(ranova_test)) {
+              message <- extractErrorMessage(ranova_test)
+              lrtTable$setNote("noluck",paste(message,". LRT cannot be computed"))
+          } else {
+             res$test<-n64$translate(rownames(res))
+             res$test<-as.character(res$test)
+             for (i in seq_len(nrow(res)))
+                  lrtTable$addRow(rowKey=i,res[i,])
+          } 
+        }
         ### parameter table ####
         
         #### confidence intervals ######
@@ -305,8 +334,6 @@ gamljMixedClass <- R6::R6Class(
         private$.populateSimple(private$.model)
         private$.populatePostHoc(private$.model)
         private$.populateDescriptives(private$.model)
-
-        mark(sessionInfo())
 
     },
   .buildreffects=function(terms,correl=TRUE) {
@@ -418,22 +445,17 @@ gamljMixedClass <- R6::R6Class(
          return()
   
   tables <- self$results$postHocs 
-  mark("ph state",tables$state)
-  if (!is.null(tables$state)) {
+  if (tables$isFilled()) {
     mark("post-hoc recycled")
     return()
   }
   mark("post-hoc computed")
-  tables$setState(list(1:10))
-  mark("ph state 2",tables$state)
-  mark("ph FILL 2",tables$isFilled())
-  
+
   postHocRows <- list()
   
   for (ph in terms) {
     
     table <- tables$get(key=ph)
-    mark("table state",table$state)
     table$setState(list(1:10))
     term <- jmvcore::composeTerm(ph)
     termB64 <- jmvcore::composeTerm(jmvcore::toB64(ph))
@@ -478,20 +500,14 @@ gamljMixedClass <- R6::R6Class(
     
        if (isMulti) {
          sepPlotsName <- self$options$plotSepPlots
-         sepPlotsVar <- data[[toB64(sepPlotsName)]]
+         sepPlotsVar <- data[[jmvcore::toB64(sepPlotsName)]]
          if(is.factor(sepPlotsVar))
             sepPlotsLevels <- levels(sepPlotsVar)
          else {
-             if (self$options$simpleScale=="mean_sd")
-               sepPlotsLevels <- c("-1 SD","Mean","+1 SD")   
-             if (self$options$simpleScale=="mean_offset")
-               sepPlotsLevels <- c(paste0("Mean-",self$options$cvalue),"Mean",paste0("Mean+",self$options$cvalue))   
-             if (self$options$simpleScale=="percent")
-               sepPlotsLevels <- c("25%","50%","75%")   
-             if (self$options$simpleScale=="percent_offset") {
-               sepPlotsLevels <- c(paste0((50-self$options$percvalue),"%"),"50%",paste0((50+self$options$percvalue),"%"))   
-             }
+           sepPlotsLevels<-private$.cov_condition$labels(sepPlotsName)
          }
+         mark("levs",sepPlotsLevels)
+
          array <- self$results$descPlots
          for (level in sepPlotsLevels) {
              title<-paste(sepPlotsName,"=",level)
@@ -514,6 +530,9 @@ gamljMixedClass <- R6::R6Class(
   optionRange<-self$options$plotDvScale
   referToData<-(optionRaw || optionRange)
   
+  ### mixed specific ###
+  cluster<-self$options$cluster[[1]]
+  
   plotScale<-self$options$simpleScale
   offset<-ifelse(self$options$simpleScale=="percent_offset",self$options$percvalue,self$options$cvalue)
   
@@ -522,24 +541,45 @@ gamljMixedClass <- R6::R6Class(
     rawData=lp.rawData(model,depName,groupName,linesName)
   else 
     rawData<-NULL
-  
+  ### this is specific of mixed model #####
+  if (self$options$plotRandomEffects) {
+    pd<-predict(model)
+    data<-model@frame
+    groupName64<-jmvcore::toB64(groupName)
+    cluster64<-jmvcore::toB64(cluster)
+    linesName64<-NULL
+    if(!is.null(linesName)) {
+       linesName64<-jmvcore::toB64(linesName)
+    } 
+    randomData<-as.data.frame(cbind(pd,data[,c(groupName64,jmvcore::toB64(cluster),linesName64)]))
+    names(randomData)<-c("y","group","cluster")
+  } else
+    randomData<-NULL
+
+
   predData<-lp.preparePlotData(model,
                                groupName,
                                linesName,
                                plotsName,
                                errorBarType,
                                ciWidth,
-                               conditioning=self$options$simpleScale,span=offset,
-                               labels=self$options$simpleScaleLabels)
-  yAxisRange <- lp.range(model,depName,predData,rawData)
-  
+                               conditioning=private$.cov_condition)
+ 
   if (!optionRaw)
     rawData<-NULL
+ 
+  yAxisRange <- lp.range(model,depName,predData,rawData)
+
+  ### this for mixed only ###
+  if (!is.null(randomData)) {
+             yAxisRange[which.max(yAxisRange)]<-max(max(randomData$y),max(yAxisRange))
+             yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
+    }
   
   
   if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
-    image$setState(list(data=predData, raw=rawData, range=yAxisRange))
+    image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=randomData))
   } else {
     images <- self$results$descPlots
     i<-1
@@ -571,9 +611,9 @@ gamljMixedClass <- R6::R6Class(
     errorType<-paste0(ciWidth,"% ",toupper(errorType))
   
   if ( ! is.null(linesName)) {
-    p<-.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
+    p<-lp.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
   } else {
-    p<-.oneWayPlot(image,theme,depName,groupName,errorType)
+    p<-lp.oneWayPlot(image,theme,depName,groupName,errorType)
   }       
   p<-p+ggtheme
   print(p)
@@ -584,7 +624,11 @@ gamljMixedClass <- R6::R6Class(
   if (self$options$eDesc) {
        
        terms<-private$.modelTerms()
-       factorsAvailable<-mf.getModelFactors(model)
+       if (self$options$eCovs)
+           terms<-private$.modelTerms()
+       else 
+           terms<-jmvcore::fromB64(mf.getModelFactors(model))
+
        meanTables<-self$results$emeansTables
        
        if (!is.null(meanTables$state)) {
@@ -594,33 +638,34 @@ gamljMixedClass <- R6::R6Class(
 
        mark("Estimated marginal means computed")
        for (term in terms) {
-         term64<-jmvcore::toB64(term)
-         if (all(term64 %in% factorsAvailable)) {
-           
-               table<-pred.means(model,term64)  
-               key<-.nicifyTerms(jmvcore::composeTerm(term))    
-               names(table)[1:length(term)]<-term
-               aTable<-meanTables$get(key=key)
+            term64<-jmvcore::toB64(term)
+            table<-pred.means(model,term64,cov_conditioning = private$.cov_condition)  
+            key<-.nicifyTerms(jmvcore::composeTerm(term))    
+            names(table)[1:length(term)]<-term
+            aTable<-meanTables$get(key=key)
                
-               for (i in seq_len(nrow(table))) {
+            for (i in seq_len(nrow(table))) {
                      values<-table[i,]
                      aTable$setRow(rowNo=i,values)
-               }
-               depend<-lf.dependencies(model,term64,"means")
-               if (depend!=FALSE) 
-                 aTable$setNote(depend,WARNS[depend])
+            }
+            depend<-lf.dependencies(model,term64,"means")
+            if (depend!=FALSE) 
+            aTable$setNote(depend,WARNS[depend])
          }
-       }
+       
        meanTables$setState(TRUE)
   } # end of eDesc              
   
 },
 .populateSimple=function(model) {
+  
   variable<-self$options$simpleVariable
   moderator<-self$options$simpleModerator
   threeway<-self$options$simple3way
   simpleScale<-self$options$simpleScale
-  offset<-ifelse(self$options$simpleScale=="percent_offset",self$options$percvalue,self$options$cvalue)
+  offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
+  
+
   interval<-self$options$paramCIWidth
 
     if (is.null(variable) | is.null(moderator)) 
@@ -633,16 +678,15 @@ gamljMixedClass <- R6::R6Class(
 
   #### check if estimation is needed
   if (!is.null(anovaTable$state)) {
-     mark("simple effects have been recycled")
+    mark("simple effects have been recycled")
     anovaTableData<-anovaTable$state
     parametersTableData<-parametersTable$state
   } else {
          simple_test <- try({
                             tables<-pred.simpleEstimates(model,
                                  jmvcore::toB64(variable),jmvcore::toB64(moderator),jmvcore::toB64(threeway),
-                                 conditioning=simpleScale,span=offset,
-                                 interval=interval,
-                                 labels=self$options$simpleScaleLabels) 
+                                 cov_conditioning=private$.cov_condition,
+                                 interval=interval) 
                          })
           if (jmvcore::isError(simple_test)) {
               anovaTable$setNote("se.noluck",WARNS[["se.noluck"]])

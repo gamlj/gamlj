@@ -128,6 +128,8 @@ children:
         children:
           - type: CheckBox
             name: correlatedEffects
+          - type: CheckBox
+            name: lrtRandomEffects
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -155,7 +157,6 @@ children:
         name: showRealNames
       - type: CheckBox
         name: showContrastCode
-
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -194,25 +195,15 @@ children:
                     name: simpleScale_mean_sd
                     optionName: simpleScale
                     optionPart: mean_sd
-                  - type: RadioButton
-                    name: simpleScale_mean_offset
-                    optionName: simpleScale
-                    optionPart: mean_offset
-                    children:
-                      - type: TextBox
-                        name: cvalue
-                        label: null
-                        format: number
-                        inputPattern: '[0-9]+'
-                        enable: (simpleScale_mean_offset)
+                    children: 
+                          - type: TextBox
+                            name: cvalue
+                            format: number
+                            inputPattern: '[0-9]+'
                   - name: simpleScale_percent
                     type: RadioButton
                     optionName: simpleScale
                     optionPart: percent
-                  - name: simpleScale_percent_offset
-                    type: RadioButton
-                    optionName: simpleScale
-                    optionPart: percent_offset
                     children:
                       - type: TextBox
                         name: percvalue
@@ -220,7 +211,7 @@ children:
                         suffix: '%'
                         format: number
                         inputPattern: '[0-9]+'
-                        enable: (simpleScale_percent_offset)
+                        enable: (simpleScale_percent)
           - type: Label
             label: Covariates labeling
             children:
@@ -343,6 +334,8 @@ children:
                 name: plotRaw
               - type: CheckBox
                 name: plotDvScale
+              - type: CheckBox
+                name: plotRandomEffects
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -384,3 +377,5 @@ children:
         children:
           - type: CheckBox
             name: eDesc
+          - type: CheckBox
+            name: eCovs

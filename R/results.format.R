@@ -80,32 +80,43 @@ rf.initContrastCode<-function(data,options,results,n64) {
   }  
   
 }
-rf.initEMeans<-function(data,options,theTables) {
+rf.initEMeans<-function(data,options,theTables,cov_conditioning=NULL) {
   
-  interval<-options$paramCIWidth
-  if (options$eDesc) {
-    factorsAvailable <- options$factors
-    modelTerms<- options$modelTerms
-    if (length(factorsAvailable) == 0)
-      return()
-    for (term in modelTerms)
-      if (all(term %in% factorsAvailable)) {
-        aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
-        aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
-        aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
-        
-        ll <- sapply(jmvcore::toB64(term), function(a) base::levels(data[[a]]), simplify=F)
-        ll$stringsAsFactors <- FALSE
-        grid <- do.call(base::expand.grid, ll)
-        grid <- as.data.frame(grid,stringsAsFactors=F)
-        for (i in seq_len(ncol(grid))) {
-          colName <- jmvcore::fromB64(colnames(grid)[[i]])
-          aTable$addColumn(name=colName, title=term[i], index=i)
-        }
+      interval<-options$paramCIWidth
+      if (options$eDesc) {
+            modelTerms<- options$modelTerms
+            factorsAvailable <- options$factors
+            if (options$eCovs)
+                 terms<-modelTerms
+            else
+                 terms<-intersect(modelTerms,factorsAvailable)
+            
+            if (length(terms) == 0)
+              return()
+        for (term in terms) {
+           aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+           aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+           aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+
+           aList=list()
+           for (ter in term) {
+             if (ter %in% cov_conditioning$vars)
+               aList[[ter]]<-cov_conditioning$labels(ter)
+             else
+               aList[[ter]]<-levels(data[,jmvcore::toB64(ter)])
+           }
+           grid<-expand.grid(aList)
+           mark(grid)
+           grid <- as.data.frame(grid,stringsAsFactors=F)
+            for (i in seq_len(ncol(grid))) {
+              colName <- colnames(grid)[[i]]
+              aTable$addColumn(name=colName, title=term[i], index=i)
+            }
         for (rowNo in seq_len(nrow(grid))) {
           row <- as.data.frame(grid[rowNo,],stringsAsFactors=F)
           colnames(row)<-term
           aTable$addRow(rowKey=row, values=row)
+        }
         }
       }
     return(theTables)
@@ -113,7 +124,7 @@ rf.initEMeans<-function(data,options,theTables) {
   
   
   
-}
+
 
 rf.initSimpleEffects<-function(data,options,results) {
 

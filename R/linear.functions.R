@@ -163,6 +163,7 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
 }
 
 
+### this should be lecacy now ###
 
 # This is a crazy piece of software to extract labels of contrasts and
 # merge them to the names of the terms of a summary.lm(). Before thinking
@@ -171,7 +172,7 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
 # or one dummy gets the same name of a continuous variable (this may happens too).
 
 
-.getFormulaContrastsLabels<-function(contrasts,formula,data) {
+.xgetFormulaContrastsLabels<-function(contrasts,formula,data) {
 
   contrasts<-as.data.frame(do.call(rbind,contrasts))
   modelmatrix<-model.matrix(formula,data)

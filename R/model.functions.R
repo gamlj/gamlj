@@ -167,8 +167,6 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
       if (dim(ss)[2]==3) {
         
           ano<-car::Anova(model,test="F",type=3)
-          mark(ano)
-          
           lnames<-rownames(ss)
           matching<-which(lnames %in% rownames(ss))
           ss$df<-NA

@@ -16,6 +16,13 @@ names64 <- R6Class("names64",list(
                              name<-paste0(var64,"_._._",i)
                              self$.contrasts[[var64]][i]<-name
                            }
+                           ## this is for lme4 random names without intercept
+                           for(a in levels) {
+                             name64<-paste0(var64,a)
+                             name<-paste0(variable,a)
+                             self$.factors[[name64]]<-name
+                           }
+                           
                          },
                          addLabel=function(variable,labels) {
                            var64<-jmvcore::toB64(variable)
