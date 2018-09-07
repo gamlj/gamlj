@@ -11,3 +11,9 @@ mark<-function(what=NULL,obj=NULL) {
     }
   }
 }
+
+c.real<-function(...) {
+  obj <- c(...)
+  obj[!is.null(obj)]
+}
+

@@ -524,17 +524,16 @@ gamljMixedClass <- R6::R6Class(
   
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
+
   errorBarType<-self$options$plotError
   ciWidth   <- self$options$ciWidth
   optionRaw<-self$options$plotRaw
   optionRange<-self$options$plotDvScale
   referToData<-(optionRaw || optionRange)
-  
-  ### mixed specific ###
-  cluster<-self$options$cluster[[1]]
-  
   plotScale<-self$options$simpleScale
-  offset<-ifelse(self$options$simpleScale=="percent_offset",self$options$percvalue,self$options$cvalue)
+  offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
+  
+  
   
   
   if (referToData)
@@ -542,20 +541,18 @@ gamljMixedClass <- R6::R6Class(
   else 
     rawData<-NULL
   ### this is specific of mixed model #####
+  cluster<-self$options$cluster[[1]]
+  preds<-c.real(cluster,groupName,linesName,plotsName)
+  preds64<-jmvcore::toB64(preds)
+  
   if (self$options$plotRandomEffects) {
     pd<-predict(model)
     data<-model@frame
-    groupName64<-jmvcore::toB64(groupName)
-    cluster64<-jmvcore::toB64(cluster)
-    linesName64<-NULL
-    if(!is.null(linesName)) {
-       linesName64<-jmvcore::toB64(linesName)
-    } 
-    randomData<-as.data.frame(cbind(pd,data[,c(groupName64,jmvcore::toB64(cluster),linesName64)]))
-    names(randomData)<-c("y","group","cluster")
+    randomData<-as.data.frame(cbind(pd,data[,preds64]))
+    pnames<-c("cluster","group","lines","plots")
+    names(randomData)<-c("y",pnames[1:length(preds)])
   } else
     randomData<-NULL
-
 
   predData<-lp.preparePlotData(model,
                                groupName,
@@ -588,7 +585,15 @@ gamljMixedClass <- R6::R6Class(
       real<-levels[i]
       i<-i+1
       image <- images$get(key=key)
-      image$setState(list(data=subset(predData,plots==real),raw=rawData, range=yAxisRange))
+      sdata<-subset(predData,plots==real)
+      sraw<-NULL
+      if (!is.null(rawData))
+           sraw<-subset(rawData,plots==real)
+      srand<-NULL
+      if (!is.null(randomData))
+           srand<-subset(randomData,plots==real)
+          
+      image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=srand))
     }
   }
   
@@ -635,7 +640,6 @@ gamljMixedClass <- R6::R6Class(
          mark("Estimated marginal means recycled")
          return(FALSE)
        }
-
        mark("Estimated marginal means computed")
        for (term in terms) {
             term64<-jmvcore::toB64(term)

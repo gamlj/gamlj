@@ -18,7 +18,7 @@ lp.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none
   }
 
     p <- ggplot2::ggplot(data=image$state$data, aes(x=group, y=fit, group=factor(lines), colour=factor(lines))) +
-       geom_line(size=.8, position=dodge) +
+       geom_line(size=1.2, position=dodge) +
        labs(x=groupName, y=depName, colour=clabel) +
        scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
 
@@ -29,13 +29,35 @@ lp.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none
     
     
     if (is.factor(image$state$data$group)) {
-      p <- p + geom_point(shape=16, size=3, position=dodge)
+      
+      if (!is.null(image$state$randomData)) {
+        data<-image$state$randomData
+        data<-aggregate(data$y,list(data$cluster,data$group),mean)
+        names(data)<-c("cluster","group","y")
+        mark("we are breaking by cluster")
+        p <- p + geom_point(data=data,aes(x=group, y=y,group=cluster),color=theme$color[1],show.legend = F,shape=12, alpha=.5,  size=.5)
+        p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster),color=theme$color[1],size=.3, alpha=.3,show.legend = F) 
+      }
+      
+
+      p <- p + geom_point(shape=16, size=4, position=dodge)
       if (errorType != '')
-          p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, width=.1, group=lines), size=.8, position=dodge)
+          p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, width=.1, group=lines), size=1.2, position=dodge)
+      
+
    } else {
-    if (errorType != '')
-     p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
-   }
+    
+     if (!is.null(image$state$randomData)) {
+       data<-image$state$randomData
+       mark("we are smoothing")
+       p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,method = "lm",colour=theme$color[1], alpha=.3,fullrange = TRUE,se=FALSE,show.legend=F) 
+       
+     }
+     if (errorType != '')
+         p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
+    
+    
+    }
     
     if (!is.null(title))
       p<-p+ ggtitle(title)
@@ -66,31 +88,35 @@ lp.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
      
 
   if (is.factor(image$state$data$group)) {
-      mark("for factors")
-      p <- p + geom_point(aes(x=group, y=fit, colour='colour'), shape=16,  size=4,show.legend=F)
-      p <- p+geom_line(aes(x=group,y=fit,group = 1)) 
+    mark("for factors")
+    
+    if (!is.null(image$state$randomData)) {
+      data<-image$state$randomData
+      data<-aggregate(data$y,list(data$cluster,data$group),mean)
+      names(data)<-c("cluster","group","y")
+      mark("we are breaking by cluster")
+      p <- p + geom_point(data=data,aes(x=group, y=y,group=cluster),color=theme$color[1],show.legend = F,shape=12, alpha=.5,  size=.5)
+      p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster),color=theme$color[1],size=.3, alpha=.3,show.legend = F) 
+    }
+    
+      p <- p + geom_point(aes(x=group, y=fit, colour=theme$color[1]), shape=16,  size=6,show.legend=F)
+      p <- p+geom_line(aes(x=group,y=fit,group = 1),size=4) 
       if (errorType != '')
            p <- p + geom_errorbar(aes(x=group, ymin=lwr, ymax=upr, colour=theme$color[1], width=.1), size=.8)
       
-      if (!is.null(image$state$randomData)) {
-        data<-image$state$randomData
-        mark("we are breaking by cluster")
-        p <- p + geom_point(data=data,aes(x=group, y=y,group=cluster, colour=theme$color[1]), shape=12,  size=3,show.legend=F)
-        p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster,colour=cluster),show.legend = F) 
-      }
       
   }  else { 
       mark("for cont")
+    if (!is.null(image$state$randomData)) {
+      data<-image$state$randomData
+      mark("we are smoothing")
+      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,method = "lm",colour=theme$color[1], alpha=.3,fullrange = TRUE,se=FALSE,show.legend=F) 
+    }
+    
       p <- p+geom_line(aes(x=group,y=fit),size=1.5) 
       if (errorType != '')
       p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=T, alpha=.3)
       
-      if (!is.null(image$state$randomData)) {
-        data<-image$state$randomData
-        mark("we are smoothing")
-        mark(theme$color)
-        p<-p+geom_smooth(data=data,aes(y=y,x=group,group=cluster),colour=theme$color[2],method = "lm",se=FALSE)
-      }
       
   
   }
@@ -193,12 +219,12 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
       nsel<-length(selected)
       varnames<-c("group","lines","plots")[1:nsel]
       data<-mf.getModelData(model)
-      mark(class(conditioning))
-      if (groupName %in% conditioning$vars)
-           conditioning$updateValues(groupName,pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25))
+      cond<-conditioning$clone()
+      if (groupName %in% cond$vars)
+           cond$updateValues(groupName,pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25))
   
   pdata<-try({
-      pred.means(model,selected64,conditioning)
+      pred.means(model,selected64,cond)
   })
   
     

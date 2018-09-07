@@ -106,7 +106,6 @@ rf.initEMeans<-function(data,options,theTables,cov_conditioning=NULL) {
                aList[[ter]]<-levels(data[,jmvcore::toB64(ter)])
            }
            grid<-expand.grid(aList)
-           mark(grid)
            grid <- as.data.frame(grid,stringsAsFactors=F)
             for (i in seq_len(ncol(grid))) {
               colName <- colnames(grid)[[i]]
