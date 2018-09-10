@@ -99,13 +99,25 @@ children:
                   change: './glm.events::onChange_modelTerms'
                 template:
                   type: TermLabel
-      - type: Label
-        label: Sum of Squares
+      - type: LayoutBox
         margin: large
-        style: list-inline
+        style: inline
         children:
-          - type: ComboBox
-            name: ss
+               - type: Label
+                 label: Sum of Squares
+                 margin: large
+                 style: list-inline
+                 children:
+                    - type: ComboBox
+                      name: ss
+               - type: Label
+                 label: Estimates
+                 margin: large
+                 style: list-inline
+                 children:
+                     - type: CheckBox
+                       name: fixedIntercept
+      
   - type: CollapseBox
     label: Assumption Checks
     collapsed: true
@@ -141,10 +153,9 @@ children:
             template:
               type: ComboBox
       - type: CheckBox
-        name: showContrasts
+        name: showRealNames
       - type: CheckBox
-        name: showContrastsTable
-
+        name: showContrastCode
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -168,6 +179,56 @@ children:
             stretchFactor: 0.5
             template:
               type: ComboBox
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+          - type: Label
+            label: Covariates conditioning
+            children:
+              - type: LayoutBox
+                margin: large
+                style: list
+                children:
+                  - type: RadioButton
+                    name: simpleScale_mean_sd
+                    optionName: simpleScale
+                    optionPart: mean_sd
+                    children:
+                      - type: TextBox
+                        name: cvalue
+                        format: number
+                        inputPattern: '[0-9]+'
+                  - name: simpleScale_percent
+                    type: RadioButton
+                    optionName: simpleScale
+                    optionPart: percent
+                    children:
+                      - type: TextBox
+                        name: percvalue
+                        label: null
+                        suffix: '%'
+                        format: number
+                        inputPattern: '[0-9]+'
+                        enable: (simpleScale_percent)
+          - type: Label
+            label: Covariates labeling
+            children:
+              - type: LayoutBox
+                margin: large
+                children:
+                  - type: RadioButton
+                    name: simpleScaleLabels_labels
+                    optionName: simpleScaleLabels
+                    optionPart: labels
+                  - type: RadioButton
+                    name: simpleScaleLabels_numbers
+                    optionName: simpleScaleLabels
+                    optionPart: values
+                  - type: RadioButton
+                    name: simpleScaleLabels_numbers_labels
+                    optionName: simpleScaleLabels
+                    optionPart: values_labels
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -312,7 +373,7 @@ children:
                 isTarget: true
                 maxItemCount: 1
   - type: CollapseBox
-    label: Means Tables
+    label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
@@ -321,3 +382,6 @@ children:
         children:
           - type: CheckBox
             name: eDesc
+          - type: CheckBox
+            name: eCovs
+            enable: (eDesc)

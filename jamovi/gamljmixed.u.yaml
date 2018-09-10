@@ -269,8 +269,9 @@ children:
                 type: CheckBox
                 optionPart: holm
                 optionName: postHocCorr
+
   - type: CollapseBox
-    label: Fixed Effects Plots
+    label: Plots
     collapsed: true
     stretchFactor: 1
     children:
@@ -379,3 +380,4 @@ children:
             name: eDesc
           - type: CheckBox
             name: eCovs
+            enable: (eDesc)

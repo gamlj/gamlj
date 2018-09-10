@@ -49,29 +49,6 @@ options:
       description:
           R: a vector of strings naming the covariates from `data`
 
-    - name: cluster
-      title: Cluster variables
-      type: Variables
-      suggested:
-        - nominal
-      description:
-          R: a vector of strings naming the clustering variables from `data`
-
-    - name: randomTerms
-      title: Random Coefficients
-      type: Terms
-      default:  
-      description:
-          R: >
-            a list of character vectors describing random coefficients that
-            need to be computed
-    - name: correlatedEffects
-      title: Correlated Effects
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE` , include correlated random effects
 
 
     - name: modelTerms
@@ -90,13 +67,6 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept
 
-    - name: reml
-      title: REML
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
 
     - name: showParamsCI
       title: Confidence intervals
@@ -156,13 +126,6 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
 
-    - name: lrtRandomEffects
-      title: LRT for Random Effects
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), LRT for the random effects
 
     - name: showContrastCode
       title: Contrast Coefficients tables
@@ -172,32 +135,6 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide contrast coefficients tables
 
-
-    - name: scaling
-      title: Covariates Scaling
-      type: Array
-      items: (covs)
-      default:
-      template:
-          type: Group
-          elements:
-              - name: var
-                type: Variable
-                content: $key
-              - name: type
-                type: List
-                options:
-                  - centered
-                  - standardized
-                  - cluster-based centered
-                  - cluster-based standardized
-                  - none
-
-                default: centered 
-      description:
-          R: >
-            a list of lists specifying the covariates scaling,
-            one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
 
 
 
@@ -240,10 +177,6 @@ options:
       type: Bool
       default: false
 
-    - name: plotRandomEffects
-      title: Plot random effects 
-      type: Bool
-      default: false
 
     - name: plotError
       title: Error Bar Definition
@@ -281,23 +214,6 @@ options:
       description:
           R: a list of terms to perform post-hoc tests on
 
-    - name: postHocCorr
-      title: Correction
-      type: NMXList
-      options:
-          - name: none
-            title: No correction
-          - name: bonf
-            title: Bonferroni
-          - name: holm
-            title: Holm
-      default:
-          - bonf
-      description:
-          R: >
-            one or more of `'none'`,  `'bonf'`, or
-            `'holm'`; provide no,  Bonferroni, and
-            Holm Post Hoc corrections respectively
 
     - name: eDesc
       title: Estimated Marginal Means
@@ -383,6 +299,102 @@ options:
         - name: values_labels
           title: Values + Labels
       default: labels
+
+
+############ generic with some specs ###########
+
+    - name: postHocCorr
+      title: Correction
+      type: NMXList
+      options:
+          - name: none
+            title: No correction
+          - name: bonf
+            title: Bonferroni
+          - name: holm
+            title: Holm
+      default:
+          - bonf
+      description:
+          R: >
+            one or more of `'none'`,  `'bonf'`, or
+            `'holm'`; provide no,  Bonferroni, and
+            Holm Post Hoc corrections respectively
+
+    - name: scaling
+      title: Covariates Scaling
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                  - centered
+                  - standardized
+                  - cluster-based centered
+                  - cluster-based standardized
+                  - none
+
+                default: centered 
+      description:
+          R: >
+            a list of lists specifying the covariates scaling,
+            one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+
+############ mixed model specifics ##############
+
+    - name: cluster
+      title: Cluster variables
+      type: Variables
+      suggested:
+        - nominal
+      description:
+          R: a vector of strings naming the clustering variables from `data`
+
+    - name: randomTerms
+      title: Random Coefficients
+      type: Terms
+      default:  
+      description:
+          R: >
+            a list of character vectors describing random coefficients that
+            need to be computed
+    - name: correlatedEffects
+      title: Correlated Effects
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , include correlated random effects
+
+    - name: reml
+      title: REML
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
+
+    - name: lrtRandomEffects
+      title: LRT for Random Effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), LRT for the random effects
+
+    - name: plotRandomEffects
+      title: Plot random effects 
+      type: Bool
+      default: false
+            
 
 ...
 

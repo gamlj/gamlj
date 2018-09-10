@@ -10,30 +10,36 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             factors = NULL,
             covs = NULL,
             modelTerms = NULL,
-            ss = "3",
-            effectSize = NULL,
+            fixedIntercept = TRUE,
             showParamsCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
-            showContrasts = TRUE,
-            showContrastsTable = FALSE,
-            scaling = NULL,
+            showRealNames = TRUE,
+            showContrastCode = FALSE,
             plotHAxis = NULL,
             plotSepLines = NULL,
             plotSepPlots = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
+            plotError = "none",
+            ciWidth = 95,
+            eDesc = FALSE,
+            eCovs = FALSE,
+            simpleVariable = NULL,
+            simpleModerator = NULL,
+            simple3way = NULL,
+            simpleScale = "mean_sd",
+            cvalue = 1,
+            percvalue = 25,
+            simpleScaleLabels = "labels",
             postHoc = NULL,
             postHocCorr = list(
                 "tukey"),
-            eDesc = FALSE,
-            homo = FALSE,
+            scaling = NULL,
+            ss = "3",
+            effectSize = NULL,
             qq = FALSE,
-            plotError = "ci",
-            ciWidth = 95,
-            simpleVariable = NULL,
-            simpleModerator = NULL,
-            simple3way = NULL, ...) {
+            homo = FALSE, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -45,8 +51,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "dep",
                 dep,
                 permitted=list(
-                    "numeric"),
-                default=NULL)
+                    "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
@@ -63,23 +68,10 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "modelTerms",
                 modelTerms,
                 default=NULL)
-            private$..ss <- jmvcore::OptionList$new(
-                "ss",
-                ss,
-                options=list(
-                    "1",
-                    "2",
-                    "3"),
-                default="3")
-            private$..effectSize <- jmvcore::OptionNMXList$new(
-                "effectSize",
-                effectSize,
-                options=list(
-                    "eta",
-                    "partEta",
-                    "omega",
-                    "beta"),
-                default=NULL)
+            private$..fixedIntercept <- jmvcore::OptionBool$new(
+                "fixedIntercept",
+                fixedIntercept,
+                default=TRUE)
             private$..showParamsCI <- jmvcore::OptionBool$new(
                 "showParamsCI",
                 showParamsCI,
@@ -94,7 +86,6 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "contrasts",
                 contrasts,
                 items="(factors)",
-                default=NULL,
                 template=jmvcore::OptionGroup$new(
                     "contrasts",
                     NULL,
@@ -107,21 +98,116 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             "type",
                             NULL,
                             options=list(
-                                "default",
                                 "deviation",
                                 "simple",
+                                "dummy",
                                 "difference",
                                 "helmert",
                                 "repeated",
-                                "polynomial")))))
-            private$..showContrasts <- jmvcore::OptionBool$new(
-                "showContrasts",
-                showContrasts,
+                                "polynomial"),
+                            default="deviation"))))
+            private$..showRealNames <- jmvcore::OptionBool$new(
+                "showRealNames",
+                showRealNames,
                 default=TRUE)
-            private$..showContrastsTable <- jmvcore::OptionBool$new(
-                "showContrastsTable",
-                showContrastsTable,
+            private$..showContrastCode <- jmvcore::OptionBool$new(
+                "showContrastCode",
+                showContrastCode,
                 default=FALSE)
+            private$..plotHAxis <- jmvcore::OptionVariable$new(
+                "plotHAxis",
+                plotHAxis,
+                default=NULL)
+            private$..plotSepLines <- jmvcore::OptionVariable$new(
+                "plotSepLines",
+                plotSepLines,
+                default=NULL)
+            private$..plotSepPlots <- jmvcore::OptionVariable$new(
+                "plotSepPlots",
+                plotSepPlots,
+                default=NULL)
+            private$..plotRaw <- jmvcore::OptionBool$new(
+                "plotRaw",
+                plotRaw,
+                default=FALSE)
+            private$..plotDvScale <- jmvcore::OptionBool$new(
+                "plotDvScale",
+                plotDvScale,
+                default=FALSE)
+            private$..plotError <- jmvcore::OptionList$new(
+                "plotError",
+                plotError,
+                options=list(
+                    "none",
+                    "ci",
+                    "se"),
+                default="none")
+            private$..ciWidth <- jmvcore::OptionNumber$new(
+                "ciWidth",
+                ciWidth,
+                min=50,
+                max=99.9,
+                default=95)
+            private$..eDesc <- jmvcore::OptionBool$new(
+                "eDesc",
+                eDesc,
+                default=FALSE)
+            private$..eCovs <- jmvcore::OptionBool$new(
+                "eCovs",
+                eCovs,
+                default=FALSE)
+            private$..simpleVariable <- jmvcore::OptionVariable$new(
+                "simpleVariable",
+                simpleVariable,
+                default=NULL)
+            private$..simpleModerator <- jmvcore::OptionVariable$new(
+                "simpleModerator",
+                simpleModerator,
+                default=NULL)
+            private$..simple3way <- jmvcore::OptionVariable$new(
+                "simple3way",
+                simple3way,
+                default=NULL)
+            private$..simpleScale <- jmvcore::OptionList$new(
+                "simpleScale",
+                simpleScale,
+                options=list(
+                    "mean_sd",
+                    "percent"),
+                default="mean_sd")
+            private$..cvalue <- jmvcore::OptionNumber$new(
+                "cvalue",
+                cvalue,
+                default=1)
+            private$..percvalue <- jmvcore::OptionNumber$new(
+                "percvalue",
+                percvalue,
+                default=25,
+                min=5,
+                max=50)
+            private$..simpleScaleLabels <- jmvcore::OptionList$new(
+                "simpleScaleLabels",
+                simpleScaleLabels,
+                options=list(
+                    "labels",
+                    "values",
+                    "values_labels"),
+                default="labels")
+            private$..postHoc <- jmvcore::OptionTerms$new(
+                "postHoc",
+                postHoc,
+                default=NULL)
+            private$..postHocCorr <- jmvcore::OptionNMXList$new(
+                "postHocCorr",
+                postHocCorr,
+                options=list(
+                    "none",
+                    "tukey",
+                    "scheffe",
+                    "bonf",
+                    "holm"),
+                default=list(
+                    "tukey"))
             private$..scaling <- jmvcore::OptionArray$new(
                 "scaling",
                 scaling,
@@ -143,164 +229,134 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "centered",
                                 "standardized"),
                             default="centered"))))
-            private$..plotHAxis <- jmvcore::OptionVariable$new(
-                "plotHAxis",
-                plotHAxis,
-                default=NULL)
-            private$..plotSepLines <- jmvcore::OptionVariable$new(
-                "plotSepLines",
-                plotSepLines,
-                default=NULL)
-            private$..plotSepPlots <- jmvcore::OptionVariable$new(
-                "plotSepPlots",
-                plotSepPlots,
-                default=NULL)
-            private$..plotRaw <- jmvcore::OptionBool$new(
-                "plotRaw",
-                plotRaw,
-                default=FALSE)
-            private$..plotDvScale <- jmvcore::OptionBool$new(
-                "plotDvScale",
-                plotDvScale,
-                default=FALSE)
-            private$..postHoc <- jmvcore::OptionTerms$new(
-                "postHoc",
-                postHoc,
-                default=NULL)
-            private$..postHocCorr <- jmvcore::OptionNMXList$new(
-                "postHocCorr",
-                postHocCorr,
+            private$..ss <- jmvcore::OptionList$new(
+                "ss",
+                ss,
                 options=list(
-                    "none",
-                    "tukey",
-                    "scheffe",
-                    "bonf",
-                    "holm"),
-                default=list(
-                    "tukey"))
-            private$..eDesc <- jmvcore::OptionBool$new(
-                "eDesc",
-                eDesc,
+                    "1",
+                    "2",
+                    "3"),
+                default="3")
+            private$..effectSize <- jmvcore::OptionNMXList$new(
+                "effectSize",
+                effectSize,
+                options=list(
+                    "eta",
+                    "partEta",
+                    "omega",
+                    "beta"),
+                default=NULL)
+            private$..qq <- jmvcore::OptionBool$new(
+                "qq",
+                qq,
                 default=FALSE)
             private$..homo <- jmvcore::OptionBool$new(
                 "homo",
                 homo,
                 default=FALSE)
-            private$..qq <- jmvcore::OptionBool$new(
-                "qq",
-                qq,
-                default=FALSE)
-            private$..plotError <- jmvcore::OptionList$new(
-                "plotError",
-                plotError,
-                options=list(
-                    "none",
-                    "ci",
-                    "se"),
-                default="ci")
-            private$..ciWidth <- jmvcore::OptionNumber$new(
-                "ciWidth",
-                ciWidth,
-                min=50,
-                max=99.9,
-                default=95)
-            private$..simpleVariable <- jmvcore::OptionVariable$new(
-                "simpleVariable",
-                simpleVariable,
-                default=NULL)
-            private$..simpleModerator <- jmvcore::OptionVariable$new(
-                "simpleModerator",
-                simpleModerator,
-                default=NULL)
-            private$..simple3way <- jmvcore::OptionVariable$new(
-                "simple3way",
-                simple3way,
-                default=NULL)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..modelTerms)
-            self$.addOption(private$..ss)
-            self$.addOption(private$..effectSize)
+            self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
-            self$.addOption(private$..showContrasts)
-            self$.addOption(private$..showContrastsTable)
-            self$.addOption(private$..scaling)
+            self$.addOption(private$..showRealNames)
+            self$.addOption(private$..showContrastCode)
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
-            self$.addOption(private$..postHoc)
-            self$.addOption(private$..postHocCorr)
-            self$.addOption(private$..eDesc)
-            self$.addOption(private$..homo)
-            self$.addOption(private$..qq)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
+            self$.addOption(private$..eDesc)
+            self$.addOption(private$..eCovs)
             self$.addOption(private$..simpleVariable)
             self$.addOption(private$..simpleModerator)
             self$.addOption(private$..simple3way)
+            self$.addOption(private$..simpleScale)
+            self$.addOption(private$..cvalue)
+            self$.addOption(private$..percvalue)
+            self$.addOption(private$..simpleScaleLabels)
+            self$.addOption(private$..postHoc)
+            self$.addOption(private$..postHocCorr)
+            self$.addOption(private$..scaling)
+            self$.addOption(private$..ss)
+            self$.addOption(private$..effectSize)
+            self$.addOption(private$..qq)
+            self$.addOption(private$..homo)
         }),
     active = list(
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         modelTerms = function() private$..modelTerms$value,
-        ss = function() private$..ss$value,
-        effectSize = function() private$..effectSize$value,
+        fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
-        showContrasts = function() private$..showContrasts$value,
-        showContrastsTable = function() private$..showContrastsTable$value,
-        scaling = function() private$..scaling$value,
+        showRealNames = function() private$..showRealNames$value,
+        showContrastCode = function() private$..showContrastCode$value,
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
         plotSepPlots = function() private$..plotSepPlots$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
-        postHoc = function() private$..postHoc$value,
-        postHocCorr = function() private$..postHocCorr$value,
-        eDesc = function() private$..eDesc$value,
-        homo = function() private$..homo$value,
-        qq = function() private$..qq$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
+        eDesc = function() private$..eDesc$value,
+        eCovs = function() private$..eCovs$value,
         simpleVariable = function() private$..simpleVariable$value,
         simpleModerator = function() private$..simpleModerator$value,
-        simple3way = function() private$..simple3way$value),
+        simple3way = function() private$..simple3way$value,
+        simpleScale = function() private$..simpleScale$value,
+        cvalue = function() private$..cvalue$value,
+        percvalue = function() private$..percvalue$value,
+        simpleScaleLabels = function() private$..simpleScaleLabels$value,
+        postHoc = function() private$..postHoc$value,
+        postHocCorr = function() private$..postHocCorr$value,
+        scaling = function() private$..scaling$value,
+        ss = function() private$..ss$value,
+        effectSize = function() private$..effectSize$value,
+        qq = function() private$..qq$value,
+        homo = function() private$..homo$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
         ..modelTerms = NA,
-        ..ss = NA,
-        ..effectSize = NA,
+        ..fixedIntercept = NA,
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
-        ..showContrasts = NA,
-        ..showContrastsTable = NA,
-        ..scaling = NA,
+        ..showRealNames = NA,
+        ..showContrastCode = NA,
         ..plotHAxis = NA,
         ..plotSepLines = NA,
         ..plotSepPlots = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
-        ..postHoc = NA,
-        ..postHocCorr = NA,
-        ..eDesc = NA,
-        ..homo = NA,
-        ..qq = NA,
         ..plotError = NA,
         ..ciWidth = NA,
+        ..eDesc = NA,
+        ..eCovs = NA,
         ..simpleVariable = NA,
         ..simpleModerator = NA,
-        ..simple3way = NA)
+        ..simple3way = NA,
+        ..simpleScale = NA,
+        ..cvalue = NA,
+        ..percvalue = NA,
+        ..simpleScaleLabels = NA,
+        ..postHoc = NA,
+        ..postHocCorr = NA,
+        ..scaling = NA,
+        ..ss = NA,
+        ..effectSize = NA,
+        ..qq = NA,
+        ..homo = NA)
 )
 
 gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -308,7 +364,6 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     active = list(
         main = function() private$.items[["main"]],
         estimates = function() private$.items[["estimates"]],
-        contrasts = function() private$.items[["contrasts"]],
         simpleEffectsAnovas = function() private$.items[["simpleEffectsAnovas"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
         model = function() private$..model,
@@ -428,31 +483,6 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="Beta", 
                         `type`="number", 
                         `visible`="(effectSize:beta)"))))
-            self$add(jmvcore::Array$new(
-                options=options,
-                name="contrasts",
-                title="Contrasts Coding",
-                visible="(showContrastsTable)",
-                clearWith=list(
-                    "dep",
-                    "modelTerms"),
-                template=jmvcore::Table$new(
-                    options=options,
-                    title="Contrasts - $key",
-                    clearWith=NULL,
-                    columns=list(
-                        list(
-                            `name`="term", 
-                            `title`="Term", 
-                            `type`="text"),
-                        list(
-                            `name`="contrast", 
-                            `title`="Contrast", 
-                            `type`="text"),
-                        list(
-                            `name`="groups", 
-                            `title`="Groups to levels", 
-                            `type`="text")))))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleEffectsAnovas",
@@ -757,60 +787,69 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param factors a vector of strings naming the fixed factors from
 #'   \code{data}
 #' @param covs a vector of strings naming the covariates from \code{data}
-#' @param modelTerms a list of character vectors describing the terms to go
-#'   into the model
-#' @param ss \code{'1'}, \code{'2'} or \code{'3'} (default), the sum of
-#'   squares to use
-#' @param effectSize one or more of \code{'eta'}, \code{'partEta'}, or
-#'   \code{'omega'}; use eta², partial eta², and omega² effect sizes,
-#'   respectively
-#' @param showParamsCI \code{TRUE} or \code{FALSE} (default), parameters CI in
-#'   table
+#' @param modelTerms a list of character vectors describing fixed effects
+#'   terms
+#' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
+#'   fixed intercept
+#' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
+#'   in table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
 #' @param contrasts a list of lists specifying the factor and type of contrast
 #'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
-#' @param showContrasts \code{TRUE} or \code{FALSE} (default), provide
-#'   definitions of the contrasts variables
-#' @param showContrastsTable \code{TRUE} or \code{FALSE} (default), provide
-#'   long definitions of the contrasts variables
-#' @param scaling a list of lists specifying the covariates scaling, one of
-#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
-#'   \code{'none'} leaves the variable as it is
+#' @param showRealNames \code{TRUE} or \code{FALSE} (default), provide raw
+#'   names of the contrasts variables
+#' @param showContrastCode \code{TRUE} or \code{FALSE} (default), provide
+#'   contrast coefficients tables
 #' @param plotHAxis a string naming the variable placed on the horizontal axis
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
 #'   lines on the plot
 #' @param plotSepPlots a string naming the variable to separate over to form
 #'   multiple plots
-#' @param plotRaw .
-#' @param plotDvScale .
-#' @param postHoc a list of terms to perform post-hoc tests on
-#' @param postHocCorr one or more of \code{'none'}, \code{'tukey'},
-#'   \code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey,
-#'   Scheffe, Bonferroni, and Holm Post Hoc corrections respectively
-#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide descriptive
+#' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
 #'   statistics
-#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity
-#'   tests
-#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
-#'   residuals
+#' @param plotDvScale .
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
 #' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width
+#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans
+#'   statistics
+#' @param eCovs \code{TRUE} or \code{FALSE} (default), provide lsmeans
+#'   statistics
 #' @param simpleVariable The variable for which the simple effects (slopes)
 #'   are computed
 #' @param simpleModerator the variable that provides the levels at which the
 #'   simple effects computed
 #' @param simple3way a moderator of the two-way interaction which is probed
+#' @param simpleScale \code{'mean_sd'} (default), \code{'custom'} , or
+#'   \code{'custom_percent'}. Use to condition the covariates (if any)
+#' @param cvalue offset value for conditioning
+#' @param percvalue offset value for conditioning
+#' @param simpleScaleLabels .
+#' @param postHoc a list of terms to perform post-hoc tests on
+#' @param postHocCorr one or more of \code{'none'}, \code{'tukey'},
+#'   \code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey,
+#'   Scheffe, Bonferroni, and Holm Post Hoc corrections respectively
+#' @param scaling a list of lists specifying the covariates scaling, one of
+#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+#'   \code{'none'} leaves the variable as it is
+#' @param ss \code{'1'}, \code{'2'} or \code{'3'} (default), the sum of
+#'   squares to use
+#' @param effectSize one or more of \code{'eta'}, \code{'partEta'}, or
+#'   \code{'omega'}; use eta², partial eta², and omega² effect sizes,
+#'   respectively
+#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+#'   residuals
+#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#'   tests
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$main} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$estimates} \tab \tab \tab \tab \tab a table of Coefficients \cr
-#'   \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
 #'   \code{results$simpleEffectsAnovas} \tab \tab \tab \tab \tab an array of simple Effects ANOVA tables \cr
 #'   \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
@@ -831,34 +870,40 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @export
 gamljGLM <- function(
     data,
-    dep = NULL,
+    dep,
     factors = NULL,
     covs = NULL,
     modelTerms = NULL,
-    ss = "3",
-    effectSize = NULL,
+    fixedIntercept = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
-    contrasts = NULL,
-    showContrasts = TRUE,
-    showContrastsTable = FALSE,
-    scaling = NULL,
+    contrasts,
+    showRealNames = TRUE,
+    showContrastCode = FALSE,
     plotHAxis = NULL,
     plotSepLines = NULL,
     plotSepPlots = NULL,
     plotRaw = FALSE,
     plotDvScale = FALSE,
+    plotError = "none",
+    ciWidth = 95,
+    eDesc = FALSE,
+    eCovs = FALSE,
+    simpleVariable = NULL,
+    simpleModerator = NULL,
+    simple3way = NULL,
+    simpleScale = "mean_sd",
+    cvalue = 1,
+    percvalue = 25,
+    simpleScaleLabels = "labels",
     postHoc = NULL,
     postHocCorr = list(
                 "tukey"),
-    eDesc = FALSE,
-    homo = FALSE,
+    scaling = NULL,
+    ss = "3",
+    effectSize = NULL,
     qq = FALSE,
-    plotError = "ci",
-    ciWidth = 95,
-    simpleVariable = NULL,
-    simpleModerator = NULL,
-    simple3way = NULL) {
+    homo = FALSE) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljGLM requires jmvcore to be installed (restart may be required)')
@@ -881,29 +926,35 @@ gamljGLM <- function(
         factors = factors,
         covs = covs,
         modelTerms = modelTerms,
-        ss = ss,
-        effectSize = effectSize,
+        fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
-        showContrasts = showContrasts,
-        showContrastsTable = showContrastsTable,
-        scaling = scaling,
+        showRealNames = showRealNames,
+        showContrastCode = showContrastCode,
         plotHAxis = plotHAxis,
         plotSepLines = plotSepLines,
         plotSepPlots = plotSepPlots,
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
-        postHoc = postHoc,
-        postHocCorr = postHocCorr,
-        eDesc = eDesc,
-        homo = homo,
-        qq = qq,
         plotError = plotError,
         ciWidth = ciWidth,
+        eDesc = eDesc,
+        eCovs = eCovs,
         simpleVariable = simpleVariable,
         simpleModerator = simpleModerator,
-        simple3way = simple3way)
+        simple3way = simple3way,
+        simpleScale = simpleScale,
+        cvalue = cvalue,
+        percvalue = percvalue,
+        simpleScaleLabels = simpleScaleLabels,
+        postHoc = postHoc,
+        postHocCorr = postHocCorr,
+        scaling = scaling,
+        ss = ss,
+        effectSize = effectSize,
+        qq = qq,
+        homo = homo)
 
     results <- gamljGLMResults$new(
         options = options)

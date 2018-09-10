@@ -9,30 +9,21 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             dep = NULL,
             factors = NULL,
             covs = NULL,
-            cluster = NULL,
-            randomTerms = NULL,
-            correlatedEffects = TRUE,
             modelTerms = NULL,
             fixedIntercept = TRUE,
-            reml = TRUE,
             showParamsCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
             showRealNames = TRUE,
-            lrtRandomEffects = FALSE,
             showContrastCode = FALSE,
-            scaling = NULL,
             plotHAxis = NULL,
             plotSepLines = NULL,
             plotSepPlots = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
-            plotRandomEffects = FALSE,
             plotError = "none",
             ciWidth = 95,
             postHoc = NULL,
-            postHocCorr = list(
-                "bonf"),
             eDesc = FALSE,
             eCovs = FALSE,
             simpleVariable = NULL,
@@ -41,7 +32,16 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             simpleScale = "mean_sd",
             cvalue = 1,
             percvalue = 25,
-            simpleScaleLabels = "labels", ...) {
+            simpleScaleLabels = "labels",
+            postHocCorr = list(
+                "bonf"),
+            scaling = NULL,
+            cluster = NULL,
+            randomTerms = NULL,
+            correlatedEffects = TRUE,
+            reml = TRUE,
+            lrtRandomEffects = FALSE,
+            plotRandomEffects = FALSE, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -66,19 +66,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 permitted=list(
                     "numeric"),
                 default=NULL)
-            private$..cluster <- jmvcore::OptionVariables$new(
-                "cluster",
-                cluster,
-                suggested=list(
-                    "nominal"))
-            private$..randomTerms <- jmvcore::OptionTerms$new(
-                "randomTerms",
-                randomTerms,
-                default=NULL)
-            private$..correlatedEffects <- jmvcore::OptionBool$new(
-                "correlatedEffects",
-                correlatedEffects,
-                default=TRUE)
             private$..modelTerms <- jmvcore::OptionTerms$new(
                 "modelTerms",
                 modelTerms,
@@ -86,10 +73,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..fixedIntercept <- jmvcore::OptionBool$new(
                 "fixedIntercept",
                 fixedIntercept,
-                default=TRUE)
-            private$..reml <- jmvcore::OptionBool$new(
-                "reml",
-                reml,
                 default=TRUE)
             private$..showParamsCI <- jmvcore::OptionBool$new(
                 "showParamsCI",
@@ -129,37 +112,10 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "showRealNames",
                 showRealNames,
                 default=TRUE)
-            private$..lrtRandomEffects <- jmvcore::OptionBool$new(
-                "lrtRandomEffects",
-                lrtRandomEffects,
-                default=FALSE)
             private$..showContrastCode <- jmvcore::OptionBool$new(
                 "showContrastCode",
                 showContrastCode,
                 default=FALSE)
-            private$..scaling <- jmvcore::OptionArray$new(
-                "scaling",
-                scaling,
-                items="(covs)",
-                default=NULL,
-                template=jmvcore::OptionGroup$new(
-                    "scaling",
-                    NULL,
-                    elements=list(
-                        jmvcore::OptionVariable$new(
-                            "var",
-                            NULL,
-                            content="$key"),
-                        jmvcore::OptionList$new(
-                            "type",
-                            NULL,
-                            options=list(
-                                "centered",
-                                "standardized",
-                                "cluster-based centered",
-                                "cluster-based standardized",
-                                "none"),
-                            default="centered"))))
             private$..plotHAxis <- jmvcore::OptionVariable$new(
                 "plotHAxis",
                 plotHAxis,
@@ -180,10 +136,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "plotDvScale",
                 plotDvScale,
                 default=FALSE)
-            private$..plotRandomEffects <- jmvcore::OptionBool$new(
-                "plotRandomEffects",
-                plotRandomEffects,
-                default=FALSE)
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
                 plotError,
@@ -202,15 +154,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "postHoc",
                 postHoc,
                 default=NULL)
-            private$..postHocCorr <- jmvcore::OptionNMXList$new(
-                "postHocCorr",
-                postHocCorr,
-                options=list(
-                    "none",
-                    "bonf",
-                    "holm"),
-                default=list(
-                    "bonf"))
             private$..eDesc <- jmvcore::OptionBool$new(
                 "eDesc",
                 eDesc,
@@ -256,33 +199,82 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "values",
                     "values_labels"),
                 default="labels")
+            private$..postHocCorr <- jmvcore::OptionNMXList$new(
+                "postHocCorr",
+                postHocCorr,
+                options=list(
+                    "none",
+                    "bonf",
+                    "holm"),
+                default=list(
+                    "bonf"))
+            private$..scaling <- jmvcore::OptionArray$new(
+                "scaling",
+                scaling,
+                items="(covs)",
+                default=NULL,
+                template=jmvcore::OptionGroup$new(
+                    "scaling",
+                    NULL,
+                    elements=list(
+                        jmvcore::OptionVariable$new(
+                            "var",
+                            NULL,
+                            content="$key"),
+                        jmvcore::OptionList$new(
+                            "type",
+                            NULL,
+                            options=list(
+                                "centered",
+                                "standardized",
+                                "cluster-based centered",
+                                "cluster-based standardized",
+                                "none"),
+                            default="centered"))))
+            private$..cluster <- jmvcore::OptionVariables$new(
+                "cluster",
+                cluster,
+                suggested=list(
+                    "nominal"))
+            private$..randomTerms <- jmvcore::OptionTerms$new(
+                "randomTerms",
+                randomTerms,
+                default=NULL)
+            private$..correlatedEffects <- jmvcore::OptionBool$new(
+                "correlatedEffects",
+                correlatedEffects,
+                default=TRUE)
+            private$..reml <- jmvcore::OptionBool$new(
+                "reml",
+                reml,
+                default=TRUE)
+            private$..lrtRandomEffects <- jmvcore::OptionBool$new(
+                "lrtRandomEffects",
+                lrtRandomEffects,
+                default=FALSE)
+            private$..plotRandomEffects <- jmvcore::OptionBool$new(
+                "plotRandomEffects",
+                plotRandomEffects,
+                default=FALSE)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
-            self$.addOption(private$..cluster)
-            self$.addOption(private$..randomTerms)
-            self$.addOption(private$..correlatedEffects)
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
-            self$.addOption(private$..reml)
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
-            self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..showContrastCode)
-            self$.addOption(private$..scaling)
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
-            self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..postHoc)
-            self$.addOption(private$..postHocCorr)
             self$.addOption(private$..eDesc)
             self$.addOption(private$..eCovs)
             self$.addOption(private$..simpleVariable)
@@ -292,34 +284,34 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..cvalue)
             self$.addOption(private$..percvalue)
             self$.addOption(private$..simpleScaleLabels)
+            self$.addOption(private$..postHocCorr)
+            self$.addOption(private$..scaling)
+            self$.addOption(private$..cluster)
+            self$.addOption(private$..randomTerms)
+            self$.addOption(private$..correlatedEffects)
+            self$.addOption(private$..reml)
+            self$.addOption(private$..lrtRandomEffects)
+            self$.addOption(private$..plotRandomEffects)
         }),
     active = list(
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
-        cluster = function() private$..cluster$value,
-        randomTerms = function() private$..randomTerms$value,
-        correlatedEffects = function() private$..correlatedEffects$value,
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
-        reml = function() private$..reml$value,
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
-        lrtRandomEffects = function() private$..lrtRandomEffects$value,
         showContrastCode = function() private$..showContrastCode$value,
-        scaling = function() private$..scaling$value,
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
         plotSepPlots = function() private$..plotSepPlots$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
-        plotRandomEffects = function() private$..plotRandomEffects$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         postHoc = function() private$..postHoc$value,
-        postHocCorr = function() private$..postHocCorr$value,
         eDesc = function() private$..eDesc$value,
         eCovs = function() private$..eCovs$value,
         simpleVariable = function() private$..simpleVariable$value,
@@ -328,34 +320,34 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         simpleScale = function() private$..simpleScale$value,
         cvalue = function() private$..cvalue$value,
         percvalue = function() private$..percvalue$value,
-        simpleScaleLabels = function() private$..simpleScaleLabels$value),
+        simpleScaleLabels = function() private$..simpleScaleLabels$value,
+        postHocCorr = function() private$..postHocCorr$value,
+        scaling = function() private$..scaling$value,
+        cluster = function() private$..cluster$value,
+        randomTerms = function() private$..randomTerms$value,
+        correlatedEffects = function() private$..correlatedEffects$value,
+        reml = function() private$..reml$value,
+        lrtRandomEffects = function() private$..lrtRandomEffects$value,
+        plotRandomEffects = function() private$..plotRandomEffects$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
-        ..cluster = NA,
-        ..randomTerms = NA,
-        ..correlatedEffects = NA,
         ..modelTerms = NA,
         ..fixedIntercept = NA,
-        ..reml = NA,
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
-        ..lrtRandomEffects = NA,
         ..showContrastCode = NA,
-        ..scaling = NA,
         ..plotHAxis = NA,
         ..plotSepLines = NA,
         ..plotSepPlots = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
-        ..plotRandomEffects = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..postHoc = NA,
-        ..postHocCorr = NA,
         ..eDesc = NA,
         ..eCovs = NA,
         ..simpleVariable = NA,
@@ -364,7 +356,15 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..simpleScale = NA,
         ..cvalue = NA,
         ..percvalue = NA,
-        ..simpleScaleLabels = NA)
+        ..simpleScaleLabels = NA,
+        ..postHocCorr = NA,
+        ..scaling = NA,
+        ..cluster = NA,
+        ..randomTerms = NA,
+        ..correlatedEffects = NA,
+        ..reml = NA,
+        ..lrtRandomEffects = NA,
+        ..plotRandomEffects = NA)
 )
 
 gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -919,18 +919,10 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param factors a vector of strings naming the fixed factors from
 #'   \code{data}
 #' @param covs a vector of strings naming the covariates from \code{data}
-#' @param cluster a vector of strings naming the clustering variables from
-#'   \code{data}
-#' @param randomTerms a list of character vectors describing random
-#'   coefficients that need to be computed
-#' @param correlatedEffects \code{TRUE} (default) or \code{FALSE} , include
-#'   correlated random effects
 #' @param modelTerms a list of character vectors describing fixed effects
 #'   terms
 #' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept
-#' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-#'   be used rather than ML
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
@@ -940,13 +932,8 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
 #' @param showRealNames \code{TRUE} or \code{FALSE} (default), provide raw
 #'   names of the contrasts variables
-#' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
-#'   random effects
 #' @param showContrastCode \code{TRUE} or \code{FALSE} (default), provide
 #'   contrast coefficients tables
-#' @param scaling a list of lists specifying the covariates scaling, one of
-#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
-#'   \code{'none'} leaves the variable as it is
 #' @param plotHAxis a string naming the variable placed on the horizontal axis
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
@@ -956,16 +943,12 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
 #'   statistics
 #' @param plotDvScale .
-#' @param plotRandomEffects .
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
 #' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width
 #' @param postHoc a list of terms to perform post-hoc tests on
-#' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
-#'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
-#'   respectively
 #' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans
 #'   statistics
 #' @param eCovs \code{TRUE} or \code{FALSE} (default), provide lsmeans
@@ -980,6 +963,23 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param cvalue offset value for conditioning
 #' @param percvalue offset value for conditioning
 #' @param simpleScaleLabels .
+#' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
+#'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
+#'   respectively
+#' @param scaling a list of lists specifying the covariates scaling, one of
+#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+#'   \code{'none'} leaves the variable as it is
+#' @param cluster a vector of strings naming the clustering variables from
+#'   \code{data}
+#' @param randomTerms a list of character vectors describing random
+#'   coefficients that need to be computed
+#' @param correlatedEffects \code{TRUE} (default) or \code{FALSE} , include
+#'   correlated random effects
+#' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
+#'   be used rather than ML
+#' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
+#'   random effects
+#' @param plotRandomEffects .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -1009,30 +1009,21 @@ gamljMixed <- function(
     dep,
     factors = NULL,
     covs = NULL,
-    cluster,
-    randomTerms = NULL,
-    correlatedEffects = TRUE,
     modelTerms = NULL,
     fixedIntercept = TRUE,
-    reml = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
     contrasts,
     showRealNames = TRUE,
-    lrtRandomEffects = FALSE,
     showContrastCode = FALSE,
-    scaling = NULL,
     plotHAxis = NULL,
     plotSepLines = NULL,
     plotSepPlots = NULL,
     plotRaw = FALSE,
     plotDvScale = FALSE,
-    plotRandomEffects = FALSE,
     plotError = "none",
     ciWidth = 95,
     postHoc = NULL,
-    postHocCorr = list(
-                "bonf"),
     eDesc = FALSE,
     eCovs = FALSE,
     simpleVariable = NULL,
@@ -1041,7 +1032,16 @@ gamljMixed <- function(
     simpleScale = "mean_sd",
     cvalue = 1,
     percvalue = 25,
-    simpleScaleLabels = "labels") {
+    simpleScaleLabels = "labels",
+    postHocCorr = list(
+                "bonf"),
+    scaling = NULL,
+    cluster,
+    randomTerms = NULL,
+    correlatedEffects = TRUE,
+    reml = TRUE,
+    lrtRandomEffects = FALSE,
+    plotRandomEffects = FALSE) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljMixed requires jmvcore to be installed (restart may be required)')
@@ -1052,41 +1052,33 @@ gamljMixed <- function(
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
             `if`( ! missing(covs), covs, NULL),
-            `if`( ! missing(cluster), cluster, NULL),
             `if`( ! missing(plotHAxis), plotHAxis, NULL),
             `if`( ! missing(plotSepLines), plotSepLines, NULL),
             `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
             `if`( ! missing(simpleVariable), simpleVariable, NULL),
             `if`( ! missing(simpleModerator), simpleModerator, NULL),
-            `if`( ! missing(simple3way), simple3way, NULL))
+            `if`( ! missing(simple3way), simple3way, NULL),
+            `if`( ! missing(cluster), cluster, NULL))
 
     options <- gamljMixedOptions$new(
         dep = dep,
         factors = factors,
         covs = covs,
-        cluster = cluster,
-        randomTerms = randomTerms,
-        correlatedEffects = correlatedEffects,
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
-        reml = reml,
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showRealNames = showRealNames,
-        lrtRandomEffects = lrtRandomEffects,
         showContrastCode = showContrastCode,
-        scaling = scaling,
         plotHAxis = plotHAxis,
         plotSepLines = plotSepLines,
         plotSepPlots = plotSepPlots,
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
-        plotRandomEffects = plotRandomEffects,
         plotError = plotError,
         ciWidth = ciWidth,
         postHoc = postHoc,
-        postHocCorr = postHocCorr,
         eDesc = eDesc,
         eCovs = eCovs,
         simpleVariable = simpleVariable,
@@ -1095,7 +1087,15 @@ gamljMixed <- function(
         simpleScale = simpleScale,
         cvalue = cvalue,
         percvalue = percvalue,
-        simpleScaleLabels = simpleScaleLabels)
+        simpleScaleLabels = simpleScaleLabels,
+        postHocCorr = postHocCorr,
+        scaling = scaling,
+        cluster = cluster,
+        randomTerms = randomTerms,
+        correlatedEffects = correlatedEffects,
+        reml = reml,
+        lrtRandomEffects = lrtRandomEffects,
+        plotRandomEffects = plotRandomEffects)
 
     results <- gamljMixedResults$new(
         options = options)
