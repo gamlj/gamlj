@@ -375,6 +375,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - simpleScaleLabels
         - randomTerms
         - correlatedEffects
         - fixedIntercept

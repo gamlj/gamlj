@@ -45,7 +45,7 @@ gamljMixedClass <- R6::R6Class(
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
       #####################
-      
+
       #### info table #####
       infoTable<-self$results$info
       infoTable$addRow(rowKey="est",list(info="Estimate"))
@@ -169,7 +169,6 @@ gamljMixedClass <- R6::R6Class(
                         msg<-n64$translate(msg)
                         jmvcore::reject(msg, code='error')
                }
-
                ### anova results ####
                anova_res<-NULL
                if (length(modelTerms)==0) {
@@ -182,7 +181,7 @@ gamljMixedClass <- R6::R6Class(
                       jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                }
                anovaTable$setState(list(model,anova_res))
-               
+
                ### full summary results ####
                
                test_summary<-try(model_summary<-summary(model))
@@ -192,6 +191,7 @@ gamljMixedClass <- R6::R6Class(
                    msg<-n64$translate(msg)
                    jmvcore::reject(msg, code='error')
                }
+
                ### coefficients summary results ####
                
                test_parameters<-try(parameters<-mf.summary(model))
@@ -588,7 +588,7 @@ gamljMixedClass <- R6::R6Class(
       sdata<-subset(predData,plots==real)
       sraw<-NULL
       if (!is.null(rawData))
-           sraw<-subset(rawData,plots==real)
+           sraw<-subset(rawData,w==real)
       srand<-NULL
       if (!is.null(randomData))
            srand<-subset(randomData,plots==real)
@@ -636,9 +636,9 @@ gamljMixedClass <- R6::R6Class(
 
        meanTables<-self$results$emeansTables
        
-       if (!is.null(meanTables$state)) {
+       if (meanTables$isFilled()) {
          mark("Estimated marginal means recycled")
-         return(FALSE)
+         return()
        }
        mark("Estimated marginal means computed")
        for (term in terms) {
@@ -727,7 +727,6 @@ gamljMixedClass <- R6::R6Class(
   
   return(lformula)
 },
-
 
 .modelTerms=function() {
   # If we are in interactive mode the model should be well specified, otherwise (if R mode)

@@ -810,6 +810,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "reml",
                     "contrasts",
                     "scaling",
+                    "simpleScaleLabels",
                     "randomTerms",
                     "correlatedEffects",
                     "fixedIntercept"),

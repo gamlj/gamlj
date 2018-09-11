@@ -6,31 +6,19 @@ const events = {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
-        updateRandomSupplier(ui,this);
 
     },
 
     onChange_factors: function(ui) {
         calcModelTerms(ui, this);
-        updateRandomSupplier(ui,this);
- 
+
     },
 
     onChange_covariates: function(ui) {
         calcModelTerms(ui, this);
-        updateRandomSupplier(ui,this);
-
-    },
-    onChange_cluster: function(ui) {
-        updateRandomSupplier(ui,this);
 
     },
 
-    onChange_randomSupplier: function(ui){
-        let supplierList = this.itemsToValues(ui.randomSupplier.value());
-        this.checkValue(ui.randomTerms, true, supplierList, rtermFormat);
-        return;
-    },
     onChange_modelTerms: function(ui) {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
@@ -57,16 +45,7 @@ const events = {
     onChange_postHocSupplier: function(ui) {
         let values = this.itemsToValues(ui.postHocSupplier.value());
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
-    },
-    onChange_randomTerms: function(ui) {
- //       randomTerms(ui,this);
- //       filterRandomTerms(ui, this);
-    },
-    onEvent_randomTerms_preprocess: function(ui, data) {
- //       for(var j = 0; j < data.items.length; j++) {
-//          data.items[j].value.raw=data.items[j].value.toString();
-//      }
-    }    
+    }
 };
 
 var calcModelTerms = function(ui, context) {
@@ -242,38 +221,6 @@ var containsCovariate = function(value, covariates) {
 };
 
 
-var updateRandomSupplier = function(ui, context) {
-    var factorList = context.cloneArray(ui.factors.value(), []);
-    var covariatesList = context.cloneArray(ui.covs.value(), []);
-    var variableList = factorList.concat(covariatesList);
-    var termsList=[];
-    termsList = context.getCombinations(variableList);
-    context.sortArraysByLength(termsList);
-//    ui.randomSupplier.setValue(context.valuesToItems(termsList, FormatDef.term));
-    var clusterList = context.cloneArray(ui.cluster.value(), []);
-    if (clusterList.length<1) {
-                ui.randomSupplier.setValue(context.valuesToItems([], rtermFormat));                  return;
-    }
-    termsList.unshift(["Intercept"]);
-    var alist=[];
-    for (var i=0; i < clusterList.length; i++) {
-     for (var j = 0; j < termsList.length; j++) {
-       var item=context.cloneArray(termsList[j]);
-       item[item.length]=clusterList[i];
-       alist.push(item);
-//       console.log(item);
-     }
-    }
-    context.sortArraysByLength(alist);
-
-      var formatted=context.valuesToItems(alist, rtermFormat);
-//    var busyList = context.cloneArray(ui.randomTerms.value(), []);
-//    var busyForm = context.valuesToItems(busyList, rtermFormat);
-//    var xunique = formatted.filter(function(val) {
-//         return busyForm.indexOf(val) == -1;
-//            });    
-    ui.randomSupplier.setValue(formatted);
-};
 
 
 var filterRandomTerms = function(ui, context) {

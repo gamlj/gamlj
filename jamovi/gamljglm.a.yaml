@@ -4,41 +4,18 @@ title: General Linear Model
 menuGroup: Linear Models
 version: '0.0.2'
 jas: '1.2'
-
+completeWhenFilled: false
 description:
-    main: General Linear Model
+    main: Mixed Linear Model
     R:
         dontrun: false
         usage: |
-            data('data3by2')
+            data('ToothGrowth')
 
-            gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
-
-            #
-            #  
-            #
-            #  ANOVA
-            #  ───────────────────────────────────────────────────────────────────────
-            #                 Sum of Squares    df    Mean Square    F        p
-            #  ───────────────────────────────────────────────────────────────────────
-            #    x               115.19         1      115.19       20.07     < .001
-            #    twogroups       31.36          1      31.36         5.46      0.021  
-            #    x:twogroups     7.15          1       7.15         1.25      0.267  
-            #    Residuals      551.13         96       5.74  
-            #  ───────────────────────────────────────────────────────────────────────
-            #
-            #  _______________________________________________________________________
-            #                  Estimates  Std. Error  t-value      p.
-            #  _______________________________________________________________________
-            #
-            #  (Intercept)     52.804      0.245        215.17   < .001
-            #   x              0.596       0.133        4.48     < .001
-            #   twogroups1    -0.574       0.245       -2.34      0.021
-            #   x:twogroups1  -0.148       0.133       -1.12      0.267
+            mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
 
 
 options:
-
     - name: data
       type: Data
       description:
@@ -83,7 +60,7 @@ options:
             a list of character vectors describing fixed effects terms
 
     - name: fixedIntercept
-      title: Intercept
+      title: Fixed Intercept
       type: Bool
       default: true
       description:
@@ -144,7 +121,7 @@ options:
     - name: showRealNames
       title: Names in estimates table
       type: Bool
-      default: true
+      default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
@@ -229,6 +206,13 @@ options:
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width
 
+
+    - name: postHoc
+      title: Post Hoc Tests
+      type: Terms
+      default:
+      description:
+          R: a list of terms to perform post-hoc tests on
 
 
     - name: eDesc
@@ -317,13 +301,7 @@ options:
       default: labels
 
 
-####### generic with some specs #######
-    - name: postHoc
-      title: Post Hoc Tests
-      type: Terms
-      default:
-      description:
-          R: a list of terms to perform post-hoc tests on
+############ generic with some specs ###########
 
     - name: postHocCorr
       title: Correction
@@ -331,22 +309,17 @@ options:
       options:
           - name: none
             title: No correction
-          - name: tukey
-            title: Tukey
-          - name: scheffe
-            title: Scheffe
           - name: bonf
             title: Bonferroni
           - name: holm
             title: Holm
       default:
-          - tukey
+          - bonf
       description:
           R: >
-            one or more of `'none'`, `'tukey'`, `'scheffe'`, `'bonf'`, or
-            `'holm'`; provide no, Tukey, Scheffe, Bonferroni, and
+            one or more of `'none'`,  `'bonf'`, or
+            `'holm'`; provide no,  Bonferroni, and
             Holm Post Hoc corrections respectively
-
 
     - name: scaling
       title: Covariates Scaling
@@ -362,33 +335,18 @@ options:
               - name: type
                 type: List
                 options:
-                  - none
                   - centered
                   - standardized
-                default: centered  
+                  - none
+
+                default: centered 
       description:
           R: >
             a list of lists specifying the covariates scaling,
             one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
 
 
-
-####### glm specifics ###########
-
-    - name: ss
-      type: List
-      options:
-        - title: Type 1
-          name: '1'
-        - title: Type 2
-          name: '2'
-        - title: Type 3
-          name: '3'
-      default: '3'
-      description:
-          R: >
-            `'1'`, `'2'` or `'3'` (default), the sum of squares
-            to use
+######### specs here ##########
 
     - name: effectSize
       title: Effect Size
@@ -402,20 +360,6 @@ options:
             title: ω²
           - name: beta
             title: β  
-            
-      default: 
-      description:
-          R: >
-            one or more of `'eta'`, `'partEta'`, or `'omega'`;
-            use η², partial η², and ω² effect sizes, respectively
-
-    - name: qq
-      title: Q-Q plot of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
 
     - name: homo
       title: Residual Variances Homogeneity tests
@@ -424,6 +368,22 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), perform homogeneity tests
+    
+    - name: qq
+      title: Q-Q plot of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+
+    - name: normTest
+      title: Test normality of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a test for normality of residuals
 
 ...
 

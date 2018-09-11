@@ -8,16 +8,15 @@
   if ("contrast" %in% names(table))
       aList[["contrast"]]<-levels(table[,"contrast"])
   
-  
   for (p in preds) {
     if (p %in% jmvcore::toB64(cov_conditioning$vars))
       aList[[p]]<-cov_conditioning$labels(p,decode=T)
-    else
-      aList[[p]]<-levels(table[,p])
+    else {
+      aList[[p]]<-levels(factor(table[,p]))
+    }    
   }
   levs<-expand.grid(aList)
   table[,names(levs)]<-levs
-  
   table
 }
 
@@ -28,15 +27,13 @@
 rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 .rawMeans.default<-function(model,terms,cov_conditioning=conditioning$new(),interval=95,type="link") {
-
   nterms<-jmvcore::fromB64(terms) 
-  df<-tolower(df)
   data<-mf.getModelData(model)
   interval=as.numeric(interval)/100
   condlist<-cov_conditioning$values(nterms)
   names(condlist)<-jmvcore::toB64(names(condlist))
   est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type)
-  est<-.fixLabels(est,terms,cov_conditioning)
+#  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
   est
 }
 
@@ -53,7 +50,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   condlist<-cov_conditioning$values(nterms)
   names(condlist)<-jmvcore::toB64(names(condlist))
   est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,lmer.df = df)
-  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
+#  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
   est
 }
 
@@ -61,7 +58,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
          est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
-         dd<-as.data.frame(est)
+         dd<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
          for (nn in names(dd))
             if (is.factor(dd[[nn]]))
                dd[[nn]]<-as.character(dd[[nn]])
@@ -100,12 +97,10 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
       attr(M, "desc") <- attr(data[[variable]],"jcontrast")
       M
     }
-    
     emm<-rawMeans(model,
                    unlist(c(variable,moderator,threeway)),
                    cov_conditioning = cov_conditioning,
                    interval=interval)
-    
     est<-emmeans::contrast(emm,method = ".internal",by = preds)
     ci<-confint(est,level = interval/100)
     params<-cbind(as.data.frame(est),ci[,c("lower.CL","upper.CL")])

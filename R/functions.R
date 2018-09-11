@@ -1,4 +1,12 @@
 
+
+info<-function(what=NULL) {
+  if (GAMLj_INFO) {
+    if (!is.null(what))
+        print(what)
+  }
+}
+
 mark<-function(what=NULL,obj=NULL) {
   if (GAMLj_DEBUG) {
     if (!is.null(what))

@@ -315,7 +315,7 @@ lp.preparePlotData<- function(x,...) UseMethod(".lp.preparePlotData")
 
 lp.rawData<- function(x,...) UseMethod(".rawData")
 
-.rawData.default<-function(model,depName,groupName,linesName=NULL) {
+.rawData.default<-function(model,depName,groupName,linesName=NULL,plotsName) {
   data=mf.getModelData(model)
   data$y<-data[[jmvcore::toB64(depName)]]
   data$x<-data[[jmvcore::toB64(groupName)]]
@@ -324,8 +324,13 @@ lp.rawData<- function(x,...) UseMethod(".rawData")
     data$z<-NA
   else
     data$z<-data[,jmvcore::toB64(linesName)]
+
+  if (is.null(plotsName) || !is.factor(data[[jmvcore::toB64(plotsName)]]))
+    data$w<-NA
+  else
+    data$w<-data[,jmvcore::toB64(plotsName)]
   
-  return(data[,c("y","x","z")])
+  return(data[,c("y","x","z","w")])
 
   }  
 

@@ -1,9 +1,9 @@
-name: gamljGLM
 title: General Linear Model
+name: gamljGLM
 jus: '2.0'
 compilerMode: tame
 events:
-  update: './glm.events::update'
+  update: './gamlj.events::update'
 children:
   - type: VariableSupplier
     name: variablesupplier
@@ -27,7 +27,7 @@ children:
             name: factors
             isTarget: true
             events:
-              change: './glm.events::onChange_factors'
+              change: './gamlj.events::onChange_factors'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
@@ -35,7 +35,7 @@ children:
             height: small
             isTarget: true
             events:
-              change: './glm.events::onChange_covariates'
+              change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
     style: inline
@@ -60,7 +60,7 @@ children:
           - name: effectSize_omega
             type: CheckBox
             optionPart: omega
-            optionName: effectSize
+            optionName: effectSize    
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -96,39 +96,14 @@ children:
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './glm.events::onChange_modelTerms'
+                  change: './gamlj.events::onChange_modelTerms'
                 template:
                   type: TermLabel
       - type: LayoutBox
         margin: large
-        style: inline
         children:
-               - type: Label
-                 label: Sum of Squares
-                 margin: large
-                 style: list-inline
-                 children:
-                    - type: ComboBox
-                      name: ss
-               - type: Label
-                 label: Estimates
-                 margin: large
-                 style: list-inline
-                 children:
-                     - type: CheckBox
-                       name: fixedIntercept
-      
-  - type: CollapseBox
-    label: Assumption Checks
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: CheckBox
-        name: homo
-        label: Homogeneity tests
-      - type: CheckBox
-        name: qq
-        label: Q-Q plot of residuals
+          - type: CheckBox
+            name: fixedIntercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -194,11 +169,11 @@ children:
                     name: simpleScale_mean_sd
                     optionName: simpleScale
                     optionPart: mean_sd
-                    children:
-                      - type: TextBox
-                        name: cvalue
-                        format: number
-                        inputPattern: '[0-9]+'
+                    children: 
+                          - type: TextBox
+                            name: cvalue
+                            format: number
+                            inputPattern: '[0-9]+'
                   - name: simpleScale_percent
                     type: RadioButton
                     optionName: simpleScale
@@ -240,7 +215,7 @@ children:
         stretchFactor: 1
         format: term
         events:
-          change: './glm.events::onChange_postHocSupplier'
+          change: './gamlj.events::onChange_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
@@ -260,14 +235,6 @@ children:
                 type: CheckBox
                 optionPart: none
                 optionName: postHocCorr
-              - name: postHocCorr_tukey
-                type: CheckBox
-                optionPart: tukey
-                optionName: postHocCorr
-              - name: postHocCorr_scheffe
-                type: CheckBox
-                optionPart: scheffe
-                optionName: postHocCorr
               - name: postHocCorr_bonf
                 type: CheckBox
                 optionPart: bonf
@@ -276,6 +243,7 @@ children:
                 type: CheckBox
                 optionPart: holm
                 optionName: postHocCorr
+
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -287,7 +255,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './glm.events::onChange_plotsSupplier'
+          change: './gamlj.events::onChange_plotsSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -352,7 +320,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './glm.events::onChange_simpleSupplier'
+          change: './gamlj.events::onChange_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -385,3 +353,17 @@ children:
           - type: CheckBox
             name: eCovs
             enable: (eDesc)
+  - type: CollapseBox
+    label: Assumption Checks
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: CheckBox
+        name: homo
+        label: Homogeneity tests
+      - type: CheckBox
+        name: normTest
+        label: Test normality of residuals
+      - type: CheckBox
+        name: qq
+        label: Q-Q plot of residuals

@@ -3,7 +3,7 @@ title: Mixed Model
 jus: '2.0'
 compilerMode: tame
 events:
-  update: './gamlj.events::update'
+  update: './mixed.events::update'
 children:
   - type: VariableSupplier
     name: variablesupplier
@@ -27,7 +27,7 @@ children:
             name: factors
             isTarget: true
             events:
-              change: './gamlj.events::onChange_factors'
+              change: './mixed.events::onChange_factors'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
@@ -35,7 +35,7 @@ children:
             height: small
             isTarget: true
             events:
-              change: './gamlj.events::onChange_covariates'
+              change: './mixed.events::onChange_covariates'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
@@ -43,7 +43,7 @@ children:
             height: small
             isTarget: true
             events:
-              change: './gamlj.events::onChange_cluster'
+              change: './mixed.events::onChange_cluster'
   - type: LayoutBox
     margin: large
     style: inline
@@ -89,7 +89,7 @@ children:
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './gamlj.events::onChange_modelTerms'
+                  change: './mixed.events::onChange_modelTerms'
                 template:
                   type: TermLabel
       - type: LayoutBox
@@ -108,7 +108,7 @@ children:
         persistentItems: false
         stretchFactor: 1
         events:
-          change: './gamlj.events::onChange_randomSupplier'
+          change: './mixed.events::onChange_randomSupplier'
         children:
           - type: TargetLayoutBox
             label: Random Coefficients
@@ -118,8 +118,8 @@ children:
                 valueFilter: unique
                 isTarget: true
                 events:
-                  change: './gamlj.events::onChange_randomTerms'
-                  preprocess: './gamlj.events::onEvent_randomTerms_preprocess'
+                  change: './mixed.events::onChange_randomTerms'
+                  preprocess: './mixed.events::onEvent_randomTerms_preprocess'
                 template:
                   type: Label
                   format: ./rtermFormat
@@ -241,7 +241,7 @@ children:
         stretchFactor: 1
         format: term
         events:
-          change: './gamlj.events::onChange_postHocSupplier'
+          change: './mixed.events::onChange_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
@@ -281,7 +281,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './gamlj.events::onChange_plotsSupplier'
+          change: './mixed.events::onChange_plotsSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -348,7 +348,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './gamlj.events::onChange_simpleSupplier'
+          change: './mixed.events::onChange_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:

@@ -146,8 +146,10 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
   
 .mf.summary.lm<-function(model){
-  ss<-summary(model)$coefficients
-  colnames(ss)<-c("estimate","se","t","p")
+  smr<-summary(model)
+  ss<-as.data.frame(smr$coefficients)
+  ss$df<-smr$df[2]
+  colnames(ss)<-c("estimate","se","t","p","df")
   as.data.frame(ss,stringsAsFactors = F)
 }
 
@@ -213,6 +215,10 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 ############# produces anova/deviance table in a somehow stadard format ##########
 mf.anova<- function(x,...) UseMethod(".anova")
 
+.anova.default<-function(model) {
+ stop("no suitable model found") 
+}
+  
 .anova.glm<-function(model) {
 
         ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
@@ -229,10 +235,28 @@ mf.anova<- function(x,...) UseMethod(".anova")
   }
   
 .anova.lm<-function(model) {
-  
     ano<-car::Anova(model,test="F",type=3, singular.ok=T)
     colnames(ano)<-c("ss","df","f","p")
-    ano
+    dss<-ano[-1,]
+    sumr<-summary(model)
+    errDF<-sumr$fstatistic[3]
+    modDF<-sumr$fstatistic[2]
+    modF<-sumr$fstatistic[1]
+    errSS<-dss$ss[length(dss$ss)]
+    errMS<-errSS/errDF
+    r2<-sumr$r.squared
+    totalSS<-1/((1-r2)*(1/errSS))
+    modSS<-totalSS-errSS
+    modp<-1 - pf(modF, modDF, errDF) 
+    modRow<-c(ss=modSS,df=modDF,F=modF,p=modp)
+    ss<-rbind(modRow,dss)
+    ss$ms<-ss$ss/ss$df
+    ss$etaSq<-ss$ss/(totalSS)
+    ss$etaSqP <- ss$ss / (ss$ss + errSS)
+    ss$omegaSq <- (ss$ss - (ss$df * errMS)) / (totalSS + errMS)
+    lt<-length(ss$df)
+    ss[lt,c("f","p","etaSq","etaSqP","omegaSq")]<-NA
+    ss
 }
 
 .anova.lmerModLmerTest<-function(model,df="Satterthwaite") 
@@ -265,7 +289,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
   if (!all(is.na(ano[,3])==F)) {
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
     # the factors. Here we try to fix it.
-    mark("lmerTest problems with df: try to fix it")
+    info("lmerTest problems with df: try to fix it")
     whichone<-is.na(ano[,3])
     rn<-rownames(ano[whichone,])
     smr<-lmerTest::summary(model,ddf=df)
@@ -299,7 +323,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
-  mark("lmerTest failed: anava uses car::Anova")
+  info("lmerTest failed: anava uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
@@ -349,7 +373,7 @@ mf.give_family<-function(modelSelection) {
   NULL  
 }
 
-mf.checkData<-function(options,data,modelType) {
+mf.checkData<-function(options,data,modelType="linear") {
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
      if (modelType %in% c("linear","mixed"))
