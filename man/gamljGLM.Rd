@@ -5,14 +5,17 @@
 \title{General Linear Model}
 \usage{
 gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
-  modelTerms = NULL, ss = "3", effectSize = NULL,
-  showParamsCI = TRUE, paramCIWidth = 95, contrasts = NULL,
-  showContrasts = TRUE, showContrastsTable = FALSE, scaling = NULL,
-  plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
-  plotRaw = FALSE, plotDvScale = FALSE, postHoc = NULL,
-  postHocCorr = list("tukey"), eDesc = FALSE, homo = FALSE,
-  qq = FALSE, plotError = "ci", ciWidth = 95,
-  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL)
+  modelTerms = NULL, fixedIntercept = TRUE, showParamsCI = TRUE,
+  paramCIWidth = 95, contrasts = NULL, showRealNames = TRUE,
+  showContrastCode = FALSE, plotHAxis = NULL, plotSepLines = NULL,
+  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
+  plotError = "none", ciWidth = 95, postHoc = NULL, eDesc = FALSE,
+  eCovs = FALSE, simpleVariable = NULL, simpleModerator = NULL,
+  simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
+  percvalue = 25, simpleScaleLabels = "labels",
+  postHocCorr = list("bonf"), scaling = NULL,
+  effectSize = list("beta"), homo = FALSE, qq = FALSE,
+  normTest = FALSE)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -25,18 +28,14 @@ variable must be numeric}
 
 \item{covs}{a vector of strings naming the covariates from \code{data}}
 
-\item{modelTerms}{a list of character vectors describing the terms to go
-into the model}
+\item{modelTerms}{a list of character vectors describing fixed effects
+terms}
 
-\item{ss}{\code{'1'}, \code{'2'} or \code{'3'} (default), the sum of
-squares to use}
+\item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
+fixed intercept}
 
-\item{effectSize}{one or more of \code{'eta'}, \code{'partEta'}, or
-\code{'omega'}; use eta², partial eta², and omega² effect sizes,
-respectively}
-
-\item{showParamsCI}{\code{TRUE} or \code{FALSE} (default), parameters CI in
-table}
+\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
+in table}
 
 \item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
@@ -45,15 +44,11 @@ the confidence interval width for the parameter estimates}
 to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide
-definitions of the contrasts variables}
+\item{showRealNames}{\code{TRUE} or \code{FALSE} (default), provide raw
+names of the contrasts variables}
 
-\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide
-long definitions of the contrasts variables}
-
-\item{scaling}{a list of lists specifying the covariates scaling, one of
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
-\code{'none'} leaves the variable as it is}
+\item{showContrastCode}{\code{TRUE} or \code{FALSE} (default), provide
+contrast coefficients tables}
 
 \item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
@@ -64,24 +59,10 @@ lines on the plot}
 \item{plotSepPlots}{a string naming the variable to separate over to form
 multiple plots}
 
-\item{plotRaw}{.}
-
-\item{plotDvScale}{.}
-
-\item{postHoc}{a list of terms to perform post-hoc tests on}
-
-\item{postHocCorr}{one or more of \code{'none'}, \code{'tukey'},
-\code{'scheffe'}, \code{'bonf'}, or \code{'holm'}; provide no, Tukey,
-Scheffe, Bonferroni, and Holm Post Hoc corrections respectively}
-
-\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide descriptive
+\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
-\item{homo}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
-tests}
-
-\item{qq}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
-residuals}
+\item{plotDvScale}{.}
 
 \item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 no error bars, use confidence intervals, or use standard errors on the
@@ -90,6 +71,14 @@ plots, respectively}
 \item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width}
 
+\item{postHoc}{a list of terms to perform post-hoc tests on}
+
+\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
+statistics}
+
+\item{eCovs}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
+statistics}
+
 \item{simpleVariable}{The variable for which the simple effects (slopes)
 are computed}
 
@@ -97,58 +86,65 @@ are computed}
 simple effects computed}
 
 \item{simple3way}{a moderator of the two-way interaction which is probed}
+
+\item{simpleScale}{\code{'mean_sd'} (default), \code{'custom'} , or
+\code{'custom_percent'}. Use to condition the covariates (if any)}
+
+\item{cvalue}{offset value for conditioning}
+
+\item{percvalue}{offset value for conditioning}
+
+\item{simpleScaleLabels}{.}
+
+\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
+\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
+respectively}
+
+\item{scaling}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+\code{'none'} leaves the variable as it is}
+
+\item{effectSize}{.}
+
+\item{homo}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
+tests}
+
+\item{qq}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+residuals}
+
+\item{normTest}{\code{TRUE} or \code{FALSE} (default), provide a test for
+normality of residuals}
 }
 \value{
 A results object containing:
 \tabular{llllll}{
-  \code{results$main} \tab \tab \tab \tab \tab a table of ANOVA results \cr
-  \code{results$estimates} \tab \tab \tab \tab \tab a table of Coefficients \cr
-  \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
-  \code{results$simpleEffectsAnovas} \tab \tab \tab \tab \tab an array of simple Effects ANOVA tables \cr
-  \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
-  \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
-  \code{results$assump$homo} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-  \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
-  \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+  \code{results$info} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+  \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
+  \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+  \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
+  \code{results$simpleEffects$Params} \tab \tab \tab \tab \tab a table \cr
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+  \code{results$assump$homo} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
+  \code{results$assump$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+  \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
 
-\code{results$main$asDF}
+\code{results$info$asDF}
 
-\code{as.data.frame(results$main)}
+\code{as.data.frame(results$info)}
 }
 \description{
 General Linear Model
 }
 \examples{
-data('data3by2')
+data('ToothGrowth')
 
-gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
-
-#
-#
-#
-#  ANOVA
-#  -----------------------------------------------------------------------
-#                 Sum of Squares    df    Mean Square    F        p
-#  -----------------------------------------------------------------------
-#    x               115.19         1      115.19       20.07     < .001
-#    twogroups       31.36          1      31.36         5.46      0.021
-#    x:twogroups     7.15          1       7.15         1.25      0.267
-#    Residuals      551.13         96       5.74
-#  -----------------------------------------------------------------------
-#
-#  _______________________________________________________________________
-#                  Estimates  Std. Error  t-value      p.
-#  _______________________________________________________________________
-#
-#  (Intercept)     52.804      0.245        215.17   < .001
-#   x              0.596       0.133        4.48     < .001
-#   twogroups1    -0.574       0.245       -2.34      0.021
-#   x:twogroups1  -0.148       0.133       -1.12      0.267
+mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
 
 }

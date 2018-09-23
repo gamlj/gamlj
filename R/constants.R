@@ -5,31 +5,46 @@ TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
+################ model info for gzlm ###############
 MINFO<-list()
 MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
                          "link"=c("Identity","Coefficients in the same scale of y"),
-                         "distribution"=c("Gaussian","Normal distribution of residual"))
+                         "distribution"=c("Gaussian","Normal distribution of residual"),
+                          "call"="glm",emmeanTitle="Mean")
 MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
                         "link"=c("log","Coefficients are in the log(y) scale"),
-                        "distribution"=c("Poisson","Rare events distribution of y"))
+                        "distribution"=c("Poisson","Rare events distribution of y"),
+                        "call"="glm",emmeanTitle="Mean Count")
+
 MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
                          "link"=c("logit","Log of the odd of y=1 over y=0"),
-                         "distribution"=c("Binomial","Dichotomous event distribution of y"))
+                         "distribution"=c("Binomial","Dichotomous event distribution of y"),
+                         "call"="glm",emmeanTitle="Prob.")
+
 MINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
                           "link"=c("probit","Inverse of normal CDF for P(y=1)"),
-                          "distribution"=c("Binomial","Dichotomous event distribution of y"))
+                          "distribution"=c("Binomial","Dichotomous event distribution of y"),
+                          "call"="glm",emmeanTitle="Prob.")
+
 
 MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
                           "link"=c("logit","Log of the odd of each category over y=0"),
-                          "distribution"=c("Multinomial","Multi-event distribution of y"))
+                          "distribution"=c("Multinomial","Multi-event distribution of y"),
+                          "call"="multinom",emmeanTitle="Prob.")
 
 MINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
                              "link"=c("log","Coefficients are in the log(y) scale"),
-                             "distribution"=c("Negative binomial","Rare event with overdispersion"))
+                             "distribution"=c("Negative binomial","Rare event with overdispersion"),
+                    "call"="glm.nb",emmeanTitle="Mean Count")
 
 MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
                     "link"=c("log","Coefficients are in the log(y) scale"),
-                    "distribution"=c("Quasi-Poisson","Rare event with overdispersion"))
+                    "distribution"=c("Quasi-Poisson","Rare event with overdispersion"),
+                    "call"="glm",emmeanTitle="Mean Count")
+
+###############################################################
+
+######### warning ######################
 
 WARNS<-list()
 
@@ -80,4 +95,13 @@ WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across intera
 
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 #WARNS<-sapply(WARNS,function(a) gsub("  ","",a,fixed=T))
+
+###############################################################
+
+
+########## contrast definition info ################
+
+CONTR<-list()
+
+
 

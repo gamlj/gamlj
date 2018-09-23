@@ -94,6 +94,7 @@ options:
       title: Factors Coding
       type: Array
       items: (factors)
+      default:
       template:
           type: Group
           elements:
@@ -391,7 +392,7 @@ options:
             `TRUE` or `FALSE` (default), LRT for the random effects
 
     - name: plotRandomEffects
-      title: Plot random effects 
+      title: Random effects  
       type: Bool
       default: false
             

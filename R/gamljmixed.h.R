@@ -88,6 +88,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "contrasts",
                 contrasts,
                 items="(factors)",
+                default=NULL,
                 template=jmvcore::OptionGroup$new(
                     "contrasts",
                     NULL,
@@ -539,6 +540,10 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 list(
                                     `name`="var", 
                                     `title`="Variance", 
+                                    `type`="number"),
+                                list(
+                                    `name`="icc", 
+                                    `title`="ICC", 
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -871,6 +876,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     options=options,
                     title="$key",
                     renderFun=".descPlot",
+                    width=500,
+                    height=300,
                     clearWith=list(
                         "dep",
                         "plotHAxis",
@@ -884,6 +891,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "simpleScale",
                         "simpleScaleLabels",
                         "plotDvScale",
+                        "plotRandomEffects",
                         "plotRaw"))))}))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -1014,7 +1022,7 @@ gamljMixed <- function(
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
-    contrasts,
+    contrasts = NULL,
     showRealNames = TRUE,
     showContrastCode = FALSE,
     plotHAxis = NULL,

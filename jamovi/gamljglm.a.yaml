@@ -6,7 +6,7 @@ version: '0.0.2'
 jas: '1.2'
 completeWhenFilled: false
 description:
-    main: Mixed Linear Model
+    main: General Linear Model
     R:
         dontrun: false
         usage: |
@@ -24,6 +24,7 @@ options:
     - name: dep
       title: Dependent Variable
       type: Variable
+      default:
       permitted:
         - numeric
       description:
@@ -94,6 +95,7 @@ options:
       title: Factors Coding
       type: Array
       items: (factors)
+      default: 
       template:
           type: Group
           elements:
@@ -121,7 +123,7 @@ options:
     - name: showRealNames
       title: Names in estimates table
       type: Bool
-      default: false
+      default: true
       description:
           R: >
             `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
@@ -311,6 +313,8 @@ options:
             title: No correction
           - name: bonf
             title: Bonferroni
+          - name: tukey
+            title: Tukey 
           - name: holm
             title: Holm
       default:
@@ -360,7 +364,9 @@ options:
             title: ω²
           - name: beta
             title: β  
-
+      default:
+          - beta
+          
     - name: homo
       title: Residual Variances Homogeneity tests
       type: Bool
@@ -378,7 +384,7 @@ options:
             `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
 
     - name: normTest
-      title: Test normality of residuals
+      title: Normality of residuals
       type: Bool
       default: false
       description:

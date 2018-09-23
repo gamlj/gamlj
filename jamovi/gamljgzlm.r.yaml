@@ -1,14 +1,15 @@
 ---
-name:  gamljGzml
-title: Generalized Linear Models
+name:  gamljGLM
+title: Generalized Linear Model
 jrs: '1.0'
+
 
 items:
 
-    - name: info
-      title: Model Info
-      type: Table
-      columns:
+  - name: info
+    title: Model Info
+    type: Table
+    columns:
        - name: info
          type: text
          title: "Info"
@@ -18,212 +19,134 @@ items:
        - name: comm
          type: text
          title: "Comment"
-         
-      clearWith:
+    clearWith:
         - dep
         - factors
         - cov
         - modelTerms
-        - modelSelection
-
-    - name: main
-      title: "Analysis of Deviance: Omnibus Tests"
-      type: Table
-      description: a table of Chi-square tests results
-      clearWith:
-        - dep
-        - modelTerms
-        - ss
-
-      columns:
-        - name: name
-          title: ""
-          type: text
-
-        - name: test
-          title: X²
-          type: number
-
-        - name: df
-          title: df
-          type: integer
-
-        - name: p
-          title: p
-          type: number
-          format: zto,pvalue
 
 
-    - name: estimates
-      title: Model Coefficients (Parameter Estimates)
-      type: Table
-      description: a table of Coefficients
-      clearWith:
-        - dep
-        - modelTerms
-        - scaling
-        - contrasts
-        - expb
-      columns:
-        - name: dep
-          title: "Response Groups"
-          type: text
-          visible: (modelSelection:multinomial)
-          combineBelow: true
-        - name: name
-          title: ""
-          type: text
-        - name: label
-          title: "Contrast"
-          type: text
-          visible: (showContrasts)
-        - name: estimate
-          title: Estimate
-          type: number
-        - name: se
-          title: SE
-          type: number
-        - name: cilow
-          type: number
-          title: Lower
-          visible: (showParamsCI)
-        - name: cihig
-          type: number
-          title: Upper
-          visible: (showParamsCI)
-        - name: expb
-          title: exp(B)
-          type: number
-          visible: (expb && !modelSelection:probit)
-
-        - name: z
-          title: z
-          type: number
-        - name: p
-          title: p
-          type: number
-          format: zto,pvalue
-
-    - name: contrasts
-      title: Contrasts Coding 
-      type: Array
-      description: an array of contrasts definitions tables
-      visible: (showContrastsTable)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
-        title: Contrasts - $key
-        type: Table
-        clearWith:
-
-        columns:
-          - name: term
-            title: "Term"
-            type: text
-          - name: contrast
-            title: "Contrast"
-            type: text
-          - name: groups
-            title: "Groups to levels"
-            type: text
-
-
-    - name: simpleEffectsAnovas
-      title: Simple Effects Analysis of Deviance
-      type: Array
-      description: an array of simple Effects Chisquared test tables
-      visible: (simpleVariable)
-      clearWith:
+  - name: main
+    type: Group
+    title: Model Results
+    clearWith:
         - dep
         - modelTerms
         - contrasts
         - scaling
-      template:
-        title: Simple Effecs  $key 
-        type: Table
-        columns:
-          - name: variable
-            title: "Effect"
-            type: text
-          - name: level
-            title: "Moderator Levels"
-            type: text
-          - name: test
-            title: X² 
-            type: number
-          - name: df 
-            title: df
-            type: integer
-          - name: p
-            title: p
-            type: number
-            format: zto,pvalue
+        - fixedIntercept
+    items:
+           - name: anova
+             title: Loglikelihood ratio tests
+             type: Table
+             description: a table of ANOVA results
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - contrasts
+                         - scaling
+                         - fixedIntercept
+                         - effectSize
+             columns:
+                    - name: name
+                      title: ""
+                      type: text
+                    - name: test
+                      title: X²
+                      type: number
+                    - name: df
+                      title: df
+                      type: integer
+                    - name: p
+                      title: p
+                      type: number
+                      format: zto,pvalue
+           - name: fixed
+             title: Fixed Effects Parameter Estimates
+             type: Table
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - fixedIntercept
+                    - effectSize
+
+             columns:
+                    - name: dep
+                      title: "Response Contrasts"
+                      type: text
+                      visible: (modelSelection:multinomial)
+                      combineBelow: true
+                    - name: source
+                      title: "Names"
+                      type: text
+                      visible: (showRealNames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (showParamsCI)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (showParamsCI)
+                    - name: expb
+                      title: "exp(B)"
+                      type: number
+                      visible: (effectSize:expb)
+                    - name: z
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
 
-    - name: simpleEffects
-      title: Simple Effects Parameters 
-      type: Array
-      description: an array of simple Effects tables
-      visible: (simpleVariable)
-      clearWith:
+
+
+           - name: contrastCodeTables
+             title: Contrast Coefficients 
+             type: Array
+             description: an array of contrast coefficients tables
+             visible: (showContrastCode)
+             clearWith:
+                    - contrasts
+             template:
+                   title:  $key
+                   type: Table
+                   columns:
+                         - name: rnames
+                           title: 'Name'
+                           type: text
+                           visible: (showRealNames)
+                         - name: clabs
+                           title: 'Contrast'
+                           type: text
+
+
+  - name: postHocs
+    title: Post Hoc Tests
+    type: Array
+    description: an array of post-hoc tables
+    items: (postHoc)
+    clearWith:
         - dep
         - modelTerms
         - contrasts
         - scaling
-      template:
-        title: Simple Effects $key
-        type: Table
-        clearWith:
-        columns:
-          - name: dep
-            title: "Response Groups"
-            type: text
-            visible: (modelSelection:multinomial)
-            combineBelow: true
-
-          - name: variable
-            title: "Effect"
-            type: text
-          - name: level
-            title: "Moderator Levels"
-            type: text
-          - name: estimate
-            title: "Estimate"
-          - name: se
-            title: SE
-            type: number
-          - name: expb
-            title: exp(B)
-            type: number
-            visible: (expb && !modelSelection:probit)
-
-          - name: z
-            title: z
-            type: number
-          - name: p
-            title: p
-            type: number
-            format: zto,pvalue
-
-
-
-    - name: model
-      type: Property
-      description: The underlying `glm` object
-
-
-
-
-    - name: postHoc
-      title: Post Hoc Tests
-      type: Array
-      description: an array of post-hoc tables
-      items: (postHoc)
-      clearWith:
-        - dep
-        - modelTerms
-      template:
+        - postHocCorr
+    template:
+        clearWith: []
         title:  ""
         type: Table
         columns:
@@ -243,8 +166,12 @@ items:
           title: SE
           type: number
         - name: test
-          title: test
+          title: z
           type: number
+        - name: df
+          title: df
+          type: number
+          visible: false
         - name: p
           title: p
           type: number
@@ -261,47 +188,138 @@ items:
           format: zto,pvalue
           visible: (postHocCorr:holm)
 
-    - name: emeansTables
-      title: Estimated Marginal Means 
-      type: Array
-      description: an array of predicted means tables
-      visible: (eDesc)
-      clearWith:
+
+  - name: simpleEffects
+    title: Simple Effects
+    type: Group
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
+              clearWith:
+                 - dep
+                 - modelTerms
+                 - contrasts
+                 - scaling
+                 - fixedIntercept
+                 - simpleVariable
+                 - simpleModerator
+                 - simple3way
+                 - simpleScale
+                 - cvalue
+                 - percvalue
+                 - simpleScaleLabels
+              columns:
+                 - name: threeway
+                   title: ""
+                   visible: (simple3way)
+                   combineBelow: true
+                 - name: moderator
+                   title: ""
+                   combineBelow: true
+                 - name: chisq
+                   title: X²
+                   type: number
+                 - name: df
+                   title:  df
+                   type: number
+                 - name: p.value
+                   title: p
+                   type: number
+                   format: zto,pvalue
+
+            - name: Params
+              title: Parameter Estimates for simple effects
+              type: Table
+              visible: false
+              clearWith:
+                     - dep
+                     - modelTerms
+                     - contrasts
+                     - fixedIntercept
+                     - simpleScale
+              columns:
+                     - name: dep
+                       title: "Response Contrasts"
+                       type: text
+                       visible: (modelSelection:multinomial)
+                       combineBelow: true
+                     - name: threeway
+                       title: " "
+                       visible: (simple3way)
+                       combineBelow: true
+                     - name: moderator
+                       title: " "
+                       combineBelow: true
+                     - name: contrast
+                       title: "contrast"
+                       type: text
+                     - name: estimate
+                       title: "Estimate"
+                       type: number
+                     - name: SE
+                       title: "SE"
+                       type: number
+                     - name: lower.CL
+                       type: number
+                       title: Lower
+                       visible: (showParamsCI)
+                     - name: upper.CL
+                       type: number
+                       title: Upper
+                       visible: (showParamsCI)
+                     - name: z.ratio
+                       title: "z"
+                       type: number
+                     - name: p.value
+                       title: "p"
+                       type: number
+                       format: zto,pvalue
+
+
+
+  - name: emeansTables
+    title: Estimated Marginal Means 
+    type: Array
+    description: an array of predicted means tables
+    visible: (eDesc)
+    clearWith:
         - dep
         - modelTerms
-      template:
+        - contrasts
+        - scaling
+        - fixedIntercept
+        - simpleScaleLabels
+    template:
         title:  $key
         type: Table
+        clearWith: []
         columns:
-        - name: dep
-          title: "Response Groups"
-          type: text
-          visible: (modelSelection:multinomial)
-          combineBelow: true
-        - name: lsmean
-          title: Mean
+        - name: emmean
+          title: 'Mean'
           type: number
-        - name: se
+        - name: SE
           title: SE
           type: number
-        - name: lower
-          title: Lower
+        - name: lower.CL
+          title: Lower 
           type: number
-        - name: upper
+        - name: upper.CL
           title: Upper
           type: number
 
 
-
-    - name: descPlot
-      title: Effects Plots
-      visible: (plotHAxis)
-      type: Image
-      description: a descriptives plot
-      width: 500
-      height: 300
-      renderFun: .descPlot
-      clearWith:
+  - name: descPlot
+    title: Plots
+    visible: (plotHAxis)
+    type: Image
+    description: a descriptives plot
+    width: 500
+    height: 300
+    renderFun: .descPlot
+    clearWith:
         - dep
         - plotHAxis
         - plotSepLines
@@ -309,18 +327,24 @@ items:
         - plotError
         - ciWidth
         - scaling
-        - modelTerms
         - plotRaw
-        
-    - name: descPlots
-      title: Results Plots
-      type: Array
-      description: an array of results plots
-      visible: (plotSepPlots)
-      template:
+        - plotDvScale
+        - fixedIntercept
+        - simpleScale
+        - simpleScaleLabels
+
+  - name: descPlots
+    title: Results Plots
+    type: Array
+    description: an array of results plots
+    visible: (plotSepPlots)
+    template:
           title: $key
           type: Image
           renderFun: .descPlot
+          width: 500
+          height: 300
+
           clearWith:
            - dep
            - plotHAxis
@@ -330,8 +354,9 @@ items:
            - ciWidth
            - scaling
            - modelTerms
-           - plotRaw
+           - fixedIntercept
+           - simpleScale
+           - simpleScaleLabels
            - plotDvScale
-
-
+           - plotRaw
 

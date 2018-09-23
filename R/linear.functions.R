@@ -151,10 +151,13 @@ lf.contrastLabels=function(levels, type) {
 }
 
 lf.scaleContinuous<-function(var,method,by=NULL) {
+
   if (method=="centered") 
           var<-scale(var,scale = F)  
-  if (method=="cluster-based centered")    
+  if (method=="cluster-based centered") {    
           var<-unlist(tapply(var,by,scale,scale=F))
+          print(tapply(var,by,mean))
+  }
   if (method=="standardized") 
           var<-scale(var,scale = T)  
   if (method=="cluster-based standardized")     
@@ -163,69 +166,9 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
 }
 
 
-### this should be lecacy now ###
-
-# This is a crazy piece of software to extract labels of contrasts and
-# merge them to the names of the terms of a summary.lm(). Before thinking
-# that it is too elaborated, please consider that this would attach the right
-# labels even in cases where two different model terms have the same name (it may happen) 
-# or one dummy gets the same name of a continuous variable (this may happens too).
-
-
-.xgetFormulaContrastsLabels<-function(contrasts,formula,data) {
-
-  contrasts<-as.data.frame(do.call(rbind,contrasts))
-  modelmatrix<-model.matrix(formula,data)
-  facts<-names(attr(modelmatrix,"contrasts"))
-
-  labels<-sapply(facts, function(varname) {
-    if (varname %in% contrasts$var) {
-      contrasttype<-contrasts[contrasts$var==varname,"type"]
-    } else {
-      contrasttype<-"deviation"
-    }
-    
-    var<-data[,varname]
-    levels <- base::levels(var)
-    .contrastLabels(levels, contrasttype)
-  },simplify = F)
-  
-  layout<-attr(terms.formula(formula),"term.labels")
-  for (i in seq_along(layout))
-     layout[i]<-gsub("`","",layout[i],fixed=T)
-  laylist<-sapply(layout,function(a) jmvcore::decomposeTerm(a))
-  vars<-as.character(attr(terms.formula(formula),"variables"))
-  vars<-vars[c(-1,-2)]
-#  laylist<-sapply(layout,function(a) strsplit(a,":",fixed = T))
-
-    for (i in seq_along(vars)) {
-      var<-jmvcore::decomposeTerm(vars[i])
-    if (var %in% names(labels)) {
-      laylist<-sapply(laylist, function(a) {
-        a[which(a == var)]<-paste(unlist(labels[var]),collapse = "#")
-        a
-      })
-    }
-  }
-  laylist<-sapply(laylist,function(a) strsplit(a,"#",fixed = T))
-  final<-list()
-  nr<-1
-  for (j in seq_along(laylist)) {
-    lay<-laylist[j]
-    records<-expand.grid(lay[[1]],stringsAsFactors = F)
-    ready<-apply(records,1,paste,collapse=":")
-    for (i in seq_along(ready)) {
-      final[nr]<-ready[i]
-      nr<-nr+1
-    }
-  } 
-  ### add an empty contrast for the intercept ####
-  c("Intercept",unlist(final))
-}
-
 
 ### this tells if a model term is dependent on the interaction
-.is.scaleDependent<-function(model,term) {
+lf.is.scaleDependent<-function(model,term) {
     if (is.null(term))
       return(FALSE)
     try({
@@ -240,7 +183,7 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
 }
 
 
-.term.develop<-function(term){
+lf.term.develop<-function(term){
      n<-.term.order(term)
      (2^n)-1
 }
@@ -251,8 +194,9 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
   
 }
 
-.interaction.term<-function(model,aList) {
-  
+lf.interaction.term<-function(model,aList) {
+
+    aList<-jmvcore::toB64(aList)
     ff<-colnames(attr(terms(model),"factors"))
     ff<-jmvcore::decomposeTerms(ff)
     for(f in ff)
@@ -265,12 +209,12 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
 
 
 lf.dependencies<-function(model,term,what) {
-  if (.is.scaleDependent(model,term))
+  if (lf.is.scaleDependent(model,term))
     return(paste(what,"interactions",sep="."))
    else {
      modelterms<-terms(model)
      modelterms<-attr(modelterms,"term.labels")
-     if (.term.develop(term)<length(modelterms))
+     if (lf.term.develop(term)<length(modelterms))
        return(paste(what,"covariates",sep="."))
    }
   FALSE

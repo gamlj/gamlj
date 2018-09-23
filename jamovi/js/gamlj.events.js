@@ -41,7 +41,11 @@ const events = {
         this.checkValue(ui.simple3way, false, values, FormatDef.variable);
     },
 
- 
+     onChange_model: function(ui) {
+        console.log("model changed");
+        ui.dep.setValue(null);
+      },
+
     onChange_postHocSupplier: function(ui) {
         let values = this.itemsToValues(ui.postHocSupplier.value());
         this.checkValue(ui.postHoc, true, values, FormatDef.term);

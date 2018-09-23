@@ -11,30 +11,7 @@ description:
         dontrun: false
         usage: |
             data('data3by2')
-
-            gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
-
-            #
-            #  
-            #
-            #  ANOVA
-            #  ───────────────────────────────────────────────────────────────────────
-            #                 Sum of Squares    df    Mean Square    F        p
-            #  ───────────────────────────────────────────────────────────────────────
-            #    x               115.19         1      115.19       20.07     < .001
-            #    twogroups       31.36          1      31.36         5.46      0.021  
-            #    x:twogroups     7.15          1       7.15         1.25      0.267  
-            #    Residuals      551.13         96       5.74  
-            #  ───────────────────────────────────────────────────────────────────────
-            #
-            #  _______________________________________________________________________
-            #                  Estimates  Std. Error  t-value      p.
-            #  _______________________________________________________________________
-            #
-            #  (Intercept)     52.804      0.245        215.17   < .001
-            #   x              0.596       0.133        4.48     < .001
-            #   twogroups1    -0.574       0.245       -2.34      0.021
-            #   x:twogroups1  -0.148       0.133       -1.12      0.267
+            gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
 
 
 options:
@@ -42,31 +19,6 @@ options:
       type: Data
       description:
           R: the data as a data frame
-
-
-    - name: modelSelection
-      title: Model Selection
-      type: List
-      options:
-        - name: linear
-          title: Linear
-        - name: poisson
-          title: Poisson
-        - name: poiover
-          title: Poisson (overdispersion)
-        - name : nb
-          title: Negative Binomial
-        - name: logistic
-          title: Logistic
-        - name: probit
-          title: Probit
-          
-        - name: multinomial
-          title: Multinomial
-      default: linear
-      description:
-          R: >
-            Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
 
     - name: dep
       title: Dependent Variable
@@ -77,7 +29,7 @@ options:
       description:
           R: >
             a string naming the dependent variable from `data`, variable
-            must be numeric
+            can be numeric or factor 
 
     - name: factors
       title: Factors
@@ -97,26 +49,27 @@ options:
       description:
           R: a vector of strings naming the covariates from `data`
 
+
+
     - name: modelTerms
       title: Model Terms
       type: Terms
       default:
       description:
           R: >
-            a list of character vectors describing the terms to go into the
-            model
+            a list of character vectors describing fixed effects terms
 
-
-    - name: expb
-      title: Odd Ratios (expB)
+    - name: fixedIntercept
+      title: Fixed Intercept
       type: Bool
       default: true
       description:
           R: >
-            `TRUE` (default) or `FALSE` , show expB in table
+            `TRUE` (default) or `FALSE`, estimates fixed intercept
+
 
     - name: showParamsCI
-      title: Confidence interval
+      title: Confidence intervals
       type: Bool
       default: true
       description:
@@ -151,56 +104,38 @@ options:
               - name: type
                 type: List
                 options:
-                  - default
                   - deviation
                   - simple
+                  - dummy
                   - difference
                   - helmert
                   - repeated
                   - polynomial
+                default: deviation
       description:
           R: >
             a list of lists specifying the factor and type of contrast to use,
             one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
             `'repeated'` or `'polynomial'`
 
-    - name: showContrastsTable
-      title: Contrasts definition table
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
-    - name: showContrasts
-      title: Contrasts in estimates table
+
+    - name: showRealNames
+      title: Names in estimates table
       type: Bool
       default: true
       description:
           R: >
-            `TRUE` or `FALSE` (default), provide definitions of the contrasts variables
+            `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
 
 
-    - name: scaling
-      title: Covariates Scaling
-      type: Array
-      items: (covs)
-      default:
-      template:
-          type: Group
-          elements:
-              - name: var
-                type: Variable
-                content: $key
-              - name: type
-                type: List
-                options:
-                  - none
-                  - centered
-                  - standardized
+    - name: showContrastCode
+      title: Contrast Coefficients tables
+      type: Bool
+      default: false
       description:
           R: >
-            a list of lists specifying the covariates scaling,
-            one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+            `TRUE` or `FALSE` (default), provide contrast coefficients tables
+
 
 
 
@@ -237,46 +172,11 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide descriptive statistics
+
     - name: plotDvScale
-      title: Y-axis observed scale
+      title: Y-axis observed range 
       type: Bool
       default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
-
-    - name: postHoc
-      title: Post Hoc Tests
-      type: Terms
-      default:
-      description:
-          R: a list of terms to perform post-hoc tests on
-
-    - name: postHocCorr
-      title: Correction
-      type: NMXList
-      options:
-          - name: none
-            title: No correction
-          - name: bonf
-            title: Bonferroni
-          - name: holm
-            title: Holm
-      default:
-          - bonf
-      description:
-          R: >
-            one or more of `'none'`,  `'bonf'`, or
-            `'holm'`; provide no,  Bonferroni, and
-            Holm Post Hoc corrections respectively
-
-    - name: eDesc
-      title: Estimated Marginal Means
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
 
 
     - name: plotError
@@ -307,6 +207,32 @@ options:
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width
 
+
+    - name: postHoc
+      title: Post Hoc Tests
+      type: Terms
+      default:
+      description:
+          R: a list of terms to perform post-hoc tests on
+
+
+    - name: eDesc
+      title: Estimated Marginal Means
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide lsmeans statistics
+
+    - name: eCovs
+      title: Include covariates
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide lsmeans statistics
+
+
     - name: simpleVariable
       title: Simple effects variable
       type: Variable
@@ -332,6 +258,129 @@ options:
             a moderator of the two-way interaction which is probed
 
 
+    - name: simpleScale
+      title: Covariates conditioning
+      type: List
+      options:
+        - name: mean_sd
+          title: Mean ±  SD
+        - name: percent
+          title: Percentiles 50 ± offset 
+      default: mean_sd
+      description:
+          R: >
+            `'mean_sd'` (default), `'custom'` , or `'custom_percent'`. Use to condition the
+            covariates (if any)
+
+
+    - name: cvalue
+      type: Number
+      default: 1
+      description:
+          R: >
+            offset value for conditioning
+
+    - name: percvalue
+      type: Number
+      default: 25
+      min: 5
+      max: 50
+      description:
+          R: >
+            offset value for conditioning
+
+    - name: simpleScaleLabels
+      title: Moderators labeling
+      type: List
+      options:
+        - name: labels
+          title: Labels
+        - name: values
+          title: Values
+        - name: values_labels
+          title: Values + Labels
+      default: labels
+
+
+############ generic with some specs ###########
+
+    - name: postHocCorr
+      title: Correction
+      type: NMXList
+      options:
+          - name: none
+            title: No correction
+          - name: bonf
+            title: Bonferroni
+          - name: holm
+            title: Holm
+      default:
+          - bonf
+      description:
+          R: >
+            one or more of `'none'`,  `'bonf'`, or
+            `'holm'`; provide no,  Bonferroni, and
+            Holm Post Hoc corrections respectively
+
+    - name: scaling
+      title: Covariates Scaling
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                  - centered
+                  - standardized
+                  - none
+
+                default: centered 
+      description:
+          R: >
+            a list of lists specifying the covariates scaling,
+            one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+
+######### specs here ##########
+
+    - name: effectSize
+      title: Effect Size
+      type: NMXList
+      options:
+          - name: expb
+            title: Odd Ratios (expB)
+      default:
+          - expb
+          
+    - name: modelSelection
+      title: Model Selection
+      type: List
+      options:
+        - name: linear
+          title: Linear
+        - name: poisson
+          title: Poisson
+        - name: poiover
+          title: Poisson (overdispersion)
+        - name : nb
+          title: Negative Binomial
+        - name: logistic
+          title: Logistic
+        - name: probit
+          title: Probit
+          
+        - name: multinomial
+          title: Multinomial
+      default: linear
+      description:
+          R: >
+            Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
 
 ...
 

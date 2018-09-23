@@ -4,10 +4,10 @@
 \alias{gamlj_update}
 \title{Update a GAMLj model by passing only the new options}
 \usage{
-gamlj_update(gobj, params)
+gamlj_update(gobj, ...)
 }
 \arguments{
-\item{a}{single obj of class \code{\link{gamljMixed}}}
+\item{a}{single obj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGZLM}}}
 }
 \value{
 an object of class GAMLj* as the input object

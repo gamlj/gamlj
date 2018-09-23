@@ -239,6 +239,10 @@ children:
                 type: CheckBox
                 optionPart: bonf
                 optionName: postHocCorr
+              - name: postHocCorr_tukey
+                type: CheckBox
+                optionPart: tukey
+                optionName: postHocCorr
               - name: postHocCorr_holm
                 type: CheckBox
                 optionPart: holm

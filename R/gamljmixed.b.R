@@ -85,17 +85,21 @@ gamljMixedClass <- R6::R6Class(
           aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[[i]]),label=.nicifyTerms(labels[i])))
 
         # other inits
-        private$.initPlots(data)
-        rf.initPostHoc(data,self$options, self$results$postHocs,modelType="linear")     
-        rf.initEMeans(data,self$options,self$results$emeansTables,private$.cov_condition)
-        rf.initSimpleEffects(data,self$options,self$results)
-        rf.initContrastCode(data,self$options,self$results,n64)
+        gplots.initPlots(self,data,private$.cov_condition)
+        gposthoc.init(data,self$options, self$results$postHocs)     
+        gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
+        gsimple.init(data,self$options,self$results$simpleEffects)
+        mi.initContrastCode(data,self$options,self$results,n64)
     },
     .run=function() {
       n64<-private$.names64
       mark("run")
       # collect some option
       dep <- self$options$dep
+      
+      if (is.null(dep))
+        return()
+      
       factors <- self$options$factors
       covs <- self$options$covs
       clusters<-self$options$cluster
@@ -202,7 +206,6 @@ gamljMixedClass <- R6::R6Class(
              } # end of check state 
              
         ### prepare info table #########       
-               
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
                info.aic<-model_summary$AICtab[1]
@@ -238,10 +241,14 @@ gamljMixedClass <- R6::R6Class(
                 realgroups<-n64$nicenames(grp)
                 realnames<-n64$nicenames(vcv$var1)
                 for (i in 1:dim(vcv)[1]) {
-                     if (i<=randomTable$rowCount)
-                              randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
+                     if (realnames[[i]]=="(Intercept)")
+                        icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
                      else
-                              randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
+                        icc<-""
+                     if (i<=randomTable$rowCount)
+                              randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                     else
+                              randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                 }
                 info<-paste("Numer of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = "")
                 randomTable$setNote('info', info)
@@ -305,35 +312,37 @@ gamljMixedClass <- R6::R6Class(
           } 
         }
         ### parameter table ####
-        
-        #### confidence intervals ######
-        ciWidth<-self$options$paramCIWidth/100
-        citry<-try({
-            ci<-mf.confint(model,level=ciWidth)
-            colnames(ci)<-c("cilow","cihig")
-            parameters<-cbind(parameters,ci) 
-          })
-          if (jmvcore::isError(citry)) {
-            message <- extractErrorMessage(citry)
-            estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-          }
-        rownames(parameters)<-n64$nicenames(rownames(parameters))
-        for (i in 1:nrow(parameters)) {
-                tableRow=parameters[i,]
-                estimatesTable$setRow(rowNo=i,tableRow)
-          }
+        if (nrow(parameters)>0) {
+             #### confidence intervals ######
+             ciWidth<-self$options$paramCIWidth/100
+             citry<-try({
+                     ci<-mf.confint(model,level=ciWidth)
+                     colnames(ci)<-c("cilow","cihig")
+                     parameters<-cbind(parameters,ci) 
+                    })
+             if (jmvcore::isError(citry)) {
+                   message <- extractErrorMessage(citry)
+                   estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                }
+             rownames(parameters)<-n64$nicenames(rownames(parameters))
+             for (i in 1:nrow(parameters)) {
+                   tableRow=parameters[i,]
+                   estimatesTable$setRow(rowNo=i,tableRow)
+             }
 
         
-       if (mf.aliased(model)) {
-          estimatesTable$setNote("aliased",WARNS["ano.aliased"])
-          infoTable$setNote("aliased",WARNS["ano.aliased"])
-       }
+             if (mf.aliased(model)) {
+                 estimatesTable$setNote("aliased",WARNS["ano.aliased"])
+                infoTable$setNote("aliased",WARNS["ano.aliased"])
+             }
+        }
   
            
         private$.preparePlots(private$.model)
-        private$.populateSimple(private$.model)
-        private$.populatePostHoc(private$.model)
-        private$.populateDescriptives(private$.model)
+        gposthoc.populate(model,self$options,self$results$postHocs)
+        gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
+        gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
+        
 
     },
   .buildreffects=function(terms,correl=TRUE) {
@@ -436,85 +445,6 @@ gamljMixedClass <- R6::R6Class(
     },
 
 
-.populatePostHoc=function(model) {
-
-    terms <- self$options$postHoc
-    dep<-self$options$dep
-
-     if (length(terms) == 0)
-         return()
-  
-  tables <- self$results$postHocs 
-  if (tables$isFilled()) {
-    mark("post-hoc recycled")
-    return()
-  }
-  mark("post-hoc computed")
-
-  postHocRows <- list()
-  
-  for (ph in terms) {
-    
-    table <- tables$get(key=ph)
-    table$setState(list(1:10))
-    term <- jmvcore::composeTerm(ph)
-    termB64 <- jmvcore::composeTerm(jmvcore::toB64(ph))
-    suppressWarnings({
-      none <- mf.posthoc(model,termB64,"none")
-      bonferroni <- mf.posthoc(model,termB64,"bonferroni")
-      holm <-mf.posthoc(model,termB64,"holm")
-      tukey <-mf.posthoc(model,termB64,"tukey")
-      
-    }) # suppressWarnings
-    if (is.character(none))
-      table$setNote("nojoy",WARNS["ph.nojoy"])
-    else {        
-      table$setState("there is work done")
-      tableData<-as.data.frame(none)
-      tableData$contrast<-as.character(tableData$contrast)
-      colnames(tableData)<-c("contrast","estimate","se","df","test","p")
-      tableData$pbonf<-bonferroni[,6]
-      tableData$pholm<-holm[,6]
-      tableData$ptukey<-tukey[,6]
-    }
-    .labs<-sapply(tableData$contrast, function(a) {
-      strsplit(a,"[-,]")
-    })
-    labs<-do.call("rbind",.labs)   
-    colnames(labs)<-paste0("c",1:ncol(labs))
-    for (i in 1:nrow(tableData)) {
-      row<-tableData[i,]
-      l<-labs[i,]
-      table$setRow(rowNo=i, values=c(row,l))
-    }
-  }
-
-},
-
-.initPlots=function(data) {
-       isAxis <- ! is.null(self$options$plotHAxis)
-       isMulti <- ! is.null(self$options$plotSepPlots)
-       
-         self$results$get('descPlot')$setVisible( ! isMulti && isAxis)
-         self$results$get('descPlots')$setVisible(isMulti)
-    
-       if (isMulti) {
-         sepPlotsName <- self$options$plotSepPlots
-         sepPlotsVar <- data[[jmvcore::toB64(sepPlotsName)]]
-         if(is.factor(sepPlotsVar))
-            sepPlotsLevels <- levels(sepPlotsVar)
-         else {
-           sepPlotsLevels<-private$.cov_condition$labels(sepPlotsName)
-         }
-         mark("levs",sepPlotsLevels)
-
-         array <- self$results$descPlots
-         for (level in sepPlotsLevels) {
-             title<-paste(sepPlotsName,"=",level)
-             array$addItem(title)
-         }
-        }
-  },
 .preparePlots=function(model) {
   
   depName <- self$options$dep
@@ -524,7 +454,9 @@ gamljMixedClass <- R6::R6Class(
   
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
-
+  if (is.null(linesName))
+      plotsName<-NULL
+  
   errorBarType<-self$options$plotError
   ciWidth   <- self$options$ciWidth
   optionRaw<-self$options$plotRaw
@@ -537,7 +469,7 @@ gamljMixedClass <- R6::R6Class(
   
   
   if (referToData)
-    rawData=lp.rawData(model,depName,groupName,linesName)
+    rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)
   else 
     rawData<-NULL
   ### this is specific of mixed model #####
@@ -554,7 +486,7 @@ gamljMixedClass <- R6::R6Class(
   } else
     randomData<-NULL
 
-  predData<-lp.preparePlotData(model,
+  predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,
                                plotsName,
@@ -562,11 +494,12 @@ gamljMixedClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition)
  
+
+  yAxisRange <- gplots.range(model,depName,predData,rawData)
+
   if (!optionRaw)
     rawData<-NULL
- 
-  yAxisRange <- lp.range(model,depName,predData,rawData)
-
+  
   ### this for mixed only ###
   if (!is.null(randomData)) {
              yAxisRange[which.max(yAxisRange)]<-max(max(randomData$y),max(yAxisRange))
@@ -587,8 +520,14 @@ gamljMixedClass <- R6::R6Class(
       image <- images$get(key=key)
       sdata<-subset(predData,plots==real)
       sraw<-NULL
-      if (!is.null(rawData))
-           sraw<-subset(rawData,w==real)
+      if (!is.null(rawData)) {
+        mark(key,is.factor(rawData[["w"]]))
+        if (is.factor(rawData[["w"]]))
+          sraw<-subset(rawData,w==real)
+        else
+          sraw<-rawData
+      }
+      
       srand<-NULL
       if (!is.null(randomData))
            srand<-subset(randomData,plots==real)
@@ -616,100 +555,12 @@ gamljMixedClass <- R6::R6Class(
     errorType<-paste0(ciWidth,"% ",toupper(errorType))
   
   if ( ! is.null(linesName)) {
-    p<-lp.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
+    p<-gplots.twoWaysPlot(image,ggtheme,depName,groupName,linesName,errorType)
   } else {
-    p<-lp.oneWayPlot(image,theme,depName,groupName,errorType)
+    p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType)
   }       
-  p<-p+ggtheme
   print(p)
   TRUE
-},
-.populateDescriptives=function(model) {
-
-  if (self$options$eDesc) {
-       
-       terms<-private$.modelTerms()
-       if (self$options$eCovs)
-           terms<-private$.modelTerms()
-       else 
-           terms<-jmvcore::fromB64(mf.getModelFactors(model))
-
-       meanTables<-self$results$emeansTables
-       
-       if (meanTables$isFilled()) {
-         mark("Estimated marginal means recycled")
-         return()
-       }
-       mark("Estimated marginal means computed")
-       for (term in terms) {
-            term64<-jmvcore::toB64(term)
-            table<-pred.means(model,term64,cov_conditioning = private$.cov_condition)  
-            key<-.nicifyTerms(jmvcore::composeTerm(term))    
-            names(table)[1:length(term)]<-term
-            aTable<-meanTables$get(key=key)
-               
-            for (i in seq_len(nrow(table))) {
-                     values<-table[i,]
-                     aTable$setRow(rowNo=i,values)
-            }
-            depend<-lf.dependencies(model,term64,"means")
-            if (depend!=FALSE) 
-            aTable$setNote(depend,WARNS[depend])
-         }
-       
-       meanTables$setState(TRUE)
-  } # end of eDesc              
-  
-},
-.populateSimple=function(model) {
-  
-  variable<-self$options$simpleVariable
-  moderator<-self$options$simpleModerator
-  threeway<-self$options$simple3way
-  simpleScale<-self$options$simpleScale
-  offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
-  
-
-  interval<-self$options$paramCIWidth
-
-    if (is.null(variable) | is.null(moderator)) 
-          return()
-  
-  ### collect the tables
-    
-  anovaTable<-self$results$simpleEffects$Anova
-  parametersTable<-self$results$simpleEffects$Params
-
-  #### check if estimation is needed
-  if (!is.null(anovaTable$state)) {
-    mark("simple effects have been recycled")
-    anovaTableData<-anovaTable$state
-    parametersTableData<-parametersTable$state
-  } else {
-         simple_test <- try({
-                            tables<-pred.simpleEstimates(model,
-                                 jmvcore::toB64(variable),jmvcore::toB64(moderator),jmvcore::toB64(threeway),
-                                 cov_conditioning=private$.cov_condition,
-                                 interval=interval) 
-                         })
-          if (jmvcore::isError(simple_test)) {
-              anovaTable$setNote("se.noluck",WARNS[["se.noluck"]])
-              return()
-          }
-         
-          anovaTableData<-tables[[2]]
-          anovaTable$setState(anovaTableData)
-          parametersTableData<-tables[[1]]  
-          parametersTable$setState(parametersTableData)
-  }
-  ### fill the Anova Table ###
-  for(r in seq_len(nrow(anovaTableData))) {
-    anovaTable$setRow(rowNo=r,anovaTableData[r,])
-  }
-  for(r in seq_len(nrow(parametersTableData))) {
-    parametersTable$setRow(rowNo=r,parametersTableData[r,])
-  }
-  
 },
 
 .fixedFormula=function() {

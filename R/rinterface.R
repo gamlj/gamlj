@@ -16,21 +16,24 @@ gamlj_options<-function(opt,value) {
 #'
 #' This function re-estimates a GAMLj model applying new options to the original model
 #'
-#' @param a single obj of class \code{\link{gamljMixed}} 
+#' @param a single obj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGZLM}} 
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
+#' @export 
 
-gamlj_update<-function(gobj,params) {
-  funs<-list("gamljMixedOptions"=gamlj::gamljMixed)
+gamlj_update<-function(gobj,...) {
+  params<-as.list(c(...))
+  funs<-list("gamljMixedOptions"=gamlj::gamljMixed,
+             "gamljGLMOptions"=gamlj::gamljGLM)
   cl<-class(gobj$options)[1]
   fun<-funs[[cl]]
-  
   forms<-formals(fun)
   alist<-list()
   for (f in names(forms)) {
     if  (f %in% names(gobj$options)) 
       alist[[f]]<-gobj$options[[f]]
   }
+
   for (p in names(params)) {
     alist[[p]]<-params[[p]]     
   }
@@ -46,13 +49,14 @@ gamlj_update<-function(gobj,params) {
 
 #' @param gobj a gamlj results object of the class GAMLj*#'
 #' @param haxis horizontal axis variable
-#' @param seplines variable defining the levels for separate lines 
-#' @param sepplot variable defining the levels for which separate plots are produced 
-#'  
+#' @param sepLines variable defining the levels for separate lines 
+#' @param sepPlot variable defining the levels for which separate plots are produced 
+#' @param ... any other options accepted by the gamlj_* function  
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
-gamlj_plot<-function(gobj,haxis,seplines=NULL,sepplots=NULL) {
- news<-list(plotHAxis=haxis,plotSepLines=seplines,plotSepPlots=sepplots)
+#' @export
+gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
+ news<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
  gamlj_update(gobj,news)  
 }
 
@@ -64,12 +68,14 @@ gamlj_plot<-function(gobj,haxis,seplines=NULL,sepplots=NULL) {
 #' @param variable the independent variable name
 #' @param moderator the moderator variable name 
 #' @param threeway the name of the additional moderator for three way interactions 
-#'  
+#' @param ... any other options accepted by the gamlj_* function  
+
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
+#' @export 
 
-gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL) {
-  args<-list(simpleVariable=variable,simpleModerator=moderator,simple3way=threeway)
+gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,...) {
+  args<-list(simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)
   gamlj_update(gobj,args)  
 }
 
@@ -83,6 +89,7 @@ gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL) {
 #'  
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
+#' @export
 
 
 gamlj_drop<-function(gobj,analysis) {
@@ -101,16 +108,3 @@ gamlj_drop<-function(gobj,analysis) {
   
   gamlj_update(gobj,args)  
 }
-
-#' Extract the R model fro  a GAMLj object
-#'
-#'
-#' @param gobj a gamlj results object of the class GAMLj*
-#'  
-#' @return an R object of class lmer, lm, or glm
-#' @author Marcello Gallucci
-
-
-gamlj_extractModel<-function(gobj) 
-    gobj$anova$state[[1]]
-  

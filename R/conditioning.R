@@ -16,6 +16,7 @@ library(R6)
 # or number that applies in order to corresponding variables. Partial vector is fine, the remaining is set to 1
 
 # In jamovi span and method are applied to all covariates. In R can be 
+
 conditioning <- R6Class("conditioning",
         public=list(
         labels_type="labels",

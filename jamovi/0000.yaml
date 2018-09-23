@@ -21,7 +21,7 @@ analyses:
     menuGroup: Linear Models
     menuSubgroup: GAMLj
     menuTitle: General Linear Model
-    description: Mixed Linear Model
+    description: General Linear Model
   - title: Mixed Model
     name: gamljMixed
     ns: gamlj

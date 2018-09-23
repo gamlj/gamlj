@@ -21,7 +21,7 @@ items:
         - factors
         - cov
         - modelTerms
-
+        - fixedIntercept
 
   - name: main
     type: Group
@@ -188,6 +188,11 @@ items:
           type: number
           format: zto,pvalue
           visible: (postHocCorr:bonf)
+        - name: ptukey
+          title: p<sub>tukey</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:tukey)
         - name: pholm
           title: p<sub>holm</sub>
           type: number
@@ -274,9 +279,6 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
-                     - name: df
-                       title: "df"
-                       type: number
                      - name: t.ratio
                        title: "t"
                        type: number
@@ -352,6 +354,9 @@ items:
           title: $key
           type: Image
           renderFun: .descPlot
+          width: 500
+          height: 300
+
           clearWith:
            - dep
            - plotHAxis

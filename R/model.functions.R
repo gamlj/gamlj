@@ -33,67 +33,7 @@ mf.aliased<-function(model) {
   FALSE
 }
 
-mf.predict_response<-function(model) {
-  if (.which.class(model)=="glm" || .which.class(model)=="lm") {
-  return(  predict(model,type="response"))    
-  }
-  if (.which.class(model)=="lmer") {
-    return(  predict(model,re.form=~0))    
-  }
-} 
-  
-##### predictions for the plots #######
 
-mf.predict<- function(x,...) UseMethod(".predict")
-
-
-.predict.lm<-function(model,data=NULL,bars="none") {
-    preds<-predict(model,data,se.fit = T,interval="confidence",type="response")
-    if (bars=="none")
-      return(data.frame(fit=preds$fit[,1]))
-    if (bars=="ci") {
-      fit<-preds$fit[,1]
-      lwr<-preds$fit[,2]
-      upr<-preds$fit[,3]
-    }
-    if (bars=="se") {
-      fit<-preds$fit[,1]
-      lwr<-preds$fit[,1]-preds$se.fit
-      upr<-preds$fit[,1]+preds$se.fit
-    }  
-    return(as.data.frame(cbind(fit=fit,lwr=lwr,upr=upr)))
-  }
-  
-.predict.glm<-function(model,data=NULL,bars="none") {
-  
-    preds<-predict(model,data,se.fit = T,type="link")
-    if (bars=="none")
-      return(data.frame(fit=model$family$linkinv(preds$fit)))
-    if (bars=="ci")
-        critval<-qnorm(0.975)
-    if (bars=="se")
-        critval<-1
-    upr <- preds$fit + (critval * preds$se.fit)
-    lwr <- preds$fit - (critval * preds$se.fit)
-    fit<-preds$fit
-    fit <- model$family$linkinv(fit)
-    upr <- model$family$linkinv(upr)
-    lwr <- model$family$linkinv(lwr)
-    return(as.data.frame(cbind(fit,lwr,upr)))
-  }
-
-.predict.merModLmerTest<-function(model,data=NULL,bars="none") 
-             return(.predict.lmer(model,data,bars))
-  
-.predict.lmer<-function(model,data=NULL,bars="none") {
-
-      return(data.frame(fit=predict(model,data,re.form=~0)))
-}
-
-.predict.multinom<-function(model,data=NULL,bars="none") {
-  
-  return(data.frame(fit=predict(model,data,type="probs")))
-}
 
 ##### get model data #########
 
@@ -114,28 +54,6 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 
 
-#### they are legacy now. Those function are not needed for simple effects and plots. They get a model as imput and gives back a function
-#### to reestimate the same kind of model
-
-mf.estimate<-function(model) {
-  if (.which.class(model)=="lm") {  
-     return(function(form,data) stats::lm(form,data))
-  }  
-
-  if (.which.class(model)=="lmer") {  
-    return(function(form,data)
-      do.call(lmerTest::lmer, list(formula=form, data=data,REML=!is.na(model@devcomp$cmp["REML"]))))
-  }
-  if (.which.class(model)=="glm") {  
-    return(function(form,data)
-      stats::glm(form,data,family=model$family))
-  }  
-  if (.which.class(model)=="multinomial") {  
-    return(function(form,data)
-       nnet::multinom(form,data,model = T))
-  }  
-  
-}
 
 ############# produces summary in a somehow standard format ##########
 
@@ -237,7 +155,11 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.lm<-function(model) {
     ano<-car::Anova(model,test="F",type=3, singular.ok=T)
     colnames(ano)<-c("ss","df","f","p")
-    dss<-ano[-1,]
+    if (length(grep("Intercept",rownames(ano),fixed=T))>0)
+        dss<-ano[-1,]
+    else
+        dss<-ano
+    
     sumr<-summary(model)
     errDF<-sumr$fstatistic[3]
     modDF<-sumr$fstatistic[2]
@@ -391,16 +313,6 @@ mf.checkData<-function(options,data,modelType="linear") {
        if (any(data[[dep]]<0))
              return("Poisson-like models require all positive numbers in the dependent variable")
      }
-      if (modelType=="logistic" || modelType=="probit") {
-          data[[dep]] <- factor(data[[dep]])
-          if (length(levels(data[[dep]]))!=2)
-               return(paste(modelType,"model requires two levels in the dependent variable"))
-      } 
-     if (modelType=="multinomial") {
-            data[[dep]] <- factor(data[[dep]])
-            if (length(levels(data[[dep]]))<3)
-                   return("For 2-levels factors please use a logistic model")
-     }
      ####### check the covariates usability ##########
      covs=options$covs
      
@@ -427,6 +339,7 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 
 ###### confidence intervals ##########
+
 mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.default<-function(model,level) 
@@ -462,95 +375,5 @@ mf.confint<- function(x,...) UseMethod(".confint")
   for (i in seq_len(dim(ci)[3]))
      cim<-rbind(cim,(ci[,,i]))
   return(cim)
-}
-
-###### post hoc ##########
-mf.posthoc<- function(x,...) UseMethod(".posthoc")
-
-.posthoc.default<-function(model,term,adjust) {
-#  term<-jmvcore::composeTerm(term)
-  term<-as.formula(paste("~",term))
-  data<-mf.getModelData(model)
-  referenceGrid<-emmeans::emmeans(model, term,type = "response",data=data)
-  table<-summary(pairs(referenceGrid),adjust=adjust)
-  table[order(table$contrast),]
-}
-
-.posthoc.multinom<-function(model,term,adjust) {
-  results<-try({
-  dep<-names(attr(terms(model),"dataClass"))[1]
-  dep<-jmvcore::composeTerm(dep)
-  term<-jmvcore::composeTerm(term)
-  terms<-paste(term,collapse = ":")
-  tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  data<-mf.getModelData(model)
-  referenceGrid<-emmeans::emmeans(model,tterm,transform = "response",data=data)
-  summary(pairs(referenceGrid, by=dep, adjust=adjust))
-  })
-  return(results)
-  }
-
-###### means tables legacy: now done with predict.R ##########
-mf.means<- function(x,...) UseMethod(".means")
-
-.means.default<-function(model,term) {
-  data=mf.getModelData(model)
-  nvar<-length(term)
-  table<-emmeans::emmeans(model,term,type = "response",data=data)
-  table<-as.data.frame(summary(table))
-  ff<-paste0("c",1:nvar)
-  colnames(table)<-c(ff,"lsmean","se","df","lower","upper")
-  for (f in ff)
-    table[[f]]<-as.character(table[[f]])
-  table
-}
-
-.means.multinom<-function(model,term) {
-  data<-mf.getModelData(model)
-  try({
-  dep<-names(attr(terms(model),"dataClass"))[1]
-  dep<-jmvcore::composeTerm(dep)
-  nvar<-length(term)
-  term<-jmvcore::composeTerm(term)
-  terms<-paste(term,collapse = ":")
-  tterm<-as.formula(paste("~",paste(dep,terms,sep = "|")))  
-  table<-emmeans::emmeans(model,tterm,type = "response",data=data)
-  table<-as.data.frame(summary(table))
-  ff<-paste0("c",1:nvar)
-  colnames(table)<-c("dep",ff,"lsmean","se","df","lower","upper")
-  table<-table[order(table$dep),]
-  table$dep<-as.character(table$dep)
-  for (f in ff)
-       table[[f]]<-as.character(table[[f]])
-  table
-  }) 
-}
-
-mf.getAIC<- function(x,...) UseMethod(".getAIC")
-
-.getAIC.default<-function(model)
-     return(model$aic)
-
-.getAIC.multinom<-function(model)
-    return(model$AIC)
-
-mf.getValueDf<- function(x,...) UseMethod(".getValueDf")
-
-.getValueDf.default<-function(model) {
-  value <- sum(residuals(model, type = "pearson")^2)
-  result <- value/model$df.residual
-  return(result)
-}
-.getValueDf.multinom<-function(model) {
-    return(NULL)
-}
-
-mf.getResDf<- function(x,...) UseMethod(".getResDf")
-
-.getResDf.default<-function(model) {
-  return(model$df.residual)
-}
-.getResDf.multinom<-function(model) {
-  return(model$edf)
 }
 

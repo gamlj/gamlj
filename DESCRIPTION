@@ -11,7 +11,7 @@ Description: A suite for estimation of linear model, such as the general linear 
 License: GPL
 Encoding: UTF-8
 LazyData: true
-Imports: jmvcore (>= 0.8.0), emmeans, car, lmerTest
+Imports: jmvcore (>= 0.8.0), emmeans, car, lmerTest, gridExtra
 Depends: jmvcore
 Exports: gamljMixed, gamljGLM, gamljGzml
 RoxygenNote: 6.1.0

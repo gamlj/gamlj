@@ -4,16 +4,18 @@
 \alias{gamljMixed}
 \title{Mixed Model}
 \usage{
-gamljMixed(data, dep, factors = NULL, covs = NULL, cluster,
-  randomTerms = NULL, correlatedEffects = TRUE, modelTerms = NULL,
-  fixedIntercept = TRUE, reml = TRUE, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts, showRealNames = TRUE, scaling = NULL,
+gamljMixed(data, dep, factors = NULL, covs = NULL, modelTerms = NULL,
+  fixedIntercept = TRUE, showParamsCI = TRUE, paramCIWidth = 95,
+  contrasts = NULL, showRealNames = TRUE, showContrastCode = FALSE,
   plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
   plotRaw = FALSE, plotDvScale = FALSE, plotError = "none",
-  ciWidth = 95, postHoc = NULL, postHocCorr = list("bonf"),
-  eDesc = FALSE, simpleVariable = NULL, simpleModerator = NULL,
-  simple3way = NULL, simpleScale = "mean_sd", cvalue = 0,
-  percvalue = 0, simpleScaleLabels = "labels")
+  ciWidth = 95, postHoc = NULL, eDesc = FALSE, eCovs = FALSE,
+  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL,
+  simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
+  simpleScaleLabels = "labels", postHocCorr = list("bonf"),
+  scaling = NULL, cluster, randomTerms = NULL,
+  correlatedEffects = TRUE, reml = TRUE, lrtRandomEffects = FALSE,
+  plotRandomEffects = FALSE)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -26,23 +28,11 @@ variable must be numeric}
 
 \item{covs}{a vector of strings naming the covariates from \code{data}}
 
-\item{cluster}{a vector of strings naming the clustering variables from
-\code{data}}
-
-\item{randomTerms}{a list of character vectors describing random
-coefficients that need to be computed}
-
-\item{correlatedEffects}{\code{TRUE} (default) or \code{FALSE} , include
-correlated random effects}
-
 \item{modelTerms}{a list of character vectors describing fixed effects
 terms}
 
 \item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept}
-
-\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-be used rather than ML}
 
 \item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
@@ -57,9 +47,8 @@ to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \item{showRealNames}{\code{TRUE} or \code{FALSE} (default), provide raw
 names of the contrasts variables}
 
-\item{scaling}{a list of lists specifying the covariates scaling, one of
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
-\code{'none'} leaves the variable as it is}
+\item{showContrastCode}{\code{TRUE} or \code{FALSE} (default), provide
+contrast coefficients tables}
 
 \item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
@@ -84,11 +73,10 @@ confidence interval width}
 
 \item{postHoc}{a list of terms to perform post-hoc tests on}
 
-\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
-\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
-respectively}
-
 \item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
+statistics}
+
+\item{eCovs}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
 statistics}
 
 \item{simpleVariable}{The variable for which the simple effects (slopes)
@@ -107,19 +95,45 @@ simple effects computed}
 \item{percvalue}{offset value for conditioning}
 
 \item{simpleScaleLabels}{.}
+
+\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
+\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
+respectively}
+
+\item{scaling}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+\code{'none'} leaves the variable as it is}
+
+\item{cluster}{a vector of strings naming the clustering variables from
+\code{data}}
+
+\item{randomTerms}{a list of character vectors describing random
+coefficients that need to be computed}
+
+\item{correlatedEffects}{\code{TRUE} (default) or \code{FALSE} , include
+correlated random effects}
+
+\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
+be used rather than ML}
+
+\item{lrtRandomEffects}{\code{TRUE} or \code{FALSE} (default), LRT for the
+random effects}
+
+\item{plotRandomEffects}{.}
 }
 \value{
 A results object containing:
 \tabular{llllll}{
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
-  \code{results$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
-  \code{results$fixed} \tab \tab \tab \tab \tab a table \cr
-  \code{results$random} \tab \tab \tab \tab \tab a table \cr
-  \code{results$randomCov} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+  \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$lrtRandomEffectsTable} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
   \code{results$simpleEffects$Params} \tab \tab \tab \tab \tab a table \cr
-  \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr

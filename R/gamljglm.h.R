@@ -14,7 +14,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             showParamsCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
-            showRealNames = FALSE,
+            showRealNames = TRUE,
             showContrastCode = FALSE,
             plotHAxis = NULL,
             plotSepLines = NULL,
@@ -36,7 +36,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             postHocCorr = list(
                 "bonf"),
             scaling = NULL,
-            effectSize = NULL,
+            effectSize = list(
+                "beta"),
             homo = FALSE,
             qq = FALSE,
             normTest = FALSE, ...) {
@@ -50,6 +51,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
+                default=NULL,
                 permitted=list(
                     "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
@@ -86,6 +88,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "contrasts",
                 contrasts,
                 items="(factors)",
+                default=NULL,
                 template=jmvcore::OptionGroup$new(
                     "contrasts",
                     NULL,
@@ -109,7 +112,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..showRealNames <- jmvcore::OptionBool$new(
                 "showRealNames",
                 showRealNames,
-                default=FALSE)
+                default=TRUE)
             private$..showContrastCode <- jmvcore::OptionBool$new(
                 "showContrastCode",
                 showContrastCode,
@@ -203,6 +206,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 options=list(
                     "none",
                     "bonf",
+                    "tukey",
                     "holm"),
                 default=list(
                     "bonf"))
@@ -234,6 +238,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "eta",
                     "partEta",
                     "omega",
+                    "beta"),
+                default=list(
                     "beta"))
             private$..homo <- jmvcore::OptionBool$new(
                 "homo",
@@ -387,7 +393,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "dep",
                     "factors",
                     "cov",
-                    "modelTerms")))
+                    "modelTerms",
+                    "fixedIntercept")))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -578,6 +585,12 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `format`="zto,pvalue", 
                             `visible`="(postHocCorr:bonf)"),
                         list(
+                            `name`="ptukey", 
+                            `title`="p<sub>tukey</sub>", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:tukey)"),
+                        list(
                             `name`="pholm", 
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
@@ -684,10 +697,6 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="df", 
-                                    `title`="df", 
-                                    `type`="number"),
-                                list(
                                     `name`="t.ratio", 
                                     `title`="t", 
                                     `type`="number"),
@@ -763,6 +772,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     options=options,
                     title="$key",
                     renderFun=".descPlot",
+                    width=500,
+                    height=300,
                     clearWith=list(
                         "dep",
                         "plotHAxis",
@@ -863,7 +874,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 
 #' General Linear Model
 #'
-#' Mixed Linear Model
+#' General Linear Model
 #'
 #' @examples
 #' data('ToothGrowth')
@@ -959,15 +970,15 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @export
 gamljGLM <- function(
     data,
-    dep,
+    dep = NULL,
     factors = NULL,
     covs = NULL,
     modelTerms = NULL,
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
-    contrasts,
-    showRealNames = FALSE,
+    contrasts = NULL,
+    showRealNames = TRUE,
     showContrastCode = FALSE,
     plotHAxis = NULL,
     plotSepLines = NULL,
@@ -989,7 +1000,8 @@ gamljGLM <- function(
     postHocCorr = list(
                 "bonf"),
     scaling = NULL,
-    effectSize,
+    effectSize = list(
+                "beta"),
     homo = FALSE,
     qq = FALSE,
     normTest = FALSE) {

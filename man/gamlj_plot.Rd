@@ -4,16 +4,18 @@
 \alias{gamlj_plot}
 \title{Update a GAMLj model plots by passing new plots directives}
 \usage{
-gamlj_plot(gobj, haxis, seplines = NULL, sepplots = NULL)
+gamlj_plot(gobj, haxis, sepLines = NULL, sepPlots = NULL, ...)
 }
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*#'}
 
 \item{haxis}{horizontal axis variable}
 
-\item{seplines}{variable defining the levels for separate lines}
+\item{sepLines}{variable defining the levels for separate lines}
 
-\item{sepplot}{variable defining the levels for which separate plots are produced}
+\item{...}{any other options accepted by the gamlj_* function}
+
+\item{sepPlot}{variable defining the levels for which separate plots are produced}
 }
 \value{
 an object of class GAMLj* as the input object

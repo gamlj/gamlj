@@ -1,6 +1,3 @@
-#' @import lmerTest
-library(lmerTest)
-
 gamljGLMClass <- R6::R6Class(
   "gamljGLMClass",
   inherit = gamljGLMBase,
@@ -13,22 +10,30 @@ gamljGLMClass <- R6::R6Class(
       mark("init")
       private$.names64<-names64$new()
       n64<-private$.names64
-      infoTable<-self$results$info
-      
+
+      modelTerms<-private$.modelTerms()
+      modelFormula<-private$.modelFormula()
+
+      ### here we initialize the info table ####
       getout<-FALSE
+      
+      infoTable<-self$results$info
       if (is.null(self$options$dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
-      if (getout) {
-        if (length(self$options$modelTerms) == 0) {
+      if (getout) 
+        if (length(self$options$modelTerms) == 0) 
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
-        }
-        return(FALSE)
-      }
-      modelTerms<-private$.modelTerms()
-      modelFormula<-private$.modelFormula()
+
+      if (getout)
+          return()
       data<-private$.cleandata()
+
+      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear mixed model fit by OLS"))
+      infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
+      infoTable$addRow(rowKey="r2m",list(info="R-squared"))
+      infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
       
       ### initialize conditioning of covariates
       if (!is.null(self$options$covs)) {
@@ -36,22 +41,12 @@ gamljGLMClass <- R6::R6Class(
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
       #####################
-      
-      #### info table #####
-      infoTable<-self$results$info
-
-      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear mixed model fit by OLS"))
-      infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
-      infoTable$addRow(rowKey="r2m",list(info="R-squared"))
-      infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
-      
-      
 
       ## anova Table 
+      
       if (length(modelTerms)>0) {
           aTable<- self$results$main$anova
           aTable$addRow(rowKey=1, list(name="Model"))
-          aTable$addFormat(col=1, rowNo=1, format=jmvcore::Cell.BEGIN_END_GROUP)
           
           for (i in seq_along(modelTerms)) {
                   lab<-.nicifyTerms(jmvcore::composeTerm(modelTerms[i]))
@@ -59,13 +54,14 @@ gamljGLMClass <- R6::R6Class(
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
          aTable$addFormat(col=1, rowNo=i+2, format=jmvcore::Cell.BEGIN_END_GROUP)
+         aTable$addFormat(col=1, rowNo=2, format=jmvcore::Cell.BEGIN_GROUP)
          
       }
       
       ## fixed effects parameters
 
       aTable<-self$results$main$fixed
-      formula<-as.formula(private$.fixedFormula())
+      formula<-as.formula(private$.modelFormula())
       mynames64<-colnames(model.matrix(formula,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
@@ -76,17 +72,22 @@ gamljGLMClass <- R6::R6Class(
           aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[[i]]),label=.nicifyTerms(labels[i])))
 
         # other inits
-        private$.initPlots(data)
-        rf.initPostHoc(data,self$options, self$results$postHocs,modelType="linear")     
-        rf.initEMeans(data,self$options,self$results$emeansTables,private$.cov_condition)
-        rf.initSimpleEffects(data,self$options,self$results)
-        rf.initContrastCode(data,self$options,self$results,n64)
+        gplots.initPlots(self,data,private$.cov_condition)
+        gposthoc.init(data,self$options, self$results$postHocs)     
+        gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
+        gsimple.init(data,self$options,self$results$simpleEffects)
+        mi.initContrastCode(data,self$options,self$results,n64)
     },
     .run=function() {
       n64<-private$.names64
       mark("run")
       # collect some option
       dep <- self$options$dep
+      
+      if (is.null(dep))
+        return()
+      
+      
       factors <- self$options$factors
       covs <- self$options$covs
 
@@ -97,6 +98,7 @@ gamljGLMClass <- R6::R6Class(
       ###############      
       modelTerms<-private$.modelTerms()
       modelFormula<-private$.modelFormula()
+      
       if (modelFormula==FALSE)  
           return()
     
@@ -140,7 +142,8 @@ gamljGLMClass <- R6::R6Class(
       private$.model <- model
       
       ### if it worked before, we skip building the tables, 
-      ### otherwise we store a flag  in parameters table state
+      ### otherwise we store a flag  in parameters table state so next time we know it worked
+
       if (is.null(estimatesTable$state)) {
                mark("anova and parameters have been estimated")
                test_summary<-try(model_summary<-summary(model))
@@ -257,38 +260,13 @@ gamljGLMClass <- R6::R6Class(
           mark("anova and parameters have been recycled")
     
         private$.preparePlots(private$.model)
-        private$.populateSimple(private$.model)
-        private$.populatePostHoc(private$.model)
-        private$.populateDescriptives(private$.model)
+        gposthoc.populate(model,self$options,self$results$postHocs)
+        gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
+        gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)        
         private$.populateLevenes(model)
         private$.populateNormTest(model)
         
     },
-  .buildreffects=function(terms,correl=TRUE) {
-    terms<-lapply(terms,jmvcore::toB64)
-
-    flatterms<-lapply(terms,function(x) c(paste0(head(x,-1),collapse = ":"),tail(x,1)))
-    res<-do.call("rbind",flatterms)
-    res<-tapply(res[,1],res[,2],paste)
-    if (correl) {
-      res<-sapply(res, function(x) paste(x,collapse = " + "))
-      form<-paste(res,names(res),sep="|")
-      form<-paste("(",form,")")
-    } else {
-      form<-sapply(names(res), function(x) sapply(res[[x]], function(z) paste("(",paste(z,x,sep = "|"),")")))
-      form<-sapply(form, function(x) paste(x,collapse = "+"))
-    } 
-    form<-gsub(jmvcore::toB64('Intercept'),1,form,fixed = T)
-    # fix the formula in case there is no intercept
-
-    form<-lapply(form, function(x) {
-              if(!grepl(" 1",x,fixed = T)) 
-                 gsub("(","(0+",x,fixed = T)
-              else
-                x})
-    form=paste(form,collapse = "+")
-    form
-  },
   .cleandata=function() {
       n64<-private$.names64
       
@@ -338,93 +316,9 @@ gamljGLMClass <- R6::R6Class(
     .estimate = function(form, data) {
       stats::lm(form, data=data)
     },
-    .modelFormula=function() {
-
-      if (!is.null(self$options$dep))  {
-        dep<-jmvcore::toB64(self$options$dep)
-      } else return(FALSE)
-      private$.fixedFormula()
-    },
 
 
-.populatePostHoc=function(model) {
 
-    terms <- self$options$postHoc
-    dep<-self$options$dep
-
-     if (length(terms) == 0)
-         return()
-  
-  tables <- self$results$postHocs 
-  if (tables$isFilled()) {
-    mark("post-hoc recycled")
-    return()
-  }
-  mark("post-hoc computed")
-
-  postHocRows <- list()
-  
-  for (ph in terms) {
-    
-    table <- tables$get(key=ph)
-    table$setState(list(1:10))
-    term <- jmvcore::composeTerm(ph)
-    termB64 <- jmvcore::composeTerm(jmvcore::toB64(ph))
-    suppressWarnings({
-      none <- mf.posthoc(model,termB64,"none")
-      bonferroni <- mf.posthoc(model,termB64,"bonferroni")
-      holm <-mf.posthoc(model,termB64,"holm")
-      tukey <-mf.posthoc(model,termB64,"tukey")
-      
-    }) # suppressWarnings
-    if (is.character(none))
-      table$setNote("nojoy",WARNS["ph.nojoy"])
-    else {        
-      table$setState("there is work done")
-      tableData<-as.data.frame(none)
-      tableData$contrast<-as.character(tableData$contrast)
-      colnames(tableData)<-c("contrast","estimate","se","df","test","p")
-      tableData$pbonf<-bonferroni[,6]
-      tableData$pholm<-holm[,6]
-      tableData$ptukey<-tukey[,6]
-    }
-    .labs<-sapply(tableData$contrast, function(a) {
-      strsplit(a,"[-,]")
-    })
-    labs<-do.call("rbind",.labs)   
-    colnames(labs)<-paste0("c",1:ncol(labs))
-    for (i in 1:nrow(tableData)) {
-      row<-tableData[i,]
-      l<-labs[i,]
-      table$setRow(rowNo=i, values=c(row,l))
-    }
-  }
-
-},
-
-.initPlots=function(data) {
-       isAxis <- ! is.null(self$options$plotHAxis)
-       isMulti <- ! is.null(self$options$plotSepPlots)
-       
-         self$results$get('descPlot')$setVisible( ! isMulti && isAxis)
-         self$results$get('descPlots')$setVisible(isMulti)
-    
-       if (isMulti) {
-         sepPlotsName <- self$options$plotSepPlots
-         sepPlotsVar <- data[[jmvcore::toB64(sepPlotsName)]]
-         if(is.factor(sepPlotsVar))
-            sepPlotsLevels <- levels(sepPlotsVar)
-         else {
-           sepPlotsLevels<-private$.cov_condition$labels(sepPlotsName)
-         }
-
-         array <- self$results$descPlots
-         for (level in sepPlotsLevels) {
-             title<-paste(sepPlotsName,"=",level)
-             array$addItem(title)
-         }
-        }
-  },
 .preparePlots=function(model) {
   
   depName <- self$options$dep
@@ -434,7 +328,10 @@ gamljGLMClass <- R6::R6Class(
   
   linesName <- self$options$plotSepLines
   plotsName <- self$options$plotSepPlots
-
+  if (is.null(linesName))
+    plotsName<-NULL
+  
+  
   errorBarType<-self$options$plotError
   ciWidth   <- self$options$ciWidth
   optionRaw<-self$options$plotRaw
@@ -443,15 +340,14 @@ gamljGLMClass <- R6::R6Class(
   plotScale<-self$options$simpleScale
   offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
   
-  
-  
+
   
   if (referToData)
-    rawData=lp.rawData(model,depName,groupName,linesName,plotsName)
+    rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)
   else 
     rawData<-NULL
 
-  predData<-lp.preparePlotData(model,
+  predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,
                                plotsName,
@@ -459,12 +355,12 @@ gamljGLMClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition)
  
+
+  yAxisRange <- gplots.range(model,depName,predData,rawData)
+
   if (!optionRaw)
     rawData<-NULL
-
-  yAxisRange <- lp.range(model,depName,predData,rawData)
-
-
+  
   if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
     image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=NULL))
@@ -478,9 +374,15 @@ gamljGLMClass <- R6::R6Class(
       image <- images$get(key=key)
       sdata<-subset(predData,plots==real)
       sraw<-NULL
-      if (!is.null(rawData))
-            sraw<-subset(rawData,w==real)
+      if (!is.null(rawData)) {
+        if (is.factor(rawData[["w"]]))
+          sraw<-subset(rawData,w==real)
+        else
+          sraw<-rawData
+      }
+      
       image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=NULL))
+      
     }
   }
   
@@ -503,104 +405,15 @@ gamljGLMClass <- R6::R6Class(
     errorType<-paste0(ciWidth,"% ",toupper(errorType))
   
   if ( ! is.null(linesName)) {
-    p<-lp.twoWaysPlot(image,theme,depName,groupName,linesName,errorType)
+    p<-gplots.twoWaysPlot(image,ggtheme,depName,groupName,linesName,errorType)
   } else {
-    p<-lp.oneWayPlot(image,theme,depName,groupName,errorType)
+    p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType)
   }       
-  p<-p+ggtheme
   print(p)
   TRUE
 },
-.populateDescriptives=function(model) {
 
-  if (self$options$eDesc) {
-       
-       terms<-private$.modelTerms()
-       if (self$options$eCovs)
-           terms<-private$.modelTerms()
-       else 
-           terms<-jmvcore::fromB64(mf.getModelFactors(model))
-
-       meanTables<-self$results$emeansTables
-
-       if (meanTables$isFilled()) {
-         mark("Estimated marginal means recycled")
-         return()
-       }
-       mark("Estimated marginal means computed")
-       for (term in terms) {
-            term64<-jmvcore::toB64(term)
-            table<-pred.means(model,term64,cov_conditioning = private$.cov_condition)  
-            key<-.nicifyTerms(jmvcore::composeTerm(term))    
-            names(table)[1:length(term)]<-term
-            aTable<-meanTables$get(key=key)
-               
-            for (i in seq_len(nrow(table))) {
-                     values<-table[i,]
-                     aTable$setRow(rowNo=i,values)
-            }
-            depend<-lf.dependencies(model,term64,"means")
-            if (depend!=FALSE) 
-            aTable$setNote(depend,WARNS[depend])
-         }
-     
-  } # end of eDesc              
-  
-},
-.populateSimple=function(model) {
-  
-  variable<-self$options$simpleVariable
-  moderator<-self$options$simpleModerator
-  threeway<-self$options$simple3way
-  simpleScale<-self$options$simpleScale
-  offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
-  
-
-  interval<-self$options$paramCIWidth
-
-    if (is.null(variable) | is.null(moderator)) 
-          return()
-  
-  ### collect the tables
-    
-  anovaTable<-self$results$simpleEffects$Anova
-  parametersTable<-self$results$simpleEffects$Params
-
-  #### check if estimation is needed
-  if (!is.null(anovaTable$state)) {
-    mark("simple effects have been recycled")
-    anovaTableData<-anovaTable$state
-    parametersTableData<-parametersTable$state
-  } else {
-         simple_test <- try({
-                            tables<-pred.simpleEstimates(model,
-                                 jmvcore::toB64(variable),jmvcore::toB64(moderator),jmvcore::toB64(threeway),
-                                 cov_conditioning=private$.cov_condition,
-                                 interval=interval) 
-                         })
-          if (jmvcore::isError(simple_test)) {
-              anovaTable$setNote("se.noluck",WARNS[["se.noluck"]])
-              return()
-          }
-         
-          anovaTableData<-tables[[2]]
-          anovaTable$setState(anovaTableData)
-          parametersTableData<-tables[[1]]  
-          parametersTable$setState(parametersTableData)
-          mark("simple effects have been computed")
-          
-  }
-  ### fill the Anova Table ###
-  for(r in seq_len(nrow(anovaTableData))) {
-    anovaTable$setRow(rowNo=r,anovaTableData[r,])
-  }
-  for(r in seq_len(nrow(parametersTableData))) {
-    parametersTable$setRow(rowNo=r,parametersTableData[r,])
-  }
-  
-},
-
-.fixedFormula=function() {
+.modelFormula=function() {
   # If we are in interactive mode the model should be well specified, otherwise (if R mode)
   # no modelTerms means full model. fix this
   modelTerms <- private$.modelTerms()
@@ -680,11 +493,15 @@ gamljGLMClass <- R6::R6Class(
   TRUE
 },
 .modelTerms=function() {
-  # If we are in interactive mode the model should be well specified, otherwise (if R mode)
-  # no modelTerms means full model
+  # If we are in interactive mode the model is taken from modelterms option
+  # If R mode either the user passes a formula
+  # or the covs and factors are passed to modelterms
   modelTerms <- self$options$modelTerms
-  if (class(modelTerms)!="list")
-       modelTerms<-private$.ff()
+  
+  if ("NULL" %in% class(modelTerms))
+      return(private$.ff())  
+  if (is.null(modelTerms))
+    return()
   modelTerms
 },
   .ff=function() {

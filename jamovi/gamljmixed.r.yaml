@@ -141,6 +141,9 @@ items:
                     - name: var
                       title: "Variance"
                       type: number
+                    - name: icc
+                      title: "ICC"
+                      type: number
 
            - name: randomCov
              title: Random Parameters correlations
@@ -434,6 +437,9 @@ items:
           title: $key
           type: Image
           renderFun: .descPlot
+          width: 500
+          height: 300
+
           clearWith:
            - dep
            - plotHAxis
@@ -447,5 +453,6 @@ items:
            - simpleScale
            - simpleScaleLabels
            - plotDvScale
+           - plotRandomEffects
            - plotRaw
 
