@@ -16,7 +16,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Moderation made easy
 * Simple slopes analysis
 * Simple effects
-* post-hocs analysis
+* post-hoc analysis
 * Plots up to three-way interactions
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
@@ -31,12 +31,6 @@ Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select
 
 ## From source
 
-## Linux
-
-If you are working in linux you can download [jamovi](https://www.jamovi.org/download.html), then download the .jmo from this link [gamlj binaries](https://github.com/mcfanda/binaries/blob/master/gamlj_linux.jmo).
-
-
-## Others
 
 You will first need to download [jamovi](https://www.jamovi.org/download.html). 
 
