@@ -150,11 +150,11 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
         }
        
        ### add some note if necessary
-       term<-lf.interaction.term(model,c(variable,moderator))
+       term<-mi.interaction.term(model,c(variable,moderator,threeway))
        if (!is.null(term)) {
-         if (lf.is.scaleDependent(model,term))
+         if (mi.is.scaleDependent(model,term))
            parametersTable$setNote("inter",WARNS["se.interactions"])
-         else if (lf.term.develop(term)<length(options$modelTerms))
+         else if (mi.term.develop(term)<length(options$modelTerms))
            parametersTable$setNote("covs",WARNS["se.covariates"])
        } else 
          parametersTable$setNote("noint",WARNS["se.noint"])

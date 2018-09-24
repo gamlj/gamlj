@@ -27,7 +27,7 @@ gmeans.init<-function(data,options,theTables,cov_conditioning=NULL) {
            aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
            aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
            aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
-mark("test",modelType=="multinomial")
+
            if (modelType=="multinomial") term<-c(dep,term)
            
            aList=list()
@@ -89,14 +89,14 @@ gmeans.populate<-function(model,options,tables,cov_conditioning=NULL) {
       aTable<-tables$get(key=key)
       if (modelType=="multinomial") term<-c(dep,term)
       term64<-jmvcore::toB64(term)
-      dataTable<-pred.means(model,term64,cov_conditioning = cov_conditioning)  
+      dataTable<-try(pred.means(model,term64,cov_conditioning = cov_conditioning) )
       names(dataTable)[1:length(term)]<-term
-
       for (i in seq_len(nrow(dataTable))) {
         values<-dataTable[i,]
         aTable$setRow(rowNo=i,values)
       }
-      depend<-lf.dependencies(model,term64,"means")
+
+      depend<-mi.dependencies(model,term64,"means")
       if (depend!=FALSE) 
         aTable$setNote(depend,WARNS[depend])
     }

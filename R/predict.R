@@ -35,7 +35,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   interval=as.numeric(interval)/100
   condlist<-cov_conditioning$values(nterms)
   names(condlist)<-jmvcore::toB64(names(condlist))
-  est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type)
+  est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,nesting=NULL)
 #  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
   est
 }
@@ -52,7 +52,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   interval=as.numeric(interval)/100
   condlist<-cov_conditioning$values(nterms)
   names(condlist)<-jmvcore::toB64(names(condlist))
-  est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,lmer.df = df)
+  est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,lmer.df = df,nesting=NULL)
 #  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
   est
 }
@@ -61,9 +61,14 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
          est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
-         dd<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
-         wide<-dim(dd)[2]
-         names(dd)[(wide-4):wide]<-c("emmean", "SE","df", "lower.CL", "upper.CL")
+         dest<-as.data.frame(est)
+         old<-names(dest)
+         ## reorder the variable independently of emmeans output
+         wide<-dim(dest)[2]
+         new<-c(terms,old[(wide-4):wide])
+         dest<-dest[,new]
+         dd<-.fixLabels(dest,terms,cov_conditioning)
+         names(dd)<-c(terms,c("emmean", "SE","df", "lower.CL", "upper.CL"))
          for (nn in names(dd))
             if (is.factor(dd[[nn]]))
                dd[[nn]]<-as.character(dd[[nn]])
@@ -161,7 +166,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
                                    interval=95) {
  
   
-  mark(paste("simple effects estimation for generic model on",paste(class(model),collapse = " ") ))
+  mark(paste("simple effects estimation for multinomial model on",paste(class(model),collapse = " ") ))
   data<-mf.getModelData(model)
   preds<-unlist(c(moderator,threeway))
   vars<-unlist(c(variable,moderator,threeway))
@@ -195,7 +200,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
     preds_int<-jmvcore::composeTerm(list(vars))
     preds_form<-as.formula(paste("~",dep,"|",preds_int))
     condlist<-cov_conditioning$values(vars,decode = T)
-    emm<-emmeans::emmeans(model,specs=preds_form,mode="latent",at=condlist)
+    emm<-emmeans::emmeans(model,specs=preds_form,mode="latent",at=condlist,nesting=NULL)
     emm<-update(emm,df=Inf)
     est<-emmeans::contrast(emm,interaction = c("trt.vs.ctrl1",".internal") ,by = preds)
     ci<-confint(est,level = interval/100,df=Inf)

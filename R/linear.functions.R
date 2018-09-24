@@ -1,9 +1,3 @@
-.nicifyTerms<-function(term) {
-  term <- jmvcore::decomposeTerm(term)
-  term <- jmvcore::stringifyTerm(term)
-  term
-}
-
 
 
 .scaleVariables=function(factors,covariates,data) {
@@ -165,60 +159,6 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
   as.numeric(var)
 }
 
-
-
-### this tells if a model term is dependent on the interaction
-lf.is.scaleDependent<-function(model,term) {
-    if (is.null(term))
-      return(FALSE)
-    try({
-    modelterms<-terms(model)
-    modelterms<-attr(modelterms,"term.labels")
-    nterm<-paste(term,collapse = ":")
-    count<-length(grep(nterm,modelterms,fixed=T))
-    if (count>1)
-      return(TRUE)
-    })
-    FALSE
-}
-
-
-lf.term.develop<-function(term){
-     n<-.term.order(term)
-     (2^n)-1
-}
-
-.term.order<-function(term) {
-  
-    length(unlist(strsplit(term,":",fixed=T)))
-  
-}
-
-lf.interaction.term<-function(model,aList) {
-
-    aList<-jmvcore::toB64(aList)
-    ff<-colnames(attr(terms(model),"factors"))
-    ff<-jmvcore::decomposeTerms(ff)
-    for(f in ff)
-        if(all(f %in% aList) & all(aList %in% f) )
-           return(paste(f,collapse = ":"))
-}
-
-
-
-
-
-lf.dependencies<-function(model,term,what) {
-  if (lf.is.scaleDependent(model,term))
-    return(paste(what,"interactions",sep="."))
-   else {
-     modelterms<-terms(model)
-     modelterms<-attr(modelterms,"term.labels")
-     if (lf.term.develop(term)<length(modelterms))
-       return(paste(what,"covariates",sep="."))
-   }
-  FALSE
-}
 
 
 

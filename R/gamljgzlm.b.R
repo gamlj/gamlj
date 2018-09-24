@@ -424,8 +424,8 @@ gamljGzlmClass <- R6::R6Class(
     image <- self$results$get('descPlot')
     image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=NULL))
     if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
-      n<-length(levels(factor(predData[["plots"]])))
-      image$setSize(500,(300*n))
+      n<-length(levels(factor(predData[["plots2"]])))
+      image$setSize(500,(200*n))
     }
     
   } else {
@@ -440,7 +440,6 @@ gamljGzlmClass <- R6::R6Class(
       sdata<-subset(predData,plots==real)
       sraw<-NULL
       if (!is.null(rawData)) {
-        mark(key,is.factor(rawData[["w"]]))
         if (is.factor(rawData[["w"]]))
           sraw<-subset(rawData,w==real)
         else
@@ -450,8 +449,8 @@ gamljGzlmClass <- R6::R6Class(
       image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=NULL))
       
       if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
-        n<-length(levels(factor(predData[["plots"]])))
-        image$setSize(500,(300*n))
+        n<-length(levels(factor(predData[["plots2"]])))
+        image$setSize(500,(200*n))
       }
       
     }

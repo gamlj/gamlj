@@ -156,8 +156,9 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
                                       conditioning=NULL) {
   
   depName<-jmvcore::fromB64(names(attr(terms(model),"dataClass"))[1])
-  selected<-list(depName,groupName,linesName,plotsName)  
-  varnames<-c("lines","group","plots","plots2")[sapply(selected, is.character)]
+  selected<-list(depName,groupName,linesName,plotsName)
+  varnames<-c("lines","group","plots2","plots")[1:length(unlist(selected))]
+  
   selected<-unlist(selected)
   selected64<-jmvcore::toB64(selected)
   nsel<-length(selected)
@@ -169,13 +170,12 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   pdata<-try({
     pred.means(model,selected64,cond)
   })
+  names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
   
   if (jmvcore::isError(pdata)) {
     mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
-  names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
-  
   if (is.factor(data[[jmvcore::toB64(groupName)]])) 
     pdata$group<-factor(pdata$group)
   
@@ -201,7 +201,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
 gplots.initPlots=function(obj,data,cov_condition) {
   isAxis <- ! is.null(obj$options$plotHAxis)
   isMulti <- (! is.null(obj$options$plotSepPlots) & ! is.null(obj$options$plotSepLines)) 
-  
+
   obj$results$get('descPlot')$setVisible( ! isMulti && isAxis)
   obj$results$get('descPlots')$setVisible(isMulti && isAxis)
   
@@ -210,16 +210,16 @@ gplots.initPlots=function(obj,data,cov_condition) {
     sepPlotsVar <- data[[jmvcore::toB64(sepPlotsName)]]
     if(is.factor(sepPlotsVar))
       sepPlotsLevels <- levels(sepPlotsVar)
-    else {
+    else 
       sepPlotsLevels<-cov_condition$labels(sepPlotsName)
-    }
-    
+
     array <- obj$results$descPlots
     for (level in sepPlotsLevels) {
       title<-paste(sepPlotsName,"=",level)
       array$addItem(title)
     }
   }
+  
 }
 
 #### "image" should be from jomovi image object
@@ -316,7 +316,6 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
   }
   
   gdata<-image$state$data
-  
   if (is.factor(image$state$data$group)) {
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
@@ -361,18 +360,13 @@ gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,p
   vars<-c(depName,groupName,linesName,plotsName)
   if (!is.null(linesName)) {
     plots<-list()
-    .levels<-levels(factor(data[["plots"]]))
-    for (level in .levels) {
-      sdata<-subset(data,plots==level)
-      sdata$plots<-NULL
-      title<-paste(linesName,"=",level)
-      image$setState(list(data=sdata,range=c(0,1)))
-      aplot<-gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType,title = title)
-      plots[[level]]<-aplot
+    aplot<-gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType,title = title)
+    labs<-function(x) {
+     x$name<-paste0(linesName,":")
+     return(x)
     }
-    
-    thegrid<-do.call(gridExtra::grid.arrange,plots)
-    return(thegrid)
+    plots<-aplot+ggplot2::facet_grid(plots2 ~ .,labeller = labs )
+    return(plots)
   } else
     return(gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType)+ggtheme)
 }

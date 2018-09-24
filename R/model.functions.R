@@ -17,21 +17,8 @@
   
 }
 
-mf.aliased<-function(model) {
-  if (.which.class(model)=="lm" || .which.class(model)=="glm") {  
-  aliased<-alias(model)
-  if (!is.null(aliased$Complete))
-    return(TRUE)
-  return(FALSE)
-  }
-  if (.which.class(model)=="lmer") {  
-     rank<-attr(model@pp$X,"msgRankdrop")
-     if (!is.null(rank))
-        return(TRUE)
-     return(FALSE)
-  }
-  FALSE
-}
+
+
 
 
 
@@ -266,9 +253,7 @@ mf.getModelFactors<-function(model) {
 mf.getModelMessages<-function(model) {
   message<-list()
   if (.which.class(model)=="lmer") {
-  eigen<-model@optinfo$conv$lme4$messages[[1]]
-  if (!is.null(eigen))
-      message["eigen"]<-eigen
+    return(model@optinfo$conv$lme4$messages)
   }
   message
 }
@@ -377,3 +362,23 @@ mf.confint<- function(x,...) UseMethod(".confint")
   return(cim)
 }
 
+
+
+########### to be removed and update with mi.xxx #########
+
+mf.aliased<- function(x,...) UseMethod(".aliased")
+
+.aliased.default<-function(model) {
+  aliased<-alias(model)
+  (!is.null(aliased$Complete))
+}
+
+.aliased.lmerMod<-function(model) {
+  rank<-attr(model@pp$X,"msgRankdrop")
+  return((!is.null(rank)))
+}
+.aliased.multinom<-function(model) {
+  ### to do 
+  FALSE
+  
+}

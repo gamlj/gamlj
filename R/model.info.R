@@ -64,7 +64,7 @@ mi.aliased<- function(x,...) UseMethod(".aliased")
     (!is.null(aliased$Complete))
 }
 
-.aliased.lmer<-function(model) {
+.aliased.lmerMerMod<-function(model) {
     rank<-attr(model@pp$X,"msgRankdrop")
     return((!is.null(rank)))
 }
@@ -176,3 +176,67 @@ mi.explainPrediction<-function(modelType,data,dep){
   
   return()
 }
+
+.nicifyTerms<-function(term) {
+  term <- jmvcore::decomposeTerm(term)
+  term <- jmvcore::stringifyTerm(term)
+  term
+}
+
+
+### this tells if a model term is dependent on the interaction
+mi.is.scaleDependent<-function(model,term) {
+  if (is.null(term))
+    return(FALSE)
+  try({
+    modelterms<-terms(model)
+    modelterms<-attr(modelterms,"term.labels")
+    nterm<-paste(term,collapse = ":")
+    count<-length(grep(nterm,modelterms,fixed=T))
+    if (count>1)
+      return(TRUE)
+  })
+  FALSE
+}
+
+
+mi.term.develop<-function(term){
+  n<-.term.order(term)
+  (2^n)-1
+}
+
+.term.order<-function(term) {
+  
+  length(unlist(strsplit(term,":",fixed=T)))
+  
+}
+
+mi.interaction.term<-function(model,aList) {
+  
+  aList<-jmvcore::toB64(aList)
+  ff<-colnames(attr(terms(model),"factors"))
+  ff<-jmvcore::decomposeTerms(ff)
+  for(f in ff)
+    if(all(f %in% aList) & all(aList %in% f) )
+      return(paste(f,collapse = ":"))
+}
+
+
+
+
+
+mi.dependencies<-function(model,term,what) {
+  if (mi.is.scaleDependent(model,term))
+    return(paste(what,"interactions",sep="."))
+  else {
+    modelterms<-terms(model)
+    modelterms<-attr(modelterms,"term.labels")
+    if (mi.term.develop(term)<length(modelterms))
+      return(paste(what,"covariates",sep="."))
+  }
+  FALSE
+}
+
+
+
+
