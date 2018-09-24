@@ -4,104 +4,120 @@
 \alias{gamljGzlm}
 \title{Generalized Linear Models}
 \usage{
-gamljGzlm(data, modelSelection = "linear", dep, factors = NULL,
-  covs = NULL, modelTerms = NULL, expb = TRUE, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts = NULL, showContrastsTable = FALSE,
-  showContrasts = TRUE, scaling = NULL, plotHAxis = NULL,
-  plotSepLines = NULL, plotSepPlots = NULL, plotRaw = FALSE,
-  plotDvScale = FALSE, postHoc = NULL, postHocCorr = list("bonf"),
-  eDesc = FALSE, plotError = "none", ciWidth = 95,
-  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL)
+gamljGzlm(data, dep, factors = NULL, covs = NULL, modelTerms = NULL,
+  fixedIntercept = TRUE, showParamsCI = TRUE, paramCIWidth = 95,
+  contrasts = NULL, showRealNames = TRUE, showContrastCode = FALSE,
+  plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
+  plotRaw = FALSE, plotDvScale = FALSE, plotError = "none",
+  ciWidth = 95, postHoc = NULL, eDesc = FALSE, eCovs = FALSE,
+  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL,
+  simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
+  simpleScaleLabels = "labels", postHocCorr = list("bonf"),
+  scaling = NULL, effectSize = list("expb"),
+  modelSelection = "linear")
 }
 \arguments{
 \item{data}{the data as a data frame}
 
-\item{modelSelection}{Select the generalized linear model: 
-\code{linear},\code{poisson},\code{logistic},\code{multinomial}}
+\item{dep}{a string naming the dependent variable from \code{data},
+variable can be numeric or factor}
 
-\item{dep}{a string naming the dependent variable from \code{data}, 
-variable must be numeric}
-
-\item{factors}{a vector of strings naming the fixed factors from 
+\item{factors}{a vector of strings naming the fixed factors from
 \code{data}}
 
 \item{covs}{a vector of strings naming the covariates from \code{data}}
 
-\item{modelTerms}{a list of character vectors describing the terms to go 
-into the model}
+\item{modelTerms}{a list of character vectors describing fixed effects
+terms}
 
-\item{expb}{\code{TRUE} (default) or \code{FALSE} , show expB in table}
+\item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
+fixed intercept}
 
-\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI 
+\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
 
-\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying 
+\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
 
-\item{contrasts}{a list of lists specifying the factor and type of contrast 
-to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'}, 
+\item{contrasts}{a list of lists specifying the factor and type of contrast
+to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showContrastsTable}{\code{TRUE} or \code{FALSE} (default), provide 
-definitions of the contrasts variables}
+\item{showRealNames}{\code{TRUE} or \code{FALSE} (default), provide raw
+names of the contrasts variables}
 
-\item{showContrasts}{\code{TRUE} or \code{FALSE} (default), provide 
-definitions of the contrasts variables}
+\item{showContrastCode}{\code{TRUE} or \code{FALSE} (default), provide
+contrast coefficients tables}
 
-\item{scaling}{a list of lists specifying the covariates scaling, one of 
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}. 
-\code{'none'} leaves the variable as it is}
-
-\item{plotHAxis}{a string naming the variable placed on the horizontal axis 
+\item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
 
-\item{plotSepLines}{a string naming the variable represented as separate 
+\item{plotSepLines}{a string naming the variable represented as separate
 lines on the plot}
 
-\item{plotSepPlots}{a string naming the variable to separate over to form 
+\item{plotSepPlots}{a string naming the variable to separate over to form
 multiple plots}
 
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive 
+\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
-\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), provide 
-descriptive statistics}
+\item{plotDvScale}{.}
+
+\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+no error bars, use confidence intervals, or use standard errors on the
+plots, respectively}
+
+\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
+confidence interval width}
 
 \item{postHoc}{a list of terms to perform post-hoc tests on}
 
-\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or 
-\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections 
-respectively}
-
-\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide descriptive 
+\item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
 statistics}
 
-\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use 
-no error bars, use confidence intervals, or use standard errors on the 
-plots, respectively}
+\item{eCovs}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
+statistics}
 
-\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the 
-confidence interval width}
-
-\item{simpleVariable}{The variable for which the simple effects (slopes) 
+\item{simpleVariable}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simpleModerator}{the variable that provides the levels at which the 
+\item{simpleModerator}{the variable that provides the levels at which the
 simple effects computed}
 
 \item{simple3way}{a moderator of the two-way interaction which is probed}
+
+\item{simpleScale}{\code{'mean_sd'} (default), \code{'custom'} , or
+\code{'custom_percent'}. Use to condition the covariates (if any)}
+
+\item{cvalue}{offset value for conditioning}
+
+\item{percvalue}{offset value for conditioning}
+
+\item{simpleScaleLabels}{.}
+
+\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
+\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
+respectively}
+
+\item{scaling}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+\code{'none'} leaves the variable as it is}
+
+\item{effectSize}{.}
+
+\item{modelSelection}{Select the generalized linear model:
+\code{linear},\code{poisson},\code{logistic},\code{multinomial}}
 }
 \value{
 A results object containing:
 \tabular{llllll}{
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
-  \code{results$main} \tab \tab \tab \tab \tab a table of Chi-square tests results \cr
-  \code{results$estimates} \tab \tab \tab \tab \tab a table of Coefficients \cr
-  \code{results$contrasts} \tab \tab \tab \tab \tab an array of contrasts definitions tables \cr
-  \code{results$simpleEffectsAnovas} \tab \tab \tab \tab \tab an array of simple Effects Chisquared test tables \cr
-  \code{results$simpleEffects} \tab \tab \tab \tab \tab an array of simple Effects tables \cr
-  \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glm} object \cr
-  \code{results$postHoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+  \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+  \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
+  \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+  \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
+  \code{results$simpleEffects$Params} \tab \tab \tab \tab \tab a table \cr
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
@@ -118,29 +134,6 @@ Generalized Linear Model
 }
 \examples{
 data('data3by2')
-
-gamljGLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
-
-#
-#  
-#
-#  ANOVA
-#  -----------------------------------------------------------------------
-#                 Sum of Squares    df    Mean Square    F        p
-#  -----------------------------------------------------------------------
-#    x               115.19         1      115.19       20.07     < .001
-#    twogroups       31.36          1      31.36         5.46      0.021  
-#    x:twogroups     7.15          1       7.15         1.25      0.267  
-#    Residuals      551.13         96       5.74  
-#  -----------------------------------------------------------------------
-#
-#  _______________________________________________________________________
-#                  Estimates  Std. Error  t-value      p.
-#  _______________________________________________________________________
-#
-#  (Intercept)     52.804      0.245        215.17   < .001
-#   x              0.596       0.133        4.48     < .001
-#   twogroups1    -0.574       0.245       -2.34      0.021
-#   x:twogroups1  -0.148       0.133       -1.12      0.267
+gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
 
 }

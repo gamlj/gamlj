@@ -1,3 +1,4 @@
+var rtermFormat = require('./rtermFormat');
 
 const events = {
     update: function(ui) {
@@ -5,18 +6,20 @@ const events = {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
+
     },
 
     onChange_factors: function(ui) {
         calcModelTerms(ui, this);
+
     },
 
     onChange_covariates: function(ui) {
         calcModelTerms(ui, this);
+
     },
 
     onChange_modelTerms: function(ui) {
-       
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
@@ -30,15 +33,19 @@ const events = {
         this.checkValue(ui.plotSepPlots, false, values, FormatDef.variable);
     },
     
-    onChange_simpleSupplier: function(ui) {
+        onChange_simpleSupplier: function(ui) {
+          console.log("updating simple");
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
         this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
         this.checkValue(ui.simple3way, false, values, FormatDef.variable);
     },
-    
 
- 
+     onChange_model: function(ui) {
+        console.log("model changed");
+        ui.dep.setValue(null);
+      },
+
     onChange_postHocSupplier: function(ui) {
         let values = this.itemsToValues(ui.postHocSupplier.value());
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
@@ -48,9 +55,7 @@ const events = {
 var calcModelTerms = function(ui, context) {
     var variableList = context.cloneArray(ui.factors.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
-
     var combinedList = variableList.concat(covariatesList);
-
     ui.modelSupplier.setValue(context.valuesToItems(combinedList, FormatDef.variable));
     ui.plotsSupplier.setValue(context.valuesToItems(combinedList, FormatDef.variable));
     ui.simpleSupplier.setValue(context.valuesToItems(combinedList, FormatDef.variable));
@@ -73,13 +78,6 @@ var calcModelTerms = function(ui, context) {
         }
     }
 
-    for (let i = 0; i < termsList.length; i++) {
-        if (termsList[i].length > 1 && containsCovariate(termsList[i], covariatesList)) {
-            termsList.splice(i, 1);
-            i -= 1;
-            termsChanged = true;
-        }
-    }
 
     for (var a = 0; a < diff.added.length; a++) {
         let item = diff.added[a];
@@ -131,6 +129,9 @@ var updateSimpleSupplier = function(ui, context) {
         ui.plotsSupplier.setValue(varList);
 
     };
+
+
+
 var updatePostHocSupplier = function(ui, context) {
     var termsList = context.cloneArray(ui.modelTerms.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
@@ -138,7 +139,7 @@ var updatePostHocSupplier = function(ui, context) {
     for (var j = 0; j < termsList.length; j++) {
         var term = termsList[j];
         if (containsCovariate(term, covariatesList) === false)
-            list.push(term)
+            list.push(term);
     }
     ui.postHocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
 };
@@ -224,4 +225,17 @@ var containsCovariate = function(value, covariates) {
 };
 
 
+
+
+var filterRandomTerms = function(ui, context) {
+  
+    var termsList = context.cloneArray(ui.randomTerms.value(), []);
+    var unique = termsList.filter((v, i, a) => a.indexOf(v) === i); 
+    if (unique.length!=termsList.length)
+      ui.randomTerms.setValue(unique);
+  
+};
+
+
 module.exports = events;
+

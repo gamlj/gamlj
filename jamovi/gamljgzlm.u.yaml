@@ -3,7 +3,7 @@ title: Generalized Linear Models
 jus: '2.0'
 compilerMode: tame
 events:
-  update: './gzlm.events::update'
+  update: './gamlj.events::update'
 children:
   - type: LayoutBox
     margin: large
@@ -12,64 +12,57 @@ children:
       - type: LayoutBox
         margin: large
         children:
-          - type: Label
-            label: Continuous dependent variable
-            children:
-              - type: RadioButton
-                name: modelSelection_linear
-                optionName: modelSelection
-                optionPart: linear
-                events:
-                  change: './gzlm.events::onChange_model'
-          - type: Label
-            label: Frequencies
-            children:
-              - type: RadioButton
-                name: modelSelection_poisson
-                optionName: modelSelection
-                optionPart: poisson
-                events:
-                  change: './gzlm.events::onChange_model'
-              - name: modelSelection_poiover
-                type: RadioButton
-                optionName: modelSelection
-                optionPart: poiover
-                events:
-                   change: './gzlm.events::onChange_model'
-              - type: RadioButton
-                name: modelSelection_nb
-                optionName: modelSelection
-                optionPart: nb
-                events:
-                  change: './gzlm.events::onChange_model'
-
+             - type: Label
+               label: Continuous dependent variable
+               children:
+                 - type: RadioButton
+                   name: modelSelection_linear
+                   optionName: modelSelection
+                   optionPart: linear
+                   events:
+                      change: './gamlj.events::onChange_model'
+             - type: Label
+               label: Frequencies
+               children:
+                 - type: RadioButton
+                   name: modelSelection_poisson
+                   optionName: modelSelection
+                   optionPart: poisson
+                   events:
+                      change: './gamlj.events::onChange_model'
+                 - name: modelSelection_poiover
+                   type: RadioButton
+                   optionName: modelSelection
+                   optionPart: poiover
+                   events:
+                      change: './gamlj.events::onChange_model'
+                 - type: RadioButton
+                   name: modelSelection_nb
+                   optionName: modelSelection
+                   optionPart: nb
+                   events:
+                      change: './gamlj.events::onChange_model'
       - type: Label
         label: Categorical dependent variable
         children:
-          - type: RadioButton
-            name: modelSelection_logistic
-            optionName: modelSelection
-            optionPart: logistic
-            events:
-              change: './gzlm.events::onChange_model'
-          - type: RadioButton
-            name: modelSelection_probit
-            optionName: modelSelection
-            optionPart: probit
-            events:
-              change: './gzlm.events::onChange_model'
-
-          - type: RadioButton
-            name: modelSelection_multinomial
-            optionName: modelSelection
-            optionPart: multinomial
-
+                     - type: RadioButton
+                       name: modelSelection_logistic
+                       optionName: modelSelection
+                       optionPart: logistic
+                       events:
+                          change: './gamlj.events::onChange_model'
+                     - type: RadioButton
+                       name: modelSelection_probit
+                       optionName: modelSelection
+                       optionPart: probit
+                       events:
+                            change: './gamlj.events::onChange_model'
+                     - type: RadioButton
+                       name: modelSelection_multinomial
+                       optionName: modelSelection
+                       optionPart: multinomial
   - type: VariableSupplier
     name: variablesupplier
-    suggested:
-      - continuous
-      - nominal
-      - ordinal
     persistentItems: false
     stretchFactor: 1
     children:
@@ -86,7 +79,7 @@ children:
             name: factors
             isTarget: true
             events:
-              change: './gzlm.events::onChange_factors'
+              change: './gamlj.events::onChange_factors'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
@@ -94,7 +87,7 @@ children:
             height: small
             isTarget: true
             events:
-              change: './gzlm.events::onChange_covariates'
+              change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
     style: inline
@@ -104,9 +97,10 @@ children:
         margin: large
         style: list-inline
         children:
-          - name: expb
+          - name: effectSize_expb
             type: CheckBox
-            enable: (!modelSelection:probit)
+            optionPart: expb
+            optionName: effectSize
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -142,9 +136,14 @@ children:
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './gzlm.events::onChange_modelTerms'
+                  change: './gamlj.events::onChange_modelTerms'
                 template:
                   type: TermLabel
+      - type: LayoutBox
+        margin: large
+        children:
+          - type: CheckBox
+            name: fixedIntercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -169,9 +168,9 @@ children:
             template:
               type: ComboBox
       - type: CheckBox
-        name: showContrasts
+        name: showRealNames
       - type: CheckBox
-        name: showContrastsTable
+        name: showContrastCode
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -195,6 +194,56 @@ children:
             stretchFactor: 0.5
             template:
               type: ComboBox
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+          - type: Label
+            label: Covariates conditioning
+            children:
+              - type: LayoutBox
+                margin: large
+                style: list
+                children:
+                  - type: RadioButton
+                    name: simpleScale_mean_sd
+                    optionName: simpleScale
+                    optionPart: mean_sd
+                    children:
+                      - type: TextBox
+                        name: cvalue
+                        format: number
+                        inputPattern: '[0-9]+'
+                  - name: simpleScale_percent
+                    type: RadioButton
+                    optionName: simpleScale
+                    optionPart: percent
+                    children:
+                      - type: TextBox
+                        name: percvalue
+                        label: null
+                        suffix: '%'
+                        format: number
+                        inputPattern: '[0-9]+'
+                        enable: (simpleScale_percent)
+          - type: Label
+            label: Covariates labeling
+            children:
+              - type: LayoutBox
+                margin: large
+                children:
+                  - type: RadioButton
+                    name: simpleScaleLabels_labels
+                    optionName: simpleScaleLabels
+                    optionPart: labels
+                  - type: RadioButton
+                    name: simpleScaleLabels_numbers
+                    optionName: simpleScaleLabels
+                    optionPart: values
+                  - type: RadioButton
+                    name: simpleScaleLabels_numbers_labels
+                    optionName: simpleScaleLabels
+                    optionPart: values_labels
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -206,7 +255,7 @@ children:
         stretchFactor: 1
         format: term
         events:
-          change: './gzlm.events::onChange_postHocSupplier'
+          change: './gamlj.events::onChange_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
@@ -245,7 +294,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './gzlm.events::onChange_plotsSupplier'
+          change: './gamlj.events::onChange_plotsSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -287,6 +336,7 @@ children:
                     suffix: '%'
                     format: number
                     inputPattern: '[0-9]+'
+                    enable: (errBarDef_ci)
               - name: plotError_se
                 type: RadioButton
                 optionName: plotError
@@ -296,12 +346,10 @@ children:
             children:
               - type: CheckBox
                 name: plotRaw
-                enable: '(!modelSelection:multinomial)'
+                enable: (!modelSelection_multinomial)
               - type: CheckBox
                 name: plotDvScale
-                enable: >-
-                  (modelSelection:linear || modelSelection:poisson ||
-                  modelSelection:nb || modelSelection:poiover|| modelSelection:probit)
+                enable: (!modelSelection_multinomial)
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -313,7 +361,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './gzlm.events::onChange_simpleSupplier'
+          change: './gamlj.events::onChange_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -334,7 +382,7 @@ children:
                 isTarget: true
                 maxItemCount: 1
   - type: CollapseBox
-    label: Means Tables
+    label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
@@ -343,3 +391,6 @@ children:
         children:
           - type: CheckBox
             name: eDesc
+          - type: CheckBox
+            name: eCovs
+            enable: (eDesc)
