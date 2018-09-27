@@ -1,5 +1,5 @@
-GAMLj_DEBUG=F
-GAMLj_INFO=F
+GAMLj_DEBUG=T
+GAMLj_INFO=T
 
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
