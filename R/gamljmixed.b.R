@@ -141,29 +141,14 @@ gamljMixedClass <- R6::R6Class(
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
       
-      
-      ## check if changed: if not, retrieve the results, otherwise estimate them ####
-      
-             if (!is.null(anovaTable$state)) {
-               model<-anovaTable$state[[1]]
-               anova_res<-anovaTable$state[[2]]
-               private$.model <- model
-               model_summary<-estimatesTable$state[[1]]
-               parameters<-estimatesTable$state[[2]]
-               mark("the model has been recycled")
-             }
-             else {
-               ## because we have no model to recycle, we need to estimate several things:
-               ## model: we need the basic model, estimated with private$.estimate() which changes depending on the particular model
-               ## model_summary: a summary of a model, full R summary
-               ## parameters: a table of coefficients, produced by mf.summary() which understands the class of the model
-               ## model_anova: a table of F or X^2, produced by mf.anova(), which undestands the class of the model
-               ## These four objects are saved in the tables states: model and model_anova in anovaTable, model_summary and parameters in estimatesTable
+      ## saving the all set of results proved to be to0 heavy for memory issues.
+      ## so we estimate the model every time. In case is not needed, we just trick
+      ## the module to believe that the other results are saved, when in reality we
+      ## just leave them the way they are :-)
 
                mark("the model has been estimated")
                
                ##### model ####
-           
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data,REML = reml)
                            wars<-warnings()
@@ -173,39 +158,47 @@ gamljMixedClass <- R6::R6Class(
                         msg<-n64$translate(msg)
                         jmvcore::reject(msg, code='error')
                }
-               ### anova results ####
-               anova_res<-NULL
-               if (length(modelTerms)==0) {
-                 anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
-               } else {
-                 suppressWarnings({
-                   anova_test <- try(anova_res<-mf.anova(model), silent=TRUE) # end suppressWarnings
-                 })
-                 if (jmvcore::isError(anova_test)) 
-                      jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
-               }
-               anovaTable$setState(list(model,anova_res))
-
-               ### full summary results ####
-               
-               test_summary<-try(model_summary<-summary(model))
-               
-               if (jmvcore::isError(test_summary)) {
-                   msg <- extractErrorMessage(test_summary)
-                   msg<-n64$translate(msg)
-                   jmvcore::reject(msg, code='error')
-               }
-
-               ### coefficients summary results ####
-               
-               test_parameters<-try(parameters<-mf.summary(model))
-               if (!is.null(attr(parameters,"warning"))) 
-                     estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
                private$.model <- model
-               estimatesTable$setState(list(model_summary,parameters))
-             } # end of check state 
-             
-        ### prepare info table #########       
+               mark("...done")
+               
+               ### anova results ####
+               if (is.null(anovaTable$state)) {
+                   mark("compute the Anova stuff")
+                   anova_res<-NULL
+                   if (length(modelTerms)==0) {
+                        anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
+                   } else {
+                       suppressWarnings({
+                       anova_test <- try(anova_res<-mf.anova(model), silent=TRUE) # end suppressWarnings
+                   })
+                   if (jmvcore::isError(anova_test)) 
+                         jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
+                   }
+                   anovaTable$setState(TRUE)
+                   mark("..done")
+                  } else mark("Anova results recycled")
+                    
+               if (is.null(estimatesTable$state)) {
+                 
+                         ### full summary results ####
+                         mark("asking for summary")
+                         test_summary<-try(model_summary<-summary(model))
+                         if (jmvcore::isError(test_summary)) {
+                               msg <- extractErrorMessage(test_summary)
+                               msg<-n64$translate(msg)
+                               jmvcore::reject(msg, code='error')
+                         }
+                         mark("...done")
+                         ### coefficients summary results ####
+
+                         mark("asking for mf.summary")
+                         test_parameters<-try(parameters<-mf.summary(model))
+                         if (!is.null(attr(parameters,"warning"))) 
+                              estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
+                         estimatesTable$setState(TRUE)
+                         mark("...done")
+               
+               ### prepare info table #########       
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
                info.aic<-model_summary$AICtab[1]
@@ -250,7 +243,7 @@ gamljMixedClass <- R6::R6Class(
                      else
                               randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                 }
-                info<-paste("Numer of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = "")
+                info<-paste("Numer of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
                 randomTable$setNote('info', info)
 
                 ### Covariance among random effects ###
@@ -296,7 +289,32 @@ gamljMixedClass <- R6::R6Class(
                               anovaTable$setNote("df",paste(attr(anova_res,"method"),"method for degrees of freedom"))
         
                  }
-
+                ### parameter table ####
+                if (nrow(parameters)>0) {
+                  #### confidence intervals ######
+                  ciWidth<-self$options$paramCIWidth/100
+                  citry<-try({
+                    ci<-mf.confint(model,level=ciWidth)
+                    colnames(ci)<-c("cilow","cihig")
+                    parameters<-cbind(parameters,ci) 
+                  })
+                  if (jmvcore::isError(citry)) {
+                    message <- extractErrorMessage(citry)
+                    estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                  }
+                  rownames(parameters)<-n64$nicenames(rownames(parameters))
+                  for (i in 1:nrow(parameters)) {
+                    tableRow=parameters[i,]
+                    estimatesTable$setRow(rowNo=i,tableRow)
+                  }
+                  if (mf.aliased(model)) {
+                    estimatesTable$setNote("aliased",WARNS["ano.aliased"])
+                    infoTable$setNote("aliased",WARNS["ano.aliased"])
+                  }
+                }
+                
+               } else mark("clean summary recycled")
+               
         #### LRT for random effects ####
         if (self$options$lrtRandomEffects) {
           
@@ -312,38 +330,13 @@ gamljMixedClass <- R6::R6Class(
                   lrtTable$addRow(rowKey=i,res[i,])
           } 
         }
-        ### parameter table ####
-        if (nrow(parameters)>0) {
-             #### confidence intervals ######
-             ciWidth<-self$options$paramCIWidth/100
-             citry<-try({
-                     ci<-mf.confint(model,level=ciWidth)
-                     colnames(ci)<-c("cilow","cihig")
-                     parameters<-cbind(parameters,ci) 
-                    })
-             if (jmvcore::isError(citry)) {
-                   message <- extractErrorMessage(citry)
-                   estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-                }
-             rownames(parameters)<-n64$nicenames(rownames(parameters))
-             for (i in 1:nrow(parameters)) {
-                   tableRow=parameters[i,]
-                   estimatesTable$setRow(rowNo=i,tableRow)
-             }
-
-        
-             if (mf.aliased(model)) {
-                 estimatesTable$setNote("aliased",WARNS["ano.aliased"])
-                infoTable$setNote("aliased",WARNS["ano.aliased"])
-             }
-        }
-  
+        mark("all done, preparing other options")
            
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
-        
+        mark("..... done, preparing other options")
 
     },
   .buildreffects=function(terms,correl=TRUE) {
