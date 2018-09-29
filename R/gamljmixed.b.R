@@ -141,7 +141,7 @@ gamljMixedClass <- R6::R6Class(
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
       
-      ## saving the all set of results proved to be to0 heavy for memory issues.
+      ## saving the whole set of results proved to be to0 heavy for memory issues.
       ## so we estimate the model every time. In case is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
