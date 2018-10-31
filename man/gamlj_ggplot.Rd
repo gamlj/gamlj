@@ -4,18 +4,12 @@
 \alias{gamlj_ggplot}
 \title{This function returns the plot as a ggplot object}
 \usage{
-gamlj_ggplot(gobj, haxis, sepLines = NULL, sepPlots = NULL, ...)
+gamlj_ggplot(gobj, ...)
 }
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*#'}
 
-\item{haxis}{horizontal axis variable}
-
-\item{sepLines}{variable defining the levels for separate lines}
-
 \item{...}{any other options accepted by the gamlj_* function}
-
-\item{sepPlot}{variable defining the levels for which separate plots are produced}
 
 \item{theme}{a theme for the ggplot plot. Default is the jamovi default theme}
 }
