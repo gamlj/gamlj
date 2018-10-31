@@ -64,23 +64,23 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
 #' This function returns the plot as a ggplot object
 
 #' @param gobj a gamlj results object of the class GAMLj*#'
-#' @param haxis horizontal axis variable
-#' @param sepLines variable defining the levels for separate lines 
-#' @param sepPlot variable defining the levels for which separate plots are produced 
 #' @param theme a theme for the ggplot plot. Default is the jamovi default theme
 #' @param ... any other options accepted by the gamlj_* function  
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
 #' @export
  
-gamlj_ggplot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
+gamlj_ggplot<-function(gobj,...) {
   options<-list(...)
   if ("theme" %in% options)
      theme<-options$theme
   else
      theme<-jmvcore::theme_default()
-
+    
     dep<-gobj$analysis$options$dep
+    haxis<-gobj$options$plotHAxis
+    sepLines<-gobj$options$plotSepLines
+    sepPlots<-gobj$options$plotSepPlots
     errorType <- gobj$options$plotError
     ciWidth   <- gobj$options$ciWidth
     image<-gobj$descPlot
