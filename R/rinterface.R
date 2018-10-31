@@ -57,7 +57,43 @@ gamlj_update<-function(gobj,...) {
 #' @export
 gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
  news<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
- gamlj_update(gobj,news)  
+ gamlj_update(gobj,args)  
+ 
+}
+
+#' This function returns the plot as a ggplot object
+
+#' @param gobj a gamlj results object of the class GAMLj*#'
+#' @param haxis horizontal axis variable
+#' @param sepLines variable defining the levels for separate lines 
+#' @param sepPlot variable defining the levels for which separate plots are produced 
+#' @param theme a theme for the ggplot plot. Default is the jamovi default theme
+#' @param ... any other options accepted by the gamlj_* function  
+#' @return an object of class GAMLj* as the input object
+#' @author Marcello Gallucci
+#' @export
+gamlj_ggplot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
+  options<-list(...)
+  if ("theme" %in% options)
+     theme<-options$theme
+  else
+     theme<-jmvcore::theme_default()
+
+    dep<-gobj$analysis$options$dep
+    errorType <- gobj$options$plotError
+    ciWidth   <- gobj$options$ciWidth
+    image<-gobj$descPlot
+    
+    if (errorType=="ci")
+      errorType<-paste0(ciWidth,"% ",toupper(errorType))
+    
+    if ( ! is.null(sepLines)) {
+      p<-gplots.twoWaysPlot(image,theme,dep,sepLines,sepPlots,errorType)
+    } else {
+      p<-gplots.oneWayPlot(image,theme,dep,sepLines,errorType)
+    }       
+    p
+    
 }
 
 #' Update a GAMLj results by passing new simple effects directives
