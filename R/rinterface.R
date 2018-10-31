@@ -72,6 +72,7 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
 #' @export
+ 
 gamlj_ggplot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
   options<-list(...)
   if ("theme" %in% options)
