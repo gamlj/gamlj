@@ -25,7 +25,7 @@ conditioning <- R6Class("conditioning",
                 return(self)
             if (is.list(method) & !is.null(names(method))) 
                 if (!all(names(method) %in% vars))
-                  stop("Conditioning values are assignet to undefined variables")
+                  stop("Conditioning values are assigned to undefined variables")
             
             self$vars<-vars
             private$init(method,span)
