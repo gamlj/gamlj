@@ -158,7 +158,7 @@ conditioning <- R6Class("conditioning",
               if (obj=="mean_sd") {
                 res<-list(method="mean_sd",
                           span=span,
-                          labels=(c(paste0("Mean-",span,"\U22C5","SD"),"Mean",paste0("Mean+",span,"\U22C5","SD"))),
+                          labels=(c(paste0("Mean-",span,"\u00B7","SD"),"Mean",paste0("Mean+",span,"\u00B7","SD"))),
                           values=NULL)
                 return(res)
               }
