@@ -129,7 +129,7 @@ mi.initContrastCode<-function(data,options,results,n64) {
     rnames<-n64$nicenames(n64$contrasts(fac))
     clabs<-n64$contrastsLabels(fac)
     aTable<-tables$addItem(key=fac)
-    codes<-round(t(contrasts(data[[jmvcore::toB64(fac)]])),digit=3)
+    codes<-round(t(contrasts(data[[jmvcore::toB64(fac)]])),digits=3)
     cnames<-colnames(codes)
     colnames(codes)<-paste0("c",1:length(cnames))
     codes<-cbind(rnames,clabs,codes)
