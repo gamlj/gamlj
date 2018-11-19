@@ -64,37 +64,18 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
 #' This function returns the plot as a ggplot object
 
 #' @param gobj a gamlj results object of the class GAMLj*#'
-#' @param theme a theme for the ggplot plot. Default is the jamovi default theme
-#' @param ... any other options accepted by the gamlj_* function  
-#' @return an object of class GAMLj* as the input object
+#' @return an object of ggplot
 #' @author Marcello Gallucci
 #' @export
  
-gamlj_ggplot<-function(gobj,...) {
-  options<-list(...)
-  if ("theme" %in% options)
-     theme<-options$theme
-  else
-     theme<-jmvcore::theme_default()
-    
-    dep<-gobj$analysis$options$dep
-    haxis<-gobj$options$plotHAxis
-    sepLines<-gobj$options$plotSepLines
-    sepPlots<-gobj$options$plotSepPlots
-    errorType <- gobj$options$plotError
-    ciWidth   <- gobj$options$ciWidth
-    image<-gobj$descPlot
-    
-    if (errorType=="ci")
-      errorType<-paste0(ciWidth,"% ",toupper(errorType))
-    
-    if ( ! is.null(sepLines)) {
-      p<-gplots.twoWaysPlot(image,theme,dep,sepLines,sepPlots,errorType)
-    } else {
-      p<-gplots.oneWayPlot(image,theme,dep,sepLines,errorType)
-    }       
-    p
-    
+gamlj_ggplot<-function(gobj) {
+
+  if (length(gobj$descPlots)==0) {
+    gobj$descPlot$plot
+  } else {
+    gobj$descPlots
+  }
+  
 }
 
 #' Update a GAMLj results by passing new simple effects directives
@@ -127,7 +108,6 @@ gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,..
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
 #' @export
-
 
 gamlj_drop<-function(gobj,analysis) {
   if (analysis=="simpleEffects") {

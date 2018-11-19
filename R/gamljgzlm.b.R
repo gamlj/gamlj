@@ -486,8 +486,7 @@ gamljGzlmClass <- R6::R6Class(
   } else {
     p<-gplots.linesMultiPlot(image,ggtheme,depName,groupName,linesName,plotsName,errorType)
   }
-  print(p)
-  TRUE
+  return(p)
 },
 
 .fixedFormula=function() {

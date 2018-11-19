@@ -1,21 +1,21 @@
 library(R6)
-# this class will take care of conditioning of covariates. Because is jamovi when you need the labels
+# this class will take care of conditioning of covariates. Because in jamovi, when you need the labels
 # you might not have the data (as in .init()), the class would compute the labels even without data.
 # when the data are available, it computes the actual conditioning values and, if requested, labels=values
 
 # Conditioning of covariates can come in different forms:
-# 1. can be a list of numbers, thus are passed as they are as the "at" levels. Each covariate is conditioned to 
+# 1. can be a list of numbers, They are passed as they are as the "at" levels. Each covariate is conditioned to 
 #    those values.
-# 2. a list variable, each with labels and values: such as list(x=list("mean-sd"=-10,"mean"=0,"mean+sd"=+10))
+# 2. named list, each with labels and methods: such as list(x="mean_sd",y="percent")
 #    the list can be partial, the missing labels are substituted with the values passed.
-# 4. a list variable, each with labels and values: such as list(x=list("mean-sd"=-10,"mean"=0,"mean+sd"=+10)) 
-# 3. one of standard conditioning: mean_sd, percent
+# 4. a list of named list, each with labels and values: such as list(x=list("mean-sd"=-10,"mean"=0,"mean+sd"=+10)) 
+# 3. one of conditioning method: mean_sd, percent
 # method "mean_sd" and "percent" can be customized with "span" option: for mean_sd span indicates
 # how many sd below and above the average should be used. For "percent", the increase and descrease of
 # percentile around the median. The option "span" can be a number which applies to all variables, or vector
 # or number that applies in order to corresponding variables. Partial vector is fine, the remaining is set to 1
 
-# In jamovi span and method are applied to all covariates. In R can be 
+# In jamovi span and methods are applied to all covariates. In R can be 
 
 conditioning <- R6Class("conditioning",
         public=list(

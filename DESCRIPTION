@@ -1,11 +1,11 @@
 Package: gamlj
 Type: Package
 Title: GAMLj suite for jamovi
-Version: 1.0.2
+Version: 1.0.3
 Author: Marcello Gallucci
 Maintainer: Marcello Gallucci <mcfanda@gmail.com>
-Description: A suite for estimation of linear model, such as the general linear model, linear mixed models,
-             generalized linear models. For ech family, models can be estimated
+Description: A suite for estimation of linear models, such as the general linear model, linear mixed models,
+             and generalized linear models. For ech family, models can be estimated
              with categorical and/or continuous variables, with options to facilitate estimation of 
              interactions, simple slopes, simple effects, post-hoc tests, contrast analysis and visualization of the results.
 License: GPL
