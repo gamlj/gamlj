@@ -4,17 +4,13 @@
 \alias{gamlj_ggplot}
 \title{This function returns the plot as a ggplot object}
 \usage{
-gamlj_ggplot(gobj, ...)
+gamlj_ggplot(gobj)
 }
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*#'}
-
-\item{...}{any other options accepted by the gamlj_* function}
-
-\item{theme}{a theme for the ggplot plot. Default is the jamovi default theme}
 }
 \value{
-an object of class GAMLj* as the input object
+an object of ggplot
 }
 \description{
 This function returns the plot as a ggplot object

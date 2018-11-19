@@ -468,7 +468,7 @@ gamljMixedClass <- R6::R6Class(
     rawData<-NULL
   ### this is specific of mixed model #####
   cluster<-self$options$cluster[[1]]
-  preds<-c.real(cluster,groupName,linesName,plotsName)
+  preds<-c(cluster,groupName,linesName,plotsName)
   preds64<-jmvcore::toB64(preds)
   
   if (self$options$plotRandomEffects) {
@@ -554,8 +554,7 @@ gamljMixedClass <- R6::R6Class(
   } else {
     p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType)
   }       
-  print(p)
-  TRUE
+  return(p)
 },
 
 .fixedFormula=function() {

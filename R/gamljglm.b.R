@@ -409,8 +409,7 @@ gamljGLMClass <- R6::R6Class(
   } else {
     p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType)
   }       
-  print(p)
-  TRUE
+  return(p)
 },
 
 .modelFormula=function() {
