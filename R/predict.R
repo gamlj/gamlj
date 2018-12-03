@@ -98,9 +98,12 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
         v[length(v)]
       })
       # get the contrast weights
+                
       codes<-contrasts(data[[variable]])
       # transform the model matrix into the contrast matrix
       n<-length(levs)
+      if (attr(data[[variable]],"jcontrast")=="dummy")
+         codes<-lf.createContrasts(levs,"simple")  
       M <- as.data.frame(MASS::ginv(t(codes)))
       # set some labels
       names(M) <- lf.contrastLabels(levs,attr(data[[variable]],"jcontrast"))
