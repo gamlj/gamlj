@@ -9,7 +9,7 @@
 }
 
 lf.createContrasts=function(levels, type) {
-  
+
   nLevels <- length(levels)
 
   if (type == 'simple') {
