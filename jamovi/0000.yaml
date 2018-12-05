@@ -36,36 +36,5 @@ analyses:
     menuSubgroup: GAMLj
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
-datasets:
-  - name: Beers
-    path: beers_bars.csv
-    description: Beers and smiles clustered by bars
-    tags:
-      - Mixed
-      - regression
-  - name: Exercise
-    path: exercise.csv
-    description: Endurance predicted by age and exercise
-    tags:
-      - GLM
-      - moderation
-  - name: Neuralgia
-    path: neuralgia.csv
-    description: Dichotomous dependent variable in BS design
-    tags:
-      - GLMZ
-      - logistic
-  - name: hsbdemo
-    path: hsbdemo.csv
-    description: Multinomial dependent variable in school data
-    tags:
-      - GLMZ
-      - multinomial
-  - name: subjects_by_stimuli
-    path: subjects_by_stimuli.csv
-    description: subjects by stimuli experimental design
-    tags:
-      - Mixed
-      - ANOVA
 
 ...
