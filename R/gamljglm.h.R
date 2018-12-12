@@ -762,7 +762,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "plotDvScale",
                     "fixedIntercept",
                     "simpleScale",
-                    "simpleScaleLabels")))
+                    "simpleScaleLabels",
+                    "modelTerms")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -1009,6 +1010,15 @@ gamljGLM <- function(
     if ( ! requireNamespace('jmvcore'))
         stop('gamljGLM requires jmvcore to be installed (restart may be required)')
 
+    if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
+    if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
+    if ( ! missing(covs)) covs <- jmvcore:::resolveQuo(jmvcore:::enquo(covs))
+    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore:::resolveQuo(jmvcore:::enquo(plotHAxis))
+    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepLines))
+    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepPlots))
+    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleVariable))
+    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleModerator))
+    if ( ! missing(simple3way)) simple3way <- jmvcore:::resolveQuo(jmvcore:::enquo(simple3way))
     if (missing(data))
         data <- jmvcore:::marshalData(
             parent.frame(),
@@ -1021,6 +1031,10 @@ gamljGLM <- function(
             `if`( ! missing(simpleVariable), simpleVariable, NULL),
             `if`( ! missing(simpleModerator), simpleModerator, NULL),
             `if`( ! missing(simple3way), simple3way, NULL))
+
+    for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
+    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore:::decomposeFormula(modelTerms)
+    if (inherits(postHoc, 'formula')) postHoc <- jmvcore:::decomposeFormula(postHoc)
 
     options <- gamljGLMOptions$new(
         dep = dep,

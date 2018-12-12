@@ -11,7 +11,7 @@ gamljGLMClass <- R6::R6Class(
       private$.names64<-names64$new()
       n64<-private$.names64
 
-      modelTerms<-private$.modelTerms()
+      modelTerms<-lf.modelTerms(self$options)
       modelFormula<-private$.modelFormula()
 
       ### here we initialize the info table ####
@@ -30,7 +30,7 @@ gamljGLMClass <- R6::R6Class(
           return()
       data<-private$.cleandata()
 
-      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear mixed model fit by OLS"))
+      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
       infoTable$addRow(rowKey="r2m",list(info="R-squared"))
       infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
@@ -49,7 +49,7 @@ gamljGLMClass <- R6::R6Class(
           aTable$addRow(rowKey=1, list(name="Model"))
           
           for (i in seq_along(modelTerms)) {
-                  lab<-.nicifyTerms(jmvcore::composeTerm(modelTerms[i]))
+                  lab<-.nicifyTerms(modelTerms[[i]])
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -61,8 +61,8 @@ gamljGLMClass <- R6::R6Class(
       ## fixed effects parameters
 
       aTable<-self$results$main$fixed
-      formula<-as.formula(private$.modelFormula())
-      mynames64<-colnames(model.matrix(formula,data))
+      formula64<-as.formula(private$.modelFormula64())
+      mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
       ciWidth<-self$options$paramCIWidth
@@ -96,8 +96,8 @@ gamljGLMClass <- R6::R6Class(
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
          return()
       ###############      
-      modelTerms<-private$.modelTerms()
-      modelFormula<-private$.modelFormula()
+      modelTerms<-lf.modelTerms64(self$options)
+      modelFormula<-private$.modelFormula64()
       
       if (modelFormula==FALSE)  
           return()
@@ -413,21 +413,29 @@ gamljGLMClass <- R6::R6Class(
 },
 
 .modelFormula=function() {
-  # If we are in interactive mode the model should be well specified, otherwise (if R mode)
-  # no modelTerms means full model. fix this
-  modelTerms <- private$.modelTerms()
+  modelTerms <- lf.modelTerms(self$options)
   dep <- self$options$dep
-  dep64 <- jmvcore::toB64(dep)
   intercept<-as.numeric(self$options$fixedIntercept)
-  terms<-sapply(private$.modelTerms(),jmvcore::toB64)
-
-  fixs<-jmvcore::constructFormula(dep=NULL,terms) 
+  fixs<-lf.constructFormula(dep=NULL,modelTerms) 
   sep<-ifelse(fixs!="","+"," ")
-  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = sep)
-  
+  lformula<-paste(paste(dep,intercept,sep="~"),fixs,sep = sep)
   return(lformula)
 },
 
+.modelFormula64=function() {
+  modelTerms64 <- lf.modelTerms64(self$options)
+  dep <- self$options$dep
+  dep64 <- jmvcore::toB64(dep)
+  intercept<-as.numeric(self$options$fixedIntercept)
+  fixs<-lf.constructFormula(dep=NULL,modelTerms64) 
+  sep<-ifelse(fixs!="","+"," ")
+  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = sep)
+  return(lformula)
+},
+
+.ff=function() {
+  modelTerms <- as.list(c(self$options$factors,self$options$covs))
+},
 .populateLevenes=function(model) {
   
   if ( ! self$options$homo)
@@ -491,22 +499,7 @@ gamljGLMClass <- R6::R6Class(
   
   TRUE
 },
-.modelTerms=function() {
-  # If we are in interactive mode the model is taken from modelterms option
-  # If R mode either the user passes a formula
-  # or the covs and factors are passed to modelterms
-  modelTerms <- self$options$modelTerms
-  
-  if ("NULL" %in% class(modelTerms))
-      return(private$.ff())  
-  if (is.null(modelTerms))
-    return()
-  modelTerms
-},
-  .ff=function() {
-    modelTerms <- as.list(c(self$options$factors,self$options$covs))
-},
-    .sourcifyOption = function(option) {
+.sourcifyOption = function(option) {
   
   name <- option$name
   value <- option$value

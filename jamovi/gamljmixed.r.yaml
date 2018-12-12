@@ -427,7 +427,8 @@ items:
         - simpleScaleLabels
         - plotRandomEffects
         - randomTerms
-        
+        - modelTerms
+
   - name: descPlots
     title: Results Plots
     type: Array
@@ -455,4 +456,5 @@ items:
            - plotDvScale
            - plotRandomEffects
            - plotRaw
+           - randomTerms
 

@@ -68,9 +68,19 @@ names64 <- R6Class("names64",list(
                            return(res)
                          },
                          .onename=function(var64) {
+                                   # first we deal with higher oders
+                                   tochange<-regmatches(var64, gregexpr("I\\(.*?\\^.*\\)", var64))
+                                   highertest<-any(sapply(tochange, length)) 
+                                   if (highertest) {
+                                       var64<-gsub("[\\I(\\^1-9\\)]", "", tochange)
+                                       apex<-gsub("\\^","",regmatches(tochange,gregexpr("\\^[[:digit:]]",tochange)))
+                                       return(paste0(self$.covs[[var64]],"^",apex))
+                                   }
+                                  # then we deal with factor contrasts
                                   x<-unlist(strsplit(var64,"_._._",fixed = T))
                                   if (length(x)==2) 
                                          return(paste0(jmvcore::fromB64(x[1]),x[2]))
+                                  ### then we search for names
                                   if (var64 %in% names(self$.factors))   
                                          return(self$.factors[[var64]])
                                   if (var64 %in% names(self$.covs))   

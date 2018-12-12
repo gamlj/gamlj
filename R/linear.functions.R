@@ -1,3 +1,62 @@
+.nicifyTerms<-function(term) {
+  term <- jmvcore::stringifyTerm(term)
+  term
+}
+
+
+
+### we cannot use jmvcore:constructFormula because it puts "`" around not regular names
+### thus does not allow I(x^2) kind of terms. We do not need "`" because we always pass
+### B64 names to models.
+
+lf.constructFormula<-function (dep = NULL, terms) 
+{
+  rhItems <- list()
+  for (term in terms) {
+    rhItems[[length(rhItems) + 1]] <- paste0(term, collapse = ":")
+  }
+  rhs <- paste0(rhItems, collapse = "+")
+  if (!is.null(dep)) {
+    formulaStr <- paste0(dep, "~", rhs)
+  }
+  else {
+    formulaStr <- rhs
+  }
+  formulaStr
+}
+
+
+.higherOrderTerm<-function(term,model=T) {
+  ho<-unique(term)
+  unlist(lapply(ho, function(b) {
+      apex<-length(term[term==b])
+      if (apex>1) {
+        if (model)
+          paste0("I(",b,"^",apex,")")
+        else
+          paste0(b,"^",apex)
+      } else
+        b
+    }))
+}
+
+lf.higherTerms<-function(aList,model=T) {
+  lapply(aList, function(a) {
+    .higherOrderTerm(a,model=model)
+  })
+}
+
+
+lf.modelTerms=function(options) {
+  modelTerms <- options$modelTerms
+  lf.higherTerms(modelTerms,model=F)
+}
+
+lf.modelTerms64=function(options) {
+  modelTerms <- options$modelTerms
+  modelTerms<-sapply(modelTerms, jmvcore::toB64)  
+  lf.higherTerms(modelTerms,model=T)
+}
 
 
 .scaleVariables=function(factors,covariates,data) {

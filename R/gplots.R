@@ -241,17 +241,19 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     dodge <- ggplot2::position_dodge(0)
   }
   
-  
+  gdata<-image$state$data
+  gdata$lines<-factor(gdata$lines)
+
   p <- ggplot2::ggplot()
   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
-    p <- p + geom_point(data=rawData,aes(x=x, y=y,group=factor(z),color=factor(z)),show.legend=FALSE, alpha=.5,shape=16, size=2)
+    p <- p + geom_point(data=rawData,aes(x=x, y=y),show.legend=FALSE, alpha=.5,shape=16, size=2)
   }
 
-  gdata<-image$state$data
+  
 
-  p <- p+ geom_line(data=gdata,aes(x=group, y=fit, group=factor(lines),colour=factor(lines)),size=1.2, position=dodge) 
+  p <- p+ geom_line(data=gdata,aes(x=group, y=fit, group=lines,colour=lines),size=1.2, position=dodge) 
   p <- p + labs(x=groupName, y=depName,colour=clabel) 
   p <- p + scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
   
@@ -266,8 +268,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster),color="gray64",size=.3, alpha=.3,show.legend = F) 
     }
     
-    
-    p <- p + geom_point(data=gdata,aes(x=group, y=fit, group=factor(lines),colour=factor(lines)),shape=16, size=4, position=dodge)
+    p <- p + geom_point(data=gdata,aes(x=group, y=fit, group=lines,colour=lines),shape=16, size=4, position=dodge)
     if (errorType != '')
       p <- p + geom_errorbar(data=gdata,aes(x=group, ymin=lwr, ymax=upr, width=.1, group=lines,color=lines), size=1.2, position=dodge)
     
@@ -282,16 +283,16 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     }
     if (errorType != '')
       p <- p + geom_ribbon(data=gdata,aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
+
   }
   
   if (!is.null(title))
     p<-p+ ggtitle(title)
-    p<-p+theme
-    # this must be here otherwise it does not work
-#    levs<-levels(factor(gdata$lines))
-#    if (sum(grep("Mean",levs,fixed=T))==6) 
-#            p<- p + scale_color_discrete(breaks=levs[c(2,1,3)])
-    
+  p<-p+theme
+  # theme  must be added before otherwise it does not work
+  levs<-levels(gdata$lines)
+  if (sum(grep("Mean",levs,fixed=T))==6) 
+              p<- p + scale_color_discrete(breaks=levs[c(2,1,3)])
   p   
 }
 

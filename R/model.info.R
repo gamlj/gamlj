@@ -177,11 +177,6 @@ mi.explainPrediction<-function(modelType,data,dep){
   return()
 }
 
-.nicifyTerms<-function(term) {
-  term <- jmvcore::decomposeTerm(term)
-  term <- jmvcore::stringifyTerm(term)
-  term
-}
 
 
 ### this tells if a model term is dependent on the interaction
