@@ -36,5 +36,9 @@ analyses:
     menuSubgroup: GAMLj
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
+datasets:
+  - name: qsport
+    path: qsport.csv
+    description: Training hours and performance with quadratic effects
 
 ...

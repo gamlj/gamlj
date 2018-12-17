@@ -18,10 +18,13 @@ gmeans.init<-function(data,options,theTables,cov_conditioning=NULL) {
           if  (all(.mterms[[i]] %in% facts))
                mterms[length(mterms)+1]<-.mterms[i]
       } else mterms<-.mterms
-       
 
-      if (length(mterms) == 0)
-              return()
+       if (length(mterms) == 0)
+         return()
+      ## remove higher order terms 
+      mterms<-lapply(mterms, unique)
+      mterms<-unique(lapply(mterms, function(a) a[order(a)]))
+
 
       for (term in mterms) {
            aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
@@ -79,6 +82,10 @@ gmeans.populate<-function(model,options,tables,cov_conditioning=NULL) {
           mterms[length(mterms)+1]<-.mterms[i]
     } else mterms<-.mterms
 
+    ## remove higher order terms 
+    mterms<-lapply(mterms, unique)
+    mterms<-unique(lapply(mterms, function(a) a[order(a)]))
+    
     if (tables$isFilled()) {
       mark("Estimated marginal means recycled")
       return()

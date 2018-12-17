@@ -9,20 +9,14 @@
 ### thus does not allow I(x^2) kind of terms. We do not need "`" because we always pass
 ### B64 names to models.
 
-lf.constructFormula<-function (dep = NULL, terms) 
+lf.constructFormula<-function (dep = NULL, terms=NULL, intercept=TRUE) 
 {
-  rhItems <- list()
-  for (term in terms) {
-    rhItems[[length(rhItems) + 1]] <- paste0(term, collapse = ":")
-  }
-  rhs <- paste0(rhItems, collapse = "+")
-  if (!is.null(dep)) {
-    formulaStr <- paste0(dep, "~", rhs)
-  }
-  else {
-    formulaStr <- rhs
-  }
-  formulaStr
+
+  sep="+"
+  if (length(terms)==0) sep=""
+  rform<-jmvcore::composeFormula(NULL,terms)
+  rform<-gsub("~",paste(dep,"~",as.numeric(intercept),sep),rform)
+  rform
 }
 
 

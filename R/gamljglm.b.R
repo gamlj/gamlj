@@ -10,9 +10,8 @@ gamljGLMClass <- R6::R6Class(
       mark("init")
       private$.names64<-names64$new()
       n64<-private$.names64
-
-      modelTerms<-lf.modelTerms(self$options)
-      modelFormula<-private$.modelFormula()
+      dep<-self$options$dep
+      modelTerms<-self$options$modelTerms
 
       ### here we initialize the info table ####
       getout<-FALSE
@@ -29,7 +28,9 @@ gamljGLMClass <- R6::R6Class(
       if (getout)
           return()
       data<-private$.cleandata()
-
+      
+      modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      
       infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
       infoTable$addRow(rowKey="r2m",list(info="R-squared"))
@@ -49,7 +50,7 @@ gamljGLMClass <- R6::R6Class(
           aTable$addRow(rowKey=1, list(name="Model"))
           
           for (i in seq_along(modelTerms)) {
-                  lab<-.nicifyTerms(modelTerms[[i]])
+                  lab<-jmvcore::stringifyTerm(modelTerms[[i]])
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -61,7 +62,9 @@ gamljGLMClass <- R6::R6Class(
       ## fixed effects parameters
 
       aTable<-self$results$main$fixed
-      formula64<-as.formula(private$.modelFormula64())
+      dep64<-jmvcore::toB64(dep)
+      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,self$options$fixedIntercept))
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
@@ -69,7 +72,7 @@ gamljGLMClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[[i]]),label=.nicifyTerms(labels[i])))
+          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
@@ -96,9 +99,9 @@ gamljGLMClass <- R6::R6Class(
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
          return()
       ###############      
-      modelTerms<-lf.modelTerms64(self$options)
-      modelFormula<-private$.modelFormula64()
-      
+      modelTerms<-lapply(self$options$modelTerms,jmvcore::toB64)
+      modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,self$options$fixedIntercept)
+
       if (modelFormula==FALSE)  
           return()
     
@@ -412,30 +415,7 @@ gamljGLMClass <- R6::R6Class(
   return(p)
 },
 
-.modelFormula=function() {
-  modelTerms <- lf.modelTerms(self$options)
-  dep <- self$options$dep
-  intercept<-as.numeric(self$options$fixedIntercept)
-  fixs<-lf.constructFormula(dep=NULL,modelTerms) 
-  sep<-ifelse(fixs!="","+"," ")
-  lformula<-paste(paste(dep,intercept,sep="~"),fixs,sep = sep)
-  return(lformula)
-},
 
-.modelFormula64=function() {
-  modelTerms64 <- lf.modelTerms64(self$options)
-  dep <- self$options$dep
-  dep64 <- jmvcore::toB64(dep)
-  intercept<-as.numeric(self$options$fixedIntercept)
-  fixs<-lf.constructFormula(dep=NULL,modelTerms64) 
-  sep<-ifelse(fixs!="","+"," ")
-  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = sep)
-  return(lformula)
-},
-
-.ff=function() {
-  modelTerms <- as.list(c(self$options$factors,self$options$covs))
-},
 .populateLevenes=function(model) {
   
   if ( ! self$options$homo)
@@ -482,7 +462,6 @@ gamljGLMClass <- R6::R6Class(
   library(ggplot2)
   dep <- self$options$dep
   factors <- self$options$factors
-  modelTerms <- private$.modelTerms()
   model<-private$.model      
   if (is.null(model) )
     return(FALSE)
@@ -515,10 +494,7 @@ gamljGLMClass <- R6::R6Class(
     }
     if (length(value) == 0)
       return('')
-  } else if (name == 'modelTerms') {
-    if (base::identical(as.list(value), private$.ff()))
-      return('')
-  } else if (name == 'postHoc') {
+  }  else if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }

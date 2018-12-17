@@ -288,11 +288,13 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   
   if (!is.null(title))
     p<-p+ ggtitle(title)
-  p<-p+theme
-  # theme  must be added before otherwise it does not work
+  ## here we put mean in the middle between mean +offset and -offset    
   levs<-levels(gdata$lines)
-  if (sum(grep("Mean",levs,fixed=T))==6) 
-              p<- p + scale_color_discrete(breaks=levs[c(2,1,3)])
+  if (sum(grep("Mean",levs,fixed=T))==6) {
+    newbreaks<-levs[c(2,1,3)]
+    theme[[3]]$breaks<-newbreaks    
+  }
+  p<-p+theme
   p   
 }
 
