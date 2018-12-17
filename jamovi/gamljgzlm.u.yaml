@@ -124,6 +124,7 @@ children:
         label: Components
         persistentItems: true
         stretchFactor: 1
+        higherOrders: true
         format: term
         children:
           - type: TargetLayoutBox

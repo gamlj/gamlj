@@ -15,9 +15,9 @@ gamljMixedClass <- R6::R6Class(
       n64<-private$.names64
       reml<-self$options$reml
       infoTable<-self$results$info
-      
+      dep<-self$options$dep
       getout<-FALSE
-      if (is.null(self$options$dep)) {
+      if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
@@ -36,7 +36,7 @@ gamljMixedClass <- R6::R6Class(
         }
         return(FALSE)
       }
-      modelTerms<-private$.modelTerms()
+      modelTerms<-self$options$modelTerms
       data<-private$.cleandata()
       
       ### initialize conditioning of covariates
@@ -62,7 +62,7 @@ gamljMixedClass <- R6::R6Class(
       
       ## random table
       aTable<-self$results$main$random
-      aTable$addRow(rowKey="res",list(groups="Residuals"))
+      aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
 
       ## anova Table 
       if (length(modelTerms)>0) {
@@ -72,17 +72,20 @@ gamljMixedClass <- R6::R6Class(
       }
       
       ## fixed effects parameters
-
+      modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      
       aTable<-self$results$main$fixed
-      formula<-as.formula(private$.fixedFormula())
-      mynames64<-colnames(model.matrix(formula,data))
+      dep64<-jmvcore::toB64(dep)
+      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,self$options$fixedIntercept))
+      mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[[i]]),label=.nicifyTerms(labels[i])))
+          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
@@ -111,7 +114,7 @@ gamljMixedClass <- R6::R6Class(
          return()
  
       ###############      
-      modelTerms<-private$.modelTerms()
+      modelTerms<-self$options$modelTerms
       modelFormula<-private$.modelFormula()
       if (modelFormula==FALSE)  
           return()
@@ -147,7 +150,7 @@ gamljMixedClass <- R6::R6Class(
       ## just leave them the way they are :-)
 
                mark("the model has been estimated")
-               
+               mark(modelFormula)               
                ##### model ####
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data,REML = reml)
@@ -233,8 +236,11 @@ gamljMixedClass <- R6::R6Class(
                 grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                 realgroups<-n64$nicenames(grp)
                 realnames<-n64$nicenames(vcv$var1)
+                realnames[[length(realnames)]]<-""
+
                 for (i in 1:dim(vcv)[1]) {
-                     if (realnames[[i]]=="(Intercept)")
+                    mark(is.null(realnames[[i]]),realnames[i])
+                     if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
                         icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
                      else
                         icc<-""
@@ -269,7 +275,7 @@ gamljMixedClass <- R6::R6Class(
                        for (i in seq_len(dim(anova_res)[1])) {
                               tableRow<-anova_res[i,]  
                               anovaTable$setRow(rowNo=i,tableRow)
-                              anovaTable$setRow(rowNo=i,list(name=.nicifyTerms(labels[i])))
+                              anovaTable$setRow(rowNo=i,list(name=jmvcore::stringifyTerm(labels[[i]])))
                        }
                       messages<-mf.getModelMessages(model)
                       if (length(messages)>0) {
@@ -433,7 +439,8 @@ gamljMixedClass <- R6::R6Class(
         dep<-jmvcore::toB64(self$options$dep)
       } else return(FALSE)
       
-      fixed<-private$.fixedFormula()
+      modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
+      fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
       mf<-paste(fixed,rands,sep =  "+")
       mf
     },
@@ -557,34 +564,7 @@ gamljMixedClass <- R6::R6Class(
   return(p)
 },
 
-.fixedFormula=function() {
-  # If we are in interactive mode the model should be well specified, otherwise (if R mode)
-  # no modelTerms means full model. fix this
-  modelTerms <- private$.modelTerms()
-  dep <- self$options$dep
-  dep64 <- jmvcore::toB64(dep)
-  intercept<-as.numeric(self$options$fixedIntercept)
-  terms<-sapply(private$.modelTerms(),jmvcore::toB64)
-
-  fixs<-jmvcore::constructFormula(dep=NULL,terms) 
-  sep<-ifelse(fixs!="","+"," ")
-  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = sep)
-  
-  return(lformula)
-},
-
-.modelTerms=function() {
-  # If we are in interactive mode the model should be well specified, otherwise (if R mode)
-  # no modelTerms means full model
-  modelTerms <- self$options$modelTerms
-  if (class(modelTerms)!="list")
-       modelTerms<-private$.ff()
-  modelTerms
-},
-  .ff=function() {
-    modelTerms <- as.list(c(self$options$factors,self$options$covs))
-},
-    .sourcifyOption = function(option) {
+.sourcifyOption = function(option) {
   
   name <- option$name
   value <- option$value
@@ -599,9 +579,6 @@ gamljMixedClass <- R6::R6Class(
         i <- i + 1
     }
     if (length(value) == 0)
-      return('')
-  } else if (name == 'modelTerms') {
-    if (base::identical(as.list(value), private$.ff()))
       return('')
   } else if (name == 'postHoc') {
     if (length(value) == 0)
