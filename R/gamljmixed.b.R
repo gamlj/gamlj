@@ -150,7 +150,6 @@ gamljMixedClass <- R6::R6Class(
       ## just leave them the way they are :-)
 
                mark("the model has been estimated")
-               mark(modelFormula)               
                ##### model ####
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data,REML = reml)
@@ -236,14 +235,13 @@ gamljMixedClass <- R6::R6Class(
                 grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                 realgroups<-n64$nicenames(grp)
                 realnames<-n64$nicenames(vcv$var1)
-                realnames[[length(realnames)]]<-""
-
+                realnames<-lapply(realnames,jmvcore::stringifyTerm)
                 for (i in 1:dim(vcv)[1]) {
-                    mark(is.null(realnames[[i]]),realnames[i])
                      if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
                         icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
                      else
                         icc<-""
+                     mark(realgroups[[i]],realnames[[i]])
                      if (i<=randomTable$rowCount)
                               randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                      else
@@ -256,8 +254,9 @@ gamljMixedClass <- R6::R6Class(
                 vcv<-vc[!is.na(vc[,3]),]
                 grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                 realgroups<-n64$nicenames(grp)
-                realnames1<-n64$nicenames(vcv$var1)
-                realnames2<-n64$nicenames(vcv$var2)
+                realnames1<-lapply(n64$nicenames(vcv$var1),jmvcore::stringifyTerm)
+                realnames2<-lapply(n64$nicenames(vcv$var2),jmvcore::stringifyTerm)
+
                 if (dim(vcv)[1]>0) {
                     for (i in 1:dim(vcv)[1]) {
                         randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
@@ -346,9 +345,10 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
+    mark(terms)
     terms<-lapply(terms,jmvcore::toB64)
 
-    flatterms<-lapply(terms,function(x) c(paste0(head(x,-1),collapse = ":"),tail(x,1)))
+    flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
     res<-do.call("rbind",flatterms)
     res<-tapply(res[,1],res[,2],paste)
     if (correl) {
@@ -522,7 +522,6 @@ gamljMixedClass <- R6::R6Class(
       sdata<-subset(predData,plots==real)
       sraw<-NULL
       if (!is.null(rawData)) {
-        mark(key,is.factor(rawData[["w"]]))
         if (is.factor(rawData[["w"]]))
           sraw<-subset(rawData,w==real)
         else

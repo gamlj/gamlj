@@ -35,6 +35,7 @@ const events = {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
+        updateRandomSupplier(ui,this);
 
     },
 
@@ -246,8 +247,10 @@ var updateRandomSupplier = function(ui, context) {
     var factorList = context.cloneArray(ui.factors.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
     var variableList = factorList.concat(covariatesList);
+    var modelTerms = context.cloneArray(ui.modelTerms.value(), []); 
     var termsList=[];
     termsList = context.getCombinations(variableList);
+    termsList=unique(termsList.concat(modelTerms));
     context.sortArraysByLength(termsList);
 //    ui.randomSupplier.setValue(context.valuesToItems(termsList, FormatDef.term));
     var clusterList = context.cloneArray(ui.cluster.value(), []);
@@ -265,7 +268,7 @@ var updateRandomSupplier = function(ui, context) {
      }
     }
     context.sortArraysByLength(alist);
-
+    console.log(alist);
       var formatted=context.valuesToItems(alist, rtermFormat);
 //    var busyList = context.cloneArray(ui.randomTerms.value(), []);
 //    var busyForm = context.valuesToItems(busyList, rtermFormat);
@@ -284,6 +287,26 @@ var filterRandomTerms = function(ui, context) {
       ui.randomTerms.setValue(unique);
   
 };
+
+var unique=function(arr) {
+    var u = {}, a = [];
+    for(var i = 0, l = arr.length; i < l; ++i){
+        var prop=ssort(JSON.stringify(arr[i]));
+        if(!u.hasOwnProperty(prop) && arr[i].length>0) {
+            a.push(arr[i]);
+            u[prop] = 1;
+        }
+    }
+    return a;
+};
+
+
+var ssort= function(str){
+  str = str.replace(/[`\[\]"\\\/]/gi, '');
+  var arr = str.split(',');
+  var sorted = arr.sort();
+  return sorted.join('');
+}
 
 
 module.exports = events;

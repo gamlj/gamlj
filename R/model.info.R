@@ -173,7 +173,6 @@ mi.explainPrediction<-function(modelType,data,dep){
   if (modelType %in% c("multinomial")) {
     dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=x)/P(x=0)"
-    mark(dlevs)
     dircomm<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
     return(c(dirvalue,dircomm))
   }

@@ -76,6 +76,7 @@ children:
         name: modelSupplier
         label: Components
         persistentItems: true
+        higherOrders: true
         stretchFactor: 1
         format: term
         children:
@@ -104,7 +105,7 @@ children:
       - type: Supplier
         name: randomSupplier
         label: Components
-        persistentItems: false
+        persistentItems: true
         stretchFactor: 1
         events:
           change: './mixed.events::onChange_randomSupplier'
