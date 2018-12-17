@@ -17,13 +17,17 @@ mi.update<-function(table,modelType,data=NULL,dep=NULL) {
 mi.rsquared<- function(x,...) UseMethod(".rsquared")
 
 .rsquared.default<-function(model) {
-   sumr<-summary(model)
     ### McFadden’s model #####
-    llfull<-logLik(model)  ### model loglikelihood
-    print(llfull)
-    llnull<<-llfull-((sumr$null.deviance-sumr$deviance)/2) ## intercept only loglikelihood
-    as.numeric(1-(llfull/llnull))
+#    llmodel<-logLik(model)  ### model loglikelihood
+#    data<-model$model
+#    nobject <- update(model, ~ 1,family= model$family$family,data=data)
+#    llnull<-logLik(nobject) ### null model loglikelihood
+#    as.numeric(1-llmodel/llnull)
+    ### D-squared. For logistic is equivalente to McFadden. For gaussian yields the standard R-square
+    ### which is not McFadden
+    1- (model$deviance/model$null.deviance)
 }
+
 
 .rsquared.multinom<-function(model) {
   llfull<-logLik(model)  ### model loglikelihood
@@ -169,7 +173,6 @@ mi.explainPrediction<-function(modelType,data,dep){
   if (modelType %in% c("multinomial")) {
     dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=x)/P(x=0)"
-    mark(dlevs)
     dircomm<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
     return(c(dirvalue,dircomm))
   }
@@ -177,11 +180,6 @@ mi.explainPrediction<-function(modelType,data,dep){
   return()
 }
 
-.nicifyTerms<-function(term) {
-  term <- jmvcore::decomposeTerm(term)
-  term <- jmvcore::stringifyTerm(term)
-  term
-}
 
 
 ### this tells if a model term is dependent on the interaction

@@ -34,8 +34,7 @@ names64 <- R6Class("names64",list(
                          nicelabels=function(obj) {
                            q<-sapply(obj,function(x) {
                              a<-unlist(strsplit(x,":",fixed = T))
-                             b<-sapply(a, function(x) self$.onelabel(x))
-                             paste(b,collapse = ":")    
+                             unlist(sapply(a, function(x) self$.onelabel(x)))
                            })
                            return(q)
                          },
@@ -47,8 +46,8 @@ names64 <- R6Class("names64",list(
                          nicenames=function(obj) {
                                  sapply(obj,function(x) {
                                  a<-unlist(strsplit(x,":",fixed = T))
-                                 b<-sapply(a, function(x) self$.onename(x))
-                                 paste(b,collapse = ":")    
+                                 unlist(sapply(a, function(x) self$.onename(x)))
+#                                 paste(b,collapse = ":")    
                                  })
                                  },
                          contrasts=function(var) {
@@ -68,9 +67,19 @@ names64 <- R6Class("names64",list(
                            return(res)
                          },
                          .onename=function(var64) {
+                                   # first we deal with higher oders
+                                   tochange<-regmatches(var64, gregexpr("I\\(.*?\\^.*\\)", var64))
+                                   highertest<-any(sapply(tochange, length)) 
+                                   if (highertest) {
+                                       var64<-gsub("^I\\(", "", gsub("\\^.*", "", tochange))
+                                       apex<-gsub("\\^","",regmatches(tochange,gregexpr("\\^[[:digit:]]",tochange)))
+                                       return(rep(self$.covs[[var64]],apex))
+                                   }
+                                  # then we deal with factor contrasts
                                   x<-unlist(strsplit(var64,"_._._",fixed = T))
                                   if (length(x)==2) 
                                          return(paste0(jmvcore::fromB64(x[1]),x[2]))
+                                  ### then we search for names
                                   if (var64 %in% names(self$.factors))   
                                          return(self$.factors[[var64]])
                                   if (var64 %in% names(self$.covs))   
@@ -78,8 +87,9 @@ names64 <- R6Class("names64",list(
                                   return(var64)                         
                          },
                          .onelabel=function(obj) {
+                           
                            if (obj %in% names(self$.labels))  
-                                return(self$.labels[obj])
+                                return(self$.labels[[obj]])
                            if (obj %in% names(self$.covs))
                                 return(self$.covs[obj])
                            return(self$.onename(obj))

@@ -332,6 +332,7 @@ items:
         - fixedIntercept
         - simpleScale
         - simpleScaleLabels
+        - modelTerms
 
   - name: descPlots
     title: Results Plots
@@ -359,4 +360,5 @@ items:
            - simpleScaleLabels
            - plotDvScale
            - plotRaw
+           - modelTerms
 

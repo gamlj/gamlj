@@ -344,6 +344,8 @@ items:
         - fixedIntercept
         - simpleScale
         - simpleScaleLabels
+        - modelTerms
+
 
   - name: descPlots
     title: Results Plots

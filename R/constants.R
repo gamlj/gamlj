@@ -1,4 +1,4 @@
-GAMLj_DEBUG=F
+GAMLj_DEBUG=T
 GAMLj_INFO=F
 
 TCONV<-list()

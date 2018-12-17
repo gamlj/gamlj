@@ -113,7 +113,6 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            inputPattern: '[0-9]+'
             enable: (showParamsCI)
   - type: CollapseBox
     label: Model
@@ -125,6 +124,7 @@ children:
         label: Components
         persistentItems: true
         stretchFactor: 1
+        higherOrders: true
         format: term
         children:
           - type: TargetLayoutBox
@@ -213,7 +213,6 @@ children:
                       - type: TextBox
                         name: cvalue
                         format: number
-                        inputPattern: '[0-9]+'
                   - name: simpleScale_percent
                     type: RadioButton
                     optionName: simpleScale
@@ -224,7 +223,6 @@ children:
                         label: null
                         suffix: '%'
                         format: number
-                        inputPattern: '[0-9]+'
                         enable: (simpleScale_percent)
           - type: Label
             label: Covariates labeling
@@ -335,7 +333,6 @@ children:
                     label: Interval
                     suffix: '%'
                     format: number
-                    inputPattern: '[0-9]+'
                     enable: (errBarDef_ci)
               - name: plotError_se
                 type: RadioButton

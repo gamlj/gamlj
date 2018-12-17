@@ -66,7 +66,6 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            inputPattern: '[0-9]+'
             enable: (showParamsCI)
   - type: CollapseBox
     label: Fixed Effects
@@ -77,6 +76,7 @@ children:
         name: modelSupplier
         label: Components
         persistentItems: true
+        higherOrders: true
         stretchFactor: 1
         format: term
         children:
@@ -105,7 +105,7 @@ children:
       - type: Supplier
         name: randomSupplier
         label: Components
-        persistentItems: false
+        persistentItems: true
         stretchFactor: 1
         events:
           change: './mixed.events::onChange_randomSupplier'
@@ -199,7 +199,6 @@ children:
                           - type: TextBox
                             name: cvalue
                             format: number
-                            inputPattern: '[0-9]+'
                   - name: simpleScale_percent
                     type: RadioButton
                     optionName: simpleScale
@@ -210,7 +209,6 @@ children:
                         label: null
                         suffix: '%'
                         format: number
-                        inputPattern: '[0-9]+'
                         enable: (simpleScale_percent)
           - type: Label
             label: Covariates labeling
@@ -322,7 +320,6 @@ children:
                     label: Interval
                     suffix: '%'
                     format: number
-                    inputPattern: '[0-9]+'
                     enable: (errBarDef_ci)
               - name: plotError_se
                 type: RadioButton

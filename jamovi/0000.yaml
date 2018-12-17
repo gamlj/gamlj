@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 1.0.4
+version: 1.0.5
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -36,5 +36,9 @@ analyses:
     menuSubgroup: GAMLj
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
+datasets:
+  - name: qsport
+    path: qsport.csv
+    description: Training hours and performance with quadratic effects
 
 ...

@@ -105,19 +105,29 @@ var rtermFormat = new Format ({
     return '|';
   },
 
-
+  getSuperscript: function(value) {
+        return '<sup> ' + value + '</sup>';
+    },
   
-  _itemToString: function(item, level) {
+  _itemToString: function(item, level, power) {
 //    console.log("rterm format used")
     if (typeof item === 'string')
-      return item;
+         return item + (power > 1 ? this.getSuperscript(power) : '');
+
     var joiner = rtermFormat._getJoiner(level);
-    var combined = rtermFormat._itemToString(item[0], level);
-    for (var i = 1; i < item.length; i++) {
-      if (i===(item.length-1))
-            joiner='|';
-      combined = combined + " " + joiner + " " + rtermFormat._itemToString(item[i], level);
-    }
+
+        let combined = '';
+        let npower = 1;
+        for (let i = 0; i < item.length; i++) {
+            if (i < item.length - 1 && item[i] === item[i+1])
+                npower += 1;
+            else {
+              if (i===(item.length-1))
+                    joiner='|';
+               combined = (combined !== '' ? (combined + ' ' + joiner + ' ') : '') + FormatDef.term._itemToString(item[i], level + 1, npower);
+                npower = 1;
+            }
+}
     return combined;
   },
   

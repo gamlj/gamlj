@@ -10,9 +10,8 @@ gamljGLMClass <- R6::R6Class(
       mark("init")
       private$.names64<-names64$new()
       n64<-private$.names64
-
-      modelTerms<-private$.modelTerms()
-      modelFormula<-private$.modelFormula()
+      dep<-self$options$dep
+      modelTerms<-self$options$modelTerms
 
       ### here we initialize the info table ####
       getout<-FALSE
@@ -29,8 +28,10 @@ gamljGLMClass <- R6::R6Class(
       if (getout)
           return()
       data<-private$.cleandata()
-
-      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear mixed model fit by OLS"))
+      
+      modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      
+      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
       infoTable$addRow(rowKey="r2m",list(info="R-squared"))
       infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
@@ -49,7 +50,7 @@ gamljGLMClass <- R6::R6Class(
           aTable$addRow(rowKey=1, list(name="Model"))
           
           for (i in seq_along(modelTerms)) {
-                  lab<-.nicifyTerms(jmvcore::composeTerm(modelTerms[i]))
+                  lab<-jmvcore::stringifyTerm(modelTerms[[i]])
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -61,15 +62,17 @@ gamljGLMClass <- R6::R6Class(
       ## fixed effects parameters
 
       aTable<-self$results$main$fixed
-      formula<-as.formula(private$.modelFormula())
-      mynames64<-colnames(model.matrix(formula,data))
+      dep64<-jmvcore::toB64(dep)
+      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,self$options$fixedIntercept))
+      mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=.nicifyTerms(terms[[i]]),label=.nicifyTerms(labels[i])))
+          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
@@ -96,9 +99,9 @@ gamljGLMClass <- R6::R6Class(
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
          return()
       ###############      
-      modelTerms<-private$.modelTerms()
-      modelFormula<-private$.modelFormula()
-      
+      modelTerms<-lapply(self$options$modelTerms,jmvcore::toB64)
+      modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,self$options$fixedIntercept)
+
       if (modelFormula==FALSE)  
           return()
     
@@ -412,21 +415,6 @@ gamljGLMClass <- R6::R6Class(
   return(p)
 },
 
-.modelFormula=function() {
-  # If we are in interactive mode the model should be well specified, otherwise (if R mode)
-  # no modelTerms means full model. fix this
-  modelTerms <- private$.modelTerms()
-  dep <- self$options$dep
-  dep64 <- jmvcore::toB64(dep)
-  intercept<-as.numeric(self$options$fixedIntercept)
-  terms<-sapply(private$.modelTerms(),jmvcore::toB64)
-
-  fixs<-jmvcore::constructFormula(dep=NULL,terms) 
-  sep<-ifelse(fixs!="","+"," ")
-  lformula<-paste(paste(dep64,intercept,sep="~"),fixs,sep = sep)
-  
-  return(lformula)
-},
 
 .populateLevenes=function(model) {
   
@@ -474,7 +462,6 @@ gamljGLMClass <- R6::R6Class(
   library(ggplot2)
   dep <- self$options$dep
   factors <- self$options$factors
-  modelTerms <- private$.modelTerms()
   model<-private$.model      
   if (is.null(model) )
     return(FALSE)
@@ -491,22 +478,7 @@ gamljGLMClass <- R6::R6Class(
   
   TRUE
 },
-.modelTerms=function() {
-  # If we are in interactive mode the model is taken from modelterms option
-  # If R mode either the user passes a formula
-  # or the covs and factors are passed to modelterms
-  modelTerms <- self$options$modelTerms
-  
-  if ("NULL" %in% class(modelTerms))
-      return(private$.ff())  
-  if (is.null(modelTerms))
-    return()
-  modelTerms
-},
-  .ff=function() {
-    modelTerms <- as.list(c(self$options$factors,self$options$covs))
-},
-    .sourcifyOption = function(option) {
+.sourcifyOption = function(option) {
   
   name <- option$name
   value <- option$value
@@ -522,10 +494,7 @@ gamljGLMClass <- R6::R6Class(
     }
     if (length(value) == 0)
       return('')
-  } else if (name == 'modelTerms') {
-    if (base::identical(as.list(value), private$.ff()))
-      return('')
-  } else if (name == 'postHoc') {
+  }  else if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }
