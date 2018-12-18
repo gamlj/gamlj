@@ -148,7 +148,7 @@ gamljMixedClass <- R6::R6Class(
       ## so we estimate the model every time. In case is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
-
+      
                mark("the model has been estimated")
                ##### model ####
                model_test <- try({
@@ -162,7 +162,7 @@ gamljMixedClass <- R6::R6Class(
                }
                private$.model <- model
                mark("...done")
-               
+
                ### anova results ####
                if (is.null(anovaTable$state)) {
                    mark("compute the Anova stuff")
@@ -229,6 +229,7 @@ gamljMixedClass <- R6::R6Class(
                ### end of info table ###
         
                ### random table ######        
+                 
                 vc<-as.data.frame(model_summary$varcor)
                 vcv<-vc[is.na(vc[,3]),]
                 vcv$var1[is.na(vcv$var1)]<-""
@@ -241,7 +242,6 @@ gamljMixedClass <- R6::R6Class(
                         icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
                      else
                         icc<-""
-                     mark(realgroups[[i]],realnames[[i]])
                      if (i<=randomTable$rowCount)
                               randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                      else
@@ -345,7 +345,6 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
-    mark(terms)
     terms<-lapply(terms,jmvcore::toB64)
 
     flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
