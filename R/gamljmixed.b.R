@@ -144,8 +144,8 @@ gamljMixedClass <- R6::R6Class(
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
       
-      ## saving the whole set of results proved to be to0 heavy for memory issues.
-      ## so we estimate the model every time. In case is not needed, we just trick
+      ## saving the whole set of results proved to be too heavy for memory issues.
+      ## so we estimate the model every time. In case it is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
       
@@ -163,6 +163,40 @@ gamljMixedClass <- R6::R6Class(
                private$.model <- model
                mark("...done")
 
+               vc<-as.data.frame(lme4::VarCorr(model))
+#               vc<-as.data.frame(model_summary$varcor)
+               vcv<-vc[is.na(vc[,3]),]
+               vcv$var1[is.na(vcv$var1)]<-""
+               grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
+               realgroups<-n64$nicenames(grp)
+               realnames<-n64$nicenames(vcv$var1)
+               realnames<-lapply(realnames,jmvcore::stringifyTerm)
+               for (i in 1:dim(vcv)[1]) {
+                 if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
+                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
+                 else
+                   icc<-""
+                 if (i<=randomTable$rowCount)
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                 else
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+               }
+               
+               ### Covariance among random effects ###
+               vcv<-vc[!is.na(vc[,3]),]
+               grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
+               realgroups<-n64$nicenames(grp)
+               realnames1<-lapply(n64$nicenames(vcv$var1),jmvcore::stringifyTerm)
+               realnames2<-lapply(n64$nicenames(vcv$var2),jmvcore::stringifyTerm)
+               
+               if (dim(vcv)[1]>0) {
+                 for (i in 1:dim(vcv)[1]) {
+                   randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
+                 }
+                 randomCovTable$setVisible(TRUE)
+               }
+               
+               
                ### anova results ####
                if (is.null(anovaTable$state)) {
                    mark("compute the Anova stuff")
@@ -199,7 +233,11 @@ gamljMixedClass <- R6::R6Class(
                               estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
                          estimatesTable$setState(TRUE)
                          mark("...done")
-               
+ 
+               ### fix random table notes
+                  info<-paste("Numer of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
+                  randomTable$setNote('info', info)
+                         
                ### prepare info table #########       
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
@@ -230,39 +268,6 @@ gamljMixedClass <- R6::R6Class(
         
                ### random table ######        
                  
-                vc<-as.data.frame(model_summary$varcor)
-                vcv<-vc[is.na(vc[,3]),]
-                vcv$var1[is.na(vcv$var1)]<-""
-                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
-                realgroups<-n64$nicenames(grp)
-                realnames<-n64$nicenames(vcv$var1)
-                realnames<-lapply(realnames,jmvcore::stringifyTerm)
-                for (i in 1:dim(vcv)[1]) {
-                     if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                        icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
-                     else
-                        icc<-""
-                     if (i<=randomTable$rowCount)
-                              randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
-                     else
-                              randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
-                }
-                info<-paste("Numer of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
-                randomTable$setNote('info', info)
-
-                ### Covariance among random effects ###
-                vcv<-vc[!is.na(vc[,3]),]
-                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
-                realgroups<-n64$nicenames(grp)
-                realnames1<-lapply(n64$nicenames(vcv$var1),jmvcore::stringifyTerm)
-                realnames2<-lapply(n64$nicenames(vcv$var2),jmvcore::stringifyTerm)
-
-                if (dim(vcv)[1]>0) {
-                    for (i in 1:dim(vcv)[1]) {
-                        randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
-                    }
-                    randomCovTable$setVisible(TRUE)
-                 }
         ### ### ### ### ###
         # anova table ##
                 ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed

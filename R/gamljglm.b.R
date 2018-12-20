@@ -9,10 +9,10 @@ gamljGLMClass <- R6::R6Class(
     .init=function() {
       mark("init")
       private$.names64<-names64$new()
+            
       n64<-private$.names64
       dep<-self$options$dep
       modelTerms<-self$options$modelTerms
-
       ### here we initialize the info table ####
       getout<-FALSE
       
@@ -21,12 +21,15 @@ gamljGLMClass <- R6::R6Class(
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
+      
       if (getout) 
         if (length(self$options$modelTerms) == 0) 
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
 
+
       if (getout)
-          return()
+           return()
+
       data<-private$.cleandata()
       
       modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)

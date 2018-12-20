@@ -126,6 +126,7 @@ items:
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
+                    - randomTerms
 
              columns:
                     - name: groups
@@ -149,6 +150,17 @@ items:
              title: Random Parameters correlations
              type: Table
              visible: false
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - reml
+                    - contrasts
+                    - scaling
+                    - randomTerms
+                    - correlatedEffects
+                    - fixedIntercept
+                    - randomTerms
+
              columns:
                    - name: groups
                      title: "Groups"
@@ -177,6 +189,7 @@ items:
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
+                    - randomTerms
              columns:
                    - name: test
                      title: "Test"
