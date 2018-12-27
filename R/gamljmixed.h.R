@@ -522,7 +522,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "scaling",
                                 "randomTerms",
                                 "correlatedEffects",
-                                "fixedIntercept"),
+                                "fixedIntercept",
+                                "randomTerms"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -550,6 +551,16 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             name="randomCov",
                             title="Random Parameters correlations",
                             visible=FALSE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "reml",
+                                "contrasts",
+                                "scaling",
+                                "randomTerms",
+                                "correlatedEffects",
+                                "fixedIntercept",
+                                "randomTerms"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -581,7 +592,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "scaling",
                                 "randomTerms",
                                 "correlatedEffects",
-                                "fixedIntercept"),
+                                "fixedIntercept",
+                                "randomTerms"),
                             columns=list(
                                 list(
                                     `name`="test", 

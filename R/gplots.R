@@ -279,7 +279,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       data<-image$state$randomData
       mark("we are smoothing")
       thinker<-.3
-      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,method = "lm",colour="gray64", alpha=.8,fullrange = TRUE,se=FALSE,show.legend=F) 
+      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,colour="gray64", alpha=.8,method = "auto",fullrange = TRUE,se=FALSE,show.legend=F) 
     }
     if (errorType != '')
       p <- p + geom_ribbon(data=gdata,aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
@@ -339,7 +339,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
   }  else { 
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,method = "lm", alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
+      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,method = "auto", alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
     }
     
     if (errorType != '')
