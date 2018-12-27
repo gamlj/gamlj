@@ -361,7 +361,6 @@ gamljGLMClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition)
  
-
   yAxisRange <- gplots.range(model,depName,predData,rawData)
 
   if (!optionRaw)

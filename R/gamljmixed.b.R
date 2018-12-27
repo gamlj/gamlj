@@ -499,7 +499,7 @@ gamljMixedClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition)
  
-
+  
   yAxisRange <- gplots.range(model,depName,predData,rawData)
 
   if (!optionRaw)
@@ -511,6 +511,7 @@ gamljMixedClass <- R6::R6Class(
              yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
     }
   
+  mark(names(predData))
   
   if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
