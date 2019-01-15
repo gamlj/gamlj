@@ -366,6 +366,7 @@ options:
             title: β  
       default:
           - beta
+          - partEta
           
     - name: homo
       title: Residual Variances Homogeneity tests

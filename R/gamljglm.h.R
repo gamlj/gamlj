@@ -37,7 +37,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "bonf"),
             scaling = NULL,
             effectSize = list(
-                "beta"),
+                "beta",
+                "partEta"),
             homo = FALSE,
             qq = FALSE,
             normTest = FALSE, ...) {
@@ -240,7 +241,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "omega",
                     "beta"),
                 default=list(
-                    "beta"))
+                    "beta",
+                    "partEta"))
             private$..homo <- jmvcore::OptionBool$new(
                 "homo",
                 homo,
@@ -1002,7 +1004,8 @@ gamljGLM <- function(
                 "bonf"),
     scaling = NULL,
     effectSize = list(
-                "beta"),
+                "beta",
+                "partEta"),
     homo = FALSE,
     qq = FALSE,
     normTest = FALSE) {

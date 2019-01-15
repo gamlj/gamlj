@@ -14,4 +14,4 @@ LazyData: true
 Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0), car, lmerTest, gridExtra
 Depends: jmvcore
 Exports: gamljMixed, gamljGLM, gamljGzml
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

@@ -11,7 +11,6 @@
 
 lf.constructFormula<-function (dep = NULL, terms=NULL, intercept=TRUE) 
 {
-
   sep="+"
   if (length(terms)==0) sep=""
   rform<-jmvcore::composeFormula(NULL,terms)
