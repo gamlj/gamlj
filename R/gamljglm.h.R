@@ -765,7 +765,9 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "fixedIntercept",
                     "simpleScale",
                     "simpleScaleLabels",
-                    "modelTerms")))
+                    "modelTerms",
+                    "percvalue",
+                    "cvalue")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -790,7 +792,9 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "simpleScale",
                         "simpleScaleLabels",
                         "plotDvScale",
-                        "plotRaw"))))
+                        "plotRaw",
+                        "percvalue",
+                        "cvalue"))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(

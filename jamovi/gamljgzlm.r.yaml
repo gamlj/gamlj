@@ -333,7 +333,8 @@ items:
         - simpleScale
         - simpleScaleLabels
         - modelTerms
-
+        - percvalue
+        - cvalue
   - name: descPlots
     title: Results Plots
     type: Array
@@ -361,4 +362,6 @@ items:
            - plotDvScale
            - plotRaw
            - modelTerms
+           - percvalue
+           - cvalue
 

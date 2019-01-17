@@ -733,7 +733,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "fixedIntercept",
                     "simpleScale",
                     "simpleScaleLabels",
-                    "modelTerms")))
+                    "modelTerms",
+                    "percvalue",
+                    "cvalue")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -759,7 +761,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "simpleScaleLabels",
                         "plotDvScale",
                         "plotRaw",
-                        "modelTerms"))))}))
+                        "modelTerms",
+                        "percvalue",
+                        "cvalue"))))}))
 
 gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljGzlmBase",

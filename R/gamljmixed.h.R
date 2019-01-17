@@ -879,7 +879,9 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "simpleScaleLabels",
                     "plotRandomEffects",
                     "randomTerms",
-                    "modelTerms")))
+                    "modelTerms",
+                    "percvalue",
+                    "cvalue")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -906,7 +908,9 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotDvScale",
                         "plotRandomEffects",
                         "plotRaw",
-                        "randomTerms"))))}))
+                        "randomTerms",
+                        "percvalue",
+                        "cvalue"))))}))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljMixedBase",
