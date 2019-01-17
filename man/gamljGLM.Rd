@@ -14,8 +14,8 @@ gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
   simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
   percvalue = 25, simpleScaleLabels = "labels",
   postHocCorr = list("bonf"), scaling = NULL,
-  effectSize = list("beta"), homo = FALSE, qq = FALSE,
-  normTest = FALSE)
+  effectSize = list("beta", "partEta"), homo = FALSE, qq = FALSE,
+  normTest = FALSE, formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -114,6 +114,8 @@ residuals}
 
 \item{normTest}{\code{TRUE} or \code{FALSE} (default), provide a test for
 normality of residuals}
+
+\item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
 A results object containing:

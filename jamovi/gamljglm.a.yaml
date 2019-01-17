@@ -14,7 +14,22 @@ description:
 
             mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
 
-
+formula:
+    dep:
+        from: lhs
+        subset: 1
+        required: true
+    factors:
+        from: rhs
+        type: vars
+        permitted: factor
+    covs:
+        from: rhs
+        type: vars
+        permitted: numeric
+    modelTerms:
+        from: rhs
+        type: terms
 options:
     - name: data
       type: Data

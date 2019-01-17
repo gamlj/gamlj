@@ -351,7 +351,6 @@ gamljMixedClass <- R6::R6Class(
     },
   .buildreffects=function(terms,correl=TRUE) {
     terms<-lapply(terms,jmvcore::toB64)
-
     flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
     res<-do.call("rbind",flatterms)
     res<-tapply(res[,1],res[,2],paste)
@@ -499,7 +498,6 @@ gamljMixedClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition)
  
-  
   yAxisRange <- gplots.range(model,depName,predData,rawData)
 
   if (!optionRaw)
@@ -511,7 +509,6 @@ gamljMixedClass <- R6::R6Class(
              yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
     }
   
-  mark(names(predData))
   
   if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
@@ -573,22 +570,42 @@ gamljMixedClass <- R6::R6Class(
   name <- option$name
   value <- option$value
   
-  if (name == 'contrasts') {
+  if (!is.something(value))
+    return('')
+  
+  if (name == 'scaling') {
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'default')
+      if (item$type == 'centered')
         value[[i]] <- NULL
       else
         i <- i + 1
     }
     if (length(value) == 0)
       return('')
-  } else if (name == 'postHoc') {
+  }
+  if (name == 'contrasts') {
+    i <- 1
+    while (i <= length(value)) {
+      item <- value[[i]]
+      if (item$type == 'deviation')
+        value[[i]] <- NULL
+      else
+        i <- i + 1
+    }
+    if (length(value) == 0)
+      return('')
+  }  else if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }
   
+  if (name == "randomTerms") {
+    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
+    newvalue<-private$.names64$translate(newvalue)
+    return(paste0(name,"=",newvalue))
+  }
   super$.sourcifyOption(option)
 }
 ))

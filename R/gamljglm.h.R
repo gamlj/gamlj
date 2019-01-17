@@ -947,6 +947,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   residuals
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
+#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -1008,10 +1009,41 @@ gamljGLM <- function(
                 "partEta"),
     homo = FALSE,
     qq = FALSE,
-    normTest = FALSE) {
+    normTest = FALSE,
+    formula) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljGLM requires jmvcore to be installed (restart may be required)')
+
+    if ( ! missing(formula)) {
+        if (missing(dep))
+            dep <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='lhs',
+                subset='1',
+                required=TRUE)
+        if (missing(factors))
+            factors <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='vars',
+                permitted='factor')
+        if (missing(covs))
+            covs <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='vars',
+                permitted='numeric')
+        if (missing(modelTerms))
+            modelTerms <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='terms')
+    }
 
     if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
     if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))

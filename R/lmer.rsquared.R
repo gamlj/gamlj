@@ -31,7 +31,6 @@ r.squared.merMod <- function(mdl){
   VarF <- var(as.vector(lme4::fixef(mdl) %*% t(mdl@pp$X)))
   # Get variance of random effects by extracting variance components
   # Omit random effects at the observation level, variance is factored in later
-  mark("here we go")
   VarRand <- sum(
     sapply(
       lme4::VarCorr(mdl)[!sapply(unique(unlist(strsplit(names(lme4::ranef(mdl)),":|/"))), function(l) length(unique(mdl@frame[,l])) == nrow(mdl@frame))],

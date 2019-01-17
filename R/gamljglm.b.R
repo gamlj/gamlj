@@ -14,7 +14,7 @@ gamljGLMClass <- R6::R6Class(
       modelTerms<-self$options$modelTerms
       fixedIntercept<-self$options$fixedIntercept
       factors<-self$options$factors
-      covs<-setdiff(unique(c(unlist(modelTerms),self$options$covs)),factors)     
+      covs<-self$options$covs     
       
       ### here we initialize the info table ####
       getout<-FALSE
@@ -108,7 +108,7 @@ gamljGLMClass <- R6::R6Class(
       modelTerms<-self$options$modelTerms
       fixedIntercept<-self$options$fixedIntercept
       factors <- self$options$factors
-      covs<-setdiff(unique(c(unlist(modelTerms),self$options$covs)),factors)     
+      covs<-self$options$covs
       
       if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
@@ -297,7 +297,7 @@ gamljGLMClass <- R6::R6Class(
       dep <- self$options$dep
       factors <- self$options$factors
       modelTerms<-self$options$modelTerms
-      covs<-setdiff(unique(c(unlist(modelTerms),self$options$covs)),factors)     
+      covs<-self$options$covs     
       dataRaw <- self$data
       data <- list()
       for (factor in factors) {
@@ -498,6 +498,9 @@ gamljGLMClass <- R6::R6Class(
   
   TRUE
 },
+.formula=function() {
+  jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
+},
 .sourcifyOption = function(option) {
   
   name <- option$name
@@ -506,6 +509,9 @@ gamljGLMClass <- R6::R6Class(
   if (!is.something(value))
     return('')
 
+  if (option$name %in% c('factors', 'dep', 'covs', 'modelTerms'))
+    return('')
+  
   if (name == 'scaling') {
     i <- 1
     while (i <= length(value)) {

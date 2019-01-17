@@ -136,7 +136,10 @@ conditioning <- R6Class("conditioning",
           cond_specs=list(),
           init=function(method,span) {
             ### expands spans to all variables
-            spans<-c(span,rep(1,(length(self$vars)-length(span))))
+            mark("span",span)
+            
+            spans<-c(span,rep(span,(length(self$vars)-length(span))))
+            mark("spans",spans)
             names(spans)<-self$vars
             if (is.list(method)) {
                 for (name in names(method)) 
