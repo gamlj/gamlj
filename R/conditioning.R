@@ -136,8 +136,6 @@ conditioning <- R6Class("conditioning",
           cond_specs=list(),
           init=function(method,span) {
             ### expands spans to all variables
-            mark("span",span)
-            
             spans<-c(span,rep(span,(length(self$vars)-length(span))))
             mark("spans",spans)
             names(spans)<-self$vars
