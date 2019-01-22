@@ -555,7 +555,9 @@ gamljMixedClass <- R6::R6Class(
        mterms<-self$options$modelTerms
        forder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
        mterms<-self$options$randomTerms
-       rorder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
+       rorder<-1
+       if (is.something(grep(groupName,mterms)))
+           rorder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
        order<-max(forder,rorder)
   }
   if (errorType=="ci")
