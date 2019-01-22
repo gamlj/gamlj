@@ -215,7 +215,8 @@ gplots.initPlots=function(obj,data,cov_condition) {
     array <- obj$results$descPlots
     for (level in sepPlotsLevels) {
       title<-paste(sepPlotsName,"=",level)
-      array$addItem(title)
+      array$addItem(level)
+      array$get(key=level)$setTitle(title)
     }
   }
   

@@ -515,24 +515,21 @@ gamljMixedClass <- R6::R6Class(
     image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=randomData))
   } else {
     images <- self$results$descPlots
-    i<-1
     levels<-levels(factor(predData$plots))
-    for (key in images$itemKeys) {
-      real<-levels[i]
-      i<-i+1
-      image <- images$get(key=key)
-      sdata<-subset(predData,plots==real)
+    for (level in levels) {
+      image <- images$get(key=level)
+      sdata<-subset(predData,plots==level)
       sraw<-NULL
       if (!is.null(rawData)) {
         if (is.factor(rawData[["w"]]))
-          sraw<-subset(rawData,w==real)
+          sraw<-subset(rawData,w==level)
         else
           sraw<-rawData
       }
       
       srand<-NULL
       if (!is.null(randomData))
-           srand<-subset(randomData,plots==real)
+           srand<-subset(randomData,plots==level)
           
       image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=srand))
     }
