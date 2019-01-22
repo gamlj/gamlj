@@ -126,7 +126,6 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
   names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
-  mark(head(pdata))
   if (is.factor(data[[jmvcore::toB64(groupName)]])) 
     pdata$group<-factor(pdata$group)
 

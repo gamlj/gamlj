@@ -235,7 +235,7 @@ gamljMixedClass <- R6::R6Class(
                          mark("...done")
  
                ### fix random table notes
-                  info<-paste("Numer of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
+                  info<-paste("Number of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
                   randomTable$setNote('info', info)
                          
                ### prepare info table #########       
