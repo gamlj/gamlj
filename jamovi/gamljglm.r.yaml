@@ -345,6 +345,8 @@ items:
         - simpleScale
         - simpleScaleLabels
         - modelTerms
+        - percvalue
+        - cvalue
 
 
   - name: descPlots
@@ -373,7 +375,8 @@ items:
            - simpleScaleLabels
            - plotDvScale
            - plotRaw
-
+           - percvalue
+           - cvalue
   - name: assump
     title: Assumption Checks
     type: Group

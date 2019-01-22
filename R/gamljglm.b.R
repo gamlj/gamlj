@@ -9,10 +9,13 @@ gamljGLMClass <- R6::R6Class(
     .init=function() {
       mark("init")
       private$.names64<-names64$new()
-            
       n64<-private$.names64
       dep<-self$options$dep
       modelTerms<-self$options$modelTerms
+      fixedIntercept<-self$options$fixedIntercept
+      factors<-self$options$factors
+      covs<-self$options$covs     
+      
       ### here we initialize the info table ####
       getout<-FALSE
       
@@ -31,8 +34,16 @@ gamljGLMClass <- R6::R6Class(
            return()
 
       data<-private$.cleandata()
+
       
-      modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      # this allows intercept only model to be passed by syntax interfase
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
+      
+      modelFormula<-lf.constructFormula(dep,modelTerms,fixedIntercept)
       
       infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
@@ -40,9 +51,9 @@ gamljGLMClass <- R6::R6Class(
       infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
       
       ### initialize conditioning of covariates
-      if (!is.null(self$options$covs)) {
+      if (!is.null(covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
-      private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
+      private$.cov_condition<-conditioning$new(covs,self$options$simpleScale,span)
       }
       #####################
 
@@ -67,7 +78,7 @@ gamljGLMClass <- R6::R6Class(
       aTable<-self$results$main$fixed
       dep64<-jmvcore::toB64(dep)
       modelTerms64<-lapply(modelTerms,jmvcore::toB64)
-      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,self$options$fixedIntercept))
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,fixedIntercept))
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
@@ -94,16 +105,25 @@ gamljGLMClass <- R6::R6Class(
         return()
       
       
+      modelTerms<-self$options$modelTerms
+      fixedIntercept<-self$options$fixedIntercept
       factors <- self$options$factors
-      covs <- self$options$covs
-
+      covs<-self$options$covs
+      
       if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
          return()
-      ###############      
-      modelTerms<-lapply(self$options$modelTerms,jmvcore::toB64)
-      modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,self$options$fixedIntercept)
+      ###############
+      # this allows intercept only model to be passed by syntax interfase
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
+      
+      modelTerms<-lapply(modelTerms,jmvcore::toB64)
+      modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,fixedIntercept)
 
       if (modelFormula==FALSE)  
           return()
@@ -135,7 +155,6 @@ gamljGLMClass <- R6::R6Class(
                ##### model ####
                ## for some reason the lm model is very heavy to save in table$state
                ## so we estimate it every time
-           
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data)
                            wars<-warnings()
@@ -275,11 +294,10 @@ gamljGLMClass <- R6::R6Class(
     },
   .cleandata=function() {
       n64<-private$.names64
-      
       dep <- self$options$dep
       factors <- self$options$factors
-      covs <- self$options$covs
-
+      modelTerms<-self$options$modelTerms
+      covs<-self$options$covs     
       dataRaw <- self$data
       data <- list()
       for (factor in factors) {
@@ -373,15 +391,13 @@ gamljGLMClass <- R6::R6Class(
     images <- self$results$descPlots
     i<-1
     levels<-levels(factor(predData$plots))
-    for (key in images$itemKeys) {
-      real<-levels[i]
-      i<-i+1
-      image <- images$get(key=key)
-      sdata<-subset(predData,plots==real)
+    for (level in levels) {
+      image <- images$get(key=level)
+      sdata<-subset(predData,plots==level)
       sraw<-NULL
       if (!is.null(rawData)) {
         if (is.factor(rawData[["w"]]))
-          sraw<-subset(rawData,w==real)
+          sraw<-subset(rawData,w==level)
         else
           sraw<-rawData
       }
@@ -480,16 +496,37 @@ gamljGLMClass <- R6::R6Class(
   
   TRUE
 },
+.formula=function() {
+  jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
+},
 .sourcifyOption = function(option) {
   
   name <- option$name
   value <- option$value
+
+  if (!is.something(value))
+    return('')
+
+  if (option$name %in% c('factors', 'dep', 'covs', 'modelTerms'))
+    return('')
   
-  if (name == 'contrasts') {
+  if (name == 'scaling') {
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'default')
+      if (item$type == 'centered')
+        value[[i]] <- NULL
+      else
+        i <- i + 1
+    }
+    if (length(value) == 0)
+      return('')
+  }
+   if (name == 'contrasts') {
+    i <- 1
+    while (i <= length(value)) {
+      item <- value[[i]]
+      if (item$type == 'deviation')
         value[[i]] <- NULL
       else
         i <- i + 1
@@ -503,6 +540,23 @@ gamljGLMClass <- R6::R6Class(
   
   super$.sourcifyOption(option)
 }
-))
+)
+
+# ,
+#  public=list(
+#   asSource=function() {
+#     
+#     dep <- self$options$dep
+#     modelTerms <- self$options$modelTerms
+#     
+#     formula=lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+# 
+#     args <- private$.asArgs()
+#     if (is.something(args))
+#       args <- paste0(',', args)
+#     
+#     paste0('gamlj::gamljGLM(\n    formula=', formula, args, ')')
+#   })
+)
 
 

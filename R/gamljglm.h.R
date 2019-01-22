@@ -37,7 +37,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "bonf"),
             scaling = NULL,
             effectSize = list(
-                "beta"),
+                "beta",
+                "partEta"),
             homo = FALSE,
             qq = FALSE,
             normTest = FALSE, ...) {
@@ -240,7 +241,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "omega",
                     "beta"),
                 default=list(
-                    "beta"))
+                    "beta",
+                    "partEta"))
             private$..homo <- jmvcore::OptionBool$new(
                 "homo",
                 homo,
@@ -763,7 +765,9 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "fixedIntercept",
                     "simpleScale",
                     "simpleScaleLabels",
-                    "modelTerms")))
+                    "modelTerms",
+                    "percvalue",
+                    "cvalue")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -788,7 +792,9 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "simpleScale",
                         "simpleScaleLabels",
                         "plotDvScale",
-                        "plotRaw"))))
+                        "plotRaw",
+                        "percvalue",
+                        "cvalue"))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -945,6 +951,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   residuals
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
+#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -1002,13 +1009,45 @@ gamljGLM <- function(
                 "bonf"),
     scaling = NULL,
     effectSize = list(
-                "beta"),
+                "beta",
+                "partEta"),
     homo = FALSE,
     qq = FALSE,
-    normTest = FALSE) {
+    normTest = FALSE,
+    formula) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljGLM requires jmvcore to be installed (restart may be required)')
+
+    if ( ! missing(formula)) {
+        if (missing(dep))
+            dep <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='lhs',
+                subset='1',
+                required=TRUE)
+        if (missing(factors))
+            factors <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='vars',
+                permitted='factor')
+        if (missing(covs))
+            covs <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='vars',
+                permitted='numeric')
+        if (missing(modelTerms))
+            modelTerms <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='terms')
+    }
 
     if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
     if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))

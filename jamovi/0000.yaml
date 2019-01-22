@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 1.0.5
+version: 1.5.0
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -40,5 +40,23 @@ datasets:
   - name: qsport
     path: qsport.csv
     description: Training hours and performance with quadratic effects
+  - name: Beers
+    path: beers_bars.csv
+    description: Beers and smiles clustered by bars
+    tags:
+      - Mixed
+      - regression
+  - name: subjects_by_stimuli
+    path: subjects_by_stimuli.csv
+    description: subjects by stimuli experimental design (crossed)
+    tags:
+      - Mixed
+      - ANOVA
+  - name: subjects_on_stimuli
+    path: subjects_on_stimuli.csv
+    description: subjects by stimuli experimental design (nested)
+    tags:
+      - Mixed
+      - ANOVA
 
 ...

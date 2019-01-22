@@ -126,10 +126,9 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
   names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
-  
   if (is.factor(data[[jmvcore::toB64(groupName)]])) 
     pdata$group<-factor(pdata$group)
-  
+
   if (bars=="se") {
     pdata$lwr<-pdata$fit-pdata$SE
     pdata$upr<-pdata$fit+pdata$SE
@@ -216,7 +215,8 @@ gplots.initPlots=function(obj,data,cov_condition) {
     array <- obj$results$descPlots
     for (level in sepPlotsLevels) {
       title<-paste(sepPlotsName,"=",level)
-      array$addItem(title)
+      array$addItem(level)
+      array$get(key=level)$setTitle(title)
     }
   }
   

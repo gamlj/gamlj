@@ -441,7 +441,9 @@ items:
         - plotRandomEffects
         - randomTerms
         - modelTerms
-
+        - percvalue
+        - cvalue
+        
   - name: descPlots
     title: Results Plots
     type: Array
@@ -470,4 +472,6 @@ items:
            - plotRandomEffects
            - plotRaw
            - randomTerms
+           - percvalue
+           - cvalue
 

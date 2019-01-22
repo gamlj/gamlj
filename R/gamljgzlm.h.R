@@ -733,7 +733,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "fixedIntercept",
                     "simpleScale",
                     "simpleScaleLabels",
-                    "modelTerms")))
+                    "modelTerms",
+                    "percvalue",
+                    "cvalue")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -759,7 +761,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "simpleScaleLabels",
                         "plotDvScale",
                         "plotRaw",
-                        "modelTerms"))))}))
+                        "modelTerms",
+                        "percvalue",
+                        "cvalue"))))}))
 
 gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljGzlmBase",
@@ -847,6 +851,7 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param effectSize .
 #' @param modelSelection Select the generalized linear model:
 #'   \code{linear},\code{poisson},\code{logistic},\code{multinomial}
+#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -902,10 +907,41 @@ gamljGzlm <- function(
     scaling = NULL,
     effectSize = list(
                 "expb"),
-    modelSelection = "linear") {
+    modelSelection = "linear",
+    formula) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljGzlm requires jmvcore to be installed (restart may be required)')
+
+    if ( ! missing(formula)) {
+        if (missing(dep))
+            dep <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='lhs',
+                subset='1',
+                required=TRUE)
+        if (missing(factors))
+            factors <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='vars',
+                permitted='factor')
+        if (missing(covs))
+            covs <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='vars',
+                permitted='numeric')
+        if (missing(modelTerms))
+            modelTerms <- jmvcore:::marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                from='rhs',
+                type='terms')
+    }
 
     if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
     if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
