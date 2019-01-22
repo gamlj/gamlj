@@ -230,7 +230,7 @@ gplots.initPlots=function(obj,data,cov_condition) {
 #### the legend name and the function assumes that the data contains "lwr" and "upr" varianbles
 #### "theme" is passed from jmv plot function
 
-gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none",title=NULL) {
+gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="none",title=NULL,order=1) {
   if (errorType != 'none') {
     dodge <- ggplot2::position_dodge(0.2)
     clabel<-paste(linesName, paste0("(",toupper(errorType),")"),sep="\n")
@@ -277,9 +277,13 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     thinker<-0
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      mark("we are smoothing")
       thinker<-.3
-      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,colour="gray64", alpha=.8,method = "auto",fullrange = TRUE,se=FALSE,show.legend=F) 
+      form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
+      mark("Random effects plotting: we are smoothing with formula",form)
+      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,colour="gray64", alpha=.8,
+                       method = lm,formula = form,
+                       fullrange = TRUE,se=FALSE,show.legend=F) 
+     
     }
     if (errorType != '')
       p <- p + geom_ribbon(data=gdata,aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
@@ -298,7 +302,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   p   
 }
 
-gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
+gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order=1) {
   if (errorType != 'none') {
     dodge <- ggplot2::position_dodge(0.2)
     clabel<-toupper(errorType)
@@ -319,6 +323,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
   }
   
   gdata<-image$state$data
+  
   if (is.factor(image$state$data$group)) {
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
@@ -339,8 +344,12 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none") {
   }  else { 
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,method = "auto", alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
-    }
+      form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
+      mark("Random effects plotting: we are smoothing with formula",form)
+      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster), size=.2,
+                       method = "lm",formula=form,
+                       alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
+          }
     
     if (errorType != '')
       p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=F, alpha=.2)

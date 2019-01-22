@@ -471,7 +471,6 @@ gamljMixedClass <- R6::R6Class(
   
   
   
-  
   if (referToData)
     rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)
   else 
@@ -482,6 +481,7 @@ gamljMixedClass <- R6::R6Class(
   preds64<-jmvcore::toB64(preds)
   
   if (self$options$plotRandomEffects) {
+    
     pd<-predict(model)
     data<-model@frame
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
@@ -509,7 +509,7 @@ gamljMixedClass <- R6::R6Class(
              yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
     }
   
-  
+
   if (is.null(plotsName)) {
     image <- self$results$get('descPlot')
     image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=randomData))
@@ -549,15 +549,22 @@ gamljMixedClass <- R6::R6Class(
   plotsName <- self$options$plotSepPlots
   errorType <- self$options$plotError
   ciWidth   <- self$options$ciWidth
-  
-  
+  order<-1
+
+  if (self$options$plotRandomEffects) {
+       mterms<-self$options$modelTerms
+       forder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
+       mterms<-self$options$randomTerms
+       rorder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
+       order<-max(forder,rorder)
+  }
   if (errorType=="ci")
     errorType<-paste0(ciWidth,"% ",toupper(errorType))
   
   if ( ! is.null(linesName)) {
-    p<-gplots.twoWaysPlot(image,ggtheme,depName,groupName,linesName,errorType)
+    p<-gplots.twoWaysPlot(image,ggtheme,depName,groupName,linesName,errorType,order=order)
   } else {
-    p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType)
+    p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType,order=order)
   }       
   return(p)
 },

@@ -403,7 +403,6 @@ gamljGzlmClass <- R6::R6Class(
   
   
   
-  
   if (referToData)
     rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)
   else 
