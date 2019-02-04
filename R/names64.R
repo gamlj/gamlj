@@ -70,7 +70,9 @@ names64 <- R6Class("names64",list(
                                    # first we deal with higher oders
                                    tochange<-regmatches(var64, gregexpr("I\\(.*?\\^.*\\)", var64))
                                    highertest<-any(sapply(tochange, length)) 
+                                  # tochange<-unlist(tochange)
                                    if (highertest) {
+                                       tochange<-unlist(tochange)
                                        var64<-gsub("^I\\(", "", gsub("\\^.*", "", tochange))
                                        apex<-gsub("\\^","",regmatches(tochange,gregexpr("\\^[[:digit:]]",tochange)))
                                        return(rep(self$.covs[[var64]],apex))
