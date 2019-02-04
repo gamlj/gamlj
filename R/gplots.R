@@ -1,5 +1,6 @@
 ################ functions to deal with data preparation ########
 
+
 ###### gives the appropriated range of the plot  ############
 
 gplots.range<- function(x,...) UseMethod(".range")
