@@ -21,7 +21,7 @@ gposthoc.init=function(data,options,tables) {
   }
   for (j in seq_len(nDepLevels))
     for (ph in phTerms) {
-      table <- tables$set(key=ph)
+      table <- tables$get(key=ph)
       table$setTitle(paste0('Post Hoc Comparisons - ',  jmvcore::stringifyTerm(ph)))
       nc<-0 
       ##### set the columns ###########
