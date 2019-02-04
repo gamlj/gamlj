@@ -4,7 +4,6 @@
 }
 
 
-
 ### we cannot use jmvcore:constructFormula because it puts "`" around not regular names
 ### thus does not allow I(x^2) kind of terms. We do not need "`" because we always pass
 ### B64 names to models.
