@@ -113,11 +113,10 @@ lf.createContrasts=function(levels, type) {
     dimnames(contrast) <- NULL
     
   } else {
-      contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
-      for (i in seq_len(nLevels-1)) {
-        contrast[i+1, i] <- 1
-        contrast[1, i] <- -1
-      }
+    dummy <- contr.treatment(levels)
+    dimnames(dummy) <- NULL
+    coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
+    contrast <- (dummy - coding)
   }
   dimnames(contrast)<-list(NULL,paste0("_._._",1:(nLevels-1)))
   contrast

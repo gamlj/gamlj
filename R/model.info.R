@@ -64,7 +64,7 @@ mi.converged<- function(x,...) UseMethod(".converged")
 mi.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
-    aliased<-alias(model)
+    aliased<-stats::alias(model)
     (!is.null(aliased$Complete))
 }
 

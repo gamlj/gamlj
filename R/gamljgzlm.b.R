@@ -297,10 +297,10 @@ gamljGzlmClass <- R6::R6Class(
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
-        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
+        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"simple")
         n64$addFactor(factor,levels)
-        n64$addLabel(factor,lf.contrastLabels(levels, "deviation")) 
-        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"deviation"
+        n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
+        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"
       }
       
       for (contrast in self$options$contrasts) {
@@ -520,7 +520,7 @@ gamljGzlmClass <- R6::R6Class(
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'deviation')
+      if (item$type == 'simple')
         value[[i]] <- NULL
       else
         i <- i + 1

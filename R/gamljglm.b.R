@@ -15,7 +15,6 @@ gamljGLMClass <- R6::R6Class(
       fixedIntercept<-self$options$fixedIntercept
       factors<-self$options$factors
       covs<-self$options$covs     
-      
       ### here we initialize the info table ####
       getout<-FALSE
       
@@ -35,7 +34,6 @@ gamljGLMClass <- R6::R6Class(
 
       data<-private$.cleandata()
 
-      
       # this allows intercept only model to be passed by syntax interfase
       aOne<-which(unlist(modelTerms)=="1")
       if (is.something(aOne)) {
@@ -49,9 +47,8 @@ gamljGLMClass <- R6::R6Class(
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
       infoTable$addRow(rowKey="r2m",list(info="R-squared"))
       infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
-      
       ### initialize conditioning of covariates
-      if (!is.null(covs)) {
+      if (is.something(covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
       private$.cov_condition<-conditioning$new(covs,self$options$simpleScale,span)
       }
@@ -310,8 +307,8 @@ gamljGLMClass <- R6::R6Class(
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
         stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
         n64$addFactor(factor,levels)
-        n64$addLabel(factor,lf.contrastLabels(levels, "deviation")) 
-        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"deviation"
+        n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
+        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"
       }
       
       for (contrast in self$options$contrasts) {
@@ -526,7 +523,7 @@ gamljGLMClass <- R6::R6Class(
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'deviation')
+      if (item$type == 'simple')
         value[[i]] <- NULL
       else
         i <- i + 1
@@ -541,22 +538,6 @@ gamljGLMClass <- R6::R6Class(
   super$.sourcifyOption(option)
 }
 )
-
-# ,
-#  public=list(
-#   asSource=function() {
-#     
-#     dep <- self$options$dep
-#     modelTerms <- self$options$modelTerms
-#     
-#     formula=lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
-# 
-#     args <- private$.asArgs()
-#     if (is.something(args))
-#       args <- paste0(',', args)
-#     
-#     paste0('gamlj::gamljGLM(\n    formula=', formula, args, ')')
-#   })
 )
 
 

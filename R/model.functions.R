@@ -262,20 +262,19 @@ mf.getModelMessages<-function(model) {
 mf.give_family<-function(modelSelection) {
   
   if (modelSelection=="linear")
-       return(gaussian())
+       return(stats::gaussian())
   if (modelSelection=="logistic")
-       return(binomial())
+       return(stats::binomial())
   if (modelSelection=="poisson")
-    return(poisson())
+    return(stats::poisson())
   if (modelSelection=="multinomial")
     return("multinomial")
   if (modelSelection=="nb")
       return("nb")
   if (modelSelection=="poiover")
-      return(quasipoisson())
+      return(stats::quasipoisson())
   if (modelSelection=="probit")
-    return(binomial("probit"))
-  
+    return(stats::binomial("probit"))
   
   NULL  
 }
@@ -366,10 +365,11 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 ########### to be removed and update with mi.xxx #########
 
+
 mf.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
-  aliased<-alias(model)
+  aliased<-stats::alias(model)
   (!is.null(aliased$Complete))
 }
 

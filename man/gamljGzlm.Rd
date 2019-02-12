@@ -14,7 +14,7 @@ gamljGzlm(data, dep, factors = NULL, covs = NULL, modelTerms = NULL,
   simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
   simpleScaleLabels = "labels", postHocCorr = list("bonf"),
   scaling = NULL, effectSize = list("expb"),
-  modelSelection = "linear")
+  modelSelection = "linear", formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -107,6 +107,8 @@ respectively}
 
 \item{modelSelection}{Select the generalized linear model:
 \code{linear},\code{poisson},\code{logistic},\code{multinomial}}
+
+\item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
 A results object containing:
