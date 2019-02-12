@@ -106,7 +106,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "helmert",
                                 "repeated",
                                 "polynomial"),
-                            default="deviation"))))
+                            default="simple"))))
             private$..showRealNames <- jmvcore::OptionBool$new(
                 "showRealNames",
                 showRealNames,
