@@ -1,5 +1,4 @@
 #' @import lmerTest
-library(lmerTest)
 
 gamljMixedClass <- R6::R6Class(
   "gamljMixedClass",
@@ -16,6 +15,7 @@ gamljMixedClass <- R6::R6Class(
       reml<-self$options$reml
       infoTable<-self$results$info
       dep<-self$options$dep
+      
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -137,7 +137,7 @@ gamljMixedClass <- R6::R6Class(
         data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
       }
       
-      if (!is.null(covs)) {
+      if (is.something(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
         names(data)<-jmvcore::toB64(names(data))
@@ -340,13 +340,11 @@ gamljMixedClass <- R6::R6Class(
                   lrtTable$addRow(rowKey=i,res[i,])
           } 
         }
-        mark("all done, preparing other options")
-           
+
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
-        mark("..... done, preparing other options")
 
     },
   .buildreffects=function(terms,correl=TRUE) {
@@ -380,7 +378,6 @@ gamljMixedClass <- R6::R6Class(
       factors <- self$options$factors
       covs <- self$options$covs
       clusters<-self$options$cluster
-      
       dataRaw <- self$data
       data <- list()
       for (factor in factors) {
@@ -571,6 +568,11 @@ gamljMixedClass <- R6::R6Class(
   return(p)
 },
 
+.formula = function() {
+  
+  private$.names64$translate(private$.modelFormula())
+  
+},
 .sourcifyOption = function(option) {
   
   name <- option$name
@@ -578,7 +580,16 @@ gamljMixedClass <- R6::R6Class(
   
   if (!is.something(value))
     return('')
+
+#  if (name == 'dep') {
+#    option$value<-paste0("'",value,"'") 
+#  }
+    
+  if (option$name %in% c('factors', 'dep', 'covs', 'cluster', 'modelTerms','randomTerms'))
+    return('')
   
+
+    
   if (name == 'scaling') {
     i <- 1
     while (i <= length(value)) {
@@ -607,13 +618,13 @@ gamljMixedClass <- R6::R6Class(
       return('')
   }
   
-  if (name == "randomTerms") {
-    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
-    newvalue<-private$.names64$translate(newvalue)
-    return(paste0(name,"=",newvalue))
-  }
+#  if (name == "randomTerms") {
+#    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
+#    newvalue<-private$.names64$translate(newvalue)
+#    return(paste0(name,"=",newvalue))
+#  }
   super$.sourcifyOption(option)
 }
 ))
 
-
+jmvcore::sourcify

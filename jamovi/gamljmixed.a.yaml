@@ -10,9 +10,14 @@ description:
     R:
         dontrun: false
         usage: |
-            data('ToothGrowth')
-
-            mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+              data(subjects_by_stimuli)
+              gamlj::gamljMixed(
+                data = subjects_by_stimuli,
+                dep = "y",
+                factors = "cond",
+                modelTerms = "cond",
+                cluster = "subj",
+                randomTerms=list(c("cond","subj")))
 
 
 options:
@@ -24,6 +29,7 @@ options:
     - name: dep
       title: Dependent Variable
       type: Variable
+      default:
       permitted:
         - numeric
       description:
@@ -59,6 +65,7 @@ options:
           R: >
             a list of character vectors describing fixed effects terms
 
+
     - name: fixedIntercept
       title: Fixed Intercept
       type: Bool
@@ -66,6 +73,8 @@ options:
       description:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept
+
+
 
 
     - name: showParamsCI
@@ -104,8 +113,8 @@ options:
               - name: type
                 type: List
                 options:
-                  - deviation
                   - simple
+                  - deviation
                   - dummy
                   - difference
                   - helmert
@@ -354,10 +363,11 @@ options:
     - name: cluster
       title: Cluster variables
       type: Variables
+      default:  
       suggested:
         - nominal
       description:
-          R: a vector of strings naming the clustering variables from `data`
+          R: a vector of strings naming the clustering variables from `data` 
 
     - name: randomTerms
       title: Random Coefficients

@@ -1,5 +1,7 @@
+
+
 gposthoc.init=function(data,options,tables) {
-  
+
   bs <- options$factors
   phTerms <- options$postHoc
   modelType<-"linear"
@@ -121,7 +123,7 @@ gposthoc.populate<-function(model,options,tables) {
   labs<-referenceGrid@grid[terms]
   newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
   referenceGrid@grid[terms]<-newlabs  
-  table<-summary(pairs(referenceGrid),adjust=adjust)
+  table<-summary(graphics::pairs(referenceGrid),adjust=adjust)
   table[order(table$contrast),]
 }
 
@@ -136,7 +138,7 @@ gposthoc.populate<-function(model,options,tables) {
     labs<-referenceGrid@grid[terms]
     newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
     referenceGrid@grid[terms]<-newlabs  
-    res<-summary(pairs(referenceGrid, by=dep, adjust=adjust))
+    res<-summary(graphics::pairs(referenceGrid, by=dep, adjust=adjust))
     res<-as.data.frame(res)
     res[,dep]<-NULL
     res

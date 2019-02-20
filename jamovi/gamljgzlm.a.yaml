@@ -10,8 +10,11 @@ description:
     R:
         dontrun: false
         usage: |
-            data('data3by2')
-            gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
+                 data<-emmeans::neuralgia
+                  gamlj::gamljGzlm(
+                            formula = Pain ~ Duration,
+                            data = data,
+                             modelSelection = "logistic")
 
 formula:
     dep:

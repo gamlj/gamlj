@@ -156,7 +156,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
     r2<-sumr$r.squared
     totalSS<-1/((1-r2)*(1/errSS))
     modSS<-totalSS-errSS
-    modp<-1 - pf(modF, modDF, errDF) 
+    modp<-1 - stats::pf(modF, modDF, errDF) 
     modRow<-c(ss=modSS,df=modDF,F=modF,p=modp)
     ss<-rbind(modRow,dss)
     ss$ms<-ss$ss/ss$df
@@ -260,7 +260,6 @@ mf.getModelMessages<-function(model) {
 
 
 mf.give_family<-function(modelSelection) {
-  
   if (modelSelection=="linear")
        return(stats::gaussian())
   if (modelSelection=="logistic")

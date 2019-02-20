@@ -102,8 +102,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             "type",
                             NULL,
                             options=list(
-                                "deviation",
                                 "simple",
+                                "deviation",
                                 "dummy",
                                 "difference",
                                 "helmert",
@@ -885,8 +885,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'
 #' @examples
 #' data('ToothGrowth')
-#'
-#' mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+#' gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},

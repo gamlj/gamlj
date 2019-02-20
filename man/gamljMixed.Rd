@@ -4,18 +4,18 @@
 \alias{gamljMixed}
 \title{Mixed Model}
 \usage{
-gamljMixed(data, dep, factors = NULL, covs = NULL, modelTerms = NULL,
-  fixedIntercept = TRUE, showParamsCI = TRUE, paramCIWidth = 95,
-  contrasts = NULL, showRealNames = TRUE, showContrastCode = FALSE,
-  plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
-  plotRaw = FALSE, plotDvScale = FALSE, plotError = "none",
-  ciWidth = 95, postHoc = NULL, eDesc = FALSE, eCovs = FALSE,
-  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL,
-  simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
-  simpleScaleLabels = "labels", postHocCorr = list("bonf"),
-  scaling = NULL, cluster, randomTerms = NULL,
-  correlatedEffects = TRUE, reml = TRUE, lrtRandomEffects = FALSE,
-  plotRandomEffects = FALSE)
+gamljMixed(data, dep = NULL, factors = NULL, covs = NULL,
+  modelTerms = NULL, fixedIntercept = TRUE, showParamsCI = TRUE,
+  paramCIWidth = 95, contrasts = NULL, showRealNames = TRUE,
+  showContrastCode = FALSE, plotHAxis = NULL, plotSepLines = NULL,
+  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
+  plotError = "none", ciWidth = 95, postHoc = NULL, eDesc = FALSE,
+  eCovs = FALSE, simpleVariable = NULL, simpleModerator = NULL,
+  simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
+  percvalue = 25, simpleScaleLabels = "labels",
+  postHocCorr = list("bonf"), scaling = NULL, cluster = NULL,
+  randomTerms = NULL, correlatedEffects = TRUE, reml = TRUE,
+  lrtRandomEffects = FALSE, plotRandomEffects = FALSE)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -149,8 +149,13 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 Mixed Linear Model
 }
 \examples{
-data('ToothGrowth')
-
-mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+data("subjects_by_stimuli")
+gamlj::gamljMixed(
+  data = subjects_by_stimuli,
+  dep = "y",
+  factors = "cond",
+  modelTerms = "cond",
+  cluster = "subj",
+  randomTerms=list(c("cond","subj")))
 
 }

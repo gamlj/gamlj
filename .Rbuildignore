@@ -3,3 +3,5 @@
 build$
 extdata$
 ^.*jmo
+jamovi$
+local$

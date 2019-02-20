@@ -52,6 +52,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
+                default=NULL,
                 permitted=list(
                     "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
@@ -101,8 +102,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             "type",
                             NULL,
                             options=list(
-                                "deviation",
                                 "simple",
+                                "deviation",
                                 "dummy",
                                 "difference",
                                 "helmert",
@@ -235,6 +236,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
                 cluster,
+                default=NULL,
                 suggested=list(
                     "nominal"))
             private$..randomTerms <- jmvcore::OptionTerms$new(
@@ -936,9 +938,14 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' Mixed Linear Model
 #'
 #' @examples
-#' data('ToothGrowth')
-#'
-#' mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+#' data("subjects_by_stimuli")
+#' gamlj::gamljMixed(
+#'   data = subjects_by_stimuli,
+#'   dep = "y",
+#'   factors = "cond",
+#'   modelTerms = "cond",
+#'   cluster = "subj",
+#'   randomTerms=list(c("cond","subj")))
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
@@ -1033,7 +1040,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @export
 gamljMixed <- function(
     data,
-    dep,
+    dep = NULL,
     factors = NULL,
     covs = NULL,
     modelTerms = NULL,
@@ -1063,7 +1070,7 @@ gamljMixed <- function(
     postHocCorr = list(
                 "bonf"),
     scaling = NULL,
-    cluster,
+    cluster = NULL,
     randomTerms = NULL,
     correlatedEffects = TRUE,
     reml = TRUE,
