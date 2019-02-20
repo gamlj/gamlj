@@ -135,7 +135,10 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 Generalized Linear Model
 }
 \examples{
-data('data3by2')
-gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
+data<-emmeans::neuralgia
+ gamlj::gamljGzlm(
+           formula = Pain ~ Duration,
+           data = data,
+            modelSelection = "logistic")
 
 }

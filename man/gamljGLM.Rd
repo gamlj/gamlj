@@ -146,7 +146,6 @@ General Linear Model
 }
 \examples{
 data('ToothGrowth')
-
-mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 
 }

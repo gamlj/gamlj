@@ -4,7 +4,7 @@
 \alias{rsquared.glmm}
 \title{R-squared and pseudo-rsquared for a list of (generalized) linear (mixed) models}
 \usage{
-rsquared.glmm(modlist)
+rsquared.glmm(obj)
 }
 \arguments{
 \item{obj}{single model or a list of fitted (generalized) linear (mixed) model objects}
@@ -14,11 +14,11 @@ a dataframe with one row per model, and "Class",
         "Family", "Marginal", "Conditional" and "AIC" columns
 }
 \description{
-This function calls the generic \code{\link{r.squared}} function for each of the
+This function calls the generic \code{r.squared} function for each of the
 models in the list and rbinds the outputs into one data frame
 }
 \references{
-\code{\link{Lefcheck, Jonathan S. (2015) piecewiseSEM: Piecewise structural equation modeling in R for ecology, evolution, and systematics. Methods in Ecology and Evolution. 7(5): 573-579. DOI: 10.1111/2041-210X.12512}}
+Lefcheck, Jonathan S. (2015) piecewiseSEM: Piecewise structural equation modeling in R for ecology, evolution, and systematics. Methods in Ecology and Evolution. 7(5): 573-579. DOI: 10.1111/2041-210X.12512
 }
 \author{
 : Jon Lefcheck

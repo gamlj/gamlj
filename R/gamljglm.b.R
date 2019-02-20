@@ -14,7 +14,7 @@ gamljGLMClass <- R6::R6Class(
       modelTerms<-self$options$modelTerms
       fixedIntercept<-self$options$fixedIntercept
       factors<-self$options$factors
-      covs<-self$options$covs     
+      covs<-self$options$covs
       ### here we initialize the info table ####
       getout<-FALSE
       
@@ -497,7 +497,7 @@ gamljGLMClass <- R6::R6Class(
   jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
 },
 .sourcifyOption = function(option) {
-  
+
   name <- option$name
   value <- option$value
 

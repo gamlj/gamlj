@@ -1,3 +1,5 @@
+#' @import ggplot2
+
 ################ functions to deal with data preparation ########
 
 
@@ -249,14 +251,14 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
-    p <- p + geom_point(data=rawData,aes(x=x, y=y),show.legend=FALSE, alpha=.5,shape=16, size=2)
+    p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
   }
 
   
 
-  p <- p+ geom_line(data=gdata,aes(x=group, y=fit, group=lines,colour=lines),size=1.2, position=dodge) 
-  p <- p + labs(x=groupName, y=depName,colour=clabel) 
-  p <- p + scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
+  p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
+  p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
+  p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
   
   
   if (is.factor(image$state$data$group)) {
@@ -265,13 +267,13 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       data<-image$state$randomData
       data<-aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
-      p <- p + geom_point(data=data,aes(x=group, y=y,group=cluster),color="gray64",show.legend = F,shape=12, alpha=.5,  size=.5)
-      p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster),color="gray64",size=.3, alpha=.3,show.legend = F) 
+      p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),color="gray64",show.legend = F,shape=12, alpha=.5,  size=.5)
+      p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group = "cluster"),color="gray64",size=.3, alpha=.3,show.legend = F) 
     }
     
-    p <- p + geom_point(data=gdata,aes(x=group, y=fit, group=lines,colour=lines),shape=16, size=4, position=dodge)
+    p <- p + ggplot2::geom_point(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),shape=16, size=4, position=dodge)
     if (errorType != '')
-      p <- p + geom_errorbar(data=gdata,aes(x=group, ymin=lwr, ymax=upr, width=.1, group=lines,color=lines), size=1.2, position=dodge)
+      p <- p + ggplot2::geom_errorbar(data=gdata,aes_string(x="group", ymin="lwr", ymax="upr", width=.1, group="lines",color="lines"), size=1.2, position=dodge)
     
     
   } else {
@@ -281,13 +283,13 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       thinker<-.3
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
       mark("Random effects plotting: we are smoothing with formula",form)
-      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster),size=.2,colour="gray64", alpha=.8,
+      p<-p +ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"),size=.2,colour="gray64", alpha=.8,
                        method = lm,formula = form,
                        fullrange = TRUE,se=FALSE,show.legend=F) 
      
     }
     if (errorType != '')
-      p <- p + geom_ribbon(data=gdata,aes(x=group, ymin=lwr, ymax=upr,group=lines,colour=lines,fill = lines),linetype = 0,show.legend=F, alpha=.2)          
+      p <- p + ggplot2::geom_ribbon(data=gdata,aes_string(x="group", ymin="lwr", ymax="upr",group="lines",colour="lines",fill = "lines"),linetype = 0,show.legend=F, alpha=.2)          
 
   }
   
@@ -315,12 +317,12 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
   }
   
   p <- ggplot2::ggplot(data=image$state$data) +
-    labs(x=groupName, y=depName,colour=clabel) +
-    scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
+    ggplot2::labs(x=groupName, y=depName,colour=clabel) +
+    ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
-    p <- p + geom_point(data=rawData,aes(x=x, y=y), colour="cadetblue3", shape=16,alpha=.5, size=2)
+    p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"), colour="cadetblue3", shape=16,alpha=.5, size=2)
   }
   
   gdata<-image$state$data
@@ -331,15 +333,15 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
       data<-aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
       mark("we are breaking by cluster")
-      p <- p + geom_point(data=data,aes(x=group, y=y,group=cluster),show.legend = F,shape=12, alpha=.5,  size=.5)
-      p <- p+geom_line(data=data,aes(x=group,y=y,group = cluster),size=.3, alpha=.3,show.legend = F) 
+      p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),show.legend = F,shape=12, alpha=.5,  size=.5)
+      p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group = "cluster"),size=.3, alpha=.3,show.legend = F) 
     }
     
     if (errorType != '') {
-      p <- p + geom_errorbar(data=gdata,aes(x=group, ymin=lwr, ymax=upr), width=.1,size=.8,show.legend = F)
+      p <- p + ggplot2::geom_errorbar(data=gdata,aes_string(x="group", ymin="lwr", ymax="upr"), width=.1,size=.8,show.legend = F)
     }           
-    p <- p+geom_line(data=gdata,aes(x=group,y=fit,group = 1),size=2,show.legend = F) 
-    p <- p + geom_point(data=gdata,aes(x=group, y=fit), shape=21, fill="white",  size=4,show.legend=F)
+    p <- p + ggplot2::geom_line(data=gdata,aes_string(x="group",y="fit",group = 1),size=2,show.legend = F) 
+    p <- p + ggplot2::geom_point(data=gdata,aes_string(x="group", y="fit"), shape=21, fill="white",  size=4,show.legend=F)
     
     
   }  else { 
@@ -347,18 +349,15 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
       data<-image$state$randomData
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
       mark("Random effects plotting: we are smoothing with formula",form)
-      p<-p+stat_smooth(geom="line",data=data,aes(y=y,x=group,group=cluster), size=.2,
+      p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
                        method = "lm",formula=form,
                        alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
           }
     
     if (errorType != '')
-      p <- p + geom_ribbon(aes(x=group, ymin=lwr, ymax=upr),show.legend=F, alpha=.2)
+      p <- p + ggplot2::geom_ribbon(aes_string(x="group", ymin="lwr", ymax="upr"),show.legend=F, alpha=.2)
     
-    p <- p+geom_line(aes(x=group,y=fit),size=1.5,show.legend = F) 
-    
-    
-    
+    p <- p + ggplot2::geom_line(aes_string(x="group",y="fit"),size=1.5,show.legend = F) 
   }
   
   p+theme

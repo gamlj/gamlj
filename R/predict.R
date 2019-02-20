@@ -1,4 +1,4 @@
-
+.internal.emmc<- NULL
 
 ### some conditioning function for the jamovi interface, plus numeric values and custom function for R interface
 

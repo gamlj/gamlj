@@ -7,7 +7,9 @@
 gamlj_options(opt, value)
 }
 \arguments{
-\item{opt}{a value for the corresponding option}
+\item{opt}{the name of the option}
+
+\item{value}{a value for the corresponding option}
 }
 \description{
 This function sets GAMLj suite general options

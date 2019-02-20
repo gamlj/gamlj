@@ -789,8 +789,11 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' Generalized Linear Model
 #'
 #' @examples
-#' data('data3by2')
-#' gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
+#' data<-emmeans::neuralgia
+#'  gamlj::gamljGzlm(
+#'            formula = Pain ~ Duration,
+#'            data = data,
+#'             modelSelection = "logistic")
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},

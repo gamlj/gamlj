@@ -14,8 +14,7 @@ gamljGzlmClass <- R6::R6Class(
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType)
       dep<-self$options$dep
-      
-      if (is.null(afamily))
+      if (!is.something(afamily))
         return()
       
 
@@ -49,12 +48,8 @@ gamljGzlmClass <- R6::R6Class(
       if ("note" %in% names(info))
         infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
       
-      if (afamily=="not yet")
-        return()
-      
-      
       ### initialize conditioning of covariates
-      if (!is.null(self$options$covs)) {
+      if (is.something(self$options$covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
