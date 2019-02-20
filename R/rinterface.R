@@ -8,6 +8,8 @@
 #' Options are: debug (TRUE or FALSE). When TRUE some additional warnings and info are printed in output
 #'     
 #' @author Marcello Gallucci
+#' @export 
+
 gamlj_options<-function(opt,value) {
   if (opt=="debug")
     GAMLj_DEBUG<<-value

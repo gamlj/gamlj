@@ -46,3 +46,15 @@ NULL
 #' @examples
 #' data(temptime)
 NULL
+
+#' School data for testing
+#'
+#' Data for different examples
+#'
+#' @docType data
+#' @name hsbdemo
+#' @usage data(hsbdemo)
+#' @keywords datasets
+#' @examples
+#' data(hsbdemo)
+NULL
