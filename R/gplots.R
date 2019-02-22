@@ -140,7 +140,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     pdata$lwr<-NULL
     pdata$upr<-NULL
   } else
-    if ("glm" %in% class(model) && "binomial" %in% family(model)["family"]) {
+    if ("glm" %in% class(model) && "binomial" %in% stats::family(model)["family"]) {
       pdata$lwr<-ifelse(pdata$lwr<0,0,pdata$lwr)
       pdata$lwr<-ifelse(pdata$lwr>1,1,pdata$lwr)
       pdata$upr<-ifelse(pdata$upr<0,0,pdata$upr)
@@ -157,7 +157,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
                                       ciwidth=95,
                                       conditioning=NULL) {
   
-  depName<-jmvcore::fromB64(names(attr(terms(model),"dataClass"))[1])
+  depName<-jmvcore::fromB64(names(attr(stats::terms(model),"dataClass"))[1])
   selected<-list(depName,groupName,linesName,plotsName)
   varnames<-c("lines","group","plots2","plots")[1:length(unlist(selected))]
   
@@ -265,7 +265,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      data<-aggregate(data$y,list(data$cluster,data$group),mean)
+      data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
       p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),color="gray64",show.legend = F,shape=12, alpha=.5,  size=.5)
       p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group = "cluster"),color="gray64",size=.3, alpha=.3,show.legend = F) 
@@ -284,7 +284,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
       mark("Random effects plotting: we are smoothing with formula",form)
       p<-p +ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"),size=.2,colour="gray64", alpha=.8,
-                       method = lm,formula = form,
+                       method = "lm",formula = form,
                        fullrange = TRUE,se=FALSE,show.legend=F) 
      
     }
@@ -330,7 +330,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
   if (is.factor(image$state$data$group)) {
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      data<-aggregate(data$y,list(data$cluster,data$group),mean)
+      data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
       mark("we are breaking by cluster")
       p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),show.legend = F,shape=12, alpha=.5,  size=.5)

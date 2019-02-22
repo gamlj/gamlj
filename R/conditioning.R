@@ -1,4 +1,3 @@
-library(R6)
 # this class will take care of conditioning of covariates. Because in jamovi, when you need the labels
 # you might not have the data (as in .init()), the class would compute the labels even without data.
 # when the data are available, it computes the actual conditioning values and, if requested, labels=values
@@ -17,7 +16,7 @@ library(R6)
 
 # In jamovi span and methods are applied to all covariates. In R can be 
 
-conditioning <- R6Class("conditioning",
+conditioning <- R6::R6Class("conditioning",
         public=list(
         labels_type="labels",
         initialize = function(vars=NULL,method= "mean_sd", span = 1) {

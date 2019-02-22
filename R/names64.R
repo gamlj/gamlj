@@ -1,6 +1,5 @@
-library(R6)
 
-names64 <- R6Class("names64",list(
+names64 <- R6::R6Class("names64",list(
                          .factors = list(),
                          .covs= list(),
                          .labels= list(),

@@ -99,7 +99,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
       })
       # get the contrast weights
                 
-      codes<-contrasts(data[[variable]])
+      codes<-stats::contrasts(data[[variable]])
       # transform the model matrix into the contrast matrix
       n<-length(levs)
       if (attr(data[[variable]],"jcontrast")=="dummy")
@@ -115,7 +115,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
                    cov_conditioning = cov_conditioning,
                    interval=interval)
     est<-emmeans::contrast(emm,method = ".internal",by = preds)
-    ci<-confint(est,level = interval/100)
+    ci<-stats::confint(est,level = interval/100)
     
     ####### rename ci variables because emmeans changes them for different models
     wci<-dim(ci)[2]
@@ -175,7 +175,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
   vars<-unlist(c(variable,moderator,threeway))
   lnames<-c("moderator","threeway")[1:length(preds)]
   
-  dep<-names(attr(terms(model),"dataClasses"))[1]
+  dep<-names(attr(stats::terms(model),"dataClasses"))[1]
   
 
     .internal.emmc<<-function(levs) {
@@ -185,12 +185,12 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
         v[length(v)]
       })
       if (!is.factor(data[[variable]])) {
-        vsd<-sd(data[[variable]])
+        vsd<-stats::sd(data[[variable]])
         M<-as.data.frame(c(-.5/vsd,0,.5/vsd))
         names(M)<-"Slope"
       } else {
       # get the contrast weights
-      codes<-contrasts(data[[variable]])
+      codes<-stats::contrasts(data[[variable]])
       # transform the model matrix into the contrast matrix
       n<-length(levs)
       M <- as.data.frame(MASS::ginv(t(codes)))
@@ -201,12 +201,12 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
       M
     }
     preds_int<-jmvcore::composeTerm(list(vars))
-    preds_form<-as.formula(paste("~",dep,"|",preds_int))
+    preds_form<-stats::as.formula(paste("~",dep,"|",preds_int))
     condlist<-cov_conditioning$values(vars,decode = T)
     emm<-emmeans::emmeans(model,specs=preds_form,mode="latent",at=condlist,nesting=NULL)
-    emm<-update(emm,df=Inf)
+    emm<-stats::update(emm,df=Inf)
     est<-emmeans::contrast(emm,interaction = c("trt.vs.ctrl1",".internal") ,by = preds)
-    ci<-confint(est,level = interval/100,df=Inf)
+    ci<-stats::confint(est,level = interval/100,df=Inf)
     
     ####### rename ci variables because emmeans changes them for different models
     wci<-dim(ci)[2]
@@ -237,7 +237,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
       .data<-data
       for (name in preds)
         if (is.factor(.data[[name]]))
-          contrasts(.data[[name]])<-contr.treatment(length(unique(vals[[name]])),base=vals[[name]][l])
+          stats::contrasts(.data[[name]])<-stats::contr.treatment(length(unique(vals[[name]])),base=vals[[name]][l])
         else
           .data[[name]]<-.data[[name]]-vals[[name]][l]
         

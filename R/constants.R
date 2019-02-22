@@ -1,3 +1,6 @@
+#' Load constants and some package
+#' @import lmerTest
+
 GAMLj_DEBUG=T
 GAMLj_INFO=F
 

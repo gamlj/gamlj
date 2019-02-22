@@ -8,8 +8,6 @@
 #'         "Family", "Marginal", "Conditional" and "AIC" columns
 #' @author: Jon Lefcheck
 #' @references  Lefcheck, Jonathan S. (2015) piecewiseSEM: Piecewise structural equation modeling in R for ecology, evolution, and systematics. Methods in Ecology and Evolution. 7(5): 573-579. DOI: 10.1111/2041-210X.12512
-#' @import stats
-#' @import lmerTest
 
 rsquared.glmm <- function(obj) {
   if( class(obj) != "list" ) obj = list(obj) else obj
@@ -25,19 +23,19 @@ r.squared <- function(mdl){
 r.squared.lm <- function(mdl){
   data.frame(Class=class(mdl), Family="gaussian", Link="identity",
              Marginal=summary(mdl)$r.squared,
-             Conditional=NA, AIC=AIC(mdl))
+             Conditional=NA, AIC=stats::AIC(mdl))
 }
 
 r.squared.merMod <- function(mdl){
   # Get variance of fixed effects by multiplying coefficients by design matrix
-  VarF <- var(as.vector(lme4::fixef(mdl) %*% t(mdl@pp$X)))
+  VarF <- stats::var(as.vector(lme4::fixef(mdl) %*% t(mdl@pp$X)))
   # Get variance of random effects by extracting variance components
   # Omit random effects at the observation level, variance is factored in later
   VarRand <- sum(
     sapply(
       lme4::VarCorr(mdl)[!sapply(unique(unlist(strsplit(names(lme4::ranef(mdl)),":|/"))), function(l) length(unique(mdl@frame[,l])) == nrow(mdl@frame))],
       function(Sigma) {
-        X <- model.matrix(mdl)
+        X <- stats::model.matrix(mdl)
         Z <- X[,rownames(Sigma)]
         sum(diag(Z %*% Sigma %*% t(Z)))/nrow(X) } ) )
   # Get the dispersion variance
@@ -47,7 +45,7 @@ r.squared.merMod <- function(mdl){
     # Get residual variance
     VarResid <- attr(lme4::VarCorr(mdl), "sc")^2
     # Get ML model AIC
-    mdl.aic <- AIC(update(mdl, REML=F))
+    mdl.aic <- stats::AIC(stats::update(mdl, REML=F))
     # Model family for lmer is gaussian
     family <- "gaussian"
     # Model link for lmer is identity
@@ -59,15 +57,15 @@ r.squared.merMod <- function(mdl){
     # Get the model's family, link and AIC
     family <- mdl.summ$family
     link <- mdl.summ$link
-    mdl.aic <- AIC(mdl)
+    mdl.aic <- stats::AIC(mdl)
     # Pseudo-r-squared for poisson also requires the fixed effects of the null model
     if(family=="poisson") {
       # Get random effects names to generate null model
-      rand.formula <- reformulate(sapply(lme4::findbars(formula(mdl)),
+      rand.formula <- stats::reformulate(sapply(lme4::findbars(stats::formula(mdl)),
                                          function(x) paste0("(", deparse(x), ")")),
                                   response=".")
       # Generate null model (intercept and random effects only, no fixed effects)
-      null.mdl <- update(mdl, rand.formula)
+      null.mdl <- stats::update(mdl, rand.formula)
       # Get the fixed effects of the null model
       null.fixef <- as.numeric(lme4::fixef(null.mdl))
     }

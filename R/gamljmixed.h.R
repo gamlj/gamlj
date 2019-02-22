@@ -938,7 +938,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' Mixed Linear Model
 #'
 #' @examples
-#' data("subjects_by_stimuli")
+#' data(subjects_by_stimuli)
 #' gamlj::gamljMixed(
 #'   data = subjects_by_stimuli,
 #'   dep = "y",
