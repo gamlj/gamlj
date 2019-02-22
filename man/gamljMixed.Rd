@@ -149,7 +149,7 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 Mixed Linear Model
 }
 \examples{
-data("subjects_by_stimuli")
+data(subjects_by_stimuli)
 gamlj::gamljMixed(
   data = subjects_by_stimuli,
   dep = "y",

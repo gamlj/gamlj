@@ -377,15 +377,15 @@ items:
            - plotRaw
            - percvalue
            - cvalue
-  - name: assump
+  - name: assumptions
     title: Assumption Checks
     type: Group
     items:
-        - name: homo
+        - name: homoTest
           title: Test for Homogeneity of Residual Variances (Levene's)
           type: Table
           description: a table of homogeneity tests
-          visible: (homo)
+          visible: (homoTest)
           rows: 1
           columns:
             - name: F

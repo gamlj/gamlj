@@ -432,7 +432,7 @@ gamljGLMClass <- R6::R6Class(
 
 .populateLevenes=function(model) {
   
-  if ( ! self$options$homo)
+  if ( ! self$options$homoTest)
     return()
   
   data<-model$model
@@ -443,7 +443,7 @@ gamljGLMClass <- R6::R6Class(
   rhs <- paste0('`', factors, '`', collapse=':')
   formula <- as.formula(paste0('`res`~', rhs))
   result <- car::leveneTest(formula, data, center="mean")
-  table <- self$results$get('assump')$get('homo')
+  table <- self$results$get('assumptions')$get('homoTest')
    
   table$setRow(rowNo=1, values=list(
     F=result[1,'F value'],
@@ -464,7 +464,7 @@ gamljGLMClass <- R6::R6Class(
   result<-rbind(cbind(ks$statistic,ks$p.value),
              cbind(st$statistic,st$p.value))
 
-  table <- self$results$get('assump')$get('normTest')
+  table <- self$results$get('assumptions')$get('normTest')
 
   table$setRow(rowNo=1, values=list(test="Kolmogorov-Smirnov",stat=result[1,1],p=result[1,2]))
   table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat=result[2,1],p=result[2,2]))

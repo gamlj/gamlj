@@ -383,7 +383,7 @@ options:
           - beta
           - partEta
           
-    - name: homo
+    - name: homoTest
       title: Residual Variances Homogeneity tests
       type: Bool
       default: false

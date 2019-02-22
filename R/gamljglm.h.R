@@ -39,7 +39,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             effectSize = list(
                 "beta",
                 "partEta"),
-            homo = FALSE,
+            homoTest = FALSE,
             qq = FALSE,
             normTest = FALSE, ...) {
 
@@ -243,9 +243,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 default=list(
                     "beta",
                     "partEta"))
-            private$..homo <- jmvcore::OptionBool$new(
-                "homo",
-                homo,
+            private$..homoTest <- jmvcore::OptionBool$new(
+                "homoTest",
+                homoTest,
                 default=FALSE)
             private$..qq <- jmvcore::OptionBool$new(
                 "qq",
@@ -286,7 +286,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..scaling)
             self$.addOption(private$..effectSize)
-            self$.addOption(private$..homo)
+            self$.addOption(private$..homoTest)
             self$.addOption(private$..qq)
             self$.addOption(private$..normTest)
         }),
@@ -321,7 +321,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         postHocCorr = function() private$..postHocCorr$value,
         scaling = function() private$..scaling$value,
         effectSize = function() private$..effectSize$value,
-        homo = function() private$..homo$value,
+        homoTest = function() private$..homoTest$value,
         qq = function() private$..qq$value,
         normTest = function() private$..normTest$value),
     private = list(
@@ -355,7 +355,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..postHocCorr = NA,
         ..scaling = NA,
         ..effectSize = NA,
-        ..homo = NA,
+        ..homoTest = NA,
         ..qq = NA,
         ..normTest = NA)
 )
@@ -370,7 +370,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
-        assump = function() private$.items[["assump"]]),
+        assumptions = function() private$.items[["assumptions"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -798,7 +798,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    homo = function() private$.items[["homo"]],
+                    homoTest = function() private$.items[["homoTest"]],
                     normTest = function() private$.items[["normTest"]],
                     qq = function() private$.items[["qq"]]),
                 private = list(),
@@ -806,13 +806,13 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     initialize=function(options) {
                         super$initialize(
                             options=options,
-                            name="assump",
+                            name="assumptions",
                             title="Assumption Checks")
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="homo",
+                            name="homoTest",
                             title="Test for Homogeneity of Residual Variances (Levene's)",
-                            visible="(homo)",
+                            visible="(homoTest)",
                             rows=1,
                             columns=list(
                                 list(
@@ -944,7 +944,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
 #' @param effectSize .
-#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
@@ -963,9 +963,9 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
-#'   \code{results$assump$homo} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-#'   \code{results$assump$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
-#'   \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
+#'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+#'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -1010,7 +1010,7 @@ gamljGLM <- function(
     effectSize = list(
                 "beta",
                 "partEta"),
-    homo = FALSE,
+    homoTest = FALSE,
     qq = FALSE,
     normTest = FALSE,
     formula) {
@@ -1105,7 +1105,7 @@ gamljGLM <- function(
         postHocCorr = postHocCorr,
         scaling = scaling,
         effectSize = effectSize,
-        homo = homo,
+        homoTest = homoTest,
         qq = qq,
         normTest = normTest)
 
