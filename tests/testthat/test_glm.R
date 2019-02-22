@@ -75,3 +75,38 @@ test_that("glm weired names", {
 })
 
 
+expect_warning(mod<-gamlj::gamljGLM(
+  data = hsbdemo,
+  formula=science~math+schtyp+math:schtyp,
+  eDesc = T,
+  normTest = T,
+  homoTest = T
+)
+)
+res<-mod$emeansTables[[1]]$asDF
+test_that("glm EMM", {
+  expect_equal(round(res[1,2],2),52.07)
+})
+
+res1<-mod$assumptions$homoTest$asDF
+res2<-mod$assumptions$normTest$asDF
+
+test_that("glm assumptions", {
+  expect_equal(round(res1[1,4],2),0.13)
+  expect_equal(round(res2[1,3],2),0.86)
+})
+
+mod<-gamlj::gamljGLM(
+  formula = science ~ math + schtyp + schtyp:math,
+  data = data,
+  contrasts = list(list(
+      var="schtyp",
+      type="deviation"))
+)
+
+res<-mod$main$fixed$asDF
+
+test_that("glm contrasts", {
+  expect_equal(round(res[3,3],2),-2.45)
+  expect_equal(round(res[1,3],2),18.55)
+})
