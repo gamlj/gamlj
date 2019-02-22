@@ -456,7 +456,6 @@ gamljGzlmClass <- R6::R6Class(
 },
 
 .descPlot=function(image, ggtheme, theme, ...) {
-  library(ggplot2)
   if (is.null(image$state))
     return(FALSE)
 

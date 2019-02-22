@@ -914,8 +914,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   lines on the plot
 #' @param plotSepPlots a string naming the variable to separate over to form
 #'   multiple plots
-#' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
-#'   statistics
+#' @param plotRaw \code{TRUE} or \code{FALSE} (default), plot raw data along
+#'   the predicted values
 #' @param plotDvScale .
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the

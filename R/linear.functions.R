@@ -64,7 +64,7 @@ lf.createContrasts=function(levels, type) {
   nLevels <- length(levels)
 
   if (type == 'simple') {
-    dummy <- contr.treatment(levels)
+    dummy <- stats::contr.treatment(levels)
     dimnames(dummy) <- NULL
     coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
     contrast <- (dummy - coding)
@@ -113,7 +113,7 @@ lf.createContrasts=function(levels, type) {
     dimnames(contrast) <- NULL
     
   } else {
-    dummy <- contr.treatment(levels)
+    dummy <- stats::contr.treatment(levels)
     dimnames(dummy) <- NULL
     coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
     contrast <- (dummy - coding)

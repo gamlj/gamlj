@@ -116,7 +116,7 @@ gposthoc.populate<-function(model,options,tables) {
 
 .posthoc.default<-function(model,term,adjust) {
   #  term<-jmvcore::composeTerm(term)
-  termf<-as.formula(paste("~",term))
+  termf<-stats::as.formula(paste("~",term))
   data<-mf.getModelData(model)
   referenceGrid<-emmeans::emmeans(model, termf,type = "response",data=data)
   terms<-jmvcore::decomposeTerm(term)
@@ -129,9 +129,9 @@ gposthoc.populate<-function(model,options,tables) {
 
 .posthoc.multinom<-function(model,term,adjust) {
   results<-try({
-    dep<-names(attr(terms(model),"dataClass"))[1]
+    dep<-names(attr(stats::terms(model),"dataClass"))[1]
     dep<-jmvcore::composeTerm(dep)
-    tterm<-as.formula(paste("~",paste(dep,term,sep = "|")))  
+    tterm<-stats::as.formula(paste("~",paste(dep,term,sep = "|")))  
     data<-mf.getModelData(model)
     referenceGrid<-emmeans::emmeans(model,tterm,transform = "response",data=data)
     terms<-jmvcore::decomposeTerm(term)

@@ -407,7 +407,6 @@ gamljGLMClass <- R6::R6Class(
 },
 
 .descPlot=function(image, ggtheme, theme, ...) {
-  library(ggplot2)
   if (is.null(image$state))
     return(FALSE)
   
@@ -474,7 +473,6 @@ gamljGLMClass <- R6::R6Class(
 
 
 .qqPlot=function(image, ggtheme, theme, ...) {
-  library(ggplot2)
   dep <- self$options$dep
   factors <- self$options$factors
   model<-private$.model      

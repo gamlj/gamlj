@@ -109,7 +109,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
      cof$se<-as.numeric(se)
      cof$expb<-exp(cof$estimate)  
      cof$z<-cof$estimate/cof$se
-     cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
+     cof$p<-(1 - stats::pnorm(abs(cof$z), 0, 1)) * 2
      ss<-as.data.frame(cof,stringsAsFactors = F)
      ss<-cof[order(ss$dep),]
      lab<-model$lab[1]
@@ -180,10 +180,10 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
   ### this check is needed for adjust to different versions of lmertest
-  if (class(model)=="merModLmerTest")
-        ano<-lmerTest::anova(model,ddf=df)
-  else
-        ano<-anova(model,ddf=df)
+#  if (class(model)=="merModLmerTest")
+#        ano<-lmerTest:::anova(model,ddf=df)
+#  else
+        ano<-stats::anova(model,ddf=df)
         
   if (dim(ano)[1]==0)
     return(ano)
@@ -201,7 +201,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
     info("lmerTest problems with df: try to fix it")
     whichone<-is.na(ano[,3])
     rn<-rownames(ano[whichone,])
-    smr<-lmerTest::summary(model,ddf=df)
+    smr<-summary(model,ddf=df)
     coefz<-as.data.frame(smr$coefficients)
     coefz<-coefz[rownames(smr$coefficients) %in% rn,3:5]
 
@@ -237,7 +237,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
     test<-"Chisq"
   else test<-"F"
   ano<-car::Anova(model,type=3,test=test)
-  if (attr(terms(model),"intercept")==1)
+  if (attr(stats::terms(model),"intercept")==1)
     ano<-ano[-1,]
   attr(ano,"method")<-"Kenward-Roger"
   attr(ano,"statistic")<-test
@@ -246,7 +246,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 
 
 mf.getModelFactors<-function(model) {
-  names(attr(model.matrix(model),"contrasts"))
+  names(attr(stats::model.matrix(model),"contrasts"))
 } 
 
 
@@ -329,10 +329,10 @@ mf.confint<- function(x,...) UseMethod(".confint")
   return(FALSE)
 
 .confint.lm<-function(model,level) 
-    return(confint(model,level = level))
+    return(stats::confint(model,level = level))
   
 .confint.glm<-function(model,level) {  
-    ci<-confint(model,level = level)
+    ci<-stats::confint(model,level = level)
     return(ci)
 }
 
@@ -344,7 +344,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.lmer<-function(model,level)  {
 
-      ci<-confint(model,method="Wald",level=level)
+      ci<-stats::confint(model,method="Wald",level=level)
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
@@ -353,7 +353,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.multinom <- function (object, level = 0.95, ...) 
   {
-  ci<-confint(object,level=level)
+  ci<-stats::confint(object,level=level)
   cim<-NULL
   for (i in seq_len(dim(ci)[3]))
      cim<-rbind(cim,(ci[,,i]))
