@@ -409,7 +409,13 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="main",
-                            title="Model Results")
+                            title="Model Results",
+                            clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "contrasts",
+                    "scaling",
+                    "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -1020,45 +1026,45 @@ gamljGLM <- function(
 
     if ( ! missing(formula)) {
         if (missing(dep))
-            dep <- jmvcore:::marshalFormula(
+            dep <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='lhs',
                 subset='1',
                 required=TRUE)
         if (missing(factors))
-            factors <- jmvcore:::marshalFormula(
+            factors <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='vars',
                 permitted='factor')
         if (missing(covs))
-            covs <- jmvcore:::marshalFormula(
+            covs <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='vars',
                 permitted='numeric')
         if (missing(modelTerms))
-            modelTerms <- jmvcore:::marshalFormula(
+            modelTerms <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='terms')
     }
 
-    if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore:::resolveQuo(jmvcore:::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore:::resolveQuo(jmvcore:::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepPlots))
-    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleVariable))
-    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleModerator))
-    if ( ! missing(simple3way)) simple3way <- jmvcore:::resolveQuo(jmvcore:::enquo(simple3way))
+    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
+    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
+    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
+    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
+    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
+    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
+    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore::resolveQuo(jmvcore::enquo(simpleVariable))
+    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerator))
+    if ( ! missing(simple3way)) simple3way <- jmvcore::resolveQuo(jmvcore::enquo(simple3way))
     if (missing(data))
-        data <- jmvcore:::marshalData(
+        data <- jmvcore::marshalData(
             parent.frame(),
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
@@ -1071,8 +1077,8 @@ gamljGLM <- function(
             `if`( ! missing(simple3way), simple3way, NULL))
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore:::decomposeFormula(modelTerms)
-    if (inherits(postHoc, 'formula')) postHoc <- jmvcore:::decomposeFormula(postHoc)
+    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore::decomposeFormula(modelTerms)
+    if (inherits(postHoc, 'formula')) postHoc <- jmvcore::decomposeFormula(postHoc)
 
     options <- gamljGLMOptions$new(
         dep = dep,

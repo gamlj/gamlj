@@ -19,7 +19,20 @@ description:
                 cluster = "subj",
                 randomTerms=list(c("cond","subj")))
 
-
+formula:
+   dep:
+     custom: true
+   factors: 
+     custom: true
+   covs: 
+     custom: true
+   cluster: 
+     custom: true
+   randomTerms: 
+     custom: true
+   modelTerms:
+     custom: true
+     
 options:
     - name: data
       type: Data

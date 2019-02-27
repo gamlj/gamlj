@@ -70,7 +70,7 @@ mod<-gamlj::gamljGLM(
   formula=science~math+`Gender (test ?)`+math:`Gender (test ?)`,
 )
 
-test_that("glm weired names", {
+test_that("glm weird names", {
   expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
 })
 

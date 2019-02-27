@@ -14,7 +14,13 @@ gamljMixedClass <- R6::R6Class(
       reml<-self$options$reml
       infoTable<-self$results$info
       dep<-self$options$dep
-      
+      # mark(dep)
+      # mark("cluster",self$options$cluster)
+      # mark("factors",self$options$factors)
+      # mark("covs",self$options$covs)
+      # mark("mterms",self$options$modelTerms)
+      # mark("rterms",self$options$randomTerms)
+      # 
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -44,7 +50,6 @@ gamljMixedClass <- R6::R6Class(
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
       #####################
-
       #### info table #####
       infoTable<-self$results$info
       infoTable$addRow(rowKey="est",list(info="Estimate"))
@@ -135,14 +140,13 @@ gamljMixedClass <- R6::R6Class(
         cluster<-jmvcore::toB64(clusters[[1]])
         data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
       }
-      
       if (is.something(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
         names(data)<-jmvcore::toB64(names(data))
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
-      
+
       ## saving the whole set of results proved to be too heavy for memory issues.
       ## so we estimate the model every time. In case it is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
@@ -565,6 +569,36 @@ gamljMixedClass <- R6::R6Class(
   }       
   return(p)
 },
+.marshalFormula= function(formula, data, name) {
+      fixed<-lme4::nobars(formula)
+      bars<-lme4::findbars(formula)
+      rterms<-sapply(bars,all.vars)
+      rvars<-unlist(sapply(rterms,function(a) if (length(a)>1) a[[length(a)-1]]))
+      if (name=="dep")
+        return(jmvcore::marshalFormula(fixed,data,from = "lhs"))  
+      if (name=="factors") {
+        ffactors<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='factor')
+        rfactors<-unlist(lapply(rvars, function(a) {if (is.factor(data[[a]])) a}))
+        return(c(ffactors,rfactors))
+      }
+      if (name=="covs") {
+        fcovs<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='numeric')
+        rcovs<-unlist(lapply(rvars, function(a) {if (is.numeric(data[[a]])) a}))
+        return(c(fcovs,rcovs))
+      }
+      if (name=="cluster") {
+       return(sapply(rterms,function(a) a[[length(a)]] ))
+      }
+      if (name=="randomTerms") {
+        return(bars)
+      }
+      
+      if (name=="modelTerms") {
+        return(jmvcore::marshalFormula(fixed,data,from='rhs',type='terms'))
+      }
+      
+},
+
 
 .formula = function() {
   

@@ -6,6 +6,6 @@ is.something<- function(x,...) UseMethod(".is.something")
 
 .is.something.numeric<-function(obj) (length(obj)>0)
 
-.is.something.character<-function(obj) isTRUE(length(obj)>0 | obj!='')
+.is.something.character<-function(obj) isTRUE(length(obj)>0 | any(obj!=''))
 
 .is.something.logical<-function(obj) !is.na(obj)
