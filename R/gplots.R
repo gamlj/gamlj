@@ -123,7 +123,6 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     pred.means(model,selected64,cond)
   })
   
-  
   if (jmvcore::isError(pdata)) {
     mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')

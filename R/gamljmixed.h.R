@@ -422,7 +422,16 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="main",
-                            title="Model Results")
+                            title="Model Results",
+                            clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "reml",
+                    "contrasts",
+                    "scaling",
+                    "randomTerms",
+                    "correlatedEffects",
+                    "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -1014,6 +1023,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
 #'   random effects
 #' @param plotRandomEffects .
+#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -1075,23 +1085,57 @@ gamljMixed <- function(
     correlatedEffects = TRUE,
     reml = TRUE,
     lrtRandomEffects = FALSE,
-    plotRandomEffects = FALSE) {
+    plotRandomEffects = FALSE,
+    formula) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljMixed requires jmvcore to be installed (restart may be required)')
 
-    if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore:::resolveQuo(jmvcore:::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore:::resolveQuo(jmvcore:::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepPlots))
-    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleVariable))
-    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleModerator))
-    if ( ! missing(simple3way)) simple3way <- jmvcore:::resolveQuo(jmvcore:::enquo(simple3way))
-    if ( ! missing(cluster)) cluster <- jmvcore:::resolveQuo(jmvcore:::enquo(cluster))
+    if ( ! missing(formula)) {
+        if (missing(dep))
+            dep <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="dep")
+        if (missing(factors))
+            factors <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="factors")
+        if (missing(covs))
+            covs <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="covs")
+        if (missing(cluster))
+            cluster <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="cluster")
+        if (missing(randomTerms))
+            randomTerms <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="randomTerms")
+        if (missing(modelTerms))
+            modelTerms <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="modelTerms")
+    }
+
+    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
+    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
+    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
+    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
+    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
+    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
+    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore::resolveQuo(jmvcore::enquo(simpleVariable))
+    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerator))
+    if ( ! missing(simple3way)) simple3way <- jmvcore::resolveQuo(jmvcore::enquo(simple3way))
+    if ( ! missing(cluster)) cluster <- jmvcore::resolveQuo(jmvcore::enquo(cluster))
     if (missing(data))
-        data <- jmvcore:::marshalData(
+        data <- jmvcore::marshalData(
             parent.frame(),
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
@@ -1105,9 +1149,9 @@ gamljMixed <- function(
             `if`( ! missing(cluster), cluster, NULL))
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore:::decomposeFormula(modelTerms)
-    if (inherits(postHoc, 'formula')) postHoc <- jmvcore:::decomposeFormula(postHoc)
-    if (inherits(randomTerms, 'formula')) randomTerms <- jmvcore:::decomposeFormula(randomTerms)
+    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore::decomposeFormula(modelTerms)
+    if (inherits(postHoc, 'formula')) postHoc <- jmvcore::decomposeFormula(postHoc)
+    if (inherits(randomTerms, 'formula')) randomTerms <- jmvcore::decomposeFormula(randomTerms)
 
     options <- gamljMixedOptions$new(
         dep = dep,

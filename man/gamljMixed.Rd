@@ -15,7 +15,7 @@ gamljMixed(data, dep = NULL, factors = NULL, covs = NULL,
   percvalue = 25, simpleScaleLabels = "labels",
   postHocCorr = list("bonf"), scaling = NULL, cluster = NULL,
   randomTerms = NULL, correlatedEffects = TRUE, reml = TRUE,
-  lrtRandomEffects = FALSE, plotRandomEffects = FALSE)
+  lrtRandomEffects = FALSE, plotRandomEffects = FALSE, formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -120,6 +120,8 @@ be used rather than ML}
 random effects}
 
 \item{plotRandomEffects}{.}
+
+\item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
 A results object containing:

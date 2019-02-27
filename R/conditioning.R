@@ -52,7 +52,6 @@ conditioning <- R6::R6Class("conditioning",
             if (is.data.frame(vardata)) 
                 names(vardata)<-jmvcore::fromB64(names(vardata))
           }
-
           if (is.data.frame(vardata)) {
             for (name in self$vars)
               if (name %in% names(vardata))

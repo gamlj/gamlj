@@ -44,7 +44,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
                .rawMeans.merModLmerTest(model,terms,cov_conditioning,df) 
     
     
-.rawMeans.merModLmerTest<-function(model,terms,cov_conditioning=conditioning$new,interval=95,type="link",df="Satterthwaite") {
+.rawMeans.merModLmerTest<-function(model,terms,cov_conditioning=conditioning$new(),interval=95,type="link",df="Satterthwaite") {
   
   nterms<-jmvcore::fromB64(terms) 
   df<-tolower(df)
@@ -54,7 +54,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   names(condlist)<-jmvcore::toB64(names(condlist))
   est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,lmer.df = df,nesting=NULL)
 #  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
-  est
+
 }
 
 
@@ -62,6 +62,7 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
          est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
          dest<-as.data.frame(est)
+         mark(dest)
          old<-names(dest)
          ## reorder the variable independently of emmeans output
          wide<-dim(dest)[2]
