@@ -8,7 +8,7 @@ gamljMixedClass <- R6::R6Class(
     .cov_condition=conditioning$new(),
     .postHocRows=NA,
     .init=function() {
-      mark("init")
+      ginfo("init")
       private$.names64<-names64$new()
       n64<-private$.names64
       reml<-self$options$reml
@@ -21,6 +21,8 @@ gamljMixedClass <- R6::R6Class(
       # mark("mterms",self$options$modelTerms)
       # mark("rterms",self$options$randomTerms)
       # 
+      mark("terms",self$options$randomTerms)
+      
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -100,7 +102,7 @@ gamljMixedClass <- R6::R6Class(
     },
     .run=function() {
       n64<-private$.names64
-      mark("run")
+      ginfo("run")
       # collect some option
       dep <- self$options$dep
       
@@ -152,7 +154,7 @@ gamljMixedClass <- R6::R6Class(
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
       
-               mark("the model has been estimated")
+               ginfo("the model has been estimated")
                ##### model ####
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data,REML = reml)
@@ -164,7 +166,7 @@ gamljMixedClass <- R6::R6Class(
                         jmvcore::reject(msg, code='error')
                }
                private$.model <- model
-               mark("...done")
+               ginfo("...done")
 
                vc<-as.data.frame(lme4::VarCorr(model))
 #               vc<-as.data.frame(model_summary$varcor)
@@ -214,29 +216,24 @@ gamljMixedClass <- R6::R6Class(
                          jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                    }
                    anovaTable$setState(TRUE)
-                   mark("..done")
-                  } else mark("Anova results recycled")
+                  } else ginfo("Anova results recycled")
                     
                if (is.null(estimatesTable$state)) {
                  
                          ### full summary results ####
-                         mark("asking for summary")
                          test_summary<-try(model_summary<-summary(model))
                          if (jmvcore::isError(test_summary)) {
                                msg <- extractErrorMessage(test_summary)
                                msg<-n64$translate(msg)
                                jmvcore::reject(msg, code='error')
                          }
-                         mark("...done")
                          ### coefficients summary results ####
 
-                         mark("asking for mf.summary")
                          test_parameters<-try(parameters<-mf.summary(model))
                          if (!is.null(attr(parameters,"warning"))) 
                               estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
                          estimatesTable$setState(TRUE)
                          mark("...done")
- 
                ### fix random table notes
                   info<-paste("Number of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
                   randomTable$setNote('info', info)
@@ -326,7 +323,7 @@ gamljMixedClass <- R6::R6Class(
                   }
                 }
                 
-               } else mark("clean summary recycled")
+               } else ginfo("clean summary recycled")
                
         #### LRT for random effects ####
         if (self$options$lrtRandomEffects) {
@@ -351,6 +348,7 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
+    
     terms<-lapply(terms,jmvcore::toB64)
     flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
     res<-do.call("rbind",flatterms)
@@ -590,7 +588,17 @@ gamljMixedClass <- R6::R6Class(
        return(sapply(rterms,function(a) a[[length(a)]] ))
       }
       if (name=="randomTerms") {
-        return(bars)
+        bars<-lme4::findbars(formula)
+        ret<-rep(list(NULL),length(bars))
+        for (b in seq_along(bars)) {
+          bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)
+          barlist<-list()
+          for (term in bar) {
+            barlist<-append(barlist,term)
+          }
+          ret[[b]]<-barlist
+        }
+        return(ret)
       }
       
       if (name=="modelTerms") {

@@ -117,6 +117,7 @@ children:
                 name: randomTerms
                 valueFilter: unique
                 isTarget: true
+                addButton: Add block
                 events:
                   change: './mixed.events::onChange_randomTerms'
                   preprocess: './mixed.events::onEvent_randomTerms_preprocess'

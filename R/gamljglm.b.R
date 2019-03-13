@@ -85,6 +85,10 @@ gamljGLMClass <- R6::R6Class(
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
+      ## hide effects labels if no factor is there
+      if (!is.something(factors))
+         aTable$getColumn('label')$setVisible(FALSE)
+      
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
