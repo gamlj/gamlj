@@ -77,6 +77,9 @@ gamljGzlmClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
 
+      if (!is.something(self$options$factors))
+        aTable$getColumn('label')$setVisible(FALSE)
+      
       if (modelType=="multinomial") {
         labs<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
         for (j in seq_along(labs)) 

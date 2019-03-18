@@ -93,6 +93,9 @@ gamljMixedClass <- R6::R6Class(
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
+      if (!is.something(self$options$factors))
+        aTable$getColumn('label')$setVisible(FALSE)
+      
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -594,10 +597,12 @@ gamljMixedClass <- R6::R6Class(
           bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)
           barlist<-list()
           for (term in bar) {
-            barlist<-append(barlist,term)
+            alist<-list(term,bars[[b]][[3]])
+            barlist<-append(barlist,alist)
           }
-          ret[[b]]<-barlist
+          ret[[b]]<-list("a"=barlist)
         }
+        mark(ret)
         return(ret)
       }
       
