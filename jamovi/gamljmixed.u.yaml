@@ -110,20 +110,35 @@ children:
         events:
           change: './mixed.events::onChange_randomSupplier'
         children:
-          - type: TargetLayoutBox
-            label: Random Coefficients
-            children:
-              - type: ListBox
-                name: randomTerms
-                valueFilter: unique
-                isTarget: true
-                addButton: Add block
-                events:
-                  change: './mixed.events::onChange_randomTerms'
-                  preprocess: './mixed.events::onEvent_randomTerms_preprocess'
-                template:
-                  type: Label
-                  format: ./rtermFormat
+              - type: TargetLayoutBox
+                transferAction: interactions
+                children:
+                  - type: ListBox
+                    name: randomTerms
+                    height: large
+                    addButton: Add block
+                    events:
+                      listItemAdded: './mixed.events::onEvent_nothing'
+                      listItemRemoved: './mixed.events::onEvent_nothing'
+                    selectable: true
+                    templateName: linreg-block-template
+                    template:
+                      type: LayoutBox
+                      margin: normal
+                      targetArea: true
+                      children:
+                        - type: ListBox
+                          name: randblockList
+                          isTarget: true
+                          valueFilter: unique
+                          height: auto
+                          ghostText: drag term here
+                          events:
+                            change: './mixed.events::onEvent_nothing'
+                          template:
+                            type: TermLabel
+                            format: ./rtermFormat
+
       - type: LayoutBox
         margin: large
         children:

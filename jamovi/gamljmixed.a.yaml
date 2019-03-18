@@ -384,12 +384,14 @@ options:
 
     - name: randomTerms
       title: Random Coefficients
-      type: Terms
-      default:  
+      type: Array
+      default: [[]]
+      template:
+          type: Terms
       description:
           R: >
-            a list of character vectors describing random coefficients that
-            need to be computed
+            a list of lists specifying the models random effects.          
+
     - name: correlatedEffects
       title: Correlated Effects
       type: Bool

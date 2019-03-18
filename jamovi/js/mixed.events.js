@@ -28,7 +28,15 @@ const events = {
 
     onChange_randomSupplier: function(ui){
         let supplierList = this.itemsToValues(ui.randomSupplier.value());
-        this.checkValue(ui.randomTerms, true, supplierList, rtermFormat);
+        console.log("change in random supplier");
+        var changes = this.findChanges("randomSupplier",supplierList,rtermFormat);
+        if (changes.removed.length>0) {
+          var randomTerms = this.cloneArray(ui.randomTerms.value(),[]);
+          var  light = removeFromMultiList(changes.removed,randomTerms,this,1);
+          ui.randomTerms.setValue(light);
+        }
+        console.log(changes);
+//        this.checkValue(ui.randomTerms, true, supplierList, rtermFormat);
         return;
     },
     onChange_modelTerms: function(ui) {
@@ -47,7 +55,6 @@ const events = {
     },
     
         onChange_simpleSupplier: function(ui) {
-          console.log("updating simple");
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
         this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
@@ -67,7 +74,11 @@ const events = {
  //       for(var j = 0; j < data.items.length; j++) {
 //          data.items[j].value.raw=data.items[j].value.toString();
 //      }
+    },
+        onEvent_nothing: function(ui, data) {
+          console.log("I didn't do anything");
     }    
+
 };
 
 var calcModelTerms = function(ui, context) {
@@ -268,6 +279,7 @@ var updateRandomSupplier = function(ui, context) {
      }
     }
     context.sortArraysByLength(alist);
+    console.log("random supplierList");
     console.log(alist);
       var formatted=context.valuesToItems(alist, rtermFormat);
 //    var busyList = context.cloneArray(ui.randomTerms.value(), []);
@@ -276,12 +288,34 @@ var updateRandomSupplier = function(ui, context) {
 //         return busyForm.indexOf(val) == -1;
 //            });    
     ui.randomSupplier.setValue(formatted);
+    
+    console.log("updating random blocks");
+    
+    var randomTerms = context.cloneArray(ui.randomTerms.value(), []); 
+    if (randomTerms.length==0)
+        for(var i = 0; i < clusterList.length; ++i) {
+           randomTerms[i]=[];
+     }
+
+    var missing = clusterList.length-randomTerms.length
+    
+    console.log("missing"+missing);
+
+    console.log(randomTerms);
+    
+    for(var i = 0; i < missing; ++i) {
+      randomTerms[randomTerms.length+1]=[];
+    }
+    console.log(randomTerms);
+    ui.randomTerms.setValue(randomTerms);
+
 };
 
 
 var filterRandomTerms = function(ui, context) {
-  
+    console.log("filter random effects");  
     var termsList = context.cloneArray(ui.randomTerms.value(), []);
+    console.log(termsList);
     var unique = termsList.filter((v, i, a) => a.indexOf(v) === i); 
     if (unique.length!=termsList.length)
       ui.randomTerms.setValue(unique);
@@ -307,6 +341,82 @@ var ssort= function(str){
   var sorted = arr.sort();
   return sorted.join('');
 }
+
+var normalize = function(cosmos) {
+
+  if (cosmos===undefined)
+          return [];
+  if (dim(cosmos)===0)
+          cosmos=[cosmos]
+          
+        for (var i = 0; i < cosmos.length; i++) {
+            var aValue = cosmos[i];
+            var newValue=dim(aValue)>0 ? aValue : [aValue];
+            cosmos[i]=newValue
+        }
+        return cosmos;
+}
+
+var removeFromMultiList = function(quantum, cosmos, context, strict = 1) {
+
+    var cosmos = context.cloneArray(cosmos);
+    var dimq = dim(quantum);
+        for (var j = 0; j < cosmos.length; j++) 
+           cosmos[j]=removeFromList(quantum,cosmos[j],context, strict);
+    return(cosmos);
+};
+
+
+
+// remove a list or a item from list
+// order=0 remove only if term and target term are equal
+// order>0 remove if term length>=order 
+// for instance, order=1 remove any matching interaction with terms, keeps main effects
+// order=2 remove from 3-way interaction on (keep up to 2-way interactions)
+
+var removeFromList = function(quantum, cosmos, context, order = 1) {
+
+     cosmos=normalize(cosmos);
+     quantum=normalize(quantum);
+     if (cosmos===undefined)
+        return([]);
+     var cosmos = context.cloneArray(cosmos);
+       for (var i = 0; i < cosmos.length; i++) {
+          if (cosmos[i]===undefined)
+             break;
+          var aCosmos = context.cloneArray(cosmos[i]);
+           for (var k = 0; k < quantum.length; k++) {
+             var  test = order === 0 ? FormatDef.term.isEqual(aCosmos,quantum[k]) : FormatDef.term.contains(aCosmos,quantum[k]);
+                 if (test && (aCosmos.length >= order)) {
+                        cosmos.splice(i, 1);
+                        i -= 1;
+                    break;    
+                    }
+          }
+            
+       }
+  
+    return(cosmos);
+};
+
+
+var dim = function(aList) {
+
+    if (!Array.isArray(aList))
+           return(0);
+    if (!Array.isArray(aList[0]))
+           return(1);
+    if (!Array.isArray(aList[0][0]))
+           return(2);
+    if (!Array.isArray(aList[0][0][0]))
+           return(3);
+    if (!Array.isArray(aList[0][0][0][0]))
+           return(4);
+
+  
+    return(value);
+};
+
 
 
 module.exports = events;

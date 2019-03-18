@@ -37,7 +37,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "bonf"),
             scaling = NULL,
             cluster = NULL,
-            randomTerms = NULL,
+            randomTerms = list(
+                list()),
             correlatedEffects = TRUE,
             reml = TRUE,
             lrtRandomEffects = FALSE,
@@ -239,10 +240,14 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 default=NULL,
                 suggested=list(
                     "nominal"))
-            private$..randomTerms <- jmvcore::OptionTerms$new(
+            private$..randomTerms <- jmvcore::OptionArray$new(
                 "randomTerms",
                 randomTerms,
-                default=NULL)
+                default=list(
+                    list()),
+                template=jmvcore::OptionTerms$new(
+                    "randomTerms",
+                    NULL))
             private$..correlatedEffects <- jmvcore::OptionBool$new(
                 "correlatedEffects",
                 correlatedEffects,
@@ -1014,8 +1019,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'none'} leaves the variable as it is
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
-#' @param randomTerms a list of character vectors describing random
-#'   coefficients that need to be computed
+#' @param randomTerms a list of lists specifying the models random effects.
 #' @param correlatedEffects \code{TRUE} (default) or \code{FALSE} , include
 #'   correlated random effects
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
@@ -1081,7 +1085,8 @@ gamljMixed <- function(
                 "bonf"),
     scaling = NULL,
     cluster = NULL,
-    randomTerms = NULL,
+    randomTerms = list(
+                list()),
     correlatedEffects = TRUE,
     reml = TRUE,
     lrtRandomEffects = FALSE,
@@ -1151,7 +1156,6 @@ gamljMixed <- function(
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
     if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore::decomposeFormula(modelTerms)
     if (inherits(postHoc, 'formula')) postHoc <- jmvcore::decomposeFormula(postHoc)
-    if (inherits(randomTerms, 'formula')) randomTerms <- jmvcore::decomposeFormula(randomTerms)
 
     options <- gamljMixedOptions$new(
         dep = dep,
