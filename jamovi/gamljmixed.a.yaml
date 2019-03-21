@@ -392,13 +392,25 @@ options:
           R: >
             a list of lists specifying the models random effects.          
 
+
     - name: correlatedEffects
-      title: Correlated Effects
-      type: Bool
-      default: true
+      title: Effects correlation
+      type: List
+      options:
+        - name: corr
+          title: Correlated
+        - name: nocorr
+          title: Not correlated
+        - name: block
+          title: Correlated by block
+      default: corr
       description:
           R: >
-            `TRUE` (default) or `FALSE` , include correlated random effects
+            `'none'`, `'corr'` (default), or `'block'`. When random effects
+            are passed as list, decides whether they should be correlated, 
+            non correlated or correlated by block. By block expects a list of 
+            lists, letting the coefficients to be correlated within each list.
+            If the model is passed using a formula, this option is ignored
 
     - name: reml
       title: REML

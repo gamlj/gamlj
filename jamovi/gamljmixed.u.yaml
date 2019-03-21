@@ -105,7 +105,7 @@ children:
       - type: Supplier
         name: randomSupplier
         label: Components
-        persistentItems: true
+        persistentItems: false
         stretchFactor: 1
         events:
           change: './mixed.events::onChange_randomSupplier'
@@ -141,11 +141,39 @@ children:
 
       - type: LayoutBox
         margin: large
+        style: inline
         children:
-          - type: CheckBox
-            name: correlatedEffects
-          - type: CheckBox
-            name: lrtRandomEffects
+          - type: Label
+            label: Effects correlation
+            children:
+                   - type: LayoutBox
+                     margin: large
+                     style: list
+                     children:
+                            - type: RadioButton
+                              name: correlatedEffects_corr
+                              optionName: correlatedEffects
+                              optionPart: corr
+                              events:
+                                 change: './mixed.events::onEvent_corr'
+                            - type: RadioButton
+                              name: correlatedEffects_nocorr
+                              optionName: correlatedEffects
+                              optionPart: nocorr
+                            - type: RadioButton
+                              name: correlatedEffects_block
+                              optionName: correlatedEffects
+                              optionPart: block
+
+          - type: Label
+            label: Tests
+            children:
+                - type: LayoutBox
+                  margin: large
+                  children:
+                    - type: CheckBox
+                      name: lrtRandomEffects
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

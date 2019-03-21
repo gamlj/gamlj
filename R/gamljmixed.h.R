@@ -39,7 +39,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             cluster = NULL,
             randomTerms = list(
                 list()),
-            correlatedEffects = TRUE,
+            correlatedEffects = "corr",
             reml = TRUE,
             lrtRandomEffects = FALSE,
             plotRandomEffects = FALSE, ...) {
@@ -248,10 +248,14 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 template=jmvcore::OptionTerms$new(
                     "randomTerms",
                     NULL))
-            private$..correlatedEffects <- jmvcore::OptionBool$new(
+            private$..correlatedEffects <- jmvcore::OptionList$new(
                 "correlatedEffects",
                 correlatedEffects,
-                default=TRUE)
+                options=list(
+                    "corr",
+                    "nocorr",
+                    "block"),
+                default="corr")
             private$..reml <- jmvcore::OptionBool$new(
                 "reml",
                 reml,
@@ -1020,8 +1024,11 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
 #' @param randomTerms a list of lists specifying the models random effects.
-#' @param correlatedEffects \code{TRUE} (default) or \code{FALSE} , include
-#'   correlated random effects
+#' @param correlatedEffects \code{'none'}, \code{'corr'} (default), or
+#'   \code{'block'}. When random effects are passed as list, decides whether
+#'   they should be correlated,  non correlated or correlated by block. By block
+#'   expects a list of  lists, letting the coefficients to be correlated within
+#'   each list. If the model is passed using a formula, this option is ignored
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be used rather than ML
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
@@ -1087,7 +1094,7 @@ gamljMixed <- function(
     cluster = NULL,
     randomTerms = list(
                 list()),
-    correlatedEffects = TRUE,
+    correlatedEffects = "corr",
     reml = TRUE,
     lrtRandomEffects = FALSE,
     plotRandomEffects = FALSE,
