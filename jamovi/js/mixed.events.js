@@ -35,8 +35,6 @@ const events = {
           var  light = removeFromMultiList(changes.removed,randomTerms,this,1);
           ui.randomTerms.setValue(light);
         }
-        console.log(changes);
-//        this.checkValue(ui.randomTerms, true, supplierList, rtermFormat);
         return;
     },
     onChange_modelTerms: function(ui) {
@@ -75,7 +73,37 @@ const events = {
 //          data.items[j].value.raw=data.items[j].value.toString();
 //      }
     },
-        onEvent_nothing: function(ui, data) {
+    onEvent_corr: function(ui, data) {
+          console.log("Correlation structure changed");
+
+          if (ui.correlatedEffects.value()=="block") {
+             ui.randomTerms.setValue(Array([]));
+             var button= ui.randomTerms.$addButton;
+             button[0].style.visibility="visible";
+             var target= ui.randomTerms;
+             target.$el[0].lastElementChild.style.borderColor=null;
+             target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+
+          } else {
+             var data = this.cloneArray(ui.randomTerms.value(),[]);
+             console.log(data);
+             var one = flatMulti(data,this);
+             console.log([one]);
+             var button= ui.randomTerms.$addButton;
+             button[0].style.visibility="hidden";
+             var target= ui.randomTerms;
+             target.setValue(Array(one));
+             var one = target.controls[0];
+             target.$el[0].lastElementChild.style.borderColor="transparent";
+             one.$el[0].childNodes[0].style.visibility="hidden";
+             one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+
+          }
+
+    },    
+
+
+   onEvent_nothing: function(ui, data) {
           console.log("I didn't do anything");
     }    
 
@@ -333,6 +361,29 @@ var unique=function(arr) {
     }
     return a;
 };
+
+var addToList = function(quantum, cosmos, context) {
+  
+    cosmos = normalize(context.cloneArray(cosmos));
+    quantum = normalize(context.cloneArray(quantum));
+    
+    for (var i = 0; i < quantum.length; i++) {
+          if (dim(quantum[i])===0)
+              cosmos.push([quantum[i]]);
+          if (dim(quantum[i])===1)
+              cosmos.push(quantum[i]);
+          }
+    return unique(cosmos);
+};
+
+var flatMulti = function(cosmos,context) {
+  var light = []
+  for (var i=0 ; i < cosmos.length; i++) {
+    light=addToList(light,cosmos[i],context);
+  }
+  return unique(light);
+};
+
 
 
 var ssort= function(str){

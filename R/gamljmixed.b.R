@@ -21,8 +21,7 @@ gamljMixedClass <- R6::R6Class(
       # mark("mterms",self$options$modelTerms)
       # mark("rterms",self$options$randomTerms)
       # 
-      mark("terms",self$options$randomTerms)
-      
+
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -32,7 +31,7 @@ gamljMixedClass <- R6::R6Class(
         infoTable$addRow(rowKey="gs2",list(info="Get started",value="Select at least one cluster variable"))
         getout=TRUE
       }
-      if (length(self$options$randomTerms)==0) {
+      if (!is.something(unlist(self$options$randomTerms))) {
         infoTable$addRow(rowKey="gs3",list(info="Get started",value="Select at least one term in Random Effects"))
         getout=TRUE
       }
@@ -351,7 +350,9 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
-    
+    mark(terms)
+    mark(class(terms[[1]]))
+    return("(1|id)")
     terms<-lapply(terms,jmvcore::toB64)
     flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
     res<-do.call("rbind",flatterms)
@@ -433,15 +434,17 @@ gamljMixedClass <- R6::R6Class(
       return(lm)
     },
     .modelFormula=function() {
-
-      if (length(self$options$randomTerms)>0)  {
-        rands<-self$options$randomTerms
-        rands<-private$.buildreffects(rands,self$options$correlatedEffects)
-      } else return(FALSE)
+      
+      if (!is.something(unlist(self$options$randomTerms))) 
+         return(FALSE)
 
       if (!is.null(self$options$dep))  {
         dep<-jmvcore::toB64(self$options$dep)
       } else return(FALSE)
+      
+      rands<-self$options$randomTerms
+      rands<-private$.buildreffects(rands,self$options$correlatedEffects)
+
       
       modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
       fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
