@@ -134,7 +134,7 @@ children:
                           height: auto
                           ghostText: drag term here
                           events:
-                            change: './mixed.events::onEvent_nothing'
+                            change: './mixed.events::onEvent_addRandomTerm'
                           template:
                             type: TermLabel
                             format: ./rtermFormat

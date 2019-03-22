@@ -7,6 +7,7 @@ const events = {
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updateRandomSupplier(ui,this);
+        fixRandomEffects(ui,this);
 
     },
 
@@ -64,9 +65,23 @@ const events = {
         let values = this.itemsToValues(ui.postHocSupplier.value());
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
-    onChange_randomTerms: function(ui) {
- //       randomTerms(ui,this);
- //       filterRandomTerms(ui, this);
+    onEvent_addRandomTerm: function(ui) {
+      
+        var data = this.cloneArray(ui.randomTerms.value(),[]);
+        if (ui.correlatedEffects.value()=="block") {
+          for (var i = 0; i < data.length; i++) {
+            var datum = data[i];
+            if (datum[0]!==undefined & datum.length>1) {
+                var cluster=datum[0].slice(-1).pop();
+                for (var j = 1; j < datum.length; j++) {
+                      if (datum[j].slice(-1).pop()!==cluster) {
+                      data[i].splice(j,1);  
+                      }
+            }
+        }
+        }
+      ui.randomTerms.setValue(data);  
+    }
     },
     onEvent_randomTerms_preprocess: function(ui, data) {
  //       for(var j = 0; j < data.items.length; j++) {
@@ -75,30 +90,7 @@ const events = {
     },
     onEvent_corr: function(ui, data) {
           console.log("Correlation structure changed");
-
-          if (ui.correlatedEffects.value()=="block") {
-             ui.randomTerms.setValue(Array([]));
-             var button= ui.randomTerms.$addButton;
-             button[0].style.visibility="visible";
-             var target= ui.randomTerms;
-             target.$el[0].lastElementChild.style.borderColor=null;
-             target.controls[0].$el[0].childNodes[0].style.visibility="visible";
-
-          } else {
-             var data = this.cloneArray(ui.randomTerms.value(),[]);
-             console.log(data);
-             var one = flatMulti(data,this);
-             console.log([one]);
-             var button= ui.randomTerms.$addButton;
-             button[0].style.visibility="hidden";
-             var target= ui.randomTerms;
-             target.setValue(Array(one));
-             var one = target.controls[0];
-             target.$el[0].lastElementChild.style.borderColor="transparent";
-             one.$el[0].childNodes[0].style.visibility="hidden";
-             one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
-
-          }
+          fixRandomEffects(ui,this);
 
     },    
 
@@ -108,6 +100,45 @@ const events = {
     }    
 
 };
+
+var fixRandomEffects = function(ui, context) {
+            var option=ui.correlatedEffects.value();
+            var oldOption = context.workspace.correlatedEffects;
+            context.workspace.correlatedEffects=option;
+
+            console.log(option);
+            console.log(oldOption);
+            
+            if (ui.correlatedEffects.value()=="block") {
+                  if (oldOption==="corr" || oldOption==="nocorr")
+                        ui.randomTerms.setValue(Array([]));
+
+                  // make sure the add button is visible                      
+                  var button= ui.randomTerms.$addButton;
+                  button[0].style.visibility="visible";
+                  // get the randomTerms field to manipulate the children
+                  var target= ui.randomTerms;
+                  target.$el[0].lastElementChild.style.borderColor=null;
+                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+                  // remove possibility to kill the first row
+                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+                  
+
+             } else {
+                 var data = context.cloneArray(ui.randomTerms.value(),[]);
+                 var one = flatMulti(data,context);
+                 var button= ui.randomTerms.$addButton;
+                 button[0].style.visibility="hidden";
+                 var target= ui.randomTerms;
+                 target.setValue(Array(one));
+                 var one = target.controls[0];
+                 target.$el[0].lastElementChild.style.borderColor="transparent";
+                 one.$el[0].childNodes[0].style.visibility="hidden";
+                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+             }
+
+  
+}
 
 var calcModelTerms = function(ui, context) {
     var variableList = context.cloneArray(ui.factors.value(), []);
@@ -303,7 +334,6 @@ var updateRandomSupplier = function(ui, context) {
        var item=context.cloneArray(termsList[j]);
        item[item.length]=clusterList[i];
        alist.push(item);
-//       console.log(item);
      }
     }
     context.sortArraysByLength(alist);
@@ -317,26 +347,6 @@ var updateRandomSupplier = function(ui, context) {
 //            });    
     ui.randomSupplier.setValue(formatted);
     
-    console.log("updating random blocks");
-    
-    var randomTerms = context.cloneArray(ui.randomTerms.value(), []); 
-    if (randomTerms.length==0)
-        for(var i = 0; i < clusterList.length; ++i) {
-           randomTerms[i]=[];
-     }
-
-    var missing = clusterList.length-randomTerms.length
-    
-    console.log("missing"+missing);
-
-    console.log(randomTerms);
-    
-    for(var i = 0; i < missing; ++i) {
-      randomTerms[randomTerms.length+1]=[];
-    }
-    console.log(randomTerms);
-    ui.randomTerms.setValue(randomTerms);
-
 };
 
 
