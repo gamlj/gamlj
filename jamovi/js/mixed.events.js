@@ -2,12 +2,18 @@ var rtermFormat = require('./rtermFormat');
 
 const events = {
     update: function(ui) {
+        this.setCustomVariable("Intercept", "none", "");
         calcModelTerms(ui, this);
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updateRandomSupplier(ui,this);
         fixRandomEffects(ui,this);
+
+    // this is for hiding the labels used for warnings 
+       ui.bogus.$el[0].remove();
+       ui.modeNote.$el[0].style.visibility="hidden";
+       ui.modeNote.$el[0].style.color="red";
 
     },
 
@@ -53,7 +59,7 @@ const events = {
         this.checkValue(ui.plotSepPlots, false, values, FormatDef.variable);
     },
     
-        onChange_simpleSupplier: function(ui) {
+    onChange_simpleSupplier: function(ui) {
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
         this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
@@ -66,7 +72,7 @@ const events = {
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
     onEvent_addRandomTerm: function(ui) {
-      
+        console.log("addRandomTerm");
         var data = this.cloneArray(ui.randomTerms.value(),[]);
         if (ui.correlatedEffects.value()=="block") {
           for (var i = 0; i < data.length; i++) {
@@ -76,11 +82,13 @@ const events = {
                 for (var j = 1; j < datum.length; j++) {
                       if (datum[j].slice(-1).pop()!==cluster) {
                       data[i].splice(j,1);  
-                      }
+                      ui.modeNote.$el[0].style.visibility="visible";
+                     } 
+
             }
         }
         }
-      ui.randomTerms.setValue(data);  
+       ui.randomTerms.setValue(data);  
     }
     },
     onEvent_randomTerms_preprocess: function(ui, data) {
@@ -90,12 +98,15 @@ const events = {
     },
     onEvent_corr: function(ui, data) {
           console.log("Correlation structure changed");
+          ui.modeNote.$el[0].style.visibility="hidden";
           fixRandomEffects(ui,this);
 
     },    
 
 
    onEvent_nothing: function(ui, data) {
+           // remove error notes if any
+          ui.modeNote.$el[0].style.visibility="hidden";
           console.log("I didn't do anything");
     }    
 
@@ -105,14 +116,11 @@ var fixRandomEffects = function(ui, context) {
             var option=ui.correlatedEffects.value();
             var oldOption = context.workspace.correlatedEffects;
             context.workspace.correlatedEffects=option;
+          
 
-            console.log(option);
-            console.log(oldOption);
-            
             if (ui.correlatedEffects.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.randomTerms.setValue(Array([]));
-
                   // make sure the add button is visible                      
                   var button= ui.randomTerms.$addButton;
                   button[0].style.visibility="visible";

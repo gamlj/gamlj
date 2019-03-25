@@ -138,6 +138,14 @@ children:
                           template:
                             type: TermLabel
                             format: ./rtermFormat
+      - type: Label
+        name: modeNote
+        margin: small
+        label: >-
+            Effects varying across different cluster variables cannot be correlated
+        children:
+                     - type: CheckBox
+                       name: bogus
 
       - type: LayoutBox
         margin: large
@@ -173,6 +181,7 @@ children:
                   children:
                     - type: CheckBox
                       name: lrtRandomEffects
+
 
   - type: CollapseBox
     label: Factors Coding

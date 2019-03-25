@@ -350,31 +350,33 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
-    mark(terms)
-    mark(class(terms[[1]]))
-    return("(1|id)")
-    terms<-lapply(terms,jmvcore::toB64)
-    flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
-    res<-do.call("rbind",flatterms)
-    res<-tapply(res[,1],res[,2],paste)
-    if (correl) {
+    
+    # remove empty sublists
+    terms<-terms[sapply(terms, function(a) !is.null(unlist(a)))]
+    # split in sublists if option=nocorr
+    if (correl=="nocorr") {
+      termslist<-terms[[1]]
+      terms<-lapply(termslist,list)
+    }
+    rterms<-""    
+    for(i in seq_along(terms)) {
+      one<-terms[[i]]
+      one64<-lapply(one,jmvcore::toB64)
+      flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
+      res<-do.call("rbind",flatterms)
+      res<-tapply(res[,1],res[,2],paste)
       res<-sapply(res, function(x) paste(x,collapse = " + "))
+      test<-grep(jmvcore::toB64("Intercept"),res,fixed=TRUE)
+      if (is.something(test))
+        res<-gsub(jmvcore::toB64("Intercept"),1,res)
+      else
+        res[[1]]<-paste(0,res[[1]],sep = "+")
       form<-paste(res,names(res),sep="|")
       form<-paste("(",form,")")
-    } else {
-      form<-sapply(names(res), function(x) sapply(res[[x]], function(z) paste("(",paste(z,x,sep = "|"),")")))
-      form<-sapply(form, function(x) paste(x,collapse = "+"))
-    } 
-    form<-gsub(jmvcore::toB64('Intercept'),1,form,fixed = T)
-    # fix the formula in case there is no intercept
-
-    form<-lapply(form, function(x) {
-              if(!grepl(" 1",x,fixed = T)) 
-                 gsub("(","(0+",x,fixed = T)
-              else
-                x})
-    form=paste(form,collapse = "+")
-    form
+      rterms<-paste(rterms,form,sep = "+")
+    }
+    rterms<-paste(rterms,collapse = "")
+    rterms
   },
   .cleandata=function() {
       n64<-private$.names64
@@ -448,7 +450,7 @@ gamljMixedClass <- R6::R6Class(
       
       modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
       fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
-      mf<-paste(fixed,rands,sep =  "+")
+      mf<-paste(fixed,rands,sep =  "")
       mf
     },
 
