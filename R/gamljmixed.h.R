@@ -411,9 +411,6 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="")),
                 clearWith=list(
                     "dep",
-                    "factors",
-                    "cluster",
-                    "cov",
                     "randomTerms",
                     "modelTerms")))
             self$add(R6::R6Class(

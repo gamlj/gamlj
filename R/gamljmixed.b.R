@@ -46,7 +46,7 @@ gamljMixedClass <- R6::R6Class(
       data<-private$.cleandata()
       
       ### initialize conditioning of covariates
-      if (!is.null(self$options$covs)) {
+      if (is.something(self$options$covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
@@ -115,7 +115,6 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       reml<-self$options$reml
-      
       if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
@@ -241,6 +240,7 @@ gamljMixedClass <- R6::R6Class(
                   randomTable$setNote('info', info)
                          
                ### prepare info table #########       
+               mark("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
                info.aic<-model_summary$AICtab[1]
@@ -350,7 +350,6 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
-    
     # remove empty sublists
     terms<-terms[sapply(terms, function(a) !is.null(unlist(a)))]
     # split in sublists if option=nocorr
@@ -364,7 +363,7 @@ gamljMixedClass <- R6::R6Class(
       one64<-lapply(one,jmvcore::toB64)
       flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
       res<-do.call("rbind",flatterms)
-      if (length(unique(res[,2]))>1)
+      if (length(unique(res[,2]))>1 && correl=="block")
          jmvcore::reject("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
       res<-tapply(res[,1],res[,2],paste)
       res<-sapply(res, function(x) paste(x,collapse = " + "))
@@ -373,7 +372,7 @@ gamljMixedClass <- R6::R6Class(
         res<-gsub(jmvcore::toB64("Intercept"),1,res)
       else
         res[[1]]<-paste(0,res[[1]],sep = "+")
-      form<-paste(res,names(res),sep="|")
+      form<-paste(res,names(res),sep=" | ")
       form<-paste("(",form,")")
       rterms<-paste(rterms,form,sep = "+")
     }
@@ -599,18 +598,25 @@ gamljMixedClass <- R6::R6Class(
       }
       if (name=="randomTerms") {
         bars<-lme4::findbars(formula)
-        ret<-rep(list(NULL),length(bars))
+        fullist<-list()
         for (b in seq_along(bars)) {
-          bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)
+          cluster=bars[[b]][[3]]
+          bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)[[1]]
           barlist<-list()
+          j<-0
           for (term in bar) {
-            alist<-list(term,bars[[b]][[3]])
-            barlist<-append(barlist,alist)
+            term<-trimws(jmvcore::decomposeTerm(term))
+            if (length(term)==1 && term=="1")
+                   term="Intercept"
+            if (length(term)==1 && term=="0")
+                next()              
+            alist<-c(term,as.character(cluster))
+            j<-j+1
+            barlist[[j]]<-alist
           }
-          ret[[b]]<-list("a"=barlist)
+          fullist[[b]]<-barlist
         }
-        mark(ret)
-        return(ret)
+        return(fullist)
       }
       
       if (name=="modelTerms") {
