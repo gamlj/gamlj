@@ -62,7 +62,6 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
          est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
          dest<-as.data.frame(est)
-         mark(dest)
          old<-names(dest)
          ## reorder the variable independently of emmeans output
          wide<-dim(dest)[2]

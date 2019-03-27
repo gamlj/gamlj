@@ -17,9 +17,6 @@ items:
          title: ""
     clearWith:
         - dep
-        - factors
-        - cluster
-        - cov
         - randomTerms
         - modelTerms
 
