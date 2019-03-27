@@ -472,3 +472,5 @@ items:
            - percvalue
            - cvalue
 
+  - name: plotnotes
+    type: Html

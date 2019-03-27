@@ -388,7 +388,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         simpleEffects = function() private$.items[["simpleEffects"]],
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
-        descPlots = function() private$.items[["descPlots"]]),
+        descPlots = function() private$.items[["descPlots"]],
+        plotnotes = function() private$.items[["plotnotes"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -927,7 +928,10 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotRaw",
                         "randomTerms",
                         "percvalue",
-                        "cvalue"))))}))
+                        "cvalue"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="plotnotes"))}))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljMixedBase",
@@ -1047,6 +1051,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
