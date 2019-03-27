@@ -433,12 +433,6 @@ options:
       type: Bool
       default: false
             
-    - name: bogus
-      type: Bool
-      default: false
-      description:
-          R: >
-            `a bogus option to define a label without visible children`
 
 ...
 
