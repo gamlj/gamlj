@@ -42,8 +42,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             correlatedEffects = "corr",
             reml = TRUE,
             lrtRandomEffects = FALSE,
-            plotRandomEffects = FALSE,
-            bogus = FALSE, ...) {
+            plotRandomEffects = FALSE, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -269,10 +268,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "plotRandomEffects",
                 plotRandomEffects,
                 default=FALSE)
-            private$..bogus <- jmvcore::OptionBool$new(
-                "bogus",
-                bogus,
-                default=FALSE)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -309,7 +304,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..reml)
             self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..plotRandomEffects)
-            self$.addOption(private$..bogus)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -346,8 +340,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         correlatedEffects = function() private$..correlatedEffects$value,
         reml = function() private$..reml$value,
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
-        plotRandomEffects = function() private$..plotRandomEffects$value,
-        bogus = function() private$..bogus$value),
+        plotRandomEffects = function() private$..plotRandomEffects$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -383,8 +376,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..correlatedEffects = NA,
         ..reml = NA,
         ..lrtRandomEffects = NA,
-        ..plotRandomEffects = NA,
-        ..bogus = NA)
+        ..plotRandomEffects = NA)
 )
 
 gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -1042,8 +1034,6 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
 #'   random effects
 #' @param plotRandomEffects .
-#' @param bogus \code{a bogus option to define a label without visible
-#'   children}
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1108,7 +1098,6 @@ gamljMixed <- function(
     reml = TRUE,
     lrtRandomEffects = FALSE,
     plotRandomEffects = FALSE,
-    bogus = FALSE,
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1210,8 +1199,7 @@ gamljMixed <- function(
         correlatedEffects = correlatedEffects,
         reml = reml,
         lrtRandomEffects = lrtRandomEffects,
-        plotRandomEffects = plotRandomEffects,
-        bogus = bogus)
+        plotRandomEffects = plotRandomEffects)
 
     results <- gamljMixedResults$new(
         options = options)

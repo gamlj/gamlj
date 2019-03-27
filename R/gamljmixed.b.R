@@ -364,6 +364,8 @@ gamljMixedClass <- R6::R6Class(
       one64<-lapply(one,jmvcore::toB64)
       flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
       res<-do.call("rbind",flatterms)
+      if (length(unique(res[,2]))>1)
+         jmvcore::reject("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
       res<-tapply(res[,1],res[,2],paste)
       res<-sapply(res, function(x) paste(x,collapse = " + "))
       test<-grep(jmvcore::toB64("Intercept"),res,fixed=TRUE)

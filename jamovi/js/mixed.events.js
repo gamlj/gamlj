@@ -10,11 +10,6 @@ const events = {
         updateRandomSupplier(ui,this);
         fixRandomEffects(ui,this);
 
-    // this is for hiding the labels used for warnings 
-       ui.bogus.$el[0].remove();
-       ui.modeNote.$el[0].style.visibility="hidden";
-       ui.modeNote.$el[0].style.color="red";
-
     },
 
     onChange_factors: function(ui) {
@@ -72,24 +67,7 @@ const events = {
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
     onEvent_addRandomTerm: function(ui) {
-        console.log("addRandomTerm");
-        var data = this.cloneArray(ui.randomTerms.value(),[]);
-        if (ui.correlatedEffects.value()=="block") {
-          for (var i = 0; i < data.length; i++) {
-            var datum = data[i];
-            if (datum[0]!==undefined & datum.length>1) {
-                var cluster=datum[0].slice(-1).pop();
-                for (var j = 1; j < datum.length; j++) {
-                      if (datum[j].slice(-1).pop()!==cluster) {
-                      data[i].splice(j,1);  
-                      ui.modeNote.$el[0].style.visibility="visible";
-                     } 
-
-            }
-        }
-        }
-       ui.randomTerms.setValue(data);  
-    }
+        console.log("addRandomTerm does nothing");
     },
     onEvent_randomTerms_preprocess: function(ui, data) {
  //       for(var j = 0; j < data.items.length; j++) {
@@ -98,7 +76,6 @@ const events = {
     },
     onEvent_corr: function(ui, data) {
           console.log("Correlation structure changed");
-          ui.modeNote.$el[0].style.visibility="hidden";
           fixRandomEffects(ui,this);
 
     },    
@@ -106,7 +83,6 @@ const events = {
 
    onEvent_nothing: function(ui, data) {
            // remove error notes if any
-          ui.modeNote.$el[0].style.visibility="hidden";
           console.log("I didn't do anything");
     }    
 
