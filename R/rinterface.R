@@ -52,16 +52,20 @@ gamlj_update<-function(gobj,...) {
 #'
 #' This function re-estimates a GAMLj model with a new plot
 
-#' @param gobj a gamlj results object of the class GAMLj*#'
+#' @param gobj a gamlj results object of the class GAMLj*
 #' @param haxis horizontal axis variable
 #' @param sepLines variable defining the levels for separate lines 
 #' @param sepPlots variable defining the levels for which separate plots are produced 
 #' @param ... any other options accepted by the gamlj_* function  
 #' @return an object of class GAMLj* as the input object
+#' @examples
+#' data<-subjects_by_stimuli
+#' data$cond<-factor(data$cond)
+#' 
 #' @author Marcello Gallucci
 #' @export
 gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
- news<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
+ args<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
  gamlj_update(gobj,args)  
  
 }

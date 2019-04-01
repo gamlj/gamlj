@@ -14,8 +14,9 @@ gamljMixed(data, dep = NULL, factors = NULL, covs = NULL,
   simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
   percvalue = 25, simpleScaleLabels = "labels",
   postHocCorr = list("bonf"), scaling = NULL, cluster = NULL,
-  randomTerms = NULL, correlatedEffects = TRUE, reml = TRUE,
-  lrtRandomEffects = FALSE, plotRandomEffects = FALSE, formula)
+  randomTerms = list(list()), correlatedEffects = "corr",
+  reml = TRUE, lrtRandomEffects = FALSE, plotRandomEffects = FALSE,
+  formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -107,11 +108,14 @@ respectively}
 \item{cluster}{a vector of strings naming the clustering variables from
 \code{data}}
 
-\item{randomTerms}{a list of character vectors describing random
-coefficients that need to be computed}
+\item{randomTerms}{a list of lists specifying the models random effects.}
 
-\item{correlatedEffects}{\code{TRUE} (default) or \code{FALSE} , include
-correlated random effects}
+\item{correlatedEffects}{\code{'nocorr'}, \code{'corr'} (default), or
+\code{'block'}. When random effects are passed as list of length 1, it
+decides whether the effects should be correlated,  non correlated. If
+\code{'randomTerms'} is a list of  lists of length > 1, the option is
+automatially set to \code{'block'}. The option is ignored if the model is
+passed using \code{formula}.}
 
 \item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 be used rather than ML}
@@ -139,6 +143,7 @@ A results object containing:
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+  \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -152,12 +157,17 @@ Mixed Linear Model
 }
 \examples{
 data(subjects_by_stimuli)
+
 gamlj::gamljMixed(
-  data = subjects_by_stimuli,
-  dep = "y",
-  factors = "cond",
-  modelTerms = "cond",
-  cluster = "subj",
-  randomTerms=list(c("cond","subj")))
+       formula = y ~ 1 + cond+( 1|subj ),
+       data = subjects_by_stimuli)
+
+gamlj::gamljMixed(
+       data = subjects_by_stimuli,
+       dep = "y",
+       factors = "cond",
+       modelTerms = "cond",
+       cluster = "subj",
+       randomTerms=list(list(c("cond","subj"))))
 
 }
