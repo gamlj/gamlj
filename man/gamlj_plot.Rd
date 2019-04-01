@@ -7,7 +7,7 @@
 gamlj_plot(gobj, haxis, sepLines = NULL, sepPlots = NULL, ...)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*#'}
+\item{gobj}{a gamlj results object of the class GAMLj*}
 
 \item{haxis}{horizontal axis variable}
 
@@ -22,6 +22,11 @@ an object of class GAMLj* as the input object
 }
 \description{
 This function re-estimates a GAMLj model with a new plot
+}
+\examples{
+data<-subjects_by_stimuli
+data$cond<-factor(data$cond)
+
 }
 \author{
 Marcello Gallucci

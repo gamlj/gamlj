@@ -877,7 +877,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(jmvcore::Image$new(
                 options=options,
                 name="descPlot",
-                title="Fixed Effects Plots",
+                title="Effects Plots",
                 visible="(plotHAxis)",
                 width=500,
                 height=300,
@@ -931,7 +931,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "cvalue"))))
             self$add(jmvcore::Html$new(
                 options=options,
-                name="plotnotes"))}))
+                name="plotnotes",
+                visible=FALSE))}))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljMixedBase",
@@ -958,13 +959,18 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'
 #' @examples
 #' data(subjects_by_stimuli)
+#'
 #' gamlj::gamljMixed(
-#'   data = subjects_by_stimuli,
-#'   dep = "y",
-#'   factors = "cond",
-#'   modelTerms = "cond",
-#'   cluster = "subj",
-#'   randomTerms=list(c("cond","subj")))
+#'        formula = y ~ 1 + cond+( 1|subj ),
+#'        data = subjects_by_stimuli)
+#'
+#' gamlj::gamljMixed(
+#'        data = subjects_by_stimuli,
+#'        dep = "y",
+#'        factors = "cond",
+#'        modelTerms = "cond",
+#'        cluster = "subj",
+#'        randomTerms=list(list(c("cond","subj"))))
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
@@ -1025,11 +1031,12 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
 #' @param randomTerms a list of lists specifying the models random effects.
-#' @param correlatedEffects \code{'none'}, \code{'corr'} (default), or
-#'   \code{'block'}. When random effects are passed as list, decides whether
-#'   they should be correlated,  non correlated or correlated by block. By block
-#'   expects a list of  lists, letting the coefficients to be correlated within
-#'   each list. If the model is passed using a formula, this option is ignored
+#' @param correlatedEffects \code{'nocorr'}, \code{'corr'} (default), or
+#'   \code{'block'}. When random effects are passed as list of length 1, it
+#'   decides whether the effects should be correlated,  non correlated. If
+#'   \code{'randomTerms'} is a list of  lists of length > 1, the option is
+#'   automatially set to \code{'block'}. The option is ignored if the model is
+#'   passed using \code{formula}.
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be used rather than ML
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the

@@ -194,7 +194,6 @@ gamljMixedClass <- R6::R6Class(
                realgroups<-n64$nicenames(grp)
                realnames1<-lapply(n64$nicenames(vcv$var1),jmvcore::stringifyTerm)
                realnames2<-lapply(n64$nicenames(vcv$var2),jmvcore::stringifyTerm)
-               
                if (dim(vcv)[1]>0) {
                  for (i in 1:dim(vcv)[1]) {
                    randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
@@ -205,7 +204,7 @@ gamljMixedClass <- R6::R6Class(
                
                ### anova results ####
                if (is.null(anovaTable$state)) {
-                   mark("compute the Anova stuff")
+                   ginfo("compute the Anova stuff")
                    anova_res<-NULL
                    if (length(modelTerms)==0) {
                         anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
@@ -234,19 +233,19 @@ gamljMixedClass <- R6::R6Class(
                          if (!is.null(attr(parameters,"warning"))) 
                               estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
                          estimatesTable$setState(TRUE)
-                         mark("...done")
+                         ginfo("...done")
                ### fix random table notes
                   info<-paste("Number of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
                   randomTable$setNote('info', info)
                          
                ### prepare info table #########       
-               mark("updating the info table")
+               ginfo("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
                info.aic<-model_summary$AICtab[1]
                info.bic<-model_summary$AICtab[2]
                info.loglik<-model_summary$AICtab[3]
-               r2<-try(r.squared(model))
+               r2<-try(r.squared(model),silent = TRUE)
                if (jmvcore::isError(r2)){
                    note<-"R-squared cannot be computed."
                    info.r2m<-NaN        
@@ -350,6 +349,10 @@ gamljMixedClass <- R6::R6Class(
 
     },
   .buildreffects=function(terms,correl=TRUE) {
+ 
+    ## this is for R. It overrides the correlatedEffect option 
+    if (length(terms)>1)
+         correl<-"block"
     # remove empty sublists
     terms<-terms[sapply(terms, function(a) !is.null(unlist(a)))]
     # split in sublists if option=nocorr
@@ -391,7 +394,7 @@ gamljMixedClass <- R6::R6Class(
       for (factor in factors) {
         ### we need this for Rinterface ####
         if (!("factor" %in% class(dataRaw[[factor]]))) {
-          mark(paste("Warning, variable",factor," has been coerced to factor"))
+          warning(paste("Warning, variable",factor," has been coerced to factor"))
           dataRaw[[factor]]<-factor(dataRaw[[factor]])
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
@@ -495,10 +498,11 @@ gamljMixedClass <- R6::R6Class(
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
     pnames<-c("cluster","group","lines","plots")
     names(randomData)<-c("y",pnames[1:length(preds64)])
-    note<-self$results$get('plotnotes')
-    note$content<-paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster))
+    note<-self$results$plotnotes
+  #  note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
+    note$setContent('Random effects')
     note$setVisible(TRUE)
-
+    
   } else
     randomData<-NULL
 
@@ -582,6 +586,7 @@ gamljMixedClass <- R6::R6Class(
   return(p)
 },
 .marshalFormula= function(formula, data, name) {
+  
       fixed<-lme4::nobars(formula)
       bars<-lme4::findbars(formula)
       rterms<-sapply(bars,all.vars)
@@ -632,7 +637,7 @@ gamljMixedClass <- R6::R6Class(
 
 
 .formula = function() {
-  
+
   private$.names64$translate(private$.modelFormula())
   
 },

@@ -54,13 +54,15 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   names(condlist)<-jmvcore::toB64(names(condlist))
   est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,lmer.df = df,nesting=NULL)
 #  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
-
+  est
 }
 
 
 
 pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
+         suppressWarnings(
          est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
+         )
          dest<-as.data.frame(est)
          old<-names(dest)
          ## reorder the variable independently of emmeans output

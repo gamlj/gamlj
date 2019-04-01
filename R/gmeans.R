@@ -87,10 +87,10 @@ gmeans.populate<-function(model,options,tables,cov_conditioning=NULL) {
     mterms<-unique(lapply(mterms, function(a) a[order(a)]))
     
     if (tables$isFilled()) {
-      mark("Estimated marginal means recycled")
+      ginfo("Estimated marginal means recycled")
       return()
     }
-    mark("Estimated marginal means computed")
+    ginfo("Estimated marginal means computed")
     for (term in mterms) {
       key<-.nicifyTerms(jmvcore::composeTerm(term))    
       aTable<-tables$get(key=key)

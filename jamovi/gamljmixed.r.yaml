@@ -415,7 +415,7 @@ items:
 
 
   - name: descPlot
-    title: Fixed Effects Plots
+    title: Effects Plots
     visible: (plotHAxis)
     type: Image
     description: a descriptives plot
@@ -474,3 +474,4 @@ items:
 
   - name: plotnotes
     type: Html
+    visible: false

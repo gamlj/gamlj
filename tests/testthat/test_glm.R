@@ -20,7 +20,6 @@ test_that("glm estimates are correct", {
 })
 
 data("hsbdemo")
-hsbdemo$schtyp
 mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
@@ -110,3 +109,10 @@ test_that("glm contrasts", {
   expect_equal(round(res[3,3],2),-2.45)
   expect_equal(round(res[1,3],2),18.55)
 })
+
+
+mod<-gamlj::gamljGLM(
+  formula = science ~ math + I(math^2),
+  data = data
+)
+

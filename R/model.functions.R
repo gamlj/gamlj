@@ -198,7 +198,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
   if (!all(is.na(ano[,3])==F)) {
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
     # the factors. Here we try to fix it.
-    info("lmerTest problems with df: try to fix it")
+    ginfo("lmerTest problems with df: try to fix it")
     whichone<-is.na(ano[,3])
     rn<-rownames(ano[whichone,])
     smr<-summary(model,ddf=df)
@@ -232,7 +232,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
-  info("lmerTest failed: anava uses car::Anova")
+  ginfo("lmerTest failed: anava uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"

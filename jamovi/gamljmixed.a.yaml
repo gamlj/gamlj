@@ -11,13 +11,20 @@ description:
         dontrun: false
         usage: |
               data(subjects_by_stimuli)
+
               gamlj::gamljMixed(
-                data = subjects_by_stimuli,
-                dep = "y",
-                factors = "cond",
-                modelTerms = "cond",
-                cluster = "subj",
-                randomTerms=list(c("cond","subj")))
+                     formula = y ~ 1 + cond+( 1|subj ),
+                     data = subjects_by_stimuli)
+
+              gamlj::gamljMixed(
+                     data = subjects_by_stimuli,
+                     dep = "y",
+                     factors = "cond",
+                     modelTerms = "cond",
+                     cluster = "subj",
+                     randomTerms=list(list(c("cond","subj"))))
+
+        
 
 formula:
    dep:
@@ -406,11 +413,11 @@ options:
       default: corr
       description:
           R: >
-            `'none'`, `'corr'` (default), or `'block'`. When random effects
-            are passed as list, decides whether they should be correlated, 
-            non correlated or correlated by block. By block expects a list of 
-            lists, letting the coefficients to be correlated within each list.
-            If the model is passed using a formula, this option is ignored
+            `'nocorr'`, `'corr'` (default), or `'block'`. When random effects
+            are passed as list of length 1, it decides whether the effects should be correlated, 
+            non correlated. If `'randomTerms'` is a list of 
+            lists of length > 1, the option is automatially set to `'block'`.
+            The option is ignored if the model is passed using `formula`.
 
     - name: reml
       title: REML
