@@ -28,6 +28,7 @@ gposthoc.init=function(data,options,tables) {
   }
 
   
+  
   for (j in seq_len(nDepLevels))
     for (ph in phTerms) {
       table <- tables$get(key=ph)
