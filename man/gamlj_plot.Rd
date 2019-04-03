@@ -24,8 +24,14 @@ an object of class GAMLj* as the input object
 This function re-estimates a GAMLj model with a new plot
 }
 \examples{
-data<-subjects_by_stimuli
-data$cond<-factor(data$cond)
+data<-exercise
+gamljGLM(formula=)
+data(qsport)
+mod<-gamlj::gamljGLM(
+  formula = performance ~ hours,
+  data = qsport)
+
+gamlj_plot(mod,haxis = "hours")
 
 }
 \author{

@@ -21,6 +21,13 @@ gposthoc.init=function(data,options,tables) {
     nDepLevels<-length(depLevels)
     off<-1
   }
+  diff_label="Difference"
+  
+  if (modelType %in% c('logistic','poisson','poiover','nb' )) {
+    diff_label="exp(B)"
+  }
+
+  
   for (j in seq_len(nDepLevels))
     for (ph in phTerms) {
       table <- tables$get(key=ph)
@@ -38,6 +45,8 @@ gposthoc.init=function(data,options,tables) {
         nc<-nc+1
         table$addColumn(name=paste0("c",nc-1), title=ph[i], type='text', superTitle='Comparison',index=nc+off)
       }
+      ##### fix the difference column label
+      table$getColumn('estimate')$setTitle(diff_label)
       ##### set the rows ###########
       
       eg<-nrow(expand.grid(bsLevels[ph]))

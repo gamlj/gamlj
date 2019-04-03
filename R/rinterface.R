@@ -59,8 +59,14 @@ gamlj_update<-function(gobj,...) {
 #' @param ... any other options accepted by the gamlj_* function  
 #' @return an object of class GAMLj* as the input object
 #' @examples
-#' data<-subjects_by_stimuli
-#' data$cond<-factor(data$cond)
+#' data<-exercise
+#' gamljGLM(formula=)
+#' data(qsport)
+#' mod<-gamlj::gamljGLM(
+#'   formula = performance ~ hours,
+#'   data = qsport)
+#' 
+#' gamlj_plot(mod,haxis = "hours")
 #' 
 #' @author Marcello Gallucci
 #' @export
