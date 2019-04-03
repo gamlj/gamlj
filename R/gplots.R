@@ -259,7 +259,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
   p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
   
-  
+
   if (is.factor(image$state$data$group)) {
     
     if (!is.null(image$state$randomData)) {
@@ -269,7 +269,6 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),color="gray64",show.legend = F,shape=12, alpha=.5,  size=.5)
       p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group = "cluster"),color="gray64",size=.3, alpha=.3,show.legend = F) 
     }
-    
     p <- p + ggplot2::geom_point(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),shape=16, size=4, position=dodge)
     if (errorType != '')
       p <- p + ggplot2::geom_errorbar(data=gdata,aes_string(x="group", ymin="lwr", ymax="upr", width=.1, group="lines",color="lines"), size=1.2, position=dodge)
@@ -297,8 +296,16 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   ## here we put mean in the middle between mean +offset and -offset    
   levs<-levels(gdata$lines)
   if (sum(grep("Mean",levs,fixed=T))==6) {
-    newbreaks<-levs[c(2,1,3)]
+    a<-grep("Mean+",levs,fixed = T)
+    c<-grep("Mean-",levs,fixed = T)
+    b<-grep("Mean$",levs)
+  
+    if (length(b)==0)
+      b<-grep("Mean=",levs)
+    newbreaks<-levs[c(a,b,c)]
+    mark(theme[[3]]$breaks)
     theme[[3]]$breaks<-newbreaks    
+    mark(newbreaks)
   }
   p<-p+theme
   p   

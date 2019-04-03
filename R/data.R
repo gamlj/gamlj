@@ -58,3 +58,15 @@ NULL
 #' @examples
 #' data(hsbdemo)
 NULL
+
+#' Sport data with curvilinear effects
+#'
+#' Data for curvilinear effects
+#'
+#' @docType data
+#' @name qsport
+#' @usage data(qsport)
+#' @keywords datasets
+#' @examples
+#' data(qsport)
+NULL

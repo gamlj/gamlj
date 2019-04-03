@@ -192,7 +192,7 @@ options:
       default:
       description:
           R: >
-            a string naming the variable to separate over to form multiple plots
+            the variable for whose levels multiple plots are computed
 
     - name: plotRaw
       title: Observed scores
@@ -206,7 +206,10 @@ options:
       title: Y-axis observed range 
       type: Bool
       default: false
-
+      description:
+          R: >
+             `TRUE` or `FALSE` (default), scale the plot Y-Axis to the max and the min
+             of the dependent variable observed scores.
 
     - name: plotError
       title: Error Bar Definition
@@ -329,6 +332,11 @@ options:
         - name: values_labels
           title: Values + Labels
       default: labels
+      description:
+            R: >
+             decide the labeling of simple effects in tables and plots. 
+             `labels` indicates that only labels are used, such as `Mean` and 
+             `Mean + 1 SD`. `values` uses the actual values as labels. `values_labels` uses both.
 
 
 ############ generic with some specs ###########
@@ -439,6 +447,10 @@ options:
       title: Random effects  
       type: Bool
       default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), add random effects predicted values in the
+            plot
             
 
 ...

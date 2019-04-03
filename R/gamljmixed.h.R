@@ -997,11 +997,12 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
 #'   lines on the plot
-#' @param plotSepPlots a string naming the variable to separate over to form
-#'   multiple plots
+#' @param plotSepPlots the variable for whose levels multiple plots are
+#'   computed
 #' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
 #'   statistics
-#' @param plotDvScale .
+#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), scale the plot
+#'   Y-Axis to the max and the min of the dependent variable observed scores.
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
@@ -1021,7 +1022,10 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'custom_percent'}. Use to condition the covariates (if any)
 #' @param cvalue offset value for conditioning
 #' @param percvalue offset value for conditioning
-#' @param simpleScaleLabels .
+#' @param simpleScaleLabels decide the labeling of simple effects in tables
+#'   and plots.  \code{labels} indicates that only labels are used, such as
+#'   \code{Mean} and  \code{Mean + 1 SD}. \code{values} uses the actual values
+#'   as labels. \code{values_labels} uses both.
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 #'   respectively
@@ -1041,7 +1045,8 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   be used rather than ML
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
 #'   random effects
-#' @param plotRandomEffects .
+#' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
+#'   effects predicted values in the plot
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{

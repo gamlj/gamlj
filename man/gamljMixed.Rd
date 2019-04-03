@@ -57,13 +57,14 @@ of the plot}
 \item{plotSepLines}{a string naming the variable represented as separate
 lines on the plot}
 
-\item{plotSepPlots}{a string naming the variable to separate over to form
-multiple plots}
+\item{plotSepPlots}{the variable for whose levels multiple plots are
+computed}
 
 \item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
 statistics}
 
-\item{plotDvScale}{.}
+\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), scale the plot
+Y-Axis to the max and the min of the dependent variable observed scores.}
 
 \item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 no error bars, use confidence intervals, or use standard errors on the
@@ -95,7 +96,10 @@ simple effects computed}
 
 \item{percvalue}{offset value for conditioning}
 
-\item{simpleScaleLabels}{.}
+\item{simpleScaleLabels}{decide the labeling of simple effects in tables
+and plots.  \code{labels} indicates that only labels are used, such as
+\code{Mean} and  \code{Mean + 1 SD}. \code{values} uses the actual values
+as labels. \code{values_labels} uses both.}
 
 \item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
 \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
@@ -123,7 +127,8 @@ be used rather than ML}
 \item{lrtRandomEffects}{\code{TRUE} or \code{FALSE} (default), LRT for the
 random effects}
 
-\item{plotRandomEffects}{.}
+\item{plotRandomEffects}{\code{TRUE} or \code{FALSE} (default), add random
+effects predicted values in the plot}
 
 \item{formula}{(optional) the formula to use, see the examples}
 }
