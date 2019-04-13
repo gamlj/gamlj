@@ -663,7 +663,7 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="Estimate", 
                                     `type`="number"),
                                 list(
-                                    `name`="SE", 
+                                    `name`="se", 
                                     `title`="SE", 
                                     `type`="number"),
                                 list(

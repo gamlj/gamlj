@@ -70,3 +70,16 @@ NULL
 #' @examples
 #' data(qsport)
 NULL
+
+#' Depression over time
+#'
+#' Data repeated measure anova with mixed models
+#'
+#' @docType data
+#' @name wicksell
+#' @usage data(wicksell)
+#' @keywords datasets
+#' @references David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~dhowell/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
+#' @examples
+#' data(wicksell)
+NULL

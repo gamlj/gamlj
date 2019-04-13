@@ -14,14 +14,6 @@ gamljMixedClass <- R6::R6Class(
       reml<-self$options$reml
       infoTable<-self$results$info
       dep<-self$options$dep
-      # mark(dep)
-      # mark("cluster",self$options$cluster)
-      # mark("factors",self$options$factors)
-      # mark("covs",self$options$covs)
-      # mark("mterms",self$options$modelTerms)
-      # mark("rterms",self$options$randomTerms)
-      # 
-
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -86,6 +78,7 @@ gamljMixedClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
+      mark(labels)
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))

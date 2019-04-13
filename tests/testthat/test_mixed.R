@@ -124,3 +124,28 @@ gamlj::gamljGLM(
 #   expect_equal(round(potable[1,5],digits = 2),0.14)
 # })
 # 
+## simple effects and polynomial
+
+data<-read.csv("/home/marcello/Skinner/Forge/jamovi/gamlj_docs/data/howell_rep.csv")
+data$group<-factor(data$group)
+data$time<-factor(data$time)
+expect_warning(gobj<-gamlj::gamljMixed(
+  formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
+  data = data,
+  contrasts = list(
+    list(
+      var="group",
+      type="simple"),
+    list(
+      var="time",
+      type="polynomial")),
+  simpleVariable = "time",
+  simpleModerator = "group")
+)
+es.params<-gobj$simpleEffects$Params$asDF
+
+ test_that("simple effects", {
+   expect_equal(as.character(es.params$contrast[[1]]),"linear")
+   expect_equal(as.character(es.params$contrast[[2]]),"quadratic")
+   expect_equal(round(es.params$estimate[3],digits=5),-7.32312)
+ })

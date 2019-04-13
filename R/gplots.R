@@ -245,7 +245,14 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   
   gdata<-image$state$data
   gdata$lines<-factor(gdata$lines)
-
+  lvls<-levels(gdata$lines)
+  if (lvls[1]=="Mean")
+            gdata$lines<-factor(gdata$lines,lvls[c(2,1,3)])
+  if (length(grep("Mean-",lvls[1],fixed=T)>0))
+           gdata$lines<-factor(gdata$lines,lvls[c(1,3,2)])
+  
+  mark(levels(gdata$lines))
+  
   p <- ggplot2::ggplot()
   
   if (!is.null(image$state$raw)) {
@@ -254,7 +261,6 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   }
 
   
-
   p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
   p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
@@ -294,19 +300,6 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   if (!is.null(title))
     p<-p+ ggtitle(title)
   ## here we put mean in the middle between mean +offset and -offset    
-  levs<-levels(gdata$lines)
-  if (sum(grep("Mean",levs,fixed=T))==6) {
-    a<-grep("Mean+",levs,fixed = T)
-    c<-grep("Mean-",levs,fixed = T)
-    b<-grep("Mean$",levs)
-  
-    if (length(b)==0)
-      b<-grep("Mean=",levs)
-    newbreaks<-levs[c(a,b,c)]
-    mark(theme[[3]]$breaks)
-    theme[[3]]$breaks<-newbreaks    
-    mark(newbreaks)
-  }
   p<-p+theme
   p   
 }

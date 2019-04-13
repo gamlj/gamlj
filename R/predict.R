@@ -1,4 +1,3 @@
-.internal.emmc<- NULL
 
 ### some conditioning function for the jamovi interface, plus numeric values and custom function for R interface
 
@@ -10,7 +9,6 @@
   
   if ("contrast" %in% names(table))
       aList[["contrast"]]<-levels(table[,"contrast"])
-  
   for (p in preds) {
     if (p %in% jmvcore::toB64(cov_conditioning$vars))
       aList[[p]]<-cov_conditioning$labels(p,decode=T)
@@ -49,11 +47,14 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   nterms<-jmvcore::fromB64(terms) 
   df<-tolower(df)
   data<-mf.getModelData(model)
+  oldw <- getOption("warn")
+  options(warn = -1)
   interval=as.numeric(interval)/100
   condlist<-cov_conditioning$values(nterms)
   names(condlist)<-jmvcore::toB64(names(condlist))
   est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,lmer.df = df,nesting=NULL)
 #  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
+  options(warn = oldw)
   est
 }
 
@@ -78,6 +79,28 @@ pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95
 }
 
 
+##### this is needed to change the contrast in pred.simpleEstimates
+
+.internal.emmc<-function(levs,data=data,variable=variable) {
+  # remove possible average covariates values in the levels passed by emmeans
+  levs<-sapply(levs,function(b) {
+    v<-strsplit(b,",")[[1]]
+    v[length(v)]
+  })
+  # get the contrast weights
+  
+  codes<-stats::contrasts(data[[variable]])
+  # transform the model matrix into the contrast matrix
+  n<-length(levs)
+  if (attr(data[[variable]],"jcontrast")=="dummy")
+    codes<-lf.createContrasts(levs,"simple")  
+  M <- as.data.frame(MASS::ginv(t(codes)))
+  # set some labels
+  names(M) <- lf.contrastLabels(levs,attr(data[[variable]],"jcontrast"))
+  attr(M, "desc") <- attr(data[[variable]],"jcontrast")
+  M
+}
+
 
 
 pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
@@ -93,30 +116,11 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
   
   if (is.factor(data[[variable]])) {
     
-    .internal.emmc<<-function(levs) {
-      # remove possible average covariates values in the levels passed by emmeans
-      levs<-sapply(levs,function(b) {
-        v<-strsplit(b,",")[[1]]
-        v[length(v)]
-      })
-      # get the contrast weights
-                
-      codes<-stats::contrasts(data[[variable]])
-      # transform the model matrix into the contrast matrix
-      n<-length(levs)
-      if (attr(data[[variable]],"jcontrast")=="dummy")
-         codes<-lf.createContrasts(levs,"simple")  
-      M <- as.data.frame(MASS::ginv(t(codes)))
-      # set some labels
-      names(M) <- lf.contrastLabels(levs,attr(data[[variable]],"jcontrast"))
-      attr(M, "desc") <- attr(data[[variable]],"jcontrast")
-      M
-    }
     emm<-rawMeans(model,
                    unlist(c(variable,moderator,threeway)),
                    cov_conditioning = cov_conditioning,
                    interval=interval)
-    est<-emmeans::contrast(emm,method = ".internal",by = preds)
+    est<-emmeans::contrast(emm,method = .internal.emmc,by = preds,data=data,variable=variable)
     ci<-stats::confint(est,level = interval/100)
     
     ####### rename ci variables because emmeans changes them for different models
@@ -147,7 +151,6 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 
   ff<-emmeans::test(est,joint=T,by=preds)
   ff<-.fixLabels(ff,preds,cov_conditioning)
-  
   ### For some model emmeans returns F with df2=Inf, which means Chi-squared/df. Let's make it explicit
   if (ff$df2[1]==Inf) {
       ff$df<-ff$df1
@@ -176,54 +179,32 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
   preds<-unlist(c(moderator,threeway))
   vars<-unlist(c(variable,moderator,threeway))
   lnames<-c("moderator","threeway")[1:length(preds)]
-  
+  ciWidth<-interval/100
   dep<-names(attr(stats::terms(model),"dataClasses"))[1]
   
-
-    .internal.emmc<<-function(levs) {
-      # remove possible average covariates values in the levels passed by emmeans
-      levs<-sapply(levs,function(b) {
-        v<-strsplit(b,",")[[1]]
-        v[length(v)]
-      })
-      if (!is.factor(data[[variable]])) {
-        vsd<-stats::sd(data[[variable]])
-        M<-as.data.frame(c(-.5/vsd,0,.5/vsd))
-        names(M)<-"Slope"
-      } else {
-      # get the contrast weights
-      codes<-stats::contrasts(data[[variable]])
-      # transform the model matrix into the contrast matrix
-      n<-length(levs)
-      M <- as.data.frame(MASS::ginv(t(codes)))
-      # set some labels
-      names(M) <- lf.contrastLabels(levs,attr(data[[variable]],"jcontrast"))
-      attr(M, "desc") <- attr(data[[variable]],"jcontrast")
-      }
-      M
-    }
-    preds_int<-jmvcore::composeTerm(list(vars))
+    
+    preds_int<-jmvcore::composeTerm(vars)
     preds_form<-stats::as.formula(paste("~",dep,"|",preds_int))
     condlist<-cov_conditioning$values(vars,decode = T)
-    emm<-emmeans::emmeans(model,specs=preds_form,mode="latent",at=condlist,nesting=NULL)
-    emm<-stats::update(emm,df=Inf)
-    est<-emmeans::contrast(emm,interaction = c("trt.vs.ctrl1",".internal") ,by = preds)
-    ci<-stats::confint(est,level = interval/100,df=Inf)
-    
-    ####### rename ci variables because emmeans changes them for different models
-    wci<-dim(ci)[2]
-    ci<-ci[,c(wci-1,wci)]
-    names(ci)<-c("lower.CL","upper.CL")  
-    ################################
-    
-    params<-cbind(as.data.frame(est),ci)
-    levs<-levels(data[[dep]])
-    names(params)[1:2]<-c("dep","contrast")
-    names(params)[3:(2+length(preds))]<-preds
-    params<-.fixLabels(params,preds,cov_conditioning)
-    params$contrast<-as.character(params$contrast)
-    names(params)[3:(2+length(lnames))]<-lnames
-
+    # emm<-emmeans::emmeans(model,specs=preds_form,mode="latent",at=condlist,nesting=NULL)
+    # emm<-stats::update(emm,df=Inf)
+    # est<-emmeans::contrast(emm,interaction = c('trt.vs.ctrl1','internal.multi') ,by = preds,data=data,variable=variable)
+    # ci<-stats::confint(est,level = interval/100,df=Inf)
+    # 
+    # ####### rename ci variables because emmeans changes them for different models
+    # wci<-dim(ci)[2]
+    # ci<-ci[,c(wci-1,wci)]
+    # names(ci)<-c("lower.CL","upper.CL")  
+    # ################################
+    # 
+    # params<-cbind(as.data.frame(est),ci)
+    # levs<-levels(data[[dep]])
+    # names(params)[1:2]<-c("dep","contrast")
+    # names(params)[3:(2+length(preds))]<-preds
+    # params<-.fixLabels(params,preds,cov_conditioning)
+    # params$contrast<-as.character(params$contrast)
+    # names(params)[3:(2+length(lnames))]<-lnames
+    params<-data.frame()
     ######## for multinom emmeans::test does not work well, so 
     ####### we use the centering method
     .vals<-list()
@@ -235,6 +216,12 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
     vals<-expand.grid(.vals)
     form<-model$call$formula
     results<-NULL
+    params<-NULL
+    if (is.factor(data[[variable]]))
+       contrast<-paste(variable,1:(length(levels(data[[variable]]))-1),sep="_._._")
+    else
+       contrast<-variable
+
     for (l in 1:nrow(vals)) {
       .data<-data
       for (name in preds)
@@ -247,19 +234,28 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
         ano<-car::Anova(.model,type=3)
         ano<-ano[rownames(ano)==variable,]
         results<-rbind(results,ano)
+        param<-mf.summary(.model)
+        citry<-try({
+          ci<-mf.confint(.model,level=ciWidth)
+          colnames(ci)<-c("lower.CL","upper.CL")
+          param<-cbind(vals[[name]][l],ci,param) 
+        })
+        param<-param[param$variable %in% contrast,]
+        params<-rbind(params,param)
     }
+    
     results<-as.data.frame(results)
     names(results)<-c("chisq","df","p.value")
-    results<-cbind(vals,results)    
+    results<-cbind(vals,results)
     ff<-.fixLabels(results,preds,cov_conditioning)
-
-  names(ff)[1:length(lnames)]<-lnames
+    names(ff)[1:length(lnames)]<-lnames
+    
+    
   for (name in lnames) {
     ff[,name]<-as.character(ff[,name])
-    params[,name]<-as.character(params[,name])
   }
   params[,"dep"]<-as.character(params[,"dep"])
-
+  names(params)[(length(names(params))-3):length(names(params))]<-c("se", "expb", "z.ratio","p.value"  )
   #### return both tables ##
   list(params,ff)
   
