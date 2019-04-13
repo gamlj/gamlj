@@ -58,5 +58,13 @@ datasets:
     tags:
       - Mixed
       - ANOVA
+  - name: wicksell
+    path: wicksell.csv
+    description: >
+      David C. Howell example data for Overview of Mixed Models webpage.
+      Features a continuous variable measured 4 times in two different groups
+    tags:
+      - Mixed
+      - ANOVA
 
 ...

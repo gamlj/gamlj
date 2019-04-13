@@ -259,7 +259,7 @@ items:
                      - name: estimate
                        title: "Estimate"
                        type: number
-                     - name: SE
+                     - name: se
                        title: "SE"
                        type: number
                      - name: lower.CL

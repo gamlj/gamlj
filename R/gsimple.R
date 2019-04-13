@@ -1,5 +1,6 @@
-gsimple.init<-function(data,options,tables) {
+gsimple.init<-function(data,options,tables, n64=NULL) {
 
+  ginfo("Init simple effects")
   dep<-options$dep
   variable<-options$simpleVariable
   moderator<-options$simpleModerator
@@ -36,12 +37,17 @@ gsimple.init<-function(data,options,tables) {
  
     ## check for special formats    
     rep<-1
+    contrastlabels<-NULL
+    labels<-NULL
+    if (is.factor(data[[variable64]])) {
+      labels<-lf.contrastLabels(levels(data[[variable64]]),attr(data[[variable64]],"jcontrast"))
+    }
+    
     if (modelType=="multinomial") {
       simpleEffectsParams$getColumn('dep')$setTitle(dep)
       rep<-length(levels(data[[dep64]]))-1
       psteps<-rep
     }
-    
     if (!is.null(threeway)) {
       threelevels<-length(levels(data[[threeway64]]))
       threelevels<-ifelse(threelevels>1,threelevels,3)
@@ -62,6 +68,8 @@ gsimple.init<-function(data,options,tables) {
       simpleEffectsAnova$getColumn('threeway')$setSuperTitle("Moderator levels")
     }
     
+
+
     for (i in seq_len(arows)) {
       simpleEffectsAnova$addRow(rowKey=i)
       if ((i %% modlevels)==1) 
@@ -75,7 +83,6 @@ gsimple.init<-function(data,options,tables) {
     
     simpleEffectsParams$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
     simpleEffectsParams$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
-    
     simpleEffectsParams$getColumn('moderator')$setTitle(moderator)
     simpleEffectsParams$getColumn('moderator')$setSuperTitle("Moderator levels")
     
@@ -84,16 +91,19 @@ gsimple.init<-function(data,options,tables) {
       simpleEffectsParams$getColumn('threeway')$setTitle(threeway)
       simpleEffectsParams$getColumn('threeway')$setSuperTitle("Moderator levels")
     }
+    if (is.factor(data[[variable64]])) 
+          contrastlabels<-rep(labels,modlevels*threelevels*rep)
+
     for (i in seq_len(prows)) {
-      simpleEffectsParams$addRow(rowKey=i)
+      simpleEffectsParams$addRow(rowKey=i,list(contrast=contrastlabels[[i]]))
       if ((i %% psteps)==1) {
         simpleEffectsParams$addFormat(rowKey=i,col=1, jmvcore::Cell.BEGIN_GROUP)
         simpleEffectsParams$addFormat(rowKey=i,col=2, jmvcore::Cell.BEGIN_GROUP)
       }
     }
-    if (!is.factor(data[[variable64]]) )
+    if (!is.factor(data[[variable64]]) ) {
      simpleEffectsParams$getColumn('contrast')$setVisible(FALSE)
-    
+    }
     
   
     simpleEffectsParams$setVisible(visible=TRUE)
@@ -102,6 +112,8 @@ gsimple.init<-function(data,options,tables) {
 
 
 gsimple.populate<-function(model,options,tables,cov_conditioning) {
+
+        ginfo("Populate simple effects")
   
         variable<-options$simpleVariable
         moderator<-options$simpleModerator
@@ -145,6 +157,7 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
         for(r in seq_len(nrow(anovaTableData))) {
               anovaTable$setRow(rowNo=r,anovaTableData[r,])
         }
+        parametersTableData$contrast<-NULL
         for(r in seq_len(nrow(parametersTableData))) {
              parametersTable$setRow(rowNo=r,parametersTableData[r,])
         }
