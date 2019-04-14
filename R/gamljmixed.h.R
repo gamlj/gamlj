@@ -788,7 +788,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "fixedIntercept",
-                                "simpleScale"),
+                                "simpleScale",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -848,7 +849,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "simpleScaleLabels",
                     "randomTerms",
                     "correlatedEffects",
-                    "fixedIntercept"),
+                    "fixedIntercept",
+                    "ciWidth"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
