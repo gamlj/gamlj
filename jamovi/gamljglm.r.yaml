@@ -254,6 +254,8 @@ items:
                      - contrasts
                      - fixedIntercept
                      - simpleScale
+                     - ciWidth
+
               columns:
                      - name: threeway
                        title: " "
@@ -301,6 +303,8 @@ items:
         - scaling
         - fixedIntercept
         - simpleScaleLabels
+        - ciWidth
+
     template:
         title:  $key
         type: Table

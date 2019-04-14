@@ -671,7 +671,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "fixedIntercept",
-                                "simpleScale"),
+                                "simpleScale",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -724,7 +725,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "contrasts",
                     "scaling",
                     "fixedIntercept",
-                    "simpleScaleLabels"),
+                    "simpleScaleLabels",
+                    "ciWidth"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",

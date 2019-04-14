@@ -92,10 +92,11 @@ gamljGzlmClass <- R6::R6Class(
       
       
         # other inits
+
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
         gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
-        gsimple.init(data,self$options,self$results$simpleEffects,n64)
+        gsimple.init(data,self$options,self$results$simpleEffects,n64,private$.cov_condition)
         mi.initContrastCode(data,self$options,self$results,n64)
     },
     .run=function() {

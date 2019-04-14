@@ -211,6 +211,7 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+
               columns:
                  - name: threeway
                    title: ""
@@ -240,6 +241,7 @@ items:
                      - contrasts
                      - fixedIntercept
                      - simpleScale
+                     - ciWidth
               columns:
                      - name: dep
                        title: "Response Contrasts"
@@ -259,7 +261,7 @@ items:
                      - name: estimate
                        title: "Estimate"
                        type: number
-                     - name: se
+                     - name: SE
                        title: "SE"
                        type: number
                      - name: lower.CL
@@ -292,6 +294,8 @@ items:
         - scaling
         - fixedIntercept
         - simpleScaleLabels
+        - ciWidth
+
     template:
         title:  $key
         type: Table

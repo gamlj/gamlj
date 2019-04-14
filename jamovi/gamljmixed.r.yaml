@@ -339,6 +339,8 @@ items:
                      - contrasts
                      - fixedIntercept
                      - simpleScale
+                     - ciWidth
+                     
               columns:
                      - name: threeway
                        title: " "
@@ -392,6 +394,8 @@ items:
         - randomTerms
         - correlatedEffects
         - fixedIntercept
+        - ciWidth
+
     template:
         title:  $key
         type: Table
