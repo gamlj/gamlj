@@ -19,22 +19,26 @@ gamljGLMClass <- R6::R6Class(
       getout<-FALSE
       
       infoTable<-self$results$info
+
       if (is.null(self$options$dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
       
-      if (getout) 
-        if (length(self$options$modelTerms) == 0) 
-          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
-
+        if (length(modelTerms) == 0) {
+          if (is.null(factors) && is.null(covs))
+             infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
+          else
+             jmvcore::reject("Please specify the model with modelTerms option")            
+          getout<-TRUE
+        }
 
       if (getout)
            return()
 
       data<-private$.cleandata()
 
-      # this allows intercept only model to be passed by syntax interfase
+      # this allows intercept only model to be passed by syntax interphase
       aOne<-which(unlist(modelTerms)=="1")
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
@@ -138,6 +142,7 @@ gamljGLMClass <- R6::R6Class(
       ##### clean the data ####
       data<-private$.cleandata()
       data<-mf.checkData(self$options,data)
+      
       if (!is.data.frame(data))
         reject(data)
       for (scaling in self$options$scaling) {

@@ -14,6 +14,8 @@ gamljMixedClass <- R6::R6Class(
       reml<-self$options$reml
       infoTable<-self$results$info
       dep<-self$options$dep
+      modelTerms<-self$options$modelTerms
+      
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -28,13 +30,17 @@ gamljMixedClass <- R6::R6Class(
         getout=TRUE
       }
       
-      if (getout) {
-        if (length(self$options$modelTerms) == 0) {
+      if (length(modelTerms) == 0) {
+        if (is.null(factors) && is.null(covs))
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
-        }
-        return(FALSE)
+        else
+          jmvcore::reject("Please specify the model with modelTerms option")            
+        getout<-TRUE
       }
-      modelTerms<-self$options$modelTerms
+      
+      if (getout) 
+        return(FALSE)
+
       data<-private$.cleandata()
       
       ### initialize conditioning of covariates

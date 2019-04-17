@@ -21,6 +21,14 @@ gamljGzlmClass <- R6::R6Class(
       if (is.null(dep)) 
         return()
 
+      if (length(modelTerms) == 0) {
+        if (is.null(factors) && is.null(covs))
+          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
+        else
+          jmvcore::reject("Please specify the model with modelTerms option")            
+        getout<-TRUE
+      }
+      
       data<-private$.cleandata()
       if (!is.data.frame(data))
          jmvcore::reject(data)
@@ -428,7 +436,7 @@ gamljGzlmClass <- R6::R6Class(
     image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=NULL))
     if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
       n<-length(levels(factor(predData[["plots2"]])))
-      image$setSize(500,(200*n))
+      image$setSize(800,(200*n))
     }
     
   } else {
@@ -450,7 +458,7 @@ gamljGzlmClass <- R6::R6Class(
       
       if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
         n<-length(levels(factor(predData[["plots2"]])))
-        image$setSize(500,(200*n))
+        image$setSize(800,(200*n))
       }
       
     }
