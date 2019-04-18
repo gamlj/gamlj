@@ -3,6 +3,9 @@
 GAMLj_DEBUG=T
 GAMLj_INFO=T
 
+IMPROBABLE_SEQ<-";._.§§._.;"
+DUMMY_TAIL<-"_._._"
+
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")

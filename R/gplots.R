@@ -122,15 +122,20 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   pdata<-try({
     pred.means(model,selected64,cond)
   })
-  
   if (jmvcore::isError(pdata)) {
     mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
+  
   names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
-  if (is.factor(data[[jmvcore::toB64(groupName)]])) 
-    pdata$group<-factor(pdata$group)
-
+  
+  if (is.factor(data[[jmvcore::toB64(groupName)]]))  {
+    pdata$group<-factor(pdata$group,levels =levels(data[[jmvcore::toB64(groupName)]]))
+  }
+  if (is.something(linesName) && is.factor(data[[jmvcore::toB64(linesName)]]))  {
+    pdata$lines<-factor(pdata$lines,levels =levels(data[[jmvcore::toB64(linesName)]]))
+  }
+  
   if (bars=="se") {
     pdata$lwr<-pdata$fit-pdata$SE
     pdata$upr<-pdata$fit+pdata$SE
@@ -177,9 +182,16 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
-  if (is.factor(data[[jmvcore::toB64(groupName)]])) 
-    pdata$group<-factor(pdata$group)
+
+  if (is.factor(data[[jmvcore::toB64(groupName)]]))  {
+    pdata$group<-factor(pdata$group,levels =levels(data[[jmvcore::toB64(groupName)]]))
+  }
+  if (is.something(linesName) && is.factor(data[[jmvcore::toB64(linesName)]]))  {
+    pdata$lines<-factor(pdata$lines,levels =levels(data[[jmvcore::toB64(linesName)]]))
+  }
   
+  
+    
   if (bars=="se") {
     pdata$lwr<-pdata$fit-pdata$SE
     pdata$upr<-pdata$fit+pdata$SE
@@ -251,8 +263,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   if (length(grep("Mean-",lvls[1],fixed=T)>0))
            gdata$lines<-factor(gdata$lines,lvls[c(1,3,2)])
   
-  mark(levels(gdata$lines))
-  
+
   p <- ggplot2::ggplot()
   
   if (!is.null(image$state$raw)) {
@@ -305,6 +316,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
 }
 
 gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order=1) {
+
   if (errorType != 'none') {
     dodge <- ggplot2::position_dodge(0.2)
     clabel<-toupper(errorType)
@@ -325,7 +337,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
   }
   
   gdata<-image$state$data
-  
+
   if (is.factor(image$state$data$group)) {
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData

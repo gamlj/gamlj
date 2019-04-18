@@ -27,7 +27,7 @@ gmeans.init<-function(data,options,theTables,cov_conditioning=NULL) {
 
 
       for (term in mterms) {
-           aTable<-theTables$addItem(key=.nicifyTerms(jmvcore::composeTerm(term)))
+           aTable<-theTables$addItem(key=lf.nicifyTerms(jmvcore::composeTerm(term)))
            aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
            aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
 
@@ -92,7 +92,7 @@ gmeans.populate<-function(model,options,tables,cov_conditioning=NULL) {
     }
     ginfo("Estimated marginal means computed")
     for (term in mterms) {
-      key<-.nicifyTerms(jmvcore::composeTerm(term))    
+      key<-lf.nicifyTerms(jmvcore::composeTerm(term))    
       aTable<-tables$get(key=key)
       if (modelType=="multinomial") term<-c(dep,term)
       term64<-jmvcore::toB64(term)

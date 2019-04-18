@@ -380,6 +380,8 @@ children:
                 name: plotDvScale
               - type: CheckBox
                 name: plotRandomEffects
+
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
