@@ -15,6 +15,8 @@ gamljMixedClass <- R6::R6Class(
       infoTable<-self$results$info
       dep<-self$options$dep
       modelTerms<-self$options$modelTerms
+      factors<-self$options$factors
+      covs<-self$options$covs
       
       getout<-FALSE
       if (is.null(dep)) {
@@ -84,15 +86,15 @@ gamljMixedClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
-      mark(labels)
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
+      for(i in seq_along(terms)) 
+          aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
+      
       if (!is.something(self$options$factors))
-        aTable$getColumn('label')$setVisible(FALSE)
+           aTable$getColumn('label')$setVisible(FALSE)
       
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
@@ -175,7 +177,7 @@ gamljMixedClass <- R6::R6Class(
                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                realgroups<-n64$nicenames(grp)
                realnames<-n64$nicenames(vcv$var1)
-               realnames<-lapply(realnames,jmvcore::stringifyTerm)
+               realnames<-lapply(realnames,lf.nicifyTerms)
                for (i in 1:dim(vcv)[1]) {
                  if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
                    icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
@@ -191,8 +193,8 @@ gamljMixedClass <- R6::R6Class(
                vcv<-vc[!is.na(vc[,3]),]
                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                realgroups<-n64$nicenames(grp)
-               realnames1<-lapply(n64$nicenames(vcv$var1),jmvcore::stringifyTerm)
-               realnames2<-lapply(n64$nicenames(vcv$var2),jmvcore::stringifyTerm)
+               realnames1<-lapply(n64$nicenames(vcv$var1),lf.nicifyTerms)
+               realnames2<-lapply(n64$nicenames(vcv$var2),lf.nicifyTerms)
                if (dim(vcv)[1]>0) {
                  for (i in 1:dim(vcv)[1]) {
                    randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
@@ -279,7 +281,7 @@ gamljMixedClass <- R6::R6Class(
                        for (i in seq_len(dim(anova_res)[1])) {
                               tableRow<-anova_res[i,]  
                               anovaTable$setRow(rowNo=i,tableRow)
-                              anovaTable$setRow(rowNo=i,list(name=jmvcore::stringifyTerm(labels[[i]])))
+                              anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                        }
                       messages<-mf.getModelMessages(model)
                       if (length(messages)>0) {
@@ -504,7 +506,6 @@ gamljMixedClass <- R6::R6Class(
     
   } else
     randomData<-NULL
-
   predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,
@@ -514,7 +515,7 @@ gamljMixedClass <- R6::R6Class(
                                conditioning=private$.cov_condition)
  
   yAxisRange <- gplots.range(model,depName,predData,rawData)
-
+  
   if (!optionRaw)
     rawData<-NULL
   

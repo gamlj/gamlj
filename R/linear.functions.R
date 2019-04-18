@@ -1,6 +1,17 @@
-.nicifyTerms<-function(term) {
-  term <- jmvcore::stringifyTerm(term)
-  term
+lf.nicifyLabels<-function(labels) {
+     
+     flabs<-grep(DUMMY_TAIL,names(labels),fixed=T)
+     
+     for (i in flabs)
+            labels[[i]]<-paste0(labels[[i]],paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
+     news<-jmvcore::stringifyTerm(labels,raise=T)
+     for (i in seq_along(news))
+        news[[i]]<-gsub(IMPROBABLE_SEQ,"",news[[i]],fixed=T)
+     news
+     }
+
+lf.nicifyTerms<-function(term) {
+  jmvcore::stringifyTerm(term,raise=T)
 }
 
 
@@ -186,7 +197,7 @@ lf.contrastLabels=function(levels, type) {
         }
         return(labels)
   }
-    mark("no contrast definition met")
+    ginfo("no contrast definition met")
     
     all <- paste(levels, collapse=', ')
     for (i in seq_len(nLevels-1))

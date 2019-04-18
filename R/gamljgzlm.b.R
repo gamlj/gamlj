@@ -67,7 +67,7 @@ gamljGzlmClass <- R6::R6Class(
       if (length(modelTerms)>0) {
           aTable<- self$results$main$anova
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]])
+                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
                   aTable$addRow(rowKey=i, list(name=lab))
           }
       }
@@ -89,16 +89,15 @@ gamljGzlmClass <- R6::R6Class(
         aTable$getColumn('label')$setVisible(FALSE)
       
       if (modelType=="multinomial") {
-        labs<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
+        labels<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
         for (j in seq_along(labs)) 
-          for(i in seq_along(terms)) {
-            aTable$addRow(rowKey=paste0(i,j),list(dep=labs[[j]],source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
-          }
+          for(i in seq_along(terms)) 
+            aTable$addRow(rowKey=paste0(i,j),list(dep=labs[[j]],source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=.nicifyLabels(labels[i])))
+          
       } else
-           for(i in seq_along(terms)) 
-              aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
-      
-      
+           for(i in seq_along(terms)) {
+              aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=.nicifyLabels(labels[i])))
+           }
         # other inits
 
         gplots.initPlots(self,data,private$.cov_condition)

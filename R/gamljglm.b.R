@@ -65,7 +65,7 @@ gamljGLMClass <- R6::R6Class(
           aTable$addRow(rowKey=1, list(name="Model"))
           
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]])
+                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -87,7 +87,7 @@ gamljGLMClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
+          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=jmvcore::stringifyTerm(labels[[i]],raise=T)))
 
       ## hide effects labels if no factor is there
       if (!is.something(factors))

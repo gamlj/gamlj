@@ -211,6 +211,7 @@ options:
              `TRUE` or `FALSE` (default), scale the plot Y-Axis to the max and the min
              of the dependent variable observed scores.
 
+
     - name: plotError
       title: Error Bar Definition
       type: List
