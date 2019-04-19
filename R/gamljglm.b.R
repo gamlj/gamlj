@@ -87,7 +87,7 @@ gamljGLMClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=jmvcore::stringifyTerm(labels[[i]],raise=T)))
+          aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
 
       ## hide effects labels if no factor is there
       if (!is.something(factors))
