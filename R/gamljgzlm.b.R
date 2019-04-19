@@ -16,6 +16,8 @@ gamljGzlmClass <- R6::R6Class(
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType)
       dep<-self$options$dep
+      fixedIntercept<-self$options$fixedIntercept
+      
       if (!is.something(afamily))
         return()
       
@@ -23,7 +25,12 @@ gamljGzlmClass <- R6::R6Class(
       if (is.null(dep)) 
         return()
 
-      if (length(modelTerms) == 0) {
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
+      if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
         if (is.null(factors) && is.null(covs))
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
         else
@@ -252,15 +259,17 @@ gamljGzlmClass <- R6::R6Class(
         ### parameter table ####
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
-        citry<-try({
-            ci<-mf.confint(model,level=ciWidth)
-            colnames(ci)<-c("cilow","cihig")
-            parameters<-cbind(parameters,ci) 
-          })
-          if (jmvcore::isError(citry)) {
-            message <- jmvcore::extractErrorMessage(citry)
-            estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-          }
+        if (self$options$showParamsCI) {
+             citry<-try({
+                 ci<-mf.confint(model,level=ciWidth)
+                 colnames(ci)<-c("cilow","cihig")
+                 parameters<-cbind(parameters,ci) 
+                 })
+              if (jmvcore::isError(citry)) {
+                  message <- jmvcore::extractErrorMessage(citry)
+                  estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+              }
+        }
         rownames(parameters)<-n64$nicenames(rownames(parameters))
 
         for (i in 1:nrow(parameters)) {

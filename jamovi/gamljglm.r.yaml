@@ -22,7 +22,8 @@ items:
         - cov
         - modelTerms
         - fixedIntercept
-
+    refs: gamljglm
+     
   - name: main
     type: Group
     title: Model Results

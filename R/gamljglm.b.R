@@ -24,12 +24,19 @@ gamljGLMClass <- R6::R6Class(
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
+
+      # this allows intercept only model to be passed by syntax interphase
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
       
-        if (length(modelTerms) == 0) {
+        if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
           if (is.null(factors) && is.null(covs))
              infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
           else
-             jmvcore::reject("Please specify the model with modelTerms option")            
+             jmvcore::reject("Please specify a model")            
           getout<-TRUE
         }
 
@@ -38,12 +45,6 @@ gamljGLMClass <- R6::R6Class(
 
       data<-private$.cleandata()
 
-      # this allows intercept only model to be passed by syntax interphase
-      aOne<-which(unlist(modelTerms)=="1")
-      if (is.something(aOne)) {
-        modelTerms[[aOne]]<-NULL
-        fixedIntercept=TRUE
-      }
       
       modelFormula<-lf.constructFormula(dep,modelTerms,fixedIntercept)
       
@@ -314,7 +315,7 @@ gamljGLMClass <- R6::R6Class(
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
-        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
+        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"simple")
         n64$addFactor(factor,levels)
         n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
         attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"

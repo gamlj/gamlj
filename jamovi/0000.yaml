@@ -6,7 +6,7 @@ jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: 2019-1-3
+date: 2019-1-5
 type: R
 description: >-
   A suite for estimation of linear model, such as the general linear model,
@@ -66,5 +66,11 @@ datasets:
     tags:
       - Mixed
       - ANOVA
-
+  - name: fivegroups
+    path: fivegroups.csv
+    description: |
+      example data for checking contrasts results
+    tags:
+      - Mixed
+      - ANOVA
 ...

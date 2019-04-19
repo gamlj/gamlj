@@ -1,6 +1,5 @@
 context("glm")
 gamlj_options("debug",FALSE)
-names(ToothGrowth)
 mod<-gamlj::gamljGLM(
   data = ToothGrowth,
   dep = "len",
@@ -8,18 +7,28 @@ mod<-gamlj::gamljGLM(
   modelTerms = ~ supp,
   
 )
-
+mod
 res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {
-  expect_equal(params[2], -1.85)
-  expect_equal(round(res$cilow[2],2),-3.78)
-  expect_equal(round(res$cilow[2],2),-3.78)
+  expect_equal(params[2], -3.70)
+  expect_equal(round(res$cihig[2],2), 0.17)
+  expect_equal(round(res$cilow[2],2),-7.57)
   expect_equal(round(res$p[2],2),0.06)
   expect_equal(round(as.numeric(as.character(mod$info$asDF[[2]][[3]])),3),0.059)
 })
 
 data("hsbdemo")
+
+mod<-gamlj::gamljGLM(
+  data = hsbdemo,
+  formula=science~1
+)
+
+test_that("intercept only works",
+          expect_equal(round(mod$main$fixed$asDF[1,2],digits=2),51.85)
+          )
+
 mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
@@ -156,4 +165,4 @@ test_that("glm contrasts", {
   expect_equal(round(res[1,4],2),65.07)
 })
 
-mod
+

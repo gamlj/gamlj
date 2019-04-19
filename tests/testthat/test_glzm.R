@@ -29,7 +29,7 @@ mod<-gamlj::gamljGLM(
   ciWidth=90,
   simpleVariable = "math",
   simpleModerator = "schtyp",
-  plotHAxis = "math",
+  plotHAxis = "math"
 )
 
 mod<-gamlj::gamljGzlm(
@@ -39,7 +39,7 @@ mod<-gamlj::gamljGzlm(
   ciWidth=90,
   simpleVariable = "write",
   simpleModerator = "honors",
-  plotHAxis = "write",
+  plotHAxis = "write"
   )
 
 r.anova<-mod$main$anova$asDF
@@ -88,8 +88,20 @@ mod<-gamlj::gamljGzlm(
 
 test_that("glm posthoc", {
    expect_equal(round(mod$postHocs[[1]]$asDF[[5]],3),1.635)
-  expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
+   expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
 })
+
+
+mod<-gamlj::gamljGzlm(showParamsCI = F,
+  formula = schtyp ~ 1,
+  data = data,
+  modelSelection = "logistic")
+
+test_that("intercept only works",
+          expect_equal(round(mod$main$fixed$asDF[1,2],digits=3),1.658)
+)
+
+
 
 data<-hsbdemo
 names(data)

@@ -10,7 +10,6 @@ model<-gamlj::gamljMixed(
   data = data, plotHAxis = cond
 )
 
-model$postHocs
 infotable<-model$info$asDF
 
 test_that("r-squared is ok", {
@@ -58,6 +57,7 @@ test_that("list interface is ok", {
   expect_equal(ftable[1,4],2949)
 })
 
+expect_warning(
 model1<-gamlj::gamljMixed(
   dep=y,
   factors = "cond",
@@ -66,7 +66,8 @@ model1<-gamlj::gamljMixed(
   randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
   data = data
 )
-
+)
+expect_warning(
 model<-gamlj::gamljMixed(
   dep=y,
   factors = "cond",
@@ -76,15 +77,14 @@ model<-gamlj::gamljMixed(
   correlatedEffects = "nocorr",
   data = data
 )
-q<-list(list(c("Intercept","subj"),c("cond","subj")))
+)
 
-model$info$asDF
-
+expect_warning(
 model2<-gamlj::gamljMixed(
   formula = y ~ 1 + cond+( 1 | subj )+( 0+cond | subj ),
   data = data
 )
-
+)
 test_that("uncorrelated error", {
   expect_error(  
     model<-gamlj::gamljMixed(
@@ -109,15 +109,22 @@ data<-beers_bars
 model<-gamlj::gamljMixed(
   formula = smile ~ 1 + beer + I(beer^2)+( 1 + beer + I(beer^2) | bar ),
   data = data)
-gamlj::gamljGLM(
-  formula = smile ~ beer + I(beer^2),
-  data = data)
 
+test_that("some poly", {
+  expect_lt(model$main$anova$asDF[2,2],0.41)
+  expect_gt(model$main$anova$asDF[2,2],0.38)
+  
+})
 
-# model<-gamlj::gamljMixed(
-#   formula =y ~ 1 + cond+( 1|subj ),
-#   data = data,  postHoc = list("cond")
-# )
+model<-gamlj::gamljMixed(
+   formula =smile ~ 1 +(1|bar),
+   
+   data = data
+ )
+test_that("intercept only works",
+   expect_equal(round(model$main$random$asDF[1,3],digits = 2),1.74)
+)
+
 # potable<-model$postHocs[[1]]$asDF
 # 
 # test_that("posthoc are produced", {
@@ -125,8 +132,8 @@ gamlj::gamljGLM(
 # })
 # 
 ## simple effects and polynomial
-
-data<-read.csv("/home/marcello/Skinner/Forge/jamovi/gamlj_docs/data/howell_rep.csv")
+data("wicksell")
+data<-wicksell
 data$group<-factor(data$group)
 data$time<-factor(data$time)
 expect_warning(gobj<-gamlj::gamljMixed(

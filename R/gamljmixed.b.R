@@ -17,7 +17,9 @@ gamljMixedClass <- R6::R6Class(
       modelTerms<-self$options$modelTerms
       factors<-self$options$factors
       covs<-self$options$covs
+      fixedIntercept<-self$options$fixedIntercept
       
+            
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -32,7 +34,13 @@ gamljMixedClass <- R6::R6Class(
         getout=TRUE
       }
       
-      if (length(modelTerms) == 0) {
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
+      
+      if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
         if (is.null(factors) && is.null(covs))
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
         else

@@ -1,9 +1,9 @@
 #' @import lmerTest
 
-GAMLj_DEBUG=T
-GAMLj_INFO=T
+GAMLj_DEBUG=F
+GAMLj_INFO=F
 
-IMPROBABLE_SEQ<-";._.§§._.;"
+IMPROBABLE_SEQ<-";._.thewintersicoming._.;"
 DUMMY_TAIL<-"_._._"
 
 TCONV<-list()

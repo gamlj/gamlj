@@ -83,3 +83,15 @@ NULL
 #' @examples
 #' data(wicksell)
 NULL
+
+#' Five groups for contrasts
+#'
+#' Data with five groups and a continuous dependent variable for checking contrasts results
+#'
+#' @docType data
+#' @name fivegroups
+#' @usage data(fivegroups)
+#' @keywords datasets
+#' @examples
+#' data(fivegroups)
+NULL
