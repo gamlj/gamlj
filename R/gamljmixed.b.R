@@ -489,9 +489,13 @@ gamljMixedClass <- R6::R6Class(
   ### this is specific of mixed model #####
   preds<-c(groupName,linesName,plotsName)
   preds64<-jmvcore::toB64(preds)
-  cluster<-names(model@cnms)[[1]]
-  preds64<-c(cluster,preds64)
+  clusters<-jmvcore::toB64(self$options$cluster)
+  mark(clusters)
+  mark(names(model@cnms))
+  cluster<-clusters[which(clusters %in% names(model@cnms))][[1]]
   
+  preds64<-c(cluster,preds64)
+  mark(jmvcore::fromB64(names(model@cnms))) 
   if (self$options$plotRandomEffects) {
     
     pd<-predict(model)
@@ -500,8 +504,8 @@ gamljMixedClass <- R6::R6Class(
     pnames<-c("cluster","group","lines","plots")
     names(randomData)<-c("y",pnames[1:length(preds64)])
     note<-self$results$plotnotes
-  #  note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
-    note$setContent('Random effects')
+    note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
+#    note$setContent('Random effects')
     note$setVisible(TRUE)
     
   } else

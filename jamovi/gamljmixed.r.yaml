@@ -428,6 +428,7 @@ items:
     renderFun: .descPlot
     clearWith:
         - dep
+        - cluster
         - plotHAxis
         - plotSepLines
         - plotSepPlots
