@@ -92,11 +92,11 @@ gamljGzlmClass <- R6::R6Class(
         labels<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
         for (j in seq_along(labs)) 
           for(i in seq_along(terms)) 
-            aTable$addRow(rowKey=paste0(i,j),list(dep=labs[[j]],source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=.nicifyLabels(labels[i])))
+            aTable$addRow(rowKey=paste0(i,j),list(dep=labs[[j]],source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
           
       } else
            for(i in seq_along(terms)) {
-              aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=.nicifyLabels(labels[i])))
+              aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
            }
         # other inits
 

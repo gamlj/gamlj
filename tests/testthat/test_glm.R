@@ -51,6 +51,20 @@ test_that("glm CI width", {
   expect_equal(round(mod$main$fixed$asDF[2,5],3),0.468)
 })
 
+hsbdemo$c1<-factor(rep(c(1,0),length(hsbdemo$id)/2))
+hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
+
+mod<-gamlj::gamljGLM(
+  data = hsbdemo,
+  formula=science~c1*c2,
+  postHoc = list("schtyp")
+)
+
+test_that("glm labels do not square", {
+  expect_equal(as.character(mod$main$fixed$asDF[4,1]),"c11:c21")
+})
+
+
 mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
@@ -116,3 +130,11 @@ mod<-gamlj::gamljGLM(
   data = data
 )
 
+res<-mod$main$anova$asDF
+
+test_that("glm contrasts", {
+  expect_equal(as.character(res$name[3]),"math²")
+  expect_equal(round(res[1,4],2),65.07)
+})
+
+mod
