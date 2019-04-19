@@ -886,6 +886,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 renderFun=".descPlot",
                 clearWith=list(
                     "dep",
+                    "cluster",
                     "plotHAxis",
                     "plotSepLines",
                     "plotSepPlots",
