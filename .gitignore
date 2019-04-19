@@ -27,7 +27,7 @@ extdata/.~lock*
 
 # RStudio files
 .Rproj.user/
-
+.rproj.user/
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
