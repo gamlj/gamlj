@@ -81,10 +81,29 @@ names(data)[3]<-c("Gender (test ?)")
 mod<-gamlj::gamljGLM(
   data = data,
   formula=science~math+`Gender (test ?)`+math:`Gender (test ?)`,
+  simpleModerator = `Gender (test ?)`,
+  simpleVariable = math
 )
-
+se.params<-mod$simpleEffects$Params$asDF
 test_that("glm weird names", {
   expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
+  expect_equal(as.character(se.params[2,1]),"male")
+  expect_equal(round(se.params[1,5],digits=5),0.80708)
+})
+
+data$sex<-factor(data$`Gender (test ?)`,levels=c("male","female"))
+
+mod2<-gamlj::gamljGLM(
+  data = data,
+  formula=science~math+sex+math:sex,
+  simpleVariable = math,
+  simpleModerator = sex
+)
+
+se.params2<-mod2$simpleEffects$Params$asDF
+test_that("glm weird names", {
+  expect_equal(as.character(se.params2[2,1]),"female")
+  expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
 })
 
 

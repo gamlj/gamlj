@@ -36,7 +36,7 @@ gamljMixedClass <- R6::R6Class(
         if (is.null(factors) && is.null(covs))
           infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
         else
-          jmvcore::reject("Please specify the model with modelTerms option")            
+          jmvcore::reject("Please specify a model")            
         getout<-TRUE
       }
       

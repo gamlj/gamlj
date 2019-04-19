@@ -10,6 +10,8 @@ gamljGzlmClass <- R6::R6Class(
       mark("init")
       private$.names64<-names64$new()
       n64<-private$.names64
+      factors<-self$options$factors
+      covs<-self$options$covs
       modelTerms<-self$options$modelTerms
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType)
@@ -89,11 +91,10 @@ gamljGzlmClass <- R6::R6Class(
         aTable$getColumn('label')$setVisible(FALSE)
       
       if (modelType=="multinomial") {
-        labels<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
-        for (j in seq_along(labs)) 
+        ylabs<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
+        for (j in seq_along(ylabs)) 
           for(i in seq_along(terms)) 
-            aTable$addRow(rowKey=paste0(i,j),list(dep=labs[[j]],source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
-          
+            aTable$addRow(rowKey=paste0(i,j),list(dep=ylabs[[j]],source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
       } else
            for(i in seq_along(terms)) {
               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
