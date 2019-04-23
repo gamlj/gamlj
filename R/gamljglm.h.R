@@ -707,6 +707,10 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
                                     `name`="t.ratio", 
                                     `title`="t", 
                                     `type`="number"),

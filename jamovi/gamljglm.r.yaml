@@ -282,6 +282,9 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
+                     - name: df
+                       title: "df"
+                       type: number
                      - name: t.ratio
                        title: "t"
                        type: number

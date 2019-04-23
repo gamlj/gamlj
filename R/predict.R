@@ -161,8 +161,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
       ff$F.ratio<-NULL
   }
       
-  mark(params)
-  
+
   names(ff)[1:length(lnames)]<-lnames
   for (name in lnames) {
     ff[,name]<-as.character(ff[,name])

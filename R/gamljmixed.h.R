@@ -762,6 +762,16 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="", 
                                     `combineBelow`=TRUE),
                                 list(
+                                    `name`="chisq", 
+                                    `title`="X\u00B2", 
+                                    `type`="number", 
+                                    `visible`=FALSE),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number", 
+                                    `visible`=FALSE),
+                                list(
                                     `name`="F.ratio", 
                                     `title`="F", 
                                     `type`="number"),
@@ -830,6 +840,10 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 list(
                                     `name`="t.ratio", 
                                     `title`="t", 
+                                    `type`="number"),
+                                list(
+                                    `name`="z.ratio", 
+                                    `title`="z", 
                                     `type`="number"),
                                 list(
                                     `name`="p.value", 

@@ -82,7 +82,7 @@ gamljGzlmClass <- R6::R6Class(
       }
       
       ## fixed effects parameters
-
+      
       aTable<-self$results$main$fixed
       dep64<-jmvcore::toB64(dep)
       modelTerms64<-lapply(modelTerms,jmvcore::toB64)
@@ -94,6 +94,9 @@ gamljGzlmClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
 
+      if (modelType=="linear")
+        aTable$getColumn("expb")$setVisible(FALSE)
+      
       if (!is.something(self$options$factors))
         aTable$getColumn('label')$setVisible(FALSE)
       
