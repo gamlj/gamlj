@@ -413,7 +413,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 clearWith=list(
                     "dep",
                     "randomTerms",
-                    "modelTerms")))
+                    "modelTerms"),
+                refs="gamljmixed"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(

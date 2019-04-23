@@ -85,6 +85,7 @@ model2<-gamlj::gamljMixed(
   data = data
 )
 )
+
 test_that("uncorrelated error", {
   expect_error(  
     model<-gamlj::gamljMixed(
@@ -156,3 +157,8 @@ es.params<-gobj$simpleEffects$Params$asDF
    expect_equal(as.character(es.params$contrast[[2]]),"quadratic")
    expect_equal(round(es.params$estimate[3],digits=5),-7.32312)
  })
+
+ 
+ 
+ 
+ 
