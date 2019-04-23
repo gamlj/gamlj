@@ -1,6 +1,6 @@
 #' @import lmerTest
 
-GAMLj_DEBUG=F
+GAMLj_DEBUG=T
 GAMLj_INFO=F
 
 IMPROBABLE_SEQ<-";._.thewintersicoming._.;"
@@ -74,6 +74,8 @@ WARNS["se.noint"]<-"No interaction involving the simple effects variables
 WARNS["se.df"]<-"Simple effects F-tests are Type III Wald F tests with Kenward-Roger df"
 
 WARNS["se.noluck"]<-"Simple effects cannot be estimated. Refine the model or the covariates conditioning (if any)"
+
+WARNS["se.largen"]<-"z-tests are computed because the number of observations exceeds 3000"
 
 #### anova #########
 

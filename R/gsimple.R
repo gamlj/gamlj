@@ -154,11 +154,27 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
 
        }
 
+
    ### fill the Anova Table ###
+       if (is.something(anovaTableData$chisq)) {
+         anovaTable$getColumn("F.ratio")$setTitle("X²")
+         anovaTable$getColumn("df1")$setTitle("df")
+         anovaTable$getColumn("df2")$setVisible(FALSE)
+         anovaTableData$df1<-anovaTableData$df
+         anovaTableData$F.ratio<-anovaTableData$chisq
+       }
         for(r in seq_len(nrow(anovaTableData))) {
               anovaTable$setRow(rowNo=r,anovaTableData[r,])
         }
         parametersTableData$contrast<-NULL
+        if (!is.something(parametersTableData$t.ratio)) {
+          parametersTableData$t.ratio<-parametersTableData$z.ratio
+          parametersTable$getColumn("t.ratio")$setTitle("z")
+          parametersTable$getColumn("df")$setVisible(FALSE)
+          parametersTable$setNote("largeN",WARNS["se.largen"])
+          
+        }
+
         for(r in seq_len(nrow(parametersTableData))) {
              parametersTable$setRow(rowNo=r,parametersTableData[r,])
         }
