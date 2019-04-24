@@ -10,18 +10,34 @@ gamljGzlmClass <- R6::R6Class(
       mark("init")
       private$.names64<-names64$new()
       n64<-private$.names64
+      factors<-self$options$factors
+      covs<-self$options$covs
       modelTerms<-self$options$modelTerms
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType)
       dep<-self$options$dep
+      fixedIntercept<-self$options$fixedIntercept
       
-      if (is.null(afamily))
+      if (!is.something(afamily))
         return()
       
 
       if (is.null(dep)) 
         return()
 
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
+      if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
+        if (is.null(factors) && is.null(covs))
+          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
+        else
+          jmvcore::reject("Please specify the model with modelTerms option")            
+        getout<-TRUE
+      }
+      
       data<-private$.cleandata()
       if (!is.data.frame(data))
          jmvcore::reject(data)
@@ -49,12 +65,8 @@ gamljGzlmClass <- R6::R6Class(
       if ("note" %in% names(info))
         infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
       
-      if (afamily=="not yet")
-        return()
-      
-      
       ### initialize conditioning of covariates
-      if (!is.null(self$options$covs)) {
+      if (is.something(self$options$covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
@@ -64,13 +76,13 @@ gamljGzlmClass <- R6::R6Class(
       if (length(modelTerms)>0) {
           aTable<- self$results$main$anova
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]])
+                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
                   aTable$addRow(rowKey=i, list(name=lab))
           }
       }
       
       ## fixed effects parameters
-
+      
       aTable<-self$results$main$fixed
       dep64<-jmvcore::toB64(dep)
       modelTerms64<-lapply(modelTerms,jmvcore::toB64)
@@ -82,22 +94,27 @@ gamljGzlmClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
 
+      if (modelType=="linear")
+        aTable$getColumn("expb")$setVisible(FALSE)
+      
+      if (!is.something(self$options$factors))
+        aTable$getColumn('label')$setVisible(FALSE)
+      
       if (modelType=="multinomial") {
-        labs<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
-        for (j in seq_along(labs)) 
-          for(i in seq_along(terms)) {
-            aTable$addRow(rowKey=paste0(i,j),list(dep=labs[[j]],source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
-          }
+        ylabs<-lf.contrastLabels(levels(data[[jmvcore::toB64(dep)]]),"simple")
+        for (j in seq_along(ylabs)) 
+          for(i in seq_along(terms)) 
+            aTable$addRow(rowKey=paste0(i,j),list(dep=ylabs[[j]],source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
       } else
-           for(i in seq_along(terms)) 
-              aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
-      
-      
+           for(i in seq_along(terms)) {
+              aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
+           }
         # other inits
+
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
         gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
-        gsimple.init(data,self$options,self$results$simpleEffects)
+        gsimple.init(data,self$options,self$results$simpleEffects,n64,private$.cov_condition)
         mi.initContrastCode(data,self$options,self$results,n64)
     },
     .run=function() {
@@ -245,15 +262,17 @@ gamljGzlmClass <- R6::R6Class(
         ### parameter table ####
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
-        citry<-try({
-            ci<-mf.confint(model,level=ciWidth)
-            colnames(ci)<-c("cilow","cihig")
-            parameters<-cbind(parameters,ci) 
-          })
-          if (jmvcore::isError(citry)) {
-            message <- jmvcore::extractErrorMessage(citry)
-            estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-          }
+        if (self$options$showParamsCI) {
+             citry<-try({
+                 ci<-mf.confint(model,level=ciWidth)
+                 colnames(ci)<-c("cilow","cihig")
+                 parameters<-cbind(parameters,ci) 
+                 })
+              if (jmvcore::isError(citry)) {
+                  message <- jmvcore::extractErrorMessage(citry)
+                  estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+              }
+        }
         rownames(parameters)<-n64$nicenames(rownames(parameters))
 
         for (i in 1:nrow(parameters)) {
@@ -297,10 +316,10 @@ gamljGzlmClass <- R6::R6Class(
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
-        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
+        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"simple")
         n64$addFactor(factor,levels)
-        n64$addLabel(factor,lf.contrastLabels(levels, "deviation")) 
-        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"deviation"
+        n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
+        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"
       }
       
       for (contrast in self$options$contrasts) {
@@ -429,7 +448,7 @@ gamljGzlmClass <- R6::R6Class(
     image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=NULL))
     if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
       n<-length(levels(factor(predData[["plots2"]])))
-      image$setSize(500,(200*n))
+      image$setSize(800,(200*n))
     }
     
   } else {
@@ -451,7 +470,7 @@ gamljGzlmClass <- R6::R6Class(
       
       if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
         n<-length(levels(factor(predData[["plots2"]])))
-        image$setSize(500,(200*n))
+        image$setSize(800,(200*n))
       }
       
     }
@@ -461,7 +480,6 @@ gamljGzlmClass <- R6::R6Class(
 },
 
 .descPlot=function(image, ggtheme, theme, ...) {
-  library(ggplot2)
   if (is.null(image$state))
     return(FALSE)
 
@@ -520,7 +538,7 @@ gamljGzlmClass <- R6::R6Class(
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'deviation')
+      if (item$type == 'simple')
         value[[i]] <- NULL
       else
         i <- i + 1

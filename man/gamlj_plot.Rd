@@ -7,21 +7,32 @@
 gamlj_plot(gobj, haxis, sepLines = NULL, sepPlots = NULL, ...)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*#'}
+\item{gobj}{a gamlj results object of the class GAMLj*}
 
 \item{haxis}{horizontal axis variable}
 
 \item{sepLines}{variable defining the levels for separate lines}
 
-\item{...}{any other options accepted by the gamlj_* function}
+\item{sepPlots}{variable defining the levels for which separate plots are produced}
 
-\item{sepPlot}{variable defining the levels for which separate plots are produced}
+\item{...}{any other options accepted by the gamlj_* function}
 }
 \value{
 an object of class GAMLj* as the input object
 }
 \description{
 This function re-estimates a GAMLj model with a new plot
+}
+\examples{
+data<-exercise
+gamljGLM(formula=)
+data(qsport)
+mod<-gamlj::gamljGLM(
+  formula = performance ~ hours,
+  data = qsport)
+
+gamlj_plot(mod,haxis = "hours")
+
 }
 \author{
 Marcello Gallucci

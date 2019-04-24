@@ -14,21 +14,31 @@ gamljGLMClass <- R6::R6Class(
       modelTerms<-self$options$modelTerms
       fixedIntercept<-self$options$fixedIntercept
       factors<-self$options$factors
-      covs<-self$options$covs     
-      
+      covs<-self$options$covs
       ### here we initialize the info table ####
       getout<-FALSE
       
       infoTable<-self$results$info
+
       if (is.null(self$options$dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
-      
-      if (getout) 
-        if (length(self$options$modelTerms) == 0) 
-          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
 
+      # this allows intercept only model to be passed by syntax interphase
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
+      }
+      
+        if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
+          if (is.null(factors) && is.null(covs))
+             infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
+          else
+             jmvcore::reject("Please specify a model")            
+          getout<-TRUE
+        }
 
       if (getout)
            return()
@@ -36,22 +46,14 @@ gamljGLMClass <- R6::R6Class(
       data<-private$.cleandata()
 
       
-      # this allows intercept only model to be passed by syntax interfase
-      aOne<-which(unlist(modelTerms)=="1")
-      if (is.something(aOne)) {
-        modelTerms[[aOne]]<-NULL
-        fixedIntercept=TRUE
-      }
-      
       modelFormula<-lf.constructFormula(dep,modelTerms,fixedIntercept)
       
       infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
       infoTable$addRow(rowKey="r2m",list(info="R-squared"))
       infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
-      
       ### initialize conditioning of covariates
-      if (!is.null(covs)) {
+      if (is.something(covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
       private$.cov_condition<-conditioning$new(covs,self$options$simpleScale,span)
       }
@@ -64,7 +66,7 @@ gamljGLMClass <- R6::R6Class(
           aTable$addRow(rowKey=1, list(name="Model"))
           
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]])
+                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -86,8 +88,12 @@ gamljGLMClass <- R6::R6Class(
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
+          aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
 
+      ## hide effects labels if no factor is there
+      if (!is.something(factors))
+         aTable$getColumn('label')$setVisible(FALSE)
+      
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -137,6 +143,7 @@ gamljGLMClass <- R6::R6Class(
       ##### clean the data ####
       data<-private$.cleandata()
       data<-mf.checkData(self$options,data)
+      
       if (!is.data.frame(data))
         reject(data)
       for (scaling in self$options$scaling) {
@@ -308,10 +315,10 @@ gamljGLMClass <- R6::R6Class(
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
-        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
+        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"simple")
         n64$addFactor(factor,levels)
-        n64$addLabel(factor,lf.contrastLabels(levels, "deviation")) 
-        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"deviation"
+        n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
+        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"
       }
       
       for (contrast in self$options$contrasts) {
@@ -410,7 +417,6 @@ gamljGLMClass <- R6::R6Class(
 },
 
 .descPlot=function(image, ggtheme, theme, ...) {
-  library(ggplot2)
   if (is.null(image$state))
     return(FALSE)
   
@@ -436,7 +442,7 @@ gamljGLMClass <- R6::R6Class(
 
 .populateLevenes=function(model) {
   
-  if ( ! self$options$homo)
+  if ( ! self$options$homoTest)
     return()
   
   data<-model$model
@@ -447,7 +453,7 @@ gamljGLMClass <- R6::R6Class(
   rhs <- paste0('`', factors, '`', collapse=':')
   formula <- as.formula(paste0('`res`~', rhs))
   result <- car::leveneTest(formula, data, center="mean")
-  table <- self$results$get('assump')$get('homo')
+  table <- self$results$get('assumptions')$get('homoTest')
    
   table$setRow(rowNo=1, values=list(
     F=result[1,'F value'],
@@ -468,7 +474,7 @@ gamljGLMClass <- R6::R6Class(
   result<-rbind(cbind(ks$statistic,ks$p.value),
              cbind(st$statistic,st$p.value))
 
-  table <- self$results$get('assump')$get('normTest')
+  table <- self$results$get('assumptions')$get('normTest')
 
   table$setRow(rowNo=1, values=list(test="Kolmogorov-Smirnov",stat=result[1,1],p=result[1,2]))
   table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat=result[2,1],p=result[2,2]))
@@ -477,7 +483,6 @@ gamljGLMClass <- R6::R6Class(
 
 
 .qqPlot=function(image, ggtheme, theme, ...) {
-  library(ggplot2)
   dep <- self$options$dep
   factors <- self$options$factors
   model<-private$.model      
@@ -500,7 +505,7 @@ gamljGLMClass <- R6::R6Class(
   jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
 },
 .sourcifyOption = function(option) {
-  
+
   name <- option$name
   value <- option$value
 
@@ -526,7 +531,7 @@ gamljGLMClass <- R6::R6Class(
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'deviation')
+      if (item$type == 'simple')
         value[[i]] <- NULL
       else
         i <- i + 1
@@ -541,22 +546,6 @@ gamljGLMClass <- R6::R6Class(
   super$.sourcifyOption(option)
 }
 )
-
-# ,
-#  public=list(
-#   asSource=function() {
-#     
-#     dep <- self$options$dep
-#     modelTerms <- self$options$modelTerms
-#     
-#     formula=lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
-# 
-#     args <- private$.asArgs()
-#     if (is.something(args))
-#       args <- paste0(',', args)
-#     
-#     paste0('gamlj::gamljGLM(\n    formula=', formula, args, ')')
-#   })
 )
 
 

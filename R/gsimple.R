@@ -1,5 +1,6 @@
-gsimple.init<-function(data,options,tables) {
+gsimple.init<-function(data,options,tables, n64=NULL, cov_condition=NULL) {
 
+  ginfo("Init simple effects")
   dep<-options$dep
   variable<-options$simpleVariable
   moderator<-options$simpleModerator
@@ -36,18 +37,25 @@ gsimple.init<-function(data,options,tables) {
  
     ## check for special formats    
     rep<-1
-    if (modelType=="multinomial") {
-      simpleEffectsParams$getColumn('dep')$setTitle(dep)
-      rep<-length(levels(data[[dep64]]))-1
-      psteps<-rep
-    }
-    
+    contrastlabels<-NULL
+    labels<-NULL
+    if (is.factor(data[[variable64]])) {
+      labels<-lf.contrastLabels(levels(data[[variable64]]),attr(data[[variable64]],"jcontrast"))
+    } 
     if (!is.null(threeway)) {
       threelevels<-length(levels(data[[threeway64]]))
       threelevels<-ifelse(threelevels>1,threelevels,3)
     } else 
       threelevels<-1
     
+    moderatorLabels<-NULL
+    
+    if (modelType=="multinomial") {
+      simpleEffectsParams$getColumn('dep')$setTitle(dep)
+      rep<-length(levels(data[[dep64]]))-1
+      psteps<-rep
+    }
+
     arows<-modlevels*threelevels
     prows<-xlevels*modlevels*threelevels*rep
     
@@ -62,6 +70,8 @@ gsimple.init<-function(data,options,tables) {
       simpleEffectsAnova$getColumn('threeway')$setSuperTitle("Moderator levels")
     }
     
+
+
     for (i in seq_len(arows)) {
       simpleEffectsAnova$addRow(rowKey=i)
       if ((i %% modlevels)==1) 
@@ -75,25 +85,26 @@ gsimple.init<-function(data,options,tables) {
     
     simpleEffectsParams$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
     simpleEffectsParams$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
-    
     simpleEffectsParams$getColumn('moderator')$setTitle(moderator)
     simpleEffectsParams$getColumn('moderator')$setSuperTitle("Moderator levels")
-    
-    
+
     if (!is.null(threeway)) {
       simpleEffectsParams$getColumn('threeway')$setTitle(threeway)
       simpleEffectsParams$getColumn('threeway')$setSuperTitle("Moderator levels")
     }
+    if (is.factor(data[[variable64]])) 
+          contrastlabels<-rep(labels,modlevels*threelevels*rep)
+
     for (i in seq_len(prows)) {
-      simpleEffectsParams$addRow(rowKey=i)
+      simpleEffectsParams$addRow(rowKey=i,list(contrast=contrastlabels[[i]]))
       if ((i %% psteps)==1) {
         simpleEffectsParams$addFormat(rowKey=i,col=1, jmvcore::Cell.BEGIN_GROUP)
         simpleEffectsParams$addFormat(rowKey=i,col=2, jmvcore::Cell.BEGIN_GROUP)
       }
     }
-    if (!is.factor(data[[variable64]]) )
+    if (!is.factor(data[[variable64]]) ) {
      simpleEffectsParams$getColumn('contrast')$setVisible(FALSE)
-    
+    }
     
   
     simpleEffectsParams$setVisible(visible=TRUE)
@@ -102,6 +113,8 @@ gsimple.init<-function(data,options,tables) {
 
 
 gsimple.populate<-function(model,options,tables,cov_conditioning) {
+
+        ginfo("Populate simple effects")
   
         variable<-options$simpleVariable
         moderator<-options$simpleModerator
@@ -118,7 +131,7 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
   
   #### check if estimation is needed
        if (!is.null(anovaTable$state)) {
-            mark("simple effects have been recycled")
+            ginfo("simple effects have been recycled")
             anovaTableData<-anovaTable$state
             parametersTableData<-parametersTable$state
        } else {
@@ -137,14 +150,34 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
              anovaTable$setState(anovaTableData)
              parametersTableData<-resultsTables[[1]]  
              parametersTable$setState(parametersTableData)
-             mark("simple effects have been computed")
-    
+             ginfo("simple effects have been computed")
+
        }
 
+
    ### fill the Anova Table ###
+       if (is.something(anovaTableData$chisq)) {
+         anovaTable$getColumn("chisq")$setVisible(TRUE)
+         anovaTable$getColumn("df")$setVisible(TRUE)
+         tnames<-names(anovaTable$columns)
+         hide<-c("F.ratio","df1","df2")
+         for (h in hide)
+            if (h %in% tnames)
+               anovaTable$getColumn(h)$setVisible(FALSE)
+       }
         for(r in seq_len(nrow(anovaTableData))) {
               anovaTable$setRow(rowNo=r,anovaTableData[r,])
         }
+        parametersTableData$contrast<-NULL
+        if (!is.something(parametersTableData$t.ratio)) {
+          tnames<-names(parametersTable$columns)
+          hide<-c("t.ratio","df")
+          for (h in hide)
+            if (h %in% tnames)
+              parametersTable$getColumn(h)$setVisible(FALSE)
+          
+        }
+
         for(r in seq_len(nrow(parametersTableData))) {
              parametersTable$setRow(rowNo=r,parametersTableData[r,])
         }

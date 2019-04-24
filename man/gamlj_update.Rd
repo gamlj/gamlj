@@ -7,7 +7,9 @@
 gamlj_update(gobj, ...)
 }
 \arguments{
-\item{a}{single obj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGZLM}}}
+\item{gobj}{of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}}}
+
+\item{...}{any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}}}
 }
 \value{
 an object of class GAMLj* as the input object

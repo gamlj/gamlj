@@ -109,7 +109,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
      cof$se<-as.numeric(se)
      cof$expb<-exp(cof$estimate)  
      cof$z<-cof$estimate/cof$se
-     cof$p<-(1 - pnorm(abs(cof$z), 0, 1)) * 2
+     cof$p<-(1 - stats::pnorm(abs(cof$z), 0, 1)) * 2
      ss<-as.data.frame(cof,stringsAsFactors = F)
      ss<-cof[order(ss$dep),]
      lab<-model$lab[1]
@@ -156,7 +156,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
     r2<-sumr$r.squared
     totalSS<-1/((1-r2)*(1/errSS))
     modSS<-totalSS-errSS
-    modp<-1 - pf(modF, modDF, errDF) 
+    modp<-1 - stats::pf(modF, modDF, errDF) 
     modRow<-c(ss=modSS,df=modDF,F=modF,p=modp)
     ss<-rbind(modRow,dss)
     ss$ms<-ss$ss/ss$df
@@ -180,10 +180,10 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
   ### this check is needed for adjust to different versions of lmertest
-  if (class(model)=="merModLmerTest")
-        ano<-lmerTest::anova(model,ddf=df)
-  else
-        ano<-anova(model,ddf=df)
+#  if (class(model)=="merModLmerTest")
+#        ano<-lmerTest:::anova(model,ddf=df)
+#  else
+        ano<-stats::anova(model,ddf=df)
         
   if (dim(ano)[1]==0)
     return(ano)
@@ -198,10 +198,10 @@ mf.anova<- function(x,...) UseMethod(".anova")
   if (!all(is.na(ano[,3])==F)) {
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
     # the factors. Here we try to fix it.
-    info("lmerTest problems with df: try to fix it")
+    ginfo("lmerTest problems with df: try to fix it")
     whichone<-is.na(ano[,3])
     rn<-rownames(ano[whichone,])
-    smr<-lmerTest::summary(model,ddf=df)
+    smr<-summary(model,ddf=df)
     coefz<-as.data.frame(smr$coefficients)
     coefz<-coefz[rownames(smr$coefficients) %in% rn,3:5]
 
@@ -232,12 +232,12 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
-  info("lmerTest failed: anava uses car::Anova")
+  ginfo("lmerTest failed: anava uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
   ano<-car::Anova(model,type=3,test=test)
-  if (attr(terms(model),"intercept")==1)
+  if (attr(stats::terms(model),"intercept")==1)
     ano<-ano[-1,]
   attr(ano,"method")<-"Kenward-Roger"
   attr(ano,"statistic")<-test
@@ -246,7 +246,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 
 
 mf.getModelFactors<-function(model) {
-  names(attr(model.matrix(model),"contrasts"))
+  names(attr(stats::model.matrix(model),"contrasts"))
 } 
 
 
@@ -260,22 +260,20 @@ mf.getModelMessages<-function(model) {
 
 
 mf.give_family<-function(modelSelection) {
-  
   if (modelSelection=="linear")
-       return(gaussian())
+       return(stats::gaussian())
   if (modelSelection=="logistic")
-       return(binomial())
+       return(stats::binomial())
   if (modelSelection=="poisson")
-    return(poisson())
+    return(stats::poisson())
   if (modelSelection=="multinomial")
     return("multinomial")
   if (modelSelection=="nb")
       return("nb")
   if (modelSelection=="poiover")
-      return(quasipoisson())
+      return(stats::quasipoisson())
   if (modelSelection=="probit")
-    return(binomial("probit"))
-  
+    return(stats::binomial("probit"))
   
   NULL  
 }
@@ -331,10 +329,10 @@ mf.confint<- function(x,...) UseMethod(".confint")
   return(FALSE)
 
 .confint.lm<-function(model,level) 
-    return(confint(model,level = level))
+    return(stats::confint(model,level = level))
   
 .confint.glm<-function(model,level) {  
-    ci<-confint(model,level = level)
+    ci<-stats::confint(model,level = level)
     return(ci)
 }
 
@@ -346,7 +344,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.lmer<-function(model,level)  {
 
-      ci<-confint(model,method="Wald",level=level)
+      ci<-stats::confint(model,method="Wald",level=level)
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
@@ -355,7 +353,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.multinom <- function (object, level = 0.95, ...) 
   {
-  ci<-confint(object,level=level)
+  ci<-stats::confint(object,level=level)
   cim<-NULL
   for (i in seq_len(dim(ci)[3]))
      cim<-rbind(cim,(ci[,,i]))
@@ -366,10 +364,11 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 ########### to be removed and update with mi.xxx #########
 
+
 mf.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
-  aliased<-alias(model)
+  aliased<-stats::alias(model)
   (!is.null(aliased$Complete))
 }
 

@@ -24,6 +24,7 @@ items:
         - factors
         - cov
         - modelTerms
+    refs: gamljglm
 
 
   - name: main
@@ -211,6 +212,7 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+
               columns:
                  - name: threeway
                    title: ""
@@ -240,6 +242,7 @@ items:
                      - contrasts
                      - fixedIntercept
                      - simpleScale
+                     - ciWidth
               columns:
                      - name: dep
                        title: "Response Contrasts"
@@ -292,6 +295,8 @@ items:
         - scaling
         - fixedIntercept
         - simpleScaleLabels
+        - ciWidth
+
     template:
         title:  $key
         type: Table

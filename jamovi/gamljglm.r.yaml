@@ -22,7 +22,8 @@ items:
         - cov
         - modelTerms
         - fixedIntercept
-
+    refs: gamljglm
+     
   - name: main
     type: Group
     title: Model Results
@@ -254,6 +255,8 @@ items:
                      - contrasts
                      - fixedIntercept
                      - simpleScale
+                     - ciWidth
+
               columns:
                      - name: threeway
                        title: " "
@@ -279,6 +282,9 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
+                     - name: df
+                       title: "df"
+                       type: number
                      - name: t.ratio
                        title: "t"
                        type: number
@@ -301,6 +307,8 @@ items:
         - scaling
         - fixedIntercept
         - simpleScaleLabels
+        - ciWidth
+
     template:
         title:  $key
         type: Table
@@ -377,15 +385,15 @@ items:
            - plotRaw
            - percvalue
            - cvalue
-  - name: assump
+  - name: assumptions
     title: Assumption Checks
     type: Group
     items:
-        - name: homo
+        - name: homoTest
           title: Test for Homogeneity of Residual Variances (Levene's)
           type: Table
           description: a table of homogeneity tests
-          visible: (homo)
+          visible: (homoTest)
           rows: 1
           columns:
             - name: F

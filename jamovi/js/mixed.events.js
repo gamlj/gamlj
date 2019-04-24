@@ -2,11 +2,13 @@ var rtermFormat = require('./rtermFormat');
 
 const events = {
     update: function(ui) {
+        this.setCustomVariable("Intercept", "none", "");
         calcModelTerms(ui, this);
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updateRandomSupplier(ui,this);
+        fixRandomEffects(ui,this);
 
     },
 
@@ -28,7 +30,13 @@ const events = {
 
     onChange_randomSupplier: function(ui){
         let supplierList = this.itemsToValues(ui.randomSupplier.value());
-        this.checkValue(ui.randomTerms, true, supplierList, rtermFormat);
+        console.log("change in random supplier");
+        var changes = this.findChanges("randomSupplier",supplierList,rtermFormat);
+        if (changes.removed.length>0) {
+          var randomTerms = this.cloneArray(ui.randomTerms.value(),[]);
+          var  light = removeFromMultiList(changes.removed,randomTerms,this,1);
+          ui.randomTerms.setValue(light);
+        }
         return;
     },
     onChange_modelTerms: function(ui) {
@@ -46,8 +54,7 @@ const events = {
         this.checkValue(ui.plotSepPlots, false, values, FormatDef.variable);
     },
     
-        onChange_simpleSupplier: function(ui) {
-          console.log("updating simple");
+    onChange_simpleSupplier: function(ui) {
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
         this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
@@ -59,16 +66,63 @@ const events = {
         let values = this.itemsToValues(ui.postHocSupplier.value());
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
-    onChange_randomTerms: function(ui) {
- //       randomTerms(ui,this);
- //       filterRandomTerms(ui, this);
+    onEvent_addRandomTerm: function(ui) {
+        console.log("addRandomTerm does nothing");
     },
     onEvent_randomTerms_preprocess: function(ui, data) {
  //       for(var j = 0; j < data.items.length; j++) {
 //          data.items[j].value.raw=data.items[j].value.toString();
 //      }
+    },
+    onEvent_corr: function(ui, data) {
+          console.log("Correlation structure changed");
+          fixRandomEffects(ui,this);
+
+    },    
+
+
+   onEvent_nothing: function(ui, data) {
+           // remove error notes if any
+          console.log("I didn't do anything");
     }    
+
 };
+
+var fixRandomEffects = function(ui, context) {
+            var option=ui.correlatedEffects.value();
+            var oldOption = context.workspace.correlatedEffects;
+            context.workspace.correlatedEffects=option;
+          
+
+            if (ui.correlatedEffects.value()=="block") {
+                  if (oldOption==="corr" || oldOption==="nocorr")
+                        ui.randomTerms.setValue(Array([]));
+                  // make sure the add button is visible                      
+                  var button= ui.randomTerms.$addButton;
+                  button[0].style.visibility="visible";
+                  // get the randomTerms field to manipulate the children
+                  var target= ui.randomTerms;
+                  target.$el[0].lastElementChild.style.borderColor=null;
+                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+                  // remove possibility to kill the first row
+                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+                  
+
+             } else {
+                 var data = context.cloneArray(ui.randomTerms.value(),[]);
+                 var one = flatMulti(data,context);
+                 var button= ui.randomTerms.$addButton;
+                 button[0].style.visibility="hidden";
+                 var target= ui.randomTerms;
+                 target.setValue(Array(one));
+                 var one = target.controls[0];
+                 target.$el[0].lastElementChild.style.borderColor="transparent";
+                 one.$el[0].childNodes[0].style.visibility="hidden";
+                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+             }
+
+  
+}
 
 var calcModelTerms = function(ui, context) {
     var variableList = context.cloneArray(ui.factors.value(), []);
@@ -204,7 +258,7 @@ var updateContrasts = function(ui, variableList, context) {
             }
         }
         if (found === null)
-            list3.push({ var: variableList[i], type: "deviation" });
+            list3.push({ var: variableList[i], type: "simple" });
         else
             list3.push(found);
     }
@@ -264,10 +318,10 @@ var updateRandomSupplier = function(ui, context) {
        var item=context.cloneArray(termsList[j]);
        item[item.length]=clusterList[i];
        alist.push(item);
-//       console.log(item);
      }
     }
     context.sortArraysByLength(alist);
+    console.log("random supplierList");
     console.log(alist);
       var formatted=context.valuesToItems(alist, rtermFormat);
 //    var busyList = context.cloneArray(ui.randomTerms.value(), []);
@@ -276,12 +330,14 @@ var updateRandomSupplier = function(ui, context) {
 //         return busyForm.indexOf(val) == -1;
 //            });    
     ui.randomSupplier.setValue(formatted);
+    
 };
 
 
 var filterRandomTerms = function(ui, context) {
-  
+    console.log("filter random effects");  
     var termsList = context.cloneArray(ui.randomTerms.value(), []);
+    console.log(termsList);
     var unique = termsList.filter((v, i, a) => a.indexOf(v) === i); 
     if (unique.length!=termsList.length)
       ui.randomTerms.setValue(unique);
@@ -300,6 +356,29 @@ var unique=function(arr) {
     return a;
 };
 
+var addToList = function(quantum, cosmos, context) {
+  
+    cosmos = normalize(context.cloneArray(cosmos));
+    quantum = normalize(context.cloneArray(quantum));
+    
+    for (var i = 0; i < quantum.length; i++) {
+          if (dim(quantum[i])===0)
+              cosmos.push([quantum[i]]);
+          if (dim(quantum[i])===1)
+              cosmos.push(quantum[i]);
+          }
+    return unique(cosmos);
+};
+
+var flatMulti = function(cosmos,context) {
+  var light = []
+  for (var i=0 ; i < cosmos.length; i++) {
+    light=addToList(light,cosmos[i],context);
+  }
+  return unique(light);
+};
+
+
 
 var ssort= function(str){
   str = str.replace(/[`\[\]"\\\/]/gi, '');
@@ -307,6 +386,82 @@ var ssort= function(str){
   var sorted = arr.sort();
   return sorted.join('');
 }
+
+var normalize = function(cosmos) {
+
+  if (cosmos===undefined)
+          return [];
+  if (dim(cosmos)===0)
+          cosmos=[cosmos]
+          
+        for (var i = 0; i < cosmos.length; i++) {
+            var aValue = cosmos[i];
+            var newValue=dim(aValue)>0 ? aValue : [aValue];
+            cosmos[i]=newValue
+        }
+        return cosmos;
+}
+
+var removeFromMultiList = function(quantum, cosmos, context, strict = 1) {
+
+    var cosmos = context.cloneArray(cosmos);
+    var dimq = dim(quantum);
+        for (var j = 0; j < cosmos.length; j++) 
+           cosmos[j]=removeFromList(quantum,cosmos[j],context, strict);
+    return(cosmos);
+};
+
+
+
+// remove a list or a item from list
+// order=0 remove only if term and target term are equal
+// order>0 remove if term length>=order 
+// for instance, order=1 remove any matching interaction with terms, keeps main effects
+// order=2 remove from 3-way interaction on (keep up to 2-way interactions)
+
+var removeFromList = function(quantum, cosmos, context, order = 1) {
+
+     cosmos=normalize(cosmos);
+     quantum=normalize(quantum);
+     if (cosmos===undefined)
+        return([]);
+     var cosmos = context.cloneArray(cosmos);
+       for (var i = 0; i < cosmos.length; i++) {
+          if (cosmos[i]===undefined)
+             break;
+          var aCosmos = context.cloneArray(cosmos[i]);
+           for (var k = 0; k < quantum.length; k++) {
+             var  test = order === 0 ? FormatDef.term.isEqual(aCosmos,quantum[k]) : FormatDef.term.contains(aCosmos,quantum[k]);
+                 if (test && (aCosmos.length >= order)) {
+                        cosmos.splice(i, 1);
+                        i -= 1;
+                    break;    
+                    }
+          }
+            
+       }
+  
+    return(cosmos);
+};
+
+
+var dim = function(aList) {
+
+    if (!Array.isArray(aList))
+           return(0);
+    if (!Array.isArray(aList[0]))
+           return(1);
+    if (!Array.isArray(aList[0][0]))
+           return(2);
+    if (!Array.isArray(aList[0][0][0]))
+           return(3);
+    if (!Array.isArray(aList[0][0][0][0]))
+           return(4);
+
+  
+    return(value);
+};
+
 
 
 module.exports = events;

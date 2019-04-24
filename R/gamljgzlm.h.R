@@ -106,7 +106,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "helmert",
                                 "repeated",
                                 "polynomial"),
-                            default="deviation"))))
+                            default="simple"))))
             private$..showRealNames <- jmvcore::OptionBool$new(
                 "showRealNames",
                 showRealNames,
@@ -384,7 +384,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "dep",
                     "factors",
                     "cov",
-                    "modelTerms")))
+                    "modelTerms"),
+                refs="gamljglm"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -397,7 +398,13 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="main",
-                            title="Model Results")
+                            title="Model Results",
+                            clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "contrasts",
+                    "scaling",
+                    "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -631,7 +638,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "fixedIntercept",
-                                "simpleScale"),
+                                "simpleScale",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="dep", 
@@ -690,7 +698,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "contrasts",
                     "scaling",
                     "fixedIntercept",
-                    "simpleScaleLabels"),
+                    "simpleScaleLabels",
+                    "ciWidth"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -789,8 +798,11 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' Generalized Linear Model
 #'
 #' @examples
-#' data('data3by2')
-#' gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
+#' data<-emmeans::neuralgia
+#'  gamlj::gamljGzlm(
+#'            formula = Pain ~ Duration,
+#'            data = data,
+#'             modelSelection = "logistic")
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
@@ -915,45 +927,45 @@ gamljGzlm <- function(
 
     if ( ! missing(formula)) {
         if (missing(dep))
-            dep <- jmvcore:::marshalFormula(
+            dep <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='lhs',
                 subset='1',
                 required=TRUE)
         if (missing(factors))
-            factors <- jmvcore:::marshalFormula(
+            factors <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='vars',
                 permitted='factor')
         if (missing(covs))
-            covs <- jmvcore:::marshalFormula(
+            covs <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='vars',
                 permitted='numeric')
         if (missing(modelTerms))
-            modelTerms <- jmvcore:::marshalFormula(
+            modelTerms <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='terms')
     }
 
-    if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore:::resolveQuo(jmvcore:::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore:::resolveQuo(jmvcore:::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepPlots))
-    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleVariable))
-    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleModerator))
-    if ( ! missing(simple3way)) simple3way <- jmvcore:::resolveQuo(jmvcore:::enquo(simple3way))
+    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
+    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
+    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
+    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
+    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
+    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
+    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore::resolveQuo(jmvcore::enquo(simpleVariable))
+    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerator))
+    if ( ! missing(simple3way)) simple3way <- jmvcore::resolveQuo(jmvcore::enquo(simple3way))
     if (missing(data))
-        data <- jmvcore:::marshalData(
+        data <- jmvcore::marshalData(
             parent.frame(),
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
@@ -966,8 +978,8 @@ gamljGzlm <- function(
             `if`( ! missing(simple3way), simple3way, NULL))
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore:::decomposeFormula(modelTerms)
-    if (inherits(postHoc, 'formula')) postHoc <- jmvcore:::decomposeFormula(postHoc)
+    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore::decomposeFormula(modelTerms)
+    if (inherits(postHoc, 'formula')) postHoc <- jmvcore::decomposeFormula(postHoc)
 
     options <- gamljGzlmOptions$new(
         dep = dep,

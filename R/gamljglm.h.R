@@ -39,7 +39,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             effectSize = list(
                 "beta",
                 "partEta"),
-            homo = FALSE,
+            homoTest = FALSE,
             qq = FALSE,
             normTest = FALSE, ...) {
 
@@ -102,14 +102,14 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             "type",
                             NULL,
                             options=list(
-                                "deviation",
                                 "simple",
+                                "deviation",
                                 "dummy",
                                 "difference",
                                 "helmert",
                                 "repeated",
                                 "polynomial"),
-                            default="deviation"))))
+                            default="simple"))))
             private$..showRealNames <- jmvcore::OptionBool$new(
                 "showRealNames",
                 showRealNames,
@@ -243,9 +243,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 default=list(
                     "beta",
                     "partEta"))
-            private$..homo <- jmvcore::OptionBool$new(
-                "homo",
-                homo,
+            private$..homoTest <- jmvcore::OptionBool$new(
+                "homoTest",
+                homoTest,
                 default=FALSE)
             private$..qq <- jmvcore::OptionBool$new(
                 "qq",
@@ -286,7 +286,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..scaling)
             self$.addOption(private$..effectSize)
-            self$.addOption(private$..homo)
+            self$.addOption(private$..homoTest)
             self$.addOption(private$..qq)
             self$.addOption(private$..normTest)
         }),
@@ -321,7 +321,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         postHocCorr = function() private$..postHocCorr$value,
         scaling = function() private$..scaling$value,
         effectSize = function() private$..effectSize$value,
-        homo = function() private$..homo$value,
+        homoTest = function() private$..homoTest$value,
         qq = function() private$..qq$value,
         normTest = function() private$..normTest$value),
     private = list(
@@ -355,7 +355,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..postHocCorr = NA,
         ..scaling = NA,
         ..effectSize = NA,
-        ..homo = NA,
+        ..homoTest = NA,
         ..qq = NA,
         ..normTest = NA)
 )
@@ -370,7 +370,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
-        assump = function() private$.items[["assump"]]),
+        assumptions = function() private$.items[["assumptions"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -396,7 +396,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "factors",
                     "cov",
                     "modelTerms",
-                    "fixedIntercept")))
+                    "fixedIntercept"),
+                refs="gamljglm"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -409,7 +410,13 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="main",
-                            title="Model Results")
+                            title="Model Results",
+                            clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "contrasts",
+                    "scaling",
+                    "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -665,7 +672,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "fixedIntercept",
-                                "simpleScale"),
+                                "simpleScale",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -699,6 +707,10 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
                                     `name`="t.ratio", 
                                     `title`="t", 
                                     `type`="number"),
@@ -718,7 +730,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "contrasts",
                     "scaling",
                     "fixedIntercept",
-                    "simpleScaleLabels"),
+                    "simpleScaleLabels",
+                    "ciWidth"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -798,7 +811,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    homo = function() private$.items[["homo"]],
+                    homoTest = function() private$.items[["homoTest"]],
                     normTest = function() private$.items[["normTest"]],
                     qq = function() private$.items[["qq"]]),
                 private = list(),
@@ -806,13 +819,13 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     initialize=function(options) {
                         super$initialize(
                             options=options,
-                            name="assump",
+                            name="assumptions",
                             title="Assumption Checks")
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="homo",
+                            name="homoTest",
                             title="Test for Homogeneity of Residual Variances (Levene's)",
-                            visible="(homo)",
+                            visible="(homoTest)",
                             rows=1,
                             columns=list(
                                 list(
@@ -885,8 +898,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'
 #' @examples
 #' data('ToothGrowth')
-#'
-#' mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+#' gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
@@ -915,8 +927,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   lines on the plot
 #' @param plotSepPlots a string naming the variable to separate over to form
 #'   multiple plots
-#' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
-#'   statistics
+#' @param plotRaw \code{TRUE} or \code{FALSE} (default), plot raw data along
+#'   the predicted values
 #' @param plotDvScale .
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
@@ -945,7 +957,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
 #' @param effectSize .
-#' @param homo \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
@@ -964,9 +976,9 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
-#'   \code{results$assump$homo} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-#'   \code{results$assump$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
-#'   \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
+#'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+#'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -1011,7 +1023,7 @@ gamljGLM <- function(
     effectSize = list(
                 "beta",
                 "partEta"),
-    homo = FALSE,
+    homoTest = FALSE,
     qq = FALSE,
     normTest = FALSE,
     formula) {
@@ -1021,45 +1033,45 @@ gamljGLM <- function(
 
     if ( ! missing(formula)) {
         if (missing(dep))
-            dep <- jmvcore:::marshalFormula(
+            dep <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='lhs',
                 subset='1',
                 required=TRUE)
         if (missing(factors))
-            factors <- jmvcore:::marshalFormula(
+            factors <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='vars',
                 permitted='factor')
         if (missing(covs))
-            covs <- jmvcore:::marshalFormula(
+            covs <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='vars',
                 permitted='numeric')
         if (missing(modelTerms))
-            modelTerms <- jmvcore:::marshalFormula(
+            modelTerms <- jmvcore::marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 from='rhs',
                 type='terms')
     }
 
-    if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore:::resolveQuo(jmvcore:::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore:::resolveQuo(jmvcore:::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepPlots))
-    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleVariable))
-    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleModerator))
-    if ( ! missing(simple3way)) simple3way <- jmvcore:::resolveQuo(jmvcore:::enquo(simple3way))
+    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
+    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
+    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
+    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
+    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
+    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
+    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore::resolveQuo(jmvcore::enquo(simpleVariable))
+    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerator))
+    if ( ! missing(simple3way)) simple3way <- jmvcore::resolveQuo(jmvcore::enquo(simple3way))
     if (missing(data))
-        data <- jmvcore:::marshalData(
+        data <- jmvcore::marshalData(
             parent.frame(),
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
@@ -1072,8 +1084,8 @@ gamljGLM <- function(
             `if`( ! missing(simple3way), simple3way, NULL))
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore:::decomposeFormula(modelTerms)
-    if (inherits(postHoc, 'formula')) postHoc <- jmvcore:::decomposeFormula(postHoc)
+    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore::decomposeFormula(modelTerms)
+    if (inherits(postHoc, 'formula')) postHoc <- jmvcore::decomposeFormula(postHoc)
 
     options <- gamljGLMOptions$new(
         dep = dep,
@@ -1106,7 +1118,7 @@ gamljGLM <- function(
         postHocCorr = postHocCorr,
         scaling = scaling,
         effectSize = effectSize,
-        homo = homo,
+        homoTest = homoTest,
         qq = qq,
         normTest = normTest)
 

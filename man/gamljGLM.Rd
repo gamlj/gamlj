@@ -14,7 +14,7 @@ gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
   simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
   percvalue = 25, simpleScaleLabels = "labels",
   postHocCorr = list("bonf"), scaling = NULL,
-  effectSize = list("beta", "partEta"), homo = FALSE, qq = FALSE,
+  effectSize = list("beta", "partEta"), homoTest = FALSE, qq = FALSE,
   normTest = FALSE, formula)
 }
 \arguments{
@@ -59,8 +59,8 @@ lines on the plot}
 \item{plotSepPlots}{a string naming the variable to separate over to form
 multiple plots}
 
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
-statistics}
+\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
+the predicted values}
 
 \item{plotDvScale}{.}
 
@@ -106,7 +106,7 @@ respectively}
 
 \item{effectSize}{.}
 
-\item{homo}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
+\item{homoTest}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
 tests}
 
 \item{qq}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
@@ -130,9 +130,9 @@ A results object containing:
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
-  \code{results$assump$homo} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-  \code{results$assump$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
-  \code{results$assump$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+  \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
+  \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+  \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -146,7 +146,6 @@ General Linear Model
 }
 \examples{
 data('ToothGrowth')
-
-mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 
 }

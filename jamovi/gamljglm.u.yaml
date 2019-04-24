@@ -360,7 +360,7 @@ children:
     stretchFactor: 1
     children:
       - type: CheckBox
-        name: homo
+        name: homoTest
         label: Homogeneity tests
       - type: CheckBox
         name: normTest

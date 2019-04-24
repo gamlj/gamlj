@@ -105,31 +105,77 @@ children:
       - type: Supplier
         name: randomSupplier
         label: Components
-        persistentItems: true
+        persistentItems: false
         stretchFactor: 1
         events:
           change: './mixed.events::onChange_randomSupplier'
         children:
-          - type: TargetLayoutBox
-            label: Random Coefficients
-            children:
-              - type: ListBox
-                name: randomTerms
-                valueFilter: unique
-                isTarget: true
-                events:
-                  change: './mixed.events::onChange_randomTerms'
-                  preprocess: './mixed.events::onEvent_randomTerms_preprocess'
-                template:
-                  type: Label
-                  format: ./rtermFormat
+              - type: TargetLayoutBox
+                transferAction: interactions
+                children:
+                  - type: ListBox
+                    name: randomTerms
+                    height: large
+                    addButton: Add block
+                    events:
+                      listItemAdded: './mixed.events::onEvent_nothing'
+                      listItemRemoved: './mixed.events::onEvent_nothing'
+                    selectable: true
+                    templateName: linreg-block-template
+                    template:
+                      type: LayoutBox
+                      margin: normal
+                      targetArea: true
+                      children:
+                        - type: ListBox
+                          name: randblockList
+                          isTarget: true
+                          valueFilter: unique
+                          height: auto
+                          ghostText: drag term here
+                          events:
+                            change: './mixed.events::onEvent_addRandomTerm'
+                          template:
+                            type: TermLabel
+                            format: ./rtermFormat
+
+
       - type: LayoutBox
         margin: large
+        style: inline
         children:
-          - type: CheckBox
-            name: correlatedEffects
-          - type: CheckBox
-            name: lrtRandomEffects
+          - type: Label
+            label: Effects correlation
+            children:
+                   - type: LayoutBox
+                     margin: large
+                     style: list
+                     children:
+                            - type: RadioButton
+                              name: correlatedEffects_corr
+                              optionName: correlatedEffects
+                              optionPart: corr
+                              events:
+                                 change: './mixed.events::onEvent_corr'
+                            - type: RadioButton
+                              name: correlatedEffects_nocorr
+                              optionName: correlatedEffects
+                              optionPart: nocorr
+                            - type: RadioButton
+                              name: correlatedEffects_block
+                              optionName: correlatedEffects
+                              optionPart: block
+
+          - type: Label
+            label: Tests
+            children:
+                - type: LayoutBox
+                  margin: large
+                  children:
+                    - type: CheckBox
+                      name: lrtRandomEffects
+
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -334,6 +380,8 @@ children:
                 name: plotDvScale
               - type: CheckBox
                 name: plotRandomEffects
+
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

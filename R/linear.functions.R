@@ -1,6 +1,17 @@
-.nicifyTerms<-function(term) {
-  term <- jmvcore::stringifyTerm(term)
-  term
+lf.nicifyLabels<-function(labels) {
+     
+     flabs<-grep(DUMMY_TAIL,names(labels),fixed=T)
+     
+     for (i in flabs)
+            labels[[i]]<-paste0(labels[[i]],paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
+     news<-jmvcore::stringifyTerm(labels,raise=T)
+     for (i in seq_along(news))
+        news[[i]]<-gsub(IMPROBABLE_SEQ,"",news[[i]],fixed=T)
+     news
+     }
+
+lf.nicifyTerms<-function(term) {
+  jmvcore::stringifyTerm(term,raise=T)
 }
 
 
@@ -64,7 +75,7 @@ lf.createContrasts=function(levels, type) {
   nLevels <- length(levels)
 
   if (type == 'simple') {
-    dummy <- contr.treatment(levels)
+    dummy <- stats::contr.treatment(levels)
     dimnames(dummy) <- NULL
     coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
     contrast <- (dummy - coding)
@@ -113,11 +124,10 @@ lf.createContrasts=function(levels, type) {
     dimnames(contrast) <- NULL
     
   } else {
-      contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
-      for (i in seq_len(nLevels-1)) {
-        contrast[i+1, i] <- 1
-        contrast[1, i] <- -1
-      }
+    dummy <- stats::contr.treatment(levels)
+    dimnames(dummy) <- NULL
+    coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
+    contrast <- (dummy - coding)
   }
   dimnames(contrast)<-list(NULL,paste0("_._._",1:(nLevels-1)))
   contrast
@@ -187,7 +197,7 @@ lf.contrastLabels=function(levels, type) {
         }
         return(labels)
   }
-    mark("no contrast definition met")
+    ginfo("no contrast definition met")
     
     all <- paste(levels, collapse=', ')
     for (i in seq_len(nLevels-1))

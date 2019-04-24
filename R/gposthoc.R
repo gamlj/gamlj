@@ -1,5 +1,7 @@
+
+
 gposthoc.init=function(data,options,tables) {
-  
+
   bs <- options$factors
   phTerms <- options$postHoc
   modelType<-"linear"
@@ -19,6 +21,14 @@ gposthoc.init=function(data,options,tables) {
     nDepLevels<-length(depLevels)
     off<-1
   }
+  diff_label="Difference"
+  
+  if (modelType %in% c('logistic','poisson','poiover','nb' )) {
+    diff_label="exp(B)"
+  }
+
+  
+  
   for (j in seq_len(nDepLevels))
     for (ph in phTerms) {
       table <- tables$get(key=ph)
@@ -36,6 +46,8 @@ gposthoc.init=function(data,options,tables) {
         nc<-nc+1
         table$addColumn(name=paste0("c",nc-1), title=ph[i], type='text', superTitle='Comparison',index=nc+off)
       }
+      ##### fix the difference column label
+      table$getColumn('estimate')$setTitle(diff_label)
       ##### set the rows ###########
       
       eg<-nrow(expand.grid(bsLevels[ph]))
@@ -114,29 +126,29 @@ gposthoc.populate<-function(model,options,tables) {
 
 .posthoc.default<-function(model,term,adjust) {
   #  term<-jmvcore::composeTerm(term)
-  termf<-as.formula(paste("~",term))
+  termf<-stats::as.formula(paste("~",term))
   data<-mf.getModelData(model)
   referenceGrid<-emmeans::emmeans(model, termf,type = "response",data=data)
   terms<-jmvcore::decomposeTerm(term)
   labs<-referenceGrid@grid[terms]
   newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
   referenceGrid@grid[terms]<-newlabs  
-  table<-summary(pairs(referenceGrid),adjust=adjust)
+  table<-summary(graphics::pairs(referenceGrid),adjust=adjust)
   table[order(table$contrast),]
 }
 
 .posthoc.multinom<-function(model,term,adjust) {
   results<-try({
-    dep<-names(attr(terms(model),"dataClass"))[1]
+    dep<-names(attr(stats::terms(model),"dataClass"))[1]
     dep<-jmvcore::composeTerm(dep)
-    tterm<-as.formula(paste("~",paste(dep,term,sep = "|")))  
+    tterm<-stats::as.formula(paste("~",paste(dep,term,sep = "|")))  
     data<-mf.getModelData(model)
     referenceGrid<-emmeans::emmeans(model,tterm,transform = "response",data=data)
     terms<-jmvcore::decomposeTerm(term)
     labs<-referenceGrid@grid[terms]
     newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
     referenceGrid@grid[terms]<-newlabs  
-    res<-summary(pairs(referenceGrid, by=dep, adjust=adjust))
+    res<-summary(graphics::pairs(referenceGrid, by=dep, adjust=adjust))
     res<-as.data.frame(res)
     res[,dep]<-NULL
     res

@@ -2,11 +2,14 @@
 #'
 #' This function sets GAMLj suite general options
 #'
-#' @param opt a value for the corresponding option 
+#' @param opt the name of the option 
+#' @param value a value for the corresponding option 
 #' @details 
 #' Options are: debug (TRUE or FALSE). When TRUE some additional warnings and info are printed in output
 #'     
 #' @author Marcello Gallucci
+#' @export 
+
 gamlj_options<-function(opt,value) {
   if (opt=="debug")
     GAMLj_DEBUG<<-value
@@ -16,7 +19,9 @@ gamlj_options<-function(opt,value) {
 #'
 #' This function re-estimates a GAMLj model applying new options to the original model
 #'
-#' @param a single obj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGZLM}} 
+#' @param  gobj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
+#' @param  ... any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
+
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
 #' @export 
@@ -47,16 +52,26 @@ gamlj_update<-function(gobj,...) {
 #'
 #' This function re-estimates a GAMLj model with a new plot
 
-#' @param gobj a gamlj results object of the class GAMLj*#'
+#' @param gobj a gamlj results object of the class GAMLj*
 #' @param haxis horizontal axis variable
 #' @param sepLines variable defining the levels for separate lines 
-#' @param sepPlot variable defining the levels for which separate plots are produced 
+#' @param sepPlots variable defining the levels for which separate plots are produced 
 #' @param ... any other options accepted by the gamlj_* function  
 #' @return an object of class GAMLj* as the input object
+#' @examples
+#' data<-exercise
+#' gamljGLM(formula=)
+#' data(qsport)
+#' mod<-gamlj::gamljGLM(
+#'   formula = performance ~ hours,
+#'   data = qsport)
+#' 
+#' gamlj_plot(mod,haxis = "hours")
+#' 
 #' @author Marcello Gallucci
 #' @export
 gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
- news<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
+ args<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
  gamlj_update(gobj,args)  
  
 }

@@ -1,5 +1,10 @@
-GAMLj_DEBUG=T
+#' @import lmerTest
+
+GAMLj_DEBUG=F
 GAMLj_INFO=F
+
+IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
+DUMMY_TAIL<-"_._._"
 
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
@@ -70,6 +75,8 @@ WARNS["se.df"]<-"Simple effects F-tests are Type III Wald F tests with Kenward-R
 
 WARNS["se.noluck"]<-"Simple effects cannot be estimated. Refine the model or the covariates conditioning (if any)"
 
+WARNS["se.largen"]<-"z-tests are computed because the number of observations exceeds 3000"
+
 #### anova #########
 
 WARNS["ano.aliased"]<-"WARNING: Some of the coefficients cannot be estimated because
@@ -94,7 +101,6 @@ WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across intera
 
 
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
-#WARNS<-sapply(WARNS,function(a) gsub("  ","",a,fixed=T))
 
 ###############################################################
 

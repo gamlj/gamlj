@@ -37,8 +37,9 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "bonf"),
             scaling = NULL,
             cluster = NULL,
-            randomTerms = NULL,
-            correlatedEffects = TRUE,
+            randomTerms = list(
+                list()),
+            correlatedEffects = "corr",
             reml = TRUE,
             lrtRandomEffects = FALSE,
             plotRandomEffects = FALSE, ...) {
@@ -52,6 +53,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
+                default=NULL,
                 permitted=list(
                     "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
@@ -101,14 +103,14 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             "type",
                             NULL,
                             options=list(
-                                "deviation",
                                 "simple",
+                                "deviation",
                                 "dummy",
                                 "difference",
                                 "helmert",
                                 "repeated",
                                 "polynomial"),
-                            default="deviation"))))
+                            default="simple"))))
             private$..showRealNames <- jmvcore::OptionBool$new(
                 "showRealNames",
                 showRealNames,
@@ -235,16 +237,25 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
                 cluster,
+                default=NULL,
                 suggested=list(
                     "nominal"))
-            private$..randomTerms <- jmvcore::OptionTerms$new(
+            private$..randomTerms <- jmvcore::OptionArray$new(
                 "randomTerms",
                 randomTerms,
-                default=NULL)
-            private$..correlatedEffects <- jmvcore::OptionBool$new(
+                default=list(
+                    list()),
+                template=jmvcore::OptionTerms$new(
+                    "randomTerms",
+                    NULL))
+            private$..correlatedEffects <- jmvcore::OptionList$new(
                 "correlatedEffects",
                 correlatedEffects,
-                default=TRUE)
+                options=list(
+                    "corr",
+                    "nocorr",
+                    "block"),
+                default="corr")
             private$..reml <- jmvcore::OptionBool$new(
                 "reml",
                 reml,
@@ -377,7 +388,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         simpleEffects = function() private$.items[["simpleEffects"]],
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
-        descPlots = function() private$.items[["descPlots"]]),
+        descPlots = function() private$.items[["descPlots"]],
+        plotnotes = function() private$.items[["plotnotes"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -400,11 +412,9 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="")),
                 clearWith=list(
                     "dep",
-                    "factors",
-                    "cluster",
-                    "cov",
                     "randomTerms",
-                    "modelTerms")))
+                    "modelTerms"),
+                refs="gamljmixed"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -420,7 +430,16 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="main",
-                            title="Model Results")
+                            title="Model Results",
+                            clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "reml",
+                    "contrasts",
+                    "scaling",
+                    "randomTerms",
+                    "correlatedEffects",
+                    "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -743,6 +762,16 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="", 
                                     `combineBelow`=TRUE),
                                 list(
+                                    `name`="chisq", 
+                                    `title`="X\u00B2", 
+                                    `type`="number", 
+                                    `visible`=FALSE),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number", 
+                                    `visible`=FALSE),
+                                list(
                                     `name`="F.ratio", 
                                     `title`="F", 
                                     `type`="number"),
@@ -770,7 +799,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "fixedIntercept",
-                                "simpleScale"),
+                                "simpleScale",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -812,6 +842,10 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="t", 
                                     `type`="number"),
                                 list(
+                                    `name`="z.ratio", 
+                                    `title`="z", 
+                                    `type`="number"),
+                                list(
                                     `name`="p.value", 
                                     `title`="p", 
                                     `type`="number", 
@@ -830,7 +864,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "simpleScaleLabels",
                     "randomTerms",
                     "correlatedEffects",
-                    "fixedIntercept"),
+                    "fixedIntercept",
+                    "ciWidth"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -859,13 +894,14 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(jmvcore::Image$new(
                 options=options,
                 name="descPlot",
-                title="Fixed Effects Plots",
+                title="Effects Plots",
                 visible="(plotHAxis)",
                 width=500,
                 height=300,
                 renderFun=".descPlot",
                 clearWith=list(
                     "dep",
+                    "cluster",
                     "plotHAxis",
                     "plotSepLines",
                     "plotSepPlots",
@@ -910,7 +946,11 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotRaw",
                         "randomTerms",
                         "percvalue",
-                        "cvalue"))))}))
+                        "cvalue"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="plotnotes",
+                visible=FALSE))}))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljMixedBase",
@@ -936,9 +976,19 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' Mixed Linear Model
 #'
 #' @examples
-#' data('ToothGrowth')
+#' data(subjects_by_stimuli)
 #'
-#' mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+#' gamlj::gamljMixed(
+#'        formula = y ~ 1 + cond+( 1|subj ),
+#'        data = subjects_by_stimuli)
+#'
+#' gamlj::gamljMixed(
+#'        data = subjects_by_stimuli,
+#'        dep = "y",
+#'        factors = "cond",
+#'        modelTerms = "cond",
+#'        cluster = "subj",
+#'        randomTerms=list(list(c("cond","subj"))))
 #'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
@@ -965,11 +1015,12 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
 #'   lines on the plot
-#' @param plotSepPlots a string naming the variable to separate over to form
-#'   multiple plots
+#' @param plotSepPlots the variable for whose levels multiple plots are
+#'   computed
 #' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
 #'   statistics
-#' @param plotDvScale .
+#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), scale the plot
+#'   Y-Axis to the max and the min of the dependent variable observed scores.
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
@@ -989,7 +1040,10 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'custom_percent'}. Use to condition the covariates (if any)
 #' @param cvalue offset value for conditioning
 #' @param percvalue offset value for conditioning
-#' @param simpleScaleLabels .
+#' @param simpleScaleLabels decide the labeling of simple effects in tables
+#'   and plots.  \code{labels} indicates that only labels are used, such as
+#'   \code{Mean} and  \code{Mean + 1 SD}. \code{values} uses the actual values
+#'   as labels. \code{values_labels} uses both.
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 #'   respectively
@@ -998,15 +1052,20 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'none'} leaves the variable as it is
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
-#' @param randomTerms a list of character vectors describing random
-#'   coefficients that need to be computed
-#' @param correlatedEffects \code{TRUE} (default) or \code{FALSE} , include
-#'   correlated random effects
+#' @param randomTerms a list of lists specifying the models random effects.
+#' @param correlatedEffects \code{'nocorr'}, \code{'corr'} (default), or
+#'   \code{'block'}. When random effects are passed as list of length 1, it
+#'   decides whether the effects should be correlated,  non correlated. If
+#'   \code{'randomTerms'} is a list of  lists of length > 1, the option is
+#'   automatially set to \code{'block'}. The option is ignored if the model is
+#'   passed using \code{formula}.
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be used rather than ML
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
 #'   random effects
-#' @param plotRandomEffects .
+#' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
+#'   effects predicted values in the plot
+#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -1022,6 +1081,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -1033,7 +1093,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @export
 gamljMixed <- function(
     data,
-    dep,
+    dep = NULL,
     factors = NULL,
     covs = NULL,
     modelTerms = NULL,
@@ -1063,28 +1123,63 @@ gamljMixed <- function(
     postHocCorr = list(
                 "bonf"),
     scaling = NULL,
-    cluster,
-    randomTerms = NULL,
-    correlatedEffects = TRUE,
+    cluster = NULL,
+    randomTerms = list(
+                list()),
+    correlatedEffects = "corr",
     reml = TRUE,
     lrtRandomEffects = FALSE,
-    plotRandomEffects = FALSE) {
+    plotRandomEffects = FALSE,
+    formula) {
 
     if ( ! requireNamespace('jmvcore'))
         stop('gamljMixed requires jmvcore to be installed (restart may be required)')
 
-    if ( ! missing(dep)) dep <- jmvcore:::resolveQuo(jmvcore:::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore:::resolveQuo(jmvcore:::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore:::resolveQuo(jmvcore:::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore:::resolveQuo(jmvcore:::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore:::resolveQuo(jmvcore:::enquo(plotSepPlots))
-    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleVariable))
-    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore:::resolveQuo(jmvcore:::enquo(simpleModerator))
-    if ( ! missing(simple3way)) simple3way <- jmvcore:::resolveQuo(jmvcore:::enquo(simple3way))
-    if ( ! missing(cluster)) cluster <- jmvcore:::resolveQuo(jmvcore:::enquo(cluster))
+    if ( ! missing(formula)) {
+        if (missing(dep))
+            dep <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="dep")
+        if (missing(factors))
+            factors <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="factors")
+        if (missing(covs))
+            covs <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="covs")
+        if (missing(cluster))
+            cluster <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="cluster")
+        if (missing(randomTerms))
+            randomTerms <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="randomTerms")
+        if (missing(modelTerms))
+            modelTerms <- gamljMixedClass$private_methods$.marshalFormula(
+                formula=formula,
+                data=`if`( ! missing(data), data, NULL),
+                name="modelTerms")
+    }
+
+    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
+    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
+    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
+    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
+    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
+    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
+    if ( ! missing(simpleVariable)) simpleVariable <- jmvcore::resolveQuo(jmvcore::enquo(simpleVariable))
+    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerator))
+    if ( ! missing(simple3way)) simple3way <- jmvcore::resolveQuo(jmvcore::enquo(simple3way))
+    if ( ! missing(cluster)) cluster <- jmvcore::resolveQuo(jmvcore::enquo(cluster))
     if (missing(data))
-        data <- jmvcore:::marshalData(
+        data <- jmvcore::marshalData(
             parent.frame(),
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
@@ -1098,9 +1193,8 @@ gamljMixed <- function(
             `if`( ! missing(cluster), cluster, NULL))
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore:::decomposeFormula(modelTerms)
-    if (inherits(postHoc, 'formula')) postHoc <- jmvcore:::decomposeFormula(postHoc)
-    if (inherits(randomTerms, 'formula')) randomTerms <- jmvcore:::decomposeFormula(randomTerms)
+    if (inherits(modelTerms, 'formula')) modelTerms <- jmvcore::decomposeFormula(modelTerms)
+    if (inherits(postHoc, 'formula')) postHoc <- jmvcore::decomposeFormula(postHoc)
 
     options <- gamljMixedOptions$new(
         dep = dep,

@@ -10,8 +10,11 @@ description:
     R:
         dontrun: false
         usage: |
-            data('data3by2')
-            gamljGZLM(dat, dep = 'y', factors =c('twogroups'), covs = 'x')
+                 data<-emmeans::neuralgia
+                  gamlj::gamljGzlm(
+                            formula = Pain ~ Duration,
+                            data = data,
+                             modelSelection = "logistic")
 
 formula:
     dep:
@@ -127,7 +130,7 @@ options:
                   - helmert
                   - repeated
                   - polynomial
-                default: deviation
+                default: simple
       description:
           R: >
             a list of lists specifying the factor and type of contrast to use,

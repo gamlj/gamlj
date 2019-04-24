@@ -6,7 +6,7 @@ jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: '2018-10-10'
+date: 2019-25-5
 type: R
 description: >-
   A suite for estimation of linear model, such as the general linear model,
@@ -55,6 +55,21 @@ datasets:
   - name: subjects_on_stimuli
     path: subjects_on_stimuli.csv
     description: subjects by stimuli experimental design (nested)
+    tags:
+      - Mixed
+      - ANOVA
+  - name: wicksell
+    path: wicksell.csv
+    description: >
+      David C. Howell example data for Overview of Mixed Models webpage.
+      Features a continuous variable measured 4 times in two different groups
+    tags:
+      - Mixed
+      - ANOVA
+  - name: fivegroups
+    path: fivegroups.csv
+    description: |
+      example data for checking contrasts results
     tags:
       - Mixed
       - ANOVA

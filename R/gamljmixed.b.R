@@ -1,5 +1,3 @@
-#' @import lmerTest
-library(lmerTest)
 
 gamljMixedClass <- R6::R6Class(
   "gamljMixedClass",
@@ -10,12 +8,18 @@ gamljMixedClass <- R6::R6Class(
     .cov_condition=conditioning$new(),
     .postHocRows=NA,
     .init=function() {
-      mark("init")
+      ginfo("init")
       private$.names64<-names64$new()
       n64<-private$.names64
       reml<-self$options$reml
       infoTable<-self$results$info
       dep<-self$options$dep
+      modelTerms<-self$options$modelTerms
+      factors<-self$options$factors
+      covs<-self$options$covs
+      fixedIntercept<-self$options$fixedIntercept
+      
+            
       getout<-FALSE
       if (is.null(dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
@@ -25,27 +29,36 @@ gamljMixedClass <- R6::R6Class(
         infoTable$addRow(rowKey="gs2",list(info="Get started",value="Select at least one cluster variable"))
         getout=TRUE
       }
-      if (length(self$options$randomTerms)==0) {
+      if (!is.something(unlist(self$options$randomTerms))) {
         infoTable$addRow(rowKey="gs3",list(info="Get started",value="Select at least one term in Random Effects"))
         getout=TRUE
       }
       
-      if (getout) {
-        if (length(self$options$modelTerms) == 0) {
-          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
-        }
-        return(FALSE)
+      aOne<-which(unlist(modelTerms)=="1")
+      if (is.something(aOne)) {
+        modelTerms[[aOne]]<-NULL
+        fixedIntercept=TRUE
       }
-      modelTerms<-self$options$modelTerms
+      
+      if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
+        if (is.null(factors) && is.null(covs))
+          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
+        else
+          jmvcore::reject("Please specify a model")            
+        getout<-TRUE
+      }
+      
+      if (getout) 
+        return(FALSE)
+
       data<-private$.cleandata()
       
       ### initialize conditioning of covariates
-      if (!is.null(self$options$covs)) {
+      if (is.something(self$options$covs)) {
       span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
       #####################
-
       #### info table #####
       infoTable<-self$results$info
       infoTable$addRow(rowKey="est",list(info="Estimate"))
@@ -84,9 +97,13 @@ gamljMixedClass <- R6::R6Class(
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]]),label=jmvcore::stringifyTerm(labels[[i]])))
 
+      for(i in seq_along(terms)) 
+          aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
+      
+      if (!is.something(self$options$factors))
+           aTable$getColumn('label')$setVisible(FALSE)
+      
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -96,7 +113,7 @@ gamljMixedClass <- R6::R6Class(
     },
     .run=function() {
       n64<-private$.names64
-      mark("run")
+      ginfo("run")
       # collect some option
       dep <- self$options$dep
       
@@ -107,7 +124,6 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       reml<-self$options$reml
-      
       if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
@@ -136,20 +152,19 @@ gamljMixedClass <- R6::R6Class(
         cluster<-jmvcore::toB64(clusters[[1]])
         data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
       }
-      
-      if (!is.null(covs)) {
+      if (is.something(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
         names(data)<-jmvcore::toB64(names(data))
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
-      
+
       ## saving the whole set of results proved to be too heavy for memory issues.
       ## so we estimate the model every time. In case it is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
       
-               mark("the model has been estimated")
+               ginfo("the model has been estimated")
                ##### model ####
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data,REML = reml)
@@ -161,7 +176,7 @@ gamljMixedClass <- R6::R6Class(
                         jmvcore::reject(msg, code='error')
                }
                private$.model <- model
-               mark("...done")
+               ginfo("...done")
 
                vc<-as.data.frame(lme4::VarCorr(model))
 #               vc<-as.data.frame(model_summary$varcor)
@@ -170,7 +185,7 @@ gamljMixedClass <- R6::R6Class(
                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                realgroups<-n64$nicenames(grp)
                realnames<-n64$nicenames(vcv$var1)
-               realnames<-lapply(realnames,jmvcore::stringifyTerm)
+               realnames<-lapply(realnames,lf.nicifyTerms)
                for (i in 1:dim(vcv)[1]) {
                  if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
                    icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
@@ -186,9 +201,8 @@ gamljMixedClass <- R6::R6Class(
                vcv<-vc[!is.na(vc[,3]),]
                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                realgroups<-n64$nicenames(grp)
-               realnames1<-lapply(n64$nicenames(vcv$var1),jmvcore::stringifyTerm)
-               realnames2<-lapply(n64$nicenames(vcv$var2),jmvcore::stringifyTerm)
-               
+               realnames1<-lapply(n64$nicenames(vcv$var1),lf.nicifyTerms)
+               realnames2<-lapply(n64$nicenames(vcv$var2),lf.nicifyTerms)
                if (dim(vcv)[1]>0) {
                  for (i in 1:dim(vcv)[1]) {
                    randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
@@ -199,7 +213,7 @@ gamljMixedClass <- R6::R6Class(
                
                ### anova results ####
                if (is.null(anovaTable$state)) {
-                   mark("compute the Anova stuff")
+                   ginfo("compute the Anova stuff")
                    anova_res<-NULL
                    if (length(modelTerms)==0) {
                         anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
@@ -211,40 +225,36 @@ gamljMixedClass <- R6::R6Class(
                          jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                    }
                    anovaTable$setState(TRUE)
-                   mark("..done")
-                  } else mark("Anova results recycled")
+                  } else ginfo("Anova results recycled")
                     
                if (is.null(estimatesTable$state)) {
                  
                          ### full summary results ####
-                         mark("asking for summary")
                          test_summary<-try(model_summary<-summary(model))
                          if (jmvcore::isError(test_summary)) {
                                msg <- extractErrorMessage(test_summary)
                                msg<-n64$translate(msg)
                                jmvcore::reject(msg, code='error')
                          }
-                         mark("...done")
                          ### coefficients summary results ####
 
-                         mark("asking for mf.summary")
                          test_parameters<-try(parameters<-mf.summary(model))
                          if (!is.null(attr(parameters,"warning"))) 
                               estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
                          estimatesTable$setState(TRUE)
-                         mark("...done")
- 
+                         ginfo("...done")
                ### fix random table notes
                   info<-paste("Number of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
                   randomTable$setNote('info', info)
                          
                ### prepare info table #########       
+               ginfo("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
                info.aic<-model_summary$AICtab[1]
                info.bic<-model_summary$AICtab[2]
                info.loglik<-model_summary$AICtab[3]
-               r2<-try(r.squared(model))
+               r2<-try(r.squared(model),silent = TRUE)
                if (jmvcore::isError(r2)){
                    note<-"R-squared cannot be computed."
                    info.r2m<-NaN        
@@ -279,7 +289,7 @@ gamljMixedClass <- R6::R6Class(
                        for (i in seq_len(dim(anova_res)[1])) {
                               tableRow<-anova_res[i,]  
                               anovaTable$setRow(rowNo=i,tableRow)
-                              anovaTable$setRow(rowNo=i,list(name=jmvcore::stringifyTerm(labels[[i]])))
+                              anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                        }
                       messages<-mf.getModelMessages(model)
                       if (length(messages)>0) {
@@ -323,7 +333,7 @@ gamljMixedClass <- R6::R6Class(
                   }
                 }
                 
-               } else mark("clean summary recycled")
+               } else ginfo("clean summary recycled")
                
         #### LRT for random effects ####
         if (self$options$lrtRandomEffects) {
@@ -340,38 +350,46 @@ gamljMixedClass <- R6::R6Class(
                   lrtTable$addRow(rowKey=i,res[i,])
           } 
         }
-        mark("all done, preparing other options")
-           
+
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
-        mark("..... done, preparing other options")
 
     },
   .buildreffects=function(terms,correl=TRUE) {
-    terms<-lapply(terms,jmvcore::toB64)
-    flatterms<-lapply(terms,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
-    res<-do.call("rbind",flatterms)
-    res<-tapply(res[,1],res[,2],paste)
-    if (correl) {
+ 
+    ## this is for R. It overrides the correlatedEffect option 
+    if (length(terms)>1)
+         correl<-"block"
+    # remove empty sublists
+    terms<-terms[sapply(terms, function(a) !is.null(unlist(a)))]
+    # split in sublists if option=nocorr
+    if (correl=="nocorr") {
+      termslist<-terms[[1]]
+      terms<-lapply(termslist,list)
+    }
+    rterms<-""    
+    for(i in seq_along(terms)) {
+      one<-terms[[i]]
+      one64<-lapply(one,jmvcore::toB64)
+      flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
+      res<-do.call("rbind",flatterms)
+      if (length(unique(res[,2]))>1 && correl=="block")
+         jmvcore::reject("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
+      res<-tapply(res[,1],res[,2],paste)
       res<-sapply(res, function(x) paste(x,collapse = " + "))
-      form<-paste(res,names(res),sep="|")
+      test<-grep(jmvcore::toB64("Intercept"),res,fixed=TRUE)
+      if (is.something(test))
+        res<-gsub(jmvcore::toB64("Intercept"),1,res)
+      else
+        res[[1]]<-paste(0,res[[1]],sep = "+")
+      form<-paste(res,names(res),sep=" | ")
       form<-paste("(",form,")")
-    } else {
-      form<-sapply(names(res), function(x) sapply(res[[x]], function(z) paste("(",paste(z,x,sep = "|"),")")))
-      form<-sapply(form, function(x) paste(x,collapse = "+"))
-    } 
-    form<-gsub(jmvcore::toB64('Intercept'),1,form,fixed = T)
-    # fix the formula in case there is no intercept
-
-    form<-lapply(form, function(x) {
-              if(!grepl(" 1",x,fixed = T)) 
-                 gsub("(","(0+",x,fixed = T)
-              else
-                x})
-    form=paste(form,collapse = "+")
-    form
+      rterms<-paste(rterms,form,sep = "+")
+    }
+    rterms<-paste(rterms,collapse = "")
+    rterms
   },
   .cleandata=function() {
       n64<-private$.names64
@@ -380,21 +398,20 @@ gamljMixedClass <- R6::R6Class(
       factors <- self$options$factors
       covs <- self$options$covs
       clusters<-self$options$cluster
-      
       dataRaw <- self$data
       data <- list()
       for (factor in factors) {
         ### we need this for Rinterface ####
         if (!("factor" %in% class(dataRaw[[factor]]))) {
-          mark(paste("Warning, variable",factor," has been coerced to factor"))
+          warning(paste("Warning, variable",factor," has been coerced to factor"))
           dataRaw[[factor]]<-factor(dataRaw[[factor]])
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
         levels <- base::levels(data[[jmvcore::toB64(factor)]])
-        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"deviation")
+        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"simple")
         n64$addFactor(factor,levels)
-        n64$addLabel(factor,lf.contrastLabels(levels, "deviation")) 
-        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"deviation"
+        n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
+        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"
       }
       
       for (contrast in self$options$contrasts) {
@@ -432,19 +449,21 @@ gamljMixedClass <- R6::R6Class(
       return(lm)
     },
     .modelFormula=function() {
-
-      if (length(self$options$randomTerms)>0)  {
-        rands<-self$options$randomTerms
-        rands<-private$.buildreffects(rands,self$options$correlatedEffects)
-      } else return(FALSE)
+      
+      if (!is.something(unlist(self$options$randomTerms))) 
+         return(FALSE)
 
       if (!is.null(self$options$dep))  {
         dep<-jmvcore::toB64(self$options$dep)
       } else return(FALSE)
       
+      rands<-self$options$randomTerms
+      rands<-private$.buildreffects(rands,self$options$correlatedEffects)
+
+      
       modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
       fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
-      mf<-paste(fixed,rands,sep =  "+")
+      mf<-paste(fixed,rands,sep =  "")
       mf
     },
 
@@ -476,20 +495,29 @@ gamljMixedClass <- R6::R6Class(
   else 
     rawData<-NULL
   ### this is specific of mixed model #####
-  cluster<-self$options$cluster[[1]]
-  preds<-c(cluster,groupName,linesName,plotsName)
+  preds<-c(groupName,linesName,plotsName)
   preds64<-jmvcore::toB64(preds)
+  clusters<-jmvcore::toB64(self$options$cluster)
+  mark(clusters)
+  mark(names(model@cnms))
+  cluster<-clusters[which(clusters %in% names(model@cnms))][[1]]
   
+  preds64<-c(cluster,preds64)
+  mark(jmvcore::fromB64(names(model@cnms))) 
   if (self$options$plotRandomEffects) {
     
     pd<-predict(model)
     data<-model@frame
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
     pnames<-c("cluster","group","lines","plots")
-    names(randomData)<-c("y",pnames[1:length(preds)])
+    names(randomData)<-c("y",pnames[1:length(preds64)])
+    note<-self$results$plotnotes
+    note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
+#    note$setContent('Random effects')
+    note$setVisible(TRUE)
+    
   } else
     randomData<-NULL
-
   predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,
@@ -499,7 +527,7 @@ gamljMixedClass <- R6::R6Class(
                                conditioning=private$.cov_condition)
  
   yAxisRange <- gplots.range(model,depName,predData,rawData)
-
+  
   if (!optionRaw)
     rawData<-NULL
   
@@ -539,7 +567,6 @@ gamljMixedClass <- R6::R6Class(
 
 .descPlot=function(image, ggtheme, theme, ...) {
 
-  library(ggplot2)
   if (is.null(image$state))
     return(FALSE)
   
@@ -570,7 +597,62 @@ gamljMixedClass <- R6::R6Class(
   }       
   return(p)
 },
+.marshalFormula= function(formula, data, name) {
+  
+      fixed<-lme4::nobars(formula)
+      bars<-lme4::findbars(formula)
+      rterms<-sapply(bars,all.vars)
+      rvars<-unlist(sapply(rterms,function(a) if (length(a)>1) a[[length(a)-1]]))
+      if (name=="dep")
+        return(jmvcore::marshalFormula(fixed,data,from = "lhs"))  
+      if (name=="factors") {
+        ffactors<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='factor')
+        rfactors<-unlist(lapply(rvars, function(a) {if (is.factor(data[[a]])) a}))
+        return(c(ffactors,rfactors))
+      }
+      if (name=="covs") {
+        fcovs<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='numeric')
+        rcovs<-unlist(lapply(rvars, function(a) {if (is.numeric(data[[a]])) a}))
+        return(c(fcovs,rcovs))
+      }
+      if (name=="cluster") {
+       return(sapply(rterms,function(a) a[[length(a)]] ))
+      }
+      if (name=="randomTerms") {
+        bars<-lme4::findbars(formula)
+        fullist<-list()
+        for (b in seq_along(bars)) {
+          cluster=bars[[b]][[3]]
+          bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)[[1]]
+          barlist<-list()
+          j<-0
+          for (term in bar) {
+            term<-trimws(jmvcore::decomposeTerm(term))
+            if (length(term)==1 && term=="1")
+                   term="Intercept"
+            if (length(term)==1 && term=="0")
+                next()              
+            alist<-c(term,as.character(cluster))
+            j<-j+1
+            barlist[[j]]<-alist
+          }
+          fullist[[b]]<-barlist
+        }
+        return(fullist)
+      }
+      
+      if (name=="modelTerms") {
+        return(jmvcore::marshalFormula(fixed,data,from='rhs',type='terms'))
+      }
+      
+},
 
+
+.formula = function() {
+
+  private$.names64$translate(private$.modelFormula())
+  
+},
 .sourcifyOption = function(option) {
   
   name <- option$name
@@ -578,7 +660,16 @@ gamljMixedClass <- R6::R6Class(
   
   if (!is.something(value))
     return('')
+
+#  if (name == 'dep') {
+#    option$value<-paste0("'",value,"'") 
+#  }
+    
+  if (option$name %in% c('factors', 'dep', 'covs', 'cluster', 'modelTerms','randomTerms'))
+    return('')
   
+
+    
   if (name == 'scaling') {
     i <- 1
     while (i <= length(value)) {
@@ -595,7 +686,7 @@ gamljMixedClass <- R6::R6Class(
     i <- 1
     while (i <= length(value)) {
       item <- value[[i]]
-      if (item$type == 'deviation')
+      if (item$type == 'simple')
         value[[i]] <- NULL
       else
         i <- i + 1
@@ -607,13 +698,13 @@ gamljMixedClass <- R6::R6Class(
       return('')
   }
   
-  if (name == "randomTerms") {
-    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
-    newvalue<-private$.names64$translate(newvalue)
-    return(paste0(name,"=",newvalue))
-  }
+#  if (name == "randomTerms") {
+#    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
+#    newvalue<-private$.names64$translate(newvalue)
+#    return(paste0(name,"=",newvalue))
+#  }
   super$.sourcifyOption(option)
 }
 ))
 
-
+jmvcore::sourcify

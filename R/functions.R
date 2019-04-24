@@ -1,6 +1,6 @@
 
 
-info<-function(what=NULL) {
+ginfo<-function(what=NULL) {
   if (GAMLj_INFO) {
     if (!is.null(what))
         print(what)
@@ -20,4 +20,9 @@ mark<-function(what=NULL,obj=NULL) {
   }
 }
 
+.listdeep<-function(aList,n=0) {
+  if (!inherits(aList,"list"))
+    return(n)
+  max(sapply(aList,.listdeep,n+1))
+}
 

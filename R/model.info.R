@@ -30,10 +30,10 @@ mi.rsquared<- function(x,...) UseMethod(".rsquared")
 
 
 .rsquared.multinom<-function(model) {
-  llfull<-logLik(model)  ### model loglikelihood
-  nobject <- update(model, ~ 1,  evaluate = FALSE)
+  llfull<-stats::logLik(model)  ### model loglikelihood
+  nobject <- stats::update(model, ~ 1,  evaluate = FALSE)
   nobject <- eval.parent(nobject)
-  llnull<-logLik(nobject)
+  llnull<-stats::logLik(nobject)
   as.numeric(1-(llfull/llnull))
 }
 
@@ -64,7 +64,7 @@ mi.converged<- function(x,...) UseMethod(".converged")
 mi.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
-    aliased<-alias(model)
+    aliased<-stats::alias(model)
     (!is.null(aliased$Complete))
 }
 
@@ -103,7 +103,7 @@ mi.getAIC<- function(x,...) UseMethod(".getAIC")
 mi.getValueDf<- function(x,...) UseMethod(".getValueDf")
 
 .getValueDf.default<-function(model) {
-  value <- sum(residuals(model, type = "pearson")^2)
+  value <- sum(stats::residuals(model, type = "pearson")^2)
   result <- value/model$df.residual
   return(result)
 }
@@ -133,7 +133,7 @@ mi.initContrastCode<-function(data,options,results,n64) {
     rnames<-n64$nicenames(n64$contrasts(fac))
     clabs<-n64$contrastsLabels(fac)
     aTable<-tables$addItem(key=fac)
-    codes<-round(t(contrasts(data[[jmvcore::toB64(fac)]])),digits=3)
+    codes<-round(t(stats::contrasts(data[[jmvcore::toB64(fac)]])),digits=3)
     cnames<-colnames(codes)
     colnames(codes)<-paste0("c",1:length(cnames))
     codes<-cbind(rnames,clabs,codes)
@@ -187,7 +187,7 @@ mi.is.scaleDependent<-function(model,term) {
   if (is.null(term))
     return(FALSE)
   try({
-    modelterms<-terms(model)
+    modelterms<-stats::terms(model)
     modelterms<-attr(modelterms,"term.labels")
     nterm<-paste(term,collapse = ":")
     count<-length(grep(nterm,modelterms,fixed=T))
@@ -212,7 +212,7 @@ mi.term.develop<-function(term){
 mi.interaction.term<-function(model,aList) {
   
   aList<-jmvcore::toB64(aList)
-  ff<-colnames(attr(terms(model),"factors"))
+  ff<-colnames(attr(stats::terms(model),"factors"))
   ff<-jmvcore::decomposeTerms(ff)
   for(f in ff)
     if(all(f %in% aList) & all(aList %in% f) )
@@ -227,7 +227,7 @@ mi.dependencies<-function(model,term,what) {
   if (mi.is.scaleDependent(model,term))
     return(paste(what,"interactions",sep="."))
   else {
-    modelterms<-terms(model)
+    modelterms<-stats::terms(model)
     modelterms<-attr(modelterms,"term.labels")
     if (mi.term.develop(term)<length(modelterms))
       return(paste(what,"covariates",sep="."))

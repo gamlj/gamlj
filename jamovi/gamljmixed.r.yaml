@@ -17,11 +17,9 @@ items:
          title: ""
     clearWith:
         - dep
-        - factors
-        - cluster
-        - cov
         - randomTerms
         - modelTerms
+    refs: gamljmixed
 
 
   - name: main
@@ -317,6 +315,14 @@ items:
                  - name: moderator
                    title: ""
                    combineBelow: true
+                 - name: chisq
+                   title: X²
+                   type: number
+                   visible: false
+                 - name: df
+                   title:  df
+                   type: number
+                   visible: false                   
                  - name: F.ratio
                    title: F
                    type: number
@@ -342,6 +348,8 @@ items:
                      - contrasts
                      - fixedIntercept
                      - simpleScale
+                     - ciWidth
+                     
               columns:
                      - name: threeway
                        title: " "
@@ -373,6 +381,9 @@ items:
                      - name: t.ratio
                        title: "t"
                        type: number
+                     - name: z.ratio
+                       title: "z"
+                       type: number
                      - name: p.value
                        title: "p"
                        type: number
@@ -395,6 +406,8 @@ items:
         - randomTerms
         - correlatedEffects
         - fixedIntercept
+        - ciWidth
+
     template:
         title:  $key
         type: Table
@@ -418,7 +431,7 @@ items:
 
 
   - name: descPlot
-    title: Fixed Effects Plots
+    title: Effects Plots
     visible: (plotHAxis)
     type: Image
     description: a descriptives plot
@@ -427,6 +440,7 @@ items:
     renderFun: .descPlot
     clearWith:
         - dep
+        - cluster
         - plotHAxis
         - plotSepLines
         - plotSepPlots
@@ -475,3 +489,6 @@ items:
            - percvalue
            - cvalue
 
+  - name: plotnotes
+    type: Html
+    visible: false

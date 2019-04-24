@@ -186,7 +186,7 @@ var updateContrasts = function(ui, variableList, context) {
             }
         }
         if (found === null)
-            list3.push({ var: variableList[i], type: "deviation" });
+            list3.push({ var: variableList[i], type: "simple" });
         else
             list3.push(found);
     }

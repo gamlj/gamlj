@@ -10,11 +10,36 @@ description:
     R:
         dontrun: false
         usage: |
-            data('ToothGrowth')
+              data(subjects_by_stimuli)
 
-            mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
+              gamlj::gamljMixed(
+                     formula = y ~ 1 + cond+( 1|subj ),
+                     data = subjects_by_stimuli)
 
+              gamlj::gamljMixed(
+                     data = subjects_by_stimuli,
+                     dep = "y",
+                     factors = "cond",
+                     modelTerms = "cond",
+                     cluster = "subj",
+                     randomTerms=list(list(c("cond","subj"))))
 
+        
+
+formula:
+   dep:
+     custom: true
+   factors: 
+     custom: true
+   covs: 
+     custom: true
+   cluster: 
+     custom: true
+   randomTerms: 
+     custom: true
+   modelTerms:
+     custom: true
+     
 options:
     - name: data
       type: Data
@@ -24,6 +49,7 @@ options:
     - name: dep
       title: Dependent Variable
       type: Variable
+      default:
       permitted:
         - numeric
       description:
@@ -59,6 +85,7 @@ options:
           R: >
             a list of character vectors describing fixed effects terms
 
+
     - name: fixedIntercept
       title: Fixed Intercept
       type: Bool
@@ -66,6 +93,8 @@ options:
       description:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept
+
+
 
 
     - name: showParamsCI
@@ -104,14 +133,14 @@ options:
               - name: type
                 type: List
                 options:
-                  - deviation
                   - simple
+                  - deviation
                   - dummy
                   - difference
                   - helmert
                   - repeated
                   - polynomial
-                default: deviation
+                default: simple
       description:
           R: >
             a list of lists specifying the factor and type of contrast to use,
@@ -163,7 +192,7 @@ options:
       default:
       description:
           R: >
-            a string naming the variable to separate over to form multiple plots
+            the variable for whose levels multiple plots are computed
 
     - name: plotRaw
       title: Observed scores
@@ -177,6 +206,10 @@ options:
       title: Y-axis observed range 
       type: Bool
       default: false
+      description:
+          R: >
+             `TRUE` or `FALSE` (default), scale the plot Y-Axis to the max and the min
+             of the dependent variable observed scores.
 
 
     - name: plotError
@@ -300,6 +333,11 @@ options:
         - name: values_labels
           title: Values + Labels
       default: labels
+      description:
+            R: >
+             decide the labeling of simple effects in tables and plots. 
+             `labels` indicates that only labels are used, such as `Mean` and 
+             `Mean + 1 SD`. `values` uses the actual values as labels. `values_labels` uses both.
 
 
 ############ generic with some specs ###########
@@ -354,26 +392,41 @@ options:
     - name: cluster
       title: Cluster variables
       type: Variables
+      default:  
       suggested:
         - nominal
       description:
-          R: a vector of strings naming the clustering variables from `data`
+          R: a vector of strings naming the clustering variables from `data` 
 
     - name: randomTerms
       title: Random Coefficients
-      type: Terms
-      default:  
+      type: Array
+      default: [[]]
+      template:
+          type: Terms
       description:
           R: >
-            a list of character vectors describing random coefficients that
-            need to be computed
+            a list of lists specifying the models random effects.          
+
+
     - name: correlatedEffects
-      title: Correlated Effects
-      type: Bool
-      default: true
+      title: Effects correlation
+      type: List
+      options:
+        - name: corr
+          title: Correlated
+        - name: nocorr
+          title: Not correlated
+        - name: block
+          title: Correlated by block
+      default: corr
       description:
           R: >
-            `TRUE` (default) or `FALSE` , include correlated random effects
+            `'nocorr'`, `'corr'` (default), or `'block'`. When random effects
+            are passed as list of length 1, it decides whether the effects should be correlated, 
+            non correlated. If `'randomTerms'` is a list of 
+            lists of length > 1, the option is automatially set to `'block'`.
+            The option is ignored if the model is passed using `formula`.
 
     - name: reml
       title: REML
@@ -395,6 +448,10 @@ options:
       title: Random effects  
       type: Bool
       default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), add random effects predicted values in the
+            plot
             
 
 ...

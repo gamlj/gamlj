@@ -11,8 +11,8 @@ description:
         dontrun: false
         usage: |
             data('ToothGrowth')
+            gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 
-            mixed(ToothGrowth, dep = 'len', factors = 'supp', covs = 'dose')
 
 formula:
     dep:
@@ -120,14 +120,14 @@ options:
               - name: type
                 type: List
                 options:
-                  - deviation
                   - simple
+                  - deviation
                   - dummy
                   - difference
                   - helmert
                   - repeated
                   - polynomial
-                default: deviation
+                default: simple
       description:
           R: >
             a list of lists specifying the factor and type of contrast to use,
@@ -187,7 +187,7 @@ options:
       default: false
       description:
           R: >
-            `TRUE` or `FALSE` (default), provide descriptive statistics
+            `TRUE` or `FALSE` (default), plot raw data along the predicted values
 
     - name: plotDvScale
       title: Y-axis observed range 
@@ -383,7 +383,7 @@ options:
           - beta
           - partEta
           
-    - name: homo
+    - name: homoTest
       title: Residual Variances Homogeneity tests
       type: Bool
       default: false
