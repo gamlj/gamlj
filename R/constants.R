@@ -1,9 +1,9 @@
 #' @import lmerTest
 
-GAMLj_DEBUG=T
+GAMLj_DEBUG=F
 GAMLj_INFO=F
 
-IMPROBABLE_SEQ<-";._.thewintersicoming._.;"
+IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
 DUMMY_TAIL<-"_._._"
 
 TCONV<-list()
@@ -101,7 +101,6 @@ WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across intera
 
 
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
-#WARNS<-sapply(WARNS,function(a) gsub("  ","",a,fixed=T))
 
 ###############################################################
 
