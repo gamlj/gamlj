@@ -1,29 +1,8 @@
 refs:
    gamlj:
       type: 'software'
-      author: Marcello Gallucci
+      author: Gallucci, M.
       year: 2019
-      title: "GAMLj: GENERAL ANALYSES FOR LINEAR MODELS"
-      publisher: '[jamovi module]. Retrieved from https://www.jamovi.org/library.html'
+      title: "GAMLj: General analyses for linear models"
+      publisher: '[jamovi module]. Retrieved from https://mcfanda.github.io/gamlj_docs/'
       url: https://mcfanda.github.io/gamlj_docs/
-   gamljglm:
-      type: 'software'
-      author: Marcello Gallucci
-      year: 2019
-      title: "GAMLj: GENERAL ANALYSES FOR LINEAR MODELS"
-      publisher: '[jamovi module]. Retrieved from https://www.jamovi.org/library.html'
-      url:  https://mcfanda.github.io/gamlj_docs/glm.html
-   gamljmixed:
-      type: 'software'
-      author: Marcello Gallucci
-      year: 2019
-      title: "GAMLj: GENERAL ANALYSES FOR LINEAR MODELS"
-      publisher: '[jamovi module]. Retrieved from https://www.jamovi.org/library.html'
-      url:  https://mcfanda.github.io/gamlj_docs/mixed.html
-   gamljgzlm:
-      type: 'software'
-      author: Marcello Gallucci
-      year: 2019
-      title: "GAMLj: GENERAL ANALYSES FOR LINEAR MODELS"
-      publisher: '[jamovi module]. Retrieved from https://www.jamovi.org/library.html'
-      url:  https://mcfanda.github.io/gamlj_docs/gzlm.html

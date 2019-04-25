@@ -59,8 +59,6 @@ gamlj_update<-function(gobj,...) {
 #' @param ... any other options accepted by the gamlj_* function  
 #' @return an object of class GAMLj* as the input object
 #' @examples
-#' data<-exercise
-#' gamljGLM(formula=)
 #' data(qsport)
 #' mod<-gamlj::gamljGLM(
 #'   formula = performance ~ hours,

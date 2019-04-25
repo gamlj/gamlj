@@ -24,7 +24,7 @@ items:
         - factors
         - cov
         - modelTerms
-    refs: gamljglm
+    refs: gamlj
 
 
   - name: main

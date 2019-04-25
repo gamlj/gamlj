@@ -19,7 +19,7 @@ items:
         - dep
         - randomTerms
         - modelTerms
-    refs: gamljmixed
+    refs: gamlj
 
 
   - name: main
