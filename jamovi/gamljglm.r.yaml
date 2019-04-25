@@ -22,7 +22,7 @@ items:
         - cov
         - modelTerms
         - fixedIntercept
-    refs: gamljglm
+    refs: gamlj
      
   - name: main
     type: Group

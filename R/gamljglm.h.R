@@ -397,7 +397,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "cov",
                     "modelTerms",
                     "fixedIntercept"),
-                refs="gamljglm"))
+                refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(

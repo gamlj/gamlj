@@ -21,7 +21,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
 
-More informations can be found at [GAMLj page](https://mcfanda.github.io/gamlj_docs/)
+More informations can be found at [GAMLj page](https://gamlj.github.io/)
 
 # Installation
 
