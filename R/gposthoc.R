@@ -111,6 +111,11 @@ gposthoc.populate<-function(model,options,tables) {
     })
     labs64<-do.call("rbind",.labs64)
     colnames(labs64)<-paste0("c",1:ncol(labs64))
+    if (tableData[1,4]==Inf) {
+        table$getColumn("test")$setTitle("z")
+        table$getColumn("df")$setVisible(FALSE)
+      
+    }
     for (i in 1:nrow(tableData)) {
       row<-tableData[i,]
       l<-jmvcore::fromB64(labs64[i,])

@@ -575,7 +575,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             `type`="number"),
                         list(
                             `name`="test", 
-                            `title`="test", 
+                            `title`="t", 
                             `type`="number"),
                         list(
                             `name`="df", 
