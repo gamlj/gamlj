@@ -1,6 +1,6 @@
 #' @import lmerTest
 
-GAMLj_DEBUG=T
+GAMLj_DEBUG=F
 GAMLj_INFO=F
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
