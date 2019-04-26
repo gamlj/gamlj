@@ -74,12 +74,6 @@ gposthoc.populate<-function(model,options,tables) {
   if (length(terms) == 0)
     return()
   
-  if (tables$isFilled()) {
-    mark("post-hoc recycled")
-    return()
-  }
-  mark("post-hoc computed")
-  
   postHocRows <- list()
 
   for (ph in terms) {
@@ -111,11 +105,13 @@ gposthoc.populate<-function(model,options,tables) {
     })
     labs64<-do.call("rbind",.labs64)
     colnames(labs64)<-paste0("c",1:ncol(labs64))
-    if (tableData[1,4]==Inf) {
-        table$getColumn("test")$setTitle("z")
-        table$getColumn("df")$setVisible(FALSE)
-      
-    }
+
+    if ("df" %in% names(tableData))
+        if (tableData$df==Inf) {
+           table$getColumn("test")$setTitle("z")
+           table$getColumn("df")$setVisible(FALSE)
+        }
+    
     for (i in 1:nrow(tableData)) {
       row<-tableData[i,]
       l<-jmvcore::fromB64(labs64[i,])
