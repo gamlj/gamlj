@@ -288,6 +288,10 @@ items:
                      - name: t.ratio
                        title: "t"
                        type: number
+                     - name: z.ratio
+                       title: "z"
+                       type: number
+                       visible: false
                      - name: p.value
                        title: "p"
                        type: number

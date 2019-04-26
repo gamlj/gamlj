@@ -715,6 +715,11 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="t", 
                                     `type`="number"),
                                 list(
+                                    `name`="z.ratio", 
+                                    `title`="z", 
+                                    `type`="number", 
+                                    `visible`=FALSE),
+                                list(
                                     `name`="p.value", 
                                     `title`="p", 
                                     `type`="number", 
