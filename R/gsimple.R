@@ -176,7 +176,9 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
             if (h %in% tnames)
               parametersTable$getColumn(h)$setVisible(FALSE)
           
-        }
+        } else
+            parametersTable$getColumn("z.ratio")$setVisible(FALSE)
+        
 
         for(r in seq_len(nrow(parametersTableData))) {
              parametersTable$setRow(rowNo=r,parametersTableData[r,])
