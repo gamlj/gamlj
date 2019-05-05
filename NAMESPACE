@@ -3,6 +3,7 @@
 export(gamljGLM)
 export(gamljGzlm)
 export(gamljMixed)
+export(gamlj_data)
 export(gamlj_drop)
 export(gamlj_ggplot)
 export(gamlj_options)

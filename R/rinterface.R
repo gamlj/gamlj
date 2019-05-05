@@ -138,3 +138,48 @@ gamlj_drop<-function(gobj,analysis) {
   
   gamlj_update(gobj,args)  
 }
+
+#' Extract data transformed by GAMLj to run R analyses in line with gamlj setup
+#'
+#' This function returns a dataset with the variables in the GAMLj model 
+#' transformed according to GAMLj options. It is usefull to run additional 
+#' models in R with other R packages with the same setup used by GAMLj
+#'
+#' @param gobj a gamlj results object of the class GAMLj*
+#'  
+#' @return a dataset
+#' @author Marcello Gallucci
+#' @examples 
+#' data("qsport")
+#' obj<-gamlj::gamljGLM(
+#'    formula = performance ~ hours,
+#'    data = qsport)
+#' gdata<-gamlj_data(obj)
+#' lm(performance ~ hours,data=gdata)
+#' @export
+
+gamlj_data<-function(gobj) {
+  gobj$options$.getData()
+}
+
+#' Extract the model estimated by GAMLj 
+#'
+#' This function returns the estimated model as a R object. It is usefull to run additional 
+#' analysis in R with model object.
+#'
+#' @param gobj a gamlj results object of the class GAMLj*
+#'  
+#' @return a R object of the class of the estimated model
+#' @author Marcello Gallucci
+#' @examples 
+#' data("qsport")
+#' obj<-gamlj::gamljGLM(
+#'    formula = performance ~ hours,
+#'    data = qsport)
+#' gmodel<-gamlj_model(obj)
+#' summary(gmodel)
+#' @export
+
+gamlj_model<-function(gobj) {
+  gobj$private$.model()
+}
