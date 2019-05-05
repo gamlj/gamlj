@@ -144,6 +144,7 @@ gamljGLMClass <- R6::R6Class(
       data<-private$.cleandata()
       data<-mf.checkData(self$options,data)
       
+
       if (!is.data.frame(data))
         reject(data)
       for (scaling in self$options$scaling) {

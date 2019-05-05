@@ -13,7 +13,7 @@ gamlj_data(gobj)
 a dataset
 }
 \description{
-This function return a dataset with the variables in the GAMLj model 
+This function returns a dataset with the variables in the GAMLj model 
 transformed according to GAMLj options. It is usefull to run additional 
 models in R with other R packages with the same setup used by GAMLj
 }

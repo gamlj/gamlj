@@ -176,10 +176,8 @@ gamlj_data<-function(gobj) {
 #' obj<-gamlj::gamljGLM(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#' gmodel<-gamlj_model(obj)
-#' summary(gmodel)
 #' @export
 
 gamlj_model<-function(gobj) {
-  gobj$private$.model()
+  gobj$options
 }
