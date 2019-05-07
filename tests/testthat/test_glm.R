@@ -66,7 +66,7 @@ hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~c1*c2,
-  postHoc = list("schtyp")
+  postHoc = list("c1")
 )
 
 test_that("glm labels do not square", {

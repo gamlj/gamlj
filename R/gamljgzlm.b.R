@@ -435,47 +435,24 @@ gamljGzlmClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition)
  
-
   yAxisRange <- gplots.range(model,depName,predData,rawData)
 
   if (!optionRaw)
     rawData<-NULL
   
-  
+  image<-gplots.images(self=self,data=predData,raw=rawData,range=yAxisRange)
 
-  if (is.null(plotsName)) {
-    image <- self$results$get('descPlot')
-    image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=NULL))
-    if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
-      n<-length(levels(factor(predData[["plots2"]])))
-      image$setSize(800,(200*n))
-    }
-    
-  } else {
-    images <- self$results$descPlots
-    i<-1
-    levels<-levels(factor(predData$plots))
-    for (level in levels) {
-      image <- images$get(key=level)
-      sdata<-subset(predData,plots==level)
-      sraw<-NULL
-      if (!is.null(rawData)) {
-        if (is.factor(rawData[["w"]]))
-          sraw<-subset(rawData,w==level)
-        else
-          sraw<-rawData
-      }
+  if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
+      if (is.null(plotsName)) {
+            n<-length(levels(factor(predData[["plots2"]])))
+            image$setSize(800,(200*n))
+          } else 
+             for (im in image) {
+                  n<-length(levels(factor(predData[["plots2"]])))
+                  im$setSize(800,(200*n))
+             }
       
-      image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=NULL))
-      
-      if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
-        n<-length(levels(factor(predData[["plots2"]])))
-        image$setSize(800,(200*n))
-      }
-      
-    }
   }
-  
   
 },
 

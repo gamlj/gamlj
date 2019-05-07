@@ -173,7 +173,8 @@ gamljGLMClass <- R6::R6Class(
                         jmvcore::reject(msg, code='error')
                }
       private$.model <- model
-      
+      #### save the model for R interface ####
+      self$results$.setModel(model)
       ### if it worked before, we skip building the tables, 
       ### otherwise we store a flag  in parameters table state so next time we know it worked
 
@@ -212,6 +213,7 @@ gamljGLMClass <- R6::R6Class(
                         }
                 }
       
+               
                
                ### anova results ####
                anova_res<-NULL
@@ -391,30 +393,9 @@ gamljGLMClass <- R6::R6Class(
 
   if (!optionRaw)
     rawData<-NULL
-  
-  if (is.null(plotsName)) {
-    image <- self$results$get('descPlot')
-    image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=NULL))
-  } else {
-    images <- self$results$descPlots
-    i<-1
-    levels<-levels(factor(predData$plots))
-    for (level in levels) {
-      image <- images$get(key=level)
-      sdata<-subset(predData,plots==level)
-      sraw<-NULL
-      if (!is.null(rawData)) {
-        if (is.factor(rawData[["w"]]))
-          sraw<-subset(rawData,w==level)
-        else
-          sraw<-rawData
-      }
-      
-      image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=NULL))
-      
-    }
-  }
-  
+
+  gplots.images(self=self,data=predData,raw=rawData,range=yAxisRange)
+    
 },
 
 .descPlot=function(image, ggtheme, theme, ...) {

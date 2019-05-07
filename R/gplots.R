@@ -186,12 +186,14 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   if (is.factor(data[[jmvcore::toB64(groupName)]]))  {
     pdata$group<-factor(pdata$group,levels =levels(data[[jmvcore::toB64(groupName)]]))
   }
-  if (is.something(linesName) && is.factor(data[[jmvcore::toB64(linesName)]]))  {
-    pdata$lines<-factor(pdata$lines,levels =levels(data[[jmvcore::toB64(linesName)]]))
-  }
-  
-  
+
+  if ("plots2" %in% names(pdata))
+    if (is.factor(data[[jmvcore::toB64(linesName)]]))  
+      pdata$plots2<-factor(pdata$plots2,levels =levels(data[[jmvcore::toB64(linesName)]]))
+    else
+      pdata$plots2<-factor(pdata$plots2,levels =unique(pdata$plots2),ordered =TRUE )
     
+  
   if (bars=="se") {
     pdata$lwr<-pdata$fit-pdata$SE
     pdata$upr<-pdata$fit+pdata$SE
@@ -208,6 +210,49 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   return(pdata)
 }
 
+gplots.images<-function(self,data,raw,range,randomData=NULL) {
+
+     groupName <- self$options$plotHAxis
+     linesName <- self$options$plotSepLines
+     plotsName <- self$options$plotSepPlots
+     if (is.null(linesName))
+       plotsName<-NULL
+     
+     if (is.null(plotsName)) {
+           image <- self$results$get('descPlot')
+           image$setState(list(data=data, raw=raw, range=range, randomData=randomData))
+           return(image)
+      } else {
+         images <- self$results$descPlots
+         i<-1
+         if (is.factor(data$plots))
+             levels<-levels(data$plots)
+         else {
+             levels<-levels(factor(data$plots,labels=unique(data$plots),ordered=TRUE))
+         }
+         glevels<-images$itemKeys
+         for (i in seq_along(glevels)) {
+              image <- images$get(key=glevels[[i]])
+              sdata<-subset(data,plots==levels[i])
+              sraw<-NULL
+              if (!is.null(raw)) {
+                  if (is.factor(raw[["w"]]))
+                      sraw<-subset(raw,w==levels[i])
+                  else
+                      sraw<-raw
+              }
+              srand<-NULL
+              if (!is.null(randomData))
+                  srand<-subset(randomData,plots==levels[i])
+    
+              image$setState(list(data=sdata,raw=sraw, range=range,randomData=srand))
+              title<-paste(plotsName,"=",levels[i])
+              image$setTitle(title)
+    
+         }
+         return(images)
+      }
+}
 
 ########### those functions deal with plots results ###########
 
@@ -310,7 +355,6 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   
   if (!is.null(title))
     p<-p+ ggtitle(title)
-  ## here we put mean in the middle between mean +offset and -offset    
   p<-p+theme
   p   
 }
@@ -378,20 +422,19 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
 
 gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,plotsName=NULL,errorType="none",title=NULL) {
   
-  data<-image$state$data
   depLabs<-paste("Prob.",depName,"categories")
   vars<-c(depName,groupName,linesName,plotsName)
   if (!is.null(linesName)) {
     plots<-list()
-    aplot<-gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType,title = title)
     labs<-function(x) {
-     x$name<-paste0(linesName,":")
-     return(x)
+      paste(linesName,x,sep="=")
     }
-    plots<-aplot+ggplot2::facet_grid(plots2 ~ .,labeller = labs )
+    aplot<-gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType,title = title)
+    plots<-aplot+ggplot2::facet_grid(plots2 ~ .,labeller = as_labeller(labs))
     return(plots)
   } else
     return(gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType)+ggtheme)
 }
 
+ggplot2::label_both(list(a=c("a","b")))
 

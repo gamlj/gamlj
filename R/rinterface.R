@@ -151,23 +151,25 @@ gamlj_drop<-function(gobj,analysis) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGLM(
-#'    formula = performance ~ hours,
-#'    data = qsport)
+#' scaling = list(
+#'       list(var="hours",type="standardized"))
+#'       )
 #' gdata<-gamlj_data(obj)
 #' lm(performance ~ hours,data=gdata)
 #' @export
 
 gamlj_data<-function(gobj) {
-  gobj$options$.getData()
+  data<-gobj$model$model
+  names(data)<-names(gobj$options$.getData())
+  data
 }
 
-#' Extract the model estimated by GAMLj 
+#' Extract the predicted values of the model estimated by GAMLj 
 #'
-#' This function returns the estimated model as a R object. It is usefull to run additional 
-#' analysis in R with model object.
+#' This function returns the predicted values model as a R object. It is usefull to run additional 
+#' analysis in R with model fitted scores. 
 #'
-#' @param gobj a gamlj results object of the class GAMLj*
+#' @param gobj a list of values
 #'  
 #' @return a R object of the class of the estimated model
 #' @author Marcello Gallucci
@@ -176,8 +178,10 @@ gamlj_data<-function(gobj) {
 #' obj<-gamlj::gamljGLM(
 #'    formula = performance ~ hours,
 #'    data = qsport)
+#'  gamlj_predict(obj)
+#'  
 #' @export
 
-gamlj_model<-function(gobj) {
-  gobj$options
+gamlj_predict<-function(gobj) {
+  predict(gobj$model)
 }
