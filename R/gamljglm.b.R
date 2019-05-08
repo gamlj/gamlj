@@ -60,9 +60,8 @@ gamljGLMClass <- R6::R6Class(
       #####################
 
       ## anova Table 
-      
+      aTable<- self$results$main$anova
       if (length(modelTerms)>0) {
-          aTable<- self$results$main$anova
           aTable$addRow(rowKey=1, list(name="Model"))
           
           for (i in seq_along(modelTerms)) {
@@ -70,11 +69,17 @@ gamljGLMClass <- R6::R6Class(
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
+         aTable$addRow(rowKey=i+3, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq=""))
+         
          aTable$addFormat(col=1, rowNo=i+2, format=jmvcore::Cell.BEGIN_END_GROUP)
          aTable$addFormat(col=1, rowNo=2, format=jmvcore::Cell.BEGIN_GROUP)
          
       }
-      
+      ### we want to output SS error and total for intercept-only models ######
+      if (length(modelTerms) == 0 && fixedIntercept==TRUE) {
+        aTable$addRow(rowKey=1, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
+        aTable$addRow(rowKey=2, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq=""))
+      }
       ## fixed effects parameters
 
       aTable<-self$results$main$fixed
@@ -106,7 +111,6 @@ gamljGLMClass <- R6::R6Class(
       mark("run")
       # collect some option
       dep <- self$options$dep
-      
       if (is.null(dep))
         return()
       
@@ -249,7 +253,10 @@ gamljGLMClass <- R6::R6Class(
                               tableRow<-anova_res[i,]  
                               anovaTable$setRow(rowNo=i,tableRow)
                        }
+                       tss<-sum(anova_res[c(1,i+1),"ss"])
+                       tdf<-sum(anova_res[c(1,i+1),"df"])
                        anovaTable$setRow(rowNo=i+1,anova_res[i+1,c("ss","df")])
+                       anovaTable$setRow(rowNo=i+2,list("ss"=tss,"df"=tdf))
                        
                       messages<-mf.getModelMessages(model)
                       for (i in seq_along(messages)) {
@@ -261,7 +268,13 @@ gamljGLMClass <- R6::R6Class(
                       }
 
                  }
-    
+               ### we want to output the error SS for intercept only model
+               if (length(modelTerms)==0 & self$options$fixedIntercept==TRUE) {
+                 ss<-var(model$residuals)*(model$df.residual)
+                 anovaTable$setRow(rowKey=1,list("ss"=ss,df=model$df.residual,f="",p="",etaSq="",etaSqP="",omegaSq=""))
+                 anovaTable$setRow(rowKey=2, list("ss"=ss,df=model$df.residual,p="",etaSq="",etaSqP="",omegaSq=""))
+               }                 
+               
 
         ### parameter table ####
         
