@@ -151,9 +151,10 @@ gamlj_drop<-function(gobj,analysis) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' scaling = list(
-#'       list(var="hours",type="standardized"))
-#'       )
+#' obj<-gamlj::gamljGLM(formula = performance ~ hours,
+#'                 data = qsport,
+#'                 scaling = list(list(var="hours",type="standardized")))
+#' 
 #' gdata<-gamlj_data(obj)
 #' lm(performance ~ hours,data=gdata)
 #' @export
@@ -178,7 +179,7 @@ gamlj_data<-function(gobj) {
 #' obj<-gamlj::gamljGLM(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#'  gamlj_predict(obj)
+#'  preds<-gamlj_predict(obj)
 #'  
 #' @export
 

@@ -21,7 +21,7 @@ data("qsport")
 obj<-gamlj::gamljGLM(
    formula = performance ~ hours,
    data = qsport)
- gamlj_predict(obj)
+ preds<-gamlj_predict(obj)
  
 }
 \author{

@@ -166,3 +166,21 @@ test_that("glm contrasts", {
 })
 
 
+mod<-gamlj::gamljGLM(
+  formula = read ~ 1,  data = data
+)
+res<-mod$main$anova$asDF
+test_that("glm intercept only model", {
+  expect_equal(as.character(res$name[1]),"Residuals")
+  expect_equal(round(res[2,2],2),20919.42)
+})
+
+mod<-gamlj::gamljGLM(
+  formula = read ~ 1,  data = data,
+  fixedIntercept=FALSE
+)
+res<-mod$main$anova$asDF
+test_that("glm zero-intercept model", {
+  expect_equal(as.character(res$name[1]),"Residuals")
+  expect_equal(round(res[2,2],2),566514)
+})

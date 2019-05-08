@@ -33,12 +33,7 @@ gamljGLMClass <- R6::R6Class(
         modelTerms[[aOne]]<-NULL
         fixedIntercept=TRUE
       }
-      aZero<-which(unlist(modelTerms)=="0")
-      if (is.something(aZero)) {
-        modelTerms[[aZero]]<-NULL
-        fixedIntercept=FALSE
-      }
-      
+
 
       data<-private$.cleandata()
 
@@ -123,23 +118,18 @@ gamljGLMClass <- R6::R6Class(
          return()
       ###############
       # this allows intercept only model to be passed by syntax interfase
+      mark(unlist(modelTerms))
+      
       aOne<-which(unlist(modelTerms)=="1")
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
         fixedIntercept=TRUE
       }
-      aZero<-which(unlist(modelTerms)=="0")
-      if (is.something(aZero)) {
-        modelTerms[[aZero]]<-NULL
-        fixedIntercept=FALSE
-      }
-      
       modelTerms<-lapply(modelTerms,jmvcore::toB64)
+      mark(fixedIntercept)
       modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,fixedIntercept)
       if (modelFormula==FALSE)  
           return()
-    
-      
       ### collect the tables #######
       infoTable<-self$results$info
       estimatesTable <- self$results$main$fixed
@@ -301,18 +291,16 @@ gamljGLMClass <- R6::R6Class(
                  anovaTable$setRow(rowKey=2, list("ss"=ss,df=model$df.residual,p="",etaSq="",etaSqP="",omegaSq=""))
                }                 
                
-               mark(fixedIntercept) 
                ### we want to output the error SS for zero only model
                if (length(modelTerms)==0 & fixedIntercept==FALSE) {
                  ss<-sum(data[[jmvcore::toB64(dep)]]^2)
                  df<-dim(data)[1]
                  anovaTable$setRow(rowKey=1,list("ss"=ss,df=df,f="",p="",etaSq="",etaSqP="",omegaSq=""))
                  anovaTable$setRow(rowKey=2, list("ss"=ss,df=df,p="",etaSq="",etaSqP="",omegaSq=""))
+                 anovaTable$setNote("glm.zeromodel",WARNS["glm.zeromodel"])
+                 
                }                 
                
-
-        
-  
         # end of check state
         } else
           mark("anova and parameters have been recycled")
