@@ -24,24 +24,21 @@ gamljGLMClass <- R6::R6Class(
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
         getout<-TRUE
       }
-
+      if (getout)
+        return()
+      
       # this allows intercept only model to be passed by syntax interphase
       aOne<-which(unlist(modelTerms)=="1")
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
         fixedIntercept=TRUE
       }
+      aZero<-which(unlist(modelTerms)=="0")
+      if (is.something(aZero)) {
+        modelTerms[[aZero]]<-NULL
+        fixedIntercept=FALSE
+      }
       
-        if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
-          if (is.null(factors) && is.null(covs))
-             infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
-          else
-             jmvcore::reject("Please specify a model")            
-          getout<-TRUE
-        }
-
-      if (getout)
-           return()
 
       data<-private$.cleandata()
 
@@ -76,7 +73,7 @@ gamljGLMClass <- R6::R6Class(
          
       }
       ### we want to output SS error and total for intercept-only models ######
-      if (length(modelTerms) == 0 && fixedIntercept==TRUE) {
+      if (length(modelTerms) == 0) {
         aTable$addRow(rowKey=1, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
         aTable$addRow(rowKey=2, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq=""))
       }
@@ -131,10 +128,14 @@ gamljGLMClass <- R6::R6Class(
         modelTerms[[aOne]]<-NULL
         fixedIntercept=TRUE
       }
+      aZero<-which(unlist(modelTerms)=="0")
+      if (is.something(aZero)) {
+        modelTerms[[aZero]]<-NULL
+        fixedIntercept=FALSE
+      }
       
       modelTerms<-lapply(modelTerms,jmvcore::toB64)
       modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,fixedIntercept)
-
       if (modelFormula==FALSE)  
           return()
     
@@ -199,25 +200,50 @@ gamljGLMClass <- R6::R6Class(
                     msg<-n64$translate(msg)
                     jmvcore::reject(msg, code='error')
                }
+                if (is.something(test_parameters)){
+                  
+                     if (!is.null(attr(parameters,"warning"))) 
+                          estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
       
-                if (!is.null(attr(parameters,"warning"))) 
-                    estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
-      
-                if ("beta" %in% self$options$effectSize) {
-                    zdata<-data
-                    zdata[[jmvcore::toB64(dep)]]<-scale(zdata[[jmvcore::toB64(dep)]])
-                    for (var in covs)
-                         zdata[[jmvcore::toB64(var)]]<-scale(zdata[[jmvcore::toB64(var)]])
-                         beta<-coef(stats::lm(modelFormula,data=zdata))
-                         if (any(is.na(beta)))
-                             estimatesTable$setNote("nobeta",WARNS["ano.aliased"])
-                        else {
-                             beta[1]<-0
-                             parameters<-cbind(parameters,beta) 
-                        }
+                     if ("beta" %in% self$options$effectSize) {
+                        zdata<-data
+                        zdata[[jmvcore::toB64(dep)]]<-scale(zdata[[jmvcore::toB64(dep)]])
+                        for (var in covs)
+                             zdata[[jmvcore::toB64(var)]]<-scale(zdata[[jmvcore::toB64(var)]])
+                             beta<-coef(stats::lm(modelFormula,data=zdata))
+                             if (any(is.na(beta)))
+                                   estimatesTable$setNote("nobeta",WARNS["ano.aliased"])
+                             else {
+                                  beta[1]<-0
+                                  parameters<-cbind(parameters,beta) 
+                             }
+                     }
+                  ### parameter table ####
+                  
+                  #### confidence intervals ######
+                  ciWidth<-self$options$paramCIWidth/100
+                  citry<-try({
+                    ci<-mf.confint(model,level=ciWidth)
+                    colnames(ci)<-c("cilow","cihig")
+                    parameters<-cbind(parameters,ci) 
+                  })
+                  if (jmvcore::isError(citry)) {
+                    message <- jmvcore::extractErrorMessage(citry)
+                    estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                  }
+                  rownames(parameters)<-n64$nicenames(rownames(parameters))
+                  for (i in 1:nrow(parameters)) {
+                    tableRow=parameters[i,]
+                    estimatesTable$setRow(rowNo=i,tableRow)
+                  }
+                  
+                  
+                  if (mf.aliased(model)) {
+                    estimatesTable$setNote("aliased",WARNS["ano.aliased"])
+                    infoTable$setNote("aliased",WARNS["ano.aliased"])
+                  }
+                  estimatesTable$setState(TRUE)
                 }
-      
-               
                
                ### anova results ####
                anova_res<-NULL
@@ -269,38 +295,22 @@ gamljGLMClass <- R6::R6Class(
 
                  }
                ### we want to output the error SS for intercept only model
-               if (length(modelTerms)==0 & self$options$fixedIntercept==TRUE) {
+               if (length(modelTerms)==0 & fixedIntercept==TRUE) {
                  ss<-var(model$residuals)*(model$df.residual)
                  anovaTable$setRow(rowKey=1,list("ss"=ss,df=model$df.residual,f="",p="",etaSq="",etaSqP="",omegaSq=""))
                  anovaTable$setRow(rowKey=2, list("ss"=ss,df=model$df.residual,p="",etaSq="",etaSqP="",omegaSq=""))
                }                 
                
+               mark(fixedIntercept) 
+               ### we want to output the error SS for zero only model
+               if (length(modelTerms)==0 & fixedIntercept==FALSE) {
+                 ss<-sum(data[[jmvcore::toB64(dep)]]^2)
+                 df<-dim(data)[1]
+                 anovaTable$setRow(rowKey=1,list("ss"=ss,df=df,f="",p="",etaSq="",etaSqP="",omegaSq=""))
+                 anovaTable$setRow(rowKey=2, list("ss"=ss,df=df,p="",etaSq="",etaSqP="",omegaSq=""))
+               }                 
+               
 
-        ### parameter table ####
-        
-        #### confidence intervals ######
-        ciWidth<-self$options$paramCIWidth/100
-        citry<-try({
-            ci<-mf.confint(model,level=ciWidth)
-            colnames(ci)<-c("cilow","cihig")
-            parameters<-cbind(parameters,ci) 
-          })
-          if (jmvcore::isError(citry)) {
-            message <- jmvcore::extractErrorMessage(citry)
-            estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-          }
-        rownames(parameters)<-n64$nicenames(rownames(parameters))
-        for (i in 1:nrow(parameters)) {
-                tableRow=parameters[i,]
-                estimatesTable$setRow(rowNo=i,tableRow)
-          }
-
-        
-       if (mf.aliased(model)) {
-          estimatesTable$setNote("aliased",WARNS["ano.aliased"])
-          infoTable$setNote("aliased",WARNS["ano.aliased"])
-       }
-        estimatesTable$setState(TRUE)
         
   
         # end of check state
