@@ -7,7 +7,6 @@ mod<-gamlj::gamljGLM(
   modelTerms = ~ supp,
   
 )
-mod
 res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {
