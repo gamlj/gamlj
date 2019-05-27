@@ -171,7 +171,7 @@ gamlj_data<-function(gobj) {
 #' analysis in R with model fitted scores. 
 #'
 #' @param gobj a list of values
-#'  
+#' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
 #' @return a R object of the class of the estimated model
 #' @author Marcello Gallucci
 #' @examples 
@@ -183,6 +183,9 @@ gamlj_data<-function(gobj) {
 #'  
 #' @export
 
-gamlj_predict<-function(gobj) {
-  predict(gobj$model)
+gamlj_predict<-function(gobj,re.form=NULL) {
+  if (!is.null(re.form))
+      stats::predict(gobj$model,re.form=re.form)
+  else
+    stats::predict(gobj$model)
 }

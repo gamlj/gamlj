@@ -233,7 +233,7 @@ gplots.images<-function(self,data,raw,range,randomData=NULL) {
          glevels<-images$itemKeys
          for (i in seq_along(glevels)) {
               image <- images$get(key=glevels[[i]])
-              sdata<-subset(data,plots==levels[i])
+              sdata<-subset(data,"plots"==levels[i])
               sraw<-NULL
               if (!is.null(raw)) {
                   if (is.factor(raw[["w"]]))
@@ -243,7 +243,7 @@ gplots.images<-function(self,data,raw,range,randomData=NULL) {
               }
               srand<-NULL
               if (!is.null(randomData))
-                  srand<-subset(randomData,plots==levels[i])
+                  srand<-subset(randomData,"plots"==levels[i])
     
               image$setState(list(data=sdata,raw=sraw, range=range,randomData=srand))
               title<-paste(plotsName,"=",levels[i])

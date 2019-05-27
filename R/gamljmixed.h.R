@@ -960,7 +960,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
             super$initialize(
                 package = 'gamlj',
                 name = 'gamljMixed',
-                version = c(0,0,2),
+                version = c(1,5,2),
                 options = options,
                 results = gamljMixedResults$new(options=options),
                 data = data,

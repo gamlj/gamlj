@@ -890,7 +890,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
             super$initialize(
                 package = 'gamlj',
                 name = 'gamljGLM',
-                version = c(0,0,2),
+                version = c(1,5,2),
                 options = options,
                 results = gamljGLMResults$new(options=options),
                 data = data,

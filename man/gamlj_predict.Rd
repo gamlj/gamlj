@@ -4,10 +4,12 @@
 \alias{gamlj_predict}
 \title{Extract the predicted values of the model estimated by GAMLj}
 \usage{
-gamlj_predict(gobj)
+gamlj_predict(gobj, re.form = NULL)
 }
 \arguments{
 \item{gobj}{a list of values}
+
+\item{re.form}{if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.}
 }
 \value{
 a R object of the class of the estimated model

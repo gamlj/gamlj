@@ -441,17 +441,18 @@ gamljGzlmClass <- R6::R6Class(
     rawData<-NULL
   
   image<-gplots.images(self=self,data=predData,raw=rawData,range=yAxisRange)
-
   if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
       if (is.null(plotsName)) {
             n<-length(levels(factor(predData[["plots2"]])))
             image$setSize(800,(200*n))
-          } else 
-             for (im in image) {
+          } else {
+             glevels<-image$itemKeys
+             for (i in seq_along(glevels)) {
+               im <- image$get(key=glevels[[i]])
                   n<-length(levels(factor(predData[["plots2"]])))
                   im$setSize(800,(200*n))
              }
-      
+          }
   }
   
 },

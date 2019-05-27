@@ -9,3 +9,4 @@ preds<-gamlj_predict(obj)
 test_that("glm predict", {
   expect_equal(round(mean(preds),2),37.88)
 })
+
