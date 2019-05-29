@@ -7,7 +7,7 @@ gamljGzlmClass <- R6::R6Class(
     .cov_condition=conditioning$new(),
     .postHocRows=NA,
     .init=function() {
-      mark("init")
+      ginfo("init")
       private$.names64<-names64$new()
       n64<-private$.names64
       factors<-self$options$factors
@@ -119,7 +119,7 @@ gamljGzlmClass <- R6::R6Class(
     },
     .run=function() {
       n64<-private$.names64
-      mark("run")
+      ginfo("run")
       # collect some option
       dep <- self$options$dep
       factors <- self$options$factors
@@ -183,7 +183,7 @@ gamljGzlmClass <- R6::R6Class(
       ### otherwise we store a flag  in parameters table state so next time we know it worked
 
       if (is.null(estimatesTable$state)) {
-               mark("anova and parameters have been estimated")
+               ginfo("anova and parameters have been estimated")
                test_summary<-try(model_summary<-summary(model))
                if (jmvcore::isError(test_summary)) {
                    msg <- jmvcore::extractErrorMessage(test_summary)
@@ -290,7 +290,7 @@ gamljGzlmClass <- R6::R6Class(
   
         # end of check state
         } else
-          mark("anova and parameters have been recycled")
+          ginfo("anova and parameters have been recycled")
     
         private$.preparePlots(private$.model)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
@@ -311,7 +311,7 @@ gamljGzlmClass <- R6::R6Class(
       for (factor in factors) {
         ### we need this for Rinterface ####
         if (!("factor" %in% class(dataRaw[[factor]]))) {
-          info(paste("Warning, variable",factor," has been coerced to factor"))
+          ginfo(paste("Warning, variable",factor," has been coerced to factor"))
           dataRaw[[factor]]<-factor(dataRaw[[factor]])
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]

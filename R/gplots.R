@@ -123,7 +123,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     pred.means(model,selected64,cond)
   })
   if (jmvcore::isError(pdata)) {
-    mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
+    ginfo(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
   
@@ -179,7 +179,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
   
   if (jmvcore::isError(pdata)) {
-    mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
+    ginfo(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
 
@@ -315,7 +315,6 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
   }
 
-  mark(gdata$lines,class(gdata$lines))  
 
   p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
@@ -342,7 +341,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       data<-image$state$randomData
       thinker<-.3
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      mark("Random effects plotting: we are smoothing with formula",form)
+      ginfo("Random effects plotting: we are smoothing with formula",form)
       p<-p +ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"),size=.2,colour="gray64", alpha=.8,
                        method = "lm",formula = form,
                        fullrange = TRUE,se=FALSE,show.legend=F) 
@@ -387,7 +386,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
       data<-image$state$randomData
       data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
-      mark("we are breaking by cluster")
+      ginfo("we are breaking by cluster")
       p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),show.legend = F,shape=12, alpha=.5,  size=.5)
       p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group = "cluster"),size=.3, alpha=.3,show.legend = F) 
     }
@@ -403,7 +402,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      mark("Random effects plotting: we are smoothing with formula",form)
+      ginfo("Random effects plotting: we are smoothing with formula",form)
       p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
                        method = "lm",formula=form,
                        alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 

@@ -7,7 +7,7 @@ gamljGLMClass <- R6::R6Class(
     .cov_condition=conditioning$new(),
     .postHocRows=NA,
     .init=function() {
-      mark("init")
+      ginfo("init")
       private$.names64<-names64$new()
       n64<-private$.names64
       dep<-self$options$dep
@@ -100,7 +100,7 @@ gamljGLMClass <- R6::R6Class(
     },
     .run=function() {
       n64<-private$.names64
-      mark("run")
+      ginfo("run")
       # collect some option
       dep <- self$options$dep
       if (is.null(dep))
@@ -118,15 +118,12 @@ gamljGLMClass <- R6::R6Class(
          return()
       ###############
       # this allows intercept only model to be passed by syntax interfase
-      mark(unlist(modelTerms))
-      
       aOne<-which(unlist(modelTerms)=="1")
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
         fixedIntercept=TRUE
       }
       modelTerms<-lapply(modelTerms,jmvcore::toB64)
-      mark(fixedIntercept)
       modelFormula<-lf.constructFormula(jmvcore::toB64(dep),modelTerms,fixedIntercept)
       if (modelFormula==FALSE)  
           return()
@@ -174,7 +171,7 @@ gamljGLMClass <- R6::R6Class(
       ### otherwise we store a flag  in parameters table state so next time we know it worked
 
       if (is.null(estimatesTable$state)) {
-               mark("anova and parameters have been estimated")
+               ginfo("anova and parameters have been estimated")
                test_summary<-try(model_summary<-summary(model))
                if (jmvcore::isError(test_summary)) {
                    msg <- jmvcore::extractErrorMessage(test_summary)
@@ -303,7 +300,7 @@ gamljGLMClass <- R6::R6Class(
                
         # end of check state
         } else
-          mark("anova and parameters have been recycled")
+          ginfo("anova and parameters have been recycled")
     
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
@@ -324,7 +321,7 @@ gamljGLMClass <- R6::R6Class(
       for (factor in factors) {
         ### we need this for Rinterface ####
         if (!("factor" %in% class(dataRaw[[factor]]))) {
-          info(paste("Warning, variable",factor," has been coerced to factor"))
+          ginfo(paste("Warning, variable",factor," has been coerced to factor"))
           dataRaw[[factor]]<-factor(dataRaw[[factor]])
         }
         data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
