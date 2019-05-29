@@ -217,7 +217,12 @@ gplots.images<-function(self,data,raw,range,randomData=NULL) {
      plotsName <- self$options$plotSepPlots
      if (is.null(linesName))
        plotsName<-NULL
-     
+     else {
+       # this is required to get labels ordered as in file
+       if (!is.factor(data$lines))
+         data$lines<-factor(data$lines,levels=unique(data$lines))
+       }
+
      if (is.null(plotsName)) {
            image <- self$results$get('descPlot')
            image$setState(list(data=data, raw=raw, range=range, randomData=randomData))
@@ -228,22 +233,22 @@ gplots.images<-function(self,data,raw,range,randomData=NULL) {
          if (is.factor(data$plots))
              levels<-levels(data$plots)
          else {
-             levels<-levels(factor(data$plots,labels=unique(data$plots),ordered=TRUE))
+             levels<-levels(factor(data$plots,labels=unique(data$plots)))
          }
          glevels<-images$itemKeys
          for (i in seq_along(glevels)) {
               image <- images$get(key=glevels[[i]])
-              sdata<-subset(data,"plots"==levels[i])
+              sdata<-data[data$plots==levels[i],]
               sraw<-NULL
               if (!is.null(raw)) {
                   if (is.factor(raw[["w"]]))
-                      sraw<-subset(raw,w==levels[i])
+                      sraw<-raw[raw$w==levels[i],]
                   else
                       sraw<-raw
               }
               srand<-NULL
               if (!is.null(randomData))
-                  srand<-subset(randomData,"plots"==levels[i])
+                  srand<-randomData[randomData$plots==levels[i],]
     
               image$setState(list(data=sdata,raw=sraw, range=range,randomData=srand))
               title<-paste(plotsName,"=",levels[i])
@@ -301,22 +306,17 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   }
   
   gdata<-image$state$data
-  gdata$lines<-factor(gdata$lines)
-  lvls<-levels(gdata$lines)
-  if (lvls[1]=="Mean")
-            gdata$lines<-factor(gdata$lines,lvls[c(2,1,3)])
-  if (length(grep("Mean-",lvls[1],fixed=T)>0))
-           gdata$lines<-factor(gdata$lines,lvls[c(1,3,2)])
-  
+#  gdata$lines<-factor(gdata$lines)
 
-  p <- ggplot2::ggplot()
+   p <- ggplot2::ggplot()
   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
     p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
   }
 
-  
+  mark(gdata$lines,class(gdata$lines))  
+
   p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
   p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 

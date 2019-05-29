@@ -439,7 +439,6 @@ gamljGzlmClass <- R6::R6Class(
 
   if (!optionRaw)
     rawData<-NULL
-  
   image<-gplots.images(self=self,data=predData,raw=rawData,range=yAxisRange)
   if (self$options$modelSelection=="multinomial" && !is.null(linesName)) {
       if (is.null(plotsName)) {
