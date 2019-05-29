@@ -498,12 +498,9 @@ gamljMixedClass <- R6::R6Class(
   preds<-c(groupName,linesName,plotsName)
   preds64<-jmvcore::toB64(preds)
   clusters<-jmvcore::toB64(self$options$cluster)
-  mark(clusters)
-  mark(names(model@cnms))
   cluster<-clusters[which(clusters %in% names(model@cnms))][[1]]
   
   preds64<-c(cluster,preds64)
-  mark(jmvcore::fromB64(names(model@cnms))) 
   if (self$options$plotRandomEffects) {
     
     pd<-predict(model)
@@ -537,32 +534,8 @@ gamljMixedClass <- R6::R6Class(
              yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
     }
   
+  gplots.images(self,data=predData,raw=rawData,range=yAxisRange,randomData=randomData)
 
-  if (is.null(plotsName)) {
-    image <- self$results$get('descPlot')
-    image$setState(list(data=predData, raw=rawData, range=yAxisRange, randomData=randomData))
-  } else {
-    images <- self$results$descPlots
-    levels<-levels(factor(predData$plots))
-    for (level in levels) {
-      image <- images$get(key=level)
-      sdata<-subset(predData,plots==level)
-      sraw<-NULL
-      if (!is.null(rawData)) {
-        if (is.factor(rawData[["w"]]))
-          sraw<-subset(rawData,w==level)
-        else
-          sraw<-rawData
-      }
-      
-      srand<-NULL
-      if (!is.null(randomData))
-           srand<-subset(randomData,plots==level)
-          
-      image$setState(list(data=sdata,raw=sraw, range=yAxisRange,randomData=srand))
-    }
-  }
-  
 },
 
 .descPlot=function(image, ggtheme, theme, ...) {

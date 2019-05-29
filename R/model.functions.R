@@ -52,6 +52,8 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   
 .mf.summary.lm<-function(model){
   smr<-summary(model)
+  if (dim(smr$coefficients)[1]==0)
+    return(NULL)
   ss<-as.data.frame(smr$coefficients)
   ss$df<-smr$df[2]
   colnames(ss)<-c("estimate","se","t","p","df")

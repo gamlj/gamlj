@@ -126,6 +126,9 @@ children:
         stretchFactor: 1
         higherOrders: true
         format: term
+        events:
+              update: './gamlj.events::onUpdate_modelSupplier'
+
         children:
           - type: TargetLayoutBox
             transferAction: interactions
@@ -253,6 +256,7 @@ children:
         stretchFactor: 1
         format: term
         events:
+          update: './gamlj.events::onUpdate_postHocSupplier'
           change: './gamlj.events::onChange_postHocSupplier'
         children:
           - type: TargetLayoutBox
@@ -292,6 +296,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
+          update: './gamlj.events::onUpdate_plotsSupplier'
           change: './gamlj.events::onChange_plotsSupplier'
         children:
           - type: TargetLayoutBox
@@ -358,6 +363,7 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
+          update: './gamlj.events::onUpdate_simpleSupplier'
           change: './gamlj.events::onChange_simpleSupplier'
         children:
           - type: TargetLayoutBox

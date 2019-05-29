@@ -39,10 +39,12 @@ const events = {
         }
         return;
     },
+
     onChange_modelTerms: function(ui) {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
+        updatePlotsSupplier(ui, this);
         updateRandomSupplier(ui,this);
 
     },
@@ -66,6 +68,30 @@ const events = {
         let values = this.itemsToValues(ui.postHocSupplier.value());
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
+    onUpdate_postHocSupplier: function(ui) {
+        updatePostHocSupplier(ui, this);
+    },
+
+    onUpdate_simpleSupplier: function(ui) {
+        updateSimpleSupplier(ui, this);
+    },
+    onUpdate_plotsSupplier: function(ui) {
+        updatePlotsSupplier(ui, this);
+    },
+
+    onUpdate_modelSupplier: function(ui) {
+            let factorsList = this.cloneArray(ui.factors.value(), []);
+            let covariatesList = this.cloneArray(ui.covs.value(), []);
+            var variablesList = factorsList.concat(covariatesList);
+            ui.modelSupplier.setValue(this.valuesToItems(variablesList, FormatDef.variable));
+    },
+
+    onUpdate_randomSupplier: function(ui) {
+        updateRandomSupplier(ui,this);
+
+    },
+
+
     onEvent_addRandomTerm: function(ui) {
         console.log("addRandomTerm does nothing");
     },
@@ -122,7 +148,7 @@ var fixRandomEffects = function(ui, context) {
              }
 
   
-}
+};
 
 var calcModelTerms = function(ui, context) {
     var variableList = context.cloneArray(ui.factors.value(), []);
@@ -198,8 +224,6 @@ var updateSimpleSupplier = function(ui, context) {
         }
         varList=context.valuesToItems(varList, FormatDef.variable);
         ui.simpleSupplier.setValue(varList);
-        ui.plotsSupplier.setValue(varList);
-
     };
 
 
@@ -343,6 +367,23 @@ var filterRandomTerms = function(ui, context) {
       ui.randomTerms.setValue(unique);
   
 };
+
+
+var updatePlotsSupplier = function(ui, context) {
+
+        var termsList = context.cloneArray(ui.modelTerms.value(), []);
+        var varList=[];
+        for (var j = 0; j < termsList.length; j++) {
+            var newTerm=context.clone(termsList[j]);
+            if (newTerm.length==1) {
+                  varList.push(newTerm[0]); // was varList.push(newTerm);
+            }
+        }
+        varList=context.valuesToItems(varList, FormatDef.variable);
+        ui.plotsSupplier.setValue(varList);
+    
+    };
+
 
 var unique=function(arr) {
     var u = {}, a = [];

@@ -363,6 +363,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
 gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
+        model = function() private$..model,
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         postHocs = function() private$.items[["postHocs"]],
@@ -371,13 +372,15 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
         assumptions = function() private$.items[["assumptions"]]),
-    private = list(),
+    private = list(
+        ..model = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="General Linear Model")
+            private$..model <- NULL
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -876,7 +879,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms")))}))$new(options=options))}))
+                                "modelTerms")))}))$new(options=options))},
+        .setModel=function(x) private$..model <- x))
 
 gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljGLMBase",
@@ -886,7 +890,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
             super$initialize(
                 package = 'gamlj',
                 name = 'gamljGLM',
-                version = c(0,0,2),
+                version = c(1,5,2),
                 options = options,
                 results = gamljGLMResults$new(options=options),
                 data = data,
@@ -971,6 +975,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
+#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr

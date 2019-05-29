@@ -7,7 +7,6 @@ mod<-gamlj::gamljGLM(
   modelTerms = ~ supp,
   
 )
-mod
 res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {
@@ -66,7 +65,7 @@ hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~c1*c2,
-  postHoc = list("schtyp")
+  postHoc = list("c1")
 )
 
 test_that("glm labels do not square", {
@@ -166,3 +165,21 @@ test_that("glm contrasts", {
 })
 
 
+mod<-gamlj::gamljGLM(
+  formula = read ~ 1,  data = data
+)
+res<-mod$main$anova$asDF
+test_that("glm intercept only model", {
+  expect_equal(as.character(res$name[1]),"Residuals")
+  expect_equal(round(res[2,2],2),20919.42)
+})
+
+mod<-gamlj::gamljGLM(
+  formula = read ~ 1,  data = data,
+  fixedIntercept=FALSE
+)
+res<-mod$main$anova$asDF
+test_that("glm zero-intercept model", {
+  expect_equal(as.character(res$name[1]),"Residuals")
+  expect_equal(round(res[2,2],2),566514)
+})

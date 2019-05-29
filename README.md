@@ -3,9 +3,10 @@
 General, Mixed and Generalized Models module for jamovi
 
 version 1.5.*
-
-<img src="docs/i1.png" class="img-responsive" alt="">
-
+<center>
+<img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
+</center>
+<br>
 
 Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Models with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
@@ -16,6 +17,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 * Moderation made easy
 * Simple slopes analysis
 * Simple effects
+* Polynomial effects
 * post-hoc analysis
 * Plots up to three-way interactions
 * Automatic selection of best estimation methods and degrees of freedom selection
@@ -23,11 +25,15 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 
 More informations can be found at [GAMLj page](https://gamlj.github.io/)
 
-# Installation
+# Instal in jamovi
 
 Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select the jamovi modules library and install GAMLj from there
 
-<img src="docs/glm/install.png" class="img-responsive" alt="">
+
+<center>
+<img width="600" src="https://gamlj.github.io/glm/install.png" class="img-responsive" alt="">
+</center>
+
 
 ## From source
 
@@ -44,21 +50,32 @@ jmvtools::install()
 
 ```
 
+# Install in R
+
+```
+
+devtools::install_github("gamlj/gamlj")
+
+```
+
+
+# Versions
+
+Please check out the  [release notes](https://gamlj.github.io/release_notes.html). 
+
+
 # Troubleshooting
+
 
 ## While using the module
 
 Please check out the  [troubleshooting page](https://mcfanda.github.io/gamlj_docs/troubles.html). 
 
 
+
 ## Installing from source
 
 The module installs dependencies automatically, but in some R installations the process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
-
-
-# Versions
-
-Please check out the  [release notes](https://mcfanda.github.io/gamlj_docs/release_notes.html). 
 
 
 

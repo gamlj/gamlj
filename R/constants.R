@@ -98,8 +98,12 @@ WARNS["ph.covariates"]<-"Post-hocs means are estimated keeping constant
 other independent variable(s) in the model"
 WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across interacting factors (if any) and setting interacting covariates to zero (if any)"
 
+#### GLM Specifics ##########
+
+WARNS["glm.zeromodel"]<-"SS are computed for predicted values equal to zero"
 
 
+### end of warnings ###
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 
 ###############################################################

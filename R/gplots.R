@@ -123,7 +123,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     pred.means(model,selected64,cond)
   })
   if (jmvcore::isError(pdata)) {
-    mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
+    ginfo(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
   
@@ -179,19 +179,21 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   names(pdata)<-c(varnames,c("fit","SE","df","lwr","upr"))  
   
   if (jmvcore::isError(pdata)) {
-    mark(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
+    ginfo(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
     jmvcore::reject("Plot estimated values cannot be computed. Refine the model or the covariates conditioning (if any)", code='error')
   }
 
   if (is.factor(data[[jmvcore::toB64(groupName)]]))  {
     pdata$group<-factor(pdata$group,levels =levels(data[[jmvcore::toB64(groupName)]]))
   }
-  if (is.something(linesName) && is.factor(data[[jmvcore::toB64(linesName)]]))  {
-    pdata$lines<-factor(pdata$lines,levels =levels(data[[jmvcore::toB64(linesName)]]))
-  }
-  
-  
+
+  if ("plots2" %in% names(pdata))
+    if (is.factor(data[[jmvcore::toB64(linesName)]]))  
+      pdata$plots2<-factor(pdata$plots2,levels =levels(data[[jmvcore::toB64(linesName)]]))
+    else
+      pdata$plots2<-factor(pdata$plots2,levels =unique(pdata$plots2),ordered =TRUE )
     
+  
   if (bars=="se") {
     pdata$lwr<-pdata$fit-pdata$SE
     pdata$upr<-pdata$fit+pdata$SE
@@ -208,6 +210,54 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
   return(pdata)
 }
 
+gplots.images<-function(self,data,raw,range,randomData=NULL) {
+
+     groupName <- self$options$plotHAxis
+     linesName <- self$options$plotSepLines
+     plotsName <- self$options$plotSepPlots
+     if (is.null(linesName))
+       plotsName<-NULL
+     else {
+       # this is required to get labels ordered as in file
+       if (!is.factor(data$lines))
+         data$lines<-factor(data$lines,levels=unique(data$lines))
+       }
+
+     if (is.null(plotsName)) {
+           image <- self$results$get('descPlot')
+           image$setState(list(data=data, raw=raw, range=range, randomData=randomData))
+           return(image)
+      } else {
+         images <- self$results$descPlots
+         i<-1
+         if (is.factor(data$plots))
+             levels<-levels(data$plots)
+         else {
+             levels<-levels(factor(data$plots,labels=unique(data$plots)))
+         }
+         glevels<-images$itemKeys
+         for (i in seq_along(glevels)) {
+              image <- images$get(key=glevels[[i]])
+              sdata<-data[data$plots==levels[i],]
+              sraw<-NULL
+              if (!is.null(raw)) {
+                  if (is.factor(raw[["w"]]))
+                      sraw<-raw[raw$w==levels[i],]
+                  else
+                      sraw<-raw
+              }
+              srand<-NULL
+              if (!is.null(randomData))
+                  srand<-randomData[randomData$plots==levels[i],]
+    
+              image$setState(list(data=sdata,raw=sraw, range=range,randomData=srand))
+              title<-paste(plotsName,"=",levels[i])
+              image$setTitle(title)
+    
+         }
+         return(images)
+      }
+}
 
 ########### those functions deal with plots results ###########
 
@@ -256,22 +306,16 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   }
   
   gdata<-image$state$data
-  gdata$lines<-factor(gdata$lines)
-  lvls<-levels(gdata$lines)
-  if (lvls[1]=="Mean")
-            gdata$lines<-factor(gdata$lines,lvls[c(2,1,3)])
-  if (length(grep("Mean-",lvls[1],fixed=T)>0))
-           gdata$lines<-factor(gdata$lines,lvls[c(1,3,2)])
-  
+#  gdata$lines<-factor(gdata$lines)
 
-  p <- ggplot2::ggplot()
+   p <- ggplot2::ggplot()
   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
     p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
   }
 
-  
+
   p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
   p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
@@ -297,7 +341,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
       data<-image$state$randomData
       thinker<-.3
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      mark("Random effects plotting: we are smoothing with formula",form)
+      ginfo("Random effects plotting: we are smoothing with formula",form)
       p<-p +ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"),size=.2,colour="gray64", alpha=.8,
                        method = "lm",formula = form,
                        fullrange = TRUE,se=FALSE,show.legend=F) 
@@ -310,7 +354,6 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   
   if (!is.null(title))
     p<-p+ ggtitle(title)
-  ## here we put mean in the middle between mean +offset and -offset    
   p<-p+theme
   p   
 }
@@ -343,7 +386,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
       data<-image$state$randomData
       data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
-      mark("we are breaking by cluster")
+      ginfo("we are breaking by cluster")
       p <- p + ggplot2::geom_point(data=data,aes_string(x="group", y="y",group="cluster"),show.legend = F,shape=12, alpha=.5,  size=.5)
       p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group = "cluster"),size=.3, alpha=.3,show.legend = F) 
     }
@@ -359,7 +402,7 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      mark("Random effects plotting: we are smoothing with formula",form)
+      ginfo("Random effects plotting: we are smoothing with formula",form)
       p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
                        method = "lm",formula=form,
                        alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
@@ -378,20 +421,19 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
 
 gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,plotsName=NULL,errorType="none",title=NULL) {
   
-  data<-image$state$data
   depLabs<-paste("Prob.",depName,"categories")
   vars<-c(depName,groupName,linesName,plotsName)
   if (!is.null(linesName)) {
     plots<-list()
-    aplot<-gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType,title = title)
     labs<-function(x) {
-     x$name<-paste0(linesName,":")
-     return(x)
+      paste(linesName,x,sep="=")
     }
-    plots<-aplot+ggplot2::facet_grid(plots2 ~ .,labeller = labs )
+    aplot<-gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType,title = title)
+    plots<-aplot+ggplot2::facet_grid(plots2 ~ .,labeller = as_labeller(labs))
     return(plots)
   } else
     return(gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType)+ggtheme)
 }
 
+ggplot2::label_both(list(a=c("a","b")))
 

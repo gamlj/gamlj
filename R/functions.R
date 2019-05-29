@@ -1,9 +1,13 @@
 
 
-ginfo<-function(what=NULL) {
+ginfo<-function(what=NULL,obj=NULL) {
   if (GAMLj_INFO) {
     if (!is.null(what))
         print(what)
+    if (!is.null(obj)) {
+      print(obj)
+      cat("------------\n")
+    }
   }
 }
 

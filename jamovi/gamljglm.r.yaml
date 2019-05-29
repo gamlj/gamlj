@@ -5,6 +5,9 @@ jrs: '1.0'
 
 
 items:
+  - name: model
+    type: Property
+    description: The underlying `lm` object
 
   - name: info
     title: Model Info
