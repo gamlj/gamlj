@@ -25,7 +25,7 @@ Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Mod
 
 More informations can be found at [GAMLj page](https://gamlj.github.io/)
 
-# Instal in jamovi
+# Install in jamovi
 
 Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select the jamovi modules library and install GAMLj from there
 
