@@ -63,7 +63,7 @@ items:
                       type: number
                       format: zto,pvalue
            - name: fixed
-             title: Fixed Effects Parameter Estimates
+             title: Parameter Estimates
              type: Table
              clearWith:
                     - dep
@@ -104,6 +104,15 @@ items:
                       title: "exp(B)"
                       type: number
                       visible: (effectSize:expb)
+                    - name: ecilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: ecihig
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+
                     - name: z
                       title: "z"
                       type: number
@@ -111,6 +120,37 @@ items:
                       title: "p"
                       type: number
                       format: zto,pvalue
+           - name: relativerisk
+             title: Relative risk
+             type: Table
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - fixedIntercept
+                    - effectSize
+
+             columns:
+                    - name: source
+                      title: "Names"
+                      type: text
+                      visible: (showRealNames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (showParamsCI)
+
 
 
 

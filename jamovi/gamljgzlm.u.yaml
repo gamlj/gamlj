@@ -106,6 +106,9 @@ children:
         margin: large
         style: list-inline
         children:
+          - name: showExpbCI
+            type: CheckBox
+            enable: (!modelSelection_linear)
           - name: showParamsCI
             type: CheckBox
           - type: TextBox
@@ -113,7 +116,8 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI)
+            enable: (showParamsCI || showExpbCI)
+
   - type: CollapseBox
     label: Model
     collapsed: true

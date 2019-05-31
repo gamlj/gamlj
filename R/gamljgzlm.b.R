@@ -93,10 +93,14 @@ gamljGzlmClass <- R6::R6Class(
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-
-      if (modelType=="linear")
-        aTable$getColumn("expb")$setVisible(FALSE)
+      aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      aTable$getColumn('ecihig')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
       
+      if (modelType=="linear") {
+        aTable$getColumn("expb")$setVisible(FALSE)
+        aTable$getColumn("ecilow")$setVisible(FALSE)
+        aTable$getColumn("ecihig")$setVisible(FALSE)
+        }
       if (!is.something(self$options$factors))
         aTable$getColumn('label')$setVisible(FALSE)
       
@@ -262,6 +266,7 @@ gamljGzlmClass <- R6::R6Class(
         ### parameter table ####
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
+
         if (self$options$showParamsCI) {
              citry<-try({
                  ci<-mf.confint(model,level=ciWidth)
@@ -273,8 +278,22 @@ gamljGzlmClass <- R6::R6Class(
                   estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
               }
         }
-        rownames(parameters)<-n64$nicenames(rownames(parameters))
+               mark(parameters)
+        if (self$options$showExpbCI) {
+                 citry<-try({
+                   ci<-mf.confint(model,level=ciWidth)
+                   ci[,1]<-exp(ci[,1])
+                   ci[,2]<-exp(ci[,2])
+                   colnames(ci)<-c("ecilow","ecihig")
+                   parameters<-cbind(parameters,ci) 
+                 })
+                 if (jmvcore::isError(citry)) {
+                   message <- jmvcore::extractErrorMessage(citry)
+                   estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                 }
+          }
 
+        rownames(parameters)<-n64$nicenames(rownames(parameters))
         for (i in 1:nrow(parameters)) {
                 tableRow=parameters[i,]
                 estimatesTable$setRow(rowNo=i,tableRow)

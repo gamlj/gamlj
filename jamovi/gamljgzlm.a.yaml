@@ -88,12 +88,19 @@ options:
 
 
     - name: showParamsCI
-      title: Confidence intervals
+      title: For estimates
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUR`  or `FALSE` (default), parameters CI in table
+    - name: showExpbCI
+      title: For exp(B)
       type: Bool
       default: true
       description:
           R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
+            `TRUE` (default) or `FALSE` , exp(B) CI in table
 
 
     - name: paramCIWidth
@@ -106,7 +113,6 @@ options:
           R: >
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width for the parameter estimates
-
 
 
     - name: contrasts
