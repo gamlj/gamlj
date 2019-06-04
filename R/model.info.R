@@ -95,10 +95,8 @@ mi.getDummiesNames<-function(varname,data) {
 mi.getAIC<- function(x,...) UseMethod(".getAIC")
 
 .getAIC.default<-function(model)
-  return(model$aic)
+  return(round(stats::extractAIC(model)[2],digits = 3))
 
-.getAIC.multinom<-function(model)
-  return(model$AIC)
 
 mi.getValueDf<- function(x,...) UseMethod(".getValueDf")
 

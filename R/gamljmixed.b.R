@@ -251,8 +251,7 @@ gamljMixedClass <- R6::R6Class(
                ginfo("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
-               info.aic<-model_summary$AICtab[1]
-               info.bic<-model_summary$AICtab[2]
+               info.aic<-round(stats::extractAIC(model)[2],digits=2)
                info.loglik<-model_summary$AICtab[3]
                r2<-try(r.squared(model),silent = TRUE)
                if (jmvcore::isError(r2)){
