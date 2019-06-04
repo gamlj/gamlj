@@ -254,8 +254,15 @@ mf.getModelFactors<-function(model) {
 
 mf.getModelMessages<-function(model) {
   message<-list()
+  mark("class",.which.class(model))
   if (.which.class(model)=="lmer") {
-    return(model@optinfo$conv$lme4$messages)
+      message=model@optinfo$conv$lme4$messages
+      lwr <- lme4::getME(model, "lower")
+      theta <- lme4::getME(model, "theta")
+      if (any(theta[lwr==0] < 1e-4))
+        message[length(message)+1]="The model fit is singular"
+
+    return(message)
   }
   message
 }

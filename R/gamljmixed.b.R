@@ -272,6 +272,7 @@ gamljMixedClass <- R6::R6Class(
                    }
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
+
         
                ### end of info table ###
         
@@ -291,14 +292,14 @@ gamljMixedClass <- R6::R6Class(
                               anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                        }
                       messages<-mf.getModelMessages(model)
+                      
+                      for (i in seq_along(messages)) {
+                              infoTable$setNote(as.character(i),messages[[i]])
+                      }
                       if (length(messages)>0) {
                         infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
                       }
                       
-                      for (i in seq_along(messages)) {
-                              anovaTable$setNote(as.character(i),messages[[i]])
-                              infoTable$setNote(as.character(i),messages[[i]])
-                      }
                       if (attr(anova_res,"statistic")=="Chisq") {
                           anovaTable$setNote("lmer.chisq",WARNS["lmer.chisq"])
                           anovaTable$getColumn('test')$setTitle("Chi-squared")
