@@ -237,7 +237,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "effectSize",
                 effectSize,
                 options=list(
-                    "expb"),
+                    "expb",
+                    "RR"),
                 default=list(
                     "expb"))
             private$..modelSelection <- jmvcore::OptionList$new(
@@ -453,7 +454,9 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "scaling",
                                 "fixedIntercept",
-                                "effectSize"),
+                                "effectSize",
+                                "showParamsCI",
+                                "showExpbCI"),
                             columns=list(
                                 list(
                                     `name`="dep", 
@@ -516,6 +519,7 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             options=options,
                             name="relativerisk",
                             title="Relative risk",
+                            visible="(effectSize:RR)",
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
@@ -546,7 +550,7 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `name`="cihig", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(showParamsCI)"))))
+                                    `visible`="(showExpbCI)"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",

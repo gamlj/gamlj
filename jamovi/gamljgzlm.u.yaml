@@ -95,16 +95,22 @@ children:
       - type: Label
         label: Effect Size
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: effectSize_expb
             type: CheckBox
             optionPart: expb
             optionName: effectSize
+          - name: effectSize_RR
+            type: CheckBox
+            optionPart: RR
+            optionName: effectSize
+            enable: (modelSelection_logistic)
+
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: showExpbCI
             type: CheckBox

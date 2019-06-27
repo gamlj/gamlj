@@ -113,7 +113,24 @@ gamljGzlmClass <- R6::R6Class(
            for(i in seq_along(terms)) {
               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
            }
-        # other inits
+
+      ## relative risks
+      if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
+        
+           aTable<-self$results$main$relativerisk
+           aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           
+           if (self$options$fixedIntercept==TRUE & length(terms)>1 ) {
+               terms<-terms[2:length(terms)]
+               labels<-labels[2:length(labels)]        
+           }
+           for(i in seq_along(terms)) {
+               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
+           }
+      }
+      
+      # other inits
 
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -270,18 +287,21 @@ gamljGzlmClass <- R6::R6Class(
         if (self$options$showParamsCI) {
              citry<-try({
                  ci<-mf.confint(model,level=ciWidth)
+                 if (is.null(dim(ci)))
+                   ci<-t(as.matrix(ci))
                  colnames(ci)<-c("cilow","cihig")
                  parameters<-cbind(parameters,ci) 
                  })
               if (jmvcore::isError(citry)) {
                   message <- jmvcore::extractErrorMessage(citry)
-                  estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                  estimatesTable$setNote("cicrash","CI cannot be computed")
               }
         }
-               mark(parameters)
         if (self$options$showExpbCI) {
                  citry<-try({
                    ci<-mf.confint(model,level=ciWidth)
+                   if (is.null(dim(ci)))
+                     ci<-t(as.matrix(ci))
                    ci[,1]<-exp(ci[,1])
                    ci[,2]<-exp(ci[,2])
                    colnames(ci)<-c("ecilow","ecihig")
@@ -310,7 +330,29 @@ gamljGzlmClass <- R6::R6Class(
         # end of check state
         } else
           ginfo("anova and parameters have been recycled")
-    
+        ############   Relative Risks      ##################
+        if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
+          res<-glm(modelFormula,family = binomial(link = "log"),data = data)
+          estimate<-res$coefficients
+          ci<-.keepShape(mf.confint(model,level=ciWidth))
+          colnames(ci)<-c("cilow","cihig")
+          estimate<-cbind(estimate,ci) 
+          estimate[]<-vapply(estimate, exp,numeric(1))
+          estimate<-try({
+            if ("(Intercept)" %in% rownames(estimate))
+              estimate<-.keepShape(estimate[2:dim(estimate)[1],])
+            else
+              estimate
+          })
+          if (jmvcore::isError(estimate))
+              return()
+          table<-self$results$main$relativerisk
+          for (i in 1:nrow(estimate))
+            table$setRow(rowKey=i,estimate[i,])
+        }
+      
+      
+        ####################################
         private$.preparePlots(private$.model)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gposthoc.populate(model,self$options,self$results$postHocs)

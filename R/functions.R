@@ -30,3 +30,8 @@ mark<-function(what=NULL,obj=NULL) {
   max(sapply(aList,.listdeep,n+1))
 }
 
+.keepShape<-function(mat) {
+  if (is.null(dim(mat)))
+    mat<-t(as.matrix(mat))
+  mat  
+}

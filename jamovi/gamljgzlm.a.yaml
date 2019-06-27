@@ -380,6 +380,8 @@ options:
       options:
           - name: expb
             title: Odd Ratios (expB)
+          - name: RR
+            title: Relative Risk (RR)
       default:
           - expb
           
