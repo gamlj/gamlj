@@ -336,12 +336,14 @@ gamljGzlmClass <- R6::R6Class(
           data$id_id_id<-seq_len(dim(data)[1])
           levs<-levels(data[[jmvcore::toB64(dep)]])
           data[,jmvcore::toB64(dep)]<-as.numeric(data[[jmvcore::toB64(dep)]]==levs[2])
-          geemodel<-geepack::geeglm(as.formula(modelFormula), family = poisson(link = "log"), id = id_id_id, corstr = "exchangeable", data = data)
+          geemodel<-try(geepack::geeglm(as.formula(modelFormula), family = poisson(link = "log"), id = id_id_id, corstr = "exchangeable", data = data))
+          if (!jmvcore::isError(geemodel)) {
           summ<-summary(geemodel)
           estimate<-summ$coefficients
           names(estimate)[1]<-"estimate"
-          if ("(Intercept)" %in% rownames(estimate) ) {
-           last<-length(estimate[,1])
+          last<-length(estimate[,1])
+          
+          if ("(Intercept)" %in% rownames(estimate) & last>1) {
             estimate<-estimate[2:last,] 
           }
           pp<-qnorm(1-ciWidth / 2)
@@ -352,9 +354,9 @@ gamljGzlmClass <- R6::R6Class(
           table<-self$results$main$relativerisk
           for (i in 1:nrow(estimate))
             table$setRow(rowKey=i,estimate[i,])
-        }
+          }
       
-      
+        }      
         ####################################
         private$.preparePlots(private$.model)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
