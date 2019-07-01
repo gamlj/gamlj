@@ -330,22 +330,25 @@ gamljGzlmClass <- R6::R6Class(
         # end of check state
         } else
           ginfo("anova and parameters have been recycled")
+
         ############   Relative Risks      ##################
         if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
-          res<-glm(modelFormula,family = binomial(link = "log"),data = data)
-          estimate<-res$coefficients
-          ci<-.keepShape(mf.confint(model,level=ciWidth))
-          colnames(ci)<-c("cilow","cihig")
-          estimate<-cbind(estimate,ci) 
+          data$id_id_id<-seq_len(dim(data)[1])
+          levs<-levels(data[[jmvcore::toB64(dep)]])
+          data[,jmvcore::toB64(dep)]<-as.numeric(data[[jmvcore::toB64(dep)]]==levs[2])
+          geemodel<-geepack::geeglm(as.formula(modelFormula), family = poisson(link = "log"), id = id_id_id, corstr = "exchangeable", data = data)
+          summ<-summary(geemodel)
+          estimate<-summ$coefficients
+          names(estimate)[1]<-"estimate"
+          if ("(Intercept)" %in% rownames(estimate) ) {
+           last<-length(estimate[,1])
+            estimate<-estimate[2:last,] 
+          }
+          pp<-qnorm(1-ciWidth / 2)
+          estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
+          estimate$cilow<-estimate$estimate- pp * estimate$Std.err
+          estimate<-as.matrix(estimate[,c("estimate","cilow","cihig")])
           estimate[]<-vapply(estimate, exp,numeric(1))
-          estimate<-try({
-            if ("(Intercept)" %in% rownames(estimate))
-              estimate<-.keepShape(estimate[2:dim(estimate)[1],])
-            else
-              estimate
-          })
-          if (jmvcore::isError(estimate))
-              return()
           table<-self$results$main$relativerisk
           for (i in 1:nrow(estimate))
             table$setRow(rowKey=i,estimate[i,])
