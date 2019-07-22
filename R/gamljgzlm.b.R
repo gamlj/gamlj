@@ -146,6 +146,7 @@ gamljGzlmClass <- R6::R6Class(
       factors <- self$options$factors
       covs <- self$options$covs
       modelType<-self$options$modelSelection
+      ciWidth<-self$options$paramCIWidth/100
       if (is.null(dep)) 
         return()
       
@@ -282,8 +283,7 @@ gamljGzlmClass <- R6::R6Class(
 
         ### parameter table ####
         #### confidence intervals ######
-        ciWidth<-self$options$paramCIWidth/100
-
+        
         if (self$options$showParamsCI) {
              citry<-try({
                  ci<-mf.confint(model,level=ciWidth)
@@ -297,6 +297,7 @@ gamljGzlmClass <- R6::R6Class(
                   estimatesTable$setNote("cicrash","CI cannot be computed")
               }
         }
+               
         if (self$options$showExpbCI) {
                  citry<-try({
                    ci<-mf.confint(model,level=ciWidth)
@@ -346,7 +347,7 @@ gamljGzlmClass <- R6::R6Class(
           if ("(Intercept)" %in% rownames(estimate) & last>1) {
             estimate<-estimate[2:last,] 
           }
-          pp<-qnorm(1-ciWidth / 2)
+          pp<-qnorm( (1-ciWidth) / 2 )
           estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
           estimate$cilow<-estimate$estimate- pp * estimate$Std.err
           estimate<-as.matrix(estimate[,c("estimate","cilow","cihig")])

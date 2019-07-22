@@ -456,7 +456,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "fixedIntercept",
                                 "effectSize",
                                 "showParamsCI",
-                                "showExpbCI"),
+                                "showExpbCI",
+                                "paramCIWidth"),
                             columns=list(
                                 list(
                                     `name`="dep", 
@@ -526,7 +527,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "scaling",
                                 "fixedIntercept",
-                                "effectSize"),
+                                "effectSize",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -539,7 +541,7 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `type`="text"),
                                 list(
                                     `name`="estimate", 
-                                    `title`="Estimate", 
+                                    `title`="RR", 
                                     `type`="number"),
                                 list(
                                     `name`="cilow", 

@@ -487,7 +487,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "scaling",
                                 "randomTerms",
                                 "correlatedEffects",
-                                "fixedIntercept"),
+                                "fixedIntercept",
+                                "paramCIWidth"),
                             columns=list(
                                 list(
                                     `name`="source", 

@@ -74,6 +74,8 @@ items:
                     - effectSize
                     - showParamsCI
                     - showExpbCI
+                    - paramCIWidth
+
              columns:
                     - name: dep
                       title: "Response Contrasts"
@@ -132,6 +134,7 @@ items:
                     - scaling
                     - fixedIntercept
                     - effectSize
+                    - ciWidth
 
              columns:
                     - name: source
@@ -142,7 +145,7 @@ items:
                       title: "Effect"
                       type: text
                     - name: estimate
-                      title: "Estimate"
+                      title: "RR"
                       type: number
                     - name: cilow
                       type: number

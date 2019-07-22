@@ -78,6 +78,8 @@ items:
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
+                    - paramCIWidth
+
              columns:
                     - name: source
                       title: "Names"
