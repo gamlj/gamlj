@@ -24,8 +24,9 @@ items:
         - factors
         - cov
         - modelTerms
+        - fixedIntercept
     refs: gamlj
-
+    
 
   - name: main
     type: Group

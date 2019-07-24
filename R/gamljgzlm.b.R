@@ -43,7 +43,6 @@ gamljGzlmClass <- R6::R6Class(
          jmvcore::reject(data)
 
       modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
-      
       infoTable<-self$results$info
       info<-MINFO[[modelType]]
       infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
@@ -458,13 +457,6 @@ gamljGzlmClass <- R6::R6Class(
     stats::glm(form,data,family=mf.give_family(modelType))
   },
   
-      .modelFormula=function() {
-
-      if (!is.null(self$options$dep))  {
-        dep<-jmvcore::toB64(self$options$dep)
-      } else return(FALSE)
-      private$.fixedFormula()
-    },
 
 
 .preparePlots=function(model) {

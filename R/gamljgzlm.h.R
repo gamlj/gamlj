@@ -393,7 +393,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "dep",
                     "factors",
                     "cov",
-                    "modelTerms"),
+                    "modelTerms",
+                    "fixedIntercept"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
