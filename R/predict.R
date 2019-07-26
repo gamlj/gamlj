@@ -106,10 +106,23 @@ pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95
 
 pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 
+.simpleEstimates.glm<-function(model,variable,moderator,threeway=NULL,
+                                   cov_conditioning=conditioning$new(),
+                                   interval=95) {
+  mark("we are in the class")
+  tables<-.simpleEstimates.default(model,variable,moderator,threeway=threeway,
+                           cov_conditioning=cov_conditioning,interval=interval)
+  params<-tables[[1]]
+  params$expb<-exp(params$estimate)
+  params$lower.ECL<-exp(params$lower.CL)
+  params$upper.ECL<-exp(params$upper.CL)
+  tables[[1]]<-params
+  tables
+}
 .simpleEstimates.default<-function(model,variable,moderator,threeway=NULL,
            cov_conditioning=conditioning$new(),
            interval=95) {
-  
+    
   ginfo(paste("simple effects estimation for generic model on",paste(class(model),collapse = " ") ))
   data<-mf.getModelData(model)
   preds<-unlist(c(moderator,threeway))

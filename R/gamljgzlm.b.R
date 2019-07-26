@@ -95,11 +95,6 @@ gamljGzlmClass <- R6::R6Class(
       aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
       aTable$getColumn('ecihig')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
       
-      if (modelType=="linear") {
-        aTable$getColumn("expb")$setVisible(FALSE)
-        aTable$getColumn("ecilow")$setVisible(FALSE)
-        aTable$getColumn("ecihig")$setVisible(FALSE)
-        }
       if (!is.something(self$options$factors))
         aTable$getColumn('label')$setVisible(FALSE)
       

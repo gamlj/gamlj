@@ -319,6 +319,24 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
+                     - name: expb
+                       title: "exp(B)"
+                       type: number
+                       visible: (effectSize:expb)
+                     - name: lower.ECL
+                       type: number
+                       title: Lower
+                       visible: (showExpbCI)
+                     - name: upper.ECL
+                       type: number
+                       title: Upper
+                       visible: (showExpbCI)
+                     - name: df
+                       title: "df"
+                       type: number
+                     - name: t.ratio
+                       title: "t"
+                       type: number
                      - name: z.ratio
                        title: "z"
                        type: number
@@ -326,6 +344,7 @@ items:
                        title: "p"
                        type: number
                        format: zto,pvalue
+                       
 
 
 

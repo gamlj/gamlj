@@ -740,6 +740,29 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
+                                    `name`="expb", 
+                                    `title`="exp(B)", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:expb)"),
+                                list(
+                                    `name`="lower.ECL", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(showExpbCI)"),
+                                list(
+                                    `name`="upper.ECL", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(showExpbCI)"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="t.ratio", 
+                                    `title`="t", 
+                                    `type`="number"),
+                                list(
                                     `name`="z.ratio", 
                                     `title`="z", 
                                     `type`="number"),

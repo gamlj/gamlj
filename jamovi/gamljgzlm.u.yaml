@@ -108,13 +108,12 @@ children:
             enable: (modelSelection_logistic)
 
       - type: Label
-        label: Confidence Intervals
+        label: Confidence Intervals 
         margin: large
         style: list
         children:
           - name: showExpbCI
             type: CheckBox
-            enable: (!modelSelection_linear)
           - name: showParamsCI
             type: CheckBox
           - type: TextBox
