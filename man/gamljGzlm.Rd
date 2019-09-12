@@ -5,16 +5,16 @@
 \title{Generalized Linear Models}
 \usage{
 gamljGzlm(data, dep, factors = NULL, covs = NULL, modelTerms = NULL,
-  fixedIntercept = TRUE, showParamsCI = TRUE, paramCIWidth = 95,
-  contrasts = NULL, showRealNames = TRUE, showContrastCode = FALSE,
-  plotHAxis = NULL, plotSepLines = NULL, plotSepPlots = NULL,
-  plotRaw = FALSE, plotDvScale = FALSE, plotError = "none",
-  ciWidth = 95, postHoc = NULL, eDesc = FALSE, eCovs = FALSE,
-  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL,
-  simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
-  simpleScaleLabels = "labels", postHocCorr = list("bonf"),
-  scaling = NULL, effectSize = list("expb"),
-  modelSelection = "linear", formula)
+  fixedIntercept = TRUE, showParamsCI = FALSE, showExpbCI = TRUE,
+  paramCIWidth = 95, contrasts = NULL, showRealNames = TRUE,
+  showContrastCode = FALSE, plotHAxis = NULL, plotSepLines = NULL,
+  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
+  plotError = "none", ciWidth = 95, postHoc = NULL, eDesc = FALSE,
+  eCovs = FALSE, simpleVariable = NULL, simpleModerator = NULL,
+  simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
+  percvalue = 25, simpleScaleLabels = "labels",
+  postHocCorr = list("bonf"), scaling = NULL,
+  effectSize = list("expb"), modelSelection = "linear", formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -33,8 +33,11 @@ terms}
 \item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept}
 
-\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
+\item{showParamsCI}{\code{TRUR}  or \code{FALSE} (default), parameters CI
 in table}
+
+\item{showExpbCI}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in
+table}
 
 \item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
@@ -116,6 +119,7 @@ A results object containing:
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
