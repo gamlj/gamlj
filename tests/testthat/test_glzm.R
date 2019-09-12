@@ -12,6 +12,7 @@ expect_error(gamlj::gamljGzlm(
 mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = data,
+  showParamsCI = TRUE,
   modelSelection = "logistic")
 
 res<-mod$main$fixed$asDF
@@ -50,6 +51,7 @@ test_that("gzlm anova is correct", {
 })
 
 se.params<-mod$simpleEffects$Params$asDF
+
 mod<-gamlj::gamljGLM(
   formula = science ~ math + schtyp + schtyp:math,
   data = data,
@@ -59,15 +61,15 @@ mod<-gamlj::gamljGLM(
 )
 
 res<-mod$main$fixed$asDF
-
+library(testthat)
 test_that("glm contrasts", {
   expect_equal(round(res[3,3],2),-2.45)
   expect_equal(round(res[1,3],2),18.55)
 })
-
+se.params
 test_that("gzlm anova simple effects", {
   expect_equal(as.character(se.params[1,1]),"enrolled")
-  expect_equal(round(se.params[2,4],3),-0.157)
+  expect_equal(round(se.params[2,4],3),0.915)
 })
 
 test_that("gzlm plot", {

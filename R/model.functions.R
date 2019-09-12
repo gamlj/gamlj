@@ -254,7 +254,6 @@ mf.getModelFactors<-function(model) {
 
 mf.getModelMessages<-function(model) {
   message<-list()
-  mark("class",.which.class(model))
   if (.which.class(model)=="lmer") {
       message=model@optinfo$conv$lme4$messages
       lwr <- lme4::getME(model, "lower")

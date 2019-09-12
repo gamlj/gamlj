@@ -13,7 +13,7 @@ model<-gamlj::gamljMixed(
 infotable<-model$info$asDF
 
 test_that("r-squared is ok", {
-  expect_equal(round(as.numeric(as.character(infotable[3,2])),digits = 2),16556.46)
+  expect_equal(round(as.numeric(as.character(infotable[3,2])),digits = 2),16561.78)
   expect_equal(round(as.numeric(as.character(infotable[4,2])),digits = 2),0.01)
 })
 

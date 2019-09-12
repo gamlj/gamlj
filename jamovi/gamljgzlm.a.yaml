@@ -93,7 +93,7 @@ options:
       default: false
       description:
           R: >
-            `TRUR`  or `FALSE` (default), parameters CI in table
+            `TRUE`  or `FALSE` (default), parameters CI in table
     - name: showExpbCI
       title: For exp(B)
       type: Bool

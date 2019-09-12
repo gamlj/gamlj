@@ -109,7 +109,6 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 .simpleEstimates.glm<-function(model,variable,moderator,threeway=NULL,
                                    cov_conditioning=conditioning$new(),
                                    interval=95) {
-  mark("we are in the class")
   tables<-.simpleEstimates.default(model,variable,moderator,threeway=threeway,
                            cov_conditioning=cov_conditioning,interval=interval)
   params<-tables[[1]]
