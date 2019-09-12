@@ -12,7 +12,7 @@ gsimple.init<-function(data,options,tables, n64=NULL, cov_condition=NULL) {
     
     modelType<-"linear"
     if ("modelSelection" %in% names(options))
-      modelType<-options$modelSelection
+         modelType<-options$modelSelection
 
     ###### encode the names    
     dep64<-jmvcore::toB64(dep)
@@ -83,8 +83,17 @@ gsimple.init<-function(data,options,tables, n64=NULL, cov_condition=NULL) {
     title<-paste("Simple effects of",variable,": Parameter estimates")
     simpleEffectsParams$setTitle(title)
     
-    simpleEffectsParams$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
     simpleEffectsParams$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+    simpleEffectsParams$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', interval))
+
+    if ("showExpbCI" %in% names(options) && options$showExpbCI==TRUE) {
+      simpleEffectsParams$getColumn('lower.ECL')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', interval))
+      simpleEffectsParams$getColumn('upper.ECL')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', interval))
+      simpleEffectsParams$getColumn('lower.ECL')$setVisible(TRUE)
+      simpleEffectsParams$getColumn('upper.ECL')$setVisible(TRUE)
+      
+          }
+    
     simpleEffectsParams$getColumn('moderator')$setTitle(moderator)
     simpleEffectsParams$getColumn('moderator')$setSuperTitle("Moderator levels")
 

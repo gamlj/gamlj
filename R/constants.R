@@ -1,6 +1,6 @@
 #' @import lmerTest
 
-GAMLj_DEBUG=F
+GAMLj_DEBUG=T
 GAMLj_INFO=F
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
@@ -56,7 +56,7 @@ WARNS<-list()
 
 
 WARNS["means.covariates"]<-"Estimated means are estimated keeping constant
-other independent variable(s) in the model to the mean"
+other effects in the model to the mean"
 WARNS["means.interactions"]<-"Estimated means are estimated averaging across interacting variables"
 WARNS["means.noemms"]<-"Estimated marginal means cannot be estimated. Please try to simplify your model"
 

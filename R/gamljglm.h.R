@@ -480,7 +480,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "scaling",
                                 "fixedIntercept",
-                                "effectSize"),
+                                "effectSize",
+                                "paramCIWidth"),
                             columns=list(
                                 list(
                                     `name`="source", 

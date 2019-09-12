@@ -50,6 +50,8 @@ const events = {
 
      onChange_model: function(ui) {
         console.log("model changed");
+        ui.effectSize_RR.setValue(false);
+        if (ui.modelSelection.getValue()==="linear");
         ui.dep.setValue(null);
       },
 

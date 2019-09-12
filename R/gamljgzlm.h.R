@@ -11,7 +11,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             covs = NULL,
             modelTerms = NULL,
             fixedIntercept = TRUE,
-            showParamsCI = TRUE,
+            showParamsCI = FALSE,
+            showExpbCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
             showRealNames = TRUE,
@@ -75,6 +76,10 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..showParamsCI <- jmvcore::OptionBool$new(
                 "showParamsCI",
                 showParamsCI,
+                default=FALSE)
+            private$..showExpbCI <- jmvcore::OptionBool$new(
+                "showExpbCI",
+                showExpbCI,
                 default=TRUE)
             private$..paramCIWidth <- jmvcore::OptionNumber$new(
                 "paramCIWidth",
@@ -232,7 +237,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "effectSize",
                 effectSize,
                 options=list(
-                    "expb"),
+                    "expb",
+                    "RR"),
                 default=list(
                     "expb"))
             private$..modelSelection <- jmvcore::OptionList$new(
@@ -254,6 +260,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
+            self$.addOption(private$..showExpbCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
@@ -287,6 +294,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
+        showExpbCI = function() private$..showExpbCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
@@ -319,6 +327,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..modelTerms = NA,
         ..fixedIntercept = NA,
         ..showParamsCI = NA,
+        ..showExpbCI = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
@@ -384,13 +393,15 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "dep",
                     "factors",
                     "cov",
-                    "modelTerms"),
+                    "modelTerms",
+                    "fixedIntercept"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
                     anova = function() private$.items[["anova"]],
                     fixed = function() private$.items[["fixed"]],
+                    relativerisk = function() private$.items[["relativerisk"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
                 public=list(
@@ -437,14 +448,17 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="fixed",
-                            title="Fixed Effects Parameter Estimates",
+                            title="Parameter Estimates",
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
                                 "contrasts",
                                 "scaling",
                                 "fixedIntercept",
-                                "effectSize"),
+                                "effectSize",
+                                "showParamsCI",
+                                "showExpbCI",
+                                "paramCIWidth"),
                             columns=list(
                                 list(
                                     `name`="dep", 
@@ -485,6 +499,16 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `type`="number", 
                                     `visible`="(effectSize:expb)"),
                                 list(
+                                    `name`="ecilow", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(showExpbCI)"),
+                                list(
+                                    `name`="ecihig", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(showExpbCI)"),
+                                list(
                                     `name`="z", 
                                     `title`="z", 
                                     `type`="number"),
@@ -493,6 +517,43 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="relativerisk",
+                            title="Relative risk",
+                            visible="(effectSize:RR)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "contrasts",
+                                "scaling",
+                                "fixedIntercept",
+                                "effectSize",
+                                "ciWidth"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="Names", 
+                                    `type`="text", 
+                                    `visible`="(showRealNames)"),
+                                list(
+                                    `name`="label", 
+                                    `title`="Effect", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="RR", 
+                                    `type`="number"),
+                                list(
+                                    `name`="cilow", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(showExpbCI)"),
+                                list(
+                                    `name`="cihig", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(showExpbCI)"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",
@@ -679,6 +740,29 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
+                                    `name`="expb", 
+                                    `title`="exp(B)", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:expb)"),
+                                list(
+                                    `name`="lower.ECL", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(showExpbCI)"),
+                                list(
+                                    `name`="upper.ECL", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(showExpbCI)"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="t.ratio", 
+                                    `title`="t", 
+                                    `type`="number"),
+                                list(
                                     `name`="z.ratio", 
                                     `title`="z", 
                                     `type`="number"),
@@ -814,8 +898,10 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   terms
 #' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept
-#' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
+#' @param showParamsCI \code{TRUR}  or \code{FALSE} (default), parameters CI
 #'   in table
+#' @param showExpbCI \code{TRUE} (default) or \code{FALSE} , exp(B) CI in
+#'   table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
 #' @param contrasts a list of lists specifying the factor and type of contrast
@@ -869,6 +955,7 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
@@ -892,7 +979,8 @@ gamljGzlm <- function(
     covs = NULL,
     modelTerms = NULL,
     fixedIntercept = TRUE,
-    showParamsCI = TRUE,
+    showParamsCI = FALSE,
+    showExpbCI = TRUE,
     paramCIWidth = 95,
     contrasts = NULL,
     showRealNames = TRUE,
@@ -988,6 +1076,7 @@ gamljGzlm <- function(
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
+        showExpbCI = showExpbCI,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showRealNames = showRealNames,

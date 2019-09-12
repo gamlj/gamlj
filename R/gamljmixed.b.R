@@ -251,8 +251,7 @@ gamljMixedClass <- R6::R6Class(
                ginfo("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
-               info.aic<-model_summary$AICtab[1]
-               info.bic<-model_summary$AICtab[2]
+               info.aic<-round(stats::extractAIC(model)[2],digits=2)
                info.loglik<-model_summary$AICtab[3]
                r2<-try(r.squared(model),silent = TRUE)
                if (jmvcore::isError(r2)){
@@ -273,6 +272,7 @@ gamljMixedClass <- R6::R6Class(
                    }
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
+
         
                ### end of info table ###
         
@@ -292,14 +292,14 @@ gamljMixedClass <- R6::R6Class(
                               anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                        }
                       messages<-mf.getModelMessages(model)
+                      
+                      for (i in seq_along(messages)) {
+                              infoTable$setNote(as.character(i),messages[[i]])
+                      }
                       if (length(messages)>0) {
                         infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
                       }
                       
-                      for (i in seq_along(messages)) {
-                              anovaTable$setNote(as.character(i),messages[[i]])
-                              infoTable$setNote(as.character(i),messages[[i]])
-                      }
                       if (attr(anova_res,"statistic")=="Chisq") {
                           anovaTable$setNote("lmer.chisq",WARNS["lmer.chisq"])
                           anovaTable$getColumn('test')$setTitle("Chi-squared")

@@ -89,6 +89,7 @@ items:
                     - scaling
                     - fixedIntercept
                     - effectSize
+                    - paramCIWidth
 
              columns:
                     - name: source

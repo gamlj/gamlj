@@ -24,8 +24,9 @@ items:
         - factors
         - cov
         - modelTerms
+        - fixedIntercept
     refs: gamlj
-
+    
 
   - name: main
     type: Group
@@ -63,7 +64,7 @@ items:
                       type: number
                       format: zto,pvalue
            - name: fixed
-             title: Fixed Effects Parameter Estimates
+             title: Parameter Estimates
              type: Table
              clearWith:
                     - dep
@@ -72,6 +73,9 @@ items:
                     - scaling
                     - fixedIntercept
                     - effectSize
+                    - showParamsCI
+                    - showExpbCI
+                    - paramCIWidth
 
              columns:
                     - name: dep
@@ -104,6 +108,15 @@ items:
                       title: "exp(B)"
                       type: number
                       visible: (effectSize:expb)
+                    - name: ecilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: ecihig
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+
                     - name: z
                       title: "z"
                       type: number
@@ -111,6 +124,39 @@ items:
                       title: "p"
                       type: number
                       format: zto,pvalue
+           - name: relativerisk
+             title: Relative risk
+             type: Table
+             visible: (effectSize:RR)
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - fixedIntercept
+                    - effectSize
+                    - ciWidth
+
+             columns:
+                    - name: source
+                      title: "Names"
+                      type: text
+                      visible: (showRealNames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "RR"
+                      type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+
 
 
 
@@ -273,6 +319,24 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
+                     - name: expb
+                       title: "exp(B)"
+                       type: number
+                       visible: (effectSize:expb)
+                     - name: lower.ECL
+                       type: number
+                       title: Lower
+                       visible: (showExpbCI)
+                     - name: upper.ECL
+                       type: number
+                       title: Upper
+                       visible: (showExpbCI)
+                     - name: df
+                       title: "df"
+                       type: number
+                     - name: t.ratio
+                       title: "t"
+                       type: number
                      - name: z.ratio
                        title: "z"
                        type: number
@@ -280,6 +344,7 @@ items:
                        title: "p"
                        type: number
                        format: zto,pvalue
+                       
 
 
 

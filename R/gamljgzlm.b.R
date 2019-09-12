@@ -43,7 +43,6 @@ gamljGzlmClass <- R6::R6Class(
          jmvcore::reject(data)
 
       modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
-      
       infoTable<-self$results$info
       info<-MINFO[[modelType]]
       infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
@@ -93,9 +92,8 @@ gamljGzlmClass <- R6::R6Class(
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-
-      if (modelType=="linear")
-        aTable$getColumn("expb")$setVisible(FALSE)
+      aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      aTable$getColumn('ecihig')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
       
       if (!is.something(self$options$factors))
         aTable$getColumn('label')$setVisible(FALSE)
@@ -109,7 +107,24 @@ gamljGzlmClass <- R6::R6Class(
            for(i in seq_along(terms)) {
               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
            }
-        # other inits
+
+      ## relative risks
+      if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
+        
+           aTable<-self$results$main$relativerisk
+           aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           
+           if (self$options$fixedIntercept==TRUE & length(terms)>1 ) {
+               terms<-terms[2:length(terms)]
+               labels<-labels[2:length(labels)]        
+           }
+           for(i in seq_along(terms)) {
+               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
+           }
+      }
+      
+      # other inits
 
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -125,6 +140,7 @@ gamljGzlmClass <- R6::R6Class(
       factors <- self$options$factors
       covs <- self$options$covs
       modelType<-self$options$modelSelection
+      ciWidth<-self$options$paramCIWidth/100
       if (is.null(dep)) 
         return()
       
@@ -261,20 +277,38 @@ gamljGzlmClass <- R6::R6Class(
 
         ### parameter table ####
         #### confidence intervals ######
-        ciWidth<-self$options$paramCIWidth/100
+        
         if (self$options$showParamsCI) {
              citry<-try({
                  ci<-mf.confint(model,level=ciWidth)
+                 if (is.null(dim(ci)))
+                   ci<-t(as.matrix(ci))
                  colnames(ci)<-c("cilow","cihig")
                  parameters<-cbind(parameters,ci) 
                  })
               if (jmvcore::isError(citry)) {
                   message <- jmvcore::extractErrorMessage(citry)
-                  estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                  estimatesTable$setNote("cicrash","CI cannot be computed")
               }
         }
-        rownames(parameters)<-n64$nicenames(rownames(parameters))
+               
+        if (self$options$showExpbCI) {
+                 citry<-try({
+                   ci<-mf.confint(model,level=ciWidth)
+                   if (is.null(dim(ci)))
+                     ci<-t(as.matrix(ci))
+                   ci[,1]<-exp(ci[,1])
+                   ci[,2]<-exp(ci[,2])
+                   colnames(ci)<-c("ecilow","ecihig")
+                   parameters<-cbind(parameters,ci) 
+                 })
+                 if (jmvcore::isError(citry)) {
+                   message <- jmvcore::extractErrorMessage(citry)
+                   estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                 }
+          }
 
+        rownames(parameters)<-n64$nicenames(rownames(parameters))
         for (i in 1:nrow(parameters)) {
                 tableRow=parameters[i,]
                 estimatesTable$setRow(rowNo=i,tableRow)
@@ -291,7 +325,34 @@ gamljGzlmClass <- R6::R6Class(
         # end of check state
         } else
           ginfo("anova and parameters have been recycled")
-    
+
+        ############   Relative Risks      ##################
+        if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
+          data$id_id_id<-seq_len(dim(data)[1])
+          levs<-levels(data[[jmvcore::toB64(dep)]])
+          data[,jmvcore::toB64(dep)]<-as.numeric(data[[jmvcore::toB64(dep)]]==levs[2])
+          geemodel<-try(geepack::geeglm(as.formula(modelFormula), family = poisson(link = "log"), id = id_id_id, corstr = "exchangeable", data = data))
+          if (!jmvcore::isError(geemodel)) {
+          summ<-summary(geemodel)
+          estimate<-summ$coefficients
+          names(estimate)[1]<-"estimate"
+          last<-length(estimate[,1])
+          
+          if ("(Intercept)" %in% rownames(estimate) & last>1) {
+            estimate<-estimate[2:last,] 
+          }
+          pp<-qnorm( (1-ciWidth) / 2 )
+          estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
+          estimate$cilow<-estimate$estimate- pp * estimate$Std.err
+          estimate<-as.matrix(estimate[,c("estimate","cilow","cihig")])
+          estimate[]<-vapply(estimate, exp,numeric(1))
+          table<-self$results$main$relativerisk
+          for (i in 1:nrow(estimate))
+            table$setRow(rowKey=i,estimate[i,])
+          }
+      
+        }      
+        ####################################
         private$.preparePlots(private$.model)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gposthoc.populate(model,self$options,self$results$postHocs)
@@ -391,13 +452,6 @@ gamljGzlmClass <- R6::R6Class(
     stats::glm(form,data,family=mf.give_family(modelType))
   },
   
-      .modelFormula=function() {
-
-      if (!is.null(self$options$dep))  {
-        dep<-jmvcore::toB64(self$options$dep)
-      } else return(FALSE)
-      private$.fixedFormula()
-    },
 
 
 .preparePlots=function(model) {
