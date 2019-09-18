@@ -62,26 +62,6 @@ children:
                        optionName: modelSelection
                        optionPart: multinomial
                        
-      - type: Label
-        label: Custom model
-        children:
-                     - type: RadioButton
-                       name: modelSelection_logistic
-                       optionName: modelSelection
-                       optionPart: logistic
-                       events:
-                          change: './gamlj.events::onChange_model'
-                     - type: RadioButton
-                       name: modelSelection_probit
-                       optionName: modelSelection
-                       optionPart: probit
-                       events:
-                            change: './gamlj.events::onChange_model'
-                     - type: RadioButton
-                       name: modelSelection_multinomial
-                       optionName: modelSelection
-                       optionPart: multinomial
-                       
                        
                        
   - type: VariableSupplier

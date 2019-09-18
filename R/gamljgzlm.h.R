@@ -898,7 +898,7 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   terms
 #' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept
-#' @param showParamsCI \code{TRUR}  or \code{FALSE} (default), parameters CI
+#' @param showParamsCI \code{TRUE}  or \code{FALSE} (default), parameters CI
 #'   in table
 #' @param showExpbCI \code{TRUE} (default) or \code{FALSE} , exp(B) CI in
 #'   table
@@ -1102,9 +1102,6 @@ gamljGzlm <- function(
         scaling = scaling,
         effectSize = effectSize,
         modelSelection = modelSelection)
-
-    results <- gamljGzlmResults$new(
-        options = options)
 
     analysis <- gamljGzlmClass$new(
         options = options,

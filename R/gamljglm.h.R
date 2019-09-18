@@ -1133,9 +1133,6 @@ gamljGLM <- function(
         qq = qq,
         normTest = normTest)
 
-    results <- gamljGLMResults$new(
-        options = options)
-
     analysis <- gamljGLMClass$new(
         options = options,
         data = data)

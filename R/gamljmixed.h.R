@@ -1235,9 +1235,6 @@ gamljMixed <- function(
         lrtRandomEffects = lrtRandomEffects,
         plotRandomEffects = plotRandomEffects)
 
-    results <- gamljMixedResults$new(
-        options = options)
-
     analysis <- gamljMixedClass$new(
         options = options,
         data = data)
