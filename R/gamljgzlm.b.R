@@ -341,10 +341,11 @@ gamljGzlmClass <- R6::R6Class(
           if ("(Intercept)" %in% rownames(estimate) & last>1) {
             estimate<-estimate[2:last,] 
           }
-          pp<-qnorm( (1-ciWidth) / 2 )
-          estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
+          pp<-abs(qnorm( (1-ciWidth) / 2 ))
           estimate$cilow<-estimate$estimate- pp * estimate$Std.err
+          estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
           estimate<-as.matrix(estimate[,c("estimate","cilow","cihig")])
+          mark(estimate)
           estimate[]<-vapply(estimate, exp,numeric(1))
           table<-self$results$main$relativerisk
           for (i in 1:nrow(estimate))
