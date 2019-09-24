@@ -33,7 +33,7 @@ terms}
 \item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept}
 
-\item{showParamsCI}{\code{TRUR}  or \code{FALSE} (default), parameters CI
+\item{showParamsCI}{\code{TRUE}  or \code{FALSE} (default), parameters CI
 in table}
 
 \item{showExpbCI}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in

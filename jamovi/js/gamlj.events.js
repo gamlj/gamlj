@@ -51,11 +51,14 @@ const events = {
      onChange_model: function(ui) {
         console.log("model changed");
         ui.effectSize_RR.setValue(false);
-        if (ui.modelSelection.getValue()==="custom") {
+        if (ui.modelSelection.getValue()==="custom" ||  ui.modelSelection.getValue()==="linear") {
                ui.effectSize_expb.setValue(false);
                ui.showParamsCI.setValue(true);
                ui.showExpbCI.setValue(false);
-          
+        } else  {
+               ui.effectSize_expb.setValue(true);
+               ui.showParamsCI.setValue(false);
+               ui.showExpbCI.setValue(true);
         }
   
         ui.dep.setValue(null);
