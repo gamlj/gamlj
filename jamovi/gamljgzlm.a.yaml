@@ -420,6 +420,8 @@ options:
             name: 'gaussian'
           - title: Binomial
             name:  'binomial'
+          - title: Poisson
+            name:  'poisson'
           - title: Inverse gaussian
             name: 'inverse.gaussian'
           - title: Gamma

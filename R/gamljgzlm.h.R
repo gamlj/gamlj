@@ -262,6 +262,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 options=list(
                     "gaussian",
                     "binomial",
+                    "poisson",
                     "inverse.gaussian",
                     "Gamma"),
                 default="gaussian")

@@ -50,7 +50,7 @@ MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
                          "call"="glm",emmeanTitle="Mean Count")
 
 MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
-                         "call"="glm",emmeanTitle="Value")
+                         "call"="glm",emmeanTitle="Mean")
 
 
 ###############################################################
