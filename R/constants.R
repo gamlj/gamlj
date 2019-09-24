@@ -11,41 +11,46 @@ TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
 ################ model info for gzlm ###############
+DINFO<-list()
+DINFO[["gaussian"]]<-c("Gaussian","Normal distribution of residual")
+DINFO[["poisson"]]<-c("Poisson","Model for count data")
+DINFO[["binomial"]]<-c("Binomial","Dichotomous event distribution of y")
+DINFO[["multinomial"]]<-c("Multinomial","Multi-event distribution of y")
+DINFO[["nb"]]<-c("Negative binomial","Rare event with overdispersion")
+DINFO[["poiover"]]<-c("Quasi-Poisson","Rare event with overdispersion")
+DINFO[["Gamma"]]<-c("Gamma","Skewed continuous distribution")
+
+LINFO<-list()
+LINFO[["identity"]]<-c("Identity","Coefficients in the same scale of y")
+LINFO[["log"]]<-c("log","Coefficients are in the log(y) scale")
+LINFO[["logit"]]<-c("Logit","Log of the odd of y=1 over y=0")
+LINFO[["probit"]]<-c("Probit","Inverse of normal CDF for P(y=1)")
+LINFO[["1/mu^2"]]<-c("1/mu^2","Inverse of y squared")
+LINFO[["inverse"]]<-c("1/mu","Inverse of y")
+LINFO[["sqrt"]]<-c("Square root","Square root of y")
+
 MINFO<-list()
 MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
-                         "link"=c("Identity","Coefficients in the same scale of y"),
-                         "distribution"=c("Gaussian","Normal distribution of residual"),
-                          "call"="glm",emmeanTitle="Mean")
+                        "call"="glm",emmeanTitle="Mean")
 MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
-                        "link"=c("log","Coefficients are in the log(y) scale"),
-                        "distribution"=c("Poisson","Rare events distribution of y"),
-                        "call"="glm",emmeanTitle="Mean Count")
-
+                         "call"="glm",emmeanTitle="Mean Count")
 MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
-                         "link"=c("logit","Log of the odd of y=1 over y=0"),
-                         "distribution"=c("Binomial","Dichotomous event distribution of y"),
-                         "call"="glm",emmeanTitle="Prob.")
-
-MINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
-                          "link"=c("probit","Inverse of normal CDF for P(y=1)"),
-                          "distribution"=c("Binomial","Dichotomous event distribution of y"),
                           "call"="glm",emmeanTitle="Prob.")
-
+MINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
+                        "call"="glm",emmeanTitle="Prob.")
 
 MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
-                          "link"=c("logit","Log of the odd of each category over y=0"),
-                          "distribution"=c("Multinomial","Multi-event distribution of y"),
-                          "call"="multinom",emmeanTitle="Prob.")
+                             "call"="multinom",emmeanTitle="Prob.")
 
 MINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
-                             "link"=c("log","Coefficients are in the log(y) scale"),
-                             "distribution"=c("Negative binomial","Rare event with overdispersion"),
                     "call"="glm.nb",emmeanTitle="Mean Count")
 
 MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
-                    "link"=c("log","Coefficients are in the log(y) scale"),
-                    "distribution"=c("Quasi-Poisson","Rare event with overdispersion"),
-                    "call"="glm",emmeanTitle="Mean Count")
+                         "call"="glm",emmeanTitle="Mean Count")
+
+MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
+                         "call"="glm",emmeanTitle="Value")
+
 
 ###############################################################
 

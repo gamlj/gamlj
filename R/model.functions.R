@@ -267,7 +267,7 @@ mf.getModelMessages<-function(model) {
 }
 
 
-mf.give_family<-function(modelSelection) {
+mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
   if (modelSelection=="linear")
        return(stats::gaussian())
   if (modelSelection=="logistic")
@@ -282,6 +282,8 @@ mf.give_family<-function(modelSelection) {
       return(stats::quasipoisson())
   if (modelSelection=="probit")
     return(stats::binomial("probit"))
+  if (modelSelection=="custom")
+    return(do.call(custom_family,list(custom_link)))
   
   NULL  
 }

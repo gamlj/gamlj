@@ -14,7 +14,7 @@ gamljGzlmClass <- R6::R6Class(
       covs<-self$options$covs
       modelTerms<-self$options$modelTerms
       modelType<-self$options$modelSelection
-      afamily<-mf.give_family(modelType)
+      afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
       dep<-self$options$dep
       fixedIntercept<-self$options$fixedIntercept
       
@@ -45,6 +45,8 @@ gamljGzlmClass <- R6::R6Class(
       modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
       infoTable<-self$results$info
       info<-MINFO[[modelType]]
+      info$link<-LINFO[[afamily$link]]
+      info$distribution<-DINFO[[afamily$family]]
       infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
       infoTable$addRow(rowKey="call",list(info="Call",comm=n64$translate(modelFormula),value=info$call))
       infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
@@ -439,6 +441,7 @@ gamljGzlmClass <- R6::R6Class(
     },
   .estimate=function(form,data) {
     modelType<-self$options$modelSelection
+    afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
     if (modelType=="multinomial") {
       mod<-nnet::multinom(form,data,model = T)
       mod$call$formula<-as.formula(mod)
@@ -448,8 +451,8 @@ gamljGzlmClass <- R6::R6Class(
       mod<-MASS::glm.nb(form,data)
       return(mod)
     }
-    
-    stats::glm(form,data,family=mf.give_family(modelType))
+    mod<-stats::glm(form,data,family=afamily)
+    mod
   },
   
 
