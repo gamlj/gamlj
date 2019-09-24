@@ -1,7 +1,7 @@
 Package: gamlj
 Type: Package
 Title: GAMLj suite for jamovi
-Version: 1.5.5
+Version: 1.6.0
 Author: Marcello Gallucci
 Maintainer: Marcello Gallucci <mcfanda@gmail.com>
 Description: A suite for estimating linear models, such as the general linear model, linear mixed models,
