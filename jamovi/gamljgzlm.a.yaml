@@ -425,7 +425,7 @@ options:
           - title: Gamma
             name: 'Gamma'
 
-      default: idenity
+      default: "gaussian"
       description:
          R: >
            Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
@@ -442,12 +442,12 @@ options:
             name:  'log'
           - title: Inverse
             name: 'inverse'
-          - title: "Inverse squared"
+          - title: Inverse squared
             name: '1/mu^2'
-          - title: "Square root"
+          - title: Square root
             name: 'sqrt'
 
-      default: idenity
+      default: "identity"
       description:
          R: >
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).

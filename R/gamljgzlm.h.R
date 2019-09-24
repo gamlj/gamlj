@@ -40,8 +40,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             effectSize = list(
                 "expb"),
             modelSelection = "linear",
-            custom_family = "idenity",
-            custom_link = "idenity", ...) {
+            custom_family = "gaussian",
+            custom_link = "identity", ...) {
 
             super$initialize(
                 package='gamlj',
@@ -264,7 +264,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "binomial",
                     "inverse.gaussian",
                     "Gamma"),
-                default="idenity")
+                default="gaussian")
             private$..custom_link <- jmvcore::OptionList$new(
                 "custom_link",
                 custom_link,
@@ -275,7 +275,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "inverse",
                     "1/mu^2",
                     "sqrt"),
-                default="idenity")
+                default="identity")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -1071,8 +1071,8 @@ gamljGzlm <- function(
     effectSize = list(
                 "expb"),
     modelSelection = "linear",
-    custom_family = "idenity",
-    custom_link = "idenity",
+    custom_family = "gaussian",
+    custom_link = "identity",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
