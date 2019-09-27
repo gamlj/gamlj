@@ -401,6 +401,8 @@ options:
           title: Logistic
         - name: probit
           title: Probit
+        - name: custom
+          title: Custom
           
         - name: multinomial
           title: Multinomial
@@ -408,6 +410,49 @@ options:
       description:
           R: >
             Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
+
+
+    - name: custom_family
+      title: Distribution
+      type: List
+      options:
+          - title: Gaussian
+            name: 'gaussian'
+          - title: Binomial
+            name:  'binomial'
+          - title: Poisson
+            name:  'poisson'
+          - title: Inverse gaussian
+            name: 'inverse.gaussian'
+          - title: Gamma
+            name: 'Gamma'
+
+      default: "gaussian"
+      description:
+         R: >
+           Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
+
+    - name: custom_link
+      title: Link Function
+      type: List
+      options:
+          - title: Identity
+            name: 'identity'
+          - title: Logit
+            name:  'logit'
+          - title: Log
+            name:  'log'
+          - title: Inverse
+            name: 'inverse'
+          - title: Inverse squared
+            name: '1/mu^2'
+          - title: Square root
+            name: 'sqrt'
+
+      default: "identity"
+      description:
+         R: >
+           Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
 
 ...
 

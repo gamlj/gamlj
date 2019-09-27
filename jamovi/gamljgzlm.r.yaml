@@ -25,6 +25,9 @@ items:
         - cov
         - modelTerms
         - fixedIntercept
+        - modelSelection
+        - custom_family
+        - custom_link
     refs: gamlj
     
 
@@ -37,6 +40,10 @@ items:
         - contrasts
         - scaling
         - fixedIntercept
+        - modelSelection
+        - custom_family
+        - custom_link
+
     items:
            - name: anova
              title: Loglikelihood ratio tests
@@ -49,6 +56,10 @@ items:
                          - scaling
                          - fixedIntercept
                          - effectSize
+                         - modelSelection
+                         - custom_family
+                         - custom_link
+                 
              columns:
                     - name: name
                       title: ""
@@ -76,7 +87,10 @@ items:
                     - showParamsCI
                     - showExpbCI
                     - paramCIWidth
-
+                    - modelSelection
+                    - custom_family
+                    - custom_link
+ 
              columns:
                     - name: dep
                       title: "Response Contrasts"
@@ -168,6 +182,7 @@ items:
              visible: (showContrastCode)
              clearWith:
                     - contrasts
+
              template:
                    title:  $key
                    type: Table
@@ -192,6 +207,10 @@ items:
         - contrasts
         - scaling
         - postHocCorr
+        - modelSelection
+        - custom_family
+        - custom_link
+
     template:
         clearWith: []
         title:  ""
@@ -258,6 +277,9 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+                 - modelSelection
+                 - custom_family
+                 - custom_link
 
               columns:
                  - name: threeway
@@ -289,6 +311,10 @@ items:
                      - fixedIntercept
                      - simpleScale
                      - ciWidth
+                     - modelSelection
+                     - custom_family
+                     - custom_link
+
               columns:
                      - name: dep
                        title: "Response Contrasts"
@@ -361,6 +387,9 @@ items:
         - fixedIntercept
         - simpleScaleLabels
         - ciWidth
+        - modelSelection
+        - custom_family
+        - custom_link
 
     template:
         title:  $key
@@ -405,6 +434,10 @@ items:
         - modelTerms
         - percvalue
         - cvalue
+        - modelSelection
+        - custom_family
+        - custom_link
+
   - name: descPlots
     title: Results Plots
     type: Array
@@ -434,4 +467,7 @@ items:
            - modelTerms
            - percvalue
            - cvalue
+           - modelSelection
+           - custom_family
+           - custom_link
 

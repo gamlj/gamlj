@@ -51,14 +51,15 @@ gmeans.init<-function(data,options,theTables,cov_conditioning=NULL) {
                colnames(row)<-term
                aTable$addRow(rowKey=row, values=row)
            }
+           if ("modelSelection" %in% names(options)) {
+             info<-MINFO[[options$modelSelection]]
+             aTable$getColumn("emmean")$setTitle(info$emmeanTitle)
+           }
+           
       }
       
       ### we make the emmean label more precise for GZLM###
 
-      if ("modelSelection" %in% names(options)) {
-        info<-MINFO[[options$modelSelection]]
-        aTable$getColumn("emmean")$setTitle(info$emmeanTitle)
-      }
       
   } # end of  means init
   

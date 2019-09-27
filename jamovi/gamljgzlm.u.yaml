@@ -42,9 +42,13 @@ children:
                    optionPart: nb
                    events:
                       change: './gamlj.events::onChange_model'
-      - type: Label
-        label: Categorical dependent variable
+      
+      - type: LayoutBox
+        margin: large
         children:
+            - type: Label
+              label: Categorical dependent variable
+              children:
                      - type: RadioButton
                        name: modelSelection_logistic
                        optionName: modelSelection
@@ -62,35 +66,49 @@ children:
                        optionName: modelSelection
                        optionPart: multinomial
                        
-                       
-                       
+            - type: Label
+              label: Custom Model
+              children:
+                     - type: RadioButton
+                       name: modelSelection_custom
+                       optionName: modelSelection
+                       optionPart: custom
+                       events:
+                          change: './gamlj.events::onChange_model'
+                     - type: ComboBox
+                       name: custom_family
+                       enable: (modelSelection_custom)
+                     - type: ComboBox
+                       name: custom_link
+                       enable: (modelSelection_custom)
+
   - type: VariableSupplier
     name: variablesupplier
     persistentItems: false
     stretchFactor: 1
     children:
-      - type: TargetLayoutBox
-        children:
-          - type: VariablesListBox
-            name: dep
-            maxItemCount: 1
-            isTarget: true
-            itemDropBehaviour: overwrite
-      - type: TargetLayoutBox
-        children:
-          - type: VariablesListBox
-            name: factors
-            isTarget: true
-            events:
-              change: './gamlj.events::onChange_factors'
-      - type: TargetLayoutBox
-        children:
-          - type: VariablesListBox
-            name: covs
-            height: small
-            isTarget: true
-            events:
-              change: './gamlj.events::onChange_covariates'
+               - type: TargetLayoutBox
+                 children:
+                          - type: VariablesListBox
+                            name: dep
+                            maxItemCount: 1
+                            isTarget: true
+                            itemDropBehaviour: overwrite
+               - type: TargetLayoutBox
+                 children:
+                          - type: VariablesListBox
+                            name: factors
+                            isTarget: true
+                            events:
+                                change: './gamlj.events::onChange_factors'
+               - type: TargetLayoutBox
+                 children:
+                          - type: VariablesListBox
+                            name: covs
+                            height: small
+                            isTarget: true
+                            events:
+                                 change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
     style: inline

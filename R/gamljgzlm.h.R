@@ -39,7 +39,9 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             scaling = NULL,
             effectSize = list(
                 "expb"),
-            modelSelection = "linear", ...) {
+            modelSelection = "linear",
+            custom_family = "gaussian",
+            custom_link = "identity", ...) {
 
             super$initialize(
                 package='gamlj',
@@ -251,8 +253,30 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "nb",
                     "logistic",
                     "probit",
+                    "custom",
                     "multinomial"),
                 default="linear")
+            private$..custom_family <- jmvcore::OptionList$new(
+                "custom_family",
+                custom_family,
+                options=list(
+                    "gaussian",
+                    "binomial",
+                    "poisson",
+                    "inverse.gaussian",
+                    "Gamma"),
+                default="gaussian")
+            private$..custom_link <- jmvcore::OptionList$new(
+                "custom_link",
+                custom_link,
+                options=list(
+                    "identity",
+                    "logit",
+                    "log",
+                    "inverse",
+                    "1/mu^2",
+                    "sqrt"),
+                default="identity")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -286,6 +310,8 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..scaling)
             self$.addOption(private$..effectSize)
             self$.addOption(private$..modelSelection)
+            self$.addOption(private$..custom_family)
+            self$.addOption(private$..custom_link)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -319,7 +345,9 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         postHocCorr = function() private$..postHocCorr$value,
         scaling = function() private$..scaling$value,
         effectSize = function() private$..effectSize$value,
-        modelSelection = function() private$..modelSelection$value),
+        modelSelection = function() private$..modelSelection$value,
+        custom_family = function() private$..custom_family$value,
+        custom_link = function() private$..custom_link$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -352,7 +380,9 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..postHocCorr = NA,
         ..scaling = NA,
         ..effectSize = NA,
-        ..modelSelection = NA)
+        ..modelSelection = NA,
+        ..custom_family = NA,
+        ..custom_link = NA)
 )
 
 gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -394,7 +424,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "factors",
                     "cov",
                     "modelTerms",
-                    "fixedIntercept"),
+                    "fixedIntercept",
+                    "modelSelection",
+                    "custom_family",
+                    "custom_link"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -415,7 +448,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "modelTerms",
                     "contrasts",
                     "scaling",
-                    "fixedIntercept"))
+                    "fixedIntercept",
+                    "modelSelection",
+                    "custom_family",
+                    "custom_link"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -426,7 +462,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "scaling",
                                 "fixedIntercept",
-                                "effectSize"),
+                                "effectSize",
+                                "modelSelection",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="name", 
@@ -458,7 +497,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "effectSize",
                                 "showParamsCI",
                                 "showExpbCI",
-                                "paramCIWidth"),
+                                "paramCIWidth",
+                                "modelSelection",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="dep", 
@@ -584,7 +626,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "modelTerms",
                     "contrasts",
                     "scaling",
-                    "postHocCorr"),
+                    "postHocCorr",
+                    "modelSelection",
+                    "custom_family",
+                    "custom_link"),
                 template=jmvcore::Table$new(
                     options=options,
                     clearWith=list(),
@@ -665,7 +710,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "simpleScale",
                                 "cvalue",
                                 "percvalue",
-                                "simpleScaleLabels"),
+                                "simpleScaleLabels",
+                                "modelSelection",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -700,7 +748,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "fixedIntercept",
                                 "simpleScale",
-                                "ciWidth"),
+                                "ciWidth",
+                                "modelSelection",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="dep", 
@@ -783,7 +834,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "scaling",
                     "fixedIntercept",
                     "simpleScaleLabels",
-                    "ciWidth"),
+                    "ciWidth",
+                    "modelSelection",
+                    "custom_family",
+                    "custom_link"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -828,7 +882,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "simpleScaleLabels",
                     "modelTerms",
                     "percvalue",
-                    "cvalue")))
+                    "cvalue",
+                    "modelSelection",
+                    "custom_family",
+                    "custom_link")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -856,7 +913,10 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotRaw",
                         "modelTerms",
                         "percvalue",
-                        "cvalue"))))}))
+                        "cvalue",
+                        "modelSelection",
+                        "custom_family",
+                        "custom_link"))))}))
 
 gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljGzlmBase",
@@ -949,6 +1009,10 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param effectSize .
 #' @param modelSelection Select the generalized linear model:
 #'   \code{linear},\code{poisson},\code{logistic},\code{multinomial}
+#' @param custom_family Distribution family for the custom model, accepts
+#'   gaussian, binomial, gamma and inverse_gaussian .
+#' @param custom_link Distribution family for the custom model, accepts
+#'   identity, log and inverse, onemu2 (for 1/mu^2).
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1008,6 +1072,8 @@ gamljGzlm <- function(
     effectSize = list(
                 "expb"),
     modelSelection = "linear",
+    custom_family = "gaussian",
+    custom_link = "identity",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1101,7 +1167,9 @@ gamljGzlm <- function(
         postHocCorr = postHocCorr,
         scaling = scaling,
         effectSize = effectSize,
-        modelSelection = modelSelection)
+        modelSelection = modelSelection,
+        custom_family = custom_family,
+        custom_link = custom_link)
 
     analysis <- gamljGzlmClass$new(
         options = options,

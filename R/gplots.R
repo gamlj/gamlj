@@ -26,7 +26,7 @@ gplots.range<- function(x,...) UseMethod(".range")
 
 .range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
   
-  if (model$family[1] %in% c("quasipoisson","poisson","gaussian"))
+  if (model$family[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
     return(.range.default(model,depName,predictions,rawData))
   
   return(c(0,1))

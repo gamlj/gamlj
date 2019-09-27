@@ -95,3 +95,15 @@ NULL
 #' @examples
 #' data(fivegroups)
 NULL
+
+#' Poisson data
+#'
+#'  Simulated data of a poisson distributed dependent variables with some independent variabes
+#'
+#' @docType data
+#' @name poissonacts
+#' @usage data(poissonacts)
+#' @keywords datasets
+#' @examples
+#' data(poissonacts)
+NULL

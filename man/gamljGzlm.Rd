@@ -14,7 +14,8 @@ gamljGzlm(data, dep, factors = NULL, covs = NULL, modelTerms = NULL,
   simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
   percvalue = 25, simpleScaleLabels = "labels",
   postHocCorr = list("bonf"), scaling = NULL,
-  effectSize = list("expb"), modelSelection = "linear", formula)
+  effectSize = list("expb"), modelSelection = "linear",
+  custom_family = "gaussian", custom_link = "identity", formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -33,7 +34,7 @@ terms}
 \item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept}
 
-\item{showParamsCI}{\code{TRUR}  or \code{FALSE} (default), parameters CI
+\item{showParamsCI}{\code{TRUE}  or \code{FALSE} (default), parameters CI
 in table}
 
 \item{showExpbCI}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in
@@ -110,6 +111,12 @@ respectively}
 
 \item{modelSelection}{Select the generalized linear model:
 \code{linear},\code{poisson},\code{logistic},\code{multinomial}}
+
+\item{custom_family}{Distribution family for the custom model, accepts
+gaussian, binomial, gamma and inverse_gaussian .}
+
+\item{custom_link}{Distribution family for the custom model, accepts
+identity, log and inverse, onemu2 (for 1/mu^2).}
 
 \item{formula}{(optional) the formula to use, see the examples}
 }
