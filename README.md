@@ -2,7 +2,7 @@
 
 General, Mixed and Generalized Models module for jamovi
 
-version 1.5.*
+version 1.6.*
 <center>
 <img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
 </center>
