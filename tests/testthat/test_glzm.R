@@ -124,4 +124,29 @@ test_that("glm EMM", {
   expect_equal(round(res[1,2],2),0.84)
 })
 
+data("poissonacts")
+data<-poissonacts
+mod<-gamlj::gamljGzlm(
+  formula=acts~agg_test,
+  data=data,
+  modelSelection = "poisson",
+  eDesc = T)
 
+res<-mod$main$anova$asDF$test
+test_that("Poisson works", {
+  expect_equal(round(res,2),85.92)
+})
+
+data$q<-data$acts+1
+mod<-gamlj::gamljGzlm(
+  formula=q~agg_test,
+  data=data,
+  modelSelection = "custom",
+  custom_family = "Gamma",
+  custom_link = "inverse",
+  eDesc = T)
+
+res<-mod$main$fixed$asDF$expb[1]
+test_that("Custom model works", {
+  expect_equal(round(res,2),3.98)
+})
