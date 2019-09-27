@@ -39,7 +39,7 @@ analyses:
 datasets:
   - name: qsport
     path: qsport.csv
-    description: Training hours and performance with quadratic effects
+    description: Training h
   - name: Beers
     path: beers_bars.csv
     description: Beers and smiles clustered by bars
@@ -73,5 +73,13 @@ datasets:
     tags:
       - Mixed
       - ANOVA
+  - name: poissonacts
+    path: poissonacts.csv
+    description: >
+      Simulated data of a poisson distributed dependent variables with some
+      independent variabes
+    tags:
+      - Poisson
+      - GzLM
 
 ...
