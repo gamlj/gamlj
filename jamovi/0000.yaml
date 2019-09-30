@@ -1,12 +1,12 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 1.6.0
+version: 2.0.0
 jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: 2019-1-7
+date: 2019-1-10
 type: R
 description: >-
   A suite for estimation of linear model, such as the general linear model,
@@ -36,6 +36,12 @@ analyses:
     menuSubgroup: GAMLj
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
+  - title: Generalized Mixed Models
+    name: gamljGlmMixed
+    ns: gamlj
+    menuGroup: Linear Models
+    menuTitle: Generalized Mixed Models
+    description: Generalized Mixed Linear Model
 datasets:
   - name: qsport
     path: qsport.csv

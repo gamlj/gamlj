@@ -12,6 +12,9 @@
       return("lmer")
   if ("lmerMod" %in% class(model))
       return("lmer")
+  if ("glmerMod" %in% class(model))
+    return("lmer")
+  
   if ("multinom" %in% class(model))
     return("multinomial")
   
@@ -26,8 +29,13 @@
 
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
-.getModelData.default<-function(model) 
+.getModelData.default<-function(model) {
+     mark("mf.getModelData",class(model))
      return(model$model)
+}
+
+.getModelData.glmer<-function(model) 
+  return(.getModelData.lmer(model))
 
 .getModelData.merModLmerTest<-function(model) 
      return(.getModelData.lmer(model))
@@ -66,6 +74,12 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 .mf.summary.lmerModLmerTest<-function(model)
   .mf.summary.lmer(model)
 
+.mf.summary.glmerMod<-function(model) {
+   ss<-summary(model)$coefficients
+   ss<-as.data.frame(ss,stringsAsFactors = F)
+   colnames(ss)<-c("estimate","se","z","p")
+   ss
+}
 .mf.summary.lmerMod<-function(model)
   .mf.summary.lmer(model)
 
@@ -336,8 +350,11 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 mf.confint<- function(x,...) UseMethod(".confint")
 
-.confint.default<-function(model,level) 
+.confint.default<-function(model,level) {
+  mark("CI model unknown",class(model))  
   return(FALSE)
+  
+}
 
 .confint.lm<-function(model,level) 
     return(stats::confint(model,level = level))
@@ -362,6 +379,17 @@ mf.confint<- function(x,...) UseMethod(".confint")
       return(ci)
   }
 
+.confint.glmerMod<-function(model,level)  {
+  ci<-stats::confint(model,level=level)
+  ci<-ci[-1,]
+  
+  ci<-ci[!is.na(ci[,1]),]
+  if (is.null(dim(ci)))
+    ci<-matrix(ci,ncol=2)
+  return(ci)
+}
+
+
 .confint.multinom <- function (object, level = 0.95, ...) 
   {
   ci<-stats::confint(object,level=level)
@@ -381,6 +409,11 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
 .aliased.default<-function(model) {
   aliased<-stats::alias(model)
   (!is.null(aliased$Complete))
+}
+
+.aliased.glmerMod<-function(model) {
+  rank<-attr(model@pp$X,"msgRankdrop")
+  return((!is.null(rank)))
 }
 
 .aliased.lmerMod<-function(model) {
