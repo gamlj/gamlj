@@ -505,6 +505,7 @@ children:
             enable: (eDesc)
   - type: CollapseBox
     label: Options
+    style: inline
     collapsed: true
     stretchFactor: 1
     children:

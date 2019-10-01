@@ -24,9 +24,15 @@ gplots.range<- function(x,...) UseMethod(".range")
   return(yAxisRange)
 }
 
+.range.glmerMod<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
+  
+    return(.range.glm(model,depName,predictions,rawData))
+  
+}
+
 .range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
   
-  if (model$family[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
+  if (family(model)[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
     return(.range.default(model,depName,predictions,rawData))
   
   return(c(0,1))
@@ -339,13 +345,8 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     thinker<-0
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      thinker<-.3
-      form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      ginfo("Random effects plotting: we are smoothing with formula",form)
-      p<-p +ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"),size=.2,colour="gray64", alpha=.8,
-                       method = "lm",formula = form,
-                       fullrange = TRUE,se=FALSE,show.legend=F) 
-     
+      p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2, color="cadetblue3",show.legend = F) 
+      
     }
     if (errorType != '')
       p <- p + ggplot2::geom_ribbon(data=gdata,aes_string(x="group", ymin="lwr", ymax="upr",group="lines",colour="lines",fill = "lines"),linetype = 0,show.legend=F, alpha=.2)          
@@ -402,11 +403,12 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      ginfo("Random effects plotting: we are smoothing with formula",form)
-      p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
-                       method = "lm",formula=form,
-                       alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
-          }
+      ginfo("Random effects plotting")
+      #p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
+      #                 method = "glm",formula=form,
+      #                 alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
+        p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2,show.legend = F) 
+      }
     
     if (errorType != '')
       p <- p + ggplot2::geom_ribbon(aes_string(x="group", ymin="lwr", ymax="upr"),show.legend=F, alpha=.2)

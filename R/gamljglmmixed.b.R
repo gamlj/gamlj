@@ -258,7 +258,7 @@ gamljGlmMixedClass <- R6::R6Class(
                          ### full summary results ####
                          test_summary<-try(model_summary<-summary(model))
                          if (jmvcore::isError(test_summary)) {
-                               msg <- extractErrorMessage(test_summary)
+                               msg <- jmvcore::extractErrorMessage(test_summary)
                                msg<-n64$translate(msg)
                                jmvcore::reject(msg, code='error')
                          }
@@ -370,7 +370,7 @@ gamljGlmMixedClass <- R6::R6Class(
           lrtTable<-self$results$main$lrtRandomEffectsTable
           ranova_test<-try(res<-as.data.frame(lmerTest::ranova(model)[-1,]))
           if (jmvcore::isError(ranova_test)) {
-              message <- extractErrorMessage(ranova_test)
+              message <- jmvcore::extractErrorMessage(ranova_test)
               lrtTable$setNote("noluck",paste(message,". LRT cannot be computed"))
           } else {
              res$test<-n64$translate(rownames(res))
@@ -538,7 +538,10 @@ gamljGlmMixedClass <- R6::R6Class(
 .preparePlots=function(model) {
   
   depName <- self$options$dep
+  dep64 <- jmvcore::toB64(depName)
   groupName <- self$options$plotHAxis
+  groupName64 <- jmvcore::toB64(groupName)
+  
   if (length(depName) == 0 || length(groupName) == 0)
     return()
   
@@ -569,9 +572,18 @@ gamljGlmMixedClass <- R6::R6Class(
   
   preds64<-c(cluster,preds64)
   if (self$options$plotRandomEffects) {
-    
-    pd<-predict(model)
     data<-model@frame
+    # here we set all model predictors but the x-axis variable to zero
+    # to smooth random effects predicted values
+    
+    mvars<-names(data)
+    tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
+    newdata<-data
+    for(v in tozero)
+        newdata[,v]<-0
+    pd<-predict(model,type="response",newdata=newdata)
+    # end of zeroing 
+    
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
     pnames<-c("cluster","group","lines","plots")
     names(randomData)<-c("y",pnames[1:length(preds64)])

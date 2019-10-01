@@ -471,7 +471,10 @@ gamljMixedClass <- R6::R6Class(
 .preparePlots=function(model) {
   
   depName <- self$options$dep
+  dep64 <- jmvcore::toB64(depName)
   groupName <- self$options$plotHAxis
+  groupName64 <- jmvcore::toB64(groupName)
+  
   if (length(depName) == 0 || length(groupName) == 0)
     return()
   
@@ -502,15 +505,22 @@ gamljMixedClass <- R6::R6Class(
   
   preds64<-c(cluster,preds64)
   if (self$options$plotRandomEffects) {
-    
-    pd<-predict(model)
     data<-model@frame
+    # here we set all model predictors but the x-axis variable to zero
+    # to smooth random effects predicted values
+    mvars<-names(data)
+    tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
+    newdata<-data
+    for(v in tozero)
+      newdata[,v]<-0
+    pd<-predict(model,type="response",newdata=newdata)
+    # end of zeroing 
+    
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
     pnames<-c("cluster","group","lines","plots")
     names(randomData)<-c("y",pnames[1:length(preds64)])
     note<-self$results$plotnotes
     note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
-#    note$setContent('Random effects')
     note$setVisible(TRUE)
     
   } else
