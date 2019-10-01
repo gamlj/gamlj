@@ -78,10 +78,12 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   .mf.summary.lmer(model)
 
 .mf.summary.glmerMod<-function(model) {
-   ss<-summary(model)$coefficients
-   ss<-as.data.frame(ss,stringsAsFactors = F)
-   colnames(ss)<-c("estimate","se","z","p")
-   ss
+  
+   return(.mf.summary.glm(model))
+#   ss<-summary(model)$coefficients
+#   ss<-as.data.frame(ss,stringsAsFactors = F)
+#   colnames(ss)<-c("estimate","se","z","p")
+#   ss
 }
 .mf.summary.lmerMod<-function(model)
   .mf.summary.lmer(model)
@@ -307,6 +309,10 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
 }
 
 mf.checkData<-function(options,data,modelType="linear") {
+     
+     if (!is.data.frame(data))
+         jmvcore::reject(data)
+  
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
      if (modelType %in% c("linear","mixed"))
@@ -353,7 +359,7 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 mf.confint<- function(x,...) UseMethod(".confint")
 
-.confint.default<-function(model,level) {
+.confint.default<-function(model,level,method=NULL) {
   mark("CI model unknown",class(model))  
   return(FALSE)
   
@@ -382,10 +388,11 @@ mf.confint<- function(x,...) UseMethod(".confint")
       return(ci)
   }
 
-.confint.glmerMod<-function(model,level)  {
-  ci<-stats::confint(model,level=level)
+.confint.glmerMod<-function(model,level,method)  {
+  if (method=="wald")
+        method="Wald"
+  ci<-stats::confint(model,level=level,method=method)
   ci<-ci[-1,]
-  
   ci<-ci[!is.na(ci[,1]),]
   if (is.null(dim(ci)))
     ci<-matrix(ci,ncol=2)

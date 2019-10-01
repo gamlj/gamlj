@@ -14,14 +14,21 @@ items:
          title: "Info"
        - name: value
          type: text
-         title: ""
+         title: "Value"
+       - name: comm
+         type: text
+         title: "Comment"
     clearWith:
         - dep
-        - randomTerms
+        - factors
+        - cov
         - modelTerms
         - fixedIntercept
-
+        - modelSelection
+        - custom_family
+        - custom_link
     refs: gamlj
+
 
 
   - name: main
@@ -373,11 +380,11 @@ items:
                        title: "exp(B)"
                        type: number
                        visible: (effectSize:expb)
-                     - name: ecilow
+                     - name: lower.ECL
                        type: number
                        title: Lower
                        visible: (showExpbCI)
-                     - name: ecihig
+                     - name: upper.ECL
                        type: number
                        title: Upper
                        visible: (showExpbCI)
@@ -388,7 +395,7 @@ items:
                        title: "p"
                        type: number
                        format: zto,pvalue
-                       
+
 
 
   - name: emeansTables

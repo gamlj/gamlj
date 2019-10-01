@@ -499,8 +499,8 @@ options:
         - name: custom
           title: Custom
           
-        - name: multinomial
-          title: Multinomial
+#        - name: multinomial
+#          title: Multinomial
       default: linear
       description:
           R: >
@@ -549,6 +549,17 @@ options:
          R: >
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
 
+
+    - name: cimethod
+      title: CI Method
+      type: List
+      options:
+        - name: wald
+          title: Wald (fast)
+        - name:  profile
+          title: Profile (slow)
+        - name: boot
+          title: Bootstrap (very slow)
 
 
 ...

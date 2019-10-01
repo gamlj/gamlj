@@ -118,6 +118,10 @@ mi.getResDf<- function(x,...) UseMethod(".getResDf")
   return(model$edf)
 }
 
+.getResDf.glmerMod<-function(model) {
+  return(model@devcomp$dims['nmp'])
+}
+
 mi.initContrastCode<-function(data,options,results,n64) {
   
   if (!options$showContrastCode) 

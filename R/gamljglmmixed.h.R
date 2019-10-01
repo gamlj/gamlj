@@ -48,7 +48,8 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "expb"),
             modelSelection = "linear",
             custom_family = "gaussian",
-            custom_link = "identity", ...) {
+            custom_link = "identity",
+            cimethod = NULL, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -295,8 +296,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "nb",
                     "logistic",
                     "probit",
-                    "custom",
-                    "multinomial"),
+                    "custom"),
                 default="linear")
             private$..custom_family <- jmvcore::OptionList$new(
                 "custom_family",
@@ -319,6 +319,13 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "1/mu^2",
                     "sqrt"),
                 default="identity")
+            private$..cimethod <- jmvcore::OptionList$new(
+                "cimethod",
+                cimethod,
+                options=list(
+                    "wald",
+                    "profile",
+                    "boot"))
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -360,6 +367,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..modelSelection)
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
+            self$.addOption(private$..cimethod)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -401,7 +409,8 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         effectSize = function() private$..effectSize$value,
         modelSelection = function() private$..modelSelection$value,
         custom_family = function() private$..custom_family$value,
-        custom_link = function() private$..custom_link$value),
+        custom_link = function() private$..custom_link$value,
+        cimethod = function() private$..cimethod$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -442,7 +451,8 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..effectSize = NA,
         ..modelSelection = NA,
         ..custom_family = NA,
-        ..custom_link = NA)
+        ..custom_link = NA,
+        ..cimethod = NA)
 )
 
 gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -475,12 +485,20 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     list(
                         `name`="value", 
                         `type`="text", 
-                        `title`="")),
+                        `title`="Value"),
+                    list(
+                        `name`="comm", 
+                        `type`="text", 
+                        `title`="Comment")),
                 clearWith=list(
                     "dep",
-                    "randomTerms",
+                    "factors",
+                    "cov",
                     "modelTerms",
-                    "fixedIntercept"),
+                    "fixedIntercept",
+                    "modelSelection",
+                    "custom_family",
+                    "custom_link"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -894,12 +912,12 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `type`="number", 
                                     `visible`="(effectSize:expb)"),
                                 list(
-                                    `name`="ecilow", 
+                                    `name`="lower.ECL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showExpbCI)"),
                                 list(
-                                    `name`="ecihig", 
+                                    `name`="upper.ECL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showExpbCI)"),
@@ -1136,6 +1154,7 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   gaussian, binomial, gamma and inverse_gaussian .
 #' @param custom_link Distribution family for the custom model, accepts
 #'   identity, log and inverse, onemu2 (for 1/mu^2).
+#' @param cimethod .
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1207,6 +1226,7 @@ gamljGlmMixed <- function(
     modelSelection = "linear",
     custom_family = "gaussian",
     custom_link = "identity",
+    cimethod,
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1313,7 +1333,8 @@ gamljGlmMixed <- function(
         effectSize = effectSize,
         modelSelection = modelSelection,
         custom_family = custom_family,
-        custom_link = custom_link)
+        custom_link = custom_link,
+        cimethod = cimethod)
 
     analysis <- gamljGlmMixedClass$new(
         options = options,

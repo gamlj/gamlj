@@ -60,10 +60,10 @@ children:
                 optionPart: probit
                 events:
                   change: './gamlj.events::onChange_model'
-              - type: RadioButton
-                name: modelSelection_multinomial
-                optionName: modelSelection
-                optionPart: multinomial
+#              - type: RadioButton
+#                name: modelSelection_multinomial
+#                optionName: modelSelection
+#                optionPart: multinomial
           - type: Label
             label: Custom Model
             children:
@@ -514,4 +514,19 @@ children:
           - type: TextBox
             name: nAGQ
             format: number
+      - type: Label
+        label: CI Method
+        children:
+              - type: RadioButton
+                name: cimethod_wald
+                optionName: cimethod
+                optionPart: wald
+              - type: RadioButton
+                name: cimethod_profile
+                optionName: cimethod
+                optionPart: profile
+              - type: RadioButton
+                name: cimethod_boot
+                optionName: cimethod
+                optionPart: boot
  
