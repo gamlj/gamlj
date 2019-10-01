@@ -98,6 +98,19 @@ items:
                       type: number
                       title: Upper
                       visible: (showParamsCI)
+                    - name: expb
+                      title: "exp(B)"
+                      type: number
+                      visible: (effectSize:expb)
+                    - name: ecilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: ecihig
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+                      
                     - name: z
                       title: "z"
                       type: number
@@ -313,15 +326,6 @@ items:
                    title:  df
                    type: number
                    visible: false                   
-                 - name: F.ratio
-                   title: F
-                   type: number
-                 - name: df1
-                   title: Num df
-                   type: number
-                 - name: df2
-                   title: Den df
-                   type: number
                  - name: p.value
                    title: p
                    type: number
@@ -365,12 +369,18 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
-                     - name: df
-                       title: "df"
+                     - name: expb
+                       title: "exp(B)"
                        type: number
-                     - name: t.ratio
-                       title: "t"
+                       visible: (effectSize:expb)
+                     - name: ecilow
                        type: number
+                       title: Lower
+                       visible: (showExpbCI)
+                     - name: ecihig
+                       type: number
+                       title: Upper
+                       visible: (showExpbCI)
                      - name: z.ratio
                        title: "z"
                        type: number
@@ -378,7 +388,7 @@ items:
                        title: "p"
                        type: number
                        format: zto,pvalue
-
+                       
 
 
   - name: emeansTables

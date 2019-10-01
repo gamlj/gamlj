@@ -5,6 +5,80 @@ compilerMode: tame
 events:
   update: './mixed.events::update'
 children:
+  - type: LayoutBox
+    margin: large
+    style: inline
+    children:
+      - type: LayoutBox
+        margin: large
+        children:
+          - type: Label
+            label: Continuous dependent variable
+            children:
+              - type: RadioButton
+                name: modelSelection_linear
+                optionName: modelSelection
+                optionPart: linear
+                events:
+                  change: './gamlj.events::onChange_model'
+          - type: Label
+            label: Frequencies
+            children:
+              - type: RadioButton
+                name: modelSelection_poisson
+                optionName: modelSelection
+                optionPart: poisson
+                events:
+                  change: './gamlj.events::onChange_model'
+              - name: modelSelection_poiover
+                type: RadioButton
+                optionName: modelSelection
+                optionPart: poiover
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_nb
+                optionName: modelSelection
+                optionPart: nb
+                events:
+                  change: './gamlj.events::onChange_model'
+      - type: LayoutBox
+        margin: large
+        children:
+          - type: Label
+            label: Categorical dependent variable
+            children:
+              - type: RadioButton
+                name: modelSelection_logistic
+                optionName: modelSelection
+                optionPart: logistic
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_probit
+                optionName: modelSelection
+                optionPart: probit
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_multinomial
+                optionName: modelSelection
+                optionPart: multinomial
+          - type: Label
+            label: Custom Model
+            children:
+              - type: RadioButton
+                name: modelSelection_custom
+                optionName: modelSelection
+                optionPart: custom
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: ComboBox
+                name: custom_family
+                enable: (modelSelection_custom)
+              - type: ComboBox
+                name: custom_link
+                enable: (modelSelection_custom)
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -49,10 +123,21 @@ children:
     style: inline
     children:
       - type: Label
+        label: Effect Size
+        margin: large
+        style: list
+        children:
+          - name: effectSize_expb
+            type: CheckBox
+            optionPart: expb
+            optionName: effectSize
+      - type: Label
         label: Confidence Intervals
         margin: large
-        style: list-inline
+        style: list
         children:
+          - name: showExpbCI
+            type: CheckBox
           - name: showParamsCI
             type: CheckBox
           - type: TextBox
@@ -60,7 +145,7 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI)
+            enable: (showParamsCI || showExpbCI)
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -418,7 +503,6 @@ children:
           - type: CheckBox
             name: eCovs
             enable: (eDesc)
-
   - type: CollapseBox
     label: Options
     collapsed: true
@@ -430,3 +514,4 @@ children:
           - type: TextBox
             name: nAGQ
             format: number
+ 

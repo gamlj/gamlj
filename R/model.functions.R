@@ -34,6 +34,9 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
      return(model$model)
 }
 
+.getModelData.glmerMod<-function(model) 
+  return(.getModelData.lmer(model))
+
 .getModelData.glmer<-function(model) 
   return(.getModelData.lmer(model))
 
