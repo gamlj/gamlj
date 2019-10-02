@@ -119,7 +119,8 @@ mi.getResDf<- function(x,...) UseMethod(".getResDf")
 }
 
 .getResDf.glmerMod<-function(model) {
-  return(model@devcomp$dims['nmp'])
+  ss<-summary(model)
+  return(ss$AICtab["df.resid"])
 }
 
 mi.initContrastCode<-function(data,options,results,n64) {

@@ -911,15 +911,16 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 #'
 #' @param data the data as a data frame
-#' @param dep a string naming the dependent variable from \code{data},
-#'   variable must be numeric
+#' @param dep a string naming the dependent variable from \code{data}; the
+#'   variable must be numeric. No needed if \code{formula} is used.
 #' @param factors a vector of strings naming the fixed factors from
-#'   \code{data}
-#' @param covs a vector of strings naming the covariates from \code{data}
+#'   \code{data}. No needed if \code{formula} is used.
+#' @param covs a vector of strings naming the covariates from \code{data}. No
+#'   needed if \code{formula} is used.
 #' @param modelTerms a list of character vectors describing fixed effects
-#'   terms
+#'   terms. No needed if \code{formula} is used.
 #' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept
+#'   fixed intercept. No needed if \code{formula} is used.
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
@@ -927,20 +928,21 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param contrasts a list of lists specifying the factor and type of contrast
 #'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 #'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
-#' @param showRealNames \code{TRUE} or \code{FALSE} (default), provide raw
-#'   names of the contrasts variables
-#' @param showContrastCode \code{TRUE} or \code{FALSE} (default), provide
+#' @param showRealNames \code{TRUE} or \code{FALSE} (default), shows raw names
+#'   of the contrasts variables
+#' @param showContrastCode \code{TRUE} or \code{FALSE} (default), shows
 #'   contrast coefficients tables
 #' @param plotHAxis a string naming the variable placed on the horizontal axis
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
-#'   lines on the plot
-#' @param plotSepPlots a string naming the variable to separate over to form
+#'   lines in the plot
+#' @param plotSepPlots a string naming the variable defining the levels for
 #'   multiple plots
 #' @param plotRaw \code{TRUE} or \code{FALSE} (default), plot raw data along
 #'   the predicted values
-#' @param plotDvScale .
-#' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), set the Y-axis
+#'   range equal to the range of the observed values.
+#' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
 #' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
@@ -949,17 +951,21 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans
 #'   statistics
 #' @param eCovs \code{TRUE} or \code{FALSE} (default), provide lsmeans
-#'   statistics
+#'   statistics conditioned to  different values of the continuous variables in
+#'   the model. Which levels of the continuous variable should be used is set by
+#'   the \code{simpleScale} option.
 #' @param simpleVariable The variable for which the simple effects (slopes)
 #'   are computed
 #' @param simpleModerator the variable that provides the levels at which the
-#'   simple effects computed
+#'   simple effects are computed
 #' @param simple3way a moderator of the two-way interaction which is probed
 #' @param simpleScale \code{'mean_sd'} (default), \code{'custom'} , or
-#'   \code{'custom_percent'}. Use to condition the covariates (if any)
+#'   \code{'percent'}. Use to condition the covariates (if any)
 #' @param cvalue offset value for conditioning
 #' @param percvalue offset value for conditioning
-#' @param simpleScaleLabels .
+#' @param simpleScaleLabels how the levels of a continuous moderator should
+#'   appear in tables and plots: \code{labels}, \code{values} and
+#'   \code{values_labels}.
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 #'   respectively

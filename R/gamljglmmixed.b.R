@@ -299,8 +299,7 @@ gamljGlmMixedClass <- R6::R6Class(
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
                infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
-               
-        
+            
                ### end of info table ###
         
                ### random table ######        
