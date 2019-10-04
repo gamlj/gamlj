@@ -128,7 +128,8 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 .simpleEstimates.default<-function(model,variable,moderator,threeway=NULL,
            cov_conditioning=conditioning$new(),
            interval=95) {
-  emmeans::emm_options(lmerTest.limit = 15000)  
+
+  emmeans::emm_options(lmerTest.limit = 25000)  
   ginfo(paste("simple effects estimation for generic model on",paste(class(model),collapse = " ") ))
   data<-mf.getModelData(model)
   preds<-unlist(c(moderator,threeway))

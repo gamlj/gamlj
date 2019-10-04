@@ -65,8 +65,8 @@ gamljMixedClass <- R6::R6Class(
       
       infoTable$addRow(rowKey="call",list(info="Call"))
       infoTable$addRow(rowKey="aic",list(info="AIC"))
-      if (!(reml)) {
       infoTable$addRow(rowKey="bic",list(info="BIC"))
+      if (!(reml)) {
       infoTable$addRow(rowKey="log",list(info="LogLikel."))
       }
       infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
@@ -251,7 +251,8 @@ gamljMixedClass <- R6::R6Class(
                ginfo("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
                info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
-               info.aic<-round(stats::extractAIC(model)[2],digits=2)
+               info.aic<-round(stats::extractAIC(model)[2],digits=4)
+               info.bic<-round(stats::BIC(model),digits=4)
                info.loglik<-model_summary$AICtab[3]
                r2<-try(r.squared(model),silent = TRUE)
                if (jmvcore::isError(r2)){
@@ -266,10 +267,10 @@ gamljMixedClass <- R6::R6Class(
                infoTable$setRow(rowKey="est", list(value=info.title))
                infoTable$setRow(rowKey="call",list(value=info.call))
                infoTable$setRow(rowKey="aic",list(value=info.aic))
+               infoTable$setRow(rowKey="bic",list(value=info.bic))
                if (!(reml)) {
-                   infoTable$setRow(rowKey="bic",list(value=info.bic))
-                   infoTable$setRow(rowKey="log",list(value=info.loglik))
-                   }
+                                  infoTable$setRow(rowKey="log",list(value=info.loglik))
+               }
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
 
