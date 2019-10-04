@@ -13,14 +13,23 @@ children:
         margin: large
         children:
           - type: Label
-            label: Continuous dependent variable
+            label: Categorical dependent variable
             children:
               - type: RadioButton
-                name: modelSelection_linear
+                name: modelSelection_logistic
                 optionName: modelSelection
-                optionPart: linear
+                optionPart: logistic
                 events:
                   change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_probit
+                optionName: modelSelection
+                optionPart: probit
+                events:
+                  change: './gamlj.events::onChange_model'
+      - type: LayoutBox
+        margin: large
+        children:
           - type: Label
             label: Frequencies
             children:
@@ -36,34 +45,7 @@ children:
                 optionPart: poiover
                 events:
                   change: './gamlj.events::onChange_model'
-              - type: RadioButton
-                name: modelSelection_nb
-                optionName: modelSelection
-                optionPart: nb
-                events:
-                  change: './gamlj.events::onChange_model'
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: Label
-            label: Categorical dependent variable
-            children:
-              - type: RadioButton
-                name: modelSelection_logistic
-                optionName: modelSelection
-                optionPart: logistic
-                events:
-                  change: './gamlj.events::onChange_model'
-              - type: RadioButton
-                name: modelSelection_probit
-                optionName: modelSelection
-                optionPart: probit
-                events:
-                  change: './gamlj.events::onChange_model'
-#              - type: RadioButton
-#                name: modelSelection_multinomial
-#                optionName: modelSelection
-#                optionPart: multinomial
+
           - type: Label
             label: Custom Model
             children:
@@ -458,6 +440,9 @@ children:
                 name: plotDvScale
               - type: CheckBox
                 name: plotRandomEffects
+              - type: CheckBox
+                name: plotLinearPred
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -518,16 +503,15 @@ children:
       - type: Label
         label: CI Method
         children:
-              - type: RadioButton
-                name: cimethod_wald
-                optionName: cimethod
-                optionPart: wald
-              - type: RadioButton
-                name: cimethod_profile
-                optionName: cimethod
-                optionPart: profile
-              - type: RadioButton
-                name: cimethod_boot
-                optionName: cimethod
-                optionPart: boot
- 
+          - type: RadioButton
+            name: cimethod_wald
+            optionName: cimethod
+            optionPart: wald
+          - type: RadioButton
+            name: cimethod_profile
+            optionName: cimethod
+            optionPart: profile
+          - type: RadioButton
+            name: cimethod_boot
+            optionName: cimethod
+            optionPart: boot

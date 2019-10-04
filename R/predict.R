@@ -61,9 +61,9 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 
 
-pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
+pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95,type="response") {
          suppressWarnings(
-         est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
+         est<-rawMeans(model,terms,cov_conditioning,interval=interval,type=type)
          )
          dest<-as.data.frame(est)
          old<-names(dest)

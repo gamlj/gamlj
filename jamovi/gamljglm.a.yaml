@@ -391,6 +391,9 @@ options:
       default:
           - beta
           - partEta
+      description:
+          R: >
+            a list of effect sizes to print out. They can be: `eta` for eta-square, 
           
     - name: homoTest
       title: Residual Variances Homogeneity tests

@@ -30,7 +30,7 @@
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 .getModelData.default<-function(model) {
-     mark("mf.getModelData",class(model))
+     mark("mf.getModelData default for class ",class(model))
      return(model$model)
 }
 
@@ -189,6 +189,14 @@ mf.anova<- function(x,...) UseMethod(".anova")
     ss
 }
 
+.anova.glmerMod<-function(model) {
+  ginfo(".anova.glmerMod")
+  ano<-.car.anova(model)
+  names(ano)<-c("test","df1","p")
+  ano  
+}
+  
+
 .anova.lmerModLmerTest<-function(model,df="Satterthwaite") 
    .anova.merModLmerTest(model,df) 
      
@@ -200,11 +208,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
              
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
-  ### this check is needed for adjust to different versions of lmertest
-#  if (class(model)=="merModLmerTest")
-#        ano<-lmerTest:::anova(model,ddf=df)
-#  else
-        ano<-stats::anova(model,ddf=df)
+  ano<-stats::anova(model,ddf=df)
         
   if (dim(ano)[1]==0)
     return(ano)
@@ -232,7 +236,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
         coefz<-data.frame(coefz)
         
         if (dim(coefz)[2]==1)
-        coefz<-as.data.frame(t(coefz))
+          coefz<-as.data.frame(t(coefz))
         rownames(coefz)<-rn
         coefz[,2]<-coefz[,2]^2
         coefz$df1<-1
@@ -253,7 +257,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
-  ginfo("lmerTest failed: anava uses car::Anova")
+  ginfo("mf.anova uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
@@ -360,7 +364,7 @@ mf.checkData<-function(options,data,modelType="linear") {
 mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.default<-function(model,level,method=NULL) {
-  mark("CI model unknown",class(model))  
+  ginfo("CI model unknown",class(model))  
   return(FALSE)
   
 }

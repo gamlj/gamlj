@@ -51,10 +51,7 @@ gamljGlmMixedClass <- R6::R6Class(
       
       if (getout) 
         return(FALSE)
-      mark("before clean")
       data<-private$.cleandata()
-      mark(data)
-      
       data<-mf.checkData(self$options,data,modelType)
       
       if (!is.data.frame(data))
@@ -116,7 +113,6 @@ gamljGlmMixedClass <- R6::R6Class(
       dep64<-jmvcore::toB64(dep)
       modelTerms64<-lapply(modelTerms,jmvcore::toB64)
       formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,self$options$fixedIntercept))
-      mark(head(data))
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
@@ -144,6 +140,7 @@ gamljGlmMixedClass <- R6::R6Class(
       ginfo("run")
       # collect some option
       dep <- self$options$dep
+      modelType<-self$options$modelSelection
       if (is.null(dep))
         return()
       
@@ -171,9 +168,9 @@ gamljGlmMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,"mixed")
+      data<-mf.checkData(self$options,data,modelType)
       if (!is.data.frame(data))
-        reject(data)
+        jmvcore::reject(data)
       for (scaling in self$options$scaling) {
         cluster<-jmvcore::toB64(clusters[[1]])
         data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
@@ -190,7 +187,7 @@ gamljGlmMixedClass <- R6::R6Class(
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
       
-               ginfo("the model has been estimated")
+               ginfo("the model is being estimated")
                ##### model ####
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data)
@@ -199,6 +196,7 @@ gamljGlmMixedClass <- R6::R6Class(
                if (jmvcore::isError(model_test)) {
                         msg<-jmvcore::extractErrorMessage(model_test)
                         msg<-n64$translate(msg)
+                        msg<-gsub("nAGQ","Precision/speed parameter",msg,fixed=T)
                         jmvcore::reject(msg, code='error')
                }
                private$.model <- model
@@ -249,6 +247,25 @@ gamljGlmMixedClass <- R6::R6Class(
                    })
                    if (jmvcore::isError(anova_test)) 
                          jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
+                   }
+                   # anova table ##
+                   ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
+                   rawlabels<-rownames(anova_res)
+                   if (is.something(rawlabels)) {
+                     labels<-n64$nicenames(rawlabels)
+                     for (i in seq_len(dim(anova_res)[1])) {
+                       tableRow<-anova_res[i,]  
+                       anovaTable$setRow(rowNo=i,tableRow)
+                       anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
+                     }
+                     messages<-mf.getModelMessages(model)
+                     
+                     for (i in seq_along(messages)) {
+                       infoTable$setNote(as.character(i),messages[[i]])
+                     }
+                     if (length(messages)>0) {
+                       infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+                     }
                    }
                    anovaTable$setState(TRUE)
                   } else ginfo("Anova results recycled")
@@ -305,25 +322,7 @@ gamljGlmMixedClass <- R6::R6Class(
                ### random table ######        
                  
         ### ### ### ### ###
-        # anova table ##
-                ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
-                       rawlabels<-rownames(anova_res)
-                       if (is.something(rawlabels)) {
-                           labels<-n64$nicenames(rawlabels)
-                            for (i in seq_len(dim(anova_res)[1])) {
-                              tableRow<-anova_res[i,]  
-                              anovaTable$setRow(rowNo=i,tableRow)
-                              anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
-                            }
-                            messages<-mf.getModelMessages(model)
-                      
-                           for (i in seq_along(messages)) {
-                              infoTable$setNote(as.character(i),messages[[i]])
-                           }
-                           if (length(messages)>0) {
-                             infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-                             }
-                       }     
+     
 
                  
                 ### parameter table ####
@@ -506,12 +505,15 @@ gamljGlmMixedClass <- R6::R6Class(
       nAGQ<-self$options$nAGQ
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
+
+      if (afamily$link=="identity" & afamily=="gaussian")
+         jmvcore::reject("The requested model is a linear mixed model, please use the Mixed Models command", code='error')
+      
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
       lm = do.call(lme4::glmer, list(formula=form, data=data,
-                                         family = afamily, control = lme4::glmerControl(optimizer = "bobyqa"),
-                                         nAGQ = nAGQ))
+                                         family = afamily, nAGQ = nAGQ))
       return(lm)
     },
     .modelFormula=function() {
@@ -553,10 +555,13 @@ gamljGlmMixedClass <- R6::R6Class(
   ciWidth   <- self$options$ciWidth
   optionRaw<-self$options$plotRaw
   optionRange<-self$options$plotDvScale
-  referToData<-(optionRaw || optionRange)
+  plotLinearPred<-self$options$plotLinearPred
+  referToData<-((optionRaw || optionRange) & !(plotLinearPred))
   plotScale<-self$options$simpleScale
   offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
-  
+  type="response"
+  if (plotLinearPred)
+     type="link"
   
   
   if (referToData)
@@ -580,7 +585,7 @@ gamljGlmMixedClass <- R6::R6Class(
     newdata<-data
     for(v in tozero)
         newdata[,v]<-0
-    pd<-predict(model,type="response",newdata=newdata)
+    pd<-predict(model,type=type,newdata=newdata)
     # end of zeroing 
     
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
@@ -599,7 +604,7 @@ gamljGlmMixedClass <- R6::R6Class(
                                plotsName,
                                errorBarType,
                                ciWidth,
-                               conditioning=private$.cov_condition)
+                               conditioning=private$.cov_condition,type=type)
  
   yAxisRange <- gplots.range(model,depName,predData,rawData)
   

@@ -113,7 +113,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
                                      plotsName=NULL,
                                      bars="none",
                                      ciwidth=95,
-                                     conditioning=NULL) {
+                                     conditioning=NULL,type="response") {
   
   selected<-c(groupName,linesName,plotsName)  
   selected64<-jmvcore::toB64(selected)
@@ -126,7 +126,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     cond$updateValues(groupName,pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25))
   
   pdata<-try({
-    pred.means(model,selected64,cond)
+    pred.means(model,selected64,cond,type=type)
   })
   if (jmvcore::isError(pdata)) {
     ginfo(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))

@@ -458,9 +458,9 @@ gamljMixedClass <- R6::R6Class(
       } else return(FALSE)
       
       rands<-self$options$randomTerms
+      
       rands<-private$.buildreffects(rands,self$options$correlatedEffects)
 
-      
       modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
       fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
       mf<-paste(fixed,rands,sep =  "")

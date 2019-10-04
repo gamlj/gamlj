@@ -475,6 +475,7 @@ items:
         - modelTerms
         - percvalue
         - cvalue
+        - plotLinearPred
         
   - name: descPlots
     title: Results Plots
@@ -506,7 +507,7 @@ items:
            - randomTerms
            - percvalue
            - cvalue
-
+           - plotLinearPred
   - name: plotnotes
     type: Html
     visible: false

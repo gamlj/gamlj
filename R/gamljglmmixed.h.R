@@ -43,10 +43,11 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             correlatedEffects = "corr",
             lrtRandomEffects = FALSE,
             plotRandomEffects = FALSE,
+            plotLinearPred = FALSE,
             nAGQ = 1,
             effectSize = list(
                 "expb"),
-            modelSelection = "linear",
+            modelSelection = "logistic",
             custom_family = "gaussian",
             custom_link = "identity",
             cimethod = NULL, ...) {
@@ -273,6 +274,10 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "plotRandomEffects",
                 plotRandomEffects,
                 default=FALSE)
+            private$..plotLinearPred <- jmvcore::OptionBool$new(
+                "plotLinearPred",
+                plotLinearPred,
+                default=FALSE)
             private$..nAGQ <- jmvcore::OptionNumber$new(
                 "nAGQ",
                 nAGQ,
@@ -290,14 +295,12 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "modelSelection",
                 modelSelection,
                 options=list(
-                    "linear",
                     "poisson",
                     "poiover",
-                    "nb",
                     "logistic",
                     "probit",
                     "custom"),
-                default="linear")
+                default="logistic")
             private$..custom_family <- jmvcore::OptionList$new(
                 "custom_family",
                 custom_family,
@@ -362,6 +365,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..correlatedEffects)
             self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..plotRandomEffects)
+            self$.addOption(private$..plotLinearPred)
             self$.addOption(private$..nAGQ)
             self$.addOption(private$..effectSize)
             self$.addOption(private$..modelSelection)
@@ -405,6 +409,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         correlatedEffects = function() private$..correlatedEffects$value,
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
         plotRandomEffects = function() private$..plotRandomEffects$value,
+        plotLinearPred = function() private$..plotLinearPred$value,
         nAGQ = function() private$..nAGQ$value,
         effectSize = function() private$..effectSize$value,
         modelSelection = function() private$..modelSelection$value,
@@ -447,6 +452,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..correlatedEffects = NA,
         ..lrtRandomEffects = NA,
         ..plotRandomEffects = NA,
+        ..plotLinearPred = NA,
         ..nAGQ = NA,
         ..effectSize = NA,
         ..modelSelection = NA,
@@ -498,7 +504,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "fixedIntercept",
                     "modelSelection",
                     "custom_family",
-                    "custom_link"),
+                    "custom_link",
+                    "nAGQ"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -523,7 +530,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "scaling",
                     "randomTerms",
                     "correlatedEffects",
-                    "fixedIntercept"))
+                    "fixedIntercept",
+                    "nAGQ"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -566,7 +574,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
-                                "paramCIWidth"),
+                                "paramCIWidth",
+                                "nAGQ"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -631,7 +640,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
-                                "randomTerms"),
+                                "randomTerms",
+                                "nAGQ"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -667,7 +677,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
-                                "randomTerms"),
+                                "randomTerms",
+                                "nAGQ"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -759,7 +770,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "scaling",
                     "randomTerms",
                     "correlatedEffects",
-                    "postHocCorr"),
+                    "postHocCorr",
+                    "nAGQ"),
                 template=jmvcore::Table$new(
                     options=options,
                     clearWith=list(),
@@ -835,7 +847,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "simpleScale",
                                 "cvalue",
                                 "percvalue",
-                                "simpleScaleLabels"),
+                                "simpleScaleLabels",
+                                "nAGQ"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -873,7 +886,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "fixedIntercept",
                                 "simpleScale",
-                                "ciWidth"),
+                                "ciWidth",
+                                "nAGQ"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -944,7 +958,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "randomTerms",
                     "correlatedEffects",
                     "fixedIntercept",
-                    "ciWidth"),
+                    "ciWidth",
+                    "nAGQ"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -996,7 +1011,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "randomTerms",
                     "modelTerms",
                     "percvalue",
-                    "cvalue")))
+                    "cvalue",
+                    "plotLinearPred")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",
@@ -1025,7 +1041,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotRaw",
                         "randomTerms",
                         "percvalue",
-                        "cvalue"))))
+                        "cvalue",
+                        "plotLinearPred"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1144,6 +1161,9 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   random effects
 #' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
 #'   effects predicted values in the plot
+#' @param plotLinearPred \code{TRUE} or \code{FALSE} (default), plot the
+#'   predicted values in the linear predictor scale. If set, \code{plotRaw} and
+#'   \code{plotDvScale} are ignored.
 #' @param nAGQ for the adaptive Gauss-Hermite log-likelihood approximation,
 #'   nAGQ argument controls the number of nodes in the quadrature formula. A
 #'   positive integer
@@ -1220,10 +1240,11 @@ gamljGlmMixed <- function(
     correlatedEffects = "corr",
     lrtRandomEffects = FALSE,
     plotRandomEffects = FALSE,
+    plotLinearPred = FALSE,
     nAGQ = 1,
     effectSize = list(
                 "expb"),
-    modelSelection = "linear",
+    modelSelection = "logistic",
     custom_family = "gaussian",
     custom_link = "identity",
     cimethod,
@@ -1329,6 +1350,7 @@ gamljGlmMixed <- function(
         correlatedEffects = correlatedEffects,
         lrtRandomEffects = lrtRandomEffects,
         plotRandomEffects = plotRandomEffects,
+        plotLinearPred = plotLinearPred,
         nAGQ = nAGQ,
         effectSize = effectSize,
         modelSelection = modelSelection,

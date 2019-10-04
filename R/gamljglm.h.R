@@ -972,7 +972,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param scaling a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
-#' @param effectSize .
+#' @param effectSize a list of effect sizes to print out. They can be:
+#'   \code{eta} for eta-square,
 #' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of

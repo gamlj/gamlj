@@ -452,7 +452,14 @@ options:
           R: >
             `TRUE` or `FALSE` (default), add random effects predicted values in the
             plot
-
+    - name: plotLinearPred
+      title: Linear Predictor  
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), plot the predicted values in the linear predictor scale.
+            If set, `plotRaw` and `plotDvScale` are ignored.
 
 ############# specs of generalized ##############
             
@@ -484,14 +491,10 @@ options:
       title: Model Selection
       type: List
       options:
-        - name: linear
-          title: Linear
         - name: poisson
           title: Poisson
         - name: poiover
           title: Poisson (overdispersion)
-        - name : nb
-          title: Negative Binomial
         - name: logistic
           title: Logistic
         - name: probit
@@ -499,9 +502,7 @@ options:
         - name: custom
           title: Custom
           
-#        - name: multinomial
-#          title: Multinomial
-      default: linear
+      default: logistic
       description:
           R: >
             Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
