@@ -575,7 +575,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "correlatedEffects",
                                 "fixedIntercept",
                                 "paramCIWidth",
-                                "nAGQ"),
+                                "nAGQ",
+                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -848,7 +849,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "cvalue",
                                 "percvalue",
                                 "simpleScaleLabels",
-                                "nAGQ"),
+                                "nAGQ",
+                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -887,7 +889,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "fixedIntercept",
                                 "simpleScale",
                                 "ciWidth",
-                                "nAGQ"),
+                                "nAGQ",
+                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -959,7 +962,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "correlatedEffects",
                     "fixedIntercept",
                     "ciWidth",
-                    "nAGQ"),
+                    "nAGQ",
+                    "cimethod"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -1012,7 +1016,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "modelTerms",
                     "percvalue",
                     "cvalue",
-                    "plotLinearPred")))
+                    "plotLinearPred",
+                    "cimethod")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="descPlots",

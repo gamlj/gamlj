@@ -18,6 +18,7 @@ gamljMixedClass <- R6::R6Class(
       factors<-self$options$factors
       covs<-self$options$covs
       fixedIntercept<-self$options$fixedIntercept
+      emmeans::emm_options(lmerTest.limit = 25000)  
       
             
       getout<-FALSE

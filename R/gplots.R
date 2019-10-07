@@ -318,7 +318,10 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
-    p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
+    if (is.factor(rawData$z))
+        p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y",color="z"),show.legend=FALSE, alpha=.5,shape=16, size=2)
+    else 
+      p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y",color="z"),show.legend=FALSE, alpha=.5,shape=16, size=2)
   }
 
 

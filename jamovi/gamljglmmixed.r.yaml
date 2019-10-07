@@ -86,6 +86,7 @@ items:
                     - fixedIntercept
                     - paramCIWidth
                     - nAGQ
+                    - cimethod
 
              columns:
                     - name: source
@@ -326,6 +327,7 @@ items:
                  - percvalue
                  - simpleScaleLabels
                  - nAGQ
+                 - cimethod
 
               columns:
                  - name: threeway
@@ -361,7 +363,8 @@ items:
                      - simpleScale
                      - ciWidth
                      - nAGQ
-                     
+                     - cimethod
+                    
               columns:
                      - name: threeway
                        title: " "
@@ -425,6 +428,7 @@ items:
         - fixedIntercept
         - ciWidth
         - nAGQ
+        - cimethod
 
     template:
         title:  $key
@@ -476,7 +480,7 @@ items:
         - percvalue
         - cvalue
         - plotLinearPred
-        
+        - cimethod
   - name: descPlots
     title: Results Plots
     type: Array
