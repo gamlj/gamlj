@@ -506,7 +506,7 @@ gamljGlmMixedClass <- R6::R6Class(
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
 
-      if (afamily$link=="identity" & afamily=="gaussian")
+      if (afamily$link=="identity" & afamily$family=="gaussian")
          jmvcore::reject("The requested model is a linear mixed model, please use the Mixed Models command", code='error')
       
       ## there is a bug in LmerTest and it does not work
@@ -606,7 +606,7 @@ gamljGlmMixedClass <- R6::R6Class(
                                ciWidth,
                                conditioning=private$.cov_condition,type=type)
  
-  yAxisRange <- gplots.range(model,depName,predData,rawData)
+  yAxisRange <- gplots.range(model,depName,predData,rawData,linearPred=plotLinearPred)
   
   if (!optionRaw)
     rawData<-NULL

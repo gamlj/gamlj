@@ -46,7 +46,10 @@ analyses:
 datasets:
   - name: qsport
     path: qsport.csv
-    description: Training h
+    description: Training hours
+    tags:
+      - GLM
+      - Curvilinear effects
   - name: Beers
     path: beers_bars.csv
     description: Beers and smiles clustered by bars
@@ -88,5 +91,12 @@ datasets:
     tags:
       - Poisson
       - GzLM
+  - name: temptime
+    path: temptime.csv
+    description: |
+      Simulated data for individual growth models.
+    tags:
+      - Mixed models
+      - Individual growth model
 
 ...

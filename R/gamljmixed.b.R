@@ -514,8 +514,10 @@ gamljMixedClass <- R6::R6Class(
     tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
     newdata<-data
     for(v in tozero)
-      newdata[,v]<-0
-    pd<-predict(model,type="response",newdata=newdata)
+      if (!is.factor(newdata[,v]))
+        newdata[,v]<-0
+    
+    pd<-stats::predict(model,type="response",newdata=newdata)
     # end of zeroing 
     
     randomData<-as.data.frame(cbind(pd,data[,preds64]))

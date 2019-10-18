@@ -436,8 +436,10 @@ children:
             children:
               - type: CheckBox
                 name: plotRaw
+                enable: (!plotLinearPred)
               - type: CheckBox
                 name: plotDvScale
+                enable: (!plotLinearPred)
               - type: CheckBox
                 name: plotRandomEffects
               - type: CheckBox

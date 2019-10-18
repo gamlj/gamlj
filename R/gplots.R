@@ -7,7 +7,7 @@
 
 gplots.range<- function(x,...) UseMethod(".range")
 
-.range.default<-function(model,depName,predictions,rawData=NULL) {
+.range.default<-function(model,depName,predictions,rawData=NULL,linearPred=FALSE) {
   
   if (!is.null(rawData)) {
     rawRange <- pretty(rawData$y)
@@ -24,13 +24,16 @@ gplots.range<- function(x,...) UseMethod(".range")
   return(yAxisRange)
 }
 
-.range.glmerMod<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
+.range.glmerMod<-function(model,depName=NULL,predictions=NULL,rawData=NULL,linearPred=FALSE) {
   
-    return(.range.glm(model,depName,predictions,rawData))
+    return(.range.glm(model,depName,predictions,rawData,linearPred))
   
 }
 
-.range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
+.range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL,linearPred=FALSE) {
+  
+  if (linearPred==TRUE)
+    return(.range.default(model,depName,predictions,rawData))
   
   if (family(model)[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
     return(.range.default(model,depName,predictions,rawData))
@@ -73,10 +76,16 @@ gplots.rawData<- function(x,...) UseMethod(".rawData")
   
 }  
 
+.rawData.glmerMod<-function(model,depName,groupName,linesName=NULL,plotsName=NULL) {
+   
+   .rawData.glm(model,depName,groupName,linesName=linesName,plotsName=plotsName) 
+     
+}
+
 .rawData.glm<-function(model,depName,groupName,linesName=NULL,plotsName=NULL) {
   
-  
-  if (model$family[1] %in% c("binomial")) {
+  .family<-family(model)
+  if (.family$family %in% c("binomial")) {
     data=mf.getModelData(model)
     data$y<-ifelse(data[[jmvcore::toB64(depName)]]==levels(data[[jmvcore::toB64(depName)]])[1],1,0)
     data$x<-data[[jmvcore::toB64(groupName)]]

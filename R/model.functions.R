@@ -23,8 +23,6 @@
 
 
 
-
-
 ##### get model data #########
 
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
