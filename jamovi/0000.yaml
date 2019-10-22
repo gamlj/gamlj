@@ -98,5 +98,12 @@ datasets:
     tags:
       - Mixed models
       - Individual growth model
+  - name: schoolexam
+    path: schoolexam.csv
+    description: |
+      Simulated data for testing logistic mixed models.
+    tags:
+      - Mixed models
+      - Logistic mixed models
 
 ...

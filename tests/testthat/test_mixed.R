@@ -1,5 +1,4 @@
 context("mixed")
-gamlj_options("debug",FALSE)
 
 data("subjects_by_stimuli")
 data<-subjects_by_stimuli
@@ -14,7 +13,7 @@ infotable<-model$info$asDF
 
 test_that("r-squared is ok", {
   expect_equal(round(as.numeric(as.character(infotable[3,2])),digits = 2),16561.78)
-  expect_equal(round(as.numeric(as.character(infotable[4,2])),digits = 2),0.01)
+  expect_equal(round(as.numeric(as.character(infotable[5,2])),digits = 2),0.01)
 })
 
 ftable<-model$main$anova$asDF

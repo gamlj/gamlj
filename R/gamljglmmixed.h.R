@@ -41,7 +41,6 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             randomTerms = list(
                 list()),
             correlatedEffects = "corr",
-            lrtRandomEffects = FALSE,
             plotRandomEffects = FALSE,
             plotLinearPred = FALSE,
             nAGQ = 1,
@@ -266,10 +265,6 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "nocorr",
                     "block"),
                 default="corr")
-            private$..lrtRandomEffects <- jmvcore::OptionBool$new(
-                "lrtRandomEffects",
-                lrtRandomEffects,
-                default=FALSE)
             private$..plotRandomEffects <- jmvcore::OptionBool$new(
                 "plotRandomEffects",
                 plotRandomEffects,
@@ -296,7 +291,6 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 modelSelection,
                 options=list(
                     "poisson",
-                    "poiover",
                     "logistic",
                     "probit",
                     "custom"),
@@ -363,7 +357,6 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..cluster)
             self$.addOption(private$..randomTerms)
             self$.addOption(private$..correlatedEffects)
-            self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..plotLinearPred)
             self$.addOption(private$..nAGQ)
@@ -407,7 +400,6 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         cluster = function() private$..cluster$value,
         randomTerms = function() private$..randomTerms$value,
         correlatedEffects = function() private$..correlatedEffects$value,
-        lrtRandomEffects = function() private$..lrtRandomEffects$value,
         plotRandomEffects = function() private$..plotRandomEffects$value,
         plotLinearPred = function() private$..plotLinearPred$value,
         nAGQ = function() private$..nAGQ$value,
@@ -450,7 +442,6 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..cluster = NA,
         ..randomTerms = NA,
         ..correlatedEffects = NA,
-        ..lrtRandomEffects = NA,
         ..plotRandomEffects = NA,
         ..plotLinearPred = NA,
         ..nAGQ = NA,
@@ -514,7 +505,6 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     fixed = function() private$.items[["fixed"]],
                     random = function() private$.items[["random"]],
                     randomCov = function() private$.items[["randomCov"]],
-                    lrtRandomEffectsTable = function() private$.items[["lrtRandomEffectsTable"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
                 public=list(
@@ -660,10 +650,6 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 list(
                                     `name`="var", 
                                     `title`="Variance", 
-                                    `type`="number"),
-                                list(
-                                    `name`="icc", 
-                                    `title`="ICC", 
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -698,47 +684,6 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `name`="cov", 
                                     `title`="Corr.", 
                                     `type`="number"))))
-                        self$add(jmvcore::Table$new(
-                            options=options,
-                            name="lrtRandomEffectsTable",
-                            title="Random Effect LRT",
-                            visible="(lrtRandomEffects)",
-                            clearWith=list(
-                                "dep",
-                                "modelTerms",
-                                "contrasts",
-                                "scaling",
-                                "randomTerms",
-                                "correlatedEffects",
-                                "fixedIntercept",
-                                "randomTerms"),
-                            columns=list(
-                                list(
-                                    `name`="test", 
-                                    `title`="Test", 
-                                    `combineBelow`=TRUE, 
-                                    `type`="text"),
-                                list(
-                                    `name`="npar", 
-                                    `title`="N. par", 
-                                    `type`="number"),
-                                list(
-                                    `name`="AIC", 
-                                    `title`="AIC", 
-                                    `type`="number"),
-                                list(
-                                    `name`="LRT", 
-                                    `title`="LRT", 
-                                    `type`="number"),
-                                list(
-                                    `name`="Df", 
-                                    `title`="df", 
-                                    `type`="number"),
-                                list(
-                                    `name`="Pr(>Chisq)", 
-                                    `title`="p", 
-                                    `type`="number", 
-                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",
@@ -1061,7 +1006,7 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
             super$initialize(
                 package = 'gamlj',
                 name = 'gamljGlmMixed',
-                version = c(1,5,2),
+                version = c(2,0,0),
                 options = options,
                 results = gamljGlmMixedResults$new(options=options),
                 data = data,
@@ -1162,8 +1107,6 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{'randomTerms'} is a list of  lists of length > 1, the option is
 #'   automatially set to \code{'block'}. The option is ignored if the model is
 #'   passed using \code{formula}.
-#' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
-#'   random effects
 #' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
 #'   effects predicted values in the plot
 #' @param plotLinearPred \code{TRUE} or \code{FALSE} (default), plot the
@@ -1188,7 +1131,6 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$lrtRandomEffectsTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
@@ -1243,7 +1185,6 @@ gamljGlmMixed <- function(
     randomTerms = list(
                 list()),
     correlatedEffects = "corr",
-    lrtRandomEffects = FALSE,
     plotRandomEffects = FALSE,
     plotLinearPred = FALSE,
     nAGQ = 1,
@@ -1353,7 +1294,6 @@ gamljGlmMixed <- function(
         cluster = cluster,
         randomTerms = randomTerms,
         correlatedEffects = correlatedEffects,
-        lrtRandomEffects = lrtRandomEffects,
         plotRandomEffects = plotRandomEffects,
         plotLinearPred = plotLinearPred,
         nAGQ = nAGQ,

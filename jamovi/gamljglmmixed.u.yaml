@@ -39,12 +39,6 @@ children:
                 optionPart: poisson
                 events:
                   change: './gamlj.events::onChange_model'
-              - name: modelSelection_poiover
-                type: RadioButton
-                optionName: modelSelection
-                optionPart: poiover
-                events:
-                  change: './gamlj.events::onChange_model'
 
           - type: Label
             label: Custom Model
@@ -227,14 +221,6 @@ children:
                     name: correlatedEffects_block
                     optionName: correlatedEffects
                     optionPart: block
-          - type: Label
-            label: Tests
-            children:
-              - type: LayoutBox
-                margin: large
-                children:
-                  - type: CheckBox
-                    name: lrtRandomEffects
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

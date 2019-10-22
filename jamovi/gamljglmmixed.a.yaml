@@ -2,7 +2,7 @@
 name: gamljGlmMixed
 title: Generalized Mixed Models
 menuGroup: Linear Models
-version: '1.5.2'
+version: '2.0.0'
 jas: '1.2'
 completeWhenFilled: false
 description:
@@ -436,13 +436,6 @@ options:
             The option is ignored if the model is passed using `formula`.
 
 
-    - name: lrtRandomEffects
-      title: LRT for Random Effects
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), LRT for the random effects
 
     - name: plotRandomEffects
       title: Random effects  
@@ -493,15 +486,12 @@ options:
       options:
         - name: poisson
           title: Poisson
-        - name: poiover
-          title: Poisson (overdispersion)
         - name: logistic
           title: Logistic
         - name: probit
           title: Probit
         - name: custom
           title: Custom
-          
       default: logistic
       description:
           R: >
@@ -522,7 +512,6 @@ options:
             name: 'inverse.gaussian'
           - title: Gamma
             name: 'Gamma'
-
       default: "gaussian"
       description:
          R: >
@@ -544,7 +533,6 @@ options:
             name: '1/mu^2'
           - title: Square root
             name: 'sqrt'
-
       default: "identity"
       description:
          R: >

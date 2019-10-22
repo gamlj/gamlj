@@ -206,20 +206,25 @@ gamljGlmMixedClass <- R6::R6Class(
 #               vc<-as.data.frame(model_summary$varcor)
                vcv<-vc[is.na(vc[,3]),]
                vcv$var1[is.na(vcv$var1)]<-""
+               .sigma<-sigma(model)
+               .sigma2<-sigma(model)^2
                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                realgroups<-n64$nicenames(grp)
                realnames<-n64$nicenames(vcv$var1)
                realnames<-lapply(realnames,lf.nicifyTerms)
                for (i in 1:dim(vcv)[1]) {
-                 if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
-                 else
-                   icc<-""
+#                 if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
+#                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+.sigma2)
+#                 else
+#                   icc<-""
                  if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
                  else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
                }
+               if (!("Residuals" %in% grp))
+                 randomTable$addRow(rowKey=i+1, list(groups="Residuals",name="",std=.sigma,var=.sigma2))
+
                
                ### Covariance among random effects ###
                vcv<-vc[!is.na(vc[,3]),]
@@ -362,21 +367,6 @@ gamljGlmMixedClass <- R6::R6Class(
                 
                } else ginfo("clean summary recycled")
                
-        #### LRT for random effects ####
-        if (self$options$lrtRandomEffects) {
-          
-          lrtTable<-self$results$main$lrtRandomEffectsTable
-          ranova_test<-try(res<-as.data.frame(lmerTest::ranova(model)[-1,]))
-          if (jmvcore::isError(ranova_test)) {
-              message <- jmvcore::extractErrorMessage(ranova_test)
-              lrtTable$setNote("noluck",paste(message,". LRT cannot be computed"))
-          } else {
-             res$test<-n64$translate(rownames(res))
-             res$test<-as.character(res$test)
-             for (i in seq_len(nrow(res)))
-                  lrtTable$addRow(rowKey=i,res[i,])
-          } 
-        }
 
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
@@ -562,7 +552,6 @@ gamljGlmMixedClass <- R6::R6Class(
   type="response"
   if (plotLinearPred)
      type="link"
-  
   
   if (referToData)
     rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)

@@ -123,3 +123,16 @@ NULL
 #' @examples
 #' data(temptime)
 NULL
+
+#' Clustered data for logistic regression
+#'
+#' Simulated data for testing logistic mixed models. 
+#' Simulation of pupils data clustered across schools with a dichotomous outcome  
+#'
+#' @docType data
+#' @name schoolexam
+#' @usage data(schoolexam)
+#' @keywords datasets
+#' @examples
+#' data(schoolexam)
+NULL

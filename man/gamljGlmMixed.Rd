@@ -15,11 +15,10 @@ gamljGlmMixed(data, dep = NULL, factors = NULL, covs = NULL,
   simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
   simpleScaleLabels = "labels", postHocCorr = list("bonf"),
   scaling = NULL, cluster = NULL, randomTerms = list(list()),
-  correlatedEffects = "corr", lrtRandomEffects = FALSE,
-  plotRandomEffects = FALSE, plotLinearPred = FALSE, nAGQ = 1,
-  effectSize = list("expb"), modelSelection = "logistic",
-  custom_family = "gaussian", custom_link = "identity", cimethod,
-  formula)
+  correlatedEffects = "corr", plotRandomEffects = FALSE,
+  plotLinearPred = FALSE, nAGQ = 1, effectSize = list("expb"),
+  modelSelection = "logistic", custom_family = "gaussian",
+  custom_link = "identity", cimethod, formula)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -126,9 +125,6 @@ decides whether the effects should be correlated,  non correlated. If
 \code{'randomTerms'} is a list of  lists of length > 1, the option is
 automatially set to \code{'block'}. The option is ignored if the model is
 passed using \code{formula}.}
-
-\item{lrtRandomEffects}{\code{TRUE} or \code{FALSE} (default), LRT for the
-random effects}
 
 \item{plotRandomEffects}{\code{TRUE} or \code{FALSE} (default), add random
 effects predicted values in the plot}
