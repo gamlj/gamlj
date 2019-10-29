@@ -8,7 +8,7 @@ version 2.0.*
 </center>
 <br>
 
-Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Models with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
+Estimates a General Linear Model, Mixed Linear Models, Generalized Linear Models and Generalized Mixed Models with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
 
 * Continuous and categorical independent and dependent variables
