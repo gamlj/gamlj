@@ -50,7 +50,9 @@ const events = {
 
      onChange_model: function(ui) {
         console.log("model changed");
-        ui.effectSize_RR.setValue(false);
+        if (typeof ui.effectSize_RR !== 'undefined' ) {
+              ui.effectSize_RR.setValue(false);
+        }
         if (ui.modelSelection.getValue()==="custom" ||  ui.modelSelection.getValue()==="linear") {
                ui.effectSize_expb.setValue(false);
                ui.showParamsCI.setValue(true);

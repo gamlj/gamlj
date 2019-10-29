@@ -20,19 +20,20 @@ gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
 \arguments{
 \item{data}{the data as a data frame}
 
-\item{dep}{a string naming the dependent variable from \code{data},
-variable must be numeric}
+\item{dep}{a string naming the dependent variable from \code{data}; the
+variable must be numeric. No needed if \code{formula} is used.}
 
 \item{factors}{a vector of strings naming the fixed factors from
-\code{data}}
+\code{data}. No needed if \code{formula} is used.}
 
-\item{covs}{a vector of strings naming the covariates from \code{data}}
+\item{covs}{a vector of strings naming the covariates from \code{data}. No
+needed if \code{formula} is used.}
 
 \item{modelTerms}{a list of character vectors describing fixed effects
-terms}
+terms. No needed if \code{formula} is used.}
 
 \item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept}
+fixed intercept. No needed if \code{formula} is used.}
 
 \item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
@@ -44,27 +45,28 @@ the confidence interval width for the parameter estimates}
 to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
 \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
 
-\item{showRealNames}{\code{TRUE} or \code{FALSE} (default), provide raw
-names of the contrasts variables}
+\item{showRealNames}{\code{TRUE} or \code{FALSE} (default), shows raw names
+of the contrasts variables}
 
-\item{showContrastCode}{\code{TRUE} or \code{FALSE} (default), provide
+\item{showContrastCode}{\code{TRUE} or \code{FALSE} (default), shows
 contrast coefficients tables}
 
 \item{plotHAxis}{a string naming the variable placed on the horizontal axis
 of the plot}
 
 \item{plotSepLines}{a string naming the variable represented as separate
-lines on the plot}
+lines in the plot}
 
-\item{plotSepPlots}{a string naming the variable to separate over to form
+\item{plotSepPlots}{a string naming the variable defining the levels for
 multiple plots}
 
 \item{plotRaw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
 the predicted values}
 
-\item{plotDvScale}{.}
+\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), set the Y-axis
+range equal to the range of the observed values.}
 
-\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
+\item{plotError}{\code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 no error bars, use confidence intervals, or use standard errors on the
 plots, respectively}
 
@@ -77,24 +79,28 @@ confidence interval width}
 statistics}
 
 \item{eCovs}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
-statistics}
+statistics conditioned to  different values of the continuous variables in
+the model. Which levels of the continuous variable should be used is set by
+the \code{simpleScale} option.}
 
 \item{simpleVariable}{The variable for which the simple effects (slopes)
 are computed}
 
 \item{simpleModerator}{the variable that provides the levels at which the
-simple effects computed}
+simple effects are computed}
 
 \item{simple3way}{a moderator of the two-way interaction which is probed}
 
 \item{simpleScale}{\code{'mean_sd'} (default), \code{'custom'} , or
-\code{'custom_percent'}. Use to condition the covariates (if any)}
+\code{'percent'}. Use to condition the covariates (if any)}
 
 \item{cvalue}{offset value for conditioning}
 
 \item{percvalue}{offset value for conditioning}
 
-\item{simpleScaleLabels}{.}
+\item{simpleScaleLabels}{how the levels of a continuous moderator should
+appear in tables and plots: \code{labels}, \code{values} and
+\code{values_labels}.}
 
 \item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
 \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
@@ -104,7 +110,8 @@ respectively}
 \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
 
-\item{effectSize}{.}
+\item{effectSize}{a list of effect sizes to print out. They can be:
+\code{eta} for eta-square,}
 
 \item{homoTest}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
 tests}

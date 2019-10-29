@@ -12,6 +12,9 @@
       return("lmer")
   if ("lmerMod" %in% class(model))
       return("lmer")
+  if ("glmerMod" %in% class(model))
+    return("lmer")
+  
   if ("multinom" %in% class(model))
     return("multinomial")
   
@@ -20,14 +23,20 @@
 
 
 
-
-
 ##### get model data #########
 
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
-.getModelData.default<-function(model) 
+.getModelData.default<-function(model) {
+     mark("mf.getModelData default for class ",class(model))
      return(model$model)
+}
+
+.getModelData.glmerMod<-function(model) 
+  return(.getModelData.lmer(model))
+
+.getModelData.glmer<-function(model) 
+  return(.getModelData.lmer(model))
 
 .getModelData.merModLmerTest<-function(model) 
      return(.getModelData.lmer(model))
@@ -66,6 +75,14 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 .mf.summary.lmerModLmerTest<-function(model)
   .mf.summary.lmer(model)
 
+.mf.summary.glmerMod<-function(model) {
+  
+   return(.mf.summary.glm(model))
+#   ss<-summary(model)$coefficients
+#   ss<-as.data.frame(ss,stringsAsFactors = F)
+#   colnames(ss)<-c("estimate","se","z","p")
+#   ss
+}
 .mf.summary.lmerMod<-function(model)
   .mf.summary.lmer(model)
 
@@ -170,6 +187,14 @@ mf.anova<- function(x,...) UseMethod(".anova")
     ss
 }
 
+.anova.glmerMod<-function(model) {
+  ginfo(".anova.glmerMod")
+  ano<-.car.anova(model)
+  names(ano)<-c("test","df1","p")
+  ano  
+}
+  
+
 .anova.lmerModLmerTest<-function(model,df="Satterthwaite") 
    .anova.merModLmerTest(model,df) 
      
@@ -181,11 +206,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
              
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
-  ### this check is needed for adjust to different versions of lmertest
-#  if (class(model)=="merModLmerTest")
-#        ano<-lmerTest:::anova(model,ddf=df)
-#  else
-        ano<-stats::anova(model,ddf=df)
+  ano<-stats::anova(model,ddf=df)
         
   if (dim(ano)[1]==0)
     return(ano)
@@ -213,7 +234,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
         coefz<-data.frame(coefz)
         
         if (dim(coefz)[2]==1)
-        coefz<-as.data.frame(t(coefz))
+          coefz<-as.data.frame(t(coefz))
         rownames(coefz)<-rn
         coefz[,2]<-coefz[,2]^2
         coefz$df1<-1
@@ -234,7 +255,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
-  ginfo("lmerTest failed: anava uses car::Anova")
+  ginfo("mf.anova uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
@@ -290,6 +311,10 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
 }
 
 mf.checkData<-function(options,data,modelType="linear") {
+     
+     if (!is.data.frame(data))
+         jmvcore::reject(data)
+  
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
      if (modelType %in% c("linear","mixed"))
@@ -336,8 +361,11 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 mf.confint<- function(x,...) UseMethod(".confint")
 
-.confint.default<-function(model,level) 
+.confint.default<-function(model,level,method=NULL) {
+  ginfo("CI model unknown",class(model))  
   return(FALSE)
+  
+}
 
 .confint.lm<-function(model,level) 
     return(stats::confint(model,level = level))
@@ -362,6 +390,18 @@ mf.confint<- function(x,...) UseMethod(".confint")
       return(ci)
   }
 
+.confint.glmerMod<-function(model,level,method)  {
+  if (method=="wald")
+        method="Wald"
+  ci<-stats::confint(model,level=level,method=method)
+  ci<-ci[-1,]
+  ci<-ci[!is.na(ci[,1]),]
+  if (is.null(dim(ci)))
+    ci<-matrix(ci,ncol=2)
+  return(ci)
+}
+
+
 .confint.multinom <- function (object, level = 0.95, ...) 
   {
   ci<-stats::confint(object,level=level)
@@ -381,6 +421,11 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
 .aliased.default<-function(model) {
   aliased<-stats::alias(model)
   (!is.null(aliased$Complete))
+}
+
+.aliased.glmerMod<-function(model) {
+  rank<-attr(model@pp$X,"msgRankdrop")
+  return((!is.null(rank)))
 }
 
 .aliased.lmerMod<-function(model) {

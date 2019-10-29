@@ -61,9 +61,9 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 
 
-pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95) {
+pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95,type="response") {
          suppressWarnings(
-         est<-rawMeans(model,terms,cov_conditioning,interval=interval,type="response")
+         est<-rawMeans(model,terms,cov_conditioning,interval=interval,type=type)
          )
          dest<-as.data.frame(est)
          old<-names(dest)
@@ -106,6 +106,13 @@ pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95
 
 pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 
+.simpleEstimates.glmerMod<-function(model,variable,moderator,threeway=NULL,
+                               cov_conditioning=conditioning$new(),
+                               interval=95) {
+
+  .simpleEstimates.glm(model,variable,moderator,threeway=threeway,
+                           cov_conditioning=cov_conditioning,interval=interval)
+}  
 .simpleEstimates.glm<-function(model,variable,moderator,threeway=NULL,
                                    cov_conditioning=conditioning$new(),
                                    interval=95) {
@@ -121,7 +128,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 .simpleEstimates.default<-function(model,variable,moderator,threeway=NULL,
            cov_conditioning=conditioning$new(),
            interval=95) {
-    
+
   ginfo(paste("simple effects estimation for generic model on",paste(class(model),collapse = " ") ))
   data<-mf.getModelData(model)
   preds<-unlist(c(moderator,threeway))

@@ -1,7 +1,7 @@
 
-gamljMixedClass <- R6::R6Class(
-  "gamljMixedClass",
-  inherit=gamljMixedBase,
+gamljGlmMixedClass <- R6::R6Class(
+  "gamljGlmMixedClass",
+  inherit=gamljGlmMixedBase,
   private=list(
     .model=NA,
     .names64=NA,
@@ -11,14 +11,14 @@ gamljMixedClass <- R6::R6Class(
       ginfo("init")
       private$.names64<-names64$new()
       n64<-private$.names64
-      reml<-self$options$reml
       infoTable<-self$results$info
       dep<-self$options$dep
       modelTerms<-self$options$modelTerms
       factors<-self$options$factors
       covs<-self$options$covs
       fixedIntercept<-self$options$fixedIntercept
-      emmeans::emm_options(lmerTest.limit = 25000)  
+      modelType<-self$options$modelSelection
+      afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
       
             
       getout<-FALSE
@@ -51,8 +51,12 @@ gamljMixedClass <- R6::R6Class(
       
       if (getout) 
         return(FALSE)
-
       data<-private$.cleandata()
+      data<-mf.checkData(self$options,data,modelType)
+      
+      if (!is.data.frame(data))
+        jmvcore::reject(data)
+      
       
       ### initialize conditioning of covariates
       if (is.something(self$options$covs)) {
@@ -61,17 +65,32 @@ gamljMixedClass <- R6::R6Class(
       }
       #####################
       #### info table #####
-      infoTable<-self$results$info
-      infoTable$addRow(rowKey="est",list(info="Estimate"))
       
-      infoTable$addRow(rowKey="call",list(info="Call"))
-      infoTable$addRow(rowKey="aic",list(info="AIC"))
-      infoTable$addRow(rowKey="bic",list(info="BIC"))
-      if (!(reml)) {
-      infoTable$addRow(rowKey="log",list(info="LogLikel."))
-      }
-      infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
-      infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
+      modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      infoTable<-self$results$info
+      info<-MINFO[[modelType]]
+      info$link<-LINFO[[afamily$link]]
+      info$distribution<-DINFO[[afamily$family]]
+      infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
+      infoTable$addRow(rowKey="call",list(info="Call",comm=n64$translate(modelFormula),value=info$call))
+      infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
+      ep<-mi.explainPrediction(modelType,data,dep)
+      if (!is.null(ep))
+        infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
+      infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
+      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="Less is better"))
+      infoTable$addRow(rowKey="r2m",list(info="R-squared",comm="Marginal"))
+      infoTable$addRow(rowKey="r2c",list(info="R-squared",comm= "Conditional"))
+      infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
+      infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
+      infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
+      infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
+      
+
+      if ("note" %in% names(info))
+        infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
+      
+      
       
       
       ## random table
@@ -98,7 +117,9 @@ gamljMixedClass <- R6::R6Class(
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-
+      aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      aTable$getColumn('ecihig')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
       
@@ -117,14 +138,13 @@ gamljMixedClass <- R6::R6Class(
       ginfo("run")
       # collect some option
       dep <- self$options$dep
-      
+      modelType<-self$options$modelSelection
       if (is.null(dep))
         return()
       
       factors <- self$options$factors
       covs <- self$options$covs
       clusters<-self$options$cluster
-      reml<-self$options$reml
       if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
@@ -146,9 +166,9 @@ gamljMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,"mixed")
+      data<-mf.checkData(self$options,data,modelType)
       if (!is.data.frame(data))
-        reject(data)
+        jmvcore::reject(data)
       for (scaling in self$options$scaling) {
         cluster<-jmvcore::toB64(clusters[[1]])
         data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
@@ -165,15 +185,16 @@ gamljMixedClass <- R6::R6Class(
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
       
-               ginfo("the model has been estimated")
+               ginfo("the model is being estimated")
                ##### model ####
                model_test <- try({
-                           model<-private$.estimate(modelFormula, data=data,REML = reml)
+                           model<-private$.estimate(modelFormula, data=data)
                            wars<-warnings()
                        })
                if (jmvcore::isError(model_test)) {
                         msg<-jmvcore::extractErrorMessage(model_test)
                         msg<-n64$translate(msg)
+                        msg<-gsub("nAGQ","Precision/speed parameter",msg,fixed=T)
                         jmvcore::reject(msg, code='error')
                }
                private$.model <- model
@@ -183,20 +204,25 @@ gamljMixedClass <- R6::R6Class(
 #               vc<-as.data.frame(model_summary$varcor)
                vcv<-vc[is.na(vc[,3]),]
                vcv$var1[is.na(vcv$var1)]<-""
+               .sigma<-sigma(model)
+               .sigma2<-sigma(model)^2
                grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
                realgroups<-n64$nicenames(grp)
                realnames<-n64$nicenames(vcv$var1)
                realnames<-lapply(realnames,lf.nicifyTerms)
                for (i in 1:dim(vcv)[1]) {
-                 if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
-                 else
-                   icc<-""
+#                 if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
+#                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+.sigma2)
+#                 else
+#                   icc<-""
                  if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
                  else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
                }
+               if (!("Residuals" %in% grp))
+                 randomTable$addRow(rowKey=i+1, list(groups="Residuals",name="",std=.sigma,var=.sigma2))
+
                
                ### Covariance among random effects ###
                vcv<-vc[!is.na(vc[,3]),]
@@ -225,6 +251,25 @@ gamljMixedClass <- R6::R6Class(
                    if (jmvcore::isError(anova_test)) 
                          jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                    }
+                   # anova table ##
+                   ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
+                   rawlabels<-rownames(anova_res)
+                   if (is.something(rawlabels)) {
+                     labels<-n64$nicenames(rawlabels)
+                     for (i in seq_len(dim(anova_res)[1])) {
+                       tableRow<-anova_res[i,]  
+                       anovaTable$setRow(rowNo=i,tableRow)
+                       anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
+                     }
+                     messages<-mf.getModelMessages(model)
+                     
+                     for (i in seq_along(messages)) {
+                       infoTable$setNote(as.character(i),messages[[i]])
+                     }
+                     if (length(messages)>0) {
+                       infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+                     }
+                   }
                    anovaTable$setState(TRUE)
                   } else ginfo("Anova results recycled")
                     
@@ -233,7 +278,7 @@ gamljMixedClass <- R6::R6Class(
                          ### full summary results ####
                          test_summary<-try(model_summary<-summary(model))
                          if (jmvcore::isError(test_summary)) {
-                               msg <- extractErrorMessage(test_summary)
+                               msg <- jmvcore::extractErrorMessage(test_summary)
                                msg<-n64$translate(msg)
                                jmvcore::reject(msg, code='error')
                          }
@@ -251,10 +296,11 @@ gamljMixedClass <- R6::R6Class(
                ### prepare info table #########       
                ginfo("updating the info table")
                info.call<-n64$translate(as.character(model@call)[[2]])
-               info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
-               info.aic<-round(stats::extractAIC(model)[2],digits=4)
-               info.bic<-round(stats::BIC(model),digits=4)
+               info.title<-paste("Generalized mixed model" )
+               info.aic<-round(stats::extractAIC(model)[2],digits=2)
                info.loglik<-model_summary$AICtab[3]
+               info.bic<-stats::BIC(model)
+               info.dev<-stats::deviance(model)
                r2<-try(r.squared(model),silent = TRUE)
                if (jmvcore::isError(r2)){
                    note<-"R-squared cannot be computed."
@@ -265,65 +311,47 @@ gamljMixedClass <- R6::R6Class(
                    info.r2m<-r2[[4]]        
                    info.r2c<-r2[[5]]     
                    }
-               infoTable$setRow(rowKey="est", list(value=info.title))
-               infoTable$setRow(rowKey="call",list(value=info.call))
+               infoTable$setRow(rowKey="call",list(comm=info.call))
                infoTable$setRow(rowKey="aic",list(value=info.aic))
                infoTable$setRow(rowKey="bic",list(value=info.bic))
-               if (!(reml)) {
-                                  infoTable$setRow(rowKey="log",list(value=info.loglik))
-               }
+               infoTable$setRow(rowKey="log",list(value=info.loglik))
+               infoTable$setRow(rowKey="dev",list(value=info.dev))
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
-
-        
+               infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
+            
                ### end of info table ###
         
                ### random table ######        
                  
         ### ### ### ### ###
-        # anova table ##
-                ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
-                 if (length(modelTerms)==0) {
-                     anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
-                 } else {
-                       rawlabels<-rownames(anova_res)
-                       labels<-n64$nicenames(rawlabels)
-                       for (i in seq_len(dim(anova_res)[1])) {
-                              tableRow<-anova_res[i,]  
-                              anovaTable$setRow(rowNo=i,tableRow)
-                              anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
-                       }
-                      messages<-mf.getModelMessages(model)
-                      
-                      for (i in seq_along(messages)) {
-                              infoTable$setNote(as.character(i),messages[[i]])
-                      }
-                      if (length(messages)>0) {
-                        infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-                      }
-                      
-                      if (attr(anova_res,"statistic")=="Chisq") {
-                          anovaTable$setNote("lmer.chisq",WARNS["lmer.chisq"])
-                          anovaTable$getColumn('test')$setTitle("Chi-squared")
-                          anovaTable$getColumn('df1')$setTitle("df")
-                          anovaTable$getColumn('df2')$setVisible(FALSE)
-                       } else
-                              anovaTable$setNote("df",paste(attr(anova_res,"method"),"method for degrees of freedom"))
-        
-                 }
+     
+
+                 
                 ### parameter table ####
                 if (nrow(parameters)>0) {
+                  if (self$options$showParamsCI==TRUE | self$options$showExpbCI==TRUE) {
                   #### confidence intervals ######
                   ciWidth<-self$options$paramCIWidth/100
                   citry<-try({
-                    ci<-mf.confint(model,level=ciWidth)
+                    ci<-mf.confint(model,level=ciWidth,method=self$options$cimethod)
                     colnames(ci)<-c("cilow","cihig")
                     parameters<-cbind(parameters,ci) 
+                    ci[,1]<-exp(ci[,1])
+                    ci[,2]<-exp(ci[,2])
+                    colnames(ci)<-c("ecilow","ecihig")
+                    parameters<-cbind(parameters,ci) 
+                    
                   })
                   if (jmvcore::isError(citry)) {
-                    message <- extractErrorMessage(citry)
+                    message <- jmvcore::extractErrorMessage(citry)
                     estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
+                    }
                   }
+                  
+
+                  ### end of confidence intervals
+                  
                   rownames(parameters)<-n64$nicenames(rownames(parameters))
                   for (i in 1:nrow(parameters)) {
                     tableRow=parameters[i,]
@@ -337,21 +365,6 @@ gamljMixedClass <- R6::R6Class(
                 
                } else ginfo("clean summary recycled")
                
-        #### LRT for random effects ####
-        if (self$options$lrtRandomEffects) {
-          
-          lrtTable<-self$results$main$lrtRandomEffectsTable
-          ranova_test<-try(res<-as.data.frame(lmerTest::ranova(model)[-1,]))
-          if (jmvcore::isError(ranova_test)) {
-              message <- extractErrorMessage(ranova_test)
-              lrtTable$setNote("noluck",paste(message,". LRT cannot be computed"))
-          } else {
-             res$test<-n64$translate(rownames(res))
-             res$test<-as.character(res$test)
-             for (i in seq_len(nrow(res)))
-                  lrtTable$addRow(rowKey=i,res[i,])
-          } 
-        }
 
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
@@ -422,11 +435,44 @@ gamljMixedClass <- R6::R6Class(
         n64$addLabel(contrast$var,lf.contrastLabels(levels, contrast$type)) 
         attr(data[[jmvcore::toB64(contrast$var)]],"jcontrast")<-contrast$type
       }
+      modelType<-self$options$modelSelection
       
-      if ( ! is.null(dep)) {
-        data[[jmvcore::toB64(dep)]] <- jmvcore::toNumeric(dataRaw[[dep]])
+      depOk<-FALSE
+      dep64<-jmvcore::toB64(dep)
+      
+      if (modelType=="logistic" || modelType=="probit") {
+        
+        if (!is.factor(dataRaw[[dep]]))
+          dataRaw[[dep]]<-factor(dataRaw[[dep]])
+        
+        data[[dep64]] <- dataRaw[[dep]] 
+        levs<-base::levels(data[[dep64]])
+        if (length(levs)!=2)
+          return(paste(modelType,"model requires two levels in the dependent variable"))
+        n64$addFactor(dep,levs)
+        depOk<-TRUE
+        
+      }
+      
+      if (modelType=="multinomial") {
+        
+        if (!is.factor(dataRaw[[dep]]))
+          dataRaw[[dep]]<-factor(dataRaw[[dep]])
+        
+        data[[dep64]] <- dataRaw[[dep]] 
+        levs<-base::levels(data[[dep64]])
+        if (length(levs)<3)
+          return("For 2-levels factors please use a logistic model")
+        n64$addFactor(dep,levs)
+        n64$addLabel(dep,lf.contrastLabels(levels, "simple")) 
+        depOk<-TRUE
+      }
+      if (!depOk) {
+        data[[dep64]] <- jmvcore::toNumeric(dataRaw[[dep]])
         n64$addVar(dep)
       }
+      
+
       for (cluster in clusters) {
         data[[jmvcore::toB64(cluster)]] <- as.factor(dataRaw[[cluster]])
         n64$addVar(cluster)
@@ -443,11 +489,19 @@ gamljMixedClass <- R6::R6Class(
       return(data)
       
     },
-    .estimate = function(form, data,REML=TRUE) {
+    .estimate = function(form, data) {
+      nAGQ<-self$options$nAGQ
+      modelType<-self$options$modelSelection
+      afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
+
+      if (afamily$link=="identity" & afamily$family=="gaussian")
+         jmvcore::reject("The requested model is a linear mixed model, please use the Mixed Models command", code='error')
+      
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      lm = do.call(lmerTest::lmer, list(formula=form, data=data,REML=REML))
+      lm = do.call(lme4::glmer, list(formula=form, data=data,
+                                         family = afamily, nAGQ = nAGQ))
       return(lm)
     },
     .modelFormula=function() {
@@ -460,9 +514,9 @@ gamljMixedClass <- R6::R6Class(
       } else return(FALSE)
       
       rands<-self$options$randomTerms
-      
       rands<-private$.buildreffects(rands,self$options$correlatedEffects)
 
+      
       modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
       fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
       mf<-paste(fixed,rands,sep =  "")
@@ -489,11 +543,13 @@ gamljMixedClass <- R6::R6Class(
   ciWidth   <- self$options$ciWidth
   optionRaw<-self$options$plotRaw
   optionRange<-self$options$plotDvScale
-  referToData<-(optionRaw || optionRange)
+  plotLinearPred<-self$options$plotLinearPred
+  referToData<-((optionRaw || optionRange) & !(plotLinearPred))
   plotScale<-self$options$simpleScale
   offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
-  
-  
+  type="response"
+  if (plotLinearPred)
+     type="link"
   
   if (referToData)
     rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)
@@ -510,14 +566,13 @@ gamljMixedClass <- R6::R6Class(
     data<-model@frame
     # here we set all model predictors but the x-axis variable to zero
     # to smooth random effects predicted values
+    
     mvars<-names(data)
     tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
     newdata<-data
     for(v in tozero)
-      if (!is.factor(newdata[,v]))
         newdata[,v]<-0
-    
-    pd<-stats::predict(model,type="response",newdata=newdata)
+    pd<-predict(model,type=type,newdata=newdata)
     # end of zeroing 
     
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
@@ -525,6 +580,7 @@ gamljMixedClass <- R6::R6Class(
     names(randomData)<-c("y",pnames[1:length(preds64)])
     note<-self$results$plotnotes
     note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
+#    note$setContent('Random effects')
     note$setVisible(TRUE)
     
   } else
@@ -535,9 +591,9 @@ gamljMixedClass <- R6::R6Class(
                                plotsName,
                                errorBarType,
                                ciWidth,
-                               conditioning=private$.cov_condition)
+                               conditioning=private$.cov_condition,type=type)
  
-  yAxisRange <- gplots.range(model,depName,predData,rawData)
+  yAxisRange <- gplots.range(model,depName,predData,rawData,linearPred=plotLinearPred)
   
   if (!optionRaw)
     rawData<-NULL

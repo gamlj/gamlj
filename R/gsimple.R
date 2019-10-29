@@ -1,6 +1,5 @@
 gsimple.init<-function(data,options,tables, n64=NULL, cov_condition=NULL) {
 
-  ginfo("Init simple effects")
   dep<-options$dep
   variable<-options$simpleVariable
   moderator<-options$simpleModerator
@@ -9,7 +8,9 @@ gsimple.init<-function(data,options,tables, n64=NULL, cov_condition=NULL) {
   
   if (is.null(variable) | is.null(moderator)) 
      return()
-    
+  
+  ginfo("Init simple effects")
+  
     modelType<-"linear"
     if ("modelSelection" %in% names(options))
          modelType<-options$modelSelection
@@ -123,7 +124,6 @@ gsimple.init<-function(data,options,tables, n64=NULL, cov_condition=NULL) {
 
 gsimple.populate<-function(model,options,tables,cov_conditioning) {
 
-        ginfo("Populate simple effects")
   
         variable<-options$simpleVariable
         moderator<-options$simpleModerator
@@ -132,7 +132,9 @@ gsimple.populate<-function(model,options,tables,cov_conditioning) {
   
         if (is.null(variable) | is.null(moderator)) 
            return()
-  
+        
+        ginfo("Populate simple effects")
+        
   ### collect the tables
   
        anovaTable<-tables$Anova

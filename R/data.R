@@ -107,3 +107,32 @@ NULL
 #' @examples
 #' data(poissonacts)
 NULL
+
+#' Individual growth model data
+#'
+#' Simulated data for individual growth models. 
+#' Simulation of an experiment in which two procedures are administered 
+#' between-subjects to two different groups. Each participant’s body temperature
+#' is measured for about 6 minutes every 6 seconds. Time is recorded in tenth of minutes
+#' (6 seconds=0.1, 12 seconds=0.2, etc.). 
+#'
+#' @docType data
+#' @name temptime
+#' @usage data(temptime)
+#' @keywords datasets
+#' @examples
+#' data(temptime)
+NULL
+
+#' Clustered data for logistic regression
+#'
+#' Simulated data for testing logistic mixed models. 
+#' Simulation of pupils data clustered across schools with a dichotomous outcome  
+#'
+#' @docType data
+#' @name schoolexam
+#' @usage data(schoolexam)
+#' @keywords datasets
+#' @examples
+#' data(schoolexam)
+NULL

@@ -1,14 +1,15 @@
 # GAMLj Suite for Linear Models in jamovi
 
-General, Mixed and Generalized Models module for jamovi
+General, Mixed and Generalized, and Generalized Mixed Models module for jamovi
 
-version 1.6.*
+version 2.0.*
+
 <center>
 <img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
 </center>
 <br>
 
-Estimates a General Linear Model, Mixed Linear Models and Generalized Linear Models with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
+Estimates a General Linear Model, Mixed Linear Models, Generalized Linear Models and Generalized Mixed Models with categorial and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
 
 * Continuous and categorical independent and dependent variables

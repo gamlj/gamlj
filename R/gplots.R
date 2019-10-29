@@ -7,7 +7,7 @@
 
 gplots.range<- function(x,...) UseMethod(".range")
 
-.range.default<-function(model,depName,predictions,rawData=NULL) {
+.range.default<-function(model,depName,predictions,rawData=NULL,linearPred=FALSE) {
   
   if (!is.null(rawData)) {
     rawRange <- pretty(rawData$y)
@@ -24,9 +24,18 @@ gplots.range<- function(x,...) UseMethod(".range")
   return(yAxisRange)
 }
 
-.range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL) {
+.range.glmerMod<-function(model,depName=NULL,predictions=NULL,rawData=NULL,linearPred=FALSE) {
   
-  if (model$family[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
+    return(.range.glm(model,depName,predictions,rawData,linearPred))
+  
+}
+
+.range.glm<-function(model,depName=NULL,predictions=NULL,rawData=NULL,linearPred=FALSE) {
+  
+  if (linearPred==TRUE)
+    return(.range.default(model,depName,predictions,rawData))
+  
+  if (stats::family(model)[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
     return(.range.default(model,depName,predictions,rawData))
   
   return(c(0,1))
@@ -67,10 +76,16 @@ gplots.rawData<- function(x,...) UseMethod(".rawData")
   
 }  
 
+.rawData.glmerMod<-function(model,depName,groupName,linesName=NULL,plotsName=NULL) {
+   
+   .rawData.glm(model,depName,groupName,linesName=linesName,plotsName=plotsName) 
+     
+}
+
 .rawData.glm<-function(model,depName,groupName,linesName=NULL,plotsName=NULL) {
   
-  
-  if (model$family[1] %in% c("binomial")) {
+  .family<-stats::family(model)
+  if (.family$family %in% c("binomial")) {
     data=mf.getModelData(model)
     data$y<-ifelse(data[[jmvcore::toB64(depName)]]==levels(data[[jmvcore::toB64(depName)]])[1],1,0)
     data$x<-data[[jmvcore::toB64(groupName)]]
@@ -107,7 +122,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
                                      plotsName=NULL,
                                      bars="none",
                                      ciwidth=95,
-                                     conditioning=NULL) {
+                                     conditioning=NULL,type="response") {
   
   selected<-c(groupName,linesName,plotsName)  
   selected64<-jmvcore::toB64(selected)
@@ -120,7 +135,7 @@ gplots.preparePlotData<- function(x,...) UseMethod(".preparePlotData")
     cond$updateValues(groupName,pretty(c(min(data[[jmvcore::toB64(groupName)]]),max(data[[jmvcore::toB64(groupName)]])),25))
   
   pdata<-try({
-    pred.means(model,selected64,cond)
+    pred.means(model,selected64,cond,type=type)
   })
   if (jmvcore::isError(pdata)) {
     ginfo(paste("problems with emmeans in plot data",jmvcore::extractErrorMessage(pdata)))
@@ -309,16 +324,19 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
 #  gdata$lines<-factor(gdata$lines)
 
    p <- ggplot2::ggplot()
-  
+   p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
+   
   if (!is.null(image$state$raw)) {
     rawData=image$state$raw
-    p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
-  }
-
+    if (is.factor(rawData$z))
+        p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y",color="z"),show.legend=FALSE, alpha=.5,shape=16, size=2)
+    else
+        p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
+    }
 
   p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
-  p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
+ # p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
   
 
   if (is.factor(image$state$data$group)) {
@@ -339,13 +357,7 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     thinker<-0
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      thinker<-.3
-      form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      ginfo("Random effects plotting: we are smoothing with formula",form)
-      p<-p +ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"),size=.2,colour="gray64", alpha=.8,
-                       method = "lm",formula = form,
-                       fullrange = TRUE,se=FALSE,show.legend=F) 
-     
+      p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2, color="cadetblue3",show.legend = F) 
     }
     if (errorType != '')
       p <- p + ggplot2::geom_ribbon(data=gdata,aes_string(x="group", ymin="lwr", ymax="upr",group="lines",colour="lines",fill = "lines"),linetype = 0,show.legend=F, alpha=.2)          
@@ -402,11 +414,12 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
       form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
-      ginfo("Random effects plotting: we are smoothing with formula",form)
-      p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
-                       method = "lm",formula=form,
-                       alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
-          }
+      ginfo("Random effects plotting")
+      #p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
+      #                 method = "glm",formula=form,
+      #                 alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
+        p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2,show.legend = F) 
+      }
     
     if (errorType != '')
       p <- p + ggplot2::geom_ribbon(aes_string(x="group", ymin="lwr", ymax="upr"),show.legend=F, alpha=.2)
