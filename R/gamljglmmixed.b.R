@@ -86,9 +86,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
       
-      if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
-        infoTable$addRow(rowKey="devdf",list(info="Value/DF",comm="Close to 1 is better"))
-      
+
       if ("note" %in% names(info))
         infoTable$addRow(rowKey="note",list(info="Note",value=info$note[[1]],comm=info$note[[2]]))
       
