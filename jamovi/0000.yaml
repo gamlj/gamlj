@@ -6,12 +6,12 @@ jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: 2019-1-10
+date: 2019-10-29
 type: R
 description: >-
-  A suite for estimation of linear model, such as the general linear model,
-  linear mixed model, generalized linear models. For ech family, models can be
-  estimated with categorical and/or continuous variables, with options to
+  A suite for estimation of linear models, such as the general linear model,
+  linear mixed model, generalized linear models and generalized mixed models.
+  For ech family, models can be estimated with categorical and/or continuous variables, with options to
   facilitate estimation of  interactions, simple slopes, simple effects,
   post-hoc tests, contrast analysis and visualization of the results.
 analyses:
