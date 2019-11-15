@@ -500,8 +500,13 @@ gamljGlmMixedClass <- R6::R6Class(
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      lm = do.call(lme4::glmer, list(formula=form, data=data,
-                                         family = afamily, nAGQ = nAGQ))
+#      lm = do.call(lme4::glmer, list(formula=form, data=data,
+#                                         family = afamily, nAGQ = nAGQ))
+      lm = do.call(lme4::glmer, list(formula=form,
+                                    data=data,
+                                    family = afamily,
+                                    nAGQ = nAGQ,
+                                    lme4::glmerControl(optimizer = "bobyqa")))
       return(lm)
     },
     .modelFormula=function() {
