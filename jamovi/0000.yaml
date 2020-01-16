@@ -106,5 +106,7 @@ datasets:
     tags:
       - Mixed models
       - Logistic mixed models
+usesNative: true
+minApp: 1.0.8
 
 ...

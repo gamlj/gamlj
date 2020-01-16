@@ -407,8 +407,8 @@ gamljGlmMixedClass <- R6::R6Class(
     rterms
   },
   .cleandata=function() {
+      Sys.setlocale("LC_NUMERIC", "C")
       n64<-private$.names64
-      
       dep <- self$options$dep
       factors <- self$options$factors
       covs <- self$options$covs
