@@ -161,7 +161,6 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 #    emmeans::emm_options(ref_grid = list(level = .90))
     args<-list(model,specs=preds,var=variable,at=condlist,options=list(level=lev))
     est<-do.call(emmeans::emtrends,args)
-    mark(est)
     ci<-as.data.frame(est)
     ####### rename ci variables because emmeans changes them for different models
     wci<-dim(ci)[2]

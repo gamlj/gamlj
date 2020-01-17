@@ -28,7 +28,6 @@
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 .getModelData.default<-function(model) {
-     mark("mf.getModelData default for class ",class(model))
      return(model$model)
 }
 
