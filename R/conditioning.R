@@ -90,7 +90,6 @@ conditioning <- R6::R6Class("conditioning",
           res<-list()
           if (decode)
              var<-jmvcore::fromB64(var)
-          
           specs<-private$cond_specs[var]
           for (one in names(specs)) {
             res[[one]]<-specs[[one]]$values
@@ -148,7 +147,6 @@ conditioning <- R6::R6Class("conditioning",
             else
               for (name in self$vars) 
                 private$cond_specs[[name]]<-private$makeLabels(method,spans[[name]])
-            
 
           },
           makeLabels=function(obj,span) {

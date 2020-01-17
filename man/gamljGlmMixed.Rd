@@ -4,21 +4,51 @@
 \alias{gamljGlmMixed}
 \title{Generalized Mixed Models}
 \usage{
-gamljGlmMixed(data, dep = NULL, factors = NULL, covs = NULL,
-  modelTerms = NULL, fixedIntercept = TRUE, showParamsCI = FALSE,
-  showExpbCI = TRUE, paramCIWidth = 95, contrasts = NULL,
-  showRealNames = TRUE, showContrastCode = FALSE, plotHAxis = NULL,
-  plotSepLines = NULL, plotSepPlots = NULL, plotRaw = FALSE,
-  plotDvScale = FALSE, plotError = "none", ciWidth = 95,
-  postHoc = NULL, eDesc = FALSE, eCovs = FALSE,
-  simpleVariable = NULL, simpleModerator = NULL, simple3way = NULL,
-  simpleScale = "mean_sd", cvalue = 1, percvalue = 25,
-  simpleScaleLabels = "labels", postHocCorr = list("bonf"),
-  scaling = NULL, cluster = NULL, randomTerms = list(list()),
-  correlatedEffects = "corr", plotRandomEffects = FALSE,
-  plotLinearPred = FALSE, nAGQ = 1, effectSize = list("expb"),
-  modelSelection = "logistic", custom_family = "gaussian",
-  custom_link = "identity", cimethod, formula)
+gamljGlmMixed(
+  data,
+  dep = NULL,
+  factors = NULL,
+  covs = NULL,
+  modelTerms = NULL,
+  fixedIntercept = TRUE,
+  showParamsCI = FALSE,
+  showExpbCI = TRUE,
+  paramCIWidth = 95,
+  contrasts = NULL,
+  showRealNames = TRUE,
+  showContrastCode = FALSE,
+  plotHAxis = NULL,
+  plotSepLines = NULL,
+  plotSepPlots = NULL,
+  plotRaw = FALSE,
+  plotDvScale = FALSE,
+  plotError = "none",
+  ciWidth = 95,
+  postHoc = NULL,
+  eDesc = FALSE,
+  eCovs = FALSE,
+  simpleVariable = NULL,
+  simpleModerator = NULL,
+  simple3way = NULL,
+  simpleScale = "mean_sd",
+  cvalue = 1,
+  percvalue = 25,
+  simpleScaleLabels = "labels",
+  postHocCorr = list("bonf"),
+  scaling = NULL,
+  cluster = NULL,
+  randomTerms = list(list()),
+  correlatedEffects = "corr",
+  plotRandomEffects = FALSE,
+  plotLinearPred = FALSE,
+  nAGQ = 1,
+  effectSize = list("expb"),
+  modelSelection = "logistic",
+  custom_family = "gaussian",
+  custom_link = "identity",
+  cimethod,
+  formula
+)
 }
 \arguments{
 \item{data}{the data as a data frame}
@@ -160,7 +190,6 @@ A results object containing:
   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
-  \code{results$main$lrtRandomEffectsTable} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr

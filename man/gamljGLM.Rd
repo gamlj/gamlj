@@ -4,18 +4,43 @@
 \alias{gamljGLM}
 \title{General Linear Model}
 \usage{
-gamljGLM(data, dep = NULL, factors = NULL, covs = NULL,
-  modelTerms = NULL, fixedIntercept = TRUE, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts = NULL, showRealNames = TRUE,
-  showContrastCode = FALSE, plotHAxis = NULL, plotSepLines = NULL,
-  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
-  plotError = "none", ciWidth = 95, postHoc = NULL, eDesc = FALSE,
-  eCovs = FALSE, simpleVariable = NULL, simpleModerator = NULL,
-  simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
-  percvalue = 25, simpleScaleLabels = "labels",
-  postHocCorr = list("bonf"), scaling = NULL,
-  effectSize = list("beta", "partEta"), homoTest = FALSE, qq = FALSE,
-  normTest = FALSE, formula)
+gamljGLM(
+  data,
+  dep = NULL,
+  factors = NULL,
+  covs = NULL,
+  modelTerms = NULL,
+  fixedIntercept = TRUE,
+  showParamsCI = TRUE,
+  paramCIWidth = 95,
+  contrasts = NULL,
+  showRealNames = TRUE,
+  showContrastCode = FALSE,
+  plotHAxis = NULL,
+  plotSepLines = NULL,
+  plotSepPlots = NULL,
+  plotRaw = FALSE,
+  plotDvScale = FALSE,
+  plotError = "none",
+  ciWidth = 95,
+  postHoc = NULL,
+  eDesc = FALSE,
+  eCovs = FALSE,
+  simpleVariable = NULL,
+  simpleModerator = NULL,
+  simple3way = NULL,
+  simpleScale = "mean_sd",
+  cvalue = 1,
+  percvalue = 25,
+  simpleScaleLabels = "labels",
+  postHocCorr = list("bonf"),
+  scaling = NULL,
+  effectSize = list("beta", "partEta"),
+  homoTest = FALSE,
+  qq = FALSE,
+  normTest = FALSE,
+  formula
+)
 }
 \arguments{
 \item{data}{the data as a data frame}
