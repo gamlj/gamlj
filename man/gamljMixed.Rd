@@ -4,19 +4,45 @@
 \alias{gamljMixed}
 \title{Mixed Model}
 \usage{
-gamljMixed(data, dep = NULL, factors = NULL, covs = NULL,
-  modelTerms = NULL, fixedIntercept = TRUE, showParamsCI = TRUE,
-  paramCIWidth = 95, contrasts = NULL, showRealNames = TRUE,
-  showContrastCode = FALSE, plotHAxis = NULL, plotSepLines = NULL,
-  plotSepPlots = NULL, plotRaw = FALSE, plotDvScale = FALSE,
-  plotError = "none", ciWidth = 95, postHoc = NULL, eDesc = FALSE,
-  eCovs = FALSE, simpleVariable = NULL, simpleModerator = NULL,
-  simple3way = NULL, simpleScale = "mean_sd", cvalue = 1,
-  percvalue = 25, simpleScaleLabels = "labels",
-  postHocCorr = list("bonf"), scaling = NULL, cluster = NULL,
-  randomTerms = list(list()), correlatedEffects = "corr",
-  reml = TRUE, lrtRandomEffects = FALSE, plotRandomEffects = FALSE,
-  formula)
+gamljMixed(
+  data,
+  dep = NULL,
+  factors = NULL,
+  covs = NULL,
+  modelTerms = NULL,
+  fixedIntercept = TRUE,
+  showParamsCI = TRUE,
+  paramCIWidth = 95,
+  contrasts = NULL,
+  showRealNames = TRUE,
+  showContrastCode = FALSE,
+  plotHAxis = NULL,
+  plotSepLines = NULL,
+  plotSepPlots = NULL,
+  plotRaw = FALSE,
+  plotDvScale = FALSE,
+  plotError = "none",
+  ciWidth = 95,
+  postHoc = NULL,
+  eDesc = FALSE,
+  eCovs = FALSE,
+  simpleVariable = NULL,
+  simpleModerator = NULL,
+  simple3way = NULL,
+  simpleScale = "mean_sd",
+  cvalue = 1,
+  percvalue = 25,
+  simpleScaleLabels = "labels",
+  postHocCorr = list("bonf"),
+  scaling = NULL,
+  cluster = NULL,
+  randomTerms = list(list()),
+  correlatedEffects = "corr",
+  reml = TRUE,
+  lrtRandomEffects = FALSE,
+  plotRandomEffects = FALSE,
+  formula
+)
 }
 \arguments{
 \item{data}{the data as a data frame}

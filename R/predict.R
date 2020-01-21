@@ -156,7 +156,11 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 
   } else {
     condlist<-cov_conditioning$values(preds,decode=T)
-    est<-emmeans::emtrends(model,specs=preds,var=variable,at=condlist,options=list(level=interval/100))
+    lev<-interval/100
+#    est<-emmeans::emtrends(model,specs=preds,var=variable,at=condlist,options=list(level=lev))
+#    emmeans::emm_options(ref_grid = list(level = .90))
+    args<-list(model,specs=preds,var=variable,at=condlist,options=list(level=lev))
+    est<-do.call(emmeans::emtrends,args)
     ci<-as.data.frame(est)
     ####### rename ci variables because emmeans changes them for different models
     wci<-dim(ci)[2]

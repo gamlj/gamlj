@@ -34,9 +34,9 @@ gamljGLMClass <- R6::R6Class(
         fixedIntercept=TRUE
       }
 
-
+      
       data<-private$.cleandata()
-
+      
       
       modelFormula<-lf.constructFormula(dep,modelTerms,fixedIntercept)
       
@@ -105,8 +105,6 @@ gamljGLMClass <- R6::R6Class(
       dep <- self$options$dep
       if (is.null(dep))
         return()
-      
-      
       modelTerms<-self$options$modelTerms
       fixedIntercept<-self$options$fixedIntercept
       factors <- self$options$factors
@@ -138,7 +136,7 @@ gamljGLMClass <- R6::R6Class(
       
 
       if (!is.data.frame(data))
-        reject(data)
+        jmvcore::reject(data)
       for (scaling in self$options$scaling) {
         data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type)  
       }
@@ -311,6 +309,7 @@ gamljGLMClass <- R6::R6Class(
         
     },
   .cleandata=function() {
+      Sys.setlocale("LC_NUMERIC", "C")
       n64<-private$.names64
       dep <- self$options$dep
       factors <- self$options$factors

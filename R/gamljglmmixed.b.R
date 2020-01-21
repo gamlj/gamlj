@@ -407,8 +407,8 @@ gamljGlmMixedClass <- R6::R6Class(
     rterms
   },
   .cleandata=function() {
+      Sys.setlocale("LC_NUMERIC", "C")
       n64<-private$.names64
-      
       dep <- self$options$dep
       factors <- self$options$factors
       covs <- self$options$covs
@@ -500,8 +500,13 @@ gamljGlmMixedClass <- R6::R6Class(
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      lm = do.call(lme4::glmer, list(formula=form, data=data,
-                                         family = afamily, nAGQ = nAGQ))
+#      lm = do.call(lme4::glmer, list(formula=form, data=data,
+#                                         family = afamily, nAGQ = nAGQ))
+      lm = do.call(lme4::glmer, list(formula=form,
+                                    data=data,
+                                    family = afamily,
+                                    nAGQ = nAGQ,
+                                    lme4::glmerControl(optimizer = "bobyqa")))
       return(lm)
     },
     .modelFormula=function() {
@@ -570,10 +575,16 @@ gamljGlmMixedClass <- R6::R6Class(
     mvars<-names(data)
     tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
     newdata<-data
+
     for(v in tozero)
-        newdata[,v]<-0
+      if (class(newdata[,v])=="numeric") {
+        center<-mean(newdata[,v])
+        newdata[,v]<-center
+      }
+
     pd<-predict(model,type=type,newdata=newdata)
     # end of zeroing 
+
     
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
     pnames<-c("cluster","group","lines","plots")
@@ -585,6 +596,7 @@ gamljGlmMixedClass <- R6::R6Class(
     
   } else
     randomData<-NULL
+  
   predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,
@@ -592,7 +604,8 @@ gamljGlmMixedClass <- R6::R6Class(
                                errorBarType,
                                ciWidth,
                                conditioning=private$.cov_condition,type=type)
- 
+
+  
   yAxisRange <- gplots.range(model,depName,predData,rawData,linearPred=plotLinearPred)
   
   if (!optionRaw)

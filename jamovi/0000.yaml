@@ -1,19 +1,20 @@
 ---
 title: General Analyses for Linear Models in Jamovi
 name: gamlj
-version: 2.0.0
+version: 2.0.1
 jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: 2019-10-29
+date: 2019-11-1
 type: R
 description: >-
   A suite for estimation of linear models, such as the general linear model,
   linear mixed model, generalized linear models and generalized mixed models.
-  For ech family, models can be estimated with categorical and/or continuous variables, with options to
-  facilitate estimation of  interactions, simple slopes, simple effects,
-  post-hoc tests, contrast analysis and visualization of the results.
+  For ech family, models can be estimated with categorical and/or continuous
+  variables, with options to facilitate estimation of  interactions, simple
+  slopes, simple effects, post-hoc tests, contrast analysis and visualization of
+  the results.
 analyses:
   - title: General Linear Model
     name: gamljGLM
@@ -105,5 +106,7 @@ datasets:
     tags:
       - Mixed models
       - Logistic mixed models
+usesNative: true
+minApp: 1.0.8
 
 ...

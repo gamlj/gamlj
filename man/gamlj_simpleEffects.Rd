@@ -4,8 +4,13 @@
 \alias{gamlj_simpleEffects}
 \title{Update a GAMLj results by passing new simple effects directives}
 \usage{
-gamlj_simpleEffects(gobj, variable = NULL, moderator = NULL,
-  threeway = NULL, ...)
+gamlj_simpleEffects(
+  gobj,
+  variable = NULL,
+  moderator = NULL,
+  threeway = NULL,
+  ...
+)
 }
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*}
