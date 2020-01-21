@@ -62,7 +62,6 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
 
 
 pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95,type="response") {
-         mark("we are in pred.means")
          suppressWarnings(
          est<-rawMeans(model,terms,cov_conditioning,interval=interval,type=type)
          )
