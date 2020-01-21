@@ -575,10 +575,16 @@ gamljGlmMixedClass <- R6::R6Class(
     mvars<-names(data)
     tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
     newdata<-data
+
     for(v in tozero)
-        newdata[,v]<-0
+      if (class(newdata[,v])=="numeric") {
+        center<-mean(newdata[,v])
+        newdata[,v]<-center
+      }
+
     pd<-predict(model,type=type,newdata=newdata)
     # end of zeroing 
+
     
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
     pnames<-c("cluster","group","lines","plots")
@@ -590,6 +596,7 @@ gamljGlmMixedClass <- R6::R6Class(
     
   } else
     randomData<-NULL
+  
   predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,
@@ -597,7 +604,8 @@ gamljGlmMixedClass <- R6::R6Class(
                                errorBarType,
                                ciWidth,
                                conditioning=private$.cov_condition,type=type)
- 
+
+  
   yAxisRange <- gplots.range(model,depName,predData,rawData,linearPred=plotLinearPred)
   
   if (!optionRaw)

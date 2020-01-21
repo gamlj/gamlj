@@ -426,8 +426,8 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
     
     p <- p + ggplot2::geom_line(aes_string(x="group",y="fit"),size=1.5,show.legend = F) 
   }
-  
   p+theme
+
 }
 
 
@@ -448,5 +448,4 @@ gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,p
     return(gplots.twoWaysPlot(image,ggtheme,depLabs,groupName,depName,errorType=errorType)+ggtheme)
 }
 
-ggplot2::label_both(list(a=c("a","b")))
 
