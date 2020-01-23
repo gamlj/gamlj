@@ -577,12 +577,13 @@ gamljGlmMixedClass <- R6::R6Class(
     newdata<-data
 
     for(v in tozero)
-      if (class(newdata[,v])=="numeric") {
+      if (!is.factor(newdata[,v])) {
         center<-mean(newdata[,v])
         newdata[,v]<-center
-      }
-
+    } 
+    
     pd<-predict(model,type=type,newdata=newdata)
+   
     # end of zeroing 
 
     
@@ -617,6 +618,7 @@ gamljGlmMixedClass <- R6::R6Class(
              yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
     }
   
+
   gplots.images(self,data=predData,raw=rawData,range=yAxisRange,randomData=randomData)
 
 },
