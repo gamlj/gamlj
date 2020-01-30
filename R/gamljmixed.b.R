@@ -233,7 +233,7 @@ gamljMixedClass <- R6::R6Class(
                          ### full summary results ####
                          test_summary<-try(model_summary<-summary(model))
                          if (jmvcore::isError(test_summary)) {
-                               msg <- extractErrorMessage(test_summary)
+                               msg <- jmvcore::extractErrorMessage(test_summary)
                                msg<-n64$translate(msg)
                                jmvcore::reject(msg, code='error')
                          }
@@ -321,7 +321,7 @@ gamljMixedClass <- R6::R6Class(
                     parameters<-cbind(parameters,ci) 
                   })
                   if (jmvcore::isError(citry)) {
-                    message <- extractErrorMessage(citry)
+                    message <- jmvcore::extractErrorMessage(citry)
                     estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
                   }
                   rownames(parameters)<-n64$nicenames(rownames(parameters))
@@ -343,7 +343,7 @@ gamljMixedClass <- R6::R6Class(
           lrtTable<-self$results$main$lrtRandomEffectsTable
           ranova_test<-try(res<-as.data.frame(lmerTest::ranova(model)[-1,]))
           if (jmvcore::isError(ranova_test)) {
-              message <- extractErrorMessage(ranova_test)
+              message <- jmvcore::extractErrorMessage(ranova_test)
               lrtTable$setNote("noluck",paste(message,". LRT cannot be computed"))
           } else {
              res$test<-n64$translate(rownames(res))
@@ -507,17 +507,21 @@ gamljMixedClass <- R6::R6Class(
   
   preds64<-c(cluster,preds64)
   if (self$options$plotRandomEffects) {
+    
     data<-model@frame
     # here we set all model predictors but the x-axis variable to zero
     # to smooth random effects predicted values
     mvars<-names(data)
     tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
     newdata<-data
+    toaggregate<-list()
     for(v in tozero)
-      if (!is.factor(newdata[,v]))
-        newdata[,v]<-0
+      if (!is.factor(newdata[,v])) {
+        center<-mean(newdata[,v])
+        newdata[,v]<-center
+      } 
+    pd<-stats::predict(model,type="response",newdata=newdata,allow.new.levels=TRUE)
     
-    pd<-stats::predict(model,type="response",newdata=newdata)
     # end of zeroing 
     
     randomData<-as.data.frame(cbind(pd,data[,preds64]))
@@ -526,7 +530,6 @@ gamljMixedClass <- R6::R6Class(
     note<-self$results$plotnotes
     note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
     note$setVisible(TRUE)
-    
   } else
     randomData<-NULL
   predData<-gplots.preparePlotData(model,

@@ -357,6 +357,9 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     thinker<-0
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
+      data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
+      names(data)<-c("cluster","group","y")
+      
       p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2, color="cadetblue3",show.legend = F) 
     }
     if (errorType != '')
@@ -413,12 +416,11 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
   }  else { 
     if (!is.null(image$state$randomData)) {
       data<-image$state$randomData
-      form<-lf.constructFormula(dep="y",sapply(1:order,function(x) rep("x",x)))
+      data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
+      names(data)<-c("cluster","group","y")
+      print(head(data))
       ginfo("Random effects plotting")
-      #p<-p + ggplot2::stat_smooth(geom="line",data=data,aes_string(y="y",x="group",group="cluster"), size=.2,
-      #                 method = "glm",formula=form,
-      #                 alpha=.5,fullrange = TRUE,se=FALSE,show.legend=F) 
-        p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2,show.legend = F) 
+      p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2,show.legend = F) 
       }
     
     if (errorType != '')

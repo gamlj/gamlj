@@ -575,15 +575,14 @@ gamljGlmMixedClass <- R6::R6Class(
     mvars<-names(data)
     tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
     newdata<-data
-
     for(v in tozero)
       if (!is.factor(newdata[,v])) {
         center<-mean(newdata[,v])
         newdata[,v]<-center
     } 
-    
-    pd<-predict(model,type=type,newdata=newdata)
-   
+    pd<-stats::predict(model,type="response",newdata=newdata)
+        
+
     # end of zeroing 
 
     
