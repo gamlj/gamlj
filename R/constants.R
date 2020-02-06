@@ -121,4 +121,7 @@ WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 CONTR<-list()
 
 
+######## lme4 optimizers #########
+
+OPTIMIZERS<-c("bobyqa","Nelder_Mead","nloptwrap")
 

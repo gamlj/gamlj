@@ -275,14 +275,13 @@ mf.getModelFactors<-function(model) {
 mf.getModelMessages<-function(model) {
   message<-list(conv=TRUE,msg=NULL,singular=FALSE)
   if (.which.class(model)=="lmer") {
+      mark(model@optinfo$conv)
       message['msg']=model@optinfo$conv$lme4$messages
       message["singular"]<-lme4::isSingular(model,tol = 1e-04)
       if (message["singular"]==TRUE)
          message['msg']="The fit is singular"
       if (!is.null(model@optinfo$conv$lme4$code))
            message['conv']=FALSE
-      
-    return(message)
   }
   message
 }

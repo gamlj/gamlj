@@ -85,6 +85,8 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
+      infoTable$addRow(rowKey="conv",list(info="Convergence",comm=""))
+      infoTable$addRow(rowKey="opt",list(info="Optimizer",comm=""))
       
 
       if ("note" %in% names(info))
@@ -251,29 +253,22 @@ gamljGlmMixedClass <- R6::R6Class(
                    if (jmvcore::isError(anova_test)) 
                          jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                    }
+               }
                    # anova table ##
                    ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
-                   rawlabels<-rownames(anova_res)
-                   if (is.something(rawlabels)) {
+                rawlabels<-rownames(anova_res)
+                if (is.something(rawlabels)) {
                      labels<-n64$nicenames(rawlabels)
                      for (i in seq_len(dim(anova_res)[1])) {
                        tableRow<-anova_res[i,]  
                        anovaTable$setRow(rowNo=i,tableRow)
                        anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                      }
-                     messages<-mf.getModelMessages(model)
                      
-                     for (i in seq_along(messages)) {
-                       infoTable$setNote(as.character(i),messages[[i]])
-                     }
-                     if (length(messages)>0) {
-                       infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-                     }
-                   }
-                   anovaTable$setState(TRUE)
+                     anovaTable$setState(TRUE)
                   } else ginfo("Anova results recycled")
                     
-               if (is.null(estimatesTable$state)) {
+                if (is.null(estimatesTable$state)) {
                  
                          ### full summary results ####
                          test_summary<-try(model_summary<-summary(model))
@@ -319,7 +314,28 @@ gamljGlmMixedClass <- R6::R6Class(
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
                infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
-            
+
+               estimatesInfo<-mf.getModelMessages(model)
+               conv<-ifelse(estimatesInfo['conv'],"yes","no")
+               infoTable$setRow(rowKey="conv",list(value=conv))
+               infoTable$setRow(rowKey="opt",list(value=model@optinfo$optimizer))
+               
+               
+               for (i in seq_along(estimatesInfo['msg'])) {
+                 infoTable$setNote(as.character(i),estimatesInfo['msg'][[i]])
+               }
+               if (estimatesInfo['conv']==FALSE) {
+                 infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+               }
+               if (estimatesInfo['singular']==TRUE) {
+                 infoTable$setNote("lmer.singular",WARNS["lmer.singular"])
+               }
+               
+               
+               
+               
+               
+                           
                ### end of info table ###
         
                ### random table ######        

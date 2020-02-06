@@ -280,7 +280,12 @@ gamljMixedClass <- R6::R6Class(
                estimatesInfo<-mf.getModelMessages(model)
                conv<-ifelse(estimatesInfo['conv'],"yes","no")
                infoTable$setRow(rowKey="conv",list(value=conv))
-               infoTable$setRow(rowKey="opt",list(value=model@optinfo$optimizer))
+               if (estimatesInfo['conv']==FALSE)
+                  opt<-paste(OPTIMIZERS,collapse=", ")
+               else 
+                  opt<-model@optinfo$optimizer
+               
+               infoTable$setRow(rowKey="opt",list(value=opt))
                
 
                for (i in seq_along(estimatesInfo['msg'])) {
@@ -457,10 +462,12 @@ gamljMixedClass <- R6::R6Class(
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      optimizers<-c("bobyqa","Nelder_Mead","nloptwrap")
-      for (opt in optimizers) {
+      
+      for (opt in OPTIMIZERS) {
+          mark(opt)
           ctr=lme4::lmerControl(optimizer = opt)
           lm = do.call(lmerTest::lmer, list(formula=form, data=data,REML=REML,control=ctr))
+          mark(summary(lm))
           res<-mf.getModelMessages(lm)
           if (res$conv==TRUE)
              break()
