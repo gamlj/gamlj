@@ -72,6 +72,8 @@ gamljMixedClass <- R6::R6Class(
       }
       infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
       infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
+      infoTable$addRow(rowKey="conv",list(info="Convergence"))
+      infoTable$addRow(rowKey="opt",list(info="Optimizer"))
       
       
       ## random table
@@ -275,6 +277,23 @@ gamljMixedClass <- R6::R6Class(
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
 
+               estimatesInfo<-mf.getModelMessages(model)
+               conv<-ifelse(estimatesInfo['conv'],"yes","no")
+               infoTable$setRow(rowKey="conv",list(value=conv))
+               infoTable$setRow(rowKey="opt",list(value=model@optinfo$optimizer))
+               
+
+               for (i in seq_along(estimatesInfo['msg'])) {
+                 infoTable$setNote(as.character(i),estimatesInfo['msg'][[i]])
+               }
+               if (estimatesInfo['conv']==FALSE) {
+                 infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
+               }
+               if (estimatesInfo['singular']==TRUE) {
+                 infoTable$setNote("lmer.singular",WARNS["lmer.singular"])
+               }
+               
+               
         
                ### end of info table ###
         
@@ -293,15 +312,6 @@ gamljMixedClass <- R6::R6Class(
                               anovaTable$setRow(rowNo=i,tableRow)
                               anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                        }
-                      messages<-mf.getModelMessages(model)
-                      
-                      for (i in seq_along(messages)) {
-                              infoTable$setNote(as.character(i),messages[[i]])
-                      }
-                      if (length(messages)>0) {
-                        infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-                      }
-                      
                       if (attr(anova_res,"statistic")=="Chisq") {
                           anovaTable$setNote("lmer.chisq",WARNS["lmer.chisq"])
                           anovaTable$getColumn('test')$setTitle("Chi-squared")
@@ -447,7 +457,14 @@ gamljMixedClass <- R6::R6Class(
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      lm = do.call(lmerTest::lmer, list(formula=form, data=data,REML=REML))
+      optimizers<-c("bobyqa","Nelder_Mead","nloptwrap")
+      for (opt in optimizers) {
+          ctr=lme4::lmerControl(optimizer = opt)
+          lm = do.call(lmerTest::lmer, list(formula=form, data=data,REML=REML,control=ctr))
+          res<-mf.getModelMessages(lm)
+          if (res$conv==TRUE)
+             break()
+      }
       return(lm)
     },
     .modelFormula=function() {
