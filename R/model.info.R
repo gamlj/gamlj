@@ -12,6 +12,20 @@ mi.update<-function(table,modelType,data=NULL,dep=NULL) {
 }
 
 
+mi.infotable_footnotes<-function(table,info) {
+  if (info$aliased==TRUE) {
+    table$setNote("aliased",WARNS["ano.aliased"])
+  }
+  if (info$singular==TRUE) {
+    table$setNote("singular",WARNS["lmer.singular"])
+  }
+  for (i in seq_along(info$warning))
+    table$setNote(i,info$warning[1])
+  
+  return(table)
+}
+
+
 ######### rsquared ##########
 
 mi.rsquared<- function(x,...) UseMethod(".rsquared")
@@ -42,22 +56,30 @@ mi.rsquared<- function(x,...) UseMethod(".rsquared")
 
 mi.converged<- function(x,...) UseMethod(".converged")
 
-.converged_test<-function(logicValue) {
-  value<-ifelse(logicValue,"yes","no")
-  comm<-ifelse(logicValue,"A solution was found","Results may be misleading")
-  list(value=value,comm=comm)
+.converged.default<-function(model) {
+
+     if ("converged" %in% names(model))
+        conv<-model$converged
+     else
+        conv<-TRUE
+     conv
 }
 
-.converged.default<-function(model) {
-  
-    .converged_test(model$converged)
-  
+.converged.lmerMerMod<-function(model) {
+            
+              if (!is.null(model@optinfo$conv$lme4$code))
+                  conv<-FALSE
+              else
+                  conv<-TRUE
+              conv
 }
+
 .converged.multinom<-function(model) {
 
-      .converged_test(model$convergence==0)
-  
+      model$convergence==0
 }
+
+
 
 ########### aliazed coefficients #########
 
@@ -239,5 +261,52 @@ mi.dependencies<-function(model,term,what) {
 }
 
 
+mi.check_estimation<-function(model,n64) {
+  if (jmvcore::isError(model)) {
+      msg<-jmvcore::extractErrorMessage(model)
+      msg<-n64$translate(msg)
+      jmvcore::reject(msg, code='error')
+  }
+}
 
+mi.warn_estimation<-function(model,n64) {
+  if (jmvcore::isError(model)) {
+    msg<-jmvcore::extractErrorMessage(model)
+    n64$translate(msg)
+  }
+}
 
+###### check model characteristics ############
+
+mi.model_check<- function(model) {
+  att<-list(conv=mi.converged(model),
+                 aliased=mi.aliased(model),
+                 singular=mi.isSingular(model),warnings=mi.warnings(model))
+  attr(model,"infoTable")<-att  
+  model
+}
+######## check for singularity of fit  ##########
+
+mi.isSingular<- function(x,...) UseMethod(".mi.isSingular")
+
+.mi.isSingular.default<-function(model) {
+  return(FALSE)
+}
+
+.mi.isSingular.lmerMod<-function(model) {
+ lme4::isSingular(model)
+}
+
+######## check model warnings ##########
+
+mi.warnings<- function(x,...) UseMethod(".mi.warnings")
+
+.mi.warnings.default<-function(model) {
+  return(NULL)
+}
+
+.mi.warnings.lmerMod<-function(model) {
+  msg<-model@optinfo$conv$lme4$messages
+  return(msg)
+  
+}
