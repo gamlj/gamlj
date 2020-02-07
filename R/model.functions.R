@@ -20,6 +20,7 @@
   
 }
 
+###### model estimation and checks ##############
 
 
 
@@ -275,13 +276,10 @@ mf.getModelFactors<-function(model) {
 mf.getModelMessages<-function(model) {
   message<-list(conv=TRUE,msg=NULL,singular=FALSE)
   if (.which.class(model)=="lmer") {
-      mark(model@optinfo$conv)
       message['msg']=model@optinfo$conv$lme4$messages
       message["singular"]<-lme4::isSingular(model,tol = 1e-04)
       if (message["singular"]==TRUE)
          message['msg']="The fit is singular"
-      if (!is.null(model@optinfo$conv$lme4$code))
-           message['conv']=FALSE
   }
   message
 }
@@ -360,15 +358,35 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 mf.confint<- function(x,...) UseMethod(".confint")
 
-.confint.default<-function(model,level,method=NULL) {
+.confint.default<-function(model,level,parameters,method=NULL) {
   ginfo("CI model unknown",class(model))  
   return(FALSE)
   
 }
 
-.confint.lm<-function(model,level) 
-    return(stats::confint(model,level = level))
+.confint.format<-function(ci,parameters) {
+  att<-attr(parameters,"warning")
+  if (jmvcore::isError(ci)) {
+    message <- jmvcore::extractErrorMessage(ci)
+    att<-append(att,paste(message,"C.I. cannot be computed"))
+    ci<-NULL
+  } else {
+    ci<-data.frame(ci)
+    if (any(is.na(ci)))
+       att<-append(att,paste("Some C.I. cannot be computed"))
+    colnames(ci)<-c("cilow","cihig")
+    ci$order<-1:dim(ci)[1]
+    parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
+    parameters<-parameters[order(parameters$order),]
+    attr(parameters,"warning")<-att
+  }
+  return(parameters)
   
+}
+.confint.lm<-function(model,level,parameters)  {
+    ci<-try(stats::confint(model,level=level))
+   .confint.format(ci,parameters)
+}
 .confint.glm<-function(model,level) {  
     ci<-stats::confint(model,level = level)
     return(ci)

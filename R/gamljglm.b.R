@@ -90,7 +90,6 @@ gamljGLMClass <- R6::R6Class(
       ## hide effects labels if no factor is there
       if (!is.something(factors))
          aTable$getColumn('label')$setVisible(FALSE)
-      
         # other inits
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -150,18 +149,12 @@ gamljGLMClass <- R6::R6Class(
       
       
                
-               ##### model ####
-               ## for some reason the lm model is very heavy to save in table$state
-               ## so we estimate it every time
-               model_test <- try({
-                           model<-private$.estimate(modelFormula, data=data)
-                           wars<-warnings()
-                       })
-               if (jmvcore::isError(model_test)) {
-                        msg<-jmvcore::extractErrorMessage(model_test)
-                        msg<-n64$translate(msg)
-                        jmvcore::reject(msg, code='error')
-               }
+      ##### model ####
+      ## for some reason the lm model is very heavy to save in table$state
+      ## so we estimate it every time
+      model<- try(private$.estimate(modelFormula, data=data))
+      mi.check_estimation(model,n64)
+      model<-mi.model_check(model)
       private$.model <- model
       #### save the model for R interface ####
       self$results$.setModel(model)
@@ -170,65 +163,45 @@ gamljGLMClass <- R6::R6Class(
 
       if (is.null(estimatesTable$state)) {
                ginfo("anova and parameters have been estimated")
-               test_summary<-try(model_summary<-summary(model))
-               if (jmvcore::isError(test_summary)) {
-                   msg <- jmvcore::extractErrorMessage(test_summary)
-                   msg<-n64$translate(msg)
-                   jmvcore::reject(msg, code='error')
-               }
+               gwarnings<-list()
+               model_summary<-try(summary(model))
+               mi.check_estimation(model_summary,n64)
       
       ### coefficients summary results ####
       
-               test_parameters<-try(parameters<-mf.summary(model))
-               if (jmvcore::isError(test_parameters)) {
-                    msg <- jmvcore::extractErrorMessage(test_parameters)
-                    msg<-n64$translate(msg)
-                    jmvcore::reject(msg, code='error')
-               }
-                if (is.something(test_parameters)){
-                  
-                     if (!is.null(attr(parameters,"warning"))) 
-                          estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
-      
-                     if ("beta" %in% self$options$effectSize) {
+               parameters<-try(parameters<-mf.summary(model))
+               mi.check_estimation(parameters,n64)
+
+               if ("beta" %in% self$options$effectSize) {
+                        .beta<-NA
                         zdata<-data
                         zdata[[jmvcore::toB64(dep)]]<-scale(zdata[[jmvcore::toB64(dep)]])
                         for (var in covs)
                              zdata[[jmvcore::toB64(var)]]<-scale(zdata[[jmvcore::toB64(var)]])
-                             beta<-coef(stats::lm(modelFormula,data=zdata))
-                             if (any(is.na(beta)))
-                                   estimatesTable$setNote("nobeta",WARNS["ano.aliased"])
-                             else {
-                                  beta[1]<-0
-                                  parameters<-cbind(parameters,beta) 
-                             }
-                     }
-                  ### parameter table ####
-                  
+                        
+                         zmodel<-try(stats::lm(modelFormula,data=zdata))
+                         warn<-mi.warn_estimation(zmodel,n64)
+                         if (is.something(warn)) {
+                             attr(parameters,"warning")<-paste0(warn,". Betas cannot be computed.")
+                         } else {
+                            beta<-coef(zmodel)
+                            beta[1]<-0
+                            parameters<-cbind(parameters,beta) 
+                          }
+                  }
                   #### confidence intervals ######
                   ciWidth<-self$options$paramCIWidth/100
-                  citry<-try({
-                    ci<-mf.confint(model,level=ciWidth)
-                    colnames(ci)<-c("cilow","cihig")
-                    parameters<-cbind(parameters,ci) 
-                  })
-                  if (jmvcore::isError(citry)) {
-                    message <- jmvcore::extractErrorMessage(citry)
-                    estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-                  }
+                  parameters<-mf.confint(model,level=ciWidth,parameters)
                   rownames(parameters)<-n64$nicenames(rownames(parameters))
+                  ######  fill the table ########
                   for (i in 1:nrow(parameters)) {
                     tableRow=parameters[i,]
                     estimatesTable$setRow(rowNo=i,tableRow)
                   }
                   
                   
-                  if (mf.aliased(model)) {
-                    estimatesTable$setNote("aliased",WARNS["ano.aliased"])
-                    infoTable$setNote("aliased",WARNS["ano.aliased"])
-                  }
-                  estimatesTable$setState(TRUE)
-                }
+               estimatesTable$setState(TRUE)
+                
                
                ### anova results ####
                anova_res<-NULL
@@ -236,12 +209,10 @@ gamljGLMClass <- R6::R6Class(
                    anovaTable$setNote("warning","F-Tests cannot be computed")
                } else {
                    suppressWarnings({
-                   anova_test <- try(anova_res<-mf.anova(model)) # end suppressWarnings
+                   anova_res <- try(mf.anova(model)) # end suppressWarnings
                  })
-                   if (jmvcore::isError(anova_test)) 
-                      jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
+                 mi.check_estimation(anova_res,n64)
                }
-
 
              
                ### prepare info table #########   
@@ -269,15 +240,7 @@ gamljGLMClass <- R6::R6Class(
                        anovaTable$setRow(rowNo=i+1,anova_res[i+1,c("ss","df")])
                        anovaTable$setRow(rowNo=i+2,list("ss"=tss,"df"=tdf))
                        
-                      messages<-mf.getModelMessages(model)
-                      for (i in seq_along(messages)) {
-                              anovaTable$setNote(names(messages)[i],messages[[i]])
-                              infoTable$setNote(names(messages)[i],messages[[i]])
-                      }
-                      if (length(messages)>0) {
-                           infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-                      }
-
+ 
                  }
                ### we want to output the error SS for intercept only model
                if (length(modelTerms)==0 & fixedIntercept==TRUE) {
@@ -298,9 +261,18 @@ gamljGLMClass <- R6::R6Class(
                
         # end of check state
         } else
-          ginfo("anova and parameters have been recycled")
-    
-        private$.preparePlots(private$.model)
+            ginfo("anova and parameters have been recycled")
+      
+        ########## update notes ##########
+        iatt<-attr(model,"infoTable")
+        mi.infotable_footnotes(infoTable,iatt)
+        patt<-attr(parameters,"warning")
+        mark(attributes(parameters))
+        for (w in patt)
+          estimatesTable$setNote(w,w)
+        
+
+        private$.preparePlots(model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)        
