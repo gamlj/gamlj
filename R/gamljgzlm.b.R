@@ -188,7 +188,6 @@ gamljGzlmClass <- R6::R6Class(
            
                model_test <- try({
                            model<-private$.estimate(modelFormula, data=data)
-                           wars<-warnings()
                        })
                if (jmvcore::isError(model_test)) {
                         msg<-jmvcore::extractErrorMessage(model_test)
@@ -266,11 +265,13 @@ gamljGzlmClass <- R6::R6Class(
                        }
 
                       messages<-mf.getModelMessages(model)
+                      estimatesInfo<-mf.getModelMessages(model)
+                      messages<-estimatesInfo["msg"]
+                      
                       for (i in seq_along(messages)) {
-                              anovaTable$setNote(names(messages)[i],messages[[i]])
                               infoTable$setNote(names(messages)[i],messages[[i]])
                       }
-                      if (length(messages)>0) {
+                      if (estimatesInfo['conv']==FALSE) {
                            infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
                       }
 

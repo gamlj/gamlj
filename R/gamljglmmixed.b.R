@@ -85,7 +85,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
-      infoTable$addRow(rowKey="conv",list(info="Convergence",comm=""))
+      infoTable$addRow(rowKey="conv",list(info="Converged",comm=""))
       infoTable$addRow(rowKey="opt",list(info="Optimizer",comm=""))
       
 
@@ -253,7 +253,7 @@ gamljGlmMixedClass <- R6::R6Class(
                    if (jmvcore::isError(anova_test)) 
                          jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
                    }
-               }
+               
                    # anova table ##
                    ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
                 rawlabels<-rownames(anova_res)
@@ -266,8 +266,9 @@ gamljGlmMixedClass <- R6::R6Class(
                      }
                      
                      anovaTable$setState(TRUE)
-                  } else ginfo("Anova results recycled")
-                    
+                  }
+                } else ginfo("Anova results recycled")
+                       
                 if (is.null(estimatesTable$state)) {
                  
                          ### full summary results ####
@@ -522,7 +523,7 @@ gamljGlmMixedClass <- R6::R6Class(
                                     data=data,
                                     family = afamily,
                                     nAGQ = nAGQ,
-                                    lme4::glmerControl(optimizer = "bobyqa")))
+                                    lme4::glmerControl(optimizer = OPTIMIZERS[2])))
       return(lm)
     },
     .modelFormula=function() {

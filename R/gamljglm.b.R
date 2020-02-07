@@ -162,7 +162,7 @@ gamljGLMClass <- R6::R6Class(
       ### otherwise we store a flag  in parameters table state so next time we know it worked
 
       if (is.null(estimatesTable$state)) {
-               ginfo("anova and parameters have been estimated")
+               ginfo("Parameters have been estimated")
                gwarnings<-list()
                model_summary<-try(summary(model))
                mi.check_estimation(model_summary,n64)
@@ -199,14 +199,15 @@ gamljGLMClass <- R6::R6Class(
                     estimatesTable$setRow(rowNo=i,tableRow)
                   }
                   
-                  
-               estimatesTable$setState(TRUE)
-                
-               
+                   
+               estimatesTable$setState(attributes(parameters))
+      }
+      if (is.null(anovaTable$state)) {
+        
                ### anova results ####
-               anova_res<-NULL
+               anova_res<-data.frame()
                if (length(modelTerms)==0) {
-                   anovaTable$setNote("warning","F-Tests cannot be computed")
+                   attr(anova_res,"warning")<-"F-Tests cannot be computed"
                } else {
                    suppressWarnings({
                    anova_res <- try(mf.anova(model)) # end suppressWarnings
@@ -214,7 +215,8 @@ gamljGLMClass <- R6::R6Class(
                  mi.check_estimation(anova_res,n64)
                }
 
-             
+               attr(anova_res,"warning")<-append(attr(anova_res,"warning"),"First warning")
+
                ### prepare info table #########   
                
                info.r2m<-model_summary$r.squared   
@@ -255,21 +257,24 @@ gamljGLMClass <- R6::R6Class(
                  df<-dim(data)[1]
                  anovaTable$setRow(rowKey=1,list("ss"=ss,df=df,f="",p="",etaSq="",etaSqP="",omegaSq=""))
                  anovaTable$setRow(rowKey=2, list("ss"=ss,df=df,p="",etaSq="",etaSqP="",omegaSq=""))
-                 anovaTable$setNote("glm.zeromodel",WARNS["glm.zeromodel"])
-                 
+                 attr(anova_res,"warning")<-append(attr(anova_res,"warning"),WARNS["glm.zeromodel"])
                }                 
-               
+
+                anovaTable$setState(attributes(anova_res))               
         # end of check state
         } else
             ginfo("anova and parameters have been recycled")
-      
+
+        pstate<-estimatesTable$state      
         ########## update notes ##########
         iatt<-attr(model,"infoTable")
         mi.infotable_footnotes(infoTable,iatt)
-        patt<-attr(parameters,"warning")
-        mark(attributes(parameters))
+        patt<-estimatesTable$state$warning
         for (w in patt)
           estimatesTable$setNote(w,w)
+        aatt<-anovaTable$state$warning
+        for (w in aatt)
+          anovaTable$setNote(w,w)
         
 
         private$.preparePlots(model)

@@ -72,7 +72,7 @@ gamljMixedClass <- R6::R6Class(
       }
       infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
       infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
-      infoTable$addRow(rowKey="conv",list(info="Convergence"))
+      infoTable$addRow(rowKey="conv",list(info="Converged"))
       infoTable$addRow(rowKey="opt",list(info="Optimizer"))
       
       
