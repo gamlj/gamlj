@@ -19,9 +19,7 @@ mi.infotable_footnotes<-function(table,info) {
   if (info$singular==TRUE) {
     table$setNote("singular",WARNS["lmer.singular"])
   }
-  for (i in seq_along(info$warning))
-    table$setNote(i,info$warning[1])
-  
+
   return(table)
 }
 
@@ -281,8 +279,9 @@ mi.warn_estimation<-function(model,n64) {
 mi.model_check<- function(model) {
   att<-list(conv=mi.converged(model),
                  aliased=mi.aliased(model),
-                 singular=mi.isSingular(model),warnings=mi.warnings(model))
+                 singular=mi.isSingular(model))
   attr(model,"infoTable")<-att  
+  attr(model,"warning")<-mi.warnings(model)
   model
 }
 ######## check for singularity of fit  ##########
@@ -307,6 +306,10 @@ mi.warnings<- function(x,...) UseMethod(".mi.warnings")
 
 .mi.warnings.lmerMod<-function(model) {
   msg<-model@optinfo$conv$lme4$messages
-  return(msg)
+  w<-grep("see ?isSingular",msg,fixed=T,invert = T)
+  return(msg[w])
   
 }
+
+
+

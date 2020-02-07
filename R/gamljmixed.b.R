@@ -63,13 +63,10 @@ gamljMixedClass <- R6::R6Class(
       #### info table #####
       infoTable<-self$results$info
       infoTable$addRow(rowKey="est",list(info="Estimate"))
-      
       infoTable$addRow(rowKey="call",list(info="Call"))
       infoTable$addRow(rowKey="aic",list(info="AIC"))
       infoTable$addRow(rowKey="bic",list(info="BIC"))
-      if (!(reml)) {
       infoTable$addRow(rowKey="log",list(info="LogLikel."))
-      }
       infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
       infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
       infoTable$addRow(rowKey="conv",list(info="Converged"))
@@ -166,208 +163,163 @@ gamljMixedClass <- R6::R6Class(
       ## so we estimate the model every time. In case it is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
-      
-               ginfo("the model has been estimated")
-               ##### model ####
-               model_test <- try({
-                           model<-private$.estimate(modelFormula, data=data,REML = reml)
-                           wars<-warnings()
-                       })
-               if (jmvcore::isError(model_test)) {
-                        msg<-jmvcore::extractErrorMessage(model_test)
-                        msg<-n64$translate(msg)
-                        jmvcore::reject(msg, code='error')
-               }
-               private$.model <- model
-               ginfo("...done")
 
-               vc<-as.data.frame(lme4::VarCorr(model))
-#               vc<-as.data.frame(model_summary$varcor)
-               vcv<-vc[is.na(vc[,3]),]
-               vcv$var1[is.na(vcv$var1)]<-""
-               grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
-               realgroups<-n64$nicenames(grp)
-               realnames<-n64$nicenames(vcv$var1)
-               realnames<-lapply(realnames,lf.nicifyTerms)
-               for (i in 1:dim(vcv)[1]) {
-                 if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
+       ginfo("the model has been estimated")
+       ##### model ####
+       model<- try(private$.estimate(modelFormula, data=data, REML=reml))
+       mi.check_estimation(model,n64)
+       model<-mi.model_check(model)
+       mark(attr(model,"infoTable"))
+       private$.model <- model
+       ginfo("...done")
+
+       ### random components data frame ######
+       vc<-as.data.frame(lme4::VarCorr(model))
+       vcv<-vc[is.na(vc[,3]),]
+       vcv$var1[is.na(vcv$var1)]<-""
+       grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
+       realgroups<-n64$nicenames(grp)
+       realnames<-n64$nicenames(vcv$var1)
+       realnames<-lapply(realnames,lf.nicifyTerms)
+       for (i in 1:dim(vcv)[1]) {
+            if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
                    icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+vcv$sdcor[dim(vcv)[1]]^2)
-                 else
+             else
                    icc<-""
-                 if (i<=randomTable$rowCount)
+             if (i<=randomTable$rowCount)
                    randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
-                 else
+             else
                    randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
-               }
-               
-               ### Covariance among random effects ###
-               vcv<-vc[!is.na(vc[,3]),]
-               grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
-               realgroups<-n64$nicenames(grp)
-               realnames1<-lapply(n64$nicenames(vcv$var1),lf.nicifyTerms)
-               realnames2<-lapply(n64$nicenames(vcv$var2),lf.nicifyTerms)
-               if (dim(vcv)[1]>0) {
-                 for (i in 1:dim(vcv)[1]) {
+       }
+        N<-as.numeric(model@devcomp$dims['n'])
+        groups<-vapply(model@flist,nlevels,1)
+        info<-paste("Number of Obs:", N,", groups:",paste(n64$nicenames(names(groups)),groups,collapse = ","))
+        randomTable$setState(list("warning"=info))
+        
+        ### Covariance among random effects ###
+        vcv<-vc[!is.na(vc[,3]),]
+        grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
+        realgroups<-n64$nicenames(grp)
+        realnames1<-lapply(n64$nicenames(vcv$var1),lf.nicifyTerms)
+        realnames2<-lapply(n64$nicenames(vcv$var2),lf.nicifyTerms)
+        if (dim(vcv)[1]>0) {
+             for (i in 1:dim(vcv)[1]) {
                    randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
-                 }
-                 randomCovTable$setVisible(TRUE)
-               }
-               
-               
-               ### anova results ####
-               if (is.null(anovaTable$state)) {
-                   ginfo("compute the Anova stuff")
-                   anova_res<-NULL
-                   if (length(modelTerms)==0) {
-                        anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
-                   } else {
-                       suppressWarnings({
-                       anova_test <- try(anova_res<-mf.anova(model), silent=TRUE) # end suppressWarnings
-                   })
-                   if (jmvcore::isError(anova_test)) 
-                         jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
-                   }
-                   anovaTable$setState(TRUE)
-                  } else ginfo("Anova results recycled")
-                    
-               if (is.null(estimatesTable$state)) {
-                 
-                         ### full summary results ####
-                         test_summary<-try(model_summary<-summary(model))
-                         if (jmvcore::isError(test_summary)) {
-                               msg <- jmvcore::extractErrorMessage(test_summary)
-                               msg<-n64$translate(msg)
-                               jmvcore::reject(msg, code='error')
-                         }
-                         ### coefficients summary results ####
-
-                         test_parameters<-try(parameters<-mf.summary(model))
-                         if (!is.null(attr(parameters,"warning"))) 
-                              estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
-                         estimatesTable$setState(TRUE)
-                         ginfo("...done")
-               ### fix random table notes
-                  info<-paste("Number of Obs:", model_summary$devcomp$dims["n"],", groups:",n64$nicenames(names(model_summary$ngrps)),",",model_summary$ngrps,collapse = " ")
-                  randomTable$setNote('info', info)
-                         
-               ### prepare info table #########       
-               ginfo("updating the info table")
-               info.call<-n64$translate(as.character(model@call)[[2]])
-               info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
-               info.aic<-round(stats::extractAIC(model)[2],digits=4)
-               info.bic<-round(stats::BIC(model),digits=4)
-               info.loglik<-model_summary$AICtab[3]
-               r2<-try(r.squared(model),silent = TRUE)
-               if (jmvcore::isError(r2)){
-                   note<-"R-squared cannot be computed."
-                   info.r2m<-NaN        
-                   info.r2c<-NaN
-                   infoTable$setNote("r2",note)  
-                   } else {
-                   info.r2m<-r2[[4]]        
-                   info.r2c<-r2[[5]]     
-                   }
-               infoTable$setRow(rowKey="est", list(value=info.title))
-               infoTable$setRow(rowKey="call",list(value=info.call))
-               infoTable$setRow(rowKey="aic",list(value=info.aic))
-               infoTable$setRow(rowKey="bic",list(value=info.bic))
-               if (!(reml)) {
-                                  infoTable$setRow(rowKey="log",list(value=info.loglik))
-               }
-               infoTable$setRow(rowKey="r2m",list(value=info.r2m))
-               infoTable$setRow(rowKey="r2c",list(value=info.r2c))
-
-               estimatesInfo<-mf.getModelMessages(model)
-               conv<-ifelse(estimatesInfo['conv'],"yes","no")
-               infoTable$setRow(rowKey="conv",list(value=conv))
-               if (estimatesInfo['conv']==FALSE)
-                  opt<-paste(OPTIMIZERS,collapse=", ")
-               else 
-                  opt<-model@optinfo$optimizer
-               
-               infoTable$setRow(rowKey="opt",list(value=opt))
+             }
+            randomCovTable$setVisible(TRUE)
+        }
+         
                
 
-               for (i in seq_along(estimatesInfo['msg'])) {
-                 infoTable$setNote(as.character(i),estimatesInfo['msg'][[i]])
-               }
-               if (estimatesInfo['conv']==FALSE) {
-                 infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-               }
-               if (estimatesInfo['singular']==TRUE) {
-                 infoTable$setNote("lmer.singular",WARNS["lmer.singular"])
-               }
-               
-               
         
-               ### end of info table ###
-        
-               ### random table ######        
-                 
-        ### ### ### ### ###
-        # anova table ##
-                ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
-                 if (length(modelTerms)==0) {
-                     anovaTable$setNote("warning","F-Tests cannot be computed without fixed effects")
-                 } else {
+       ### anova results ####
+       if (is.null(anovaTable$state)) {
+             ginfo("compute the Anova stuff")
+             anova_res<-data.frame()
+             if (length(modelTerms)==0) {
+                  attr(anova_res,"warning")<-"F-Tests cannot be computed without fixed effects"
+             } else {
+                  suppressWarnings({anova_res <- try(mf.anova(model), silent=TRUE) })
+                  mi.check_estimation(anova_res,n64)   
+                  if (length(modelTerms)==0) {
+                       attr(anova_res,"warning")<-append(attr(anova_res,"warning"),"F-Tests cannot be computed without fixed effects")
+                   } else {
                        rawlabels<-rownames(anova_res)
                        labels<-n64$nicenames(rawlabels)
                        for (i in seq_len(dim(anova_res)[1])) {
-                              tableRow<-anova_res[i,]  
-                              anovaTable$setRow(rowNo=i,tableRow)
-                              anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
+                           tableRow<-anova_res[i,]  
+                           anovaTable$setRow(rowNo=i,tableRow)
+                           anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
                        }
-                      if (attr(anova_res,"statistic")=="Chisq") {
-                          anovaTable$setNote("lmer.chisq",WARNS["lmer.chisq"])
-                          anovaTable$getColumn('test')$setTitle("Chi-squared")
-                          anovaTable$getColumn('df1')$setTitle("df")
-                          anovaTable$getColumn('df2')$setVisible(FALSE)
-                       } else
-                              anovaTable$setNote("df",paste(attr(anova_res,"method"),"method for degrees of freedom"))
-        
-                 }
-                ### parameter table ####
-                if (nrow(parameters)>0) {
+                       if (attr(anova_res,"statistic")=="Chisq") {
+                           attr(anova_res,"warning")<-append(attr(anova_res,"warning"),WARNS["lmer.chisq"])
+                           anovaTable$getColumn('test')$setTitle("Chi-squared")
+                           anovaTable$getColumn('df1')$setTitle("df")
+                           anovaTable$getColumn('df2')$setVisible(FALSE)
+                        } else
+                           attr(anova_res,"warning")<-append(attr(anova_res,"warning"),paste(attr(anova_res,"method"),"method for degrees of freedom"))
+                   }
+                   anovaTable$setState(list(warning=attr(anova_res,"warning")))
+             }
+       } else ginfo("Anova results recycled")
+                    
+       if (is.null(estimatesTable$state)) {
+                 ### coefficients summary results ####
+                 parameters<-try(mf.summary(model))
+                 ginfo("...done")
+                 if (nrow(parameters)>0) {
                   #### confidence intervals ######
-                  ciWidth<-self$options$paramCIWidth/100
-                  citry<-try({
-                    ci<-mf.confint(model,level=ciWidth)
-                    colnames(ci)<-c("cilow","cihig")
-                    parameters<-cbind(parameters,ci) 
-                  })
-                  if (jmvcore::isError(citry)) {
-                    message <- jmvcore::extractErrorMessage(citry)
-                    estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-                  }
-                  rownames(parameters)<-n64$nicenames(rownames(parameters))
-                  for (i in 1:nrow(parameters)) {
-                    tableRow=parameters[i,]
-                    estimatesTable$setRow(rowNo=i,tableRow)
-                  }
-                  if (mf.aliased(model)) {
-                    estimatesTable$setNote("aliased",WARNS["ano.aliased"])
-                    infoTable$setNote("aliased",WARNS["ano.aliased"])
-                  }
-                }
-                
-               } else ginfo("clean summary recycled")
+                       ciWidth<-self$options$paramCIWidth/100
+                       parameters<-mf.confint(model,ciWidth,parameters)
+                       rownames(parameters)<-n64$nicenames(rownames(parameters))
+                  ##### fill the table ############
+                       for (i in 1:nrow(parameters)) {
+                             tableRow=parameters[i,]
+                             estimatesTable$setRow(rowNo=i,tableRow)
+                       }
+                 }
+                 estimatesTable$setState(list(warning=attr(parameters,"warning")))
+                 ### prepare info table #########       
+                 ginfo("updating the info table")
+                 info.call<-n64$translate(as.character(model@call)[[2]])
+                 info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
+                 info.aic<-round(stats::extractAIC(model)[2],digits=4)
+                 info.bic<-round(stats::BIC(model),digits=4)
+                 loglik<-lme4::llikAIC(model)$AICtab
+                 info.loglik<-ifelse("logLik" %in% names(loglik),loglik['logLik'],loglik['REML'])
+
+                 r2<-try(r.squared(model),silent = TRUE)
+                 if (jmvcore::isError(r2)){
+                   note<-"R-squared cannot be computed."
+                   attr(model,"warning")<-append(attr(model,"warning"),note)
+                   info.r2m<-NaN        
+                   info.r2c<-NaN
+                 } else {
+                   info.r2m<-r2[[4]]        
+                   info.r2c<-r2[[5]]     
+                 }
+                 infoTable$setRow(rowKey="est", list(value=info.title))
+                 infoTable$setRow(rowKey="call",list(value=info.call))
+                 infoTable$setRow(rowKey="aic",list(value=info.aic))
+                 infoTable$setRow(rowKey="bic",list(value=info.bic))
+                 infoTable$setRow(rowKey="log",list(value=info.loglik))
+                 infoTable$setRow(rowKey="r2m",list(value=info.r2m))
+                 infoTable$setRow(rowKey="r2c",list(value=info.r2c))
+                 modelInfo<-attr(model,"infoTable" )
+                 conv<-ifelse(modelInfo$conv,"yes","no")
+                 infoTable$setRow(rowKey="conv",list(value=conv))
+                 if (modelInfo$conv==FALSE)
+                   opt<-paste(OPTIMIZERS,collapse=", ")
+                 else 
+                   opt<-model@optinfo$optimizer
+                 infoTable$setRow(rowKey="opt",list(value=opt))
+                 ### end of info table ###
+                 infoTable$setState(list(warning=attr(model,"warning")))
+               } else ginfo("infotable and parameters recycled")
                
         #### LRT for random effects ####
-        if (self$options$lrtRandomEffects) {
+        lrtTable<-self$results$main$lrtRandomEffectsTable
+        if (self$options$lrtRandomEffects && is.null(lrtTabl$state)) {
           
-          lrtTable<-self$results$main$lrtRandomEffectsTable
-          ranova_test<-try(res<-as.data.frame(lmerTest::ranova(model)[-1,]))
+          ranova_test<-try(as.data.frame(lmerTest::ranova(model)[-1,]))
           if (jmvcore::isError(ranova_test)) {
               message <- jmvcore::extractErrorMessage(ranova_test)
-              lrtTable$setNote("noluck",paste(message,". LRT cannot be computed"))
+              .warning=paste(message,". LRT cannot be computed")
           } else {
              res$test<-n64$translate(rownames(res))
              res$test<-as.character(res$test)
              for (i in seq_len(nrow(res)))
                   lrtTable$addRow(rowKey=i,res[i,])
-          } 
+          }
+          lrtTable$setState(list(warning=.warning))
         }
-
+        mi.infotable_footnotes(infoTable,attr(model,"infoTable"))        
+        out.table_notes(infoTable)
+        out.table_notes(anovaTable)
+        out.table_notes(estimatesTable)
+        out.table_notes(randomTable)
+        out.table_notes(lrtTable)
+        
         private$.preparePlots(private$.model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
@@ -464,15 +416,14 @@ gamljMixedClass <- R6::R6Class(
       ## the do.call is a workaround.
       
       for (opt in OPTIMIZERS) {
-          mark(opt)
           ctr=lme4::lmerControl(optimizer = opt)
           lm = do.call(lmerTest::lmer, list(formula=form, data=data,REML=REML,control=ctr))
-          mark(summary(lm))
-          res<-mf.getModelMessages(lm)
-          if (res$conv==TRUE)
+          model<-mi.model_check(lm)
+          info<-attr(model,"infoTable")
+          if (info$conv==TRUE)
              break()
       }
-      return(lm)
+      return(model)
     },
     .modelFormula=function() {
       

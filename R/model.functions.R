@@ -392,19 +392,18 @@ mf.confint<- function(x,...) UseMethod(".confint")
     return(ci)
 }
 
-.confint.merModLmerTest<-function(model,level) 
-                                return(.confint.lmer(model,level))
+.confint.merModLmerTest<-function(model,level,parameters) 
+                                return(.confint.lmer(model,level,parameters))
 
-.confint.lmerModLmerTest<-function(model,level) 
-  return(.confint.lmer(model,level))
+.confint.lmerModLmerTest<-function(model,level,parameters) 
+  return(.confint.lmer(model,level,parameters))
 
-.confint.lmer<-function(model,level)  {
-
+.confint.lmer<-function(model,level,parameters)  {
       ci<-stats::confint(model,method="Wald",level=level)
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
-      return(ci)
+      .confint.format(ci,parameters)
   }
 
 .confint.glmerMod<-function(model,level,method)  {

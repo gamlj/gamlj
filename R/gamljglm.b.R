@@ -263,7 +263,7 @@ gamljGLMClass <- R6::R6Class(
                 anovaTable$setState(attributes(anova_res))               
         # end of check state
         } else
-            ginfo("anova and parameters have been recycled")
+            ginfo("anova have been recycled")
 
         pstate<-estimatesTable$state      
         ########## update notes ##########
