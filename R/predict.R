@@ -286,7 +286,6 @@ pred.predictRandom<-function(model,
   data<-model@frame
   preds64<-c(groupName64,linesName64,plotsName64)
   gclass<-class(data[[groupName64]])
-  print(gclass)
   # here we set all model predictors but the x-axis variable to zero
   # to smooth random effects predicted values
   mvars<-names(data)
@@ -315,13 +314,12 @@ pred.predictRandom<-function(model,
   preds<-c(groupName,linesName,plotsName)
   data<-model@frame
      
-  .coefs<-coefficients(model)
+  .coefs<-stats::coefficients(model)
   .ccoefs<-.coefs[[cluster]]
   .where<-grep(groupName,names(.ccoefs),fixed = T)
-  print(.where)
   .num_coefs<-.ccoefs[,c(1,.where)]
   nterms<-length(.num_coefs)-1
-  FUN<-family(model)$linkinv
+  FUN<-stats::family(model)$linkinv
   if (type!="response")
     FUN<-identity
   
@@ -330,8 +328,7 @@ pred.predictRandom<-function(model,
     .x<-.data[,groupName]
     .m<-matrix(rep(.x,nterms),ncol = nterms)
      x<-cbind(1,.m)
-     print(x)
-    pr<-as.numeric(x%*%.num_coefs)
+     pr<-as.numeric(x%*%.num_coefs)
     .newdata<-.data[,preds]
     .newdata$y<-FUN(pr)
     .newdata$cluster=row

@@ -23,6 +23,7 @@ out.table_notes<-function(table) {
 }
 
 ######  fill the table ########
+
 out.fillTable<-function(table,params) {
     if (nrow(params)==0)
         return()

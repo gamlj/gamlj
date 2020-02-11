@@ -418,7 +418,6 @@ gplots.oneWayPlot<-function(image,theme,depName,groupName,errorType="none",order
       data<-image$state$randomData
       data<-stats::aggregate(data$y,list(data$cluster,data$group),mean)
       names(data)<-c("cluster","group","y")
-      print(head(data))
       ginfo("Random effects plotting")
       p <- p + ggplot2::geom_line(data=data,aes_string(x="group",y="y",group="cluster"),alpha=.5,size=.2,show.legend = F) 
       }

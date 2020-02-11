@@ -396,8 +396,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
 #    parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
 #    parameters<-parameters[order(parameters$order),]
 #    parameters$order<-NULL
-    mark(ci)
-    mark(parameters)
     parameters<-cbind(parameters,ci)
     attr(parameters,"warning")<-att
   }
@@ -414,6 +412,8 @@ mf.confint<- function(x,...) UseMethod(".confint")
      ci<-try(stats::confint(model,level = level))
      if (jmvcore::isError(ci)) 
        return(.confint.format(ci,parameters))
+     if (is.null(dim(ci)))
+       ci<-matrix(ci,ncol=2)
      ci<-data.frame(ci)
      colnames(ci)<-c("cilow","cihig")
      ci["ecilow"]<-exp(ci["cilow"])     
@@ -445,7 +445,8 @@ mf.confint<- function(x,...) UseMethod(".confint")
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)
-  ci<-ci[-1,]
+  w<-grep(".sig",rownames(ci),fixed=T,invert = T)
+  ci<-ci[w,]
   if (is.null(dim(ci)))
     ci<-matrix(ci,ncol=2)
   ci<-data.frame(ci)
