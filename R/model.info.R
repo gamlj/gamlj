@@ -12,16 +12,6 @@ mi.update<-function(table,modelType,data=NULL,dep=NULL) {
 }
 
 
-mi.infotable_footnotes<-function(table,info) {
-  if (info$aliased==TRUE) {
-    table$setNote("aliased",WARNS["ano.aliased"])
-  }
-  if (info$singular==TRUE) {
-    table$setNote("singular",WARNS["lmer.singular"])
-  }
-
-  return(table)
-}
 
 
 ######### rsquared ##########
@@ -86,6 +76,13 @@ mi.aliased<- function(x,...) UseMethod(".aliased")
 .aliased.default<-function(model) {
     aliased<-stats::alias(model)
     (!is.null(aliased$Complete))
+}
+
+.aliased.lm<-function(model) {
+  if (model$rank==0)
+    return(FALSE)
+  aliased<-stats::alias(model)
+  (!is.null(aliased$Complete))
 }
 
 .aliased.lmerMerMod<-function(model) {

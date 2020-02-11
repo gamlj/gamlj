@@ -66,7 +66,20 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   ss<-as.data.frame(smr$coefficients)
   ss$df<-smr$df[2]
   colnames(ss)<-c("estimate","se","t","p","df")
-  as.data.frame(ss,stringsAsFactors = F)
+  ### fix missing coefficients ########
+  all_coefs<-data.frame(all=names(smr$aliased))
+  rownames(all_coefs)<-names(smr$aliased)
+  all_coefs$order<-1:length(all_coefs$all)
+  res<-merge(ss,all_coefs,by="row.names",all=T)
+  res<-res[order(res$order),]
+  rownames(res)<-res$Row.names
+  res[,c("Row.names", "order","all")]<-NULL
+  ########################
+  res
+  
+  
+  ###########################à
+  as.data.frame(res,stringsAsFactors = F)
 }
 
 .mf.summary.merModLmerTest<-function(model)
@@ -366,18 +379,22 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 .confint.format<-function(ci,parameters) {
   att<-attr(parameters,"warning")
+  if (length(ci)==0) {
+    att<-append(att,"C.I. cannot be computed")
+    attr(parameters,"warning")<-att
+    return(parameters)
+  }
   if (jmvcore::isError(ci)) {
     message <- jmvcore::extractErrorMessage(ci)
     att<-append(att,paste(message,"C.I. cannot be computed"))
     ci<-NULL
   } else {
-    ci<-data.frame(ci)
     if (any(is.na(ci)))
        att<-append(att,paste("Some C.I. cannot be computed"))
-    colnames(ci)<-c("cilow","cihig")
     ci$order<-1:dim(ci)[1]
     parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
     parameters<-parameters[order(parameters$order),]
+    parameters$order<-NULL
     attr(parameters,"warning")<-att
   }
   return(parameters)
@@ -385,11 +402,20 @@ mf.confint<- function(x,...) UseMethod(".confint")
 }
 .confint.lm<-function(model,level,parameters)  {
     ci<-try(stats::confint(model,level=level))
+    ci<-data.frame(ci)
+    colnames(ci)<-c("cilow","cihig")
    .confint.format(ci,parameters)
 }
-.confint.glm<-function(model,level) {  
-    ci<-stats::confint(model,level = level)
-    return(ci)
+.confint.glm<-function(model,level,parameters) {  
+     ci<-try(stats::confint(model,level = level))
+     if (jmvcore::isError(ci)) 
+       return(.confint.format(ci,parameters))
+     ci<-data.frame(ci)
+     colnames(ci)<-c("cilow","cihig")
+     ci["ecilow"]<-exp(ci["cilow"])     
+     ci["ecihig"]<-exp(ci["cihig"])
+     .confint.format(ci,parameters)
+    
 }
 
 .confint.merModLmerTest<-function(model,level,parameters) 
@@ -399,10 +425,15 @@ mf.confint<- function(x,...) UseMethod(".confint")
   return(.confint.lmer(model,level,parameters))
 
 .confint.lmer<-function(model,level,parameters)  {
-      ci<-stats::confint(model,method="Wald",level=level)
+      ci<-try(stats::confint(model,method="Wald",level=level))
+      if (jmvcore::isError(ci)) 
+        return(.confint.format(ci,parameters))
+      
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
+      ci<-data.frame(ci)
+      colnames(ci)<-c("cilow","cihig")
       .confint.format(ci,parameters)
   }
 

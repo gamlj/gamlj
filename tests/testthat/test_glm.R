@@ -1,11 +1,9 @@
 context("glm")
-gamlj_options("debug",FALSE)
 mod<-gamlj::gamljGLM(
   data = ToothGrowth,
   dep = "len",
   factors = "supp",
   modelTerms = ~ supp,
-  
 )
 res<-mod$main$fixed$asDF
 params<-res$estimate
@@ -115,7 +113,8 @@ test_that("glm weird names", {
 })
 
 
-expect_warning(mod<-gamlj::gamljGLM(
+expect_warning(
+  mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   eDesc = T,
@@ -174,10 +173,13 @@ test_that("glm intercept only model", {
   expect_equal(round(res[2,2],2),20919.42)
 })
 
+
+
 mod<-gamlj::gamljGLM(
   formula = read ~ 1,  data = data,
   fixedIntercept=FALSE
 )
+
 res<-mod$main$anova$asDF
 test_that("glm zero-intercept model", {
   expect_equal(as.character(res$name[1]),"Residuals")

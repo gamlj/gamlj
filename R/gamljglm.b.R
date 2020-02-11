@@ -160,34 +160,34 @@ gamljGLMClass <- R6::R6Class(
       self$results$.setModel(model)
       ### if it worked before, we skip building the tables, 
       ### otherwise we store a flag  in parameters table state so next time we know it worked
-
-      if (is.null(estimatesTable$state)) {
+      if (is.null(estimatesTable$state) & model$rank>0) {
                ginfo("Parameters have been estimated")
-               gwarnings<-list()
-               model_summary<-try(summary(model))
-               mi.check_estimation(model_summary,n64)
-      
       ### coefficients summary results ####
-      
                parameters<-try(parameters<-mf.summary(model))
                mi.check_estimation(parameters,n64)
 
                if ("beta" %in% self$options$effectSize) {
+                         ginfo("computing betas...")
                         .beta<-NA
                         zdata<-data
                         zdata[[jmvcore::toB64(dep)]]<-scale(zdata[[jmvcore::toB64(dep)]])
                         for (var in covs)
                              zdata[[jmvcore::toB64(var)]]<-scale(zdata[[jmvcore::toB64(var)]])
-                        
                          zmodel<-try(stats::lm(modelFormula,data=zdata))
                          warn<-mi.warn_estimation(zmodel,n64)
                          if (is.something(warn)) {
                              attr(parameters,"warning")<-paste0(warn,". Betas cannot be computed.")
                          } else {
-                            beta<-coef(zmodel)
-                            beta[1]<-0
-                            parameters<-cbind(parameters,beta) 
-                          }
+                            beta<-coef(zmodel,complete = T)
+                            if (fixedIntercept==TRUE)
+                                beta[1]<-0
+                            if (any(is.na(beta)))
+                              attr(parameters,"warning")<-paste0(warn,"Some betas cannot be computed.")
+                            parameters<-cbind(parameters,beta)
+
+                         }
+                         ginfo("...done")
+                         
                   }
                   #### confidence intervals ######
                   ciWidth<-self$options$paramCIWidth/100
@@ -202,6 +202,7 @@ gamljGLMClass <- R6::R6Class(
                    
                estimatesTable$setState(attributes(parameters))
       }
+      
       if (is.null(anovaTable$state)) {
         
                ### anova results ####
@@ -215,16 +216,17 @@ gamljGLMClass <- R6::R6Class(
                  mi.check_estimation(anova_res,n64)
                }
 
-               attr(anova_res,"warning")<-append(attr(anova_res,"warning"),"First warning")
 
                ### prepare info table #########   
+               model_summary<-try(summary(model))
+               mi.check_estimation(model_summary,n64)
                
                info.r2m<-model_summary$r.squared   
                info.r2c<-model_summary$adj.r.squared
                    
                infoTable$setRow(rowKey="r2m",list(value=info.r2m))
                infoTable$setRow(rowKey="r2c",list(value=info.r2c))
-        
+               infoTable$setState(list(warning=attr(model,"warning")))
                ### end of info table ###
         
         # anova table ##
@@ -268,14 +270,11 @@ gamljGLMClass <- R6::R6Class(
         pstate<-estimatesTable$state      
         ########## update notes ##########
         iatt<-attr(model,"infoTable")
-        mi.infotable_footnotes(infoTable,iatt)
-        patt<-estimatesTable$state$warning
-        for (w in patt)
-          estimatesTable$setNote(w,w)
-        aatt<-anovaTable$state$warning
-        for (w in aatt)
-          anovaTable$setNote(w,w)
-        
+        out.infotable_footnotes(infoTable,iatt)
+        out.table_notes(infoTable)
+        out.table_notes(estimatesTable)
+        out.table_notes(anovaTable)
+
 
         private$.preparePlots(model)
         gposthoc.populate(model,self$options,self$results$postHocs)
