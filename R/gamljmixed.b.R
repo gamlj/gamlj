@@ -163,13 +163,11 @@ gamljMixedClass <- R6::R6Class(
       ## so we estimate the model every time. In case it is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
       ## just leave them the way they are :-)
-
        ginfo("the model has been estimated")
        ##### model ####
        model<- try(private$.estimate(modelFormula, data=data, REML=reml))
        mi.check_estimation(model,n64)
        model<-mi.model_check(model)
-       mark(attr(model,"infoTable"))
        private$.model <- model
        ginfo("...done")
 
@@ -313,7 +311,7 @@ gamljMixedClass <- R6::R6Class(
           }
           lrtTable$setState(list(warning=.warning))
         }
-        mi.infotable_footnotes(infoTable,attr(model,"infoTable"))        
+        out.infotable_footnotes(infoTable,attr(model,"infoTable"))        
         out.table_notes(infoTable)
         out.table_notes(anovaTable)
         out.table_notes(estimatesTable)

@@ -207,7 +207,6 @@ gamljGzlmClass <- R6::R6Class(
         
         ### fill info table #########   
         modelType<-self$options$modelSelection
-        
         infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))

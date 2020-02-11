@@ -121,8 +121,9 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .mf.summary.glm<-function(model) {
-     
      ss<-summary(model)$coefficients
+     if (nrow(ss)[1]==0)
+        return(as.data.frame(NULL))
      expb<-exp(ss[,"Estimate"])  
      ss<-cbind(ss,expb)
      colnames(ss)<-c("estimate","se","z","p","expb")
@@ -391,10 +392,13 @@ mf.confint<- function(x,...) UseMethod(".confint")
   } else {
     if (any(is.na(ci)))
        att<-append(att,paste("Some C.I. cannot be computed"))
-    ci$order<-1:dim(ci)[1]
-    parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
-    parameters<-parameters[order(parameters$order),]
-    parameters$order<-NULL
+#    ci$order<-1:dim(ci)[1]
+#    parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
+#    parameters<-parameters[order(parameters$order),]
+#    parameters$order<-NULL
+    mark(ci)
+    mark(parameters)
+    parameters<-cbind(parameters,ci)
     attr(parameters,"warning")<-att
   }
   return(parameters)
@@ -437,15 +441,18 @@ mf.confint<- function(x,...) UseMethod(".confint")
       .confint.format(ci,parameters)
   }
 
-.confint.glmerMod<-function(model,level,method)  {
+.confint.glmerMod<-function(model,level,parameters,method="wald")  {
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)
   ci<-ci[-1,]
-  ci<-ci[!is.na(ci[,1]),]
   if (is.null(dim(ci)))
     ci<-matrix(ci,ncol=2)
-  return(ci)
+  ci<-data.frame(ci)
+  colnames(ci)<-c("cilow","cihig")
+  ci["ecilow"]<-exp(ci["cilow"])     
+  ci["ecihig"]<-exp(ci["cihig"])
+  .confint.format(ci,parameters)
 }
 
 

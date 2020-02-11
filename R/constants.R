@@ -59,6 +59,7 @@ MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
 
 WARNS<-list()
 
+WARNS["noconv"]<-"The model did not converge. Results may be misleading or uninterpretable."
 
 
 WARNS["means.covariates"]<-"Estimated means are estimated keeping constant

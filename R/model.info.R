@@ -52,6 +52,17 @@ mi.converged<- function(x,...) UseMethod(".converged")
         conv<-TRUE
      conv
 }
+.converged.glmerMod<-function(model) 
+  .converged.glmerMerMod(model)
+    
+.converged.glmerMerMod<-function(model) {
+  
+  if (!is.null(model@optinfo$conv$lme4$code))
+    conv<-FALSE
+  else
+    conv<-TRUE
+  conv
+}
 
 .converged.lmerMerMod<-function(model) {
             
@@ -259,6 +270,9 @@ mi.dependencies<-function(model,term,what) {
 mi.check_estimation<-function(model,n64) {
   if (jmvcore::isError(model)) {
       msg<-jmvcore::extractErrorMessage(model)
+      ### this should be made programatic #####
+      msg<-gsub("nAGQ","Precision/speed parameter",msg,fixed=T)
+      ###
       msg<-n64$translate(msg)
       jmvcore::reject(msg, code='error')
   }
@@ -301,10 +315,12 @@ mi.warnings<- function(x,...) UseMethod(".mi.warnings")
   return(NULL)
 }
 
+.mi.warnings.glmerMod<-function(model)
+         .mi.warnings.lmerMod(model)
+    
 .mi.warnings.lmerMod<-function(model) {
   msg<-model@optinfo$conv$lme4$messages
-  w<-grep("see ?isSingular",msg,fixed=T,invert = T)
-  return(msg[w])
+  return(msg)
   
 }
 
