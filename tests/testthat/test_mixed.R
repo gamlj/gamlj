@@ -56,6 +56,7 @@ testthat::test_that("list interface is ok", {
   expect_equal(ftable[1,4],2949)
 })
 
+####### this was ok before R 3.6 ########
 # expect_warning(
 # model1<-gamlj::gamljMixed(
 #   dep=y,
@@ -150,13 +151,17 @@ testthat::test_that("intercept only works",
 )
 
 
+formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
+model<-gamlj::gamljMixed(
+  formula =formula,
+  data = data, plotHAxis = cond,
+  lrtRandomEffects=T  
+)
+testthat::test_that("ranova works",
+                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+)
 
-# potable<-model$postHocs[[1]]$asDF
-# 
-# testthat::test_that("posthoc are produced", {
-#   expect_equal(round(potable[1,5],digits = 2),0.14)
-# })
-# 
+
 ## simple effects and polynomial
 data("wicksell")
 data<-wicksell
