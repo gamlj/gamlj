@@ -25,7 +25,7 @@ val2<-round(as.numeric(as.character(mod$main$anova$asDF$p)),digits = 5)
 val3<-as.character(mod$main$anova$asDF$name[1])
 
 testthat::test_that("anova table is fine",{
-  testthat::expect_equal(val1,90.851)
+  testthat::expect_equal(val1,90.853)
   testthat::expect_equal(val2, 0)
   testthat::expect_equal(val3, "math")
   
@@ -57,7 +57,6 @@ mod<-gamlj::gamljGlmMixed(
   correlatedEffects = "nocorr",
   cimethod = "wald")
   )
-mod
 
 val1<-as.character(mod$info$asDF$value[13])
 
@@ -71,8 +70,8 @@ val2<-round(as.numeric(as.character(mod$main$fixed$asDF[2,7])),digits = 3)
 val3<-as.character(mod$main$fixed$asDF[3,1])
 
 testthat::test_that("params table is fine",{
-  testthat::expect_equal(val1, 0.088)
-  testthat::expect_equal(val2, 1.211)
+  testthat::expect_equal(val1, 0.089)
+  testthat::expect_equal(val2, 1.196)
   testthat::expect_equal(val3, "math²")
   
 })
@@ -88,14 +87,3 @@ testthat::test_that("plot is there",{
 })
 
 
-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math+( 1 | school ),
-  data = data,
-  plotHAxis = math,
-  scaling = list(
-    list(
-      var="math",
-      type="none")),
-  plotRandomEffects = T,
-  plotLinearPred = TRUE,
-  cimethod = "wald")

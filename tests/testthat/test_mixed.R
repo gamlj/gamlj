@@ -116,6 +116,17 @@ testthat::test_that("uncorrelated works", {
   expect_equal(model1$info$asDF[2,2],model2$info$asDF[2,2])
 })
 
+formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
+model<-gamlj::gamljMixed(
+  formula =formula,
+  data = data, plotHAxis = cond,
+  lrtRandomEffects=T  
+)
+testthat::test_that("ranova works",
+                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+)
+
+
 data("beers_bars")
 data<-beers_bars
 
@@ -137,6 +148,8 @@ model<-gamlj::gamljMixed(
 testthat::test_that("intercept only works",
    expect_equal(round(model$main$random$asDF[1,3],digits = 2),1.74)
 )
+
+
 
 # potable<-model$postHocs[[1]]$asDF
 # 

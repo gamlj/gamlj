@@ -298,11 +298,17 @@ gamljGlmMixedClass <- R6::R6Class(
            infoTable$setRow(rowKey="r2m",list(value=info.r2m))
            infoTable$setRow(rowKey="r2c",list(value=info.r2c))
            infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
-           infoTable$setRow(rowKey="opt",list(value=model@optinfo$optimizer))
            modelInfo<-attr(model,"infoTable" )
-           conv<-ifelse(modelInfo$conv,"yes","no")
-            infoTable$setRow(rowKey="conv",list(value=conv))
-            infoTable$setState(list(warning=attr(model,"warning")))
+           if (modelInfo$conv==FALSE) {
+             opt<-paste(OPTIMIZERS,collapse=", ")
+             conv="no"
+           } else { 
+             opt<-model@optinfo$optimizer
+             conv="yes"
+           }
+           infoTable$setRow(rowKey="opt",list(value=opt))
+           infoTable$setRow(rowKey="conv",list(value=conv))
+           infoTable$setState(list(warning=attr(model,"warning")))
            ### end of info table ###
          } ## end of estimate and info calculation
          
@@ -447,12 +453,22 @@ gamljGlmMixedClass <- R6::R6Class(
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      lm = do.call(lme4::glmer, list(formula=form,
-                                    data=data,
-                                    family = afamily,
-                                    nAGQ = nAGQ,
-                                    lme4::glmerControl(optimizer = OPTIMIZERS[2])))
-      return(lm)
+      
+      for (opt in OPTIMIZERS) {
+        ctr=lme4::glmerControl(optimizer = opt)
+        lm = do.call(lme4::glmer, list(formula=form,
+                                       data=data,
+                                       family = afamily,
+                                       nAGQ = nAGQ,
+                                       control=ctr))
+        model<-mi.model_check(lm)
+        info<-attr(model,"infoTable")
+        if (info$conv==TRUE)
+          break()
+        
+      }
+      
+      return(model)
     },
     .modelFormula=function() {
       
