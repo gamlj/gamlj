@@ -62,7 +62,7 @@ mod<-gamlj::gamljGzlm(
 preds<-gamlj_predict(mod)
 dd<-gamlj_data(mod)
 
-modee<-mod$model
+
 testthat::test_that("mixed predict", {
   testthat::expect_equal(round(mean(preds),2),1.78)
 })

@@ -354,7 +354,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
        if (any(is.na(data[[cov64]])))
           return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
-       type<-ifelse(cov %in% names(scaling),scaling[cov]['type'],options$simpleScale)
+       type<-ifelse(cov %in% names(scaling),scaling[cov]['type'],"centered")
        data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=cluster)  
 
      }
