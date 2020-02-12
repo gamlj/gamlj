@@ -5,9 +5,12 @@ obj<-gamlj::gamljGLM(
     formula = performance ~ hours,
     data = qsport)
 preds<-gamlj_predict(obj)
+n<-dim(gamlj_data(obj))[1]
 
-testthat::test_that("glm predict", {
+testthat::test_that("test glm", {
   testthat::expect_equal(round(mean(preds),2),37.88)
+  testthat::expect_equal(n,100)
+  
 })
 
 
@@ -21,10 +24,15 @@ mod<-gamlj::gamljGlmMixed(
   cimethod = "wald")
 
 preds<-gamlj_predict(mod)
-
+n<-dim(gamlj_data(mod))[1]
 testthat::test_that("glmixed predict", {
   testthat::expect_equal(round(mean(preds),2),0.04)
+  testthat::expect_equal(n,5041)
+  
 })
+
+data("beers_bars")
+
 
 data("subjects_by_stimuli")
 
@@ -34,9 +42,12 @@ mod<-gamlj::gamljMixed(
 )
 
 preds<-gamlj_predict(mod)
+n<-dim(gamlj_data(mod))[1]
 
 testthat::test_that("mixed predict", {
   testthat::expect_equal(round(mean(preds),2),19.6)
+  testthat::expect_equal(n,3000)
+  
 })
 
 
@@ -45,9 +56,13 @@ mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   showParamsCI = TRUE,
-  modelSelection = "logistic")
-preds<-gamlj_predict(mod)
+  modelSelection = "logistic",
+  plotHAxis = write)
 
+preds<-gamlj_predict(mod)
+dd<-gamlj_data(mod)
+
+modee<-mod$model
 testthat::test_that("mixed predict", {
   testthat::expect_equal(round(mean(preds),2),1.78)
 })

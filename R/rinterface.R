@@ -144,8 +144,11 @@ gamlj_drop<-function(gobj,analysis) {
 #' @export
 
 gamlj_data<-function(gobj) {
-  data<-gobj$model$model
-  names(data)<-names(gobj$options$.getData())
+  if (isS4(gobj$model))
+     data<-gobj$model@frame
+  else
+    data<-gobj$model$model
+  names(data)<-jmvcore::fromB64(names(data))
   data
 }
 

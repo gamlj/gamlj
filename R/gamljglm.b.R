@@ -132,14 +132,9 @@ gamljGLMClass <- R6::R6Class(
       ##### clean the data ####
       data<-private$.cleandata()
       data<-mf.checkData(self$options,data)
-      
-
       if (!is.data.frame(data))
         jmvcore::reject(data)
-      for (scaling in self$options$scaling) {
-        data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type)  
-      }
-      
+
       if (!is.null(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
