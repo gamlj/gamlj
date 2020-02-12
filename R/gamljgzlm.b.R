@@ -166,12 +166,10 @@ gamljGzlmClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,modelType)
+      data<-mf.checkData(self$options,data,modelType=modelType)
       if (!is.data.frame(data))
         jmvcore::reject(data)
-      for (scaling in self$options$scaling) {
-        data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type)  
-      }
+
       
       if (!is.null(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
@@ -193,6 +191,7 @@ gamljGzlmClass <- R6::R6Class(
 
       if (is.null(estimatesTable$state)) {
         ginfo("Parameters have been estimated")
+        self$results$.setModel(model)
         ### coefficients summary results ####
         parameters<-try(mf.summary(model))
         mi.check_estimation(parameters,n64)

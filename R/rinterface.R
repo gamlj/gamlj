@@ -1,35 +1,20 @@
-#' GAMLj models options
-#'
-#' This function sets GAMLj suite general options
-#'
-#' @param opt the name of the option 
-#' @param value a value for the corresponding option 
-#' @details 
-#' Options are: debug (TRUE or FALSE). When TRUE some additional warnings and info are printed in output
-#'     
-#' @author Marcello Gallucci
-#' @export 
-
-gamlj_options<-function(opt,value) {
-  if (opt=="debug")
-    GAMLj_DEBUG<<-value
-}
 
 #' Update a GAMLj model by passing only the new options
 #'
 #' This function re-estimates a GAMLj model applying new options to the original model
 #'
 #' @param  gobj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
-#' @param  ... any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
+#' @param  ... any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
 
-#' @return an object of class GAMLj* as the input object
+#' @return an object of class gamlj* as the input object
 #' @author Marcello Gallucci
 #' @export 
 
 gamlj_update<-function(gobj,...) {
-  params<-as.list(c(...))
+  params<-list(...)
   funs<-list("gamljMixedOptions"=gamlj::gamljMixed,
-             "gamljGLMOptions"=gamlj::gamljGLM)
+             "gamljGLMOptions"=gamlj::gamljGLM,
+             "gamljGzlmOptions"=gamlj::gamljGzlm)
   cl<-class(gobj$options)[1]
   fun<-funs[[cl]]
   forms<-formals(fun)
@@ -38,11 +23,9 @@ gamlj_update<-function(gobj,...) {
     if  (f %in% names(gobj$options)) 
       alist[[f]]<-gobj$options[[f]]
   }
-
   for (p in names(params)) {
     alist[[p]]<-params[[p]]     
   }
-  
   data<-gobj$options$.getData()
   alist[["data"]]<-data
   do.call(fun,alist)
@@ -106,8 +89,7 @@ gamlj_ggplot<-function(gobj) {
 #' @export 
 
 gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,...) {
-  args<-list(simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)
-  gamlj_update(gobj,args)  
+  gamlj_update(gobj,simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)  
 }
 
 
@@ -160,8 +142,11 @@ gamlj_drop<-function(gobj,analysis) {
 #' @export
 
 gamlj_data<-function(gobj) {
-  data<-gobj$model$model
-  names(data)<-names(gobj$options$.getData())
+  if (isS4(gobj$model))
+     data<-gobj$model@frame
+  else
+    data<-gobj$model$model
+  names(data)<-jmvcore::fromB64(names(data))
   data
 }
 
@@ -189,3 +174,4 @@ gamlj_predict<-function(gobj,re.form=NULL) {
   else
     stats::predict(gobj$model)
 }
+

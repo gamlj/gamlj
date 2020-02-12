@@ -455,6 +455,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
 gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
+        model = function() private$..model,
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         postHocs = function() private$.items[["postHocs"]],
@@ -463,13 +464,15 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
         plotnotes = function() private$.items[["plotnotes"]]),
-    private = list(),
+    private = list(
+        ..model = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="Generalized Mixed Model")
+            private$..model <- NULL
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -996,7 +999,8 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
-                visible=FALSE))}))
+                visible=FALSE))},
+        .setModel=function(x) private$..model <- x))
 
 gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljGlmMixedBase",
@@ -1126,6 +1130,7 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
+#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glmer} object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr

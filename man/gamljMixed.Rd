@@ -161,6 +161,7 @@ effects predicted values in the plot}
 \value{
 A results object containing:
 \tabular{llllll}{
+  \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr

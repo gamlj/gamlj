@@ -6,7 +6,7 @@ gamljMixedClass <- R6::R6Class(
     .model=NA,
     .names64=NA,
     .cov_condition=conditioning$new(),
-    .postHocRows=NA,
+    .postHocRhttps://github.com/gamlj/gamlj/pull/110/conflict?name=R%252Fgamljmixed.b.R&ancestor_oid=6e285b4ebf7980bbbb771823b075e284b2b65aaa&base_oid=2c6740e9d0d0009b124c03f0d6d99565c913088a&head_oid=859bc2939e431aa9295333bf746a2fe2514aef79ows=NA,
     .init=function() {
       ginfo("init")
       private$.names64<-names64$new()
@@ -145,13 +145,9 @@ gamljMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,"mixed")
+      data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType="mixed")
       if (!is.data.frame(data))
         reject(data)
-      for (scaling in self$options$scaling) {
-        cluster<-jmvcore::toB64(clusters[[1]])
-        data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
-      }
       if (is.something(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
@@ -242,6 +238,7 @@ gamljMixedClass <- R6::R6Class(
        } else ginfo("Anova results recycled")
                     
        if (is.null(estimatesTable$state)) {
+                 self$results$.setModel(model)
                  ### coefficients summary results ####
                  parameters<-try(mf.summary(model))
                  ginfo("...done")
@@ -301,17 +298,18 @@ gamljMixedClass <- R6::R6Class(
           .warning=NULL
           ranova_test<-try(as.data.frame(lmerTest::ranova(model)[-1,]))
           if (jmvcore::isError(ranova_test)) {
-              message <- jmvcore::extractErrorMessage(ranova_test)
-              .warning=paste(message,". LRT cannot be computed")
+            message <- jmvcore::extractErrorMessage(ranova_test)
+            .warning=paste(message,". LRT cannot be computed")
           } else {
             ranova_test$test<-n64$translate(rownames(ranova_test))
             ranova_test$test<-as.character(ranova_test$test)
-             for (i in seq_len(nrow(ranova_test)))
-                  lrtTable$addRow(rowKey=i,ranova_test[i,])
+            for (i in seq_len(nrow(ranova_test)))
+              lrtTable$addRow(rowKey=i,ranova_test[i,]
           }
           lrtTable$setVisible(TRUE)
           lrtTable$setState(list(warning=.warning))
         }
+        
         out.infotable_footnotes(infoTable,attr(model,"infoTable"))        
         out.table_notes(infoTable)
         out.table_notes(anovaTable)

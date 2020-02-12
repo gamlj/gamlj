@@ -4,6 +4,9 @@ title: Generalized Mixed Model
 jrs: '1.0'
 
 items:
+  - name: model
+    type: Property
+    description: The underlying `glmer` object
 
   - name: info
     title: Model Info

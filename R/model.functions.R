@@ -321,7 +321,7 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
   NULL  
 }
 
-mf.checkData<-function(options,data,modelType="linear") {
+mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      
      if (!is.data.frame(data))
          jmvcore::reject(data)
@@ -343,14 +343,22 @@ mf.checkData<-function(options,data,modelType="linear") {
        if (any(data[[dep]]<0))
              return("Poisson-like models require all positive numbers in the dependent variable")
      }
-     ####### check the covariates usability ##########
+     ####### check the covariates usability and center them##########
      covs=options$covs
-     
+     scaling=options$scaling
+     scalingVars<-sapply(scaling,function(a) a$var)
+     clusterdata<-NULL
+     if (is.something(cluster))
+           clusterdata<-data[[jmvcore::toB64(cluster)]]
      for (cov in covs) {
-       cov<-jmvcore::toB64(cov) 
-       data[[cov]]<-as.numeric(as.character(data[[cov]]))
-       if (any(is.na(data[[cov]])))
-          return(paste("Covariate",jmvcore::fromB64(cov), "cannot be converted to a numeric variable"))
+       cov64<-jmvcore::toB64(cov) 
+       data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
+       if (any(is.na(data[[cov64]])))
+          return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
+       w<-which(scalingVars==cov)
+       type<-ifelse(is.something(w),scaling[[w]][['type']],"centered")
+       data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=cluster)  
+
      }
      # check factors
      factors=options$factors

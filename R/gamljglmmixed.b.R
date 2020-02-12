@@ -171,13 +171,10 @@ gamljGlmMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,modelType)
+      data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType=modelType)
       if (!is.data.frame(data))
         jmvcore::reject(data)
-      for (scaling in self$options$scaling) {
-        cluster<-jmvcore::toB64(clusters[[1]])
-        data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type,data[[cluster]])  
-      }
+ 
       if (is.something(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
@@ -260,6 +257,7 @@ gamljGlmMixedClass <- R6::R6Class(
         } else ginfo("Anova results recycled")
 
          if (is.null(estimatesTable$state)) {
+           self$results$.setModel(model)
            ginfo("Parameters have been estimated")
            ### coefficients summary results ####
            parameters<-try(mf.summary(model))
@@ -298,11 +296,17 @@ gamljGlmMixedClass <- R6::R6Class(
            infoTable$setRow(rowKey="r2m",list(value=info.r2m))
            infoTable$setRow(rowKey="r2c",list(value=info.r2c))
            infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
-           infoTable$setRow(rowKey="opt",list(value=model@optinfo$optimizer))
            modelInfo<-attr(model,"infoTable" )
-           conv<-ifelse(modelInfo$conv,"yes","no")
-            infoTable$setRow(rowKey="conv",list(value=conv))
-            infoTable$setState(list(warning=attr(model,"warning")))
+           if (modelInfo$conv==FALSE) {
+             opt<-paste(OPTIMIZERS,collapse=", ")
+             conv="no"
+           } else { 
+             opt<-model@optinfo$optimizer
+             conv="yes"
+           }
+           infoTable$setRow(rowKey="opt",list(value=opt))
+           infoTable$setRow(rowKey="conv",list(value=conv))
+           infoTable$setState(list(warning=attr(model,"warning")))
            ### end of info table ###
          } ## end of estimate and info calculation
          
@@ -447,12 +451,22 @@ gamljGlmMixedClass <- R6::R6Class(
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
-      lm = do.call(lme4::glmer, list(formula=form,
-                                    data=data,
-                                    family = afamily,
-                                    nAGQ = nAGQ,
-                                    lme4::glmerControl(optimizer = OPTIMIZERS[2])))
-      return(lm)
+      
+      for (opt in OPTIMIZERS) {
+        ctr=lme4::glmerControl(optimizer = opt)
+        lm = do.call(lme4::glmer, list(formula=form,
+                                       data=data,
+                                       family = afamily,
+                                       nAGQ = nAGQ,
+                                       control=ctr))
+        model<-mi.model_check(lm)
+        info<-attr(model,"infoTable")
+        if (info$conv==TRUE)
+          break()
+        
+      }
+      
+      return(model)
     },
     .modelFormula=function() {
       

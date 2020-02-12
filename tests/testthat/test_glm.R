@@ -137,7 +137,7 @@ test_that("glm assumptions", {
 
 mod<-gamlj::gamljGLM(
   formula = science ~ math + schtyp + schtyp:math,
-  data = data,
+  data = hsbdemo,
   contrasts = list(list(
       var="schtyp",
       type="deviation"))
@@ -145,9 +145,9 @@ mod<-gamlj::gamljGLM(
 
 res<-mod$main$fixed$asDF
 
-test_that("glm contrasts", {
-  expect_equal(round(res[3,3],2),-2.45)
-  expect_equal(round(res[1,3],2),18.55)
+testthat::test_that("glm contrasts", {
+  testthat::expect_equal(round(res[3,3],2),-0.11)
+  testthat::expect_equal(round(res[1,3],2),51.96)
 })
 
 
