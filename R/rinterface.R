@@ -11,9 +11,10 @@
 #' @export 
 
 gamlj_update<-function(gobj,...) {
-  params<-as.list(c(...))
+  params<-list(...)
   funs<-list("gamljMixedOptions"=gamlj::gamljMixed,
-             "gamljGLMOptions"=gamlj::gamljGLM)
+             "gamljGLMOptions"=gamlj::gamljGLM,
+             "gamljGzlmOptions"=gamlj::gamljGzlm)
   cl<-class(gobj$options)[1]
   fun<-funs[[cl]]
   forms<-formals(fun)
@@ -22,11 +23,9 @@ gamlj_update<-function(gobj,...) {
     if  (f %in% names(gobj$options)) 
       alist[[f]]<-gobj$options[[f]]
   }
-
   for (p in names(params)) {
     alist[[p]]<-params[[p]]     
   }
-  
   data<-gobj$options$.getData()
   alist[["data"]]<-data
   do.call(fun,alist)
@@ -90,8 +89,7 @@ gamlj_ggplot<-function(gobj) {
 #' @export 
 
 gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,...) {
-  args<-list(simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)
-  gamlj_update(gobj,args)  
+  gamlj_update(gobj,simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)  
 }
 
 

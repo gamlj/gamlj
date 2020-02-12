@@ -346,6 +346,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      ####### check the covariates usability and center them##########
      covs=options$covs
      scaling=options$scaling
+     scalingVars<-sapply(scaling,function(a) a$var)
      clusterdata<-NULL
      if (is.something(cluster))
            clusterdata<-data[[jmvcore::toB64(cluster)]]
@@ -354,7 +355,8 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
        if (any(is.na(data[[cov64]])))
           return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
-       type<-ifelse(cov %in% names(scaling),scaling[cov]['type'],"centered")
+       w<-which(scalingVars==cov)
+       type<-ifelse(is.something(w),scaling[[w]][['type']],"centered")
        data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=cluster)  
 
      }
