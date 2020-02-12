@@ -191,7 +191,7 @@ gamljMixedClass <- R6::R6Class(
        }
         N<-as.numeric(model@devcomp$dims['n'])
         groups<-vapply(model@flist,nlevels,1)
-        info<-paste("Number of Obs:", N,", groups:",paste(n64$nicenames(names(groups)),groups,collapse = ","))
+        info<-paste("Number of Obs:", N,", groups:",paste(n64$nicenames(names(groups)),groups,collapse = ", "))
         randomTable$setState(list("warning"=info))
         
         ### Covariance among random effects ###

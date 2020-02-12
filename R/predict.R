@@ -297,7 +297,7 @@ pred.predictRandom<-function(model,
   
   pd<-stats::predict(model,type="response",newdata=newdata)
   # end of zeroing 
-  
+    
   randomData<-as.data.frame(cbind(pd,data[,c(cluster64,groupName64)]))
   pnames<-c("group","lines","plots")
   names(randomData)<-c("y","cluster",pnames[1:length(preds64)])
@@ -322,7 +322,6 @@ pred.predictRandom<-function(model,
   FUN<-stats::family(model)$linkinv
   if (type!="response")
     FUN<-identity
-  
   res<-lapply(rownames(.num_coefs),function(row) {
     .data<-data[data[[cluster]]==row,]
     .x<-.data[,groupName]

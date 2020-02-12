@@ -220,7 +220,7 @@ gamljGlmMixedClass <- R6::R6Class(
 
         N<-as.numeric(model@devcomp$dims['n'])
         groups<-vapply(model@flist,nlevels,1)
-        info<-paste("Number of Obs:", N,", groups:",paste(n64$nicenames(names(groups)),groups,collapse = ","))
+        info<-paste("Number of Obs:", N,", groups:",paste(n64$nicenames(names(groups)),groups,collapse = ", "))
         randomTable$setState(list("warning"=info))
         
          ### Covariance among random effects ###
@@ -525,7 +525,7 @@ gamljGlmMixedClass <- R6::R6Class(
         center<-mean(newdata[,v])
         newdata[,v]<-center
     } 
-    pd<-stats::predict(model,type="response",newdata=newdata)
+    pd<-stats::predict(model,type=type,newdata=newdata)
         
 
     # end of zeroing 
@@ -541,7 +541,6 @@ gamljGlmMixedClass <- R6::R6Class(
     
   } else
     randomData<-NULL
-  
   predData<-gplots.preparePlotData(model,
                                groupName,
                                linesName,

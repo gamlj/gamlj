@@ -86,3 +86,16 @@ testthat::test_that("plot is there",{
   testthat::expect_equal(val3, 1)
   
 })
+
+
+gamlj::gamljGlmMixed(
+  formula = pass ~ 1 + math+( 1 | school ),
+  data = data,
+  plotHAxis = math,
+  scaling = list(
+    list(
+      var="math",
+      type="none")),
+  plotRandomEffects = T,
+  plotLinearPred = TRUE,
+  cimethod = "wald")
