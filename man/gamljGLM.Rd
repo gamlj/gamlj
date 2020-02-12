@@ -68,7 +68,8 @@ the confidence interval width for the parameter estimates}
 
 \item{contrasts}{a list of lists specifying the factor and type of contrast
 to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
-\code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
+\code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+\code{simple} is used.}
 
 \item{showRealNames}{\code{TRUE} or \code{FALSE} (default), shows raw names
 of the contrasts variables}
@@ -93,12 +94,12 @@ range equal to the range of the observed values.}
 
 \item{plotError}{\code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 no error bars, use confidence intervals, or use standard errors on the
-plots, respectively}
+plots, respectively.}
 
 \item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
-confidence interval width}
+confidence interval width for the plots.}
 
-\item{postHoc}{a list of terms to perform post-hoc tests on}
+\item{postHoc}{a list of terms to perform post-hoc tests on.}
 
 \item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
 statistics}
@@ -119,9 +120,12 @@ simple effects are computed}
 \item{simpleScale}{\code{'mean_sd'} (default), \code{'custom'} , or
 \code{'percent'}. Use to condition the covariates (if any)}
 
-\item{cvalue}{offset value for conditioning}
+\item{cvalue}{how many st.deviations around the means used to condition
+simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}}
 
-\item{percvalue}{offset value for conditioning}
+\item{percvalue}{offsett (number of percentiles) around the median used to
+condition simple effects and plots. Used if
+\code{simpleScale}=\code{'percent'}}
 
 \item{simpleScaleLabels}{how the levels of a continuous moderator should
 appear in tables and plots: \code{labels}, \code{values} and
@@ -129,14 +133,17 @@ appear in tables and plots: \code{labels}, \code{values} and
 
 \item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
 \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
-respectively}
+respectively.}
 
 \item{scaling}{a list of lists specifying the covariates scaling, one of
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+\code{'centered'} to the mean, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
 
 \item{effectSize}{a list of effect sizes to print out. They can be:
-\code{eta} for eta-square,}
+\code{'eta'} for eta-square, \code{'partEta'} for partial eta-square,
+\code{'omega'} for omega-square, and \code{'beta'} for standardized
+coefficients (betas). Default is \code{beta} and \code{partial
+eta-squared}.}
 
 \item{homoTest}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
 tests}

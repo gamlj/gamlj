@@ -297,18 +297,19 @@ gamljMixedClass <- R6::R6Class(
                
         #### LRT for random effects ####
         lrtTable<-self$results$main$lrtRandomEffectsTable
-        if (self$options$lrtRandomEffects && is.null(lrtTabl$state)) {
-          
+        if (self$options$lrtRandomEffects && is.null(lrtTable$state)) {
+          .warning=NULL
           ranova_test<-try(as.data.frame(lmerTest::ranova(model)[-1,]))
           if (jmvcore::isError(ranova_test)) {
               message <- jmvcore::extractErrorMessage(ranova_test)
               .warning=paste(message,". LRT cannot be computed")
           } else {
-             res$test<-n64$translate(rownames(res))
-             res$test<-as.character(res$test)
-             for (i in seq_len(nrow(res)))
-                  lrtTable$addRow(rowKey=i,res[i,])
+            ranova_test$test<-n64$translate(rownames(ranova_test))
+            ranova_test$test<-as.character(ranova_test$test)
+             for (i in seq_len(nrow(ranova_test)))
+                  lrtTable$addRow(rowKey=i,ranova_test[i,])
           }
+          lrtTable$setVisible(TRUE)
           lrtTable$setState(list(warning=.warning))
         }
         out.infotable_footnotes(infoTable,attr(model,"infoTable"))        
