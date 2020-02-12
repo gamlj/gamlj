@@ -260,6 +260,7 @@ gamljGlmMixedClass <- R6::R6Class(
         } else ginfo("Anova results recycled")
 
          if (is.null(estimatesTable$state)) {
+           self$results$.setModel(model)
            ginfo("Parameters have been estimated")
            ### coefficients summary results ####
            parameters<-try(mf.summary(model))

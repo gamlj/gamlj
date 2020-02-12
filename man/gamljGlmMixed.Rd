@@ -185,6 +185,7 @@ identity, log and inverse, onemu2 (for 1/mu^2).}
 \value{
 A results object containing:
 \tabular{llllll}{
+  \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glmer} object \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr

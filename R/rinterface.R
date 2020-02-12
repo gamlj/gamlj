@@ -1,28 +1,12 @@
-#' GAMLj models options
-#'
-#' This function sets GAMLj suite general options
-#'
-#' @param opt the name of the option 
-#' @param value a value for the corresponding option 
-#' @details 
-#' Options are: debug (TRUE or FALSE). When TRUE some additional warnings and info are printed in output
-#'     
-#' @author Marcello Gallucci
-#' @export 
-
-gamlj_options<-function(opt,value) {
-  if (opt=="debug")
-    GAMLj_DEBUG<<-value
-}
 
 #' Update a GAMLj model by passing only the new options
 #'
 #' This function re-estimates a GAMLj model applying new options to the original model
 #'
 #' @param  gobj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
-#' @param  ... any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
+#' @param  ... any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
 
-#' @return an object of class GAMLj* as the input object
+#' @return an object of class gamlj* as the input object
 #' @author Marcello Gallucci
 #' @export 
 
@@ -189,3 +173,4 @@ gamlj_predict<-function(gobj,re.form=NULL) {
   else
     stats::predict(gobj$model)
 }
+

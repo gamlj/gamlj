@@ -193,6 +193,7 @@ gamljGzlmClass <- R6::R6Class(
 
       if (is.null(estimatesTable$state)) {
         ginfo("Parameters have been estimated")
+        self$results$.setModel(model)
         ### coefficients summary results ####
         parameters<-try(mf.summary(model))
         mi.check_estimation(parameters,n64)

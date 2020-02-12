@@ -1,5 +1,4 @@
 context("gzlm")
-gamlj_options("debug",FALSE)
 data("hsbdemo")
 data<-hsbdemo
 test_that("gzlm logistic coherence",{

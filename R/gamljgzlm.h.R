@@ -388,6 +388,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
 gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
+        model = function() private$..model,
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         postHocs = function() private$.items[["postHocs"]],
@@ -395,13 +396,15 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]]),
-    private = list(),
+    private = list(
+        ..model = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="Generalized Linear Model")
+            private$..model <- NULL
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -916,7 +919,8 @@ gamljGzlmResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "cvalue",
                         "modelSelection",
                         "custom_family",
-                        "custom_link"))))}))
+                        "custom_link"))))},
+        .setModel=function(x) private$..model <- x))
 
 gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
     "gamljGzlmBase",
@@ -1016,6 +1020,7 @@ gamljGzlmBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
+#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glm} object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr

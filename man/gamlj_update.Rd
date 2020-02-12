@@ -9,10 +9,10 @@ gamlj_update(gobj, ...)
 \arguments{
 \item{gobj}{of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}}}
 
-\item{...}{any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}}}
+\item{...}{any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}}}
 }
 \value{
-an object of class GAMLj* as the input object
+an object of class gamlj* as the input object
 }
 \description{
 This function re-estimates a GAMLj model applying new options to the original model
