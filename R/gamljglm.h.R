@@ -891,7 +891,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
             super$initialize(
                 package = 'gamlj',
                 name = 'gamljGLM',
-                version = c(1,5,2),
+                version = c(2,0,3),
                 options = options,
                 results = gamljGLMResults$new(options=options),
                 data = data,
@@ -927,7 +927,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   the confidence interval width for the parameter estimates
 #' @param contrasts a list of lists specifying the factor and type of contrast
 #'   to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}
+#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+#'   \code{simple} is used.
 #' @param showRealNames \code{TRUE} or \code{FALSE} (default), shows raw names
 #'   of the contrasts variables
 #' @param showContrastCode \code{TRUE} or \code{FALSE} (default), shows
@@ -944,10 +945,10 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   range equal to the range of the observed values.
 #' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
-#'   plots, respectively
+#'   plots, respectively.
 #' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
-#'   confidence interval width
-#' @param postHoc a list of terms to perform post-hoc tests on
+#'   confidence interval width for the plots.
+#' @param postHoc a list of terms to perform post-hoc tests on.
 #' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans
 #'   statistics
 #' @param eCovs \code{TRUE} or \code{FALSE} (default), provide lsmeans
@@ -961,19 +962,25 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param simple3way a moderator of the two-way interaction which is probed
 #' @param simpleScale \code{'mean_sd'} (default), \code{'custom'} , or
 #'   \code{'percent'}. Use to condition the covariates (if any)
-#' @param cvalue offset value for conditioning
-#' @param percvalue offset value for conditioning
+#' @param cvalue how many st.deviations around the means used to condition
+#'   simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}
+#' @param percvalue offsett (number of percentiles) around the median used to
+#'   condition simple effects and plots. Used if
+#'   \code{simpleScale}=\code{'percent'}
 #' @param simpleScaleLabels how the levels of a continuous moderator should
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}.
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
-#'   respectively
+#'   respectively.
 #' @param scaling a list of lists specifying the covariates scaling, one of
-#'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+#'   \code{'centered'} to the mean, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
 #' @param effectSize a list of effect sizes to print out. They can be:
-#'   \code{eta} for eta-square,
+#'   \code{'eta'} for eta-square, \code{'partEta'} for partial eta-square,
+#'   \code{'omega'} for omega-square, and \code{'beta'} for standardized
+#'   coefficients (betas). Default is \code{beta} and \code{partial
+#'   eta-squared}.
 #' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of

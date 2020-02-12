@@ -59,6 +59,7 @@ MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
 
 WARNS<-list()
 
+WARNS["noconv"]<-"The model did not converge. Results may be misleading or uninterpretable."
 
 
 WARNS["means.covariates"]<-"Estimated means are estimated keeping constant
@@ -97,6 +98,7 @@ WARNS["lmer.init"]<-"Specify at least one cluster variable: A random intecepts m
 will be estimated"
 WARNS["lmer.nogood"]<-"Results may be uninterpretable or misleading. Try to refine your model."
 WARNS["lmer.chisq"]<-"ML estimation of F-Tests failed. Chi-squared tests were performed."
+WARNS["lmer.singular"]<-"(Almost) singular fit. Maybe random coefficients variances are too small or correlations among them too large."
 
 ######### posst hoc ###################
 WARNS["ph.nojoy"]<-"Post-hoc tests cannot be estimated. Try simplifying your model removing interactions or covariates"
@@ -120,4 +122,7 @@ WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 CONTR<-list()
 
 
+######## lme4 optimizers #########
+
+OPTIMIZERS<-c("bobyqa","Nelder_Mead","nloptwrap")
 

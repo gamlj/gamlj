@@ -275,6 +275,64 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
   
 }
 
+pred.predictRandom<-function(model,
+                             dep64,
+                             groupName64,
+                             cluster64,
+                             linesName64=NULL,
+                             plotsName64=NULL,
+                             type="response") {
+  
+  data<-model@frame
+  preds64<-c(groupName64,linesName64,plotsName64)
+  gclass<-class(data[[groupName64]])
+  # here we set all model predictors but the x-axis variable to zero
+  # to smooth random effects predicted values
+  mvars<-names(data)
+  tozero<-setdiff(mvars,c(groupName64,cluster64,dep64))
+  newdata<-data
+  for(v in tozero)
+    if (!is.factor(newdata[,v]))
+      newdata[,v]<-0
+  
+  pd<-stats::predict(model,type="response",newdata=newdata)
+  # end of zeroing 
+    
+  randomData<-as.data.frame(cbind(pd,data[,c(cluster64,groupName64)]))
+  pnames<-c("group","lines","plots")
+  names(randomData)<-c("y","cluster",pnames[1:length(preds64)])
+  randomData  
+}
 
-
-
+.predictRandom_continuous<-function(model,
+                                    groupName,
+                                    cluster,
+                                    linesName=NULL,
+                                    plotsName=NULL,
+                                    type="response") {
+  
+  preds<-c(groupName,linesName,plotsName)
+  data<-model@frame
+     
+  .coefs<-stats::coefficients(model)
+  .ccoefs<-.coefs[[cluster]]
+  .where<-grep(groupName,names(.ccoefs),fixed = T)
+  .num_coefs<-.ccoefs[,c(1,.where)]
+  nterms<-length(.num_coefs)-1
+  FUN<-stats::family(model)$linkinv
+  if (type!="response")
+    FUN<-identity
+  res<-lapply(rownames(.num_coefs),function(row) {
+    .data<-data[data[[cluster]]==row,]
+    .x<-.data[,groupName]
+    .m<-matrix(rep(.x,nterms),ncol = nterms)
+     x<-cbind(1,.m)
+     pr<-as.numeric(x%*%.num_coefs)
+    .newdata<-.data[,preds]
+    .newdata$y<-FUN(pr)
+    .newdata$cluster=row
+    .newdata[,c("y","cluster",preds)]
+  })
+  do.call("rbind",res)
+  
+}

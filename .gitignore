@@ -7,6 +7,8 @@
 
 # jamovi
 build/
+build*/
+
 temp/
 *.jmo
 newversion.R

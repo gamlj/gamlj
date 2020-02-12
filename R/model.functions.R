@@ -20,6 +20,7 @@
   
 }
 
+###### model estimation and checks ##############
 
 
 
@@ -65,7 +66,20 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   ss<-as.data.frame(smr$coefficients)
   ss$df<-smr$df[2]
   colnames(ss)<-c("estimate","se","t","p","df")
-  as.data.frame(ss,stringsAsFactors = F)
+  ### fix missing coefficients ########
+  all_coefs<-data.frame(all=names(smr$aliased))
+  rownames(all_coefs)<-names(smr$aliased)
+  all_coefs$order<-1:length(all_coefs$all)
+  res<-merge(ss,all_coefs,by="row.names",all=T)
+  res<-res[order(res$order),]
+  rownames(res)<-res$Row.names
+  res[,c("Row.names", "order","all")]<-NULL
+  ########################
+  res
+  
+  
+  ###########################à
+  as.data.frame(res,stringsAsFactors = F)
 }
 
 .mf.summary.merModLmerTest<-function(model)
@@ -107,8 +121,9 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .mf.summary.glm<-function(model) {
-     
      ss<-summary(model)$coefficients
+     if (nrow(ss)[1]==0)
+        return(as.data.frame(NULL))
      expb<-exp(ss[,"Estimate"])  
      ss<-cbind(ss,expb)
      colnames(ss)<-c("estimate","se","z","p","expb")
@@ -273,15 +288,12 @@ mf.getModelFactors<-function(model) {
 
 
 mf.getModelMessages<-function(model) {
-  message<-list()
+  message<-list(conv=TRUE,msg=NULL,singular=FALSE)
   if (.which.class(model)=="lmer") {
-      message=model@optinfo$conv$lme4$messages
-      lwr <- lme4::getME(model, "lower")
-      theta <- lme4::getME(model, "theta")
-      if (any(theta[lwr==0] < 1e-4))
-        message[length(message)+1]="The model fit is singular"
-
-    return(message)
+      message['msg']=model@optinfo$conv$lme4$messages
+      message["singular"]<-lme4::isSingular(model,tol = 1e-04)
+      if (message["singular"]==TRUE)
+         message['msg']="The fit is singular"
   }
   message
 }
@@ -360,44 +372,88 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 mf.confint<- function(x,...) UseMethod(".confint")
 
-.confint.default<-function(model,level,method=NULL) {
+.confint.default<-function(model,level,parameters,method=NULL) {
   ginfo("CI model unknown",class(model))  
   return(FALSE)
   
 }
 
-.confint.lm<-function(model,level) 
-    return(stats::confint(model,level = level))
+.confint.format<-function(ci,parameters) {
+  att<-attr(parameters,"warning")
+  if (length(ci)==0) {
+    att<-append(att,"C.I. cannot be computed")
+    attr(parameters,"warning")<-att
+    return(parameters)
+  }
+  if (jmvcore::isError(ci)) {
+    message <- jmvcore::extractErrorMessage(ci)
+    att<-append(att,paste(message,"C.I. cannot be computed"))
+    ci<-NULL
+  } else {
+    if (any(is.na(ci)))
+       att<-append(att,paste("Some C.I. cannot be computed"))
+#    ci$order<-1:dim(ci)[1]
+#    parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
+#    parameters<-parameters[order(parameters$order),]
+#    parameters$order<-NULL
+    parameters<-cbind(parameters,ci)
+    attr(parameters,"warning")<-att
+  }
+  return(parameters)
   
-.confint.glm<-function(model,level) {  
-    ci<-stats::confint(model,level = level)
-    return(ci)
+}
+.confint.lm<-function(model,level,parameters)  {
+    ci<-try(stats::confint(model,level=level))
+    ci<-data.frame(ci)
+    colnames(ci)<-c("cilow","cihig")
+   .confint.format(ci,parameters)
+}
+.confint.glm<-function(model,level,parameters) {  
+     ci<-try(stats::confint(model,level = level))
+     if (jmvcore::isError(ci)) 
+       return(.confint.format(ci,parameters))
+     if (is.null(dim(ci)))
+       ci<-matrix(ci,ncol=2)
+     ci<-data.frame(ci)
+     colnames(ci)<-c("cilow","cihig")
+     ci["ecilow"]<-exp(ci["cilow"])     
+     ci["ecihig"]<-exp(ci["cihig"])
+     .confint.format(ci,parameters)
+    
 }
 
-.confint.merModLmerTest<-function(model,level) 
-                                return(.confint.lmer(model,level))
+.confint.merModLmerTest<-function(model,level,parameters) 
+                                return(.confint.lmer(model,level,parameters))
 
-.confint.lmerModLmerTest<-function(model,level) 
-  return(.confint.lmer(model,level))
+.confint.lmerModLmerTest<-function(model,level,parameters) 
+  return(.confint.lmer(model,level,parameters))
 
-.confint.lmer<-function(model,level)  {
-
-      ci<-stats::confint(model,method="Wald",level=level)
+.confint.lmer<-function(model,level,parameters)  {
+      ci<-try(stats::confint(model,method="Wald",level=level))
+      if (jmvcore::isError(ci)) 
+        return(.confint.format(ci,parameters))
+      
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
-      return(ci)
+      ci<-data.frame(ci)
+      colnames(ci)<-c("cilow","cihig")
+      .confint.format(ci,parameters)
   }
 
-.confint.glmerMod<-function(model,level,method)  {
+.confint.glmerMod<-function(model,level,parameters,method="wald")  {
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)
-  ci<-ci[-1,]
-  ci<-ci[!is.na(ci[,1]),]
+  w<-grep(".sig",rownames(ci),fixed=T,invert = T)
+  ci<-ci[w,]
   if (is.null(dim(ci)))
     ci<-matrix(ci,ncol=2)
-  return(ci)
+  ci<-data.frame(ci)
+  colnames(ci)<-c("cilow","cihig")
+  ci["ecilow"]<-exp(ci["cilow"])     
+  ci["ecihig"]<-exp(ci["cihig"])
+  .confint.format(ci,parameters)
 }
 
 

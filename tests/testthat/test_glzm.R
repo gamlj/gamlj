@@ -66,7 +66,6 @@ test_that("glm contrasts", {
   expect_equal(round(res[3,3],2),-2.45)
   expect_equal(round(res[1,3],2),18.55)
 })
-se.params
 test_that("gzlm anova simple effects", {
   expect_equal(as.character(se.params[1,1]),"enrolled")
   expect_equal(round(se.params[2,4],3),0.915)
@@ -96,11 +95,11 @@ test_that("glm posthoc", {
 
 mod<-gamlj::gamljGzlm(showParamsCI = F,
   formula = schtyp ~ 1,
-  data = data,
+  data = hsbdemo,
   modelSelection = "logistic")
 
-test_that("intercept only works",
-          expect_equal(round(mod$main$fixed$asDF[1,2],digits=3),1.658)
+testthat::test_that("intercept only works",
+          testthat::expect_equal(round(mod$main$fixed$asDF[1,2],digits=3),1.658)
 )
 
 
