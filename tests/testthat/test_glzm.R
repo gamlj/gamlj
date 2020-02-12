@@ -1,11 +1,11 @@
 context("gzlm")
 data("hsbdemo")
 data<-hsbdemo
-test_that("gzlm logistic coherence",{
-expect_error(gamlj::gamljGzlm(
-  formula = ses ~ 1,
-  data = data,
-  modelSelection = "logistic")
+testthat::test_that("gzlm logistic coherence",{
+  testthat::expect_error(gamlj::gamljGzlm(
+    formula = ses ~ 1,
+    data = data,
+   modelSelection = "logistic")
 )}
 )
 mod<-gamlj::gamljGzlm(
