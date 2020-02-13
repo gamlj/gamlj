@@ -39,12 +39,10 @@ testthat::test_that("updating", {
 
 
 data("schoolexam")
-
 mod<-gamlj::gamljGlmMixed(
   formula = pass ~ 1 + math+( 1 | school ),
   data = schoolexam,
   plotHAxis = math,
-  correlatedEffects = "nocorr",
   cimethod = "wald")
 
 preds<-gamlj_predict(mod)

@@ -60,6 +60,10 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .fix_coeffs<-function(parameters, coeffs) {
+
+  if (length(coeffs)==dim(parameters)[1]) {
+    return(as.data.frame(parameters))
+  }
   
   ### fix missing coefficients ########
   all_coefs<-data.frame(all=coeffs)
@@ -82,8 +86,6 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   params$df<-smr$df[2]
   colnames(params)<-c("estimate","se","t","p","df")
   params
-  
-  
   ###########################à
   as.data.frame(params,stringsAsFactors = F)
 }
@@ -95,12 +97,16 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
   .mf.summary.lmer(model)
 
 .mf.summary.glmerMod<-function(model) {
-  
-   return(.mf.summary.glm(model))
-#   ss<-summary(model)$coefficients
-#   ss<-as.data.frame(ss,stringsAsFactors = F)
-#   colnames(ss)<-c("estimate","se","z","p")
-#   ss
+  smr<-summary(model)
+  params<-stats::coef(smr)
+  all_coefs<-lme4::fixef(model,add.dropped=T)
+  params<-.fix_coeffs(params,all_coefs)
+  if (nrow(params)[1]==0)
+    return(as.data.frame(NULL))
+  expb<-exp(params[,"Estimate"])  
+  params<-cbind(params,expb)
+  colnames(params)<-c("estimate","se","z","p","expb")
+  as.data.frame(params,stringsAsFactors = F)
 }
 .mf.summary.lmerMod<-function(model)
   .mf.summary.lmer(model)
@@ -408,11 +414,15 @@ mf.confint<- function(x,...) UseMethod(".confint")
   } else {
     if (any(is.na(ci)))
        att<-append(att,paste("Some C.I. cannot be computed"))
-#    ci$order<-1:dim(ci)[1]
-#    parameters<-merge(ci,parameters,by="row.names",all.x=TRUE)
-#    parameters<-parameters[order(parameters$order),]
-#    parameters$order<-NULL
-    parameters<-cbind(parameters,ci)
+    if (nrow(ci)==nrow(parameters)) {
+         parameters<-cbind(parameters,ci)
+    } else {
+         parameters$order<-1:dim(parameters)[1]
+         parameters<-merge(ci,parameters,by="row.names",all=TRUE)
+         parameters<-parameters[order(parameters$order),]
+         parameters$order<-NULL
+    }
+#    parameters<-cbind(parameters,ci)
     attr(parameters,"warning")<-att
   }
   return(parameters)
