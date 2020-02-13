@@ -197,7 +197,7 @@ gamljGzlmClass <- R6::R6Class(
         mi.check_estimation(parameters,n64)
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
-        parameters<-mf.confint(model,level=ciWidth,parameters)
+        parameters<-mf.confint(model,ciWidth,parameters)
         out.fillTable(estimatesTable,parameters)        
         estimatesTable$setState(attributes(parameters))
        }

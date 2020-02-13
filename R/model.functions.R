@@ -58,28 +58,34 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 .mf.summary.default<-function(model) {
       return(FALSE)
 }
+
+.fix_coeffs<-function(parameters, coeffs) {
   
-.mf.summary.lm<-function(model){
-  smr<-summary(model)
-  if (dim(smr$coefficients)[1]==0)
-    return(NULL)
-  ss<-as.data.frame(smr$coefficients)
-  ss$df<-smr$df[2]
-  colnames(ss)<-c("estimate","se","t","p","df")
   ### fix missing coefficients ########
-  all_coefs<-data.frame(all=names(smr$aliased))
-  rownames(all_coefs)<-names(smr$aliased)
+  all_coefs<-data.frame(all=coeffs)
+  rownames(all_coefs)<-names(coeffs)
   all_coefs$order<-1:length(all_coefs$all)
-  res<-merge(ss,all_coefs,by="row.names",all=T)
+  res<-merge(parameters,all_coefs,by="row.names",all=T)
   res<-res[order(res$order),]
   rownames(res)<-res$Row.names
   res[,c("Row.names", "order","all")]<-NULL
   ########################
   res
+}
+  
+.mf.summary.lm<-function(model){
+  smr<-summary(model)
+  params<-smr$coefficients
+  params<-.fix_coeffs(params,smr$aliased)
+  if (nrow(params)[1]==0)
+    return(as.data.frame(NULL))
+  params$df<-smr$df[2]
+  colnames(params)<-c("estimate","se","t","p","df")
+  params
   
   
   ###########################à
-  as.data.frame(res,stringsAsFactors = F)
+  as.data.frame(params,stringsAsFactors = F)
 }
 
 .mf.summary.merModLmerTest<-function(model)
@@ -121,13 +127,15 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .mf.summary.glm<-function(model) {
-     ss<-summary(model)$coefficients
-     if (nrow(ss)[1]==0)
+     smr<-summary(model)
+     params<-smr$coefficients
+     params<-.fix_coeffs(params,smr$aliased)
+     if (nrow(params)[1]==0)
         return(as.data.frame(NULL))
-     expb<-exp(ss[,"Estimate"])  
-     ss<-cbind(ss,expb)
-     colnames(ss)<-c("estimate","se","z","p","expb")
-     as.data.frame(ss,stringsAsFactors = F)
+     expb<-exp(params[,"Estimate"])  
+     params<-cbind(params,expb)
+     colnames(params)<-c("estimate","se","z","p","expb")
+     as.data.frame(params,stringsAsFactors = F)
 }
 
 .mf.summary.multinom<-function(model) {

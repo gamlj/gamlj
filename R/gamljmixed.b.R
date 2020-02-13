@@ -6,7 +6,7 @@ gamljMixedClass <- R6::R6Class(
     .model=NA,
     .names64=NA,
     .cov_condition=conditioning$new(),
-    .postHocRhttps://github.com/gamlj/gamlj/pull/110/conflict?name=R%252Fgamljmixed.b.R&ancestor_oid=6e285b4ebf7980bbbb771823b075e284b2b65aaa&base_oid=2c6740e9d0d0009b124c03f0d6d99565c913088a&head_oid=859bc2939e431aa9295333bf746a2fe2514aef79ows=NA,
+    .postHocRows=NA,
     .init=function() {
       ginfo("init")
       private$.names64<-names64$new()
@@ -304,7 +304,7 @@ gamljMixedClass <- R6::R6Class(
             ranova_test$test<-n64$translate(rownames(ranova_test))
             ranova_test$test<-as.character(ranova_test$test)
             for (i in seq_len(nrow(ranova_test)))
-              lrtTable$addRow(rowKey=i,ranova_test[i,]
+              lrtTable$addRow(rowKey=i,ranova_test[i,])
           }
           lrtTable$setVisible(TRUE)
           lrtTable$setState(list(warning=.warning))
