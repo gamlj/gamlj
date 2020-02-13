@@ -150,11 +150,12 @@ testthat::test_that("intercept only works",
    expect_equal(round(model$main$random$asDF[1,3],digits = 2),1.74)
 )
 
-
+data("subjects_by_stimuli")
+subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =formula,
-  data = data, plotHAxis = cond,
+  data = subjects_by_stimuli, plotHAxis = cond,
   lrtRandomEffects=T  
 )
 testthat::test_that("ranova works",

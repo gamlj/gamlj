@@ -86,3 +86,14 @@ testthat::test_that("plot is there",{
 })
 
 
+mod<-gamlj::gamljGlmMixed(
+  formula = pass ~ 1 +( 1 | school ),
+  data = schoolexam,
+  correlatedEffects = "nocorr",
+  cimethod = "wald")
+
+val1<-round(mod$main$fixed$asDF[[4]],2)
+testthat::test_that("intercept only",{
+  testthat::expect_equal(val1, 0.98)
+
+})
