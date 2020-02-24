@@ -98,12 +98,14 @@ testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
 )
 
-subjects_by_stimuli$x<-rnorm(length(subjects_by_stimuli$nrow))
+adddata<-subjects_by_stimuli
+adddata$x<-rnorm(length(adddata$nrow))
 
-formula<-y~1+cond+(1+x+cond|subj)+(1|stimulus)
+formula<-y~1+cond+x+(1+cond|subj)+(1|stimulus)
+
 model<-gamlj::gamljMixed(
   formula =formula,
-  data = subjects_by_stimuli, 
+  data = adddata, 
   scaling = list(list(
     var="x",
     type="standardized"))
