@@ -376,8 +376,8 @@ options:
                 options:
                   - centered
                   - standardized
-                  - cluster-based centered
-                  - cluster-based standardized
+                  - cluster-based-centered
+                  - cluster-based-standardized
                   - none
 
                 default: centered 

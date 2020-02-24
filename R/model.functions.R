@@ -371,7 +371,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
           return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
        w<-which(scalingVars==cov)
        type<-ifelse(is.something(w),scaling[[w]][['type']],"centered")
-       data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=cluster)  
+       data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=clusterdata)  
 
      }
      # check factors

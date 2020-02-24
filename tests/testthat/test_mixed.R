@@ -56,35 +56,6 @@ testthat::test_that("list interface is ok", {
   expect_equal(ftable[1,4],2949)
 })
 
-####### this was ok before R 3.6 ########
-# expect_warning(
-# model1<-gamlj::gamljMixed(
-#   dep=y,
-#   factors = "cond",
-#   modelTerms = "cond",
-#   cluster = "subj",
-#   randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
-#   data = data
-# )
-# )
-# expect_warning(
-# model<-gamlj::gamljMixed(
-#   dep=y,
-#   factors = "cond",
-#   modelTerms = "cond",
-#   cluster = "subj",
-#   randomTerms = list(list(c("Intercept","subj"),c("cond","subj"))),
-#   correlatedEffects = "nocorr",
-#   data = data
-# )
-# )
-# 
-# expect_warning(
-# model2<-gamlj::gamljMixed(
-#   formula = y ~ 1 + cond+( 1 | subj )+( 0+cond | subj ),
-#   data = data
-# )
-# )
 
 testthat::test_that("uncorrelated error", {
   testthat::expect_error(  
@@ -105,16 +76,16 @@ model1<-gamlj::gamljMixed(
    modelTerms = "cond",
    cluster = "subj",
    randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
-   data = data
+   data = subjects_by_stimuli
  )
 
 model2<-gamlj::gamljMixed(
    formula = y ~ 1 + cond+( 1 | subj )+( 0+cond | subj ),
-   data = data
+   data = subjects_by_stimuli
  )
 
 testthat::test_that("uncorrelated works", {
-  expect_equal(model1$info$asDF[2,2],model2$info$asDF[2,2])
+  testthat::expect_equal(as.character(model1$info$asDF[2,2]),as.character(model2$info$asDF[2,2]))
 })
 
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
@@ -127,6 +98,22 @@ testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
 )
 
+subjects_by_stimuli$x<-rnorm(length(subjects_by_stimuli$nrow))
+
+formula<-y~1+cond+(1+x+cond|subj)+(1|stimulus)
+model<-gamlj::gamljMixed(
+  formula =formula,
+  data = subjects_by_stimuli, 
+  scaling = list(list(
+    var="x",
+    type="standardized"))
+  
+)
+
+testthat::test_that("standardizing with more clusters",
+                    testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
+)
+
 
 data("beers_bars")
 data<-beers_bars
@@ -136,14 +123,48 @@ model<-gamlj::gamljMixed(
   data = data)
 ###### this has changed with lme4 1.1 
 testthat::test_that("some poly", {
-  expect_lt(model$main$anova$asDF[2,2],0.43)
-  expect_gt(model$main$anova$asDF[2,2],0.31)
+  testthat::expect_lt(model$main$anova$asDF[2,2],0.43)
+  testthat::expect_gt(model$main$anova$asDF[2,2],0.31)
   
 })
 
 model<-gamlj::gamljMixed(
+  formula = smile ~ 1 + beer +( 1 + beer  | bar ),
+  data = data,
+  scaling = list(list(
+    var="beer",
+    type="standardized")))
+model
+
+testthat::test_that("standardizing", {
+  testthat::expect_equal(model$main$fixed$asDF[2,2],.8506,tolerance = .002)
+})
+
+model<-gamlj::gamljMixed(
+  formula = smile ~ 1 + beer +( 1 + beer  | bar ),
+  data = data,
+  scaling = list(list(
+    var="beer",
+    type="cluster-based-standardized")))
+
+testthat::test_that("cluster-based-standardizing", {
+  testthat::expect_equal(model$main$fixed$asDF[2,2],.6111,tolerance = .002)
+})
+
+model<-gamlj::gamljMixed(
+  formula = smile ~ 1 + beer +( 1 + beer  | bar ),
+  data = data,
+  scaling = list(list(
+    var="beer",
+    type="cluster-based centered")))
+
+testthat::test_that("cluster-based centering", {
+  testthat::expect_equal(model$main$fixed$asDF[2,2],.6070,tolerance = .002)
+})
+
+
+model<-gamlj::gamljMixed(
    formula =smile ~ 1 +(1|bar),
-   
    data = data
  )
 testthat::test_that("intercept only works",
@@ -155,11 +176,19 @@ subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =formula,
-  data = subjects_by_stimuli, plotHAxis = cond,
-  lrtRandomEffects=T  
+  data = subjects_by_stimuli, 
+  lrtRandomEffects=T , 
+  plotHAxis=cond,
+  plotRandomEffects = T
 )
 testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+)
+
+testthat::test_that("plot works",{
+                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+                    testthat::expect_equal(class(model$descPlot$plot$layers[[1]])[[4]],"gg")
+}
 )
 
 

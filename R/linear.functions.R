@@ -206,16 +206,14 @@ lf.contrastLabels=function(levels, type) {
 }
 
 lf.scaleContinuous<-function(var,method,by=NULL) {
-
+  method<-gsub("[- ]","",tolower(method))
   if (method=="centered") 
           var<-scale(var,scale = F)  
-  if (method=="cluster-based centered") {    
+  if (method=="clusterbasedcentered") 
           var<-unlist(tapply(var,by,scale,scale=F))
-          print(tapply(var,by,mean))
-  }
   if (method=="standardized") 
           var<-scale(var,scale = T)  
-  if (method=="cluster-based standardized")     
+  if (method=="clusterbasedstandardized")     
           var<-unlist(tapply(var,by,scale,scale=T))
   as.numeric(var)
 }

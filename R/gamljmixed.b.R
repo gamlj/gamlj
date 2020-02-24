@@ -145,6 +145,7 @@ gamljMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
+      mark(clusters)
       data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType="mixed")
       if (!is.data.frame(data))
         reject(data)
@@ -566,7 +567,7 @@ gamljMixedClass <- R6::R6Class(
   
       fixed<-lme4::nobars(formula)
       bars<-lme4::findbars(formula)
-      rterms<-sapply(bars,all.vars)
+      rterms<-lapply(bars,all.vars)
       rvars<-unlist(sapply(rterms,function(a) if (length(a)>1) a[[length(a)-1]]))
       if (name=="dep")
         return(jmvcore::marshalFormula(fixed,data,from = "lhs"))  
@@ -581,7 +582,7 @@ gamljMixedClass <- R6::R6Class(
         return(c(fcovs,rcovs))
       }
       if (name=="cluster") {
-       return(sapply(rterms,function(a) a[[length(a)]] ))
+         return(sapply(rterms,function(a) a[[length(a)]] ))
       }
       if (name=="randomTerms") {
         bars<-lme4::findbars(formula)
