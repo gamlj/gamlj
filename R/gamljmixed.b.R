@@ -491,7 +491,10 @@ gamljMixedClass <- R6::R6Class(
       if (!is.factor(newdata[,v])) {
         center<-mean(newdata[,v])
         newdata[,v]<-center
-      } 
+      } else {
+        d<-dim(contrasts(newdata[,v]))
+        contrasts(newdata[,v])<-matrix(0,d[1],d[2])
+      }
     pd<-stats::predict(model,type="response",newdata=newdata,allow.new.levels=TRUE)
     
     # end of zeroing 
