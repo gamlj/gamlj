@@ -40,6 +40,9 @@ options:
       title: Dependent Variable
       type: Variable
       default:
+      suggested:
+        - continuous
+        - ordinal
       permitted:
         - numeric
       description:
@@ -50,6 +53,8 @@ options:
     - name: factors
       title: Factors
       type: Variables
+      suggested:
+         - nominal
       permitted:
         - factor
       default:

@@ -53,11 +53,16 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "dep",
                 dep,
                 default=NULL,
+                suggested=list(
+                    "continuous",
+                    "ordinal"),
                 permitted=list(
                     "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
+                suggested=list(
+                    "nominal"),
                 permitted=list(
                     "factor"),
                 default=NULL)
