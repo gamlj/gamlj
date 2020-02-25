@@ -1,5 +1,6 @@
 context("gzlm")
 data("hsbdemo")
+tol<-0.001
 
 testthat::test_that("gzlm logistic coherence",{
   testthat::expect_error(gamlj::gamljGzlm(
@@ -15,12 +16,12 @@ mod<-gamlj::gamljGzlm(
   modelSelection = "logistic")
 
 res<-mod$main$fixed$asDF
-test_that("glm estimates are correct", {
-  expect_equal(as.character(res[3,1]), "honors1")
-  expect_equal(round(res$cilow[2],2),-0.2)
-  expect_equal(round(res$cihig[2],2),.17)
-  expect_equal(round(res$p[2],2),0.81)
-  expect_equal(round(as.numeric(as.character(mod$info$asDF[[2]][[6]])),3),0.046)
+testthat::test_that("glm estimates are correct", {
+  testthat::expect_equal(as.character(res[3,1]), "honors1")
+  testthat::expect_equal(res$cilow[2],-0.20408,tolerance=tol)
+  testthat::expect_equal(res$cihig[2],.1703,tolerance=tol)
+  testthat::expect_equal(res$p[2],0.8079,tolerance=tol)
+  testthat::expect_equal(as.numeric(as.character(mod$info$asDF[[2]][[6]])),0.0459,tolerance=tol)
 })
 
 mod<-gamlj::gamljGLM(
@@ -135,8 +136,10 @@ mod<-gamlj::gamljGzlm(
   eDesc = T)
 
 res<-mod$main$anova$asDF$test
-test_that("Poisson works", {
-  expect_equal(round(res,2),85.92)
+testthat::test_that("Poisson works", {
+  testthat::expect_equal(round(res,2),85.92)
+  testthat::expect_equal(res,85.9161,tolerance=tol)
+  
 })
 
 data$q<-data$acts+1
