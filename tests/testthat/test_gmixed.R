@@ -70,7 +70,7 @@ val3<-as.character(mod$main$fixed$asDF[3,1])
 
 testthat::test_that("params table is fine",{
   testthat::expect_equal(val1, 0.708)
-  testthat::expect_equal(val2, 9.516)
+  testthat::expect_equal(val2, 9.521)
   testthat::expect_equal(val3, "math²")
   
 })

@@ -13,4 +13,4 @@ Encoding: UTF-8
 LazyData: true
 Imports: stats, jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0), car, lmerTest, lme4, ggeffects, nnet, MASS, gridExtra, ggplot2, geepack
 Exports: gamljMixed, gamljGLM, gamljGzml, gamljGlmMixed
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

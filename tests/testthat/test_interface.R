@@ -1,5 +1,4 @@
 context("R interface")
-
 data("qsport")
 obj<-gamlj::gamljGLM(
     formula = performance ~ hours,

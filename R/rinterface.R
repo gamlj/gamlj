@@ -168,10 +168,10 @@ gamlj_data<-function(gobj) {
 #'  
 #' @export
 
-gamlj_predict<-function(gobj,re.form=NULL) {
+gamlj_predict<-function(gobj,re.form=NULL, type="response") {
   if (!is.null(re.form))
-      stats::predict(gobj$model,re.form=re.form)
+      stats::predict(gobj$model,re.form=re.form, type=type)
   else
-    stats::predict(gobj$model)
+    stats::predict(gobj$model,type=type)
 }
 
