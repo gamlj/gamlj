@@ -1,4 +1,6 @@
 context("R interface")
+library(ggplot2)
+
 data("qsport")
 obj<-gamlj::gamljGLM(
     formula = performance ~ hours,
@@ -35,6 +37,24 @@ testthat::test_that("updating", {
   
 })
 
+data("hsbdemo")
+mod<-gamlj::gamljGzlm(
+  formula = prog ~ write +  ses*female,
+  data = hsbdemo,
+  showParamsCI = TRUE,
+  plotHAxis = write,
+  plotSepLines = ses,
+  plotSepPlots = female,
+  modelSelection = "multinomial")
+
+mplots<-gamlj::gamlj_ggplot(mod)
+
+testthat::test_that("plot ok", {
+                    testthat::expect_true(is.list(mplots))
+                    testthat::expect_true(is.ggplot(mplots[[1]]))
+}
+)
+
 
 
 data("schoolexam")
@@ -51,7 +71,6 @@ testthat::test_that("glmixed predict", {
   testthat::expect_equal(n,5041)
   
 })
-library(ggplot2)
 
 mod1<-gamlj::gamljGlmMixed(
   formula = formula("pass ~ 1 + math+( 1 | school )"),
@@ -59,10 +78,12 @@ mod1<-gamlj::gamljGlmMixed(
   plotHAxis = math,
   cimethod = "wald")
 
-testthat::test_that("plot ok", {
-  testthat::expect_true(is.ggplot(mod1$descPlot$plot))
-  testthat::expect_true(is.ggplot(gamlj_ggplot(mod1)))
-})
+
+mplot<-gamlj::gamlj_ggplot(mod1)
+
+testthat::test_that("plot ok", 
+  testthat::expect_true(is.ggplot(mplot))
+)
 
 
 data("beers_bars")
@@ -99,24 +120,26 @@ testthat::test_that("mixed predict", {
 
 
 data("hsbdemo")
-mod<-gamlj::gamljGzlm(
+mod0<-stats::glm(schtyp ~ write + honors + honors:write,data=hsbdemo,family = binomial())
+preds0<-predict(mod0,type = "response")
+
+mod1<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   showParamsCI = TRUE,
   modelSelection = "logistic")
 
-preds<-gamlj_predict(mod)
-dd<-gamlj_data(mod)
+preds<-gamlj_predict(mod1)
+dd<-gamlj_data(mod1)
 
 testthat::test_that("mixed ", {
-  testthat::expect_equal(round(mean(preds),2),1.78)
+  testthat::expect_equal(round(mean(preds),2),round(mean(preds0),2))
   testthat::expect_equal(round(mean(dd$write),2),0)
   
 })
 
 
-se<-gamlj_simpleEffects(mod,variable="write",moderator="honors")
-se
+se<-gamlj_simpleEffects(mod1,variable="write",moderator="honors")
 res<-se$simpleEffects$Anova$asDF
 testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,2],2),6.64)

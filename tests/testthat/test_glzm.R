@@ -134,8 +134,15 @@ mod<-gamlj::gamljGzlm(
   modelSelection = "multinomial",
   eDesc = T)
 
-mod$main$fixed
-mod
+res1<-mod$main$fixed$asDF
+res2<-mod$main$anova$asDF
+
+testthat::test_that("Multinomial works", {
+  testthat::expect_equal(round(res1[2,6],2),.92)
+  testthat::expect_equal(res2[4,2],1.5950,tolerance=tol)
+  
+})
+
 
 data("poissonacts")
 data<-poissonacts
