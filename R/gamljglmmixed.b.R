@@ -611,6 +611,8 @@ gamljGlmMixedClass <- R6::R6Class(
   } else {
     p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType,order=order)
   }       
+  mark("p",class(p))
+  
   return(p)
 },
 .marshalFormula= function(formula, data, name) {

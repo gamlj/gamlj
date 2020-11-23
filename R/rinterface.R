@@ -66,11 +66,17 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
  
 gamlj_ggplot<-function(gobj) {
 
-  if (length(gobj$descPlots)==0) {
-    gobj$descPlot$plot
-  } else {
-    gobj$descPlots
-  }
+    if (length(gobj$descPlots)==0)
+            return(gobj$descPlot$plot$fun())
+     else {
+       alist<-list()
+       for (i in 1:length(gobj$descPlots)) 
+         alist[[i]]<-gobj$descPlots[[i]]$plot$fun()
+       return(alist)
+     }
+          
+
+  
   
 }
 

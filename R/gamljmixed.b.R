@@ -145,7 +145,6 @@ gamljMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      mark(clusters)
       data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType="mixed")
       if (!is.data.frame(data))
         reject(data)

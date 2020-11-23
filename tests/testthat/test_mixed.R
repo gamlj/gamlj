@@ -32,12 +32,12 @@ testthat::test_that("p-table is ok", {
 rtable<-model$main$random$asDF
 
 testthat::test_that("p-table is ok", {
-  expect_equal(round(rtable[1,4],digits = 2),4.49)
-  expect_equal(as.character(rtable[1,"groups"]),"subj")
+  testthat::expect_equal(round(rtable[1,4],digits = 2),4.49)
+  testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
 
 testthat::test_that("a plot is produced", {
-  expect_equal(class(model$descPlot$plot)[1],"gg")
+  testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
 })
 
 model<-gamlj::gamljMixed(
@@ -189,7 +189,7 @@ testthat::test_that("ranova works",
 
 testthat::test_that("plot works",{
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
-                    testthat::expect_equal(class(model$descPlot$plot$layers[[1]])[[4]],"gg")
+                    testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
 }
 )
 

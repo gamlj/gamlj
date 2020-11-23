@@ -75,15 +75,18 @@ testthat::test_that("params table is fine",{
   
 })
 
-val1<-"ggplot" %in% class(mod$descPlot$plot)
-val2<-mod$descPlot$plot$labels$y
-val3<-mod$descPlot$plot$theme$line$linetype
+mplot<-mod$descPlot$plot$fun()
+val1<-"ggplot" %in% class(mplot)
+
+val2<-mplot$labels$y
+val3<-mplot$theme$line$linetype
 testthat::test_that("plot is there",{
   testthat::expect_equal(val1, TRUE)
   testthat::expect_equal(val2, "pass")
   testthat::expect_equal(val3, 1)
   
 })
+
 
 
 mod<-gamlj::gamljGlmMixed(
