@@ -44,18 +44,44 @@ mod<-gamlj::gamljGlmMixed(
   plotHAxis = math,
   cimethod = "wald")
 
-preds<-gamlj_predict(mod)
-n<-dim(gamlj_data(mod))[1]
+preds<-gamlj::gamlj_predict(mod)
+n<-dim(gamlj::gamlj_data(mod))[1]
 testthat::test_that("glmixed predict", {
-  testthat::expect_equal(round(mean(preds),2),0.04)
+  testthat::expect_equal(round(mean(preds),2),0.51)
   testthat::expect_equal(n,5041)
   
 })
+library(ggplot2)
+
+mod1<-gamlj::gamljGlmMixed(
+  formula = formula("pass ~ 1 + math+( 1 | school )"),
+  data = schoolexam,
+  plotHAxis = math,
+  cimethod = "wald")
+
+testthat::test_that("plot ok", {
+  testthat::expect_true(is.ggplot(mod1$descPlot$plot))
+  testthat::expect_true(is.ggplot(gamlj_ggplot(mod1)))
+})
+
 
 data("beers_bars")
 
 
 data("subjects_by_stimuli")
+
+mod1<-gamlj::gamljMixed(
+  formula =y ~ 1 + cond+( 1|subj ),
+  data = subjects_by_stimuli
+)
+mod2<-gamlj::gamljMixed(
+  formula =y ~ 1 + cond+( 1+cond|subj ),
+  data = subjects_by_stimuli
+)
+
+#rmod1<-mod1$model
+#rmod2<-mod2$model
+#anova(rmod1,rmod2)
 
 mod<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),

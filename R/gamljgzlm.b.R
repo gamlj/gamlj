@@ -194,6 +194,8 @@ gamljGzlmClass <- R6::R6Class(
         self$results$.setModel(model)
         ### coefficients summary results ####
         parameters<-try(mf.summary(model))
+        mark(parameters)
+        
         mi.check_estimation(parameters,n64)
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100

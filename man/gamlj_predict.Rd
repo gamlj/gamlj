@@ -4,7 +4,9 @@
 \alias{gamlj_predict}
 \title{Extract the predicted values of the model estimated by GAMLj}
 \usage{
-gamlj_predict(gobj, re.form = NULL)
+gamlj_predict(gobj, re.form = NULL, type = "response")
+
+gamlj_predict(gobj, re.form = NULL, type = "response")
 }
 \arguments{
 \item{gobj}{a list of values}
@@ -13,8 +15,13 @@ gamlj_predict(gobj, re.form = NULL)
 }
 \value{
 a R object of the class of the estimated model
+
+a R object of the class of the estimated model
 }
 \description{
+This function returns the predicted values model as a R object. It is usefull to run additional 
+analysis in R with model fitted scores.
+
 This function returns the predicted values model as a R object. It is usefull to run additional 
 analysis in R with model fitted scores.
 }
@@ -25,7 +32,15 @@ obj<-gamlj::gamljGLM(
    data = qsport)
  preds<-gamlj_predict(obj)
  
+data("qsport")
+obj<-gamlj::gamljGLM(
+   formula = performance ~ hours,
+   data = qsport)
+ preds<-gamlj_predict(obj)
+ 
 }
 \author{
+Marcello Gallucci
+
 Marcello Gallucci
 }
