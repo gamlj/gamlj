@@ -92,7 +92,7 @@ mod<-gamlj::gamljGzlm(
 )
 
 
-test_that("glm posthoc", {
+test_that("gzlm posthoc", {
    expect_equal(round(mod$postHocs[[1]]$asDF[[5]],3),1.635)
    expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
 })
@@ -126,6 +126,16 @@ res<-mod$emeansTables[[1]]$asDF
 test_that("glm EMM", {
   expect_equal(round(res[1,2],2),0.84)
 })
+
+names(hsbdemo)
+mod<-gamlj::gamljGzlm(
+  formula=prog~math+ses*female,
+  data=hsbdemo,
+  modelSelection = "multinomial",
+  eDesc = T)
+
+mod$main$fixed
+mod
 
 data("poissonacts")
 data<-poissonacts

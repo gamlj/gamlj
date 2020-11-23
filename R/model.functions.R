@@ -483,13 +483,20 @@ mf.confint<- function(x,...) UseMethod(".confint")
 }
 
 
-.confint.multinom <- function (object, level = 0.95, ...) 
+.confint.multinom <- function (object, level, parameters) 
   {
   ci<-stats::confint(object,level=level)
   cim<-NULL
   for (i in seq_len(dim(ci)[3]))
      cim<-rbind(cim,(ci[,,i]))
-  return(cim)
+  cim<-as.data.frame(cim)
+  rownames(cim)<-1:length(cim[,1])
+  rownames(parameters)<-1:length(cim[,1])
+  colnames(cim)<-c("cilow","cihig")
+  cim["ecilow"]<-exp(cim["cilow"])     
+  cim["ecihig"]<-exp(cim["cihig"])
+  .confint.format(cim,parameters)
+
 }
 
 

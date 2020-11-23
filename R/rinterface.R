@@ -168,10 +168,36 @@ gamlj_data<-function(gobj) {
 #'  
 #' @export
 
-gamlj_predict<-function(gobj,re.form=NULL) {
+gamlj_predict<-function(gobj,re.form=NULL, type="response") {
   if (!is.null(re.form))
-      stats::predict(gobj$model,re.form=re.form)
+      stats::predict(gobj$model,re.form=re.form, type=type)
   else
-    stats::predict(gobj$model)
+    stats::predict(gobj$model,type=type)
+}
+
+
+#' Extract the predicted values of the model estimated by GAMLj 
+#'
+#' This function returns the predicted values model as a R object. It is usefull to run additional 
+#' analysis in R with model fitted scores. 
+#'
+#' @param gobj a list of values
+#' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
+#' @return a R object of the class of the estimated model
+#' @author Marcello Gallucci
+#' @examples 
+#' data("qsport")
+#' obj<-gamlj::gamljGLM(
+#'    formula = performance ~ hours,
+#'    data = qsport)
+#'  preds<-gamlj_predict(obj)
+#'  
+#' @export
+
+gamlj_predict<-function(gobj,re.form=NULL, type="response") {
+  if (!is.null(re.form))
+    stats::predict(gobj$model,re.form=re.form, type=type)
+  else
+    stats::predict(gobj$model,type=type)
 }
 

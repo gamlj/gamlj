@@ -270,6 +270,8 @@ mi.dependencies<-function(model,term,what) {
 mi.check_estimation<-function(model,n64) {
   if (jmvcore::isError(model)) {
       msg<-jmvcore::extractErrorMessage(model)
+      if (msg=="Unknown error")
+          msg="The estimation of the model could not be completed. Please refine the model"
       ### this should be made programatic #####
       msg<-gsub("nAGQ","Precision/speed parameter",msg,fixed=T)
       ###
