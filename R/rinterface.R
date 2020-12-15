@@ -207,7 +207,7 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #'  
 #' @export
 
-gamlj_residuals<-function(gobj,re.form=NULL, type="working") {
+gamlj_residuals<-function(gobj, type="working") {
     stats::residuals(gobj$model)
 }
 
