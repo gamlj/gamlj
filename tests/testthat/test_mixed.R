@@ -202,7 +202,7 @@ data("wicksell")
 data<-wicksell
 data$group<-factor(data$group)
 data$time<-factor(data$time)
-expect_warning(gobj<-gamlj::gamljMixed(
+testthat::expect_warning(gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
   contrasts = list(
@@ -218,12 +218,19 @@ expect_warning(gobj<-gamlj::gamljMixed(
 es.params<-gobj$simpleEffects$Params$asDF
 
 testthat::test_that("simple effects", {
-   expect_equal(as.character(es.params$contrast[[1]]),"linear")
-   expect_equal(as.character(es.params$contrast[[2]]),"quadratic")
-   expect_equal(round(es.params$estimate[3],digits=5),-7.32312)
+   testthat::expect_equal(as.character(es.params$contrast[[1]]),"linear")
+  testthat::expect_equal(as.character(es.params$contrast[[2]]),"quadratic")
+  testthat::expect_equal(round(es.params$estimate[3],digits=5),-7.32312)
  })
 
- 
- 
- 
- 
+es.anova<-gobj$main$anova$asDF
+
+gobj2<-gamlj::gamljMixed(
+  formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
+  data = data)
+es2.anova<-gobj2$main$anova$asDF
+
+testthat::test_that("order does not count", {
+  testthat::expect_equal(es2.anova[1,2],es.anova[1,2])
+
+})
