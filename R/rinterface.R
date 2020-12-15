@@ -57,8 +57,8 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
  
 }
 
-#' Extract a ggplot2 plot from a GAMLj results object
-#'  
+#' Extract a ggplot2 plot from a GAMLj results object 
+#' 
 #' This function returns the plot as a ggplot object contained in the gamlj object (the model). If the model 
 #' contains one plot, it is returned. If there are more plots, a list is returned with plots as elements of the list.
 
@@ -167,7 +167,8 @@ gamlj_data<-function(gobj) {
 #' @param gobj a gamlj results object of the class GAMLj*
 #' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
 #' @param type the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial model the default are the predicted probabilities. The "link" gives the scale of the linear predictors; 
-#'             is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. cf. \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::predict.lm()}}
+#'             is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+#'             Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}
 #' @return a R object of the class of the estimated model
 #' @author Marcello Gallucci
 #' @examples 
@@ -191,6 +192,7 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #'
 #' This function returns the residuals of a model as a R object. It is usefull to run additional 
 #' analysis in R on model assumptions. 
+#' \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}} 
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
 #' @param type the type of the residuals. cf. [stats::residuals()]

@@ -16,7 +16,8 @@ a list of value
 }
 \description{
 This function returns the residuals of a model as a R object. It is usefull to run additional 
-analysis in R on model assumptions.
+analysis in R on model assumptions. 
+\code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}}
 }
 \examples{
 data("qsport")

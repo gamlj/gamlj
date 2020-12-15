@@ -12,7 +12,8 @@ gamlj_predict(gobj, re.form = NULL, type = "response")
 \item{re.form}{if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.}
 
 \item{type}{the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial model the default are the predicted probabilities. The "link" gives the scale of the linear predictors; 
-is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. cf. \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::predict.lm()}}}
+is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}}
 }
 \value{
 a R object of the class of the estimated model

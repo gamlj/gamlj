@@ -294,7 +294,7 @@ gamljMixedClass <- R6::R6Class(
                
         #### LRT for random effects ####
         lrtTable<-self$results$main$lrtRandomEffectsTable
-        if (self$options$lrtRandomEffects && is.null(lrtTable$state)) {
+        if (self$options$lrtRandomEffects) {
           .warning=NULL
           ranova_test<-try(as.data.frame(lmerTest::ranova(model)[-1,]))
           if (jmvcore::isError(ranova_test)) {
