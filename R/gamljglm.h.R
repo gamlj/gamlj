@@ -41,7 +41,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "partEta"),
             homoTest = FALSE,
             qq = FALSE,
-            normTest = FALSE, ...) {
+            normTest = FALSE,
+            resids = NULL,
+            predicts = NULL, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -260,6 +262,12 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "normTest",
                 normTest,
                 default=FALSE)
+            private$..resids <- jmvcore::OptionOutput$new(
+                "resids",
+                resids)
+            private$..predicts <- jmvcore::OptionOutput$new(
+                "predicts",
+                predicts)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -294,6 +302,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..homoTest)
             self$.addOption(private$..qq)
             self$.addOption(private$..normTest)
+            self$.addOption(private$..resids)
+            self$.addOption(private$..predicts)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -328,7 +338,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         effectSize = function() private$..effectSize$value,
         homoTest = function() private$..homoTest$value,
         qq = function() private$..qq$value,
-        normTest = function() private$..normTest$value),
+        normTest = function() private$..normTest$value,
+        resids = function() private$..resids$value,
+        predicts = function() private$..predicts$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -362,7 +374,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..effectSize = NA,
         ..homoTest = NA,
         ..qq = NA,
-        ..normTest = NA)
+        ..normTest = NA,
+        ..resids = NA,
+        ..predicts = NA)
 )
 
 gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -376,7 +390,9 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
-        assumptions = function() private$.items[["assumptions"]]),
+        assumptions = function() private$.items[["assumptions"]],
+        resids = function() private$.items[["resids"]],
+        predicts = function() private$.items[["predicts"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -885,7 +901,15 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms")))}))$new(options=options))},
+                                "modelTerms")))}))$new(options=options))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="resids",
+                title="Residuals"))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="predicts",
+                title="Predicted"))},
         .setModel=function(x) private$..model <- x))
 
 gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -1010,6 +1034,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
 #'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
 #'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$resids} \tab \tab \tab \tab \tab an output \cr
+#'   \code{results$predicts} \tab \tab \tab \tab \tab an output \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

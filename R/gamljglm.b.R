@@ -277,6 +277,7 @@ gamljGLMClass <- R6::R6Class(
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)        
         private$.populateLevenes(model)
         private$.populateNormTest(model)
+        private$.savedata(model)
         
     },
   .cleandata=function() {
@@ -460,6 +461,18 @@ gamljGLMClass <- R6::R6Class(
           ggtheme)
   
   TRUE
+},
+.savedata=function(model) {
+  if (!is.null(self$options$resids)) {
+    resids<-residuals(model)
+    self$results$resids$setValues(resids)
+  }
+  if (is.something(self$options$predicts)) {
+    preds<-predict(model)
+    self$results$predicts$setValues(preds)
+  }
+  
+  
 },
 .formula=function() {
   jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)

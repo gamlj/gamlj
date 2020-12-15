@@ -35,6 +35,7 @@ testthat::test_that("p-table is ok", {
   testthat::expect_equal(round(rtable[1,4],digits = 2),4.49)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
+class(model$descPlot$plot)
 
 testthat::test_that("a plot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
@@ -97,6 +98,8 @@ model<-gamlj::gamljMixed(
 testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
 )
+
+
 
 adddata<-subjects_by_stimuli
 adddata$x<-rnorm(length(adddata$nrow))

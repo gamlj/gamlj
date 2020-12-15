@@ -57,7 +57,8 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
  
 }
 
-#' This function returns the plot as a ggplot object
+#' This function returns the plot as a ggplot object contained in the gamlj object (the model). If the model 
+#' contains one plot, it is returned. If there are more plots, a list is returned with plots as elements of the list.
 
 #' @param gobj a gamlj results object of the class GAMLj*#'
 #' @return an object of ggplot
