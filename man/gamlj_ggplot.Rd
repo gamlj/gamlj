@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_ggplot}
 \alias{gamlj_ggplot}
-\title{This function returns the plot as a ggplot object}
+\title{Extract a ggplot2 plot from a GAMLj results object}
 \usage{
 gamlj_ggplot(gobj)
 }
@@ -13,7 +13,8 @@ gamlj_ggplot(gobj)
 an object of ggplot
 }
 \description{
-This function returns the plot as a ggplot object
+This function returns the plot as a ggplot object contained in the gamlj object (the model). If the model 
+contains one plot, it is returned. If there are more plots, a list is returned with plots as elements of the list.
 }
 \author{
 Marcello Gallucci

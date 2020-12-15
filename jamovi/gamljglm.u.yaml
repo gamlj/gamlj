@@ -60,7 +60,7 @@ children:
           - name: effectSize_omega
             type: CheckBox
             optionPart: omega
-            optionName: effectSize    
+            optionName: effectSize
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -87,7 +87,7 @@ children:
         format: term
         higherOrders: true
         events:
-                  update: './gamlj.events::onUpdate_modelSupplier'
+          update: './gamlj.events::onUpdate_modelSupplier'
         children:
           - type: TargetLayoutBox
             transferAction: interactions
@@ -171,10 +171,10 @@ children:
                     name: simpleScale_mean_sd
                     optionName: simpleScale
                     optionPart: mean_sd
-                    children: 
-                          - type: TextBox
-                            name: cvalue
-                            format: number
+                    children:
+                      - type: TextBox
+                        name: cvalue
+                        format: number
                   - name: simpleScale_percent
                     type: RadioButton
                     optionName: simpleScale
@@ -248,7 +248,6 @@ children:
                 type: CheckBox
                 optionPart: holm
                 optionName: postHocCorr
-
   - type: CollapseBox
     label: Plots
     collapsed: true

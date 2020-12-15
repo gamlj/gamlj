@@ -428,6 +428,8 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a test for normality of residuals
+            
+
 
 ...
 

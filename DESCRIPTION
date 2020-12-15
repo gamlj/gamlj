@@ -1,7 +1,7 @@
 Package: gamlj
 Type: Package
 Title: GAMLj suite for jamovi
-Version: 2.1.0
+Version: 2.1.1
 Author: Marcello Gallucci
 Maintainer: Marcello Gallucci <mcfanda@gmail.com>
 Description: A suite for estimating linear models, such as the general linear model, linear mixed models,
@@ -11,6 +11,6 @@ Description: A suite for estimating linear models, such as the general linear mo
 License: GPL
 Encoding: UTF-8
 LazyData: true
-Imports: stats, jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0), car, lmerTest, lme4, ggeffects, nnet, MASS, gridExtra, ggplot2, geepack
+Imports: stats, jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0), car, lmerTest, lme4, nnet, MASS, gridExtra, ggplot2
 Exports: gamljMixed, gamljGLM, gamljGzml, gamljGlmMixed
 RoxygenNote: 7.1.0

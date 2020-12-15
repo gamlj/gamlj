@@ -43,6 +43,11 @@ gamljGzlmClass <- R6::R6Class(
          jmvcore::reject(data)
 
       modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      dep64<-jmvcore::toB64(dep)
+      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,fixedIntercept))
+      
+      
       infoTable<-self$results$info
       info<-MINFO[[modelType]]
       info$link<-LINFO[[afamily$link]]
@@ -72,12 +77,16 @@ gamljGzlmClass <- R6::R6Class(
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
       #####################
-
+      
+      
       ## anova Table 
       if (length(modelTerms)>0) {
           aTable<- self$results$main$anova
+          mynames64<-attr(terms(as.formula(formula64)),"term.labels")
+          terms<-n64$nicenames(mynames64)  
+          
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
+                  lab<-jmvcore::stringifyTerm(terms[[i]],raise=T)
                   aTable$addRow(rowKey=i, list(name=lab))
           }
       }

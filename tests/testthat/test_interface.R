@@ -6,11 +6,13 @@ obj<-gamlj::gamljGLM(
     formula = performance ~ hours,
     data = qsport)
 preds<-gamlj_predict(obj)
+reds<-gamlj_residuals(obj)
 n<-dim(gamlj_data(obj))[1]
 
 testthat::test_that("test glm", {
   testthat::expect_equal(round(mean(preds),2),37.88)
   testthat::expect_equal(n,100)
+  testthat::expect_equal(round(mean(reds),3),0)
   
 })
 

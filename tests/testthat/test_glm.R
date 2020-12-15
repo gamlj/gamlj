@@ -91,10 +91,10 @@ mod<-gamlj::gamljGLM(
   simpleVariable = math
 )
 se.params<-mod$simpleEffects$Params$asDF
-test_that("glm weird names", {
-  expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
-  expect_equal(as.character(se.params[2,1]),"male")
-  expect_equal(round(se.params[1,5],digits=5),0.80708)
+testthat::test_that("glm weird names", {
+  testthat::expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
+  testthat::expect_equal(as.character(se.params[2,1]),"male")
+  testthat::expect_equal(round(se.params[1,5],digits=5),0.80708)
 })
 
 data$sex<-factor(data$`Gender (test ?)`,levels=c("male","female"))
@@ -110,6 +110,21 @@ se.params2<-mod2$simpleEffects$Params$asDF
 test_that("glm weird names", {
   expect_equal(as.character(se.params2[2,1]),"female")
   expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
+})
+
+mod3<-gamlj::gamljGLM(
+  data = data,
+  formula=science~math+math:`Gender (test ?)`+`Gender (test ?)`,
+  simpleModerator = `Gender (test ?)`,
+  simpleVariable = math
+)
+
+res<-mod$main$anova$asDF
+res3<-mod3$main$anova$asDF
+
+testthat::test_that("glm order does not count", {
+  testthat::expect_equal(res[2,4],res3[2,4])
+  testthat::expect_equal(as.character(res[4,1]),as.character(res3[4,1]))
 })
 
 
@@ -142,13 +157,15 @@ mod<-gamlj::gamljGLM(
       var="schtyp",
       type="deviation"))
 )
-
 res<-mod$main$fixed$asDF
 
 testthat::test_that("glm contrasts", {
   testthat::expect_equal(round(res[3,3],2),-0.11)
   testthat::expect_equal(round(res[1,3],2),51.96)
 })
+
+
+
 
 
 mod<-gamlj::gamljGLM(
@@ -185,3 +202,4 @@ test_that("glm zero-intercept model", {
   expect_equal(as.character(res$name[1]),"Residuals")
   expect_equal(round(res[2,2],2),566514)
 })
+

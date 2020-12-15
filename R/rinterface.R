@@ -31,7 +31,7 @@ gamlj_update<-function(gobj,...) {
   do.call(fun,alist)
 }
 
-#' Update a GAMLj model plots by passing new plots directives
+#' Update a GAMLj model plot by passing new plot directives
 #'
 #' This function re-estimates a GAMLj model with a new plot
 
@@ -57,7 +57,10 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
  
 }
 
-#' This function returns the plot as a ggplot object
+#' Extract a ggplot2 plot from a GAMLj results object 
+#' 
+#' This function returns the plot as a ggplot object contained in the gamlj object (the model). If the model 
+#' contains one plot, it is returned. If there are more plots, a list is returned with plots as elements of the list.
 
 #' @param gobj a gamlj results object of the class GAMLj*#'
 #' @return an object of ggplot
@@ -99,7 +102,7 @@ gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,..
 }
 
 
-#' Update a GAMLj results by removing a block or results
+#' Update GAMLj results by removing a block or results
 #'
 #' This function re-estimates a GAMLj model removing some of the directives passed to the orginal model
 #'
@@ -161,8 +164,11 @@ gamlj_data<-function(gobj) {
 #' This function returns the predicted values model as a R object. It is usefull to run additional 
 #' analysis in R with model fitted scores. 
 #'
-#' @param gobj a list of values
+#' @param gobj a gamlj results object of the class GAMLj*
 #' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
+#' @param type the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial model the default are the predicted probabilities. The "link" gives the scale of the linear predictors; 
+#'             is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+#'             Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}
 #' @return a R object of the class of the estimated model
 #' @author Marcello Gallucci
 #' @examples 
@@ -182,28 +188,26 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 }
 
 
-#' Extract the predicted values of the model estimated by GAMLj 
+#' Extract the residuals values of the model estimated by GAMLj 
 #'
-#' This function returns the predicted values model as a R object. It is usefull to run additional 
-#' analysis in R with model fitted scores. 
+#' This function returns the residuals of a model as a R object. It is usefull to run additional 
+#' analysis in R on model assumptions. 
+#' \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}} 
 #'
-#' @param gobj a list of values
-#' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
-#' @return a R object of the class of the estimated model
+#' @param gobj a gamlj results object of the class GAMLj*
+#' @param type the type of the residuals. cf. [stats::residuals()]
+#' @return a list of value
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
 #' obj<-gamlj::gamljGLM(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#'  preds<-gamlj_predict(obj)
+#'  preds<-gamlj_residuals(obj)
 #'  
 #' @export
 
-gamlj_predict<-function(gobj,re.form=NULL, type="response") {
-  if (!is.null(re.form))
-    stats::predict(gobj$model,re.form=re.form, type=type)
-  else
-    stats::predict(gobj$model,type=type)
+gamlj_residuals<-function(gobj,re.form=NULL, type="working") {
+    stats::residuals(gobj$model)
 }
 

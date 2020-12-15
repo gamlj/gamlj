@@ -5,23 +5,20 @@
 \title{Extract the predicted values of the model estimated by GAMLj}
 \usage{
 gamlj_predict(gobj, re.form = NULL, type = "response")
-
-gamlj_predict(gobj, re.form = NULL, type = "response")
 }
 \arguments{
-\item{gobj}{a list of values}
+\item{gobj}{a gamlj results object of the class GAMLj*}
 
 \item{re.form}{if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.}
+
+\item{type}{the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial model the default are the predicted probabilities. The "link" gives the scale of the linear predictors; 
+is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}}
 }
 \value{
 a R object of the class of the estimated model
-
-a R object of the class of the estimated model
 }
 \description{
-This function returns the predicted values model as a R object. It is usefull to run additional 
-analysis in R with model fitted scores.
-
 This function returns the predicted values model as a R object. It is usefull to run additional 
 analysis in R with model fitted scores.
 }
@@ -32,15 +29,7 @@ obj<-gamlj::gamljGLM(
    data = qsport)
  preds<-gamlj_predict(obj)
  
-data("qsport")
-obj<-gamlj::gamljGLM(
-   formula = performance ~ hours,
-   data = qsport)
- preds<-gamlj_predict(obj)
- 
 }
 \author{
-Marcello Gallucci
-
 Marcello Gallucci
 }

@@ -47,9 +47,8 @@ mod<-gamlj::gamljGzlm(
 r.anova<-mod$main$anova$asDF
 r.show<-as.character(mod$main$contrastCodeTables[[1]]$asDF[1,3])
 testthat::test_that("gzlm anova is correct", {
-  testthat::expect_equal(as.character(r.anova[3,1]),"honors:write")
+  testthat::expect_equal(as.character(r.anova[3,1]),"write:honors")
   testthat::expect_equal(round(r.anova[1,4],3),0.809)
-  
 })
 testthat::test_that("contrasts are correct", {
   testthat::expect_equal(r.show,"-0.5")
@@ -133,7 +132,7 @@ mod<-gamlj::gamljGzlm(
   data=hsbdemo,
   modelSelection = "multinomial",
   eDesc = T)
-
+mod
 res1<-mod$main$fixed$asDF
 res2<-mod$main$anova$asDF
 
@@ -141,6 +140,18 @@ testthat::test_that("Multinomial works", {
   testthat::expect_equal(round(res1[2,6],2),.92)
   testthat::expect_equal(res2[4,2],1.5950,tolerance=tol)
   
+})
+
+mod2<-gamlj::gamljGzlm(
+  formula=prog~ses*female+math,
+  data=hsbdemo,
+  modelSelection = "multinomial")
+
+res<-mod$main$anova$asDF
+res2<-mod2$main$anova$asDF
+testthat::test_that("glm order does not count", {
+  testthat::expect_equal(res[1,2],res2[3,2])
+  testthat::expect_equal(as.character(res[1,1]),as.character(res2[3,1]))
 })
 
 
