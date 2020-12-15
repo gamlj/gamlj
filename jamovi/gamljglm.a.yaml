@@ -430,12 +430,6 @@ options:
             `TRUE` or `FALSE` (default), provide a test for normality of residuals
             
 
-    - name: resids
-      title: Residuals
-      type: Output
-    - name: predicts
-      title: Predicted
-      type: Output
 
 ...
 

@@ -17,7 +17,6 @@ gamljGLMClass <- R6::R6Class(
       covs<-self$options$covs
       ### here we initialize the info table ####
       getout<-FALSE
-      
       infoTable<-self$results$info
 
       if (is.null(self$options$dep)) {
@@ -39,6 +38,9 @@ gamljGLMClass <- R6::R6Class(
       
       
       modelFormula<-lf.constructFormula(dep,modelTerms,fixedIntercept)
+      dep64<-jmvcore::toB64(dep)
+      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,fixedIntercept))
       
       infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
       infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
@@ -55,9 +57,11 @@ gamljGLMClass <- R6::R6Class(
       aTable<- self$results$main$anova
       if (length(modelTerms)>0) {
           aTable$addRow(rowKey=1, list(name="Model"))
-          
+
+          mynames64<-attr(terms(as.formula(formula64)),"term.labels")
+          terms<-n64$nicenames(mynames64)  
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
+                  lab<-jmvcore::stringifyTerm(terms[[i]],raise=T)
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -75,9 +79,6 @@ gamljGLMClass <- R6::R6Class(
       ## fixed effects parameters
 
       aTable<-self$results$main$fixed
-      dep64<-jmvcore::toB64(dep)
-      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
-      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,fixedIntercept))
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
@@ -277,8 +278,7 @@ gamljGLMClass <- R6::R6Class(
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)        
         private$.populateLevenes(model)
         private$.populateNormTest(model)
-        private$.savedata(model)
-        
+
     },
   .cleandata=function() {
       Sys.setlocale("LC_NUMERIC", "C")
@@ -461,18 +461,6 @@ gamljGLMClass <- R6::R6Class(
           ggtheme)
   
   TRUE
-},
-.savedata=function(model) {
-  if (!is.null(self$options$resids)) {
-    resids<-residuals(model)
-    self$results$resids$setValues(resids)
-  }
-  if (is.something(self$options$predicts)) {
-    preds<-predict(model)
-    self$results$predicts$setValues(preds)
-  }
-  
-  
 },
 .formula=function() {
   jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
