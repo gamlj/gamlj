@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_plot}
 \alias{gamlj_plot}
-\title{Update a GAMLj model plots by passing new plots directives}
+\title{Update a GAMLj model plot by passing new plot directives}
 \usage{
 gamlj_plot(gobj, haxis, sepLines = NULL, sepPlots = NULL, ...)
 }

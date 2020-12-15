@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_drop}
 \alias{gamlj_drop}
-\title{Update a GAMLj results by removing a block or results}
+\title{Update GAMLj results by removing a block or results}
 \usage{
 gamlj_drop(gobj, analysis)
 }
