@@ -255,7 +255,6 @@ var updateScaling = function(ui, variableList, context) {
         else
             list3.push(found);
     }
-
     ui.scaling.setValue(list3);
 };
 
