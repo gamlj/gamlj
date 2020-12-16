@@ -234,3 +234,6 @@ testthat::test_that("order does not count", {
   testthat::expect_equal(es2.anova[1,2],es.anova[1,2])
 
 })
+
+
+
