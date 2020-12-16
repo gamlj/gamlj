@@ -293,6 +293,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "poisson",
                     "logistic",
                     "probit",
+                    "nbm",
                     "custom"),
                 default="logistic")
             private$..custom_family <- jmvcore::OptionList$new(

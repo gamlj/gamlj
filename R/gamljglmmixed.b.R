@@ -445,13 +445,22 @@ gamljGlmMixedClass <- R6::R6Class(
       nAGQ<-self$options$nAGQ
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
-
       if (afamily$link=="identity" & afamily$family=="gaussian")
          jmvcore::reject("The requested model is a linear mixed model, please use the Mixed Models command", code='error')
       
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
+
+      if (afamily$family=="nbm") {
+        library(lme4)
+        lm = do.call(lme4::glmer.nb, list(formula=form,
+                                       data=data))
+        model<-mi.model_check(lm)
+        return(model)
+        
+      }
+      
       
       for (opt in OPTIMIZERS) {
         ctr=lme4::glmerControl(optimizer = opt)

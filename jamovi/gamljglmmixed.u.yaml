@@ -39,6 +39,12 @@ children:
                 optionPart: poisson
                 events:
                   change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_nbm
+                optionName: modelSelection
+                optionPart: nbm
+                events:
+                  change: './gamlj.events::onChange_model'
 
           - type: Label
             label: Custom Model
@@ -430,7 +436,6 @@ children:
                 name: plotRandomEffects
               - type: CheckBox
                 name: plotLinearPred
-
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

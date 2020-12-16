@@ -1,7 +1,7 @@
 #' @import lmerTest
 
-GAMLj_DEBUG=F
-GAMLj_INFO=F
+GAMLj_DEBUG=T
+GAMLj_INFO=T
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
 DUMMY_TAIL<-"_._._"
@@ -45,6 +45,9 @@ MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
 
 MINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
                     "call"="glm.nb",emmeanTitle="Mean Count")
+
+MINFO[["nbm"]]<-list("name"=c("Negative binomial","Model for count data"),
+                    "call"="glmer.nb",emmeanTitle="Mean Count")
 
 MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
                          "call"="glm",emmeanTitle="Mean Count")
