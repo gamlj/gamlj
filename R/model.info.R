@@ -327,4 +327,11 @@ mi.warnings<- function(x,...) UseMethod(".mi.warnings")
 }
 
 
+mi.overdispertion<-function(model) {
+
+  rdf <- df.residual(model)
+  rp <- residuals(model,type="pearson")
+  Pearson.chisq <- sum(rp^2)
+  Pearson.chisq/rdf
+}
 

@@ -85,6 +85,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
+      infoTable$addRow(rowKey="chidf",list(info="Chi²/DF",comm="Overdispertion indicator"))
       infoTable$addRow(rowKey="conv",list(info="Converged",comm=""))
       infoTable$addRow(rowKey="opt",list(info="Optimizer",comm=""))
       
@@ -297,6 +298,8 @@ gamljGlmMixedClass <- R6::R6Class(
            infoTable$setRow(rowKey="r2m",list(value=info.r2m))
            infoTable$setRow(rowKey="r2c",list(value=info.r2c))
            infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
+           infoTable$setRow(rowKey="chidf",list(value=mi.overdispertion(model)))
+           
            modelInfo<-attr(model,"infoTable" )
            if (modelInfo$conv==FALSE) {
              opt<-paste(OPTIMIZERS,collapse=", ")
