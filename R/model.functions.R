@@ -448,14 +448,15 @@ mf.confint<- function(x,...) UseMethod(".confint")
     
 }
 
-.confint.merModLmerTest<-function(model,level,parameters) 
-                                return(.confint.lmer(model,level,parameters))
+.confint.merModLmerTest<-function(model,level,parameters,method="Wald") 
+                                return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmerModLmerTest<-function(model,level,parameters) 
-  return(.confint.lmer(model,level,parameters))
+.confint.lmerModLmerTest<-function(model,level,parameters,method=NULL) 
+  return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmer<-function(model,level,parameters)  {
-      ci<-try(stats::confint(model,method="Wald",level=level))
+.confint.lmer<-function(model,level,parameters,method="Wald")  {
+      mark(paste("C.I for glmerMod with method",method))
+      ci<-try(stats::confint(model,method=method,level=level))
       if (jmvcore::isError(ci)) 
         return(.confint.format(ci,parameters))
       
@@ -468,6 +469,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
   }
 
 .confint.glmerMod<-function(model,level,parameters,method="wald")  {
+  mark(paste("C.I for glmerMod with method",method))
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)

@@ -265,7 +265,7 @@ gamljGlmMixedClass <- R6::R6Class(
            
            #### confidence intervals ######
            ciWidth<-self$options$paramCIWidth/100
-           parameters<-mf.confint(model,level=ciWidth,parameters)
+           parameters<-mf.confint(model,level=ciWidth,parameters,method=self$options$cimethod)
            out.fillTable(estimatesTable,parameters)        
            estimatesTable$setState(attributes(parameters))
          
@@ -620,8 +620,7 @@ gamljGlmMixedClass <- R6::R6Class(
   } else {
     p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType,order=order)
   }       
-  mark("p",class(p))
-  
+
   return(p)
 },
 .marshalFormula= function(formula, data, name) {
