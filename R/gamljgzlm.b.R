@@ -63,9 +63,7 @@ gamljGzlmClass <- R6::R6Class(
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
-      
-      if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
-        infoTable$addRow(rowKey="devdf",list(info="Value/DF",comm="Close to 1 is better"))
+      infoTable$addRow(rowKey="devdf",list(info="Chi²/DF",comm="Overdispertion indicator"))
       
       infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
       if ("note" %in% names(info))
@@ -219,14 +217,13 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
         infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
-        if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
-          infoTable$setRow(rowKey="devdf",list(value=mi.getValueDf(model)))
+        infoTable$setRow(rowKey="devdf",list(value=mi.getValueDf(model)))
         if (modelType=="poiover") {
           infoTable$setRow(rowKey="r2",list(comm="Not available for quasi-poisson"))
           infoTable$setRow(rowKey="aic",list(comm="Not available for quasi-poisson"))
         }
         infoTable$setRow(rowKey="conv",list(value=ifelse(mi.converged(model),"yes","no")))
-        
+
         
         ### end of info table ###
         

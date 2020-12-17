@@ -130,7 +130,7 @@ mi.getValueDf<- function(x,...) UseMethod(".getValueDf")
 
 .getValueDf.default<-function(model) {
   value <- sum(stats::residuals(model, type = "pearson")^2)
-  result <- value/model$df.residual
+  result <- value/df.residual(model)
   return(result)
 }
 .getValueDf.multinom<-function(model) {
@@ -327,11 +327,4 @@ mi.warnings<- function(x,...) UseMethod(".mi.warnings")
 }
 
 
-mi.overdispertion<-function(model) {
-
-  rdf <- df.residual(model)
-  rp <- residuals(model,type="pearson")
-  Pearson.chisq <- sum(rp^2)
-  Pearson.chisq/rdf
-}
 
