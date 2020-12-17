@@ -490,14 +490,14 @@ options:
           title: Logistic
         - name: probit
           title: Probit
-        - name : nbm
+        - name : nb
           title: Negative Binomial
         - name: custom
           title: Custom
       default: logistic
       description:
           R: >
-            Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
+            Select the generalized linear model: `linear`,`poisson`,`logistic`,`nb`, the latest being Negative Binomial
 
 
     - name: custom_family

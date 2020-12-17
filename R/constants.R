@@ -44,10 +44,8 @@ MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
                              "call"="multinom",emmeanTitle="Prob.")
 
 MINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
-                    "call"="glm.nb",emmeanTitle="Mean Count")
+                    "call"="glm(er).nb",emmeanTitle="Mean Count")
 
-MINFO[["nbm"]]<-list("name"=c("Negative binomial","Model for count data"),
-                    "call"="glmer.nb",emmeanTitle="Mean Count")
 
 MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
                          "call"="glm",emmeanTitle="Mean Count")

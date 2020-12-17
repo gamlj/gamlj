@@ -452,7 +452,7 @@ gamljGlmMixedClass <- R6::R6Class(
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
 
-      if (afamily$family=="nbm") {
+      if (afamily$family=="nb") {
         library(lme4)
         lm = do.call(lme4::glmer.nb, list(formula=form,
                                        data=data))

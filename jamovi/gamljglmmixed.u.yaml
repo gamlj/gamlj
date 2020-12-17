@@ -40,9 +40,9 @@ children:
                 events:
                   change: './gamlj.events::onChange_model'
               - type: RadioButton
-                name: modelSelection_nbm
+                name: modelSelection_nb
                 optionName: modelSelection
-                optionPart: nbm
+                optionPart: nb
                 events:
                   change: './gamlj.events::onChange_model'
 

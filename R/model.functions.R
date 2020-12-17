@@ -324,9 +324,7 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
     return(list(family="multinomial",link="slogit"))
   if (modelSelection=="nb")
     return(list(family="nb",link="log"))
-  if (modelSelection=="nbm")
-    return(list(family="nbm",link="log"))
-  
+
     if (modelSelection=="poiover")
       return(stats::quasipoisson())
   if (modelSelection=="probit")
@@ -353,7 +351,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
           return(paste(nice,"model requires a numeric dependent variable"))
        }
                
-     if  (modelType=="poisson" || modelType=="nb" || modelType=="nbm" || modelType=="poiover") {
+     if  (modelType=="poisson" || modelType=="nb" || modelType=="poiover") {
          ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))
        if (any(data[[dep]]<0))

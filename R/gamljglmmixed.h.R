@@ -293,7 +293,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "poisson",
                     "logistic",
                     "probit",
-                    "nbm",
+                    "nb",
                     "custom"),
                 default="logistic")
             private$..custom_family <- jmvcore::OptionList$new(
@@ -1123,7 +1123,8 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   positive integer
 #' @param effectSize .
 #' @param modelSelection Select the generalized linear model:
-#'   \code{linear},\code{poisson},\code{logistic},\code{multinomial}
+#'   \code{linear},\code{poisson},\code{logistic},\code{nb}, the latest being
+#'   Negative Binomial
 #' @param custom_family Distribution family for the custom model, accepts
 #'   gaussian, binomial, gamma and inverse_gaussian .
 #' @param custom_link Distribution family for the custom model, accepts
