@@ -418,7 +418,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
          parameters<-cbind(parameters,ci)
     } else {
          parameters$order<-1:dim(parameters)[1]
-         parameters<-merge(ci,parameters,by="row.names",all=TRUE)
+         parameters<-merge(ci,parameters,by="row.names",all.y=TRUE)
          parameters<-parameters[order(parameters$order),]
          parameters$order<-NULL
     }
@@ -448,13 +448,16 @@ mf.confint<- function(x,...) UseMethod(".confint")
     
 }
 
-.confint.merModLmerTest<-function(model,level,parameters,method="Wald") 
+.confint.merModLmerTest<-function(model,level,parameters,method="wald") 
                                 return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmerModLmerTest<-function(model,level,parameters,method=NULL) 
+.confint.lmerModLmerTest<-function(model,level,parameters,method="wald") 
   return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmer<-function(model,level,parameters,method="Wald")  {
+.confint.lmer<-function(model,level,parameters,method="wald")  {
+     if (method=="wald")
+               method<-"Wald"
+     
       mark(paste("C.I for glmerMod with method",method))
       ci<-try(stats::confint(model,method=method,level=level))
       if (jmvcore::isError(ci)) 

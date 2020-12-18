@@ -544,6 +544,7 @@ options:
     - name: cimethod
       title: CI Method
       type: List
+      default: wald
       options:
         - name: wald
           title: Wald (fast)

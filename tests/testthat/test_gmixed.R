@@ -113,6 +113,8 @@ mod<-gamlj::gamljGlmMixed(
 testthat::test_that("negative binomial", {
     testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")
     testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[8])),3198.46)
+    testthat::expect_equal(mod$main$random$asDF[1,5],0.08220,to=.0001)
+    
 }
 )
 
