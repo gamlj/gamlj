@@ -163,6 +163,9 @@ items:
                     - name: var
                       title: "Variance"
                       type: number
+                    - name: icc
+                      title: "ICC"
+                      type: number
 
            - name: randomCov
              title: Random Parameters correlations

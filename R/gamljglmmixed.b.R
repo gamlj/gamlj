@@ -208,10 +208,15 @@ gamljGlmMixedClass <- R6::R6Class(
         realnames<-n64$nicenames(vcv$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
         for (i in 1:dim(vcv)[1]) {
+               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
+                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+1)
+               else
+                  icc<-""
+          
                if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                  else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                }
                if (!("Residuals" %in% grp))
                  randomTable$addRow(rowKey=i+1, list(groups="Residuals",name="",std=.sigma,var=.sigma2))

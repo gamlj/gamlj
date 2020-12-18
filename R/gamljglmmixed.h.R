@@ -654,6 +654,10 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 list(
                                     `name`="var", 
                                     `title`="Variance", 
+                                    `type`="number"),
+                                list(
+                                    `name`="icc", 
+                                    `title`="ICC", 
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,
