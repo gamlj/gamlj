@@ -100,3 +100,19 @@ testthat::test_that("intercept only",{
   testthat::expect_equal(val1, 0.98)
 
 })
+
+
+data("phdpubs")
+
+mod<-gamlj::gamljGlmMixed(
+  formula = art ~ 1 + fem +( 1 | program ),
+  data = phdpubs,
+  modelSelection = "nb",
+  cimethod = "wald")
+
+testthat::test_that("negative binomial", {
+    testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")
+    testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[8])),3198.46)
+}
+)
+
