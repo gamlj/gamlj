@@ -73,6 +73,14 @@ testthat::test_that("uncorrelated error", {
 })
 
 
+model1<-gamlj::gamljMixed(
+  dep=y,
+  factors = "cond",
+  modelTerms = "cond",
+  cluster = "subj",
+  randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
+  data = subjects_by_stimuli
+)
 
 model2<-gamlj::gamljMixed(
    formula = y ~ 1 + cond+( 1 | subj )+( 0+cond | subj ),
