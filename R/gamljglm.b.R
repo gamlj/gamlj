@@ -26,7 +26,7 @@ gamljGLMClass <- R6::R6Class(
       if (getout)
         return()
       
-      # this allows intercept only model to be passed by syntax interphase
+      # this allows intercept only model to be passed by syntax interface
       aOne<-which(unlist(modelTerms)=="1")
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
@@ -53,11 +53,11 @@ gamljGLMClass <- R6::R6Class(
       }
       #####################
 
+
       ## anova Table 
       aTable<- self$results$main$anova
       if (length(modelTerms)>0) {
           aTable$addRow(rowKey=1, list(name="Model"))
-
           mynames64<-attr(terms(as.formula(formula64)),"term.labels")
           terms<-n64$nicenames(mynames64)  
           for (i in seq_along(modelTerms)) {
@@ -92,11 +92,12 @@ gamljGLMClass <- R6::R6Class(
       if (!is.something(factors))
          aTable$getColumn('label')$setVisible(FALSE)
         # other inits
-        gplots.initPlots(self,data,private$.cov_condition)
-        gposthoc.init(data,self$options, self$results$postHocs)     
-        gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
-        gsimple.init(data,self$options,self$results$simpleEffects)
-        mi.initContrastCode(data,self$options,self$results,n64)
+      mi.initInterceptInfo(self$options,self$results)
+      gplots.initPlots(self,data,private$.cov_condition)
+      gposthoc.init(data,self$options, self$results$postHocs)     
+      gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
+      gsimple.init(data,self$options,self$results$simpleEffects)
+      mi.initContrastCode(data,self$options,self$results,n64)
     },
     .run=function() {
       n64<-private$.names64
@@ -129,6 +130,7 @@ gamljGLMClass <- R6::R6Class(
       infoTable<-self$results$info
       estimatesTable <- self$results$main$fixed
       anovaTable<-self$results$main$anova
+
 
       ##### clean the data ####
       data<-private$.cleandata()
@@ -271,14 +273,15 @@ gamljGLMClass <- R6::R6Class(
         out.table_notes(estimatesTable)
         out.table_notes(anovaTable)
 
-
+        private$.populateInterceptInfo(model)
         private$.preparePlots(model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)        
         private$.populateLevenes(model)
         private$.populateNormTest(model)
-
+        
+        
     },
   .cleandata=function() {
       Sys.setlocale("LC_NUMERIC", "C")
@@ -442,6 +445,21 @@ gamljGLMClass <- R6::R6Class(
   
 },
 
+.populateInterceptInfo=function(model) {
+  
+  if (!self$options$interceptInfo || ! self$options$fixedIntercept) 
+    return()
+  ss<-summary(model)
+  tt<-ss$coefficients[1,3]
+  f<-tt^2
+  df<-df.residual(model)
+  p<-ss$coefficients[1,4]
+  peta<-effectsize::t_to_eta2(tt,df_error = df)
+  omega<-effectsize::t_to_omega2(tt,df_error = df)
+  tableRow<-list(df=df,f=f,etaSqP=peta$Eta_Sq_partial,omegaSq=omega$Omega_Sq_partial,p=p)
+  aTable<-self$results$main$interceptTable
+  aTable$setRow(rowNo=1,tableRow)
+},
 
 .qqPlot=function(image, ggtheme, theme, ...) {
   dep <- self$options$dep

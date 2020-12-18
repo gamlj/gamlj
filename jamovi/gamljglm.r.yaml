@@ -37,6 +37,44 @@ items:
         - scaling
         - fixedIntercept
     items:
+           - name: interceptTable
+             title: Intercept Information
+             type: Table
+             visible: (interceptInfo)
+             description: a table of information for the model intercept
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - contrasts
+                         - scaling
+                         - fixedIntercept
+                         - effectSize
+                         - interceptInfo
+             columns:
+                    - name: name
+                      title: ""
+                      type: text
+                    - name:  df
+                      title: df
+                      type: integer
+                    - name: f
+                      title: F
+                      type: number
+                    - name: p
+                      title: p
+                      type: number
+                      format: zto,pvalue
+                    - name: etaSqP
+                      title: η²p
+                      type: number
+                      visible: (effectSize:partEta)
+                      format: zto
+                    - name: omegaSq
+                      title: ω²
+                      type: number
+                      visible: (effectSize:omega)
+                      format: zto
+
            - name: anova
              title: ANOVA Omnibus tests
              type: Table

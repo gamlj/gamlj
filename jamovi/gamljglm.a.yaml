@@ -81,7 +81,7 @@ options:
             a list of character vectors describing fixed effects terms. No needed if `formula` is used.
 
     - name: fixedIntercept
-      title: Fixed Intercept
+      title: Intercept
       type: Bool
       default: true
       description:
@@ -429,7 +429,21 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide a test for normality of residuals
             
+    - name: interceptInfo
+      title: On intercept
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide ìnformation about the intercept (F test, effect size indexes)
 
+    - name: effectSizeInfo
+      title: On Effect sizes
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
 
 ...
 
