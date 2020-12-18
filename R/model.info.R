@@ -130,7 +130,7 @@ mi.getValueDf<- function(x,...) UseMethod(".getValueDf")
 
 .getValueDf.default<-function(model) {
   value <- sum(stats::residuals(model, type = "pearson")^2)
-  result <- value/model$df.residual
+  result <- value/df.residual(model)
   return(result)
 }
 .getValueDf.multinom<-function(model) {

@@ -11,7 +11,7 @@ mod<-gamlj::gamljGlmMixed(
 
 val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)
 val2<-round(as.numeric(as.character(mod$info$asDF$value[9])),digits = 3)
-val3<-as.character(mod$info$asDF$value[13])
+val3<-as.character(mod$info$asDF$value[14])
 
 testthat::test_that("info table is fine",{
                     testthat::expect_equal(val1,-2826.509)
@@ -58,7 +58,7 @@ mod<-gamlj::gamljGlmMixed(
   cimethod = "wald")
   )
 
-val1<-as.character(mod$info$asDF$value[13])
+val1<-as.character(mod$info$asDF$value[14])
 
 testthat::test_that("fail",{
   testthat::expect_equal(val1,"no")
@@ -100,3 +100,21 @@ testthat::test_that("intercept only",{
   testthat::expect_equal(val1, 0.98)
 
 })
+
+
+data("phdpubs")
+
+mod<-gamlj::gamljGlmMixed(
+  formula = art ~ 1 + fem +( 1 | program ),
+  data = phdpubs,
+  modelSelection = "nb",
+  cimethod = "wald")
+
+testthat::test_that("negative binomial", {
+    testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")
+    testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[8])),3198.46)
+    testthat::expect_equal(mod$main$random$asDF[1,5],0.08220,to=.0001)
+    
+}
+)
+

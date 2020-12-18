@@ -49,7 +49,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             modelSelection = "logistic",
             custom_family = "gaussian",
             custom_link = "identity",
-            cimethod = NULL, ...) {
+            cimethod = "wald", ...) {
 
             super$initialize(
                 package='gamlj',
@@ -293,6 +293,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "poisson",
                     "logistic",
                     "probit",
+                    "nb",
                     "custom"),
                 default="logistic")
             private$..custom_family <- jmvcore::OptionList$new(
@@ -319,6 +320,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
                 cimethod,
+                default="wald",
                 options=list(
                     "wald",
                     "profile",
@@ -653,6 +655,10 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 list(
                                     `name`="var", 
                                     `title`="Variance", 
+                                    `type`="number"),
+                                list(
+                                    `name`="icc", 
+                                    `title`="ICC", 
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -1122,7 +1128,8 @@ gamljGlmMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   positive integer
 #' @param effectSize .
 #' @param modelSelection Select the generalized linear model:
-#'   \code{linear},\code{poisson},\code{logistic},\code{multinomial}
+#'   \code{linear},\code{poisson},\code{logistic},\code{nb}, the latest being
+#'   Negative Binomial
 #' @param custom_family Distribution family for the custom model, accepts
 #'   gaussian, binomial, gamma and inverse_gaussian .
 #' @param custom_link Distribution family for the custom model, accepts
@@ -1199,7 +1206,7 @@ gamljGlmMixed <- function(
     modelSelection = "logistic",
     custom_family = "gaussian",
     custom_link = "identity",
-    cimethod,
+    cimethod = "wald",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))

@@ -89,4 +89,9 @@ install.packages(package,lib = instdir)
 
 ```
 
+# Programmatic name
 
+```
+paste(paste(LETTERS[c(7,1,13,12)],collapse =""),paste(letters[10]),sep="")
+
+```

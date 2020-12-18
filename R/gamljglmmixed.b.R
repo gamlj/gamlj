@@ -85,6 +85,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
+      infoTable$addRow(rowKey="valdf",list(info="Chi²/DF",comm="Overdispersion indicator"))
       infoTable$addRow(rowKey="conv",list(info="Converged",comm=""))
       infoTable$addRow(rowKey="opt",list(info="Optimizer",comm=""))
       
@@ -207,10 +208,15 @@ gamljGlmMixedClass <- R6::R6Class(
         realnames<-n64$nicenames(vcv$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
         for (i in 1:dim(vcv)[1]) {
+               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
+                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+1)
+               else
+                  icc<-""
+          
                if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                  else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2))
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
                }
                if (!("Residuals" %in% grp))
                  randomTable$addRow(rowKey=i+1, list(groups="Residuals",name="",std=.sigma,var=.sigma2))
@@ -265,7 +271,7 @@ gamljGlmMixedClass <- R6::R6Class(
            
            #### confidence intervals ######
            ciWidth<-self$options$paramCIWidth/100
-           parameters<-mf.confint(model,level=ciWidth,parameters)
+           parameters<-mf.confint(model,level=ciWidth,parameters,method=self$options$cimethod)
            out.fillTable(estimatesTable,parameters)        
            estimatesTable$setState(attributes(parameters))
          
@@ -297,6 +303,8 @@ gamljGlmMixedClass <- R6::R6Class(
            infoTable$setRow(rowKey="r2m",list(value=info.r2m))
            infoTable$setRow(rowKey="r2c",list(value=info.r2c))
            infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
+           infoTable$setRow(rowKey="valdf",list(value=mi.getValueDf(model)))
+           
            modelInfo<-attr(model,"infoTable" )
            if (modelInfo$conv==FALSE) {
              opt<-paste(OPTIMIZERS,collapse=", ")
@@ -445,13 +453,22 @@ gamljGlmMixedClass <- R6::R6Class(
       nAGQ<-self$options$nAGQ
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
-
       if (afamily$link=="identity" & afamily$family=="gaussian")
          jmvcore::reject("The requested model is a linear mixed model, please use the Mixed Models command", code='error')
       
       ## there is a bug in LmerTest and it does not work
       ## when called within an restricted environment such as a function.
       ## the do.call is a workaround.
+
+      if (afamily$family=="nb") {
+        library(lme4)
+        lm = do.call(lme4::glmer.nb, list(formula=form,
+                                       data=data))
+        model<-mi.model_check(lm)
+        return(model)
+        
+      }
+      
       
       for (opt in OPTIMIZERS) {
         ctr=lme4::glmerControl(optimizer = opt)
@@ -611,8 +628,7 @@ gamljGlmMixedClass <- R6::R6Class(
   } else {
     p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType,order=order)
   }       
-  mark("p",class(p))
-  
+
   return(p)
 },
 .marshalFormula= function(formula, data, name) {

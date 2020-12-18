@@ -245,7 +245,7 @@ gamljMixedClass <- R6::R6Class(
                  if (nrow(parameters)>0) {
                   #### confidence intervals ######
                        ciWidth<-self$options$paramCIWidth/100
-                       parameters<-mf.confint(model,ciWidth,parameters)
+                       parameters<-mf.confint(model,ciWidth,parameters,method=self$options$cimethod)
                        rownames(parameters)<-n64$nicenames(rownames(parameters))
                   ##### fill the table ############
                        for (i in 1:nrow(parameters)) {

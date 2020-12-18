@@ -453,6 +453,17 @@ options:
             `TRUE` or `FALSE` (default), add random effects predicted values in the
             plot
             
+    - name: cimethod
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name: wald
+          title: Wald (fast)
+        - name:  profile
+          title: Profile (slow)
+        - name: boot
+          title: Bootstrap (very slow)
 
 ...
 

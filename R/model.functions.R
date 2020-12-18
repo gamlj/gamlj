@@ -323,8 +323,8 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
   if (modelSelection=="multinomial")
     return(list(family="multinomial",link="slogit"))
   if (modelSelection=="nb")
-    return(list(family="nb",link="logit"))
-  
+    return(list(family="nb",link="log"))
+
     if (modelSelection=="poiover")
       return(stats::quasipoisson())
   if (modelSelection=="probit")
@@ -418,7 +418,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
          parameters<-cbind(parameters,ci)
     } else {
          parameters$order<-1:dim(parameters)[1]
-         parameters<-merge(ci,parameters,by="row.names",all=TRUE)
+         parameters<-merge(ci,parameters,by="row.names",all.y=TRUE)
          parameters<-parameters[order(parameters$order),]
          parameters$order<-NULL
     }
@@ -448,14 +448,18 @@ mf.confint<- function(x,...) UseMethod(".confint")
     
 }
 
-.confint.merModLmerTest<-function(model,level,parameters) 
-                                return(.confint.lmer(model,level,parameters))
+.confint.merModLmerTest<-function(model,level,parameters,method="wald") 
+                                return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmerModLmerTest<-function(model,level,parameters) 
-  return(.confint.lmer(model,level,parameters))
+.confint.lmerModLmerTest<-function(model,level,parameters,method="wald") 
+  return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmer<-function(model,level,parameters)  {
-      ci<-try(stats::confint(model,method="Wald",level=level))
+.confint.lmer<-function(model,level,parameters,method="wald")  {
+     if (method=="wald")
+               method<-"Wald"
+     
+      mark(paste("C.I for glmerMod with method",method))
+      ci<-try(stats::confint(model,method=method,level=level))
       if (jmvcore::isError(ci)) 
         return(.confint.format(ci,parameters))
       
@@ -468,6 +472,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
   }
 
 .confint.glmerMod<-function(model,level,parameters,method="wald")  {
+  mark(paste("C.I for glmerMod with method",method))
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)

@@ -37,6 +37,8 @@ gplots.range<- function(x,...) UseMethod(".range")
   
   if (stats::family(model)[1] %in% c("quasipoisson","poisson","gaussian","Gamma"))
     return(.range.default(model,depName,predictions,rawData))
+  if (stats::family(model)[2] %in% c("log"))
+    return(.range.default(model,depName,predictions,rawData))
   
   return(c(0,1))
 }

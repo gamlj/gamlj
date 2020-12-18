@@ -25,8 +25,9 @@ testthat::test_that("f-table is ok", {
 ptable<-model$main$fixed$asDF
 
 testthat::test_that("p-table is ok", {
-  expect_equal(round(ptable[1,4],digits = 2),0.31)
-  expect_equal(as.character(ptable[2,2]),"1 - -1")
+  testthat::expect_equal(round(ptable[1,4],digits = 2),0.31)
+  testthat::expect_equal(round(ptable[2,5],digits = 3),0.703)
+  testthat::expect_equal(as.character(ptable[2,2]),"1 - -1")
 })
 
 rtable<-model$main$random$asDF
@@ -71,14 +72,15 @@ testthat::test_that("uncorrelated error", {
     )
 })
 
+
 model1<-gamlj::gamljMixed(
-   dep=y,
-   factors = "cond",
-   modelTerms = "cond",
-   cluster = "subj",
-   randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
-   data = subjects_by_stimuli
- )
+  dep=y,
+  factors = "cond",
+  modelTerms = "cond",
+  cluster = "subj",
+  randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
+  data = subjects_by_stimuli
+)
 
 model2<-gamlj::gamljMixed(
    formula = y ~ 1 + cond+( 1 | subj )+( 0+cond | subj ),
@@ -234,3 +236,6 @@ testthat::test_that("order does not count", {
   testthat::expect_equal(es2.anova[1,2],es.anova[1,2])
 
 })
+
+
+

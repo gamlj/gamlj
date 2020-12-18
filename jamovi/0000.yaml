@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in jamovi
 name: gamlj
-version: 2.1.1
+version: 2.1.2
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -106,6 +106,18 @@ datasets:
     tags:
       - Mixed models
       - Logistic mixed models
+  - name: phdpubs
+    path: phdpubs.csv
+    description: >
+      Modified version of dataset in Long, J. S., & Freese, J. (2006).
+      Regression models for categorical dependent variables using Stata. Stata
+      press.
+
+      Data present number of articles published by PhD students in a three year
+      period with some predictors. Data are clustered by program.
+    tags:
+      - Generalized Mixed models
+      - Negative Binomial mixed models
 usesNative: true
 minApp: 1.0.8
 

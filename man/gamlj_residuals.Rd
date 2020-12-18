@@ -4,7 +4,7 @@
 \alias{gamlj_residuals}
 \title{Extract the residuals values of the model estimated by GAMLj}
 \usage{
-gamlj_residuals(gobj, re.form = NULL, type = "working")
+gamlj_residuals(gobj, type = "working")
 }
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*}
