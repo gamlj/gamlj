@@ -49,7 +49,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             modelSelection = "logistic",
             custom_family = "gaussian",
             custom_link = "identity",
-            cimethod = NULL, ...) {
+            cimethod = "wald", ...) {
 
             super$initialize(
                 package='gamlj',
@@ -320,6 +320,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
                 cimethod,
+                default="wald",
                 options=list(
                     "wald",
                     "profile",
@@ -1205,7 +1206,7 @@ gamljGlmMixed <- function(
     modelSelection = "logistic",
     custom_family = "gaussian",
     custom_link = "identity",
-    cimethod,
+    cimethod = "wald",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
