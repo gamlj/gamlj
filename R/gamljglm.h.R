@@ -41,7 +41,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "partEta"),
             homoTest = FALSE,
             qq = FALSE,
-            normTest = FALSE, ...) {
+            normTest = FALSE,
+            interceptInfo = FALSE,
+            effectSizeInfo = FALSE, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -260,6 +262,14 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "normTest",
                 normTest,
                 default=FALSE)
+            private$..interceptInfo <- jmvcore::OptionBool$new(
+                "interceptInfo",
+                interceptInfo,
+                default=FALSE)
+            private$..effectSizeInfo <- jmvcore::OptionBool$new(
+                "effectSizeInfo",
+                effectSizeInfo,
+                default=FALSE)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -294,6 +304,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..homoTest)
             self$.addOption(private$..qq)
             self$.addOption(private$..normTest)
+            self$.addOption(private$..interceptInfo)
+            self$.addOption(private$..effectSizeInfo)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -328,7 +340,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         effectSize = function() private$..effectSize$value,
         homoTest = function() private$..homoTest$value,
         qq = function() private$..qq$value,
-        normTest = function() private$..normTest$value),
+        normTest = function() private$..normTest$value,
+        interceptInfo = function() private$..interceptInfo$value,
+        effectSizeInfo = function() private$..effectSizeInfo$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -362,7 +376,9 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..effectSize = NA,
         ..homoTest = NA,
         ..qq = NA,
-        ..normTest = NA)
+        ..normTest = NA,
+        ..interceptInfo = NA,
+        ..effectSizeInfo = NA)
 )
 
 gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -409,6 +425,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
+                    interceptTable = function() private$.items[["interceptTable"]],
                     anova = function() private$.items[["anova"]],
                     fixed = function() private$.items[["fixed"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
@@ -425,6 +442,49 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "contrasts",
                     "scaling",
                     "fixedIntercept"))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="interceptTable",
+                            title="Intercept Information",
+                            visible="(interceptInfo)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "contrasts",
+                                "scaling",
+                                "fixedIntercept",
+                                "effectSize",
+                                "interceptInfo"),
+                            columns=list(
+                                list(
+                                    `name`="name", 
+                                    `title`="", 
+                                    `type`="text"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="f", 
+                                    `title`="F", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"),
+                                list(
+                                    `name`="etaSqP", 
+                                    `title`="\u03B7\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:partEta)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="omegaSq", 
+                                    `title`="\u03C9\u00B2", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:omega)", 
+                                    `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -993,11 +1053,16 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   residuals
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
+#' @param interceptInfo \code{TRUE} or \code{FALSE} (default), provide
+#'   ìnformation about the intercept (F test, effect size indexes)
+#' @param effectSizeInfo \code{TRUE} or \code{FALSE} (default), provide
+#'   ìnformation about the effect size indexes
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$interceptTable} \tab \tab \tab \tab \tab a table of information for the model intercept \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
@@ -1057,6 +1122,8 @@ gamljGLM <- function(
     homoTest = FALSE,
     qq = FALSE,
     normTest = FALSE,
+    interceptInfo = FALSE,
+    effectSizeInfo = FALSE,
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1151,7 +1218,9 @@ gamljGLM <- function(
         effectSize = effectSize,
         homoTest = homoTest,
         qq = qq,
-        normTest = normTest)
+        normTest = normTest,
+        interceptInfo = interceptInfo,
+        effectSizeInfo = effectSizeInfo)
 
     analysis <- gamljGLMClass$new(
         options = options,

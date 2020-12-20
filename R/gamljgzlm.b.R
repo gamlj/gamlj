@@ -63,7 +63,7 @@ gamljGzlmClass <- R6::R6Class(
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
-      infoTable$addRow(rowKey="devdf",list(info="Chi²/DF",comm="Overdispersion indicator"))
+      infoTable$addRow(rowKey="devdf",list(info="Chi-squared/DF",comm="Overdispersion indicator"))
       
       infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
       if ("note" %in% names(info))

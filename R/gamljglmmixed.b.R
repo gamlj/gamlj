@@ -85,7 +85,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
-      infoTable$addRow(rowKey="valdf",list(info="Chi²/DF",comm="Overdispersion indicator"))
+      infoTable$addRow(rowKey="valdf",list(info="Chi-squared/DF",comm="Overdispersion indicator"))
       infoTable$addRow(rowKey="conv",list(info="Converged",comm=""))
       infoTable$addRow(rowKey="opt",list(info="Optimizer",comm=""))
       

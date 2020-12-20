@@ -372,3 +372,16 @@ children:
       - type: CheckBox
         name: qq
         label: Q-Q plot of residuals
+  - type: CollapseBox
+    label: Options
+    style: inline
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Additional Info
+        children:
+          - type: CheckBox
+            name: interceptInfo
+          - type: CheckBox
+            name: effectSizeInfo

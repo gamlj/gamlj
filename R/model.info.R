@@ -184,6 +184,13 @@ mi.initContrastCode<-function(data,options,results,n64) {
   
 }
 
+mi.initInterceptInfo<-function(options, results) {
+  mark(options$interceptInfo)
+  if (!options$interceptInfo || !options$fixedIntercept) 
+      return()
+  aTable<-results$main$interceptTable
+  aTable$addRow(rowKey=1, values=list(name="(Intercept)"))
+}
 
 
 
