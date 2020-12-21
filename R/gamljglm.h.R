@@ -482,7 +482,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `format`="zto"),
                                 list(
                                     `name`="omegaSq", 
-                                    `title`="\u03C9\u00B2", 
+                                    `title`="\u03C9\u00B2p", 
                                     `type`="number", 
                                     `visible`="(effectSize:omega)", 
                                     `format`="zto"))))

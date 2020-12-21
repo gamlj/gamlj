@@ -82,6 +82,22 @@ test_that("glm posthoc", {
   expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"public")
 })
 
+
+
+mod<-gamlj::gamljGLM(
+  data = hsbdemo,
+  formula=science~math+schtyp+math:schtyp,
+  effectSizeInfo = T
+)
+tab<-mod$main$effectSizeTable$asDF
+
+testthat::test_that("glm effectsize", {
+  testthat::expect_equal(tab[4,3],.2198,tol=.0001)
+  testthat::expect_equal(tab[10,5],.029999,tol=.00001)
+})
+
+
+
 data<-hsbdemo
 names(data)[3]<-c("Gender (test ?)")
 mod<-gamlj::gamljGLM(
@@ -202,4 +218,7 @@ test_that("glm zero-intercept model", {
   expect_equal(as.character(res$name[1]),"Residuals")
   expect_equal(round(res[2,2],2),566514)
 })
+
+
+
 
