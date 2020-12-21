@@ -192,6 +192,27 @@ mi.initInterceptInfo<-function(options, results) {
   aTable$addRow(rowKey=1, values=list(name="(Intercept)"))
 }
 
+mi.initEffectSizeInfo<-function(options, results, terms, ciWidth) {
+  if (!options$effectSizeInfo) 
+    return()
+  aTable<-results$main$effectSizeTable
+  aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+  aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+  i<-1
+  j<-1
+
+  for (term in terms) {
+    aTable$addRow(rowKey=j,list(effect=lf.nicifyTerms(terms[[i]]),name='η²'))
+    aTable$addRow(rowKey=j+1,list(effect=lf.nicifyTerms(terms[[i]]),name='η²p'))
+    aTable$addRow(rowKey=j+2,list(effect=lf.nicifyTerms(terms[[i]]),name='ω²'))
+    aTable$addRow(rowKey=j+3,list(effect=lf.nicifyTerms(terms[[i]]),name='ε²'))
+
+    aTable$addFormat(col=1, rowNo=j, format=jmvcore::Cell.BEGIN_GROUP)
+    aTable$addFormat(col=1, rowNo=j, format=jmvcore::Cell.BEGIN_END_GROUP)
+    i<-i+1
+    j<-j+4
+  }
+}
 
 
 mi.explainPrediction<-function(modelType,data,dep){

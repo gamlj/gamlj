@@ -427,6 +427,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 active = list(
                     interceptTable = function() private$.items[["interceptTable"]],
                     anova = function() private$.items[["anova"]],
+                    effectSizeTable = function() private$.items[["effectSizeTable"]],
                     fixed = function() private$.items[["fixed"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
@@ -535,6 +536,41 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `type`="number", 
                                     `visible`="(effectSize:omega)", 
                                     `format`="zto"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="effectSizeTable",
+                            title="Effect Size Indeces",
+                            visible="(effectSizeInfo)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "contrasts",
+                                "scaling",
+                                "fixedIntercept",
+                                "effectSize"),
+                            columns=list(
+                                list(
+                                    `name`="effect", 
+                                    `title`="Effect", 
+                                    `combineBelow`=TRUE, 
+                                    `type`="text"),
+                                list(
+                                    `name`="name", 
+                                    `title`="Statistics", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="Estimate", 
+                                    `type`="number"),
+                                list(
+                                    `name`="cilow", 
+                                    `title`="Lower", 
+                                    `type`="number"),
+                                list(
+                                    `name`="cihig", 
+                                    `title`="Higher", 
+                                    `type`="number")),
+                            refs="effectsize"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="fixed",
@@ -1064,6 +1100,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$interceptTable} \tab \tab \tab \tab \tab a table of information for the model intercept \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+#'   \code{results$main$effectSizeTable} \tab \tab \tab \tab \tab a table of effect size indeces \cr
 #'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr

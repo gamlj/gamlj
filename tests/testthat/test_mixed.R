@@ -11,9 +11,11 @@ model<-gamlj::gamljMixed(
 
 infotable<-model$info$asDF
 
-testthat::test_that("r-squared is ok", {
-  expect_equal(round(as.numeric(as.character(infotable[3,2])),digits = 2),16561.78)
-  expect_equal(round(as.numeric(as.character(infotable[6,2])),digits = 2),0.01)
+testthat::test_that("info is ok", {
+  testthat::expect_equal(round(as.numeric(as.character(infotable[3,2])),digits = 2),16561.78)
+  testthat::expect_equal(round(as.numeric(as.character(infotable[6,2])),digits = 2),0.01)
+  testthat::expect_equal(round(as.numeric(as.character(infotable[5,2])),digits = 2),-8278.23)
+  
 })
 
 ftable<-model$main$anova$asDF
