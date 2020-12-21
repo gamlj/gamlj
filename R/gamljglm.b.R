@@ -15,6 +15,8 @@ gamljGLMClass <- R6::R6Class(
       fixedIntercept<-self$options$fixedIntercept
       factors<-self$options$factors
       covs<-self$options$covs
+      ciWidth<-self$options$paramCIWidth
+      
       ### here we initialize the info table ####
       getout<-FALSE
       infoTable<-self$results$info
@@ -59,9 +61,9 @@ gamljGLMClass <- R6::R6Class(
       if (length(modelTerms)>0) {
           aTable$addRow(rowKey=1, list(name="Model"))
           mynames64<-attr(terms(as.formula(formula64)),"term.labels")
-          terms<-n64$nicenames(mynames64)  
+          aterms<-n64$nicenames(mynames64)  
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(terms[[i]],raise=T)
+                  lab<-jmvcore::stringifyTerm(aterms[[i]],raise=T)
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
          aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
@@ -82,7 +84,6 @@ gamljGLMClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
-      ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
@@ -93,6 +94,8 @@ gamljGLMClass <- R6::R6Class(
          aTable$getColumn('label')$setVisible(FALSE)
         # other inits
       mi.initInterceptInfo(self$options,self$results)
+      mi.initEffectSizeInfo(self$options,self$results,aterms,ciWidth)
+      
       gplots.initPlots(self,data,private$.cov_condition)
       gposthoc.init(data,self$options, self$results$postHocs)     
       gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
@@ -102,6 +105,7 @@ gamljGLMClass <- R6::R6Class(
     .run=function() {
       n64<-private$.names64
       ginfo("run")
+      ciWidthp<-self$options$paramCIWidth/100
       # collect some option
       dep <- self$options$dep
       if (is.null(dep))
@@ -188,8 +192,8 @@ gamljGLMClass <- R6::R6Class(
                          
                   }
                   #### confidence intervals ######
-                  ciWidth<-self$options$paramCIWidth/100
-                  parameters<-mf.confint(model,level=ciWidth,parameters)
+                  
+                  parameters<-mf.confint(model,level=ciWidthp,parameters)
                   rownames(parameters)<-n64$nicenames(rownames(parameters))
                   ######  fill the table ########
                   for (i in 1:nrow(parameters)) {
@@ -274,6 +278,8 @@ gamljGLMClass <- R6::R6Class(
         out.table_notes(anovaTable)
 
         private$.populateInterceptInfo(model)
+        private$.populateEffectSizeInfo(model,ciWidthp)
+        
         private$.preparePlots(model)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
@@ -459,6 +465,33 @@ gamljGLMClass <- R6::R6Class(
   tableRow<-list(df=df,f=f,etaSqP=peta$Eta_Sq_partial,omegaSq=omega$Omega_Sq_partial,p=p)
   aTable<-self$results$main$interceptTable
   aTable$setRow(rowNo=1,tableRow)
+},
+
+.populateEffectSizeInfo=function(model,ciWidth) {
+  
+  if (!self$options$effectSizeInfo) 
+    return()
+  ano<-car::Anova(model,type=3)
+  eta<-effectsize::eta_squared(ano,partial = F,ci=ciWidth)
+  peta<-effectsize::eta_squared(ano,partial = T,ci=ciWidth)
+  omega<-  effectsize::omega_squared(ano,partial = T,ci=ciWidth)
+  epsilon<-  effectsize::epsilon_squared(ano,partial = T,ci=ciWidth)
+  aTable<-self$results$main$effectSizeTable
+  j<-1
+  i<-1
+  for (i in seq_along(eta$Parameter)) {
+    stat<-eta
+    aTable$setRow(rowNo=j,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
+    stat<-peta
+    aTable$setRow(rowNo=j+1,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
+    stat<-omega
+    aTable$setRow(rowNo=j+2,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
+    stat<-epsilon
+    aTable$setRow(rowNo=j+3,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
+    j<-j+4
+  }
+
+
 },
 
 .qqPlot=function(image, ggtheme, theme, ...) {

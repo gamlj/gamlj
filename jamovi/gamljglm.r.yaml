@@ -70,7 +70,7 @@ items:
                       visible: (effectSize:partEta)
                       format: zto
                     - name: omegaSq
-                      title: ω²
+                      title: ω²p
                       type: number
                       visible: (effectSize:omega)
                       format: zto
@@ -117,6 +117,40 @@ items:
                       type: number
                       visible: (effectSize:omega)
                       format: zto
+
+           - name: effectSizeTable
+             title: Effect Size Indeces
+             type: Table
+             visible: (effectSizeInfo)
+             description: a table of effect size indeces
+            
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - contrasts
+                         - scaling
+                         - fixedIntercept
+                         - effectSize
+                         
+             columns:
+                    - name: effect
+                      title: Effect
+                      combineBelow: true
+                      type: text
+                    - name: name
+                      title: Statistics
+                      type: text
+                    - name: estimate
+                      title: Estimate
+                      type: number
+                    - name: cilow
+                      title: Lower
+                      type: number
+                    - name: cihig
+                      title: Higher
+                      type: number
+             refs: effectsize
+
            - name: fixed
              title: Fixed Effects Parameter Estimates
              type: Table

@@ -393,7 +393,7 @@ options:
           - name: partEta
             title: partial η²
           - name: omega
-            title: ω²
+            title: partial ω²
           - name: beta
             title: β  
       default:

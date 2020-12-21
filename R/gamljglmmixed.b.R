@@ -78,7 +78,7 @@ gamljGlmMixedClass <- R6::R6Class(
       if (!is.null(ep))
         infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
-      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="Less is better"))
+      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="More is better"))
       infoTable$addRow(rowKey="r2m",list(info="R-squared",comm="Marginal"))
       infoTable$addRow(rowKey="r2c",list(info="R-squared",comm= "Conditional"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))

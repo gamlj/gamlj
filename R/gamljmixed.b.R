@@ -260,8 +260,9 @@ gamljMixedClass <- R6::R6Class(
                  info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
                  info.aic<-round(stats::extractAIC(model)[2],digits=4)
                  info.bic<-round(stats::BIC(model),digits=4)
-                 loglik<-lme4::llikAIC(model)$AICtab
+                 loglik<-lme4::llikAIC(model)
                  info.loglik<-ifelse("logLik" %in% names(loglik),loglik['logLik'],loglik['REML'])
+                 info.loglik<-as.numeric(info.loglik)
 
                  r2<-try(r.squared(model),silent = TRUE)
                  if (jmvcore::isError(r2)){
