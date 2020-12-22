@@ -518,3 +518,27 @@ items:
           clearWith:
             - dep
             - modelTerms
+        - name: normPlot
+          title: Residual histogram
+          visible: (normPlot)
+          type: Image
+          description: Residual histogram
+          width: 450
+          height: 400
+          renderFun: .normPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+        - name: residPlot
+          title: Residual-Predicted Scatterplot
+          visible: (residPlot)
+          type: Image
+          description: Residual Predicted plot
+          width: 450
+          height: 400
+          renderFun: .residPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms

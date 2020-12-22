@@ -42,6 +42,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             homoTest = FALSE,
             qq = FALSE,
             normTest = FALSE,
+            normPlot = FALSE,
+            residPlot = FALSE,
             interceptInfo = FALSE,
             effectSizeInfo = FALSE, ...) {
 
@@ -262,6 +264,14 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "normTest",
                 normTest,
                 default=FALSE)
+            private$..normPlot <- jmvcore::OptionBool$new(
+                "normPlot",
+                normPlot,
+                default=FALSE)
+            private$..residPlot <- jmvcore::OptionBool$new(
+                "residPlot",
+                residPlot,
+                default=FALSE)
             private$..interceptInfo <- jmvcore::OptionBool$new(
                 "interceptInfo",
                 interceptInfo,
@@ -304,6 +314,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..homoTest)
             self$.addOption(private$..qq)
             self$.addOption(private$..normTest)
+            self$.addOption(private$..normPlot)
+            self$.addOption(private$..residPlot)
             self$.addOption(private$..interceptInfo)
             self$.addOption(private$..effectSizeInfo)
         }),
@@ -341,6 +353,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         homoTest = function() private$..homoTest$value,
         qq = function() private$..qq$value,
         normTest = function() private$..normTest$value,
+        normPlot = function() private$..normPlot$value,
+        residPlot = function() private$..residPlot$value,
         interceptInfo = function() private$..interceptInfo$value,
         effectSizeInfo = function() private$..effectSizeInfo$value),
     private = list(
@@ -377,6 +391,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..homoTest = NA,
         ..qq = NA,
         ..normTest = NA,
+        ..normPlot = NA,
+        ..residPlot = NA,
         ..interceptInfo = NA,
         ..effectSizeInfo = NA)
 )
@@ -923,7 +939,9 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                 active = list(
                     homoTest = function() private$.items[["homoTest"]],
                     normTest = function() private$.items[["normTest"]],
-                    qq = function() private$.items[["qq"]]),
+                    qq = function() private$.items[["qq"]],
+                    normPlot = function() private$.items[["normPlot"]],
+                    residPlot = function() private$.items[["residPlot"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -978,6 +996,30 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             width=450,
                             height=400,
                             renderFun=".qqPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms")))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="normPlot",
+                            title="Residual histogram",
+                            visible="(normPlot)",
+                            width=450,
+                            height=400,
+                            renderFun=".normPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms")))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="residPlot",
+                            title="Residual-Predicted Scatterplot",
+                            visible="(residPlot)",
+                            width=450,
+                            height=400,
+                            renderFun=".residPlot",
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
@@ -1089,6 +1131,10 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   residuals
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
+#' @param normPlot \code{TRUE} or \code{FALSE} (default), provide a histogram
+#'   of residuals superimposed by a normal distribution
+#' @param residPlot \code{TRUE} or \code{FALSE} (default), provide a
+#'   scatterplot of the residuals against predicted
 #' @param interceptInfo \code{TRUE} or \code{FALSE} (default), provide
 #'   ìnformation about the intercept (F test, effect size indexes)
 #' @param effectSizeInfo \code{TRUE} or \code{FALSE} (default), provide
@@ -1112,6 +1158,8 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
 #'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
 #'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
+#'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -1159,6 +1207,8 @@ gamljGLM <- function(
     homoTest = FALSE,
     qq = FALSE,
     normTest = FALSE,
+    normPlot = FALSE,
+    residPlot = FALSE,
     interceptInfo = FALSE,
     effectSizeInfo = FALSE,
     formula) {
@@ -1256,6 +1306,8 @@ gamljGLM <- function(
         homoTest = homoTest,
         qq = qq,
         normTest = normTest,
+        normPlot = normPlot,
+        residPlot = residPlot,
         interceptInfo = interceptInfo,
         effectSizeInfo = effectSizeInfo)
 

@@ -496,6 +496,93 @@ items:
            - randomTerms
            - percvalue
            - cvalue
+  - name: assumptions
+    title: Assumption Checks
+    type: Group
+    items:
+        - name: normTest
+          title: Test for Normality of residuals
+          type: Table
+          description: a table of normality tests
+          visible: (normTest)
+          rows: 2
+          columns:
+            - name: test
+              title: Test
+              type: number
+
+            - name: stat
+              title: Statistics
+              type: number
+            - name: p
+              type: number
+              format: zto,pvalue
+
+        - name: qq
+          title: Q-Q Plot
+          visible: (qq)
+          type: Image
+          description: a q-q plot
+          width: 450
+          height: 400
+          renderFun: .qqPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+        - name: normPlot
+          title: Residual histogram
+          visible: (normPlot)
+          type: Image
+          description: Residual histogram
+          width: 450
+          height: 400
+          renderFun: .normPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+        - name: residPlot
+          title: Residual-Predicted Scatterplot
+          visible: (residPlot)
+          type: Image
+          description: Residual Predicted plot
+          width: 450
+          height: 400
+          renderFun: .residPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+        - name: clusterBoxplot
+          title: Residuals by cluster boxplot
+          type: Array
+          description: Residuals boxplot by cluster
+          visible: (clusterBoxplot)
+          clearWith:
+            - dep
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .clusterBoxplot
+             width: 450
+             height: 400
+
+        - name: randHist
+          title: Random coefficients histogram
+          type: Array
+          description: an array of random coefficients histograms
+          visible: (randHist)
+          clearWith:
+            - dep
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .randHist
+             width: 450
+             height: 400
 
   - name: plotnotes
     type: Html

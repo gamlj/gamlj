@@ -61,6 +61,7 @@ gamlj_plot<-function(gobj,haxis,sepLines=NULL,sepPlots=NULL,...) {
 #' 
 #' This function returns the plot as a ggplot object contained in the gamlj object (the model). If the model 
 #' contains one plot, it is returned. If there are more plots, a list is returned with plots as elements of the list.
+#' For the plots produced by the assumptions checking plot function use gamlj_assumptionsPlots().
 
 #' @param gobj a gamlj results object of the class GAMLj*#'
 #' @return an object of ggplot
@@ -77,9 +78,53 @@ gamlj_ggplot<-function(gobj) {
          alist[[i]]<-gobj$descPlots[[i]]$plot$fun()
        return(alist)
      }
-          
-
+}
   
+  #' Extract assumptions checking plots from a GAMLj results object 
+  #' 
+  #' This function returns a list of plots as a ggplot objects produced by the assumptions checking options, such
+  #' as `residPlot`, `normPlot` (for continuous dependent variable models), `randHist` and `clusterBoxplot` (for mixed models).
+  #' @param gobj a gamlj results object of the class GAMLj*#'
+  #' @return a list of lists with titles and ggplot objects
+  #' @author Marcello Gallucci
+  #' @export
+  
+gamlj_assumptionsPlots<-function(gobj) {
+
+    if (!("assumptions" %in% names(gobj)))
+       stop("No assumptions checking plots is contained in the GAMLj model")
+  
+    pnames<-names(gobj$assumptions)
+    if (!is.something(pnames))
+       stop("No assumptions checking plots is contained in the GAMLj model")
+    res<-list()
+    for (pname in pnames) {
+      obj<-gobj$assumptions[[pname]]
+      if ("Image" %in% class(obj)) {
+        plot<-obj$plot$fun()
+        if (is.something(plot)) {
+          title<-obj$title
+          name<-obj$name
+          plot<-obj$plot$fun()
+          res[[length(res)+1]]<-list(name=name,title=title,plot=plot)
+        }
+      }
+      if ("Array" %in% class(obj)) {
+        groupname<-obj$name
+        j<-0
+        for (key in obj$itemKeys) {
+          j<-j+1
+          one<-obj$get(key=key)
+          title<-one$title
+          name<-paste0(groupname,j)
+          plot<-one$plot$fun()
+          res[[length(res)+1]]<-list(name=name,title=title,plot=plot)
+        }
+      }
+      
+    }
+    
+    res
   
 }
 
@@ -210,4 +255,5 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 gamlj_residuals<-function(gobj, type="working") {
     stats::residuals(gobj$model)
 }
+
 

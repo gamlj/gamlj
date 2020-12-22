@@ -15,6 +15,7 @@ an object of ggplot
 \description{
 This function returns the plot as a ggplot object contained in the gamlj object (the model). If the model 
 contains one plot, it is returned. If there are more plots, a list is returned with plots as elements of the list.
+For the plots produced by the assumptions checking plot function use gamlj_assumptionsPlots().
 }
 \author{
 Marcello Gallucci

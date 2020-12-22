@@ -372,6 +372,12 @@ children:
       - type: CheckBox
         name: qq
         label: Q-Q plot of residuals
+      - type: CheckBox
+        name:  normPlot
+        label: Residuals histogram
+      - type: CheckBox
+        name: residPlot
+        label: Residuals-Predicted plot
   - type: CollapseBox
     label: Options
     style: inline

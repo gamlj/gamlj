@@ -35,3 +35,21 @@ mark<-function(what=NULL,obj=NULL) {
     mat<-t(as.matrix(mat))
   mat  
 }
+
+
+
+is.something<- function(x,...) UseMethod(".is.something")
+
+.is.something.default<-function(obj) (!is.null(obj))
+
+.is.something.list<-function(obj) (length(obj)>0)
+
+.is.something.numeric<-function(obj) (length(obj)>0)
+
+.is.something.character<-function(obj) (length(obj)>0)
+
+.is.something.logical<-function(obj) !is.na(obj)
+
+
+
+

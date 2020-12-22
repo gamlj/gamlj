@@ -504,15 +504,32 @@ gamljGLMClass <- R6::R6Class(
   data <- model$model
   residuals <- rstandard(model)
   df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
-  print(ggplot2::ggplot(data=df, aes(y=y, x=x)) +
+  plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
           geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
           geom_point(aes(x=x,y=y), size=2, colour=theme$color[1]) +
           xlab("Theoretical Quantiles") +
-          ylab("Standardized Residuals") +
-          ggtheme)
+          ylab("Standardized Residuals") +ggtheme
   
-  TRUE
+  return(plot)
 },
+.normPlot=function(image, ggtheme, theme, ...) {
+  
+  model<-private$.model      
+  if (is.null(model) )
+    return(FALSE)
+  plot<-gplots.normPlot(model,ggtheme,theme)
+  return(plot)
+},
+
+.residPlot=function(image, ggtheme, theme, ...) {
+  
+  model<-private$.model      
+  if (is.null(model) )
+    return(FALSE)
+  plot<-gplots.residPlot(model,ggtheme,theme)
+  return(plot)
+},
+
 .formula=function() {
   jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
 },

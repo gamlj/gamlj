@@ -94,17 +94,25 @@ data("beers_bars")
 data("subjects_by_stimuli")
 
 mod1<-gamlj::gamljMixed(
-  formula =y ~ 1 + cond+( 1|subj ),
-  data = subjects_by_stimuli
-)
-mod2<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1+cond|subj ),
-  data = subjects_by_stimuli
+  data = subjects_by_stimuli,
+  randHist=T
+  
 )
+#mod2<-gamlj::gamljMixed(
+#  formula =y ~ 1 + cond+( 1+cond|subj ),
+#  data = subjects_by_stimuli
+#)
 
-#rmod1<-mod1$model
-#rmod2<-mod2$model
-#anova(rmod1,rmod2)
+res<-gamlj::gamlj_assumptionsPlots(mod1)
+
+testthat::test_that("assumptions plots are there", {
+  testthat::expect_equal(length(res),2)
+  testthat::expect_equal(res[[1]]$name,"randHist1")
+  testthat::expect_true(ggplot2::is.ggplot(res[[2]]$plot))
+})
+
+
 
 mod<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),

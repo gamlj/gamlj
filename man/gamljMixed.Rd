@@ -41,6 +41,13 @@ gamljMixed(
   reml = TRUE,
   lrtRandomEffects = FALSE,
   plotRandomEffects = FALSE,
+  cimethod = "wald",
+  qq = FALSE,
+  normTest = FALSE,
+  normPlot = FALSE,
+  residPlot = FALSE,
+  clusterBoxplot = FALSE,
+  randHist = FALSE,
   formula
 )
 }
@@ -156,6 +163,26 @@ random effects}
 \item{plotRandomEffects}{\code{TRUE} or \code{FALSE} (default), add random
 effects predicted values in the plot}
 
+\item{cimethod}{.}
+
+\item{qq}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+residuals}
+
+\item{normTest}{\code{TRUE} or \code{FALSE} (default), provide a test for
+normality of residuals}
+
+\item{normPlot}{\code{TRUE} or \code{FALSE} (default), provide a histogram
+of residuals superimposed by a normal distribution}
+
+\item{residPlot}{\code{TRUE} or \code{FALSE} (default), provide a
+scatterplot of the residuals against predicted}
+
+\item{clusterBoxplot}{\code{TRUE} or \code{FALSE} (default), provide a
+boxplot of random effects by the first defined clustering variable}
+
+\item{randHist}{\code{TRUE} or \code{FALSE} (default), provide histogram of
+random Coefficients}
+
 \item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
@@ -175,6 +202,12 @@ A results object containing:
   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+  \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+  \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+  \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
+  \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
+  \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
+  \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 }
 

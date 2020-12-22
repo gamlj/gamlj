@@ -43,7 +43,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             reml = TRUE,
             lrtRandomEffects = FALSE,
             plotRandomEffects = FALSE,
-            cimethod = "wald", ...) {
+            cimethod = "wald",
+            qq = FALSE,
+            normTest = FALSE,
+            normPlot = FALSE,
+            residPlot = FALSE,
+            clusterBoxplot = FALSE,
+            randHist = FALSE, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -277,6 +283,30 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "wald",
                     "profile",
                     "boot"))
+            private$..qq <- jmvcore::OptionBool$new(
+                "qq",
+                qq,
+                default=FALSE)
+            private$..normTest <- jmvcore::OptionBool$new(
+                "normTest",
+                normTest,
+                default=FALSE)
+            private$..normPlot <- jmvcore::OptionBool$new(
+                "normPlot",
+                normPlot,
+                default=FALSE)
+            private$..residPlot <- jmvcore::OptionBool$new(
+                "residPlot",
+                residPlot,
+                default=FALSE)
+            private$..clusterBoxplot <- jmvcore::OptionBool$new(
+                "clusterBoxplot",
+                clusterBoxplot,
+                default=FALSE)
+            private$..randHist <- jmvcore::OptionBool$new(
+                "randHist",
+                randHist,
+                default=FALSE)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -314,6 +344,12 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..cimethod)
+            self$.addOption(private$..qq)
+            self$.addOption(private$..normTest)
+            self$.addOption(private$..normPlot)
+            self$.addOption(private$..residPlot)
+            self$.addOption(private$..clusterBoxplot)
+            self$.addOption(private$..randHist)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -351,7 +387,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         reml = function() private$..reml$value,
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
         plotRandomEffects = function() private$..plotRandomEffects$value,
-        cimethod = function() private$..cimethod$value),
+        cimethod = function() private$..cimethod$value,
+        qq = function() private$..qq$value,
+        normTest = function() private$..normTest$value,
+        normPlot = function() private$..normPlot$value,
+        residPlot = function() private$..residPlot$value,
+        clusterBoxplot = function() private$..clusterBoxplot$value,
+        randHist = function() private$..randHist$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -388,7 +430,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..reml = NA,
         ..lrtRandomEffects = NA,
         ..plotRandomEffects = NA,
-        ..cimethod = NA)
+        ..cimethod = NA,
+        ..qq = NA,
+        ..normTest = NA,
+        ..normPlot = NA,
+        ..residPlot = NA,
+        ..clusterBoxplot = NA,
+        ..randHist = NA)
 )
 
 gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -402,6 +450,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
+        assumptions = function() private$.items[["assumptions"]],
         plotnotes = function() private$.items[["plotnotes"]]),
     private = list(
         ..model = NA),
@@ -964,6 +1013,105 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "randomTerms",
                         "percvalue",
                         "cvalue"))))
+            self$add(R6::R6Class(
+                inherit = jmvcore::Group,
+                active = list(
+                    normTest = function() private$.items[["normTest"]],
+                    qq = function() private$.items[["qq"]],
+                    normPlot = function() private$.items[["normPlot"]],
+                    residPlot = function() private$.items[["residPlot"]],
+                    clusterBoxplot = function() private$.items[["clusterBoxplot"]],
+                    randHist = function() private$.items[["randHist"]]),
+                private = list(),
+                public=list(
+                    initialize=function(options) {
+                        super$initialize(
+                            options=options,
+                            name="assumptions",
+                            title="Assumption Checks")
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="normTest",
+                            title="Test for Normality of residuals",
+                            visible="(normTest)",
+                            rows=2,
+                            columns=list(
+                                list(
+                                    `name`="test", 
+                                    `title`="Test", 
+                                    `type`="number"),
+                                list(
+                                    `name`="stat", 
+                                    `title`="Statistics", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="qq",
+                            title="Q-Q Plot",
+                            visible="(qq)",
+                            width=450,
+                            height=400,
+                            renderFun=".qqPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms")))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="normPlot",
+                            title="Residual histogram",
+                            visible="(normPlot)",
+                            width=450,
+                            height=400,
+                            renderFun=".normPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms")))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="residPlot",
+                            title="Residual-Predicted Scatterplot",
+                            visible="(residPlot)",
+                            width=450,
+                            height=400,
+                            renderFun=".residPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms")))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterBoxplot",
+                            title="Residuals by cluster boxplot",
+                            visible="(clusterBoxplot)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterBoxplot",
+                                width=450,
+                                height=400)))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="randHist",
+                            title="Random coefficients histogram",
+                            visible="(randHist)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".randHist",
+                                width=450,
+                                height=400)))}))$new(options=options))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1085,6 +1233,18 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
 #'   effects predicted values in the plot
 #' @param cimethod .
+#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+#'   residuals
+#' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
+#'   normality of residuals
+#' @param normPlot \code{TRUE} or \code{FALSE} (default), provide a histogram
+#'   of residuals superimposed by a normal distribution
+#' @param residPlot \code{TRUE} or \code{FALSE} (default), provide a
+#'   scatterplot of the residuals against predicted
+#' @param clusterBoxplot \code{TRUE} or \code{FALSE} (default), provide a
+#'   boxplot of random effects by the first defined clustering variable
+#' @param randHist \code{TRUE} or \code{FALSE} (default), provide histogram of
+#'   random Coefficients
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1102,6 +1262,12 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+#'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+#'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
+#'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
+#'   \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
+#'   \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
 #'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #' }
 #'
@@ -1152,6 +1318,12 @@ gamljMixed <- function(
     lrtRandomEffects = FALSE,
     plotRandomEffects = FALSE,
     cimethod = "wald",
+    qq = FALSE,
+    normTest = FALSE,
+    normPlot = FALSE,
+    residPlot = FALSE,
+    clusterBoxplot = FALSE,
+    randHist = FALSE,
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1254,7 +1426,13 @@ gamljMixed <- function(
         reml = reml,
         lrtRandomEffects = lrtRandomEffects,
         plotRandomEffects = plotRandomEffects,
-        cimethod = cimethod)
+        cimethod = cimethod,
+        qq = qq,
+        normTest = normTest,
+        normPlot = normPlot,
+        residPlot = residPlot,
+        clusterBoxplot = clusterBoxplot,
+        randHist = randHist)
 
     analysis <- gamljMixedClass$new(
         options = options,

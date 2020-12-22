@@ -428,6 +428,22 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a test for normality of residuals
+
+    - name: normPlot
+      title: Histogram of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+
+    - name: residPlot
+      title: Residuals-Predicted scatterplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
             
     - name: interceptInfo
       title: On intercept

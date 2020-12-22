@@ -465,5 +465,55 @@ options:
         - name: boot
           title: Bootstrap (very slow)
 
+
+    - name: qq
+      title: Q-Q plot of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+
+    - name: normTest
+      title: Normality of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a test for normality of residuals
+    - name: normPlot
+      title: Histogram of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+
+
+    - name: residPlot
+      title: Residuals-Predicted scatterplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+
+    - name: clusterBoxplot
+      title: Residuals by cluster boxplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a boxplot of random effects by the first defined clustering variable
+
+    - name: randHist
+      title: Histogram of random Coefficients
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide histogram of random Coefficients
+
+
 ...
 

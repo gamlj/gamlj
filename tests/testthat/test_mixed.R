@@ -6,9 +6,9 @@ data$cond<-factor(data$cond)
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),
-  data = data, plotHAxis = cond
+  data = data, plotHAxis = cond,
+  residPlot=T, randHist = T, clusterBoxplot = T
 )
-
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {
@@ -38,11 +38,24 @@ testthat::test_that("p-table is ok", {
   testthat::expect_equal(round(rtable[1,4],digits = 2),4.49)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
-class(model$descPlot$plot)
 
-testthat::test_that("a plot is produced", {
+testthat::test_that("a descplot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
 })
+
+testthat::test_that("a  residplot is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$residPlot$plot$fun()))
+})
+
+testthat::test_that("a  resid boxplot is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterBoxplot[[1]]$plot$fun()))
+})
+
+testthat::test_that("a randhist is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$randHist[[1]]$plot$fun()))
+})
+
+
 
 model<-gamlj::gamljMixed(
   dep=y,
