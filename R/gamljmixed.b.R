@@ -583,7 +583,7 @@ gamljMixedClass <- R6::R6Class(
   if (!is.something(model) )
     return(FALSE)
   
-  residuals <- residuals(model)
+  residuals <- as.numeric(scale(residuals(model)))
   df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
   plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
           geom_abline(slope=1, intercept=0, colour=theme$color[1]) +

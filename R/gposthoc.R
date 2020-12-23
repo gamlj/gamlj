@@ -2,6 +2,9 @@
 
 gposthoc.init=function(data,options,tables) {
 
+  if (!is.something(options$postHoc))
+    return()
+  
   ginfo("Init posthoc...")
   bs <- options$factors
   phTerms <- options$postHoc
@@ -71,8 +74,9 @@ gposthoc.init=function(data,options,tables) {
 
 gposthoc.populate<-function(model,options,tables) {
 
+  if (!is.something(options$postHoc))
+     return()
   ginfo("Populate posthoc...")
-  
   terms <- options$postHoc
   dep<-options$dep
   if (length(terms) == 0)
