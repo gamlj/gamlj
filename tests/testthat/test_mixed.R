@@ -6,9 +6,9 @@ data$cond<-factor(data$cond)
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),
-  data = data, plotHAxis = cond
+  data = data, plotHAxis = cond,
+  residPlot=T, randHist = T, clusterBoxplot = T
 )
-
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {
@@ -38,11 +38,24 @@ testthat::test_that("p-table is ok", {
   testthat::expect_equal(round(rtable[1,4],digits = 2),4.49)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
-class(model$descPlot$plot)
 
-testthat::test_that("a plot is produced", {
+testthat::test_that("a descplot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
 })
+
+testthat::test_that("a  residplot is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$residPlot$plot$fun()))
+})
+
+testthat::test_that("a  resid boxplot is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterBoxplot[[1]]$plot$fun()))
+})
+
+testthat::test_that("a randhist is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$randHist[[1]]$plot$fun()))
+})
+
+
 
 model<-gamlj::gamljMixed(
   dep=y,
@@ -206,7 +219,8 @@ data("wicksell")
 data<-wicksell
 data$group<-factor(data$group)
 data$time<-factor(data$time)
-testthat::expect_warning(gobj<-gamlj::gamljMixed(
+testthat::expect_warning(
+  gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
   contrasts = list(
@@ -219,6 +233,7 @@ testthat::expect_warning(gobj<-gamlj::gamljMixed(
   simpleVariable = "time",
   simpleModerator = "group")
 )
+
 es.params<-gobj$simpleEffects$Params$asDF
 
 testthat::test_that("simple effects", {
@@ -231,7 +246,16 @@ es.anova<-gobj$main$anova$asDF
 
 gobj2<-gamlj::gamljMixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
-  data = data)
+  data = data, postHoc = list(c("time","group")))
+
+ph<-gobj2$postHocs[[1]]$asDF
+test<-ph[ph$c1=="0" & ph$c2=="1" & ph$c3=="6" & ph$c4=="1", ]
+
+testthat::test_that("posthoc in mixed", {
+  testthat::expect_equal(as.numeric(test[6]),155.5,tol=.00001)
+  testthat::expect_equal(as.numeric(test[9]),66,tol=.00001)
+})
+
 es2.anova<-gobj2$main$anova$asDF
 
 testthat::test_that("order does not count", {

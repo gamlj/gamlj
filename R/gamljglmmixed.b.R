@@ -138,6 +138,13 @@ gamljGlmMixedClass <- R6::R6Class(
         gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
         gsimple.init(data,self$options,self$results$simpleEffects)
         mi.initContrastCode(data,self$options,self$results,n64)
+
+        # some cleaning
+        note<-self$results$plotnotes
+        note$setVisible(FALSE)
+        
+        
+        
     },
     .run=function() {
       n64<-private$.names64
@@ -568,7 +575,6 @@ gamljGlmMixedClass <- R6::R6Class(
     names(randomData)<-c("y",pnames[1:length(preds64)])
     note<-self$results$plotnotes
     note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
-#    note$setContent('Random effects')
     note$setVisible(TRUE)
     
   } else

@@ -63,11 +63,23 @@ hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 mod<-gamlj::gamljGLM(
   data = hsbdemo,
   formula=science~c1*c2,
-  postHoc = list("c1")
+  postHoc = list("c1",c("c1","c2"))
 )
 
 test_that("glm labels do not square", {
   expect_equal(as.character(mod$main$fixed$asDF[4,1]),"c11:c21")
+})
+
+ph<-mod$postHocs
+ph1<-ph[[1]]$asDF
+ph2<-ph[[2]]$asDF
+
+testthat::test_that("postoh in glm", {
+  testthat::expect_equal(as.character(ph1[1,1]),"0")
+  testthat::expect_equal(ph1[1,4],0.52)
+  testthat::expect_equal(as.character(ph2[4,1]),"0")
+  testthat::expect_equal(ph2[6,6],13.46)
+  
 })
 
 
@@ -171,7 +183,8 @@ mod<-gamlj::gamljGLM(
   data = hsbdemo,
   contrasts = list(list(
       var="schtyp",
-      type="deviation"))
+      type="deviation")),
+  qq=T
 )
 res<-mod$main$fixed$asDF
 
@@ -180,7 +193,11 @@ testthat::test_that("glm contrasts", {
   testthat::expect_equal(round(res[1,3],2),51.96)
 })
 
+plot<-mod$assumptions$qq$plot$fun()
 
+testthat::test_that("glm assumptions plot", {
+  testthat::expect_true(ggplot2::is.ggplot(plot))
+})
 
 
 

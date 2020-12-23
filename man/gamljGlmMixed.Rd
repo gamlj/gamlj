@@ -46,7 +46,7 @@ gamljGlmMixed(
   modelSelection = "logistic",
   custom_family = "gaussian",
   custom_link = "identity",
-  cimethod,
+  cimethod = "wald",
   formula
 )
 }
@@ -170,7 +170,8 @@ positive integer}
 \item{effectSize}{.}
 
 \item{modelSelection}{Select the generalized linear model:
-\code{linear},\code{poisson},\code{logistic},\code{multinomial}}
+\code{linear},\code{poisson},\code{logistic},\code{nb}, the latest being
+Negative Binomial}
 
 \item{custom_family}{Distribution family for the custom model, accepts
 gaussian, binomial, gamma and inverse_gaussian .}

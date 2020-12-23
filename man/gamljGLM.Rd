@@ -39,6 +39,10 @@ gamljGLM(
   homoTest = FALSE,
   qq = FALSE,
   normTest = FALSE,
+  normPlot = FALSE,
+  residPlot = FALSE,
+  interceptInfo = FALSE,
+  effectSizeInfo = FALSE,
   formula
 )
 }
@@ -154,6 +158,18 @@ residuals}
 \item{normTest}{\code{TRUE} or \code{FALSE} (default), provide a test for
 normality of residuals}
 
+\item{normPlot}{\code{TRUE} or \code{FALSE} (default), provide a histogram
+of residuals superimposed by a normal distribution}
+
+\item{residPlot}{\code{TRUE} or \code{FALSE} (default), provide a
+scatterplot of the residuals against predicted}
+
+\item{interceptInfo}{\code{TRUE} or \code{FALSE} (default), provide
+ìnformation about the intercept (F test, effect size indexes)}
+
+\item{effectSizeInfo}{\code{TRUE} or \code{FALSE} (default), provide
+ìnformation about the effect size indexes}
+
 \item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
@@ -161,7 +177,9 @@ A results object containing:
 \tabular{llllll}{
   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$interceptTable} \tab \tab \tab \tab \tab a table of information for the model intercept \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+  \code{results$main$effectSizeTable} \tab \tab \tab \tab \tab a table of effect size indeces \cr
   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
@@ -173,6 +191,8 @@ A results object containing:
   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+  \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
+  \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

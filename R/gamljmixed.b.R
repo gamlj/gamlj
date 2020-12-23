@@ -110,6 +110,10 @@ gamljMixedClass <- R6::R6Class(
         gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
         gsimple.init(data,self$options,self$results$simpleEffects)
         mi.initContrastCode(data,self$options,self$results,n64)
+        
+        note<-self$results$plotnotes
+        note$setVisible(FALSE)
+        
     },
     .run=function() {
       n64<-private$.names64
@@ -318,11 +322,13 @@ gamljMixedClass <- R6::R6Class(
         out.table_notes(randomTable)
         out.table_notes(lrtTable)
         
-        private$.preparePlots(private$.model)
+        private$.preparePlots(model)
+        private$.prepareRandHist()
+        private$.prepareClusterBoxplot()
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
-
+        private$.populateNormTest(model)
     },
   .buildreffects=function(terms,correl=TRUE) {
  
@@ -528,6 +534,9 @@ gamljMixedClass <- R6::R6Class(
     }
   
   gplots.images(self,data=predData,raw=rawData,range=yAxisRange,randomData=randomData)
+  
+  ####### random effect plots #########
+
 
 },
 
@@ -563,6 +572,171 @@ gamljMixedClass <- R6::R6Class(
   }       
   return(p)
 },
+
+
+.qqPlot=function(image, ggtheme, theme, ...) {
+
+  if (!self$options$qq)
+    return()
+  
+  model<-private$.model      
+  if (!is.something(model) )
+    return(FALSE)
+  
+  residuals <- as.numeric(scale(residuals(model)))
+  df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
+  plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
+          geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
+          geom_point(aes(x=x,y=y), size=2, colour=theme$color[1]) +
+          xlab("Theoretical Quantiles") +
+          ylab("Standardized Residuals") +ggtheme
+  
+  plot
+},
+.normPlot=function(image, ggtheme, theme, ...) {
+  if (!self$options$normPlot)
+    return()
+  model<-private$.model      
+  if (!is.something(model) )
+    return(FALSE)
+  plot<-gplots.normPlot(model,ggtheme,theme)
+  return(plot)
+},
+
+.residPlot=function(image, ggtheme, theme, ...) {
+
+  if (!self$options$residPlot)
+    return()
+  model<-private$.model      
+  if (!is.something(model) )
+    return(FALSE)
+  plot<-gplots.residPlot(model,ggtheme,theme)
+  
+  return(plot)
+},
+
+.prepareClusterBoxplot=function() {
+  
+  if (!self$options$clusterBoxplot)
+    return()
+  
+  model<-private$.model
+  if (!is.something(model))
+    return()
+  n64<-private$.names64
+  clusters64<-names(model@cnms)
+  image<-self$results$assumptions$clusterBoxplot
+  for (cluster in clusters64) {
+    mark("prepareClusterBox: processing",cluster)
+    label<-n64$nicenames(cluster)
+    title<-paste("Clustering variable:",jmvcore::fromB64(cluster))
+    id<-cluster
+    image$addItem(id)
+    image$get(key=id)$setTitle(title)
+    image$get(key=id)$setState(list(cluster=cluster,label=label))
+    }
+},
+
+
+.clusterBoxplot=function(image, ggtheme, theme, ...) {
+  
+  if (!self$options$clusterBoxplot)
+    return()
+  
+  model<-private$.model      
+  if (!is.something(model) )
+    return(FALSE)
+  label<-image$state$label
+  cluster<-image$state$cluster
+  fmodel<-lme4::fortify.merMod(model)
+  plot<-ggplot(fmodel, aes_string(cluster,".resid")) + geom_boxplot() + coord_flip()
+  plot<-plot+xlab(jmvcore::fromB64(cluster))+ylab("Residuals")
+  plot<-plot+ ggtheme 
+  note<-self$results$plotnotes
+  note$setContent(paste('<i>Note</i>: Residuals plotted by',jmvcore::fromB64(cluster)))
+  note$setVisible(TRUE)
+  
+  return(plot)
+},
+
+.prepareRandHist=function() {
+  
+  if (!self$options$randHist)
+    return()
+  
+  model<-private$.model
+  if ((!self$options$randHist) | !is.something(model))
+     return()
+  n64<-private$.names64
+  res<-lme4::ranef(model)
+  clusters64<-names(res)
+  image<-self$results$assumptions$randHist
+  for (cluster in clusters64) {
+       mark("prepareRandHist: processing",cluster)
+       clusterres<-res[[cluster]]
+       vars<-names(clusterres)
+       for (v in vars) {
+           data<-data.frame(clusterres[,v])
+           names(data)<-"x"
+           label<-n64$nicenames(v)
+           title<-paste("Coefficient",label," random across",jmvcore::fromB64(cluster))
+           id<-paste0(v,cluster)
+           image$addItem(id)
+           image$get(key=id)$setTitle(title)
+           image$get(key=id)$setState(list(data=data,label=label))
+       }
+
+  }
+
+
+},
+
+.randHist=function(image, ggtheme, theme, ...) {
+
+  if (!self$options$randHist)
+    return()
+  
+  label<-image$state$label
+  data<-image$state$data
+  fill <- theme$fill[2]
+  color <- theme$color[1]
+  alpha <- 0.4
+  plot <- ggplot(data=data, aes(x=x)) +
+    labs(x="Residuals", y='density')
+  
+  plot <- plot + geom_histogram(aes(y=..density..), position="identity",
+                                stat="bin", color=color, fill=fill)
+  plot <- plot + stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
+  
+  themeSpec <- theme(axis.text.y=element_blank(),
+                     axis.ticks.y=element_blank())
+  plot <- plot + ggtheme + themeSpec
+  
+  
+  return(plot)
+},
+
+
+
+.populateNormTest=function(model) {
+  
+  if ( ! self$options$normTest)
+    return()
+  rr<-residuals(model)
+  ks<-ks.test(rr,"pnorm",mean(rr),sd(rr))
+  st<-shapiro.test(rr)
+  
+  result<-rbind(cbind(ks$statistic,ks$p.value),
+                cbind(st$statistic,st$p.value))
+  
+  table <- self$results$get('assumptions')$get('normTest')
+  
+  table$setRow(rowNo=1, values=list(test="Kolmogorov-Smirnov",stat=result[1,1],p=result[1,2]))
+  table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat=result[2,1],p=result[2,2]))
+  
+},
+
+
 .marshalFormula= function(formula, data, name) {
   
       fixed<-lme4::nobars(formula)
