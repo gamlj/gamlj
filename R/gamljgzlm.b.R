@@ -219,11 +219,11 @@ gamljGzlmClass <- R6::R6Class(
         infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
         infoTable$setRow(rowKey="devdf",list(value=mi.getValueDf(model)))
         if (modelType=="poiover") {
-          infoTable$setRow(rowKey="r2",list(comm="Not available for quasi-poisson"))
           infoTable$setRow(rowKey="aic",list(comm="Not available for quasi-poisson"))
         }
         infoTable$setRow(rowKey="conv",list(value=ifelse(mi.converged(model),"yes","no")))
-
+        infoTable$setState(list(warning=attr(model,"warning")))
+        
         
         ### end of info table ###
         
@@ -276,7 +276,7 @@ gamljGzlmClass <- R6::R6Class(
         }      
       iatt<-attr(model,"infoTable")
       out.infotable_footnotes(infoTable,iatt)
-      out.table_notes(model)
+      out.table_notes(infoTable)
       out.table_notes(estimatesTable)
       out.table_notes(anovaTable)
       
