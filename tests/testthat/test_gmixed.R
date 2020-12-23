@@ -103,13 +103,19 @@ testthat::test_that("intercept only",{
 
 
 data("phdpubs")
-
+phdpubs$q<-phdpubs$art
 mod<-gamlj::gamljGlmMixed(
   formula = art ~ 1 + fem*mar +( 1 | program ),
   data = phdpubs,
   modelSelection = "nb",
   cimethod = "wald",
   postHoc = ~fem:mar)
+
+model<-glmer(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs,family = poisson())
+
+model<-glmer.nb(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs)
+
+model@frame[,1]
 
 testthat::test_that("negative binomial", {
     testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")

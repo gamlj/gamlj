@@ -352,7 +352,7 @@ mi.warnings<- function(x,...) UseMethod(".mi.warnings")
    if (family$family=="poisson" | family$family=="quasipoisson") 
      if (all.equal(as.numeric(model$y), as.integer(model$y))!=TRUE)
        return("Warnings: Poisson model requires the values of dependent variable to be integers. Results may be misleading ")
-     mark(model$y)
+
      if (length(grep("Negative Binomial",family$family))>0) 
        if (all.equal(as.numeric(model$y), as.integer(model$y))!=TRUE)
           return("Warnings: Negative Binomial model requires the values of dependent variable to be integers. Results may be misleading ")
@@ -360,7 +360,19 @@ mi.warnings<- function(x,...) UseMethod(".mi.warnings")
 
 .mi.warnings.glmerMod<-function(model) {
          .warnings<-.mi.warnings.lmerMod(model)
-         c(.warnings,.mi.warnings.glm(model))
+         family<-family(model)
+         
+         if (family$family=="poisson" | family$family=="quasipoisson")  {
+           y<-model@frame[,1]
+           if (all.equal(as.numeric(y), as.integer(y))!=TRUE)
+             .warnings<-c(.warnings,"Warnings: Poisson model requires the values of dependent variable to be integers. Results may be misleading ")
+         }
+         if (length(grep("Negative Binomial",family$family))>0) {
+           y<-model@frame[,1]
+           if (all.equal(as.numeric(y), as.integer(y))!=TRUE)
+             .warnings<-c(.warnings,"Warnings: Negative Binomial model requires the values of dependent variable to be integers. Results may be misleading ")
+         }
+         .warnings
 }
 .mi.warnings.lmerMod<-function(model) {
   msg<-model@optinfo$conv$lme4$messages
