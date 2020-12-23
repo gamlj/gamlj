@@ -450,8 +450,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
-        assumptions = function() private$.items[["assumptions"]],
-        plotnotes = function() private$.items[["plotnotes"]]),
+        plotnotes = function() private$.items[["plotnotes"]],
+        assumptions = function() private$.items[["assumptions"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -1013,6 +1013,10 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "randomTerms",
                         "percvalue",
                         "cvalue"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="plotnotes",
+                visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1111,11 +1115,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 title="$key",
                                 renderFun=".randHist",
                                 width=450,
-                                height=400)))}))$new(options=options))
-            self$add(jmvcore::Html$new(
-                options=options,
-                name="plotnotes",
-                visible=FALSE))},
+                                height=400)))}))$new(options=options))},
         .setModel=function(x) private$..model <- x))
 
 gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -1262,13 +1262,13 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
 #'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
 #'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
 #'   \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
 #'   \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
-#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

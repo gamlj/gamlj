@@ -40,7 +40,7 @@ mi.rsquared<- function(x,...) UseMethod(".rsquared")
 }
 
 
-####### confergence ############################
+####### convergence ############################
 
 mi.converged<- function(x,...) UseMethod(".converged")
 

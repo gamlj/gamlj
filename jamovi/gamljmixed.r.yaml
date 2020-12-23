@@ -496,6 +496,10 @@ items:
            - randomTerms
            - percvalue
            - cvalue
+  - name: plotnotes
+    type: Html
+    visible: false
+
   - name: assumptions
     title: Assumption Checks
     type: Group
@@ -584,6 +588,3 @@ items:
              width: 450
              height: 400
 
-  - name: plotnotes
-    type: Html
-    visible: false
