@@ -92,7 +92,7 @@ gamlj_ggplot<-function(gobj) {
 gamlj_assumptionsPlots<-function(gobj) {
 
     if (!("assumptions" %in% names(gobj)))
-       stop("No assumptions checking plots is contained in the GAMLj model")
+       stop("No assumptions checking plot is contained in the GAMLj model")
   
     pnames<-names(gobj$assumptions)
     if (!is.something(pnames))
