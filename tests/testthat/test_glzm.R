@@ -91,9 +91,9 @@ mod<-gamlj::gamljGzlm(
 )
 
 
-test_that("gzlm posthoc", {
-   expect_equal(round(mod$postHocs[[1]]$asDF[[5]],3),1.635)
-   expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
+testthat::test_that("gzlm posthoc", {
+  testthat::expect_equal(round(mod$postHocs[[1]]$asDF[[5]],3),1.635)
+  testthat::expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
 })
 
 
@@ -122,25 +122,32 @@ test_that("glm weird names", {
 
 
 res<-mod$emeansTables[[1]]$asDF
-test_that("glm EMM", {
-  expect_equal(round(res[1,2],2),0.84)
+testthat::test_that("glm EMM", {
+  testthat::expect_equal(round(res[1,2],2),0.84)
 })
 
-names(hsbdemo)
 mod<-gamlj::gamljGzlm(
   formula=prog~math+ses*female,
   data=hsbdemo,
   modelSelection = "multinomial",
-  eDesc = T)
-mod
+  eDesc = T,
+  postHoc = ~ses:female)
+
 res1<-mod$main$fixed$asDF
 res2<-mod$main$anova$asDF
-
 testthat::test_that("Multinomial works", {
   testthat::expect_equal(round(res1[2,6],2),.92)
   testthat::expect_equal(res2[4,2],1.5950,tolerance=tol)
   
 })
+
+ph<-mod$postHocs[[1]]$asDF
+
+testthat::test_that("Multinomial posthoc works", {
+  testthat::expect_equal(as.character(ph[11,1]),"academic")
+  testthat::expect_equal(ph[42,9],-0.2435,tol=.0001)
+})
+
 
 mod2<-gamlj::gamljGzlm(
   formula=prog~ses*female+math,

@@ -2,6 +2,7 @@
 
 gposthoc.init=function(data,options,tables) {
 
+  ginfo("Init posthoc...")
   bs <- options$factors
   phTerms <- options$postHoc
   modelType<-"linear"
@@ -53,21 +54,24 @@ gposthoc.init=function(data,options,tables) {
       eg<-nrow(expand.grid(bsLevels[ph]))
       nRows<-(eg*(eg-1))/2
       for (i in seq_len(nRows)) {
-        table$addRow(rowKey=((j*10)+i),list(sep="-"))
+        table$addRow(rowKey=((j*100)+i),list(sep="-"))
         if (modelType=='multinomial')
-          table$setRow(rowKey=((j*10)+i),list(dep=depLevels[j]))
+          table$setRow(rowKey=((j*100)+i),list(dep=depLevels[j]))
         #### make rows look nicer  ###
         if (i==1)
-          table$addFormat(rowKey=((j*10)+i), col=1, jmvcore::Cell.BEGIN_GROUP)
+          table$addFormat(rowKey=((j*100)+i), col=1, jmvcore::Cell.BEGIN_GROUP)
         if (i==nRows)
-          table$addFormat(rowKey=((j*10)+i), col=1, jmvcore::Cell.END_GROUP)
+          table$addFormat(rowKey=((j*100)+i), col=1, jmvcore::Cell.END_GROUP)
       }
     }
-  #  return(tables)
+  ginfo("Init done...")
+  
 }
 
 
 gposthoc.populate<-function(model,options,tables) {
+
+  ginfo("Populate posthoc...")
   
   terms <- options$postHoc
   dep<-options$dep
@@ -100,24 +104,28 @@ gposthoc.populate<-function(model,options,tables) {
       tableData$pholm<-holm[,6]
       tableData$ptukey<-tukey[,6]
     }
-    .labs64<-sapply(as.character(tableData$contrast), function(a) {
-      sapply(strsplit(as.character(a),"[-,/]"),trimws,USE.NAMES = F,simplify = F)
+
+    .cont<-as.character(tableData$contrast)
+    .cont<-gsub(" - ","-",.cont,fixed = T)
+    .cont<-gsub(" / ","/",.cont,fixed = T)
+    
+    .labs64<-sapply(.cont, function(a) {
+      sapply(strsplit(as.character(a),"[- ,/]"),trimws,USE.NAMES = F,simplify = F)
     })
     labs64<-do.call("rbind",.labs64)
     colnames(labs64)<-paste0("c",1:ncol(labs64))
-
     if ("df" %in% names(tableData))
-        if (tableData$df==Inf) {
+        if (tableData$df[1]==Inf) {
            table$getColumn("test")$setTitle("z")
            table$getColumn("df")$setVisible(FALSE)
         }
-    
     for (i in 1:nrow(tableData)) {
       row<-tableData[i,]
       l<-jmvcore::fromB64(labs64[i,])
       table$setRow(rowNo=i, values=c(row,l))
     }
   }
+  ginfo("Populate posthoc done")
   
 }
 

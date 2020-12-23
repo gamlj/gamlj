@@ -219,7 +219,8 @@ data("wicksell")
 data<-wicksell
 data$group<-factor(data$group)
 data$time<-factor(data$time)
-testthat::expect_warning(gobj<-gamlj::gamljMixed(
+testthat::expect_warning(
+  gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
   contrasts = list(
@@ -232,6 +233,7 @@ testthat::expect_warning(gobj<-gamlj::gamljMixed(
   simpleVariable = "time",
   simpleModerator = "group")
 )
+
 es.params<-gobj$simpleEffects$Params$asDF
 
 testthat::test_that("simple effects", {
@@ -244,7 +246,16 @@ es.anova<-gobj$main$anova$asDF
 
 gobj2<-gamlj::gamljMixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
-  data = data)
+  data = data, postHoc = list(c("time","group")))
+
+ph<-gobj2$postHocs[[1]]$asDF
+test<-ph[ph$c1=="0" & ph$c2=="1" & ph$c3=="6" & ph$c4=="1", ]
+
+testthat::test_that("posthoc in mixed", {
+  testthat::expect_equal(as.numeric(test[6]),155.5,tol=.00001)
+  testthat::expect_equal(as.numeric(test[9]),66,tol=.00001)
+})
+
 es2.anova<-gobj2$main$anova$asDF
 
 testthat::test_that("order does not count", {
