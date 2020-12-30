@@ -702,7 +702,7 @@ gamljMixedClass <- R6::R6Class(
   color <- theme$color[1]
   alpha <- 0.4
   plot <- ggplot(data=data, aes(x=x)) +
-    labs(x="Residuals", y='density')
+    labs(x="Coefficients", y='density')
   
   plot <- plot + geom_histogram(aes(y=..density..), position="identity",
                                 stat="bin", color=color, fill=fill)
