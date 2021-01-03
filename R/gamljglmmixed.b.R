@@ -216,7 +216,7 @@ gamljGlmMixedClass <- R6::R6Class(
         realnames<-lapply(realnames,lf.nicifyTerms)
         for (i in 1:dim(vcv)[1]) {
                if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+1)
+                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+3.29)
                else
                   icc<-""
           
