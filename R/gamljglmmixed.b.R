@@ -99,7 +99,9 @@ gamljGlmMixedClass <- R6::R6Class(
       ## random table
       aTable<-self$results$main$random
       aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
-
+      if (modelType != "logistic")
+         aTable$getColumn("icc")$setVisible(FALSE)
+      
       ## anova Table 
       if (length(modelTerms)>0) {
         aTable<- self$results$main$anova
@@ -214,9 +216,11 @@ gamljGlmMixedClass <- R6::R6Class(
         realgroups<-n64$nicenames(grp)
         realnames<-n64$nicenames(vcv$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
+        
+        
         for (i in 1:dim(vcv)[1]) {
-               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+3.29)
+               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") 
+                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+(pi^2/3))
                else
                   icc<-""
           
