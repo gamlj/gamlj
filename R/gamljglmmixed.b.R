@@ -98,9 +98,8 @@ gamljGlmMixedClass <- R6::R6Class(
       
       ## random table
       aTable<-self$results$main$random
-      aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
-      if (modelType != "logistic")
-         aTable$getColumn("icc")$setVisible(FALSE)
+
+      
       
       ## anova Table 
       if (length(modelTerms)>0) {
@@ -216,13 +215,17 @@ gamljGlmMixedClass <- R6::R6Class(
         realgroups<-n64$nicenames(grp)
         realnames<-n64$nicenames(vcv$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
+        r2<-try(r.squared(model),silent = TRUE)
         
         
         for (i in 1:dim(vcv)[1]) {
-               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") 
-                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+(pi^2/3))
-               else
-                  icc<-""
+               icc<-""
+               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") {
+                 if (!jmvcore::isError(r2)) {
+                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+r2$varDist)
+                 }
+               }
+
           
                if (i<=randomTable$rowCount)
                    randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
@@ -296,7 +299,6 @@ gamljGlmMixedClass <- R6::R6Class(
            info.loglik<-lme4::llikAIC(model)$AICtab['logLik']
            info.bic<-stats::BIC(model)
            info.dev<-stats::deviance(model)
-           r2<-try(r.squared(model),silent = TRUE)
            if (jmvcore::isError(r2)){
                    note<-"R-squared cannot be computed."
                    info.r2m<-NaN        
