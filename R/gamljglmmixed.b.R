@@ -220,11 +220,11 @@ gamljGlmMixedClass <- R6::R6Class(
         
         for (i in 1:dim(vcv)[1]) {
                icc<-""
-  #             if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") {
+             if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") {
                  if (!jmvcore::isError(r2)) {
                    icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+r2$varDist)
                  }
-  #             }
+               }
 
           
                if (i<=randomTable$rowCount)
