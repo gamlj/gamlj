@@ -115,12 +115,10 @@ model<-glmer(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs,family = poisson())
 
 model<-glmer.nb(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs)
 
-model@frame[,1]
 
 testthat::test_that("negative binomial", {
     testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")
     testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[8])),3201.73)
-    testthat::expect_equal(mod$main$random$asDF[1,5],0.08155,to=.0001)
     testthat::expect_equal(as.character(mod$postHocs[[1]]$asDF[1,1]),"Men")
     testthat::expect_equal(mod$postHocs[[1]]$asDF[1,6],0.9350,tol=.0001)
     
