@@ -44,6 +44,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             lrtRandomEffects = FALSE,
             plotRandomEffects = FALSE,
             cimethod = "wald",
+            dfmethod = "Satterthwaite",
             qq = FALSE,
             normTest = FALSE,
             normPlot = FALSE,
@@ -283,6 +284,13 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "wald",
                     "profile",
                     "boot"))
+            private$..dfmethod <- jmvcore::OptionList$new(
+                "dfmethod",
+                dfmethod,
+                default="Satterthwaite",
+                options=list(
+                    "Satterthwaite",
+                    "Kenward-Roger"))
             private$..qq <- jmvcore::OptionBool$new(
                 "qq",
                 qq,
@@ -344,6 +352,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..cimethod)
+            self$.addOption(private$..dfmethod)
             self$.addOption(private$..qq)
             self$.addOption(private$..normTest)
             self$.addOption(private$..normPlot)
@@ -388,6 +397,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
         plotRandomEffects = function() private$..plotRandomEffects$value,
         cimethod = function() private$..cimethod$value,
+        dfmethod = function() private$..dfmethod$value,
         qq = function() private$..qq$value,
         normTest = function() private$..normTest$value,
         normPlot = function() private$..normPlot$value,
@@ -431,6 +441,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..lrtRandomEffects = NA,
         ..plotRandomEffects = NA,
         ..cimethod = NA,
+        ..dfmethod = NA,
         ..qq = NA,
         ..normTest = NA,
         ..normPlot = NA,
@@ -504,7 +515,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "scaling",
                     "randomTerms",
                     "correlatedEffects",
-                    "fixedIntercept"))
+                    "fixedIntercept",
+                    "dfmethod"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -517,7 +529,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "scaling",
                                 "randomTerms",
                                 "correlatedEffects",
-                                "fixedIntercept"),
+                                "fixedIntercept",
+                                "dfmethod"),
                             columns=list(
                                 list(
                                     `name`="name", 
@@ -1233,6 +1246,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
 #'   effects predicted values in the plot
 #' @param cimethod .
+#' @param dfmethod .
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
@@ -1318,6 +1332,7 @@ gamljMixed <- function(
     lrtRandomEffects = FALSE,
     plotRandomEffects = FALSE,
     cimethod = "wald",
+    dfmethod = "Satterthwaite",
     qq = FALSE,
     normTest = FALSE,
     normPlot = FALSE,
@@ -1427,6 +1442,7 @@ gamljMixed <- function(
         lrtRandomEffects = lrtRandomEffects,
         plotRandomEffects = plotRandomEffects,
         cimethod = cimethod,
+        dfmethod = dfmethod,
         qq = qq,
         normTest = normTest,
         normPlot = normPlot,

@@ -465,6 +465,17 @@ options:
         - name: boot
           title: Bootstrap (very slow)
 
+    - name: dfmethod
+      title: DF Method
+      type: List
+      default: Satterthwaite
+      options:
+        - name: Satterthwaite
+          title: Satterthwaite
+        - name:  Kenward-Roger
+          title: "Kenward-Roger"
+
+
 
     - name: qq
       title: Q-Q plot of residuals

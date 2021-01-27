@@ -128,6 +128,8 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       reml<-self$options$reml
+      dfmethod<-self$options$dfmethod
+      
       if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
           return()
       if (self$options$simpleScale=="percent" && self$options$percvalue==0)
@@ -217,7 +219,8 @@ gamljMixedClass <- R6::R6Class(
              if (length(modelTerms)==0) {
                   attr(anova_res,"warning")<-"F-Tests cannot be computed without fixed effects"
              } else {
-                  suppressWarnings({anova_res <- try(mf.anova(model), silent=TRUE) })
+                  mark(dfmethod)
+                  suppressWarnings({anova_res <- try(mf.anova(model,df=dfmethod ), silent=TRUE) })
                   mi.check_estimation(anova_res,n64)   
                   if (length(modelTerms)==0) {
                        attr(anova_res,"warning")<-append(attr(anova_res,"warning"),"F-Tests cannot be computed without fixed effects")

@@ -40,6 +40,7 @@ items:
         - randomTerms
         - correlatedEffects
         - fixedIntercept
+        - dfmethod
     items:
            - name: anova
              title: Fixed Effect Omnibus tests
@@ -54,6 +55,8 @@ items:
                          - randomTerms
                          - correlatedEffects
                          - fixedIntercept
+                         - dfmethod
+
              columns:
                     - name: name
                       title: ""
