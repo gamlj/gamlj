@@ -219,7 +219,6 @@ gamljMixedClass <- R6::R6Class(
              if (length(modelTerms)==0) {
                   attr(anova_res,"warning")<-"F-Tests cannot be computed without fixed effects"
              } else {
-                  mark(dfmethod)
                   suppressWarnings({anova_res <- try(mf.anova(model,df=dfmethod ), silent=TRUE) })
                   mi.check_estimation(anova_res,n64)   
                   if (length(modelTerms)==0) {

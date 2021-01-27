@@ -76,7 +76,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
       ep<-mi.explainPrediction(modelType,data,dep)
       if (!is.null(ep))
-        infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
+        infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
       infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="More is better"))
       infoTable$addRow(rowKey="r2m",list(info="R-squared",comm="Marginal"))
@@ -293,6 +293,10 @@ gamljGlmMixedClass <- R6::R6Class(
 
                ### prepare info table #########       
            ginfo("updating the info table")
+           ep<-mi.explainPrediction(modelType,data,dep)
+           if (!is.null(ep))
+             infoTable$setRow(rowKey="dir",list(comm=ep[2]))
+           
            info.call<-n64$translate(as.character(model@call)[[2]])
            info.title<-paste("Generalized mixed model" )
            info.aic<-round(stats::extractAIC(model)[2],digits=2)

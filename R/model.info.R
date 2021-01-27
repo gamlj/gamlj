@@ -216,21 +216,18 @@ mi.initEffectSizeInfo<-function(options, results, terms, ciWidth) {
 
 
 mi.explainPrediction<-function(modelType,data,dep){
-  
+  dlevs<-levels(data[[jmvcore::toB64(dep)]])
   if (modelType %in% c("logistic")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=1)/P(y=0)"
     dircomm<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
     return(c(dirvalue,dircomm))
   }
   if (modelType %in% c("probit")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=1)"
     dircomm<-paste("P(",dep,"=",dlevs[2],")")
     return(c(dirvalue,dircomm))
   }
   if (modelType %in% c("multinomial")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=x)/P(x=0)"
     dircomm<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
     return(c(dirvalue,dircomm))

@@ -237,7 +237,6 @@ mf.anova<- function(x,...) UseMethod(".anova")
   ano<-stats::anova(model,ddf=df)
   if (dim(ano)[1]==0)
     return(ano)
-  mark(ano)  
   if (dim(ano)[2]==4) {
     ano<-.car.anova(model,df)
   } else {

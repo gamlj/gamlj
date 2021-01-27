@@ -57,7 +57,7 @@ gamljGzlmClass <- R6::R6Class(
       infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
       ep<-mi.explainPrediction(modelType,data,dep)
       if (!is.null(ep))
-              infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
+              infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
       infoTable$addRow(rowKey="r2",list(info="R-squared",comm="Proportion of reduction of error"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
@@ -213,6 +213,9 @@ gamljGzlmClass <- R6::R6Class(
         
         ### fill info table #########   
         modelType<-self$options$modelSelection
+        ep<-mi.explainPrediction(modelType,data,dep)
+        if (!is.null(ep))
+          infoTable$setRow(rowKey="dir",list(comm=ep[2]))
         infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
