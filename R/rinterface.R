@@ -257,3 +257,24 @@ gamlj_residuals<-function(gobj, type="working") {
 }
 
 
+#' Extract the R model object contained in the GAMLj results 
+#'
+#' This function returns the R model  object. It is usefull to run additional 
+#' analysis in R on model results. 
+#'
+#' @param gobj a gamlj results object of the class GAMLj*
+#' @return a R object from lm(), glm(), lmer() or glmer()
+#' @author Marcello Gallucci
+#' @examples 
+#' data("qsport")
+#' obj<-gamlj::gamljGLM(
+#'    formula = performance ~ hours,
+#'    data = qsport)
+#'  model<-gamlj_model(obj)
+#'  
+#' @export
+
+gamlj_model<-function(gobj) {
+  gobj$model
+}
+
