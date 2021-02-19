@@ -50,7 +50,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             normPlot = FALSE,
             residPlot = FALSE,
             clusterBoxplot = FALSE,
-            randHist = FALSE, ...) {
+            randHist = FALSE,
+            dep_scale = "none", ...) {
 
             super$initialize(
                 package='gamlj',
@@ -238,8 +239,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             options=list(
                                 "centered",
                                 "standardized",
-                                "cluster-based-centered",
-                                "cluster-based-standardized",
+                                "clusterbasedcentered",
+                                "clusterbasedstandardized",
                                 "none"),
                             default="centered"))))
             private$..cluster <- jmvcore::OptionVariables$new(
@@ -315,6 +316,17 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "randHist",
                 randHist,
                 default=FALSE)
+            private$..dep_scale <- jmvcore::OptionList$new(
+                "dep_scale",
+                dep_scale,
+                options=list(
+                    "none",
+                    "centered",
+                    "standardized",
+                    "clusterbasedcentered",
+                    "clusterbasedstandardized",
+                    "log"),
+                default="none")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -359,6 +371,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..residPlot)
             self$.addOption(private$..clusterBoxplot)
             self$.addOption(private$..randHist)
+            self$.addOption(private$..dep_scale)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -403,7 +416,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         normPlot = function() private$..normPlot$value,
         residPlot = function() private$..residPlot$value,
         clusterBoxplot = function() private$..clusterBoxplot$value,
-        randHist = function() private$..randHist$value),
+        randHist = function() private$..randHist$value,
+        dep_scale = function() private$..dep_scale$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -447,7 +461,8 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..normPlot = NA,
         ..residPlot = NA,
         ..clusterBoxplot = NA,
-        ..randHist = NA)
+        ..randHist = NA,
+        ..dep_scale = NA)
 )
 
 gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -487,6 +502,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         `title`="")),
                 clearWith=list(
                     "dep",
+                    "dep_scale",
                     "randomTerms",
                     "modelTerms",
                     "fixedIntercept"),
@@ -513,6 +529,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "reml",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "randomTerms",
                     "correlatedEffects",
                     "fixedIntercept",
@@ -527,6 +544,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
@@ -563,6 +581,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
@@ -618,6 +637,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
@@ -655,6 +675,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
@@ -688,6 +709,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
@@ -750,6 +772,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "reml",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "randomTerms",
                     "correlatedEffects",
                     "postHocCorr"),
@@ -820,6 +843,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
@@ -879,7 +903,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "fixedIntercept",
                                 "simpleScale",
-                                "ciWidth"),
+                                "ciWidth",
+                                "dep_scale"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -940,6 +965,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "reml",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "simpleScaleLabels",
                     "randomTerms",
                     "correlatedEffects",
@@ -987,6 +1013,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "plotError",
                     "ciWidth",
                     "scaling",
+                    "dep_scale",
                     "plotRaw",
                     "plotDvScale",
                     "fixedIntercept",
@@ -1016,6 +1043,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotError",
                         "ciWidth",
                         "scaling",
+                        "dep_scale",
                         "modelTerms",
                         "fixedIntercept",
                         "simpleScale",
@@ -1088,7 +1116,8 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms")))
+                                "modelTerms",
+                                "dep_scale")))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="residPlot",
@@ -1100,6 +1129,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
+                                "dep_scale",
                                 "modelTerms")))
                         self$add(jmvcore::Array$new(
                             options=options,
@@ -1108,6 +1138,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             visible="(clusterBoxplot)",
                             clearWith=list(
                                 "dep",
+                                "dep_scale",
                                 "modelTerms"),
                             template=jmvcore::Image$new(
                                 options=options,
@@ -1122,6 +1153,7 @@ gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             visible="(randHist)",
                             clearWith=list(
                                 "dep",
+                                "dep_scale",
                                 "modelTerms"),
                             template=jmvcore::Image$new(
                                 options=options,
@@ -1259,6 +1291,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   boxplot of random effects by the first defined clustering variable
 #' @param randHist \code{TRUE} or \code{FALSE} (default), provide histogram of
 #'   random Coefficients
+#' @param dep_scale Re-scale the dependent variable.
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1339,6 +1372,7 @@ gamljMixed <- function(
     residPlot = FALSE,
     clusterBoxplot = FALSE,
     randHist = FALSE,
+    dep_scale = "none",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1448,7 +1482,8 @@ gamljMixed <- function(
         normPlot = normPlot,
         residPlot = residPlot,
         clusterBoxplot = clusterBoxplot,
-        randHist = randHist)
+        randHist = randHist,
+        dep_scale = dep_scale)
 
     analysis <- gamljMixedClass$new(
         options = options,

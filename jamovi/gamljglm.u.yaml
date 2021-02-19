@@ -204,6 +204,12 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+          - type: Label
+            label: Dependent variable 
+            children:
+                     - type: ComboBox
+                       name: dep_scale
+
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true

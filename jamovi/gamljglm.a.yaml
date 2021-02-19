@@ -461,5 +461,24 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
 
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: Standardized
+            name:  'Standardized'
+          - title: Log
+            name: 'log'
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
+
 ...
 

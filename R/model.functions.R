@@ -215,7 +215,8 @@ mf.anova<- function(x,...) UseMethod(".anova")
     ss
 }
 
-.anova.glmerMod<-function(model) {
+.anova.glmerMod<-function(model,df="Satterthwaite") {
+  mark("using .anova.glmerMod")
   ginfo(".anova.glmerMod")
   ano<-.car.anova(model)
   names(ano)<-c("test","df1","p")
@@ -340,10 +341,14 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
   
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
-     if (modelType %in% c("linear","mixed"))
+     if (modelType %in% c("linear","mixed")) {
        ### here I need the dv to be really numeric
-       data[[dep]] <- as.numeric(as.character(data[[dep]]))  
-     
+       data[[dep]] <- as.numeric(as.character(data[[dep]]))
+       clusterdata<-NULL
+       if (is.something(cluster))
+         clusterdata<-data[[jmvcore::toB64(cluster)]]
+       data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
+     }
        if ( any(is.na(data[[dep]])) ) {
           nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
           return(paste(nice,"model requires a numeric dependent variable"))

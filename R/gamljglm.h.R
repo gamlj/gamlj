@@ -45,7 +45,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             normPlot = FALSE,
             residPlot = FALSE,
             interceptInfo = FALSE,
-            effectSizeInfo = FALSE, ...) {
+            effectSizeInfo = FALSE,
+            dep_scale = "none", ...) {
 
             super$initialize(
                 package='gamlj',
@@ -280,6 +281,15 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "effectSizeInfo",
                 effectSizeInfo,
                 default=FALSE)
+            private$..dep_scale <- jmvcore::OptionList$new(
+                "dep_scale",
+                dep_scale,
+                options=list(
+                    "none",
+                    "centered",
+                    "Standardized",
+                    "log"),
+                default="none")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -318,6 +328,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..residPlot)
             self$.addOption(private$..interceptInfo)
             self$.addOption(private$..effectSizeInfo)
+            self$.addOption(private$..dep_scale)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -356,7 +367,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         normPlot = function() private$..normPlot$value,
         residPlot = function() private$..residPlot$value,
         interceptInfo = function() private$..interceptInfo$value,
-        effectSizeInfo = function() private$..effectSizeInfo$value),
+        effectSizeInfo = function() private$..effectSizeInfo$value,
+        dep_scale = function() private$..dep_scale$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -394,7 +406,8 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..normPlot = NA,
         ..residPlot = NA,
         ..interceptInfo = NA,
-        ..effectSizeInfo = NA)
+        ..effectSizeInfo = NA,
+        ..dep_scale = NA)
 )
 
 gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -458,6 +471,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "modelTerms",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -469,6 +483,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "fixedIntercept",
                                 "effectSize",
                                 "interceptInfo"),
@@ -511,6 +526,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "fixedIntercept",
                                 "effectSize"),
                             columns=list(
@@ -563,7 +579,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "scaling",
                                 "fixedIntercept",
-                                "effectSize"),
+                                "effectSize",
+                                "dep_scale"),
                             columns=list(
                                 list(
                                     `name`="effect", 
@@ -596,6 +613,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "fixedIntercept",
                                 "effectSize",
                                 "paramCIWidth"),
@@ -675,6 +693,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "modelTerms",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "postHocCorr"),
                 template=jmvcore::Table$new(
                     options=options,
@@ -748,6 +767,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "fixedIntercept",
                                 "simpleVariable",
                                 "simpleModerator",
@@ -794,7 +814,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "contrasts",
                                 "fixedIntercept",
                                 "simpleScale",
-                                "ciWidth"),
+                                "ciWidth",
+                                "dep_scale"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -855,6 +876,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "modelTerms",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "fixedIntercept",
                     "simpleScaleLabels",
                     "ciWidth"),
@@ -899,6 +921,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                     "plotError",
                     "ciWidth",
                     "scaling",
+                    "dep_scale",
                     "plotRaw",
                     "plotDvScale",
                     "fixedIntercept",
@@ -926,6 +949,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         "plotError",
                         "ciWidth",
                         "scaling",
+                        "dep_scale",
                         "modelTerms",
                         "fixedIntercept",
                         "simpleScale",
@@ -999,7 +1023,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms")))
+                                "modelTerms",
+                                "dep_scale")))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="normPlot",
@@ -1011,6 +1036,7 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
+                                "dep_scale",
                                 "modelTerms")))
                         self$add(jmvcore::Image$new(
                             options=options,
@@ -1023,7 +1049,8 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms")))}))$new(options=options))},
+                                "modelTerms",
+                                "dep_scale")))}))$new(options=options))},
         .setModel=function(x) private$..model <- x))
 
 gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -1139,6 +1166,7 @@ gamljGLMBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   ìnformation about the intercept (F test, effect size indexes)
 #' @param effectSizeInfo \code{TRUE} or \code{FALSE} (default), provide
 #'   ìnformation about the effect size indexes
+#' @param dep_scale Re-scale the dependent variable.
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1211,6 +1239,7 @@ gamljGLM <- function(
     residPlot = FALSE,
     interceptInfo = FALSE,
     effectSizeInfo = FALSE,
+    dep_scale = "none",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1309,7 +1338,8 @@ gamljGLM <- function(
         normPlot = normPlot,
         residPlot = residPlot,
         interceptInfo = interceptInfo,
-        effectSizeInfo = effectSizeInfo)
+        effectSizeInfo = effectSizeInfo,
+        dep_scale = dep_scale)
 
     analysis <- gamljGLMClass$new(
         options = options,

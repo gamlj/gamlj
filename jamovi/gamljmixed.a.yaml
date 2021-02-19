@@ -374,12 +374,16 @@ options:
               - name: type
                 type: List
                 options:
-                  - centered
-                  - standardized
-                  - cluster-based-centered
-                  - cluster-based-standardized
-                  - none
-
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Centered clusterwise
+                      name:  clusterbasedcentered
+                    - title: z-scores clusterwise
+                      name:  clusterbasedstandardized
+                    - title: None
+                      name: 'none'
                 default: centered 
       description:
           R: >
@@ -524,6 +528,28 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide histogram of random Coefficients
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: z-scores
+            name: standardized
+          - title: Centered clusterwise
+            name:  clusterbasedcentered
+          - title: z-scores clusterwise
+            name:  clusterbasedstandardized
+          - title: Log
+            name:  log
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
 
 
 ...

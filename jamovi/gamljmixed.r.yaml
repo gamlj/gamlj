@@ -21,6 +21,7 @@ items:
          title: ""
     clearWith:
         - dep
+        - dep_scale
         - randomTerms
         - modelTerms
         - fixedIntercept
@@ -37,6 +38,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - randomTerms
         - correlatedEffects
         - fixedIntercept
@@ -52,6 +54,7 @@ items:
                          - reml
                          - contrasts
                          - scaling
+                         - dep_scale
                          - randomTerms
                          - correlatedEffects
                          - fixedIntercept
@@ -84,6 +87,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -132,6 +136,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -165,6 +170,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -195,10 +201,12 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
                     - randomTerms
+
              columns:
                    - name: test
                      title: "Test"
@@ -252,6 +260,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - randomTerms
         - correlatedEffects
         - postHocCorr
@@ -308,6 +317,7 @@ items:
                  - reml
                  - contrasts
                  - scaling
+                 - dep_scale
                  - randomTerms
                  - correlatedEffects
                  - fixedIntercept
@@ -360,6 +370,7 @@ items:
                      - fixedIntercept
                      - simpleScale
                      - ciWidth
+                     - dep_scale
                      
               columns:
                      - name: threeway
@@ -413,6 +424,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - simpleScaleLabels
         - randomTerms
         - correlatedEffects
@@ -458,6 +470,7 @@ items:
         - plotError
         - ciWidth
         - scaling
+        - dep_scale
         - plotRaw
         - plotDvScale
         - fixedIntercept
@@ -489,6 +502,7 @@ items:
            - plotError
            - ciWidth
            - scaling
+           - dep_scale
            - modelTerms
            - fixedIntercept
            - simpleScale
@@ -549,6 +563,8 @@ items:
           clearWith:
             - dep
             - modelTerms
+            - dep_scale
+          
         - name: residPlot
           title: Residual-Predicted Scatterplot
           visible: (residPlot)
@@ -560,6 +576,7 @@ items:
           requiresData: true
           clearWith:
             - dep
+            - dep_scale
             - modelTerms
         - name: clusterBoxplot
           title: Residuals by cluster boxplot
@@ -568,6 +585,7 @@ items:
           visible: (clusterBoxplot)
           clearWith:
             - dep
+            - dep_scale
             - modelTerms
           template:
              title: $key
@@ -583,6 +601,7 @@ items:
           visible: (randHist)
           clearWith:
             - dep
+            - dep_scale
             - modelTerms
           template:
              title: $key

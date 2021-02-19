@@ -206,7 +206,6 @@ lf.contrastLabels=function(levels, type) {
 }
 
 lf.scaleContinuous<-function(var,method,by=NULL) {
-  method<-gsub("[- ]","",tolower(method))
   if (method=="centered") 
           var<-scale(var,scale = F)  
   if (method=="clusterbasedcentered") 
@@ -215,6 +214,13 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
           var<-scale(var,scale = T)  
   if (method=="clusterbasedstandardized")     
           var<-unlist(tapply(var,by,scale,scale=T))
+  if (method=="log") {     
+    if (any(var<=0))
+      return("Log transformation requires all positive numbers in the dependent variable")
+    else
+     var<-log(var)
+  }
+  
   as.numeric(var)
 }
 
