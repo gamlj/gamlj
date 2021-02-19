@@ -214,11 +214,11 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
           var<-scale(var,scale = T)  
   if (method=="clusterbasedstandardized")     
           var<-unlist(tapply(var,by,scale,scale=T))
-  if (method=="log") {     
+  if (method=="log") {
     if (any(var<=0))
-      return("Log transformation requires all positive numbers in the dependent variable")
+      jmvcore::reject("Log transformation requires all positive numbers in the dependent variable")
     else
-     var<-log(var)
+      var<-log(var)
   }
   
   as.numeric(var)

@@ -139,6 +139,7 @@ gamljGLMClass <- R6::R6Class(
       ##### clean the data ####
       data<-private$.cleandata()
       data<-mf.checkData(self$options,data)
+      mark(data)
       if (!is.data.frame(data))
         jmvcore::reject(data)
 
