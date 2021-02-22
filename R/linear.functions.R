@@ -216,7 +216,7 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
           var<-unlist(tapply(var,by,scale,scale=T))
   if (method=="log") {
     if (any(var<=0))
-      jmvcore::reject("Log transformation requires all positive numbers in the dependent variable")
+      jmvcore::reject("Log transformation requires all positive numbers in the original variable")
     else
       var<-log(var)
   }

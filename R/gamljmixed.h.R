@@ -241,6 +241,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "standardized",
                                 "clusterbasedcentered",
                                 "clusterbasedstandardized",
+                                "log",
                                 "none"),
                             default="centered"))))
             private$..cluster <- jmvcore::OptionVariables$new(

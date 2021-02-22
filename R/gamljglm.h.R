@@ -240,6 +240,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                             options=list(
                                 "centered",
                                 "standardized",
+                                "log",
                                 "none"),
                             default="centered"))))
             private$..effectSize <- jmvcore::OptionNMXList$new(

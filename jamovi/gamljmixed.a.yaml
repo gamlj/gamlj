@@ -382,6 +382,8 @@ options:
                       name:  clusterbasedcentered
                     - title: z-scores clusterwise
                       name:  clusterbasedstandardized
+                    - title: Log
+                      name: 'log'
                     - title: None
                       name: 'none'
                 default: centered 

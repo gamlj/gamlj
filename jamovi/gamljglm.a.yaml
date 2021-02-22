@@ -371,9 +371,14 @@ options:
               - name: type
                 type: List
                 options:
-                  - centered
-                  - standardized
-                  - none
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Log
+                      name: 'log'
+                    - title: None
+                      name: 'none'
 
                 default: centered 
       description:
