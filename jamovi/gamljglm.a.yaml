@@ -393,14 +393,17 @@ options:
       title: Effect Size
       type: NMXList
       options:
+          - name: beta
+            title: β  
           - name: eta
             title: η²
           - name: partEta
             title: partial η²
           - name: omega
             title: partial ω²
-          - name: beta
-            title: β  
+          - name: epsilon
+            title: partial ε²
+            
       default:
           - beta
           - partEta

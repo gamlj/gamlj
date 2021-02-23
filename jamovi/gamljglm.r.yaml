@@ -76,6 +76,11 @@ items:
                       type: number
                       visible: (effectSize:omega)
                       format: zto
+                    - name: epsilonSq
+                      title: ε²p
+                      type: number
+                      visible: (effectSize:epsilon)
+                      format: zto
 
            - name: anova
              title: ANOVA Omnibus tests
@@ -116,9 +121,14 @@ items:
                       visible: (effectSize:partEta)
                       format: zto
                     - name: omegaSq
-                      title: ω²
+                      title: ω²p
                       type: number
                       visible: (effectSize:omega)
+                      format: zto
+                    - name: epsilonSq
+                      title: ε²p
+                      type: number
+                      visible: (effectSize:epsilon)
                       format: zto
 
            - name: effectSizeTable
@@ -327,6 +337,25 @@ items:
                    title: p
                    type: number
                    format: zto,pvalue
+                 - name: etaSq
+                   title: η²
+                   type: number
+                   visible: (effectSize:eta)
+                 - name: etaSqP
+                   title: η²p
+                   type: number
+                   visible: (effectSize:partEta)
+                   format: zto
+                 - name: omegaSq
+                   title: ω²p
+                   type: number
+                   visible: (effectSize:omega)
+                   format: zto
+                 - name: epsilonSq
+                   title: ε²p
+                   type: number
+                   visible: (effectSize:epsilon)
+                   format: zto
 
             - name: Params
               title: Parameter Estimates for simple effects

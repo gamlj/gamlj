@@ -66,8 +66,8 @@ gamljGLMClass <- R6::R6Class(
                   lab<-jmvcore::stringifyTerm(aterms[[i]],raise=T)
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
-         aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
-         aTable$addRow(rowKey=i+3, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq=""))
+         aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+         aTable$addRow(rowKey=i+3, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
          
          aTable$addFormat(col=1, rowNo=i+2, format=jmvcore::Cell.BEGIN_END_GROUP)
          aTable$addFormat(col=1, rowNo=2, format=jmvcore::Cell.BEGIN_GROUP)
@@ -235,33 +235,31 @@ gamljGLMClass <- R6::R6Class(
         # anova table ##
                 ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
                  if (length(modelTerms)>0) {
-                       rawlabels<-rownames(anova_res)
+                       mark(anova_res)
+                       rawlabels<-names(anova_res)
                        labels<-n64$nicenames(rawlabels)
                        trows<-dim(anova_res)[1]-1
-                       for (i in seq_len(trows)) {
-                              tableRow<-anova_res[i,]  
+                       for (i in seq_along(anova_res)) {
+                              tableRow<-anova_res[[i]]  
                               anovaTable$setRow(rowNo=i,tableRow)
                        }
-                       tss<-sum(anova_res[c(1,i+1),"ss"])
-                       tdf<-sum(anova_res[c(1,i+1),"df"])
-                       anovaTable$setRow(rowNo=i+1,anova_res[i+1,c("ss","df")])
-                       anovaTable$setRow(rowNo=i+2,list("ss"=tss,"df"=tdf))
+                       
                        
  
                  }
                ### we want to output the error SS for intercept only model
                if (length(modelTerms)==0 & fixedIntercept==TRUE) {
                  ss<-var(model$residuals)*(model$df.residual)
-                 anovaTable$setRow(rowKey=1,list("ss"=ss,df=model$df.residual,f="",p="",etaSq="",etaSqP="",omegaSq=""))
-                 anovaTable$setRow(rowKey=2, list("ss"=ss,df=model$df.residual,p="",etaSq="",etaSqP="",omegaSq=""))
+                 anovaTable$setRow(rowKey=1,list("ss"=ss,df=model$df.residual,f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+                 anovaTable$setRow(rowKey=2, list("ss"=ss,df=model$df.residual,p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
                }                 
                
                ### we want to output the error SS for zero only model
                if (length(modelTerms)==0 & fixedIntercept==FALSE) {
                  ss<-sum(data[[jmvcore::toB64(dep)]]^2)
                  df<-dim(data)[1]
-                 anovaTable$setRow(rowKey=1,list("ss"=ss,df=df,f="",p="",etaSq="",etaSqP="",omegaSq=""))
-                 anovaTable$setRow(rowKey=2, list("ss"=ss,df=df,p="",etaSq="",etaSqP="",omegaSq=""))
+                 anovaTable$setRow(rowKey=1,list("ss"=ss,df=df,f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+                 anovaTable$setRow(rowKey=2, list("ss"=ss,df=df,p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
                  attr(anova_res,"warning")<-append(attr(anova_res,"warning"),WARNS["glm.zeromodel"])
                }                 
 
@@ -463,7 +461,11 @@ gamljGLMClass <- R6::R6Class(
   p<-ss$coefficients[1,4]
   peta<-effectsize::t_to_eta2(tt,df_error = df)
   omega<-effectsize::t_to_omega2(tt,df_error = df)
-  tableRow<-list(df=df,f=f,etaSqP=peta$Eta_Sq_partial,omegaSq=omega$Omega_Sq_partial,p=p)
+  tt<-3
+  df<-33
+  epsilon<-effectsize::t_to_epsilon2(tt,df_error = df)
+  
+  tableRow<-list(df=df,f=f,etaSqP=peta$Eta_Sq_partial,omegaSq=omega$Omega_Sq_partial,epsilonSq=epsilon$Epsilon2_partial,p=p)
   aTable<-self$results$main$interceptTable
   aTable$setRow(rowNo=1,tableRow)
 },

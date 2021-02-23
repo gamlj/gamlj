@@ -247,10 +247,11 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "effectSize",
                 effectSize,
                 options=list(
+                    "beta",
                     "eta",
                     "partEta",
                     "omega",
-                    "beta"),
+                    "epsilon"),
                 default=list(
                     "beta",
                     "partEta"))
@@ -517,6 +518,12 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `title`="\u03C9\u00B2p", 
                                     `type`="number", 
                                     `visible`="(effectSize:omega)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="epsilonSq", 
+                                    `title`="\u03B5\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:epsilon)", 
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -565,9 +572,15 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `format`="zto"),
                                 list(
                                     `name`="omegaSq", 
-                                    `title`="\u03C9\u00B2", 
+                                    `title`="\u03C9\u00B2p", 
                                     `type`="number", 
                                     `visible`="(effectSize:omega)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="epsilonSq", 
+                                    `title`="\u03B5\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:epsilon)", 
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -803,7 +816,30 @@ gamljGLMResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                                     `name`="p.value", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))
+                                    `format`="zto,pvalue"),
+                                list(
+                                    `name`="etaSq", 
+                                    `title`="\u03B7\u00B2", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:eta)"),
+                                list(
+                                    `name`="etaSqP", 
+                                    `title`="\u03B7\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:partEta)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="omegaSq", 
+                                    `title`="\u03C9\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:omega)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="epsilonSq", 
+                                    `title`="\u03B5\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:epsilon)", 
+                                    `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="Params",

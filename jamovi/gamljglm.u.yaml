@@ -38,7 +38,7 @@ children:
               change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
-    style: inline
+    style: list
     children:
       - type: Label
         label: Effect Size
@@ -61,6 +61,11 @@ children:
             type: CheckBox
             optionPart: omega
             optionName: effectSize
+          - name: effectSize_epsilon
+            type: CheckBox
+            optionPart: epsilon
+            optionName: effectSize
+
       - type: Label
         label: Confidence Intervals
         margin: large

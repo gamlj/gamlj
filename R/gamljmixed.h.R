@@ -36,6 +36,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             postHocCorr = list(
                 "bonf"),
             scaling = NULL,
+            dep_scale = "none",
             cluster = NULL,
             randomTerms = list(
                 list()),
@@ -50,8 +51,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             normPlot = FALSE,
             residPlot = FALSE,
             clusterBoxplot = FALSE,
-            randHist = FALSE,
-            dep_scale = "none", ...) {
+            randHist = FALSE, ...) {
 
             super$initialize(
                 package='gamlj',
@@ -244,6 +244,17 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                                 "log",
                                 "none"),
                             default="centered"))))
+            private$..dep_scale <- jmvcore::OptionList$new(
+                "dep_scale",
+                dep_scale,
+                options=list(
+                    "none",
+                    "centered",
+                    "standardized",
+                    "clusterbasedcentered",
+                    "clusterbasedstandardized",
+                    "log"),
+                default="none")
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
                 cluster,
@@ -317,17 +328,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 "randHist",
                 randHist,
                 default=FALSE)
-            private$..dep_scale <- jmvcore::OptionList$new(
-                "dep_scale",
-                dep_scale,
-                options=list(
-                    "none",
-                    "centered",
-                    "standardized",
-                    "clusterbasedcentered",
-                    "clusterbasedstandardized",
-                    "log"),
-                default="none")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -358,6 +358,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..simpleScaleLabels)
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..scaling)
+            self$.addOption(private$..dep_scale)
             self$.addOption(private$..cluster)
             self$.addOption(private$..randomTerms)
             self$.addOption(private$..correlatedEffects)
@@ -372,7 +373,6 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
             self$.addOption(private$..residPlot)
             self$.addOption(private$..clusterBoxplot)
             self$.addOption(private$..randHist)
-            self$.addOption(private$..dep_scale)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -404,6 +404,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         simpleScaleLabels = function() private$..simpleScaleLabels$value,
         postHocCorr = function() private$..postHocCorr$value,
         scaling = function() private$..scaling$value,
+        dep_scale = function() private$..dep_scale$value,
         cluster = function() private$..cluster$value,
         randomTerms = function() private$..randomTerms$value,
         correlatedEffects = function() private$..correlatedEffects$value,
@@ -417,8 +418,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         normPlot = function() private$..normPlot$value,
         residPlot = function() private$..residPlot$value,
         clusterBoxplot = function() private$..clusterBoxplot$value,
-        randHist = function() private$..randHist$value,
-        dep_scale = function() private$..dep_scale$value),
+        randHist = function() private$..randHist$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -449,6 +449,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..simpleScaleLabels = NA,
         ..postHocCorr = NA,
         ..scaling = NA,
+        ..dep_scale = NA,
         ..cluster = NA,
         ..randomTerms = NA,
         ..correlatedEffects = NA,
@@ -462,8 +463,7 @@ gamljMixedOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
         ..normPlot = NA,
         ..residPlot = NA,
         ..clusterBoxplot = NA,
-        ..randHist = NA,
-        ..dep_scale = NA)
+        ..randHist = NA)
 )
 
 gamljMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
@@ -1263,6 +1263,7 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #' @param scaling a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
+#' @param dep_scale Re-scale the dependent variable.
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
 #' @param randomTerms a list of lists specifying the models random effects.
@@ -1292,7 +1293,6 @@ gamljMixedBase <- if (requireNamespace('jmvcore')) R6::R6Class(
 #'   boxplot of random effects by the first defined clustering variable
 #' @param randHist \code{TRUE} or \code{FALSE} (default), provide histogram of
 #'   random Coefficients
-#' @param dep_scale Re-scale the dependent variable.
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1358,6 +1358,7 @@ gamljMixed <- function(
     postHocCorr = list(
                 "bonf"),
     scaling = NULL,
+    dep_scale = "none",
     cluster = NULL,
     randomTerms = list(
                 list()),
@@ -1373,7 +1374,6 @@ gamljMixed <- function(
     residPlot = FALSE,
     clusterBoxplot = FALSE,
     randHist = FALSE,
-    dep_scale = "none",
     formula) {
 
     if ( ! requireNamespace('jmvcore'))
@@ -1470,6 +1470,7 @@ gamljMixed <- function(
         simpleScaleLabels = simpleScaleLabels,
         postHocCorr = postHocCorr,
         scaling = scaling,
+        dep_scale = dep_scale,
         cluster = cluster,
         randomTerms = randomTerms,
         correlatedEffects = correlatedEffects,
@@ -1483,8 +1484,7 @@ gamljMixed <- function(
         normPlot = normPlot,
         residPlot = residPlot,
         clusterBoxplot = clusterBoxplot,
-        randHist = randHist,
-        dep_scale = dep_scale)
+        randHist = randHist)
 
     analysis <- gamljMixedClass$new(
         options = options,

@@ -43,6 +43,7 @@ gamljGLM(
   residPlot = FALSE,
   interceptInfo = FALSE,
   effectSizeInfo = FALSE,
+  dep_scale = "none",
   formula
 )
 }
@@ -169,6 +170,8 @@ scatterplot of the residuals against predicted}
 
 \item{effectSizeInfo}{\code{TRUE} or \code{FALSE} (default), provide
 ìnformation about the effect size indexes}
+
+\item{dep_scale}{Re-scale the dependent variable.}
 
 \item{formula}{(optional) the formula to use, see the examples}
 }

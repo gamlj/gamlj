@@ -211,8 +211,8 @@ gamlj_data<-function(gobj) {
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
 #' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
-#' @param type the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial model the default are the predicted probabilities. The "link" gives the scale of the linear predictors; 
-#'             is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+#' @param type the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial models the default is to compute the predicted probabilities.  "link" gives the scale of the linear predictors; 
+#'             is on the scale of the linear predictors;  The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
 #'             Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}
 #' @return a R object of the class of the estimated model
 #' @author Marcello Gallucci
@@ -252,7 +252,7 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #'  
 #' @export
 
-gamlj_residuals<-function(gobj, type="working") {
+gamlj_residuals<-function(gobj) {
     stats::residuals(gobj$model)
 }
 

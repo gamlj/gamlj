@@ -189,30 +189,37 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.lm<-function(model) {
     ano<-car::Anova(model,test="F",type=3, singular.ok=T)
     colnames(ano)<-c("ss","df","f","p")
-    if (length(grep("Intercept",rownames(ano),fixed=T))>0)
-        dss<-ano[-1,]
-    else
-        dss<-ano
+    dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
+    tots<-list(ss=sum(ano$ss),df=sum(ano$df))
+    reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
+    ss<-summary(model)
+    p<-pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
+    modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+    modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+    modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
     
-    sumr<-summary(model)
-    errDF<-sumr$fstatistic[3]
-    modDF<-sumr$fstatistic[2]
-    modF<-sumr$fstatistic[1]
-    errSS<-dss$ss[length(dss$ss)]
-    errMS<-errSS/errDF
-    r2<-sumr$r.squared
-    totalSS<-1/((1-r2)*(1/errSS))
-    modSS<-totalSS-errSS
-    modp<-1 - stats::pf(modF, modDF, errDF) 
-    modRow<-c(ss=modSS,df=modDF,F=modF,p=modp)
-    ss<-rbind(modRow,dss)
-    ss$ms<-ss$ss/ss$df
-    ss$etaSq<-ss$ss/(totalSS)
-    ss$etaSqP <- ss$ss / (ss$ss + errSS)
-    ss$omegaSq <- (ss$ss - (ss$df * errMS)) / (totalSS + errMS)
-    lt<-length(ss$df)
-    ss[lt,c("f","p","etaSq","etaSqP","omegaSq")]<-NA
-    ss
+    mods<-list(ss=sum(dss$ss),
+               df= ss$fstatistic[[2]],
+               f=ss$fstatistic[[1]],
+               p=p,
+               etaSq=modeta[[1]],etaSqP=modeta[[1]],
+               omegaSq=modomega[[1]],
+               epsilonSq=modepsilon[[1]])
+    
+    etap<-effectsize::eta_squared(model,partial = T)
+    eta<-effectsize::eta_squared(model,partial = F)
+    eps<-effectsize::epsilon_squared(model,partial = T)
+    omega<-effectsize::omega_squared(model,partial = T)
+    epsilon<-effectsize::epsilon_squared(model,partial = T)
+    dss$etaSq<-eta[,2]
+    dss$etaSqP<-etap[,2]
+    dss$omegaSq<-omega[,2]
+    dss$epsilonSq<-epsilon[,2]
+    reslist<-listify(dss)
+    reslist<-append_list(reslist,reds,"Residuals")
+    reslist<-append_list(reslist,tots,"Totals")
+    reslist<-prepend_list(reslist,mods,"Model")
+    reslist
 }
 
 .anova.glmerMod<-function(model,df="Satterthwaite") {

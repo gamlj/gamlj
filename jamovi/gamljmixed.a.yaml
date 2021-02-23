@@ -392,6 +392,28 @@ options:
             a list of lists specifying the covariates scaling,
             one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
 
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: z-scores
+            name: standardized
+          - title: Centered clusterwise
+            name:  clusterbasedcentered
+          - title: z-scores clusterwise
+            name:  clusterbasedstandardized
+          - title: Log
+            name:  log
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
+
 
 ############ mixed model specifics ##############
 
@@ -531,27 +553,6 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide histogram of random Coefficients
 
-    - name: dep_scale
-      title: Scale
-      type: List
-      options:
-          - title: None
-            name: 'none'
-          - title: Centered
-            name:  'centered'
-          - title: z-scores
-            name: standardized
-          - title: Centered clusterwise
-            name:  clusterbasedcentered
-          - title: z-scores clusterwise
-            name:  clusterbasedstandardized
-          - title: Log
-            name:  log
-
-      default: "none"
-      description:
-         R: >
-           Re-scale the dependent variable.
 
 
 ...
