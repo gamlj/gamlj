@@ -193,11 +193,12 @@ mf.anova<- function(x,...) UseMethod(".anova")
     tots<-list(ss=sum(ano$ss),df=sum(ano$df))
     reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
     ss<-summary(model)
-    p<-pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
-    modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-    modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-    modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-    
+    p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
+    suppressWarnings({
+        modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+    })
     mods<-list(ss=sum(dss$ss),
                df= ss$fstatistic[[2]],
                f=ss$fstatistic[[1]],
@@ -354,7 +355,8 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        clusterdata<-NULL
        if (is.something(cluster))
          clusterdata<-data[[jmvcore::toB64(cluster)]]
-       data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
+       if ("dep_scale" %in% names(options))
+           data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
      }
        if ( any(is.na(data[[dep]])) ) {
           nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))

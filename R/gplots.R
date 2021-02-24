@@ -464,9 +464,9 @@ gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,p
   color <- theme$color[1]
   alpha <- 0.4
   data<-data.frame()
-  data <- as.data.frame(rstandard(model))
+  data <- as.data.frame(stats::rstandard(model))
   names(data)<-"x"
-  ndata<-as.data.frame(rnorm(1000,mean(data$x),sd(data$x)))
+  ndata<-as.data.frame(stats::rnorm(1000,mean(data$x),stats::sd(data$x)))
   names(ndata)<-"norm"
   #  library(ggplot2)
   plot <- ggplot(data=data, aes(x=x)) +
@@ -474,7 +474,7 @@ gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,p
   
   plot <- plot + geom_histogram(aes(y=..density..), position="identity",
                                 stat="bin", color=color, fill=fill)
-  plot <- plot + stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
+  plot <- plot + stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))  
   
   themeSpec <- theme(axis.text.y=element_blank(),
                      axis.ticks.y=element_blank())

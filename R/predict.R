@@ -190,7 +190,7 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
     ff[,name]<-as.character(ff[,name])
     params[,name]<-as.character(params[,name])
   }
-  if (class(model)=="lm") {
+  if (.which.class(model)=="lm") {
     ff$etaSqP<-ff$F.ratio*ff$df1/(ff$F.ratio*ff$df1+ff$df2)
     ff$omegaSq<-(ff$F.ratio-1)*ff$df1/(ff$F.ratio*ff$df1+ff$df2+1)
     ff$omegaSq[ff$omegaSq<0]<-0  
@@ -198,8 +198,8 @@ pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
     ff$epsilonSq[ff$epsilonSq<0]<-0  
     
     ## eta squared
-    SS<-anova(model)
-    SSerr<-sigma(model)^2*model$df.residual
+    SS<-stats::anova(model)
+    SSerr<-stats::sigma(model)^2*model$df.residual
     SStot<-sum(SS$`Sum Sq`)
     SSe<-(ff$etaSqP/(1-ff$etaSqP))*SSerr
     ff$etaSq<-SSe/SStot

@@ -35,6 +35,7 @@ gamljMixed(
   simpleScaleLabels = "labels",
   postHocCorr = list("bonf"),
   scaling = NULL,
+  dep_scale = "none",
   cluster = NULL,
   randomTerms = list(list()),
   correlatedEffects = "corr",
@@ -49,7 +50,6 @@ gamljMixed(
   residPlot = FALSE,
   clusterBoxplot = FALSE,
   randHist = FALSE,
-  dep_scale = "none",
   formula
 )
 }
@@ -144,6 +144,8 @@ respectively}
 \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
 
+\item{dep_scale}{Re-scale the dependent variable.}
+
 \item{cluster}{a vector of strings naming the clustering variables from
 \code{data}}
 
@@ -186,8 +188,6 @@ boxplot of random effects by the first defined clustering variable}
 
 \item{randHist}{\code{TRUE} or \code{FALSE} (default), provide histogram of
 random Coefficients}
-
-\item{dep_scale}{Re-scale the dependent variable.}
 
 \item{formula}{(optional) the formula to use, see the examples}
 }

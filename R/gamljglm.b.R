@@ -455,7 +455,7 @@ gamljGLMClass <- R6::R6Class(
   ss<-summary(model)
   tt<-ss$coefficients[1,3]
   f<-tt^2
-  df<-df.residual(model)
+  df<-stats::df.residual(model)
   p<-ss$coefficients[1,4]
   peta<-effectsize::t_to_eta2(tt,df_error = df)
   omega<-effectsize::t_to_omega2(tt,df_error = df)
@@ -473,10 +473,12 @@ gamljGLMClass <- R6::R6Class(
   if (!self$options$effectSizeInfo) 
     return()
   ano<-car::Anova(model,type=3)
-  eta<-effectsize::eta_squared(ano,partial = F,ci=ciWidth)
-  peta<-effectsize::eta_squared(ano,partial = T,ci=ciWidth)
-  omega<-  effectsize::omega_squared(ano,partial = T,ci=ciWidth)
-  epsilon<-  effectsize::epsilon_squared(ano,partial = T,ci=ciWidth)
+  suppressWarnings({
+      eta<-effectsize::eta_squared(ano,partial = F,ci=ciWidth)
+      peta<-effectsize::eta_squared(ano,partial = T,ci=ciWidth)
+      omega<-  effectsize::omega_squared(ano,partial = T,ci=ciWidth)
+      epsilon<-  effectsize::epsilon_squared(ano,partial = T,ci=ciWidth)
+  })
   aTable<-self$results$main$effectSizeTable
   j<-1
   i<-1

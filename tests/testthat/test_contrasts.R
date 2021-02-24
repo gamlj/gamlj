@@ -6,18 +6,18 @@ fivegroups$Group<-factor(fivegroups$Group)
 mod<-gamlj::gamljGLM(formula = Score ~ Group,  data = fivegroups,
                       contrasts = list(list(var="Group",type="deviation")))
 
-test_that("deviation works",{
-expect_equal(as.character(mod$main$fixed$asDF[3,2]),  "3 - ( 1, 2, 3, 4 )")        
-expect_equal(round(mod$main$fixed$asDF[3,3],digits=3),  0.097)        
+testthat::test_that("deviation works",{
+  testthat::expect_equal(as.character(mod$main$fixed$asDF[3,2]),  "3 - ( 1, 2, 3, 4 )")        
+  testthat::expect_equal(round(mod$main$fixed$asDF[3,3],digits=3),  0.097)        
 }
 )
 
 
 mod<-gamlj::gamljGLM(formula = Score ~ Group,  data = fivegroups)
 
-test_that("simple works",{
-  expect_equal(as.character(mod$main$fixed$asDF[3,2]),  "3 - 1")        
-  expect_equal(round(mod$main$fixed$asDF[3,3],digits=3),  0.244)        
+testthat::test_that("simple works",{
+  testthat::expect_equal(as.character(mod$main$fixed$asDF[3,2]),  "3 - 1")        
+  testthat::expect_equal(round(mod$main$fixed$asDF[3,3],digits=3),  0.244)        
 }
 )
 
@@ -147,7 +147,7 @@ test_that("simple works",{
 
 mod<-gamlj::gamljGzlm(formula = Score ~ Group,  data = fivegroups,
                      contrasts = list(list(var="Group",type="dummy")))
-mod
+
 test_that("dummy works",{
   expect_equal(as.character(mod$main$fixed$asDF[3,2]),  "3 - 1")        
   expect_equal(round(mod$main$fixed$asDF[3,3],digits=3),  0.244)        

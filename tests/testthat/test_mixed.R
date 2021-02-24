@@ -21,7 +21,7 @@ testthat::test_that("info is ok", {
 ftable<-model$main$anova$asDF
 
 testthat::test_that("f-table is ok", {
-  expect_equal(ftable[1,4],2949)
+  testthat::expect_equal(ftable[1,4],2949)
 })
 
 ptable<-model$main$fixed$asDF
@@ -70,7 +70,7 @@ model<-gamlj::gamljMixed(
 ftable<-model$main$anova$asDF
 
 testthat::test_that("list interface is ok", {
-  expect_equal(ftable[1,4],2949)
+  testthat::expect_equal(ftable[1,4],2949)
 })
 
 
@@ -156,7 +156,6 @@ model<-gamlj::gamljMixed(
   scaling = list(list(
     var="beer",
     type="standardized")))
-model
 
 testthat::test_that("standardizing", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.8506,tolerance = .002)
@@ -167,7 +166,7 @@ model<-gamlj::gamljMixed(
   data = data,
   scaling = list(list(
     var="beer",
-    type="cluster-based-standardized")))
+    type="clusterbasedstandardized")))
 
 testthat::test_that("cluster-based-standardizing", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.6111,tolerance = .002)
@@ -178,9 +177,9 @@ model<-gamlj::gamljMixed(
   data = data,
   scaling = list(list(
     var="beer",
-    type="cluster-based centered")))
+    type="clusterbasedcentered")))
 
-testthat::test_that("cluster-based centering", {
+testthat::test_that("cluster-based-centering", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.6070,tolerance = .002)
 })
 

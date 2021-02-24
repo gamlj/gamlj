@@ -24,14 +24,6 @@ testthat::test_that("glm estimates are correct", {
   testthat::expect_equal(as.numeric(as.character(mod$info$asDF[[2]][[6]])),0.0459,tolerance=tol)
 })
 
-mod<-gamlj::gamljGLM(
-  data = hsbdemo,
-  formula=science~math+schtyp+math:schtyp,
-  ciWidth=90,
-  simpleVariable = "math",
-  simpleModerator = "schtyp",
-  plotHAxis = "math"
-)
 
 mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
@@ -56,44 +48,34 @@ testthat::test_that("contrasts are correct", {
 
 se.params<-mod$simpleEffects$Params$asDF
 
-mod<-gamlj::gamljGLM(
-  formula = science ~ math + schtyp + schtyp:math,
-  data = hsbdemo,
-  contrasts = list(list(
-    var="schtyp",
-    type="deviation"))
-)
-
-res<-mod$main$fixed$asDF
-library(testthat)
-test_that("glm contrasts", {
-  expect_equal(round(res[3,3],2),-0.11)
-  expect_equal(round(res[1,3],2),51.96)
-})
-test_that("gzlm anova simple effects", {
-  expect_equal(as.character(se.params[1,1]),"enrolled")
-  expect_equal(round(se.params[2,4],3),0.915)
-})
-
-test_that("gzlm plot", {
-  expect_is(mod$descPlot,"Image")
-})
-
-test_that("gzlm CI width", {
-  expect_equal(round(mod$main$fixed$asDF[2,5],3),0.468)
-})
 
 mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   modelSelection = "logistic",
-  postHoc =  "honors"
+  postHoc =  "honors",
+  plotHAxis = "write"
 )
 
 
 testthat::test_that("gzlm posthoc", {
   testthat::expect_equal(round(mod$postHocs[[1]]$asDF[[5]],3),1.635)
   testthat::expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
+})
+
+res<-mod$main$fixed$asDF
+
+testthat::test_that("glm contrasts", {
+  testthat::expect_equal(round(res[3,3],2),0.19)
+  testthat::expect_equal(round(res[1,3],2),1.36)
+})
+
+testthat::test_that("gzlm plot", {
+  testthat::expect_is(mod$descPlot,"Image")
+})
+
+testthat::test_that("gzlm CI width", {
+  testthat::expect_equal(round(mod$main$fixed$asDF[2,5],3),0.978)
 })
 
 
