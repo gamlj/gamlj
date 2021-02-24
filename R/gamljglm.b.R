@@ -139,7 +139,6 @@ gamljGLMClass <- R6::R6Class(
       ##### clean the data ####
       data<-private$.cleandata()
       data<-mf.checkData(self$options,data)
-      mark(data)
       if (!is.data.frame(data))
         jmvcore::reject(data)
 
@@ -235,7 +234,6 @@ gamljGLMClass <- R6::R6Class(
         # anova table ##
                 ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
                  if (length(modelTerms)>0) {
-                       mark(anova_res)
                        rawlabels<-names(anova_res)
                        labels<-n64$nicenames(rawlabels)
                        trows<-dim(anova_res)[1]-1
@@ -483,14 +481,10 @@ gamljGLMClass <- R6::R6Class(
   j<-1
   i<-1
   for (i in seq_along(eta$Parameter)) {
-    stat<-eta
-    aTable$setRow(rowNo=j,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
-    stat<-peta
-    aTable$setRow(rowNo=j+1,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
-    stat<-omega
-    aTable$setRow(rowNo=j+2,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
-    stat<-epsilon
-    aTable$setRow(rowNo=j+3,list(estimate=stat[[2]][i],cilow=stat$CI_low[i],cihig=stat$CI_high[i]))
+       aTable$setRow(rowNo=j,list(estimate=eta[[2]][i],cilow=eta$CI_low[i],cihig=eta$CI_high[i]))
+       aTable$setRow(rowNo=j+1,list(estimate=peta[[2]][i],cilow=peta$CI_low[i],cihig=peta$CI_high[i]))
+       aTable$setRow(rowNo=j+2,list(estimate=omega[[2]][i],cilow=omega$CI_low[i],cihig=omega$CI_high[i]))
+       aTable$setRow(rowNo=j+3,list(estimate=epsilon[[2]][i],cilow=epsilon$CI_low[i],cihig=epsilon$CI_high[i]))
     j<-j+4
   }
 
