@@ -18,15 +18,12 @@ gamljGLMClass <- R6::R6Class(
       ciWidth<-self$options$paramCIWidth
       
       ### here we initialize the info table ####
-      getout<-FALSE
       infoTable<-self$results$info
 
       if (is.null(self$options$dep)) {
         infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
-        getout<-TRUE
-      }
-      if (getout)
         return()
+      }
       
       # this allows intercept only model to be passed by syntax interface
       aOne<-which(unlist(modelTerms)=="1")
@@ -170,7 +167,6 @@ gamljGLMClass <- R6::R6Class(
 
                if ("beta" %in% self$options$effectSize) {
                          ginfo("computing betas...")
-                        .beta<-NA
                         zdata<-data
                         zdata[[jmvcore::toB64(dep)]]<-scale(zdata[[jmvcore::toB64(dep)]])
                         for (var in covs)
@@ -459,10 +455,7 @@ gamljGLMClass <- R6::R6Class(
   p<-ss$coefficients[1,4]
   peta<-effectsize::t_to_eta2(tt,df_error = df)
   omega<-effectsize::t_to_omega2(tt,df_error = df)
-  tt<-3
-  df<-33
   epsilon<-effectsize::t_to_epsilon2(tt,df_error = df)
-  
   tableRow<-list(df=df,f=f,etaSqP=peta$Eta_Sq_partial,omegaSq=omega$Omega_Sq_partial,epsilonSq=epsilon$Epsilon2_partial,p=p)
   aTable<-self$results$main$interceptTable
   aTable$setRow(rowNo=1,tableRow)
@@ -473,12 +466,10 @@ gamljGLMClass <- R6::R6Class(
   if (!self$options$effectSizeInfo) 
     return()
   ano<-car::Anova(model,type=3)
-  suppressWarnings({
-      eta<-effectsize::eta_squared(ano,partial = F,ci=ciWidth)
-      peta<-effectsize::eta_squared(ano,partial = T,ci=ciWidth)
-      omega<-  effectsize::omega_squared(ano,partial = T,ci=ciWidth)
-      epsilon<-  effectsize::epsilon_squared(ano,partial = T,ci=ciWidth)
-  })
+      eta<-effectsize::eta_squared(ano,partial = F,ci=ciWidth,verbose=F)
+      peta<-effectsize::eta_squared(ano,partial = T,ci=ciWidth,verbose=F)
+      omega<-  effectsize::omega_squared(ano,partial = T,ci=ciWidth,verbose=F)
+      epsilon<-  effectsize::epsilon_squared(ano,partial = T,ci=ciWidth,verbose=F)
   aTable<-self$results$main$effectSizeTable
   j<-1
   i<-1
@@ -532,6 +523,8 @@ gamljGLMClass <- R6::R6Class(
 .formula=function() {
   jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
 },
+
+
 .sourcifyOption = function(option) {
 
   name <- option$name
@@ -554,6 +547,8 @@ gamljGLMClass <- R6::R6Class(
     }
     if (length(value) == 0)
       return('')
+    vec<-paste0("scaling=c(",paste(sapply(value,function(a) paste0(a$var," = '",a$type,"'")),collapse=", "),")")
+    return(vec)
   }
    if (name == 'contrasts') {
     i <- 1
@@ -566,7 +561,12 @@ gamljGLMClass <- R6::R6Class(
     }
     if (length(value) == 0)
       return('')
-  }  else if (name == 'postHoc') {
+    vec<-paste0("contrasts=c(",paste(sapply(value,function(a) paste0(a$var," = '",a$type,"'")),collapse=", "),")")
+    return(vec)
+    
+  }  
+  
+  if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }

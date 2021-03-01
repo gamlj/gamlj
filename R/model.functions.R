@@ -187,19 +187,17 @@ mf.anova<- function(x,...) UseMethod(".anova")
   }
   
 .anova.lm<-function(model) {
-    ano<-car::Anova(model,test="F",type=3, singular.ok=T)
-    colnames(ano)<-c("ss","df","f","p")
-    dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
-    tots<-list(ss=sum(ano$ss),df=sum(ano$df))
-    reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
-    ss<-summary(model)
-    p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
-    suppressWarnings({
+        ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+        colnames(ano)<-c("ss","df","f","p")
+        dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
+        tots<-list(ss=sum(ano$ss),df=sum(ano$df))
+        reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
+        ss<-summary(model)
+        p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
         modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
         modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
         modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-    })
-    mods<-list(ss=sum(dss$ss),
+        mods<-list(ss=sum(dss$ss),
                df= ss$fstatistic[[2]],
                f=ss$fstatistic[[1]],
                p=p,
@@ -207,25 +205,24 @@ mf.anova<- function(x,...) UseMethod(".anova")
                omegaSq=modomega[[1]],
                epsilonSq=modepsilon[[1]])
     
-    etap<-effectsize::eta_squared(model,partial = T)
-    eta<-effectsize::eta_squared(model,partial = F)
-    eps<-effectsize::epsilon_squared(model,partial = T)
-    omega<-effectsize::omega_squared(model,partial = T)
-    epsilon<-effectsize::epsilon_squared(model,partial = T)
-    dss$etaSq<-eta[,2]
-    dss$etaSqP<-etap[,2]
-    dss$omegaSq<-omega[,2]
-    dss$epsilonSq<-epsilon[,2]
-    reslist<-listify(dss)
-    reslist<-append_list(reslist,reds,"Residuals")
-    reslist<-append_list(reslist,tots,"Totals")
-    reslist<-prepend_list(reslist,mods,"Model")
+        etap<-effectsize::eta_squared(model,partial = T,verbose = F)
+        eta<-effectsize::eta_squared(model,partial = F,verbose = F)
+        eps<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        omega<-effectsize::omega_squared(model,partial = T,verbose = F)
+        epsilon<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        dss$etaSq<-eta[,2]
+        dss$etaSqP<-etap[,2]
+        dss$omegaSq<-omega[,2]
+        dss$epsilonSq<-epsilon[,2]
+        reslist<-listify(dss)
+        reslist<-append_list(reslist,reds,"Residuals")
+        reslist<-append_list(reslist,tots,"Totals")
+        reslist<-prepend_list(reslist,mods,"Model")
     reslist
 }
 
 .anova.glmerMod<-function(model,df="Satterthwaite") {
-  mark("using .anova.glmerMod")
-  ginfo(".anova.glmerMod")
+  ginfo("using .anova.glmerMod")
   ano<-.car.anova(model)
   names(ano)<-c("test","df1","p")
   ano  
@@ -470,7 +467,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
      if (method=="wald")
                method<-"Wald"
      
-      mark(paste("C.I for glmerMod with method",method))
       ci<-try(stats::confint(model,method=method,level=level))
       if (jmvcore::isError(ci)) 
         return(.confint.format(ci,parameters))
@@ -484,7 +480,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
   }
 
 .confint.glmerMod<-function(model,level,parameters,method="wald")  {
-  mark(paste("C.I for glmerMod with method",method))
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)
@@ -515,7 +510,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
   .confint.format(cim,parameters)
 
 }
-
 
 
 ########### to be removed and update with mi.xxx #########

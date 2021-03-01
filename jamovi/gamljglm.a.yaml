@@ -5,6 +5,7 @@ menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
 completeWhenFilled: false
+export: false
 description:
     main: General Linear Model
     R:
@@ -135,9 +136,9 @@ options:
                 default: simple
       description:
           R: >
-            a list of lists specifying the factor and type of contrast to use,
-            one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
-            `'repeated'` or `'polynomial'`. If NULL, `simple` is used.
+            a named vector of the form `c(var1="type", var2="type2")` specifying the type of contrast to use,
+            one of `'deviation'`, `'simple'`, `'dummy'`, `'difference'`, `'helmert'`,
+            `'repeated'` or `'polynomial'`. If NULL, `simple` is used. Can also be passed as a list of list of the form list(list(var="var1",type="type1")).
 
 
     - name: showRealNames
@@ -237,7 +238,7 @@ options:
       type: Terms
       default:
       description:
-          R: a list of terms to perform post-hoc tests on.
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
 
 
     - name: eDesc
@@ -353,8 +354,8 @@ options:
           - bonf
       description:
           R: >
-            one or more of `'none'`,  `'bonf'`, or
-            `'holm'`; provide no,  Bonferroni, and
+            one or more of `'none'`,  `'bonf'`,`'tukey'` 
+            `'holm'`; provide no,  Bonferroni, Tukey and
             Holm Post Hoc corrections respectively.
 
     - name: scaling
@@ -383,8 +384,8 @@ options:
                 default: centered 
       description:
           R: >
-            a list of lists specifying the covariates scaling,
-            one of `'centered'` to the mean, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates:
+            one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is
 
 
 ######### specs here ##########
@@ -478,7 +479,7 @@ options:
             name: 'none'
           - title: Centered
             name:  'centered'
-          - title: Standardized
+          - title: z-scores
             name:  'Standardized'
           - title: Log
             name: 'log'

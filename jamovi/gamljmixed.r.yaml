@@ -305,13 +305,7 @@ items:
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    items:
-            - name: Anova
-              title: Simple Effects ANOVA
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
+    clearWith:
                  - dep
                  - modelTerms
                  - reml
@@ -328,6 +322,13 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
               columns:
                  - name: threeway
                    title: ""
@@ -362,16 +363,6 @@ items:
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
-              clearWith:
-                     - dep
-                     - cluster
-                     - modelTerms
-                     - contrasts
-                     - fixedIntercept
-                     - simpleScale
-                     - ciWidth
-                     - dep_scale
-                     
               columns:
                      - name: threeway
                        title: " "

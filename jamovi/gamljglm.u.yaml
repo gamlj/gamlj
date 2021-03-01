@@ -65,7 +65,6 @@ children:
             type: CheckBox
             optionPart: epsilon
             optionName: effectSize
-
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -106,11 +105,10 @@ children:
                   change: './gamlj.events::onChange_modelTerms'
                 template:
                   type: TermLabel
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: CheckBox
-            name: fixedIntercept
+      - type: CheckBox
+        name: fixedIntercept
+            
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -210,11 +208,10 @@ children:
                     optionName: simpleScaleLabels
                     optionPart: values_labels
           - type: Label
-            label: Dependent variable 
+            label: Dependent variable
             children:
-                     - type: ComboBox
-                       name: dep_scale
-
+              - type: ComboBox
+                name: dep_scale
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -384,7 +381,7 @@ children:
         name: qq
         label: Q-Q plot of residuals
       - type: CheckBox
-        name:  normPlot
+        name: normPlot
         label: Residuals histogram
       - type: CheckBox
         name: residPlot

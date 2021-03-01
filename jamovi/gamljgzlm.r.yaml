@@ -261,13 +261,7 @@ items:
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    items:
-            - name: Anova
-              title: Simple Effects ANOVA
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
+    clearWith:
                  - dep
                  - modelTerms
                  - contrasts
@@ -284,6 +278,12 @@ items:
                  - custom_family
                  - custom_link
 
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
               columns:
                  - name: threeway
                    title: ""
@@ -307,17 +307,6 @@ items:
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
-              clearWith:
-                     - dep
-                     - modelTerms
-                     - contrasts
-                     - fixedIntercept
-                     - simpleScale
-                     - ciWidth
-                     - modelSelection
-                     - custom_family
-                     - custom_link
-
               columns:
                      - name: dep
                        title: "Response Contrasts"

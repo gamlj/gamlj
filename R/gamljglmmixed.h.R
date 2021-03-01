@@ -782,29 +782,29 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="simpleEffects",
-                            title="Simple Effects")
+                            title="Simple Effects",
+                            clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "contrasts",
+                    "scaling",
+                    "randomTerms",
+                    "correlatedEffects",
+                    "fixedIntercept",
+                    "simpleVariable",
+                    "simpleModerator",
+                    "simple3way",
+                    "simpleScale",
+                    "cvalue",
+                    "percvalue",
+                    "simpleScaleLabels",
+                    "nAGQ",
+                    "cimethod"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="Anova",
                             title="Simple Effects ANOVA",
                             visible=FALSE,
-                            clearWith=list(
-                                "dep",
-                                "modelTerms",
-                                "contrasts",
-                                "scaling",
-                                "randomTerms",
-                                "correlatedEffects",
-                                "fixedIntercept",
-                                "simpleVariable",
-                                "simpleModerator",
-                                "simple3way",
-                                "simpleScale",
-                                "cvalue",
-                                "percvalue",
-                                "simpleScaleLabels",
-                                "nAGQ",
-                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="threeway", 
@@ -835,16 +835,6 @@ gamljGlmMixedResults <- if (requireNamespace('jmvcore')) R6::R6Class(
                             name="Params",
                             title="Parameter Estimates for simple effects",
                             visible=FALSE,
-                            clearWith=list(
-                                "dep",
-                                "cluster",
-                                "modelTerms",
-                                "contrasts",
-                                "fixedIntercept",
-                                "simpleScale",
-                                "ciWidth",
-                                "nAGQ",
-                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="threeway", 

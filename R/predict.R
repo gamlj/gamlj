@@ -106,83 +106,101 @@ pred.means<-function(model,terms,cov_conditioning=conditioning$new(),interval=95
 
 pred.simpleEstimates<- function(x,...) UseMethod(".simpleEstimates")
 
-.simpleEstimates.glmerMod<-function(model,variable,moderator,threeway=NULL,
+.simpleEstimates.glmerMod<-function(model,
+                                    variable,
+                                    moderator,
+                                    threeway=NULL,
+                                    cov_conditioning=conditioning$new(),
+                                    interval=95) {
+                                                 .simpleEstimates.glm(model,
+                                                                      variable,
+                                                                      moderator,
+                                                                      threeway=threeway,
+                                                                      cov_conditioning=cov_conditioning,
+                                                                      interval=interval)
+                                    }
+
+.simpleEstimates.glm<-function(model,
+                               variable,
+                               moderator,
+                               threeway=NULL,
                                cov_conditioning=conditioning$new(),
                                interval=95) {
+             
+           tables<-.simpleEstimates.default(model,
+                                            variable,
+                                            moderator,
+                                            threeway=threeway,
+                                            cov_conditioning=cov_conditioning,
+                                            interval=interval)
+           params<-tables[[1]]
+           params$expb<-exp(params$estimate)
+           params$lower.ECL<-exp(params$lower.CL) 
+           params$upper.ECL<-exp(params$upper.CL)
+           tables[[1]]<-params
+           tables
+}
 
-  .simpleEstimates.glm(model,variable,moderator,threeway=threeway,
-                           cov_conditioning=cov_conditioning,interval=interval)
-}  
-.simpleEstimates.glm<-function(model,variable,moderator,threeway=NULL,
+.simpleEstimates.default<-function(model,
+                                   variable,
+                                   moderator,
+                                   threeway=NULL,
                                    cov_conditioning=conditioning$new(),
                                    interval=95) {
-  tables<-.simpleEstimates.default(model,variable,moderator,threeway=threeway,
-                           cov_conditioning=cov_conditioning,interval=interval)
-  params<-tables[[1]]
-  params$expb<-exp(params$estimate)
-  params$lower.ECL<-exp(params$lower.CL)
-  params$upper.ECL<-exp(params$upper.CL)
-  tables[[1]]<-params
-  tables
-}
-.simpleEstimates.default<-function(model,variable,moderator,threeway=NULL,
-           cov_conditioning=conditioning$new(),
-           interval=95) {
-
-  ginfo(paste("simple effects estimation for generic model on",paste(class(model),collapse = " ") ))
-  data<-mf.getModelData(model)
-  preds<-unlist(c(moderator,threeway))
-  lnames<-c("moderator","threeway")[1:length(preds)]
+ 
+               ginfo(paste("simple effects estimation for generic model on",paste(class(model),collapse = " ") ))
+               data<-mf.getModelData(model)
+               preds<-unlist(c(moderator,threeway))
+               lnames<-c("moderator","threeway")[1:length(preds)]
   
-  if (is.factor(data[[variable]])) {
-    
-    emm<-rawMeans(model,
+        if (is.factor(data[[variable]])) {
+                   emm<-rawMeans(model,
                    unlist(c(variable,moderator,threeway)),
                    cov_conditioning = cov_conditioning,
                    interval=interval)
-    est<-emmeans::contrast(emm,method = .internal.emmc,by = preds,data=data,variable=variable)
-    ci<-stats::confint(est,level = interval/100)
+                   est<-emmeans::contrast(emm,method = .internal.emmc,by = preds,data=data,variable=variable)
+                   ci<-stats::confint(est,level = interval/100)
     
     ####### rename ci variables because emmeans changes them for different models
-    wci<-dim(ci)[2]
-    ci<-ci[,c(wci-1,wci)]
-    names(ci)<-c("lower.CL","upper.CL")  
+                   wci<-dim(ci)[2]
+                   ci<-ci[,c(wci-1,wci)]
+                   names(ci)<-c("lower.CL","upper.CL")  
     ################################
     
-    params<-cbind(as.data.frame(est),ci)
-    params<-.fixLabels(params,preds,cov_conditioning)
-    params$contrast<-as.character(params$contrast)
-    names(params)[2:(1+length(lnames))]<-lnames
+                   params<-cbind(as.data.frame(est),ci)
+                   params<-.fixLabels(params,preds,cov_conditioning)
+                   params$contrast<-as.character(params$contrast)
+                   names(params)[2:(1+length(lnames))]<-lnames
 
-  } else {
-    condlist<-cov_conditioning$values(preds,decode=T)
-    lev<-interval/100
+        } else {
+                   condlist<-cov_conditioning$values(preds,decode=T)
+                   lev<-interval/100
 #    est<-emmeans::emtrends(model,specs=preds,var=variable,at=condlist,options=list(level=lev))
 #    emmeans::emm_options(ref_grid = list(level = .90))
-    args<-list(model,specs=preds,var=variable,at=condlist,options=list(level=lev))
-    est<-do.call(emmeans::emtrends,args)
-    ci<-as.data.frame(est)
+                   args<-list(model,specs=preds,var=variable,at=condlist,options=list(level=lev))
+                   est<-do.call(emmeans::emtrends,args)
+                   ci<-as.data.frame(est)
     ####### rename ci variables because emmeans changes them for different models
-    wci<-dim(ci)[2]
-    ci<-ci[,c(wci-1,wci)]
-    names(ci)<-c("lower.CL","upper.CL")  
+                   wci<-dim(ci)[2]
+                   ci<-ci[,c(wci-1,wci)]
+                   names(ci)<-c("lower.CL","upper.CL")  
     ################################
-    params<-cbind(emmeans::test(est),ci)
-    params<-.fixLabels(params,preds,cov_conditioning)
-    names(params)[1:(length(lnames)+1)]<-c(lnames,"estimate")
+                   params<-cbind(emmeans::test(est),ci)
+                   params<-.fixLabels(params,preds,cov_conditioning)
+                   names(params)[1:(length(lnames)+1)]<-c(lnames,"estimate")
     }
   
 
-  ff<-emmeans::test(est,joint=T,by=preds)
-  ff<-.fixLabels(ff,preds,cov_conditioning)
+                   ff<-emmeans::test(est,joint=T,by=preds)
+                   ff<-.fixLabels(ff,preds,cov_conditioning)
   ### For some model emmeans returns F with df2=Inf, which means Chi-squared/df. Let's make it explicit
-  if (ff$df2[1]==Inf) {
-      ff$df<-ff$df1
-      ff$chisq<-ff$F.ratio*ff$df1
-      ff$df1<-NULL
-      ff$df2<-NULL
-      ff$F.ratio<-NULL
-  }
+                   if (ff$df2[1]==Inf) {
+                        ff$df<-ff$df1
+                        ff$chisq<-ff$F.ratio*ff$df1
+                        ff$df1<-NULL
+                        ff$df2<-NULL
+                        ff$F.ratio<-NULL
+                   }
       
 
   names(ff)[1:length(lnames)]<-lnames
