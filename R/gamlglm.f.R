@@ -7,6 +7,7 @@
 #' gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 #'
 #' @param data the data as a data frame
+#' #' @param formula (optional) the formula to use, see the examples
 #' @param dep a string naming the dependent variable from \code{data}; the
 #'   variable must be numeric. No needed if \code{formula} is used.
 #' @param factors a vector of strings naming the fixed factors from
@@ -92,7 +93,6 @@
 #' @param effectSizeInfo \code{TRUE} or \code{FALSE} (default), provide
 #'   ìnformation about the effect size indexes
 #' @param dep_scale Re-scale the dependent variable.
-#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
@@ -124,6 +124,7 @@
 #' @export
 gamljGLM <- function(
   data,
+  formula,
   dep = NULL,
   factors = NULL,
   covs = NULL,
@@ -164,8 +165,8 @@ gamljGLM <- function(
   residPlot = FALSE,
   interceptInfo = FALSE,
   effectSizeInfo = FALSE,
-  dep_scale = "none",
-  formula) {
+  dep_scale = "none"
+  ) {
   
   if ( ! requireNamespace('jmvcore'))
     stop('gamljGLM requires jmvcore to be installed (restart may be required)')

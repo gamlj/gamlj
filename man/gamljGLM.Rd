@@ -6,6 +6,7 @@
 \usage{
 gamljGLM(
   data,
+  formula,
   dep = NULL,
   factors = NULL,
   covs = NULL,
@@ -43,12 +44,12 @@ gamljGLM(
   residPlot = FALSE,
   interceptInfo = FALSE,
   effectSizeInfo = FALSE,
-  dep_scale = "none",
-  formula
+  dep_scale = "none"
 )
 }
 \arguments{
-\item{data}{the data as a data frame}
+\item{data}{the data as a data frame
+#' @param formula (optional) the formula to use, see the examples}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. No needed if \code{formula} is used.}
@@ -71,9 +72,9 @@ in table}
 \item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
 
-\item{contrasts}{a named vector of the form \code{c(var1="type", var2="type2")} specifying the type of contrast to use,
-one of \code{deviation}, \code{simple}, \code{dummy}, \code{difference}, \code{helmert}, \code{repeated} or \code{polynomial}.
- If NULL, \code{simple} is used. Can also be passed as a list of list of the form \code{list(list(var="var1",type="type1"))}.}
+\item{contrasts}{a named vector of the form \code{c(var1='type', var2='type2')} specifying the type of contrast to use,
+one of \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'}, \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}.
+ If NULL, \code{'simple'} is used. Can also be passed as a list of list of the form \code{list(list(var='var1',type='type1'))}.}
 
 \item{showRealNames}{\code{TRUE} or \code{FALSE} (default), shows raw names
 of the contrasts variables}
@@ -103,7 +104,7 @@ plots, respectively.}
 \item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width for the plots.}
 
-\item{postHoc}{a list of terms to perform post-hoc tests on.}
+\item{postHoc}{a rhs formula with the terms specifying the table to apply the comparisons (of the form \code{'~x+x:z'}}
 
 \item{eDesc}{\code{TRUE} or \code{FALSE} (default), provide lsmeans
 statistics}
@@ -139,7 +140,7 @@ appear in tables and plots: \code{labels}, \code{values} and
 \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 respectively.}
 
-\item{scaling}{a named vector of the form \code{c(var1="type1",var2="type2")}. Types are
+\item{scaling}{a named vector of the form \code{c(var1='type1',var2='type2')}. Types are
 \code{'centered'} to the mean, \code{'standardized'}, log-transformed \code{'log'} or \code{'none'}.
 \code{'none'} leaves the variable as it is. It can also be passed as a list of lists.}
 
@@ -171,8 +172,6 @@ scatterplot of the residuals against predicted}
 ìnformation about the effect size indexes}
 
 \item{dep_scale}{Re-scale the dependent variable.}
-
-\item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
 A results object containing:

@@ -5,6 +5,7 @@ data("qsport")
 obj<-gamlj::gamljGLM(
     formula = performance ~ hours,
     data = qsport)
+
 preds<-gamlj_predict(obj)
 reds<-gamlj_residuals(obj)
 n<-dim(gamlj_data(obj))[1]
@@ -29,6 +30,17 @@ cc<-zobj$main$fixed$asDF[2,]
 testthat::test_that("standardizing", {
   testthat::expect_equal(cc[[2]],cc[[6]])
 })
+
+zobj2<-gamlj::gamljGLM(
+  formula = z ~ hours,
+  data = qsport,
+  scaling=c("hours"="standardized"))
+
+test<-all(zobj$main$fixed$asDF[2,]==zobj2$main$fixed$asDF[2,])
+testthat::test_that("standardizing", {
+  testthat::expect_true(test)
+})
+
 
 upd<-gamlj_update(obj,scaling=newopt,effectSize = c("beta", "partEta", "omega"))
 res1<-upd$main$fixed$asDF

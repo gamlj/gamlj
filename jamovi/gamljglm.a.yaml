@@ -384,8 +384,8 @@ options:
                 default: centered 
       description:
           R: >
-             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates:
-            one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is
+             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
+             one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
 
 ######### specs here ##########

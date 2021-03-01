@@ -141,12 +141,14 @@ gposthoc.populate<-function(model,options,tables) {
   #  term<-jmvcore::composeTerm(term)
   termf<-stats::as.formula(paste("~",term))
   data<-mf.getModelData(model)
-  referenceGrid<-emmeans::emmeans(model, termf,type = "response",data=data)
-  terms<-jmvcore::decomposeTerm(term)
-  labs<-referenceGrid@grid[terms]
-  newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
-  referenceGrid@grid[terms]<-newlabs  
-  table<-summary(graphics::pairs(referenceGrid),adjust=adjust)
+  suppressMessages({
+             referenceGrid<-emmeans::emmeans(model, termf,type = "response",data=data) 
+             terms<-jmvcore::decomposeTerm(term)
+             labs<-referenceGrid@grid[terms]
+             newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
+             referenceGrid@grid[terms]<-newlabs  
+             table<-summary(graphics::pairs(referenceGrid),adjust=adjust)
+  })
   table[order(table$contrast),]
 }
 
@@ -156,12 +158,16 @@ gposthoc.populate<-function(model,options,tables) {
     dep<-jmvcore::composeTerm(dep)
     tterm<-stats::as.formula(paste("~",paste(dep,term,sep = "|")))  
     data<-mf.getModelData(model)
-    referenceGrid<-emmeans::emmeans(model,tterm,transform = "response",data=data)
-    terms<-jmvcore::decomposeTerm(term)
-    labs<-referenceGrid@grid[terms]
-    newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
-    referenceGrid@grid[terms]<-newlabs  
-    res<-summary(graphics::pairs(referenceGrid, by=dep, adjust=adjust))
+    suppressMessages({
+      
+            referenceGrid<-emmeans::emmeans(model,tterm,transform = "response",data=data)
+            terms<-jmvcore::decomposeTerm(term)
+            labs<-referenceGrid@grid[terms]
+            newlabs<-sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
+            referenceGrid@grid[terms]<-newlabs  
+            res<-summary(graphics::pairs(referenceGrid, by=dep, adjust=adjust))
+            
+    })
     res<-as.data.frame(res)
     res[,dep]<-NULL
     res
