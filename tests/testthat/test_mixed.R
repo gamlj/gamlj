@@ -122,14 +122,22 @@ adddata<-subjects_by_stimuli
 adddata$x<-rnorm(length(adddata$nrow))
 
 formula<-y~1+cond+x+(1+cond|subj)+(1|stimulus)
+adddata$cond<-factor(adddata$cond)
+model<-gamlj::gamljMixed(
+  formula =formula,
+  data = adddata, 
+  scaling = c(x="standardized")
+  
+)
+
+testthat::test_that("standardizing with more clusters",
+                    testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
+)
 
 model<-gamlj::gamljMixed(
   formula =formula,
   data = adddata, 
-  scaling = list(list(
-    var="x",
-    type="standardized"))
-  
+  scaling = c("x"="clusterbasedstandardized")
 )
 
 testthat::test_that("standardizing with more clusters",

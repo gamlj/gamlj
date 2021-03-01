@@ -220,7 +220,6 @@ lf.scaleContinuous<-function(var,method,by=NULL) {
     else
       var<-log(var)
   }
-  
   as.numeric(var)
 }
 

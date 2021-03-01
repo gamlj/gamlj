@@ -536,36 +536,14 @@ gamljGLMClass <- R6::R6Class(
   if (option$name %in% c('factors', 'dep', 'covs', 'modelTerms'))
     return('')
   
-  if (name == 'scaling') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'centered')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-    vec<-paste0("scaling=c(",paste(sapply(value,function(a) paste0(a$var," = '",a$type,"'")),collapse=", "),")")
+  if (name =='scaling') {
+    vec<-sourcifyList(option,"centered")
     return(vec)
   }
-   if (name == 'contrasts') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'simple')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-    vec<-paste0("contrasts=c(",paste(sapply(value,function(a) paste0(a$var," = '",a$type,"'")),collapse=", "),")")
+  if (name =='contrasts') {
+    vec<-sourcifyList(option,"simple")
     return(vec)
-    
-  }  
-  
+  }
   if (name == 'postHoc') {
     if (length(value) == 0)
       return('')

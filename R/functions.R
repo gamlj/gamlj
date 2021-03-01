@@ -69,3 +69,14 @@ listify<-function(adata) {
    names(res)<-rownames(adata)
    res
 }
+
+
+sourcifyList<-function(option,def) {
+  alist<-option$value
+  test<-all(sapply(alist,function(a) a$type)==def)
+  if (test)
+    return("")
+  paste0(option$name,"=c(",paste(sapply(alist,function(a) paste0(a$var,' = \"',a$type,'\"')),collapse=", "),")")
+}
+
+

@@ -629,7 +629,6 @@ gamljMixedClass <- R6::R6Class(
   clusters64<-names(model@cnms)
   image<-self$results$assumptions$clusterBoxplot
   for (cluster in clusters64) {
-    mark("prepareClusterBox: processing",cluster)
     label<-n64$nicenames(cluster)
     title<-paste("Clustering variable:",jmvcore::fromB64(cluster))
     id<-cluster
@@ -674,7 +673,6 @@ gamljMixedClass <- R6::R6Class(
   clusters64<-names(res)
   image<-self$results$assumptions$randHist
   for (cluster in clusters64) {
-       mark("prepareRandHist: processing",cluster)
        clusterres<-res[[cluster]]
        vars<-names(clusterres)
        for (v in vars) {
@@ -803,48 +801,24 @@ gamljMixedClass <- R6::R6Class(
   if (!is.something(value))
     return('')
 
-#  if (name == 'dep') {
-#    option$value<-paste0("'",value,"'") 
-#  }
-    
+  
   if (option$name %in% c('factors', 'dep', 'covs', 'cluster', 'modelTerms','randomTerms'))
     return('')
   
-
-    
-  if (name == 'scaling') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'centered')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
+  if (name =='scaling') {
+    vec<-sourcifyList(option,"centered")
+    return(vec)
   }
-  if (name == 'contrasts') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'simple')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-  }  else if (name == 'postHoc') {
+  if (name =='contrasts') {
+    vec<-sourcifyList(option,"simple")
+    return(vec)
+  }
+  if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }
   
-#  if (name == "randomTerms") {
-#    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
-#    newvalue<-private$.names64$translate(newvalue)
-#    return(paste0(name,"=",newvalue))
-#  }
+    
   super$.sourcifyOption(option)
 }
 ))
