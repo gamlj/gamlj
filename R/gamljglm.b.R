@@ -156,6 +156,7 @@ gamljGLMClass <- R6::R6Class(
       model<-mi.model_check(model)
       private$.model <- model
       #### save the model for R interface ####
+      attr(model,"refit")<-list(formula=n64$translate(modelFormula),command="lm",hasfamily=FALSE)
       self$results$.setModel(model)
       ### if it worked before, we skip building the tables, 
       ### otherwise we store a flag  in parameters table state so next time we know it worked

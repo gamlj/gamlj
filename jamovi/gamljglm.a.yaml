@@ -410,9 +410,10 @@ options:
           - partEta
       description:
           R: >
-            a list of effect sizes to print out. They can be: `'eta'` for eta-square,
-            `'partEta'` for partial eta-square, `'omega'` for omega-square, and `'beta'`
-            for standardized coefficients (betas). Default is `beta` and `partial eta-squared`.
+             a list of effect sizes to print out. They can be:
+              `"eta"` for eta-squared, `'partEta'` for partial eta-squared,
+             `'omega'` for partial omega-squared, `'epsilon'` for partial epsilon-squared, and `'beta'` for standardized
+             coefficients (betas). Default is `"beta"` and `"parEta"`.
           
     - name: homoTest
       title: Residual Variances Homogeneity tests
@@ -480,7 +481,7 @@ options:
           - title: Centered
             name:  'centered'
           - title: z-scores
-            name:  'Standardized'
+            name:  'standardized'
           - title: Log
             name: 'log'
 

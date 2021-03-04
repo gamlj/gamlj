@@ -60,7 +60,7 @@
 #'   \code{'custom_percent'}. Use to condition the covariates (if any)
 #' @param cvalue offset value for conditioning
 #' @param percvalue offset value for conditioning
-#' @param simpleScaleLabels .
+#' @param simpleScaleLabels style for presenting condition values of a moderator. It can be \code{'labels'} (default), \code{'values'} or \code{'labels_values'} for both.   
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 #'   respectively

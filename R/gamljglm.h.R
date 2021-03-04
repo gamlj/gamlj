@@ -289,7 +289,7 @@ gamljGLMOptions <- if (requireNamespace('jmvcore')) R6::R6Class(
                 options=list(
                     "none",
                     "centered",
-                    "Standardized",
+                    "standardized",
                     "log"),
                 default="none")
 

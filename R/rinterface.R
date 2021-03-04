@@ -14,7 +14,8 @@ gamlj_update<-function(gobj,...) {
   params<-list(...)
   funs<-list("gamljMixedOptions"=gamlj::gamljMixed,
              "gamljGLMOptions"=gamlj::gamljGLM,
-             "gamljGzlmOptions"=gamlj::gamljGzlm)
+             "gamljGzlmOptions"=gamlj::gamljGzlm,
+             "gamljGlmMixedOptions"=gamlj::gamljGlmMixed)
   cl<-class(gobj$options)[1]
   fun<-funs[[cl]]
   forms<-formals(fun)
@@ -240,7 +241,8 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #' \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}} 
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
-#' @param type the type of the residuals. cf. [stats::residuals()]
+#' @param type the type of the residuals. cf.  it can be "response" (default),"working", "deviance", "pearson",
+#' "partial", cf.  \code{\link[stats:residuals.lm]{stats::residuals.lm()}}
 #' @return a list of value
 #' @author Marcello Gallucci
 #' @examples 
@@ -252,8 +254,8 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #'  
 #' @export
 
-gamlj_residuals<-function(gobj) {
-    stats::residuals(gobj$model)
+gamlj_residuals<-function(gobj, type="response") {
+    stats::residuals(gobj$model,type=type)
 }
 
 
@@ -275,6 +277,24 @@ gamlj_residuals<-function(gobj) {
 #' @export
 
 gamlj_model<-function(gobj) {
-  gobj$model
+
+  rf<-attr(gobj$model,"refit")
+  if (!is.null(rf$lib))
+    require(rf$lib,character.only = TRUE)
+  mdl<-rf$command
+  options<-list()
+  options[["formula"]]<-rf$formula
+  options[["data"]]<-gamlj_data(gobj)
+  if (rf$hasfamily==TRUE)
+    options[["family"]]<-family(obj$model)
+  mod<-do.call(mdl,options)
+  call<-paste0(mdl,"(",options[["formula"]],",data=data")
+  mod<-mf.setModelCall(model,call)
+  if (rf$family==TRUE)
+    mod$call<-paste(mod$call,paste0(family(obj$model)[1],"('",family(obj$model)[2],"')"))
+  mod$call<-paste(mod$call,")")
+  mod  
+
 }
+
 

@@ -81,7 +81,8 @@
 #'   \code{'centered'} to the mean, \code{'clusterbasedcentered'} to the mean of each cluster, \code{'standardized'},
 #'    \code{'clusterbasedstandardized'} standardized within each cluster, log-transformed \code{'log'},  or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is. It can also be passed as a list of lists.
-#' @param dep_scale Re-scale the dependent variable.
+#' @param dep_scale Re-scale the dependent variable. It could be  \code{'centered'} to the mean, \code{'clusterbasedcentered'} to the mean of each cluster, \code{'standardized'},
+#'    \code{'clusterbasedstandardized'} standardized within each cluster, log-transformed \code{'log'},  or \code{'none'} (default).
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
 #' @param randomTerms a list of lists specifying the models random effects.

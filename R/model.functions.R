@@ -352,7 +352,8 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        clusterdata<-NULL
        if (is.something(cluster))
          clusterdata<-data[[jmvcore::toB64(cluster)]]
-       if ("dep_scale" %in% names(options))
+
+       if ("dep_scale" %in% names(options)) 
            data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
      }
        if ( any(is.na(data[[dep]])) ) {
@@ -514,7 +515,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
 
 ########### to be removed and update with mi.xxx #########
 
-
 mf.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
@@ -535,4 +535,14 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   ### to do 
   FALSE
   
+}
+
+
+########### set the model call for R in a reasonable way #########
+
+mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
+
+.setModelCall.default<-function(model,call,family=NULL) {
+  model$call<-call
+  model
 }

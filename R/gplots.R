@@ -455,44 +455,44 @@ gplots.linesMultiPlot<-function(image,ggtheme,depName,groupName,linesName=NULL,p
 ######## assumptions ######################
 
 
-.normPlot=function(image, ggtheme, theme) {
-  
-  model<-private$.model      
-  if (is.null(model) )
-    return(FALSE)
-  fill <- theme$fill[2]
-  color <- theme$color[1]
-  alpha <- 0.4
-  data<-data.frame()
-  data <- as.data.frame(stats::rstandard(model))
-  names(data)<-"x"
-  ndata<-as.data.frame(stats::rnorm(1000,mean(data$x),stats::sd(data$x)))
-  names(ndata)<-"norm"
-  #  library(ggplot2)
-  plot <- ggplot(data=data, aes(x=x)) +
-    labs(x="Residuals", y='density')
-  
-  plot <- plot + geom_histogram(aes(y=..density..), position="identity",
-                                stat="bin", color=color, fill=fill)
-  plot <- plot + stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))  
-  
-  themeSpec <- theme(axis.text.y=element_blank(),
-                     axis.ticks.y=element_blank())
-}
+# .normPlot=function(image, ggtheme, theme) {
+#   
+#   model<-private$.model      
+#   if (is.null(model) )
+#     return(FALSE)
+#   fill <- theme$fill[2]
+#   color <- theme$color[1]
+#   alpha <- 0.4
+#   data<-data.frame()
+#   data <- as.data.frame(stats::rstandard(model))
+#   names(data)<-"x"
+#   ndata<-as.data.frame(stats::rnorm(1000,mean(data$x),stats::sd(data$x)))
+#   names(ndata)<-"norm"
+#   #  library(ggplot2)
+#   plot <- ggplot(data=data, aes(x=x)) +
+#     labs(x="Residuals", y='density')
+#   
+#   plot <- plot + geom_histogram(aes(y=..density..), position="identity",
+#                                 stat="bin", color=color, fill=fill)
+#   plot <- plot + stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))  
+#   
+#   themeSpec <- theme(axis.text.y=element_blank(),
+#                      axis.ticks.y=element_blank())
+# }
 
 gplots.normPlot=function(model, ggtheme, theme) {
     
     fill <- theme$fill[2]
     color <- theme$color[1]
-    data <- as.data.frame(residuals(model))
+    data <- as.data.frame(stats::residuals(model))
     names(data)<-"x"
     #  library(ggplot2)
-    plot <- ggplot(data=data, aes(x=x)) +
+    plot <- ggplot2::ggplot(data=data, aes_string(x="x")) +
       labs(x="Residuals", y='density')
     
-    plot <- plot + geom_histogram(aes(y=..density..), position="identity",
+    plot <- plot + geom_histogram(aes_string(y="..density.."), position="identity",
                                   stat="bin", color=color, fill=fill)
-    plot <- plot + stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
+    plot <- plot + stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))  
     
     themeSpec <- theme(axis.text.y=element_blank(),
                        axis.ticks.y=element_blank())
@@ -507,12 +507,12 @@ gplots.residPlot=function(model, ggtheme ,theme) {
   fill <- theme$fill[2]
   color <- theme$color[1]
   data<-data.frame()
-  data <- as.data.frame(residuals(model))
+  data <- as.data.frame(stats::residuals(model))
   names(data)<-"res"
   data$pred<-stats::predict(model)
   
   #  library(ggplot2)
-  plot <- ggplot(data=data, aes(x=pred,y=res)) +
+  plot <- ggplot(data=data, aes_string(x="pred",y="res")) +
     labs(x="Predicted", y='Residuals')
   
   plot <- plot + geom_point(shape = 21,color=color, fill=fill)

@@ -244,6 +244,7 @@ gamljMixedClass <- R6::R6Class(
        } else ginfo("Anova results recycled")
                     
        if (is.null(estimatesTable$state)) {
+                 attr(model,"refit")<-list(formula=n64$translate(modelFormula),command="lmer",family=FALSE,lib="lme4")
                  self$results$.setModel(model)
                  ### coefficients summary results ####
                  parameters<-try(mf.summary(model))

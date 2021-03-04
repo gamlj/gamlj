@@ -7,7 +7,7 @@
 #' gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
 #'
 #' @param data the data as a data frame
-#' #' @param formula (optional) the formula to use, see the examples
+#' @param formula (optional) an object of class \code{\link[stats]{formula}} (or one that can be coerced to that class): a symbolic description of the model to be fitted. 
 #' @param dep a string naming the dependent variable from \code{data}; the
 #'   variable must be numeric. No needed if \code{formula} is used.
 #' @param factors a vector of strings naming the fixed factors from
@@ -74,10 +74,9 @@
 #'   \code{'centered'} to the mean, \code{'standardized'}, log-transformed \code{'log'} or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is. It can also be passed as a list of lists.
 #' @param effectSize a list of effect sizes to print out. They can be:
-#'   \code{'eta'} for eta-square, \code{'partEta'} for partial eta-square,
-#'   \code{'omega'} for omega-square, and \code{'beta'} for standardized
-#'   coefficients (betas). Default is \code{beta} and \code{partial
-#'   eta-squared}.
+#'   \code{'eta'} for eta-squared, \code{'partEta'} for partial eta-squared,
+#'   \code{'omega'} for partial omega-squared, \code{'epsilon'} for partial epsilon-squared, and \code{'beta'} for standardized
+#'   coefficients (betas). Default is \code{beta} and \code{partEta}.
 #' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
