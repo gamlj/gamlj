@@ -17,6 +17,11 @@ testthat::test_that("test glm", {
   
 })
 
+
+#rmod<-gamlj_model(obj)
+
+
+
 newopt<-list(list(
     var="hours",
     type="standardized") 
@@ -96,11 +101,9 @@ mod1<-gamlj::gamljGlmMixed(
 mplot<-gamlj::gamlj_ggplot(mod1)
 
 testthat::test_that("plot ok", 
-  testthat::expect_true(is.ggplot(mplot))
+  testthat::expect_true(ggplot2::is.ggplot(mplot))
 )
 
-
-data("beers_bars")
 
 
 data("subjects_by_stimuli")
@@ -111,10 +114,6 @@ mod1<-gamlj::gamljMixed(
   randHist=T
   
 )
-#mod2<-gamlj::gamljMixed(
-#  formula =y ~ 1 + cond+( 1+cond|subj ),
-#  data = subjects_by_stimuli
-#)
 
 res<-gamlj::gamlj_assumptionsPlots(mod1)
 
@@ -140,6 +139,14 @@ testthat::test_that("mixed predict", {
   
 })
 
+rmod<-gamlj_model(mod)
+
+
+rmod<-lmer(
+  formula =y ~ 1 + cond+( 1|subj ),
+  data = subjects_by_stimuli
+)
+
 
 data("hsbdemo")
 mod0<-stats::glm(schtyp ~ write + honors + honors:write,data=hsbdemo,family = binomial())
@@ -151,6 +158,7 @@ mod1<-gamlj::gamljGzlm(
   showParamsCI = TRUE,
   modelSelection = "logistic")
 
+
 preds<-gamlj_predict(mod1)
 dd<-gamlj_data(mod1)
 
@@ -159,7 +167,17 @@ testthat::test_that("mixed ", {
   testthat::expect_equal(round(mean(dd$write),2),0)
   
 })
+names(dd)
+colnames(contrasts(dd$honors))<-1
 
+glm(schtyp ~ write + honors + honors:write,data=dd,family = binomial())
+
+str(mod1)
+mod$model@call
+
+class(mod1$options)[1]
+mod1$options$modelSelection
+family(modx)
 
 se<-gamlj_simpleEffects(mod1,variable="write",moderator="honors")
 res<-se$simpleEffects$Anova$asDF
@@ -167,3 +185,10 @@ testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,2],2),6.64)
   testthat::expect_equal(round(res[2,3],2),1)
 })
+
+modx<-gamlj_model(mod1)
+dd<-gamlj_data(mod1)
+nn<-names(dd)
+nn64<-jmvcore::toB64(nn)
+
+str(modx)
