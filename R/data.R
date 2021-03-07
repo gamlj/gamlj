@@ -79,7 +79,7 @@ NULL
 #' @name wicksell
 #' @usage data(wicksell)
 #' @keywords datasets
-#' @references David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~dhowell/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
+#' @references David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~statdhtx/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
 #' @examples
 #' data(wicksell)
 NULL

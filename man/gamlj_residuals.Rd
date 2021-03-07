@@ -4,12 +4,13 @@
 \alias{gamlj_residuals}
 \title{Extract the residuals values of the model estimated by GAMLj}
 \usage{
-gamlj_residuals(gobj)
+gamlj_residuals(gobj, type = "response")
 }
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*}
 
-\item{type}{the type of the residuals. cf. [stats::residuals()]}
+\item{type}{the type of the residuals. cf.  it can be "response" (default),"working", "deviance", "pearson",
+"partial", cf.  \code{\link[stats:residuals.lm]{stats::residuals.lm()}}}
 }
 \value{
 a list of value

@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_predict}
 \alias{gamlj_predict}
-\title{Extract the predicted values of the model estimated by GAMLj}
+\title{Predicted values from GAMLj models}
 \usage{
 gamlj_predict(gobj, re.form = NULL, type = "response")
 }
@@ -19,8 +19,8 @@ Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]
 a R object of the class of the estimated model
 }
 \description{
-This function returns the predicted values model as a R object. It is usefull to run additional 
-analysis in R with model fitted scores.
+This function returns the predicted values of a GAMLj model. It is usefull to run additional 
+analysis on the fitted scores.
 }
 \examples{
 data("qsport")

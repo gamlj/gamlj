@@ -153,7 +153,7 @@ gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,..
 #' This function re-estimates a GAMLj model removing some of the directives passed to the orginal model
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
-#' @param analysis which analysis needs to be removed. It can be `simpleEffects`, `emmans` (estimated means for factors),`plots`, or `posthoc`
+#' @param analysis which analysis needs to be removed. It can be `simpleEffects`, `emeans` (estimated means for factors),`plots`, or `posthoc`
 #'  
 #' @return an object of class GAMLj* as the input object
 #' @author Marcello Gallucci
@@ -205,10 +205,10 @@ gamlj_data<-function(gobj) {
   data
 }
 
-#' Extract the predicted values of the model estimated by GAMLj 
+#' Predicted values from GAMLj models 
 #'
-#' This function returns the predicted values model as a R object. It is usefull to run additional 
-#' analysis in R with model fitted scores. 
+#' This function returns the predicted values of a GAMLj model. It is usefull to run additional 
+#' analysis on the fitted scores. 
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
 #' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
@@ -234,10 +234,10 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 }
 
 
-#' Extract the residuals values of the model estimated by GAMLj 
+#' Residuals values of a GAMLj model 
 #'
-#' This function returns the residuals of a model as a R object. It is usefull to run additional 
-#' analysis in R on model assumptions. 
+#' This function returns the residuals of a GAMLj model. It is usefull to run additional 
+#' analysis on model assumptions. 
 #' \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}} 
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
@@ -262,7 +262,7 @@ gamlj_residuals<-function(gobj, type="response") {
 #' Extract the R model object contained in the GAMLj results 
 #'
 #' This function returns the R model  object. It is usefull to run additional 
-#' analysis in R on model results. 
+#' analysis on model results. 
 #'
 #' @param gobj a gamlj results object of the class GAMLj*
 #' @return a R object from lm(), glm(), lmer() or glmer()

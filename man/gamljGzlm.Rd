@@ -123,7 +123,7 @@ simple effects computed}
 
 \item{percvalue}{offset value for conditioning}
 
-\item{simpleScaleLabels}{.}
+\item{simpleScaleLabels}{style for presenting condition values of a moderator. It can be \code{'labels'} (default), \code{'values'} or \code{'labels_values'} for both.}
 
 \item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
 \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
