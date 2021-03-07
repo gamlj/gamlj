@@ -155,8 +155,6 @@ gamljGLMClass <- R6::R6Class(
       mi.check_estimation(model,n64)
       model<-mi.model_check(model)
       private$.model <- model
-      #### save the model for R interface ####
-      attr(model,"refit")<-list(formula=n64$translate(modelFormula),command="lm",hasfamily=FALSE)
       self$results$.setModel(model)
       ### if it worked before, we skip building the tables, 
       ### otherwise we store a flag  in parameters table state so next time we know it worked
@@ -330,7 +328,12 @@ gamljGLMClass <- R6::R6Class(
       
     },
     .estimate = function(form, data) {
-      stats::lm(form, data=data)
+      model<-stats::lm(form, data=data)
+      attr(model,"refit")<-list(command="lm",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form)))
+      
+      model
     },
 
 

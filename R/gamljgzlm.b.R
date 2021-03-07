@@ -200,10 +200,13 @@ gamljGzlmClass <- R6::R6Class(
         ginfo("Parameters have been estimated")
         self$results$.setModel(model)
         ### coefficients summary results ####
+        capture.output({
         parameters<-try(mf.summary(model))
+        })
         mi.check_estimation(parameters,n64)
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
+        
         parameters<-mf.confint(model,ciWidth,parameters)
         out.fillTable(estimatesTable,parameters)        
         estimatesTable$setState(attributes(parameters))
@@ -373,16 +376,35 @@ gamljGzlmClass <- R6::R6Class(
     modelType<-self$options$modelSelection
     afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
     if (modelType=="multinomial") {
-      mod<-nnet::multinom(form,data,model = T)
-      mod$call$formula<-as.formula(mod)
-      return(mod)
+      mark("Estimating multinomial")
+      model<-nnet::multinom(form,data,model = T)
+      model$call$formula<-as.formula(model)
+      ### save info for R refit ####
+      attr(model,"refit")<-list(lib="nnet",
+                                command="multinom",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form),model=TRUE))
+      return(model)
     }
     if (modelType=="nb") {
-      mod<-MASS::glm.nb(form,data)
-      return(mod)
+      model<-MASS::glm.nb(form,data)
+      ### save info for R refit ####
+      attr(model,"refit")<-list(lib="MASS",
+                                command="glm.nb",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form)))
+      
+      return(model)
     }
-    mod<-stats::glm(form,data,family=afamily)
-    mod
+    model<-stats::glm(form,data,family=afamily)
+    ### save info for R refit ####
+    cfamily<-paste0(afamily$family,"(",afamily$link,")")
+    attr(model,"refit")<-list(command="glm",
+                              coptions=list(formula=private$.names64$translate(form),family=cfamily),
+                              eoptions=list(formula=private$.names64$translate(form),family=afamily))
+    
+  
+    model
   },
   
 

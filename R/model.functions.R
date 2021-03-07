@@ -145,7 +145,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .mf.summary.multinom<-function(model) {
-  
+
      sumr<-summary(model)
      rcof<-sumr$coefficients
      cof<-as.data.frame(matrix(rcof,ncol=1))
@@ -179,7 +179,6 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.multinom<-function(model) {
-
       ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
       colnames(ano)<-c("test","df","p")
       as.data.frame(ano, stringsAsFactors = F)
@@ -542,7 +541,19 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
 
 mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
 
-.setModelCall.default<-function(model,call,family=NULL) {
+.setModelCall.default<-function(model,info) {
+  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
+  call<-paste0(info$command,"(",coptions,", data=data)")
   model$call<-call
   model
 }
+
+.setModelCall.lmerMod<-function(model,info) {
+  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
+  call<-paste0(info$command,"(",coptions,", data=data)")
+  model@call<-as.call(str2lang(call))
+  model
+}
+.setModelCall.glmerMod<-function(model,info) 
+        .setModelCall.lmerMod(model,info)
+  

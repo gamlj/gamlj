@@ -98,8 +98,8 @@ mod<-gamlj::gamljGzlm(
   modelSelection = "logistic",
   eDesc = T)
 
-test_that("glm weird names", {
-  expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
+testthat::test_that("glm weird names", {
+  testthat::expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
 })
 
 
@@ -112,8 +112,8 @@ mod<-gamlj::gamljGzlm(
   formula=prog~math+ses*female,
   data=hsbdemo,
   modelSelection = "multinomial",
-  eDesc = T,
   postHoc = ~ses:female)
+
 
 res1<-mod$main$fixed$asDF
 res2<-mod$main$anova$asDF

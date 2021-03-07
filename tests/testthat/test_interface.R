@@ -1,6 +1,5 @@
 context("R interface")
 library(ggplot2)
-
 data("qsport")
 obj<-gamlj::gamljGLM(
     formula = performance ~ hours,
@@ -18,7 +17,13 @@ testthat::test_that("test glm", {
 })
 
 
-#rmod<-gamlj_model(obj)
+rmod0<-gamlj_model(obj)
+rmod1<-lm(performance ~ hours,data=qsport)
+
+testthat::test_that("glm get model", {
+  testthat::expect_equal(sigma(rmod0),sigma(rmod1),tolerance = 0.01)
+  testthat::expect_equal(sigma(rmod1),sigma(obj$model),tolerance = 0.01)
+})
 
 
 
@@ -56,6 +61,8 @@ testthat::test_that("updating", {
   
 })
 
+rmod<-gamlj_model(zobj)
+
 data("hsbdemo")
 mod<-gamlj::gamljGzlm(
   formula = prog ~ write +  ses*female,
@@ -90,6 +97,20 @@ testthat::test_that("glmixed predict", {
   testthat::expect_equal(n,5041)
   
 })
+
+rmod0<-gamlj_model(mod)
+
+rmod1<-glmer(formula = pass ~ 1 + math + (1 | school), family = binomial(logit), 
+             data = schoolexam)
+
+
+
+
+testthat::test_that("glmixed get model", {
+  testthat::expect_equal(rmod0@optinfo$val[[1]],rmod1@optinfo$val[[1]], tolerance = .0001)
+  testthat::expect_equal(rmod1@optinfo$val[[1]],mod$model@optinfo$val[[1]],tolerance = .0001)
+})
+
 
 mod1<-gamlj::gamljGlmMixed(
   formula = formula("pass ~ 1 + math+( 1 | school )"),
@@ -130,8 +151,8 @@ mod<-gamlj::gamljMixed(
   data = subjects_by_stimuli
 )
 
-preds<-gamlj_predict(mod)
-n<-dim(gamlj_data(mod))[1]
+preds<-gamlj::gamlj_predict(mod)
+n<-dim(gamlj::gamlj_data(mod))[1]
 
 testthat::test_that("mixed predict", {
   testthat::expect_equal(round(mean(preds),2),19.6)
@@ -139,13 +160,17 @@ testthat::test_that("mixed predict", {
   
 })
 
-rmod<-gamlj_model(mod)
-
-
-rmod<-lmer(
+rmod0<-gamlj::gamlj_model(mod)
+rmod1<-lmer(
   formula =y ~ 1 + cond+( 1|subj ),
-  data = subjects_by_stimuli
+  data = gamlj_data(mod),
+  REML = TRUE
 )
+
+testthat::test_that("mixed get model", {
+  testthat::expect_equal(rmod0@theta,rmod1@theta,tolerance = 0.001)
+  testthat::expect_equal(rmod1@theta,mod$model@theta,tolerance = 0.001)
+})
 
 
 data("hsbdemo")
@@ -158,7 +183,6 @@ mod1<-gamlj::gamljGzlm(
   showParamsCI = TRUE,
   modelSelection = "logistic")
 
-
 preds<-gamlj_predict(mod1)
 dd<-gamlj_data(mod1)
 
@@ -167,17 +191,15 @@ testthat::test_that("mixed ", {
   testthat::expect_equal(round(mean(dd$write),2),0)
   
 })
-names(dd)
-colnames(contrasts(dd$honors))<-1
 
-glm(schtyp ~ write + honors + honors:write,data=dd,family = binomial())
+rmod<-gamlj_model(mod1)
 
-str(mod1)
-mod$model@call
+testthat::test_that("glm get model ", {
+  testthat::expect_equal(sigma(rmod),sigma(mod0),tolerance = 0.01)
+  testthat::expect_equal(sigma(mod0),sigma(mod1$model),tolerance = 0.01)
+})
 
-class(mod1$options)[1]
-mod1$options$modelSelection
-family(modx)
+
 
 se<-gamlj_simpleEffects(mod1,variable="write",moderator="honors")
 res<-se$simpleEffects$Anova$asDF
@@ -186,9 +208,3 @@ testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,3],2),1)
 })
 
-modx<-gamlj_model(mod1)
-dd<-gamlj_data(mod1)
-nn<-names(dd)
-nn64<-jmvcore::toB64(nn)
-
-str(modx)

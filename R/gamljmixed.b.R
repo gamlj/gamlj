@@ -171,6 +171,7 @@ gamljMixedClass <- R6::R6Class(
        mi.check_estimation(model,n64)
        model<-mi.model_check(model)
        private$.model <- model
+       self$results$.setModel(model)
        ginfo("...done")
 
        ### random components data frame ######
@@ -244,8 +245,6 @@ gamljMixedClass <- R6::R6Class(
        } else ginfo("Anova results recycled")
                     
        if (is.null(estimatesTable$state)) {
-                 attr(model,"refit")<-list(formula=n64$translate(modelFormula),command="lmer",family=FALSE,lib="lme4")
-                 self$results$.setModel(model)
                  ### coefficients summary results ####
                  parameters<-try(mf.summary(model))
                  ginfo("...done")
@@ -430,6 +429,12 @@ gamljMixedClass <- R6::R6Class(
           if (info$conv==TRUE)
              break()
       }
+
+      ## set info for R refit ###
+      attr(model,"refit")<-list(lib="lme4",
+                                command="lmer",
+                                coptions=list(formula=private$.names64$translate(form),REML=REML),
+                                eoptions=list(formula=private$.names64$translate(form),REML=REML,control=ctr))
       return(model)
     },
     .modelFormula=function() {

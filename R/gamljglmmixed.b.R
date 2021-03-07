@@ -482,6 +482,11 @@ gamljGlmMixedClass <- R6::R6Class(
         lm = do.call(lme4::glmer.nb, list(formula=form,
                                        data=data))
         model<-mi.model_check(lm)
+        attr(model,"refit")<-list(lib="lme4",
+                                  command="glmer.nb",
+                                  coptions=list(formula=private$.names64$translate(form)),
+                                  eoptions=list(formula=private$.names64$translate(form)))
+        
         return(model)
         
       }
@@ -496,6 +501,13 @@ gamljGlmMixedClass <- R6::R6Class(
                                        control=ctr))
         model<-mi.model_check(lm)
         info<-attr(model,"infoTable")
+        ### save info for R refit ####
+        cfamily<-paste0(afamily$family,"(",afamily$link,")")
+        attr(model,"refit")<-list(lib="lme4",
+                                  command="glmer",
+                                  coptions=list(formula=private$.names64$translate(form),family=cfamily),
+                                  eoptions=list(formula=private$.names64$translate(form),family=afamily,nAGQ=nAGQ,control=ctr))
+        
         if (info$conv==TRUE)
           break()
         

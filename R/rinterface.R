@@ -279,22 +279,10 @@ gamlj_residuals<-function(gobj, type="response") {
 gamlj_model<-function(gobj) {
 
   rf<-attr(gobj$model,"refit")
-  if (!is.null(rf$lib))
-    require(rf$lib,character.only = TRUE)
-  mdl<-rf$command
-  options<-list()
-  options[["formula"]]<-rf$formula
-  options[["data"]]<-gamlj_data(gobj)
-  if (rf$hasfamily==TRUE)
-    options[["family"]]<-family(obj$model)
-  mod<-do.call(mdl,options)
-  call<-paste0(mdl,"(",options[["formula"]],",data=data")
-  mod<-mf.setModelCall(model,call)
-  if (rf$family==TRUE)
-    mod$call<-paste(mod$call,paste0(family(obj$model)[1],"('",family(obj$model)[2],"')"))
-  mod$call<-paste(mod$call,")")
-  mod  
-
+  rf$eoptions[["data"]]<-gamlj_data(gobj)
+  model<-do.call(rf$command,rf$eoptions)
+  model<-mf.setModelCall(model,rf)
+  model  
 }
 
 
