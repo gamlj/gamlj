@@ -14,6 +14,6 @@ Data repeated measure anova with mixed models
 data(wicksell)
 }
 \references{
-David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~dhowell/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
+David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~statdhtx/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
 }
 \keyword{datasets}

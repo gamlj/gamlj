@@ -14,7 +14,7 @@ a R object from lm(), glm(), lmer() or glmer()
 }
 \description{
 This function returns the R model  object. It is usefull to run additional 
-analysis in R on model results.
+analysis on model results.
 }
 \examples{
 data("qsport")

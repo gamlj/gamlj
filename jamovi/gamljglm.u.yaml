@@ -107,8 +107,6 @@ children:
                   type: TermLabel
       - type: CheckBox
         name: fixedIntercept
-            
-
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

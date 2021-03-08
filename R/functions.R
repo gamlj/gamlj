@@ -79,4 +79,12 @@ sourcifyList<-function(option,def) {
   paste0(option$name,"=c(",paste(sapply(alist,function(a) paste0(a$var,' = \"',a$type,'\"')),collapse=", "),")")
 }
 
+getfun<-function(x) {
+  if(length(grep("::", x))>0) {
+    parts<-strsplit(x, "::")[[1]]
+    getExportedValue(parts[1], parts[2])
+  } else {
+    x
+  }
+}
 

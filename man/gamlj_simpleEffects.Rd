@@ -24,7 +24,7 @@ gamlj_simpleEffects(
 \item{...}{any other options accepted by the gamlj_* function}
 }
 \value{
-an object of class GAMLj* as the input object
+Two tables with simple effects parameters estimates and ANOVA tables
 }
 \description{
 This function re-estimates a GAMLj model with new simple effects directives

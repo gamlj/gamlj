@@ -9,7 +9,7 @@ gamlj_drop(gobj, analysis)
 \arguments{
 \item{gobj}{a gamlj results object of the class GAMLj*}
 
-\item{analysis}{which analysis needs to be removed. It can be `simpleEffects`, `emmans` (estimated means for factors),`plots`, or `posthoc`}
+\item{analysis}{which analysis needs to be removed. It can be `simpleEffects`, `emeans` (estimated means for factors),`plots`, or `posthoc`}
 }
 \value{
 an object of class GAMLj* as the input object

@@ -728,17 +728,19 @@ gamljMixedClass <- R6::R6Class(
   
   if ( ! self$options$normTest)
     return()
-  rr<-residuals(model)
-  ks<-ks.test(rr,"pnorm",mean(rr),sd(rr))
-  st<-shapiro.test(rr)
-  
-  result<-rbind(cbind(ks$statistic,ks$p.value),
-                cbind(st$statistic,st$p.value))
-  
   table <- self$results$get('assumptions')$get('normTest')
   
-  table$setRow(rowNo=1, values=list(test="Kolmogorov-Smirnov",stat=result[1,1],p=result[1,2]))
-  table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat=result[2,1],p=result[2,2]))
+  rr<-residuals(model)
+  ks<-ks.test(rr,"pnorm",mean(rr),sd(rr))
+  table$setRow(rowNo=1, values=list(test="Kolmogorov-Smirnov",stat=ks$statistic,p=ks$p.value))
+  
+  st<-try(shapiro.test(rr))
+  if (jmvcore::isError(st)) {
+    table$setNote("noshapiro","Shapiro-Wilk not available due to too large number of cases")
+    table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat="",p=""))
+  }
+  else
+    table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat=st$statistic,p=st$p.value))
   
 },
 

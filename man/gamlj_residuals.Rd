@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_residuals}
 \alias{gamlj_residuals}
-\title{Extract the residuals values of the model estimated by GAMLj}
+\title{Residuals values of a GAMLj model}
 \usage{
 gamlj_residuals(gobj, type = "response")
 }
@@ -16,8 +16,8 @@ gamlj_residuals(gobj, type = "response")
 a list of value
 }
 \description{
-This function returns the residuals of a model as a R object. It is usefull to run additional 
-analysis in R on model assumptions. 
+This function returns the residuals of a GAMLj model. It is usefull to run additional 
+analysis on model assumptions. 
 \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}}
 }
 \examples{

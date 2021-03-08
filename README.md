@@ -1,6 +1,6 @@
-# GAMLj Suite for Linear Models in jamovi
+# GAMLj Suite for Linear Models
 
-General, Mixed and Generalized, and Generalized Mixed Models module for jamovi
+General, Mixed, Generalized, and Generalized Mixed Models 
 
 version 2.4.0
 
