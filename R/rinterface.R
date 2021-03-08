@@ -139,12 +139,13 @@ gamlj_assumptionsPlots<-function(gobj) {
 #' @param threeway the name of the additional moderator for three way interactions 
 #' @param ... any other options accepted by the gamlj_* function  
 
-#' @return an object of class GAMLj* as the input object
+#' @return Two tables with simple effects parameters estimates and ANOVA tables 
 #' @author Marcello Gallucci
 #' @export 
 
 gamlj_simpleEffects<-function(gobj,variable=NULL,moderator=NULL,threeway=NULL,...) {
-  gamlj_update(gobj,simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)  
+  mod<-gamlj_update(gobj,simpleVariable=variable,simpleModerator=moderator,simple3way=threeway,...)  
+  mod$simpleEffects
 }
 
 
@@ -190,7 +191,7 @@ gamlj_drop<-function(gobj,analysis) {
 #' data("qsport")
 #' obj<-gamlj::gamljGLM(formula = performance ~ hours,
 #'                 data = qsport,
-#'                 scaling = list(list(var="hours",type="standardized")))
+#'                 scaling = c(hours="standardized")))
 #' 
 #' gdata<-gamlj_data(obj)
 #' lm(performance ~ hours,data=gdata)
@@ -277,10 +278,14 @@ gamlj_residuals<-function(gobj, type="response") {
 #' @export
 
 gamlj_model<-function(gobj) {
-
+  
   rf<-attr(gobj$model,"refit")
+  command<-rf$command
+  if (!is.null(rf$lib))
+      command<-paste0(rf$lib,"::",rf$command)
   rf$eoptions[["data"]]<-gamlj_data(gobj)
-  model<-do.call(rf$command,rf$eoptions)
+  fun<-getfun(command)
+  model<-do.call(fun,rf$eoptions)
   model<-mf.setModelCall(model,rf)
   model  
 }

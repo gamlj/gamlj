@@ -5,6 +5,7 @@ obj<-gamlj::gamljGLM(
     formula = performance ~ hours,
     data = qsport)
 
+
 preds<-gamlj_predict(obj)
 reds<-gamlj_residuals(obj)
 n<-dim(gamlj_data(obj))[1]
@@ -128,7 +129,8 @@ testthat::test_that("plot ok",
 
 
 data("subjects_by_stimuli")
-
+subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
+contrasts(subjects_by_stimuli$cond)<-contr.sum(2)/2
 mod1<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1+cond|subj ),
   data = subjects_by_stimuli,
@@ -160,8 +162,10 @@ testthat::test_that("mixed predict", {
   
 })
 
+
 rmod0<-gamlj::gamlj_model(mod)
-rmod1<-lmer(
+
+rmod1<-lme4::lmer(
   formula =y ~ 1 + cond+( 1|subj ),
   data = gamlj_data(mod),
   REML = TRUE
@@ -171,6 +175,21 @@ testthat::test_that("mixed get model", {
   testthat::expect_equal(rmod0@theta,rmod1@theta,tolerance = 0.001)
   testthat::expect_equal(rmod1@theta,mod$model@theta,tolerance = 0.001)
 })
+
+
+mod<-gamlj::gamljMixed(
+  formula =y ~ 1 + cond+( 1|subj ),
+  data = subjects_by_stimuli,
+  contrasts = c(cond="deviation")
+)
+
+res<-mod$main$fixed$asDF[2,3]
+
+testthat::test_that("contrast option works", {
+  testthat::expect_equal(res,.484954,tolerance = 0.001)
+})
+
+
 
 
 data("hsbdemo")
@@ -206,5 +225,19 @@ res<-se$simpleEffects$Anova$asDF
 testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,2],2),6.64)
   testthat::expect_equal(round(res[2,3],2),1)
+})
+
+
+mod<-gamlj::gamljGzlm(
+  formula = schtyp ~ write + honors + honors:write,
+  data = hsbdemo,
+  showParamsCI = TRUE,
+  modelSelection = "logistic",
+  scaling = c(write="standardized"))
+
+
+res<-mod$main$fixed$asDF[2,3]
+testthat::test_that("test scaling works ", {
+  testthat::expect_equal(res,-0.214873,tol=.001)
 })
 
