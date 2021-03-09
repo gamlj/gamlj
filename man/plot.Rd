@@ -6,15 +6,18 @@
 \usage{
 \method{plot}{gamljGlmResults}(
   object,
+  formula = NULL,
   haxis = NULL,
   sepLines = NULL,
   sepPlots = NULL,
-  formula = NULL,
   ...
 )
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj*Results`}
+
+\item{formula}{a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
+It can be combined with the other options but it has prevalence.}
 
 \item{haxis}{horizontal axis variable}
 
@@ -38,7 +41,8 @@ mod<-gamlj::gamljGlm(
   formula = performance ~ hours,
   data = qsport)
 
-gamlj_plot(mod,haxis = "hours")
+plot(mod,haxis = "hours")
+plot(mod,formula=~hours)
 }
 \author{
 Marcello Gallucci

@@ -34,7 +34,9 @@ rawMeans<- function(x,...) UseMethod(".rawMeans")
   interval=as.numeric(interval)/100
   condlist<-cov_conditioning$values(nterms)
   names(condlist)<-jmvcore::toB64(names(condlist))
-  est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,nesting=NULL)
+  suppressMessages({
+    est<-emmeans::emmeans(model,specs=terms,at=condlist,type=type,nesting=NULL)
+  })
 #  est<-.fixLabels(as.data.frame(est),terms,cov_conditioning)
   est
 }

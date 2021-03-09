@@ -58,7 +58,8 @@ update.gamljGlmMixedResults<-function(object,...) {
 #' a list of plots is returned. An empty list is returned if no plot is present or defined. 
 
 #' @param object a gamlj results object of the class `gamlj*Results`
-#' @param formula a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. It has prevalence on the other options.
+#' @param formula a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
+#' It can be combined with the other options but it has prevalence.
 #' @param haxis horizontal axis variable
 #' @param sepLines variable defining the levels for separate lines 
 #' @param sepPlots variable defining the levels for which separate plots are produced 
