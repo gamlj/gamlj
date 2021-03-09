@@ -3,8 +3,8 @@
 #'
 #' This function re-estimates a GAMLj model applying new options to the original model
 #'
-#' @param  gobj of class \code{\link{gamljGLM}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
-#' @param  ... any parameter to be passed to \code{\link{gamljGLM}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
+#' @param  gobj of class \code{\link{gamljGlm}},  \code{\link{gamljMixed}}, or  \code{\link{gamljGzlm}} 
+#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
 
 #' @return an object of class gamlj* as the input object
 #' @author Marcello Gallucci
@@ -13,7 +13,7 @@
 gamlj_update<-function(gobj,...) {
   params<-list(...)
   funs<-list("gamljMixedOptions"=gamlj::gamljMixed,
-             "gamljGLMOptions"=gamlj::gamljGLM,
+             "gamljGlmOptions"=gamlj::gamljGlm,
              "gamljGzlmOptions"=gamlj::gamljGzlm,
              "gamljGlmMixedOptions"=gamlj::gamljGlmMixed)
   cl<-class(gobj$options)[1]
@@ -44,7 +44,7 @@ gamlj_update<-function(gobj,...) {
 #' @return an object of class GAMLj* as the input object
 #' @examples
 #' data(qsport)
-#' mod<-gamlj::gamljGLM(
+#' mod<-gamlj::gamljGlm(
 #'   formula = performance ~ hours,
 #'   data = qsport)
 #' 
@@ -189,9 +189,9 @@ gamlj_drop<-function(gobj,analysis) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGLM(formula = performance ~ hours,
+#' obj<-gamlj::gamljGlm(formula = performance ~ hours,
 #'                 data = qsport,
-#'                 scaling = c(hours="standardized")))
+#'                 scaling = c(hours="standardized"))
 #' 
 #' gdata<-gamlj_data(obj)
 #' lm(performance ~ hours,data=gdata)
@@ -220,7 +220,7 @@ gamlj_data<-function(gobj) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGLM(
+#' obj<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-gamlj_predict(obj)
@@ -248,7 +248,7 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGLM(
+#' obj<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-gamlj_residuals(obj)
@@ -270,7 +270,7 @@ gamlj_residuals<-function(gobj, type="response") {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGLM(
+#' obj<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  model<-gamlj_model(obj)
@@ -289,5 +289,6 @@ gamlj_model<-function(gobj) {
   model<-mf.setModelCall(model,rf)
   model  
 }
+
 
 

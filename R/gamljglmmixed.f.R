@@ -1,6 +1,8 @@
 #' Generalized Mixed Models
 #'
-#' Generalized Mixed Linear Model
+#' Generalized Mixed Linear Model. Estimates models using `lme4::glmer()` function and provides options to facilitate estimation of 
+#'            interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
+#'
 #'
 #' @examples
 #' data(subjects_by_stimuli)
@@ -16,7 +18,8 @@
 #'        modelTerms = "cond",
 #'        cluster = "subj",
 #'        randomTerms=list(list(c("cond","subj"))))
-#'
+#'        
+#' @param formula (optional) the formula to use. The syntax is the same used in [lme4::lmer()]. See the examples
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
 #'   variable must be numeric
@@ -106,7 +109,6 @@
 #' @param custom_link Distribution family for the custom model, accepts
 #'   identity, log and inverse, onemu2 (for 1/mu^2).
 #' @param cimethod .
-#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glmer} object \cr

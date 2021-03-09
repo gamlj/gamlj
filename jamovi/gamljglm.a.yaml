@@ -1,5 +1,5 @@
 ---
-name: gamljGLM
+name: gamljGlm
 title: General Linear Model
 menuGroup: Linear Models
 version: '2.0.3'
@@ -7,12 +7,14 @@ jas: '1.2'
 completeWhenFilled: false
 export: false
 description:
-    main: General Linear Model
+    main: |
+           General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
+           interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
     R:
         dontrun: false
         usage: |
             data('ToothGrowth')
-            gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
+            gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
 
 
 formula:
@@ -49,7 +51,7 @@ options:
       description:
           R: >
             a string naming the dependent variable from `data`; the variable
-            must be numeric. No needed if `formula` is used.
+            must be numeric. Not needed if `formula` is used.
 
     - name: factors
       title: Factors
@@ -60,7 +62,7 @@ options:
         - factor
       default:
       description:
-          R: a vector of strings naming the fixed factors from `data`. No needed if `formula` is used.
+          R: a vector of strings naming the fixed factors from `data`. Not needed if `formula` is used.
 
     - name: covs
       title: Covariates
@@ -69,7 +71,7 @@ options:
         - numeric
       default:
       description:
-          R: a vector of strings naming the covariates from `data`. No needed if `formula` is used.
+          R: a vector of strings naming the covariates from `data`. Not needed if `formula` is used.
 
 
 
@@ -79,7 +81,7 @@ options:
       default:
       description:
           R: >
-            a list of character vectors describing fixed effects terms. No needed if `formula` is used.
+            a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
 
     - name: fixedIntercept
       title: Intercept
@@ -87,7 +89,7 @@ options:
       default: true
       description:
           R: >
-            `TRUE` (default) or `FALSE`, estimates fixed intercept. No needed if `formula` is used.
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
 
     - name: showParamsCI

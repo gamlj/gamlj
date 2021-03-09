@@ -191,7 +191,7 @@ boxplot of random effects by the first defined clustering variable}
 \item{randHist}{\code{TRUE} or \code{FALSE} (default), provide histogram of
 random Coefficients}
 
-\item{formula}{(optional) the formula to use, see the examples}
+\item{formula}{(optional) the formula to use, see the examples#'}
 }
 \value{
 A results object containing:
@@ -226,7 +226,8 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Mixed Linear Model
+Mixed Linear Model. Estimates models using `me4::lmer()` function and provides options to facilitate estimation of 
+           interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
 }
 \examples{
 data(subjects_by_stimuli)
@@ -242,5 +243,5 @@ gamlj::gamljMixed(
        modelTerms = "cond",
        cluster = "subj",
        randomTerms=list(list(c("cond","subj"))))
-
+       
 }

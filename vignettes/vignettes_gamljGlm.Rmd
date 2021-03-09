@@ -1,5 +1,5 @@
 ---
-title: "Examples of gamljGLM"
+title: "Examples of gamljGlm"
 author: Marcello Gallucci
 date: '`r Sys.Date()`'
 output: 
@@ -14,7 +14,7 @@ output:
              collapsed: false
          css: style.css
 vignette: >
-  %\VignetteIndexEntry{Examples of gamljGLM}
+  %\VignetteIndexEntry{Examples of gamljGlm}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -64,7 +64,7 @@ We first run a multiple regression (to warm up), then we estimate a multiple reg
 
 GAMLj GML function minimum setup only requires to specify the formula of the model and the dataframe. The formula interface is the same one uses in `lm()` function.
 ```{r warning=FALSE, message=FALSE}
-mod1<-gamljGLM(formula = yendu~xage+zexer, data=data)
+mod1<-gamljGlm(formula = yendu~xage+zexer, data=data)
 mod1
 ```
 
@@ -82,18 +82,18 @@ anofaDF
 
 Results show three tables. Table info contains information about the overall model. The Anova omnibus tests table contains the results of the `car:Anova()` function, with the addition of the partial $\eta^2$ index for each effect and the inferential test for the whole model. The `Fixed effect parameter estimates` table contains the `summary()` results. For each coefficient the confidence interval is also reported.
 
-A special note should be made for the intercept. The intercept is the expected value (the mean) of the dependent variable, estimated for all independent variables equal to their means. This is because in gamljGLM(), continuous variables are centered to their mean by default. In case one wants the independent variables not to be centered, one can select a different scaling with the option `scaling`.
+A special note should be made for the intercept. The intercept is the expected value (the mean) of the dependent variable, estimated for all independent variables equal to their means. This is because in gamljGlm(), continuous variables are centered to their mean by default. In case one wants the independent variables not to be centered, one can select a different scaling with the option `scaling`.
 
 Additional effect size indexes can be asked with the option `effectSize`. 
 
 ```{r }
-mod2<-gamljGLM(formula = yendu~xage+zexer, 
+mod2<-gamljGlm(formula = yendu~xage+zexer, 
               data=data,
               effectSize = c("beta", "eta","partEta","omega","epsilon"))
 mod2$main$anova
 ```
 
-The same analysis can be done by updating the model with the `gamlj_update()` function. Almost all the options available in `gamljGLM()` can be added to a model by running `gamlj_update(mod,...)` where `...` is any option or options accepted by `gamljGLM()`.
+The same analysis can be done by updating the model with the `gamlj_update()` function. Almost all the options available in `gamljGlm()` can be added to a model by running `gamlj_update(mod,...)` where `...` is any option or options accepted by `gamljGlm()`.
 
 
 ```{r }
@@ -108,7 +108,7 @@ mod2_2$main$anova
 To include the interaction we simply add the interaction effect in the formula.
 
 ```{r warning=FALSE, message=FALSE}
-mod3<-gamljGLM(formula = yendu~xage*zexer, data=data)
+mod3<-gamljGlm(formula = yendu~xage*zexer, data=data)
 mod3
 ```
 
@@ -124,7 +124,7 @@ We can now probe the interaction. One can re-run the model adding the appropriat
 
 
 ```{r warning=FALSE, message=FALSE}
-#mod4<-gamljGLM(formula = yendu~xage*zexer,
+#mod4<-gamljGlm(formula = yendu~xage*zexer,
 #               data=data,
 #               simpleVariable = "xage",
 #               simpleModerator = "zexer")
@@ -135,7 +135,7 @@ gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer")
 In this way we obtain the effect of age computed for high exercise (`zexer` centered to 1 SD above average), the main effect of age (`zexer` centered to its mean) and the effect of age computed for low exercise (`zexer` centered to -1 SD above average). `gamlGLM()` produces both the F-tests and the parameter estimates for the simple slopes. We focus on the latter table now.
 
 
-One can change the conditioning levels of the moderators with the `simpleScale` option (defaul is `mean_sd` for mean plus/minus one SD), either added to the `gamljGLM()` function or to the `gamlj_simpleEffects()` function. If one wants to use the percentiles (25%,50%,75%), for instance, one can run the following.
+One can change the conditioning levels of the moderators with the `simpleScale` option (defaul is `mean_sd` for mean plus/minus one SD), either added to the `gamljGlm()` function or to the `gamlj_simpleEffects()` function. If one wants to use the percentiles (25%,50%,75%), for instance, one can run the following.
 
 ```{r warning=FALSE, message=FALSE}
 gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer",simpleScale="percent")
@@ -158,11 +158,11 @@ gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer",
 We can get a clear picture of the interaction by asking for a plot. Also the plot module takes care of centering the variables in a way that makes the plot clearly understandable. 
 
 
-The options needed in `gamljGLM()` are `plotHAxis` for the x-axis variable and  `plotSepLines` for the moderator. At which three levels of the moderator the separate lines are computed is decided by the option `simpleScale` as for the simple effects. 
+The options needed in `gamljGlm()` are `plotHAxis` for the x-axis variable and  `plotSepLines` for the moderator. At which three levels of the moderator the separate lines are computed is decided by the option `simpleScale` as for the simple effects. 
 
 
 ```{r warning=FALSE, message=FALSE}
-mod4<-gamljGLM(formula = yendu~xage*zexer, data=data, 
+mod4<-gamljGlm(formula = yendu~xage*zexer, data=data, 
                plotHAxis = "xage",plotSepLines = "zexer",plotError = "ci")
 mod4$descPlot
 ```
@@ -172,12 +172,12 @@ The nice plot we get shows the simple effects (simple equations to be precise) w
 Finally, in order to give a more honest account of the model fit, we can visualize the simple slopes over the the actual data. 
 
 ```{r warning=FALSE, message=FALSE}
-mod4<-gamljGLM(formula = yendu~xage*zexer, data=data, 
+mod4<-gamljGlm(formula = yendu~xage*zexer, data=data, 
                plotHAxis = "xage",plotSepLines = "zexer",plotError = "ci",plotRaw = TRUE)
 mod4$descPlot
 ```
 
-Any plot produced by `gamljGLM` can be obtained as a ggplot2 object for futher manipolations or usage. For instance, one can change the theme of the plot:
+Any plot produced by `gamljGlm` can be obtained as a ggplot2 object for futher manipolations or usage. For instance, one can change the theme of the plot:
 
 ```{r warning=FALSE, message=FALSE}
 myplot<-gamlj_ggplot(mod4)

@@ -1,5 +1,5 @@
 context("glm")
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = ToothGrowth,
   dep = "len",
   factors = "supp",
@@ -18,7 +18,7 @@ test_that("glm estimates are correct", {
 
 data("hsbdemo")
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~1
 )
@@ -27,7 +27,7 @@ test_that("intercept only works",
           expect_equal(round(mod$main$fixed$asDF[1,2],digits=2),51.85)
           )
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   ciWidth=90,
@@ -61,7 +61,7 @@ test_that("glm CI width", {
 hsbdemo$c1<-factor(rep(c(1,0),length(hsbdemo$id)/2))
 hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~c1*c2,
   postHoc = list("c1",c("c1","c2"))
@@ -84,7 +84,7 @@ testthat::test_that("postoh in glm", {
 })
 
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   postHoc = list("schtyp")
@@ -97,7 +97,7 @@ test_that("glm posthoc", {
 
 
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   effectSizeInfo = T
@@ -113,7 +113,7 @@ testthat::test_that("glm effectsize", {
 
 data<-hsbdemo
 names(data)[3]<-c("Gender (test ?)")
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = data,
   formula=science~math+`Gender (test ?)`+math:`Gender (test ?)`,
   simpleModerator = `Gender (test ?)`,
@@ -128,7 +128,7 @@ testthat::test_that("glm weird names", {
 
 data$sex<-factor(data$`Gender (test ?)`,levels=c("male","female"))
 
-mod2<-gamlj::gamljGLM(
+mod2<-gamlj::gamljGlm(
   data = data,
   formula=science~math+sex+math:sex,
   simpleVariable = math,
@@ -141,7 +141,7 @@ test_that("glm weird names", {
   expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
 })
 
-mod3<-gamlj::gamljGLM(
+mod3<-gamlj::gamljGlm(
   data = data,
   formula=science~math+math:`Gender (test ?)`+`Gender (test ?)`,
   simpleModerator = `Gender (test ?)`,
@@ -158,7 +158,7 @@ testthat::test_that("glm order does not count", {
 
 
 expect_warning(
-  mod<-gamlj::gamljGLM(
+  mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   eDesc = T,
@@ -179,7 +179,7 @@ test_that("glm assumptions", {
   expect_equal(round(res2[1,3],2),0.86)
 })
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = science ~ math + schtyp + schtyp:math,
   data = hsbdemo,
   contrasts = list(list(
@@ -202,7 +202,7 @@ testthat::test_that("glm assumptions plot", {
 
 
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = science ~ math + I(math^2),
   data = data
 )
@@ -215,7 +215,7 @@ test_that("glm contrasts", {
 })
 
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = read ~ 1,  data = data
 )
 res<-mod$main$anova$asDF
@@ -226,7 +226,7 @@ test_that("glm intercept only model", {
 
 
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = read ~ 1,  data = data,
   fixedIntercept=FALSE
 )

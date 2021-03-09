@@ -1,6 +1,8 @@
 #' Mixed Model
 #'
-#' Mixed Linear Model
+#' Mixed Linear Model. Estimates models using `me4::lmer()` function and provides options to facilitate estimation of 
+#'            interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
+#'
 #'
 #' @examples
 #' data(subjects_by_stimuli)
@@ -16,7 +18,8 @@
 #'        modelTerms = "cond",
 #'        cluster = "subj",
 #'        randomTerms=list(list(c("cond","subj"))))
-#'
+#'        
+#' @param formula (optional) the formula to use, see the examples#'
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
 #'   variable must be numeric
@@ -112,7 +115,6 @@
 #'   boxplot of random effects by the first defined clustering variable
 #' @param randHist \code{TRUE} or \code{FALSE} (default), provide histogram of
 #'   random Coefficients
-#' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr

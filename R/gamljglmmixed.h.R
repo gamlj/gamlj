@@ -455,6 +455,7 @@ gamljGlmMixedOptions <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Cla
 )
 
 gamljGlmMixedResults <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
+       classname=c("gamlj","gamljGlmMixed"),
     inherit = jmvcore::Group,
     active = list(
         model = function() private$..model,

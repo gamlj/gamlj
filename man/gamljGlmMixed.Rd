@@ -182,7 +182,7 @@ identity, log and inverse, onemu2 (for 1/mu^2).}
 
 \item{cimethod}{.}
 
-\item{formula}{(optional) the formula to use, see the examples}
+\item{formula}{(optional) the formula to use. The syntax is the same used in [lme4::lmer()]. See the examples}
 }
 \value{
 A results object containing:
@@ -210,7 +210,8 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Generalized Mixed Linear Model
+Generalized Mixed Linear Model. Estimates models using `lme4::glmer()` function and provides options to facilitate estimation of 
+           interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
 }
 \examples{
 data(subjects_by_stimuli)
@@ -226,5 +227,5 @@ gamlj::gamljMixed(
        modelTerms = "cond",
        cluster = "subj",
        randomTerms=list(list(c("cond","subj"))))
-
+       
 }

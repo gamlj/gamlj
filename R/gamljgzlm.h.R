@@ -386,6 +386,7 @@ gamljGzlmOptions <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
 )
 
 gamljGzlmResults <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
+       classname=c("gamlj","gamljGzlm"),
     inherit = jmvcore::Group,
     active = list(
         model = function() private$..model,

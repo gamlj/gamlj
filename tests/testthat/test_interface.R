@@ -1,7 +1,7 @@
 context("R interface")
 library(ggplot2)
 data("qsport")
-obj<-gamlj::gamljGLM(
+obj<-gamlj::gamljGlm(
     formula = performance ~ hours,
     data = qsport)
 
@@ -27,13 +27,13 @@ testthat::test_that("glm get model", {
 })
 
 
-
 newopt<-list(list(
-    var="hours",
-    type="standardized") 
-    )
+  var="hours",
+  type="standardized") 
+)
+
 qsport$z<-as.numeric(scale(qsport$performance))
-zobj<-gamlj::gamljGLM(
+zobj<-gamlj::gamljGlm(
   formula = z ~ hours,
   data = qsport,
   scaling=newopt)
@@ -42,7 +42,7 @@ testthat::test_that("standardizing", {
   testthat::expect_equal(cc[[2]],cc[[6]])
 })
 
-zobj2<-gamlj::gamljGLM(
+zobj2<-gamlj::gamljGlm(
   formula = z ~ hours,
   data = qsport,
   scaling=c("hours"="standardized"))
@@ -221,7 +221,7 @@ testthat::test_that("glm get model ", {
 
 
 se<-gamlj_simpleEffects(mod1,variable="write",moderator="honors")
-res<-se$simpleEffects$Anova$asDF
+res<-se$Anova$asDF
 testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,2],2),6.64)
   testthat::expect_equal(round(res[2,3],2),1)

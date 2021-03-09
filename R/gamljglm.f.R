@@ -1,10 +1,12 @@
 #' General Linear Model
-#'
-#' General Linear Model
+#' 
+#' 
+#'  General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
+#'  interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
 #'
 #' @examples
 #' data('ToothGrowth')
-#' gamlj::gamljGLM(formula = len ~ supp,  data = ToothGrowth)
+#' gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
 #'
 #' @param data the data as a data frame
 #' @param formula (optional) an object of class \code{\link[stats]{formula}} (or one that can be coerced to that class): a symbolic description of the model to be fitted. 
@@ -121,7 +123,7 @@
 #' \code{as.data.frame(results$info)}
 #'
 #' @export
-gamljGLM <- function(
+gamljGlm <- function(
   data,
   formula,
   dep = NULL,
@@ -168,7 +170,7 @@ gamljGLM <- function(
   ) {
   
   if ( ! requireNamespace('jmvcore'))
-    stop('gamljGLM requires jmvcore to be installed (restart may be required)')
+    stop('gamljGlm requires jmvcore to be installed (restart may be required)')
   
   if ( ! missing(formula)) {
     if (missing(dep))
@@ -237,7 +239,7 @@ gamljGLM <- function(
     
     
     
-    options <- gamljGLMOptions$new(
+    options <- gamljGlmOptions$new(
     dep = dep,
     factors = factors,
     covs = covs,
@@ -276,12 +278,11 @@ gamljGLM <- function(
     interceptInfo = interceptInfo,
     effectSizeInfo = effectSizeInfo,
     dep_scale = dep_scale)
-  
-  analysis <- gamljGLMClass$new(
+
+  analysis <- gamljGlmClass$new(
     options = options,
     data = data)
   
   analysis$run()
-  
   analysis$results
 }

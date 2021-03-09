@@ -170,7 +170,8 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Generalized Linear Model
+Generalized Linear Models. Estimates models using `glm()` function and similar functions. It provides options to facilitate estimation of 
+           interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
 }
 \examples{
 data<-emmeans::neuralgia
@@ -178,5 +179,4 @@ data<-emmeans::neuralgia
            formula = Pain ~ Duration,
            data = data,
             modelSelection = "logistic")
-
 }

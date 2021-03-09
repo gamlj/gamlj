@@ -1,6 +1,6 @@
-gamljGLMClass <- R6::R6Class(
-  "gamljGLMClass",
-  inherit = gamljGLMBase,
+gamljGlmClass <- R6::R6Class(
+  "gamljGlmClass",
+  inherit = gamljGlmBase,
   private=list(
     .model=NA,
     .names64=NA,

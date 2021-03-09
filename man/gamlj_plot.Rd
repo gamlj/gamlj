@@ -25,7 +25,7 @@ This function re-estimates a GAMLj model with a new plot
 }
 \examples{
 data(qsport)
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = performance ~ hours,
   data = qsport)
 

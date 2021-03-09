@@ -18,7 +18,7 @@ analysis on model results.
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGLM(
+obj<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)
  model<-gamlj_model(obj)

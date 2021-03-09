@@ -1,9 +1,7 @@
 ---
-name:  gamljGLM
+name:  gamljGlm
 title: General Linear Model
 jrs: '1.0'
-
-
 items:
   - name: model
     type: Property

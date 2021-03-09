@@ -22,7 +22,7 @@ analysis on model assumptions.
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGLM(
+obj<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)
  preds<-gamlj_residuals(obj)

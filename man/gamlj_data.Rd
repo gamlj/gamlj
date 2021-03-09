@@ -19,9 +19,9 @@ models in R with other R packages with the same setup used by GAMLj
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGLM(formula = performance ~ hours,
+obj<-gamlj::gamljGlm(formula = performance ~ hours,
                 data = qsport,
-                scaling = c(hours="standardized")))
+                scaling = c(hours="standardized"))
 
 gdata<-gamlj_data(obj)
 lm(performance ~ hours,data=gdata)

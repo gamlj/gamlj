@@ -1,6 +1,9 @@
 #' Generalized Linear Models
 #'
-#' Generalized Linear Model
+#'
+#' Generalized Linear Models. Estimates models using `glm()` function and similar functions. It provides options to facilitate estimation of 
+#'            interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
+#'
 #'
 #' @examples
 #' data<-emmeans::neuralgia
@@ -8,7 +11,7 @@
 #'            formula = Pain ~ Duration,
 #'            data = data,
 #'             modelSelection = "logistic")
-#'
+#' @param formula (optional) the formula to use. The syntax is the one used in [stats::glm()]. See the examples.
 #' @param data the data as a data frame
 #' @param dep a string naming the dependent variable from \code{data},
 #'   variable can be numeric or factor
