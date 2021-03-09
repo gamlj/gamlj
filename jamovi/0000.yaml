@@ -22,7 +22,12 @@ analyses:
     menuGroup: Linear Models
     menuSubgroup: GAMLj
     menuTitle: General Linear Model
-    description: General Linear Model
+    description: >
+      General Linear Model. Estimates models using `lm()` function and provides
+      options to facilitate estimation of 
+
+      interactions, simple slopes, simple effects, post-hoc tests, contrast
+      analysis, effect size indexes and visualization of the results.
   - title: Mixed Model
     name: gamljMixed
     ns: gamlj
@@ -44,12 +49,6 @@ analyses:
     menuSubgroup: GAMLj
     menuTitle: Generalized Mixed Models
     description: Generalized Mixed Linear Model
-  - title: General Linear Model
-    name: gamljGlm
-    ns: gamlj
-    menuGroup: Linear Models
-    menuTitle: General Linear Model
-    description: General Linear Model
 datasets:
   - name: qsport
     path: qsport.csv
