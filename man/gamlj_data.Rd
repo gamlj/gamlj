@@ -4,10 +4,10 @@
 \alias{gamlj_data}
 \title{Extract data transformed by GAMLj to run R analyses in line with gamlj setup}
 \usage{
-gamlj_data(gobj)
+gamlj_data(object)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 }
 \value{
 a dataset

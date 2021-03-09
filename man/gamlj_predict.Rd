@@ -7,7 +7,7 @@
 gamlj_predict(gobj, re.form = NULL, type = "response")
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{gobj}{a gamlj results object of the class `gamlj*Results`}
 
 \item{re.form}{if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.}
 
@@ -19,8 +19,7 @@ Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]
 a R object of the class of the estimated model
 }
 \description{
-This function returns the predicted values of a GAMLj model. It is usefull to run additional 
-analysis on the fitted scores.
+Deprecated. Please use `predict()`
 }
 \examples{
 data("qsport")

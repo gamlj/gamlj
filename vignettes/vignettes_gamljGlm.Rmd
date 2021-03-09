@@ -93,11 +93,11 @@ mod2<-gamljGlm(formula = yendu~xage+zexer,
 mod2$main$anova
 ```
 
-The same analysis can be done by updating the model with the `gamlj_update()` function. Almost all the options available in `gamljGlm()` can be added to a model by running `gamlj_update(mod,...)` where `...` is any option or options accepted by `gamljGlm()`.
+The same analysis can be done by updating the model with the `update()` function. Almost all the options available in `gamljGlm()` can be added to a model by running `update(mod,...)` where `...` is any option or options accepted by `gamljGlm()`.
 
 
 ```{r }
-mod2_2<-gamlj_update(mod1,effectSize = c("beta", "eta","partEta","omega","epsilon"))
+mod2_2<-update(mod1,effectSize = c("beta", "eta","partEta","omega","epsilon"))
 mod2_2$main$anova
 ```
 
@@ -180,7 +180,7 @@ mod4$descPlot
 Any plot produced by `gamljGlm` can be obtained as a ggplot2 object for futher manipolations or usage. For instance, one can change the theme of the plot:
 
 ```{r warning=FALSE, message=FALSE}
-myplot<-gamlj_ggplot(mod4)
+myplot<-plot(mod4)
 myplot+ggplot2::theme_grey()
 
 ```

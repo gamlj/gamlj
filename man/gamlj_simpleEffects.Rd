@@ -5,7 +5,7 @@
 \title{Update a GAMLj results by passing new simple effects directives}
 \usage{
 gamlj_simpleEffects(
-  gobj,
+  object,
   variable = NULL,
   moderator = NULL,
   threeway = NULL,
@@ -13,7 +13,7 @@ gamlj_simpleEffects(
 )
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 
 \item{variable}{the independent variable name}
 

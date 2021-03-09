@@ -4,17 +4,16 @@
 \alias{gamlj_model}
 \title{Extract the R model object contained in the GAMLj results}
 \usage{
-gamlj_model(gobj)
+gamlj_model(object)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 }
 \value{
 a R object from lm(), glm(), lmer() or glmer()
 }
 \description{
-This function returns the R model  object. It is usefull to run additional 
-analysis on model results.
+Return the estimated model object of the class lm, lmer, glm depending on the model.
 }
 \examples{
 data("qsport")

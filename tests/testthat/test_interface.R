@@ -1,4 +1,5 @@
 context("R interface")
+tol<-0.001
 library(ggplot2)
 data("qsport")
 obj<-gamlj::gamljGlm(
@@ -53,7 +54,7 @@ testthat::test_that("standardizing", {
 })
 
 
-upd<-gamlj_update(obj,scaling=newopt,effectSize = c("beta", "partEta", "omega"))
+upd<-update(obj,scaling=newopt,effectSize = c("beta", "partEta", "omega"))
 res1<-upd$main$fixed$asDF
 res2<-upd$main$anova$asDF
 testthat::test_that("updating", {
@@ -82,6 +83,20 @@ testthat::test_that("plot ok", {
 }
 )
 
+data("subjects_by_stimuli")
+names(subjects_by_stimuli)
+mod<-gamlj::gamljMixed(
+  formula = y ~ cond+( 1 | subj ),
+  data = subjects_by_stimuli)
+
+p0<-predict(mod)
+p1<-predict(mod,random.only=T)
+
+
+testthat::test_that("Mixed dots work", {
+  testthat::expect_equal(mean(p0),19.6043,tol=tol)
+  testthat::expect_equal(mean(p1),0,tol=tol)
+})
 
 
 data("schoolexam")
@@ -91,7 +106,7 @@ mod<-gamlj::gamljGlmMixed(
   plotHAxis = math,
   cimethod = "wald")
 
-preds<-gamlj::gamlj_predict(mod)
+preds<-predict(mod)
 n<-dim(gamlj::gamlj_data(mod))[1]
 testthat::test_that("glmixed predict", {
   testthat::expect_equal(round(mean(preds),2),0.51)
@@ -153,7 +168,7 @@ mod<-gamlj::gamljMixed(
   data = subjects_by_stimuli
 )
 
-preds<-gamlj::gamlj_predict(mod)
+preds<-predict(mod)
 n<-dim(gamlj::gamlj_data(mod))[1]
 
 testthat::test_that("mixed predict", {
@@ -202,16 +217,19 @@ mod1<-gamlj::gamljGzlm(
   showParamsCI = TRUE,
   modelSelection = "logistic")
 
-preds<-gamlj_predict(mod1)
+preds<-predict(mod1)
 dd<-gamlj_data(mod1)
 
-testthat::test_that("mixed ", {
+testthat::test_that("gzlm predict ", {
   testthat::expect_equal(round(mean(preds),2),round(mean(preds0),2))
   testthat::expect_equal(round(mean(dd$write),2),0)
   
 })
 
+1/6
+
 rmod<-gamlj_model(mod1)
+
 
 testthat::test_that("glm get model ", {
   testthat::expect_equal(sigma(rmod),sigma(mod0),tolerance = 0.01)
