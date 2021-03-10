@@ -18,18 +18,26 @@ update.gamljGlmResults<-function(object,...) {
 #' @rdname update
 #' @export 
 
-update.gamljMixedResults<-function(object,...) {
-  fun<-gamljMixed
-  .gamlj_update(fun,object,...)
-}
-
-update.gamljGlmMixedResults<-function(object,...) {
-  fun<-gamljGlmMixed
+update.gamljGzlmResults<-function(object,...) {
+  fun<-gamljGzlm
   .gamlj_update(fun,object,...)
 }
 
 #' @rdname update
 #' @export 
+
+update.gamljMixedResults<-function(object,...) {
+  fun<-gamljMixed
+  .gamlj_update(fun,object,...)
+}
+
+#' @rdname update
+#' @export 
+
+update.gamljGlmMixedResults<-function(object,...) {
+  fun<-gamljGlmMixed
+  .gamlj_update(fun,object,...)
+}
 
 .gamlj_update<-function(fun,object,...) {
 
@@ -43,6 +51,7 @@ update.gamljGlmMixedResults<-function(object,...) {
     if  (f %in% names(object$options)) 
       alist[[f]]<-object$options[[f]]
   }
+  mark("update",params)
   for (p in names(params)) {
     alist[[p]]<-params[[p]]     
   }
@@ -51,15 +60,15 @@ update.gamljGlmMixedResults<-function(object,...) {
   do.call(fun,alist)
 }
 
-#' Update a GAMLj model plot by passing new plot directives
+#'  GAMLj plot
 #'
-#' This function re-estimates a GAMLj model with a new plot. If not options is passed, extracts the 
-#' plots present in the `gamlj*Results` object. If one plot is present, it is returned, if more than one is present, 
-#' a list of plots is returned. An empty list is returned if no plot is present or defined. 
+#' This function re-estimates a GAMLj model adding a new plot. If no options is passed, extracts the 
+#' plots present in the `gamlj*Results` object. If one plot is present, it is returned as a ggplot2 object,
+#'  if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined. 
 
-#' @param object a gamlj results object of the class `gamlj*Results`
+#' @param x a gamlj results object of the class `gamlj*Results`
 #' @param formula a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
-#' It can be combined with the other options but it has prevalence.
+#' It has prevalence on other options defining a plot.
 #' @param haxis horizontal axis variable
 #' @param sepLines variable defining the levels for separate lines 
 #' @param sepPlots variable defining the levels for which separate plots are produced 
@@ -77,25 +86,48 @@ update.gamljGlmMixedResults<-function(object,...) {
 #' @rdname plot
 #' @export
 
-plot.gamljGlmResults<-function(object,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
+plot.gamljGlmResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
+ .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
+}
 
-  if (is.something(formula)) {
-    .vars<-all.vars(formula)
-    haxis<-.vars[1]
-    if (!is.na(.vars[2])) sepLines<-.vars[2] 
-    if (!is.na(.vars[3])) sepPlots<-.vars[3] 
-    
-  }
-  if (is.something(haxis)) {
-      args<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots)
-      object<-update(object,args)
-  }
- .gamlj_ggplot(object)
+#' @rdname plot
+#' @export
+
+plot.gamljGzlmResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
+  .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
+}
+
+#' @rdname plot
+#' @export
+
+plot.gamljMixedResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
+  .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
+}
+
+#' @rdname plot
+#' @export
+
+plot.gamljGlmMixedResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
+  .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
 }
 
 
-.gamlj_ggplot<-function(object) {
+.gamlj_ggplot<-function(object,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
 
+   if (is.something(formula)) {
+    .vars<-all.vars(formula)
+    haxis<-.vars[1]
+    if (!is.na(.vars[2])) sepLines<-.vars[2] else sepLines<-NULL 
+    if (!is.na(.vars[3])) sepPlots<-.vars[3] else sepPlots<-NULL
+   }
+  if (is.something(haxis)) {
+    args<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
+    object<-stats::update(object,args)
+  } else
+        if (is.something(list(...))) {
+            object<-stats::update(object,...)
+        }
+  
     if (length(object$descPlots)==0)
             return(object$descPlot$plot$fun())
      else {
@@ -295,7 +327,6 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #' 
 #' \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}} 
 #'
-#' @rdname residuals
 #' @param gobj a gamlj results object of the class `gamlj*Results`
 #' @param type the type of the residuals for generalized models. The alternatives are: "deviance" (default), "pearson", "working", "response", and "partial". Can be abbreviated., 
 #' cf.  \code{\link[stats:residuals.lm]{stats::residuals.lm()}}
@@ -315,7 +346,7 @@ gamlj_residuals<-function(gobj, type="response") {
 }
 
 
-#' Residdials values from GAMLj models 
+#' Residuals values from GAMLj models 
 #'
 #' Returns residuals values from the estimated model
 #' 

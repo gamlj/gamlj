@@ -279,7 +279,6 @@ gamljGlmClass <- R6::R6Class(
         private$.populateLevenes(model)
         private$.populateNormTest(model)
         
-        
     },
   .cleandata=function() {
       Sys.setlocale("LC_NUMERIC", "C")

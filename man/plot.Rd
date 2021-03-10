@@ -2,22 +2,24 @@
 % Please edit documentation in R/rinterface.R
 \name{plot.gamljGlmResults}
 \alias{plot.gamljGlmResults}
-\title{Update a GAMLj model plot by passing new plot directives}
+\alias{plot.gamljGzlmResults}
+\alias{plot.gamljMixedResults}
+\alias{plot.gamljGlmMixedResults}
+\title{GAMLj plot}
 \usage{
-\method{plot}{gamljGlmResults}(
-  object,
-  formula = NULL,
-  haxis = NULL,
-  sepLines = NULL,
-  sepPlots = NULL,
-  ...
-)
+\method{plot}{gamljGlmResults}(x, formula = NULL, haxis = NULL, sepLines = NULL, sepPlots = NULL, ...)
+
+\method{plot}{gamljGzlmResults}(x, formula = NULL, haxis = NULL, sepLines = NULL, sepPlots = NULL, ...)
+
+\method{plot}{gamljMixedResults}(x, formula = NULL, haxis = NULL, sepLines = NULL, sepPlots = NULL, ...)
+
+\method{plot}{gamljGlmMixedResults}(x, formula = NULL, haxis = NULL, sepLines = NULL, sepPlots = NULL, ...)
 }
 \arguments{
-\item{object}{a gamlj results object of the class `gamlj*Results`}
+\item{x}{a gamlj results object of the class `gamlj*Results`}
 
 \item{formula}{a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
-It can be combined with the other options but it has prevalence.}
+It has prevalence on other options defining a plot.}
 
 \item{haxis}{horizontal axis variable}
 
@@ -31,9 +33,9 @@ It can be combined with the other options but it has prevalence.}
 an object of class GAMLj* as the input object
 }
 \description{
-This function re-estimates a GAMLj model with a new plot. If not options is passed, extracts the 
-plots present in the `gamlj*Results` object. If one plot is present, it is returned, if more than one is present, 
-a list of plots is returned. An empty list is returned if no plot is present or defined.
+This function re-estimates a GAMLj model adding a new plot. If no options is passed, extracts the 
+plots present in the `gamlj*Results` object. If one plot is present, it is returned as a ggplot2 object,
+ if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined.
 }
 \examples{
 data(qsport)

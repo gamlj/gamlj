@@ -2,15 +2,18 @@
 % Please edit documentation in R/rinterface.R
 \name{update.gamljGlmResults}
 \alias{update.gamljGlmResults}
+\alias{update.gamljGzlmResults}
 \alias{update.gamljMixedResults}
-\alias{.gamlj_update}
+\alias{update.gamljGlmMixedResults}
 \title{Update a GAMLj model by passing only the new options}
 \usage{
 \method{update}{gamljGlmResults}(object, ...)
 
+\method{update}{gamljGzlmResults}(object, ...)
+
 \method{update}{gamljMixedResults}(object, ...)
 
-.gamlj_update(fun, object, ...)
+\method{update}{gamljGlmMixedResults}(object, ...)
 }
 \arguments{
 \item{object}{of class `gamlj*Results`}

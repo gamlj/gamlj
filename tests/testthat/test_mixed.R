@@ -1,12 +1,13 @@
 context("mixed")
 
 data("subjects_by_stimuli")
-data<-subjects_by_stimuli
-data$cond<-factor(data$cond)
+
+subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),
-  data = data, plotHAxis = cond,
+  data = subjects_by_stimuli,
+  plotHAxis = cond,
   residPlot=T, randHist = T, clusterBoxplot = T
 )
 infotable<-model$info$asDF
@@ -40,7 +41,7 @@ testthat::test_that("p-table is ok", {
 })
 
 testthat::test_that("a descplot is produced", {
-  testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
+  testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 })
 
 testthat::test_that("a  residplot is produced", {
@@ -63,7 +64,7 @@ model<-gamlj::gamljMixed(
   modelTerms = "cond",
   cluster = "subj",
   randomTerms = list(list(c("Intercept","subj"))),
-  data = data
+  data = subjects_by_stimuli
 )
 
 
@@ -109,13 +110,16 @@ testthat::test_that("uncorrelated works", {
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =formula,
-  data = data, plotHAxis = cond,
+  data = subjects_by_stimuli, plotHAxis = cond,
   lrtRandomEffects=T  
 )
 testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
 )
 
+testthat::test_that("mixed plot works",
+                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+)
 
 
 adddata<-subjects_by_stimuli
@@ -155,8 +159,8 @@ model<-gamlj::gamljMixed(
 testthat::test_that("some poly", {
   testthat::expect_lt(model$main$anova$asDF[2,2],0.43)
   testthat::expect_gt(model$main$anova$asDF[2,2],0.31)
-  
 })
+
 
 model<-gamlj::gamljMixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
@@ -216,7 +220,7 @@ testthat::test_that("ranova works",
 
 testthat::test_that("plot works",{
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
-                    testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
+                    testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 }
 )
 

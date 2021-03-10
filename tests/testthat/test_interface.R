@@ -6,16 +6,15 @@ obj<-gamlj::gamljGlm(
     formula = performance ~ hours,
     data = qsport)
 
-
-preds<-gamlj_predict(obj)
-reds<-gamlj_residuals(obj)
+preds<-predict(obj)
+reds<-residuals(obj)
 n<-dim(gamlj_data(obj))[1]
 
 testthat::test_that("test glm", {
   testthat::expect_equal(round(mean(preds),2),37.88)
   testthat::expect_equal(n,100)
   testthat::expect_equal(round(mean(reds),3),0)
-  
+  testthat::expect_false(plot(obj))
 })
 
 
@@ -53,7 +52,6 @@ testthat::test_that("standardizing", {
   testthat::expect_true(test)
 })
 
-
 upd<-update(obj,scaling=newopt,effectSize = c("beta", "partEta", "omega"))
 res1<-upd$main$fixed$asDF
 res2<-upd$main$anova$asDF
@@ -63,7 +61,12 @@ testthat::test_that("updating", {
   
 })
 
-rmod<-gamlj_model(zobj)
+test<-ggplot2::is.ggplot(plot(obj,formula = ~hours))
+testthat::test_that("glm plot", {
+  testthat::expect_true(test)
+
+})
+
 
 data("hsbdemo")
 mod<-gamlj::gamljGzlm(
@@ -75,7 +78,7 @@ mod<-gamlj::gamljGzlm(
   plotSepPlots = female,
   modelSelection = "multinomial")
 
-mplots<-gamlj::gamlj_ggplot(mod)
+mplots<-plot(mod)
 
 testthat::test_that("plot ok", {
                     testthat::expect_true(is.list(mplots))
@@ -91,6 +94,7 @@ mod<-gamlj::gamljMixed(
 
 p0<-predict(mod)
 p1<-predict(mod,random.only=T)
+
 
 
 testthat::test_that("Mixed dots work", {
@@ -135,7 +139,7 @@ mod1<-gamlj::gamljGlmMixed(
   cimethod = "wald")
 
 
-mplot<-gamlj::gamlj_ggplot(mod1)
+mplot<-plot(mod1)
 
 testthat::test_that("plot ok", 
   testthat::expect_true(ggplot2::is.ggplot(mplot))
@@ -225,8 +229,6 @@ testthat::test_that("gzlm predict ", {
   testthat::expect_equal(round(mean(dd$write),2),0)
   
 })
-
-1/6
 
 rmod<-gamlj_model(mod1)
 

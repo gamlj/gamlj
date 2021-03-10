@@ -164,20 +164,20 @@ The options needed in `gamljGlm()` are `plotHAxis` for the x-axis variable and  
 ```{r warning=FALSE, message=FALSE}
 mod4<-gamljGlm(formula = yendu~xage*zexer, data=data, 
                plotHAxis = "xage",plotSepLines = "zexer",plotError = "ci")
-mod4$descPlot
+plot(mod4)
 ```
 
 The nice plot we get shows the simple effects (simple equations to be precise) with the prediction confidence intervals indicated by the colored shades around the lines. If needed, the confidence intervals can be substituted with the standard errors of the estimates or they can be removed completely.
 
-Finally, in order to give a more honest account of the model fit, we can visualize the simple slopes over the the actual data. 
+We use the`plot()` function. The function, applied to a `gamlj` results object, returns one plot if it is present in the model, returned as a ggplot2 object. If more than one plot is present, a list of plots is returned. FALSE is returned if no plot is present or defined. The function `plot()` can also be use to add new plots or to add options to the plots.
+
+For instance, if we want to give a more honest account of the model fit, we can visualize the simple slopes over the the actual data. The function `plot()` produces a new plot after adding any options accepted by `gamljGlm()`
 
 ```{r warning=FALSE, message=FALSE}
-mod4<-gamljGlm(formula = yendu~xage*zexer, data=data, 
-               plotHAxis = "xage",plotSepLines = "zexer",plotError = "ci",plotRaw = TRUE)
-mod4$descPlot
+plot(mod4,plotRaw=T)
 ```
 
-Any plot produced by `gamljGlm` can be obtained as a ggplot2 object for futher manipolations or usage. For instance, one can change the theme of the plot:
+Any plot produced by `gamljGlm` or `plot()` can be obtained as a ggplot2 object for futher manipolations or usage. For instance, one can change the theme of the plot:
 
 ```{r warning=FALSE, message=FALSE}
 myplot<-plot(mod4)
