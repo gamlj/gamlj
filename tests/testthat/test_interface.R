@@ -144,6 +144,38 @@ mplot<-plot(mod1)
 testthat::test_that("plot ok", 
   testthat::expect_true(ggplot2::is.ggplot(mplot))
 )
+library(gamlj)
+wicksell$time<-factor(wicksell$time)
+wicksell$group<-factor(wicksell$group)
+
+gobj<-gamlj::gamljMixed(
+  formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
+  data = wicksell)
+
+r1<-posthoc(gobj)
+r2<-posthoc(gobj,formula=~group+group:time,postHocCorr=c("bonf","holm"))
+tab<-r2[[2]]$asDF
+
+testthat::test_that("posthoc function", {
+                    testthat::expect_false(r1)
+                    testthat::expect_equal(tab[6,8],4.42730,tolerance = tol)
+}
+)
+
+gobj<-gamlj::gamljMixed(
+  formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
+  data = wicksell)
+
+r1<-simpleEffects(gobj)
+r2<-simpleEffects(gobj,formula=~group:time,postHocCorr=c("bonf","holm"))
+tab<-r2[[2]]$asDF
+
+testthat::test_that("posthoc function", {
+  testthat::expect_false(r1)
+  testthat::expect_equal(tab[4,8],-1.4187,tolerance = tol)
+}
+)
+
 
 
 

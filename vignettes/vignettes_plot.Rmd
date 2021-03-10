@@ -60,7 +60,7 @@ mod<-gamljGlm(formula=Sepal.Length~Sepal.Width*Petal.Length*Petal.Width,
 plot(mod)
 ```
 
-To have additional plots, we can re-estimate the model using the options described above or to use `plot()`. The function `plot()` accepts either a formula or character options. The formula is a right hand side formula specifying the x-axis variable and the (optional) moderators.
+To have additional plots, we can re-estimate the model using the options described above or using `plot()`. The function `plot()` accepts either a formula or character options. The formula is a right hand side formula specifying the X-axis variable and the (optional) moderators.
 
 Examples are:
 
@@ -78,7 +78,7 @@ plot(mod,formula = ~Petal.Length)
 plot(mod,formula = ~Sepal.Width:Petal.Length)
 ```
 
-Because the moderator variable `Petal.Length` is a continuous variable, the function plots the independent variable effect at three different levels of the moderator. By default, the three levels are the mean, the mean plus one standard deviation and the mean minus one standard deviation. The conditioning values can be changed with the option `simpleScale`. The option accepts mean_sd' (default) and 'percent'.
+Because the moderator variable `Petal.Length` is a continuous variable, the function plots the independent variable effect at three different levels of the moderator. By default, the three levels are the mean, the mean plus one standard deviation and the mean minus one standard deviation. The conditioning values can be changed with the option `simpleScale`. The option accepts `mean_sd` (default) and `percent`, for 25th,50th, and 75th percentiles.
 
 ```{r warning=FALSE, message=FALSE}
 plot(mod,formula = ~Sepal.Width:Petal.Length, simpleScale="percent")
@@ -88,7 +88,7 @@ plot(mod,formula = ~Sepal.Width:Petal.Length, simpleScale="percent")
 
 ## Three-way plots
 
-A three-way plot produces three plots, one for each level of the last moderator.
+A three-way plot produces one plot for each level of the last moderator, in this case three plots.
 
 ```{r warning=FALSE, message=FALSE}
 plots<-plot(mod,formula = ~Sepal.Width:Petal.Length:Petal.Width)
@@ -99,10 +99,9 @@ Because the formula is expanded, one can obtain all main effects and interaction
 
 # Factors
 
-When the x-axis variable is a factor, a means plot is produced
+When the X-axis variable is a factor, a plot of means is produced.
 
 ```{r warning=FALSE, message=FALSE}
-names(iris)
 mod2<-gamljGlm(formula=Sepal.Length~Species,  data=iris)
 plot(mod2,formula=~Species)
 ```
@@ -145,9 +144,12 @@ p<-plot(mod,plotHAxis="Sepal.Width", plotSepLines="Petal.Length", plotRaw=T,plot
 p+ggplot2::ggtitle("A nice plot")+ggplot2::theme_minimal()
 ```
 
+In case of multiple plots produced, the ggplot objects are contained in a list returned by `plot()`.
+
+
 # Other GAMLj functions
 
-All model functions in GAMLj  (`gamljGlm()`,`gamljGzlm()`,`gamljMixed()` and `gamljGlmMixed()`) can produce plots using the options and functions described above. Here an example with a generalized (logistic) mixed model in which we plot the fixed and random effects predicted values.
+All model functions in GAMLj, (`gamljGlm()`,`gamljGzlm()`,`gamljMixed()` and `gamljGlmMixed()`), can produce plots using the options and functions described above. Here an example with a generalized (logistic) mixed model in which we plot the fixed and random effects predicted values.
 
 ```{r warning=FALSE, message=FALSE, results='hide'}
 data("schoolexam")

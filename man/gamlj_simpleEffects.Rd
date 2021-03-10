@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_simpleEffects}
 \alias{gamlj_simpleEffects}
-\title{Update a GAMLj results by passing new simple effects directives}
+\title{Deprecated simple effects}
 \usage{
 gamlj_simpleEffects(
   object,
@@ -27,7 +27,8 @@ gamlj_simpleEffects(
 Two tables with simple effects parameters estimates and ANOVA tables
 }
 \description{
-This function re-estimates a GAMLj model with new simple effects directives
+Deprecated, please use `simpleffects`
+#'
 }
 \author{
 Marcello Gallucci

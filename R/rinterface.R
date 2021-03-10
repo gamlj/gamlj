@@ -74,12 +74,12 @@ update.gamljGlmMixedResults<-function(object,...) {
 #' @author Marcello Gallucci
 #' @examples
 #' data(qsport)
-#' mod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamljGlm(
 #'   formula = performance ~ hours,
 #'   data = qsport)
 #' 
-#' plot(mod,plotHAxis = "hours")
-#' plot(mod,formula=~hours)
+#' plot(gmod,plotHAxis = "hours")
+#' plot(gmod,formula=~hours)
 #' @rdname plot
 #' @export
 
@@ -171,10 +171,10 @@ gamlj_assumptionsPlots<-function(object) {
   
 }
 
-#' Update a GAMLj results by passing new simple effects directives
+#' Deprecated simple effects
 #'
-#' This function re-estimates a GAMLj model with new simple effects directives
-#'
+#' Deprecated, please use `simpleffects`
+#' #'
 #' @param object a gamlj results object of the class `gamlj*Results`
 #' @param variable the independent variable name
 #' @param moderator the moderator variable name 
@@ -204,11 +204,11 @@ gamlj_simpleEffects<-function(object,variable=NULL,moderator=NULL,threeway=NULL,
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGlm(formula = performance ~ hours,
+#' gmod<-gamlj::gamljGlm(formula = performance ~ hours,
 #'                 data = qsport,
 #'                 scaling = c(hours="standardized"))
 #' 
-#' gdata<-gamlj_data(obj)
+#' gdata<-gamlj_data(gmod)
 #' lm(performance ~ hours,data=gdata)
 #' @export
 
@@ -238,10 +238,10 @@ gamlj_data<-function(object) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#'  preds<-predict(obj)
+#'  preds<-predict(gmod)
 #'  
 #' @export
 
@@ -286,10 +286,10 @@ predict.gamljGlmMixedResults<-function(object, re.form=NULL, type="response", ..
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#'  preds<-gamlj_predict(obj)
+#'  preds<-gamlj_predict(gmod)
 #'  
 #' @export
 
@@ -316,10 +316,10 @@ gamlj_predict<-function(gobj,re.form=NULL, type="response") {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#'  preds<-gamlj_residuals(obj)
+#'  preds<-gamlj_residuals(gmod)
 #'  
 #' @export
 
@@ -343,10 +343,10 @@ gamlj_residuals<-function(gobj, type="response") {
 #' @author Marcello Gallucci
 #' @examples 
 #' data("qsport")
-#' obj<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamljGlm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
-#'  preds<-residuals(obj)
+#'  preds<-residuals(gmod)
 #'  
 #' @export
 
@@ -408,5 +408,101 @@ gamlj_model<-function(object) {
   model  
 }
 
+
+
+#'  Post-hoc test on GAMLj results 
+#'
+#' This is a convenience function to re-estimates a GAMLj model adding posthoc tests. If no options is passed, extracts the 
+#' post-hoc tests tables already in the model results (if any). If new post-hoc are defined, the post-hoc tests tables 
+#' are returned.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @param formula a right hand side formula specifying the factors or factors combinations to test, of the form `~x+z`, `~x:z` or `~x*z`. 
+#' It has prevalence on other options defining a post-hoc test via character options.
+#' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
+#'   `postHoc` (a list of list of terms), `postHocCorr`, a list of correction to apply:
+#'    one or more of 'none', 'bonf', or 'holm'; provide no, Bonferroni, and Holm Post Hoc corrections respectively. 
+#' @return an object of class ggplot or a list of ggplot objects
+#' @author Marcello Gallucci
+#' @examples
+#' data(fivegroups)
+#' fivegroups$Group<-factor(fivegroups$Group)
+#' gmod<-gamlj::gamljGlm(
+#'   formula = Score ~Group,
+#'   data = fivegroups)
+#' 
+#' posthoc(gmod,formula =~Group)
+#' @rdname posthoc
+#' @export
+
+posthoc<-function(object,...) UseMethod("posthoc")
+
+#' @rdname posthoc
+#' @export
+
+posthoc.gamlj<-function(object,formula=NULL,...) {
+
+    if (is.something(formula))
+        object<-stats::update(object,postHoc=formula,...)
+    else
+       if (is.something(list(...)))
+          object<-stats::update(object,...)
+    if (length(object$postHocs)==0)
+         return(FALSE)
+       
+    object$postHocs
+}
+  
+ 
+#'  Simple Effects on GAMLj results 
+#'
+#' This is a convenience function to re-estimates a GAMLj model adding simple effect analysis. If no options is passed, extracts the 
+#' simple effects tables already in the model results (if any). If new tests are defined, the simple effects tests tables 
+#' are returned.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @param formula a right hand side formula specifying the variables to test, of the form `~x:z`, `~x:z:w` or `~x*z`. 
+#' The formula is not exanded, so the first variable is the simple effect variable, the second is the moderator, 
+#' the third an optional additional moderator
+#' It has prevalence on other options defining a simple effects test via character options.
+#' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
+#'   `simpleVariable` (the simple effect variable), `simpleModerator` (the moderator), and `simple3way` for the second moderator. 
+#' @return an object of class gamlj results
+#' @author Marcello Gallucci
+#' @examples
+#' data(winkel)
+#' wicksell$time<-factor(wicksell$time)
+#' wicksell$group<-factor(wicksell$group) 
+#' gmod<-gamlj::gamljMixed(
+#'    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
+#'    data = wicksell)
+#' 
+#' simpleEffects(gmod,formula =~time:group)
+#' @rdname simpleeffects
+#' @export
+
+simpleEffects<-function(object,...) UseMethod("simpleEffects")
+
+#' @rdname simpleeffects
+#' @export
+
+simpleEffects.gamlj<-function(object,formula=NULL,...) {
+
+  if (is.something(formula)) {
+       .call<-all.vars(formula)
+       .simpleVariable<-.call[1]
+       .simpleModerator<-.call[2] 
+        if (!is.na(.call[3])) .simple3way<-.call[3] else .simple3way<-NULL
+        args<-list(simpleVariable=.simpleVariable,simpleModerator=.simpleModerator,simple3way=.simple3way,...)
+        object<-stats::update(object,args)
+  }  else
+        if (is.something(list(...)))
+             object<-stats::update(object,...)
+
+     if (dim(object$simpleEffects$Anova$asDF)[1]==0)
+           return(FALSE)
+
+     object$simpleEffects
+}
 
 
