@@ -1,0 +1,166 @@
+---
+title: "Plots in GAMLj"
+author: Marcello Gallucci
+date: '`r Sys.Date()`'
+output: 
+  
+     rmarkdown::html_vignette:
+          css: style.css
+     html_document:
+         includes:
+            in_header: ganalytics.txt
+         toc: true
+         toc_float:
+             collapsed: false
+         css: style.css
+vignette: >
+  %\VignetteIndexEntry{Plots in GAMLj}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "",
+  fig.align = "center",
+  fig.height = 4,
+  fig.width = 6
+)
+options(digits=3)
+
+```
+
+```{r setup}
+library(gamlj)
+```
+
+# Obtaining a plot
+
+`gamlj` functions (`gamljGlm()`,`gamljGzlm()`,`gamljMixed()` and `gamljGlmMixed()`) can produce plots including up to three variables. The plots portrait the model predicted values in the Y-axis. Using the functions, one can obtain the plots by using the following options:
+
+* `plotHAxis` the variable in the X-axis
+* `plotSepLines` the moderator variable, whose levels define the traces (separated lines)
+* `plotSepPlots` the variable whose levels define the two-way interactions in multiple plots (separated plots)
+
+# Example
+
+We use the `iris` R dataframe. Assume we want to plot the influence of `Sepal.Width`, `Petal.Length` and `Petal.Width` on `Sepal.Length`, and their interactions. We use `gamljGlm()` to estimate the model and ask for the plots.
+
+First we ask for the plot of the main effect of `Sepal.Width`. We use `plot()` without any option to extract the plot from the galmj results object.
+
+```{r warning=FALSE, message=FALSE}
+mod<-gamljGlm(formula=Sepal.Length~Sepal.Width*Petal.Length*Petal.Width, 
+              data=iris,
+              plotHAxis = "Sepal.Width"
+              )
+
+plot(mod)
+```
+
+To have additional plots, we can re-estimate the model using the options described above or to use `plot()`. The function `plot()` accepts either a formula or character options. The formula is a right hand side formula specifying the x-axis variable and the (optional) moderators.
+
+Examples are:
+
+## One-way plots
+
+```{r warning=FALSE, message=FALSE}
+plot(mod,formula = ~Petal.Length)
+
+```
+
+## Two-way plots
+
+
+```{r warning=FALSE, message=FALSE}
+plot(mod,formula = ~Sepal.Width:Petal.Length)
+```
+
+Because the moderator variable `Petal.Length` is a continuous variable, the function plots the independent variable effect at three different levels of the moderator. By default, the three levels are the mean, the mean plus one standard deviation and the mean minus one standard deviation. The conditioning values can be changed with the option `simpleScale`. The option accepts mean_sd' (default) and 'percent'.
+
+```{r warning=FALSE, message=FALSE}
+plot(mod,formula = ~Sepal.Width:Petal.Length, simpleScale="percent")
+```
+
+
+
+## Three-way plots
+
+A three-way plot produces three plots, one for each level of the last moderator.
+
+```{r warning=FALSE, message=FALSE}
+plots<-plot(mod,formula = ~Sepal.Width:Petal.Length:Petal.Width)
+print<-lapply(plots,print)
+```
+
+Because the formula is expanded, one can obtain all main effects and interactions plots in one call by passing `formula=~Sepal.Width*Petal.Length*Petal.Width`
+
+# Factors
+
+When the x-axis variable is a factor, a means plot is produced
+
+```{r warning=FALSE, message=FALSE}
+names(iris)
+mod2<-gamljGlm(formula=Sepal.Length~Species,  data=iris)
+plot(mod2,formula=~Species)
+```
+
+
+# Character options
+
+Alternatively, the function accepts  charcater options. The three options relevant here are:
+
+* `plotHAxis` defining the variable in the X-axis
+* `plotSepLines` defining the variable whose levels define the way the effect of the variable in the X-axis is broken down (the moderator)
+* `plotSepPlots` defining the variable whose levels define the way the two-way interaction is broken down
+
+A two-way plot, for instance, can be obtained as follows:
+
+```{r warning=FALSE, message=FALSE}
+plot(mod,plotHAxis="Sepal.Width", plotSepLines="Petal.Length")
+```
+
+# Other options
+
+The function `plot` accepts any option which is accepted by `gaml*` functions. The most relevant for producing plots are: 
+
+* `plotRaw` (logical) to plot the observed scores along the predicted values
+* `plotDvScale` (logical) to set the range of the Y-axis equal to the actual range of the dependent variable
+*  `plotError` to add confidence intervals bars (`ci`) or error bars `se` along the predicted values. Default is `none`.
+
+
+```{r warning=FALSE, message=FALSE}
+plot(mod,plotHAxis="Sepal.Width", plotSepLines="Petal.Length", plotRaw=T,plotError="ci")
+
+plot(mod2,formula=~Species,plotRaw=T,plotError="ci")
+
+```
+
+In addition, the plot can be saved in a variable an manipulated as any other ggplot object, for instance to change the theme or add a title.
+s
+```{r warning=FALSE, message=FALSE}
+p<-plot(mod,plotHAxis="Sepal.Width", plotSepLines="Petal.Length", plotRaw=T,plotError="ci")
+p+ggplot2::ggtitle("A nice plot")+ggplot2::theme_minimal()
+```
+
+# Other GAMLj functions
+
+All model functions in GAMLj  (`gamljGlm()`,`gamljGzlm()`,`gamljMixed()` and `gamljGlmMixed()`) can produce plots using the options and functions described above. Here an example with a generalized (logistic) mixed model in which we plot the fixed and random effects predicted values.
+
+```{r warning=FALSE, message=FALSE, results='hide'}
+data("schoolexam")
+mod3<-gamljGlmMixed(formula=pass~math+(1|school),data=schoolexam)
+
+p<-plot(mod3, plotHAxis = "math",plotRandomEffects=T)
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+p
+
+```
+
+...
+
+[back to top](#plots-in-gamlj)

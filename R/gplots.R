@@ -335,8 +335,8 @@ gplots.twoWaysPlot<-function(image,theme,depName,groupName,linesName,errorType="
     else
         p <- p + ggplot2::geom_point(data=rawData,aes_string(x="x", y="y"),show.legend=FALSE, alpha=.5,shape=16, size=2)
     }
-
-  p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2, position=dodge) 
+  
+  p <- p+ ggplot2::geom_line(data=gdata,aes_string(x="group", y="fit", group="lines",colour="lines"),size=1.2) ## removed , position=dodge
   p <- p + ggplot2::labs(x=groupName, y=depName,colour=clabel) 
  # p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range))) 
   

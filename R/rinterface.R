@@ -44,6 +44,7 @@ update.gamljGlmMixedResults<-function(object,...) {
   params<-list(...)
   if (is.null(names(params)))
       params<-params[[1]]
+  mark(params)
   
   forms<-formals(fun)
   alist<-list()
@@ -51,7 +52,6 @@ update.gamljGlmMixedResults<-function(object,...) {
     if  (f %in% names(object$options)) 
       alist[[f]]<-object$options[[f]]
   }
-  mark("update",params)
   for (p in names(params)) {
     alist[[p]]<-params[[p]]     
   }
@@ -66,14 +66,11 @@ update.gamljGlmMixedResults<-function(object,...) {
 #' plots present in the `gamlj*Results` object. If one plot is present, it is returned as a ggplot2 object,
 #'  if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined. 
 
-#' @param x a gamlj results object of the class `gamlj*Results`
+#' @param x a gamlj results object of the class `gamlj`
 #' @param formula a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
 #' It has prevalence on other options defining a plot.
-#' @param haxis horizontal axis variable
-#' @param sepLines variable defining the levels for separate lines 
-#' @param sepPlots variable defining the levels for which separate plots are produced 
-#' @param ... ignored
-#' @return an object of class GAMLj* as the input object
+#' @param ... all options accepted by a gamlj model function. Relevant for new plots are `plotHAxis`, `plotSepLines` and `plotSepPlots`
+#' @return an object of class ggplot or a list of ggplot objects
 #' @author Marcello Gallucci
 #' @examples
 #' data(qsport)
@@ -81,55 +78,40 @@ update.gamljGlmMixedResults<-function(object,...) {
 #'   formula = performance ~ hours,
 #'   data = qsport)
 #' 
-#' plot(mod,haxis = "hours")
+#' plot(mod,plotHAxis = "hours")
 #' plot(mod,formula=~hours)
 #' @rdname plot
 #' @export
 
-plot.gamljGlmResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
- .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
-}
-
-#' @rdname plot
-#' @export
-
-plot.gamljGzlmResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
-  .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
-}
-
-#' @rdname plot
-#' @export
-
-plot.gamljMixedResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
-  .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
-}
-
-#' @rdname plot
-#' @export
-
-plot.gamljGlmMixedResults<-function(x,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
-  .gamlj_ggplot(x,formula=formula,haxis=haxis,sepLines=sepLines,sepPlots=sepPlots,...)
-}
-
-
-.gamlj_ggplot<-function(object,formula=NULL,haxis=NULL,sepLines=NULL,sepPlots=NULL,...) {
+plot.gamlj<-function(x,formula=NULL,...) {
 
    if (is.something(formula)) {
-    .vars<-all.vars(formula)
-    haxis<-.vars[1]
-    if (!is.na(.vars[2])) sepLines<-.vars[2] else sepLines<-NULL 
-    if (!is.na(.vars[3])) sepPlots<-.vars[3] else sepPlots<-NULL
+     .calls<-jmvcore::marshalFormula(formula,from='rhs',type='terms',data=NULL)
+     plots<-lapply(.calls, function(.call) {
+       haxis<-.call[1]
+       if (!is.na(.call[2])) sepLines<-.call[2] else sepLines<-NULL 
+       if (!is.na(.call[3])) sepPlots<-.call[3] else sepPlots<-NULL
+       args<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
+       object<-stats::update(x,args)
+       .extract_plots(object)
+      }) 
+     }  else {
+        if (is.something(list(...))) 
+              x<-stats::update(x,...)
+        
+      plots<-.extract_plots(x)
+     }
+   if ("list" %in% class(plots) && length(plots)==1)
+       plots<-plots[[1]]
+    plots
    }
-  if (is.something(haxis)) {
-    args<-list(plotHAxis=haxis,plotSepLines=sepLines,plotSepPlots=sepPlots,...)
-    object<-stats::update(object,args)
-  } else
-        if (is.something(list(...))) {
-            object<-stats::update(object,...)
-        }
+
+
+.extract_plots<-function(object) {
   
-    if (length(object$descPlots)==0)
-            return(object$descPlot$plot$fun())
+    if (length(object$descPlots)==0) {
+          return(object$descPlot$plot$fun())
+    }
      else {
        alist<-list()
        for (i in 1:length(object$descPlots)) {
