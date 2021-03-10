@@ -1,5 +1,5 @@
 ---
-title: "Examples of gamljGlm"
+title: "Examples of gamljGlm()"
 author: Marcello Gallucci
 date: '`r Sys.Date()`'
 output: 
@@ -14,7 +14,7 @@ output:
              collapsed: false
          css: style.css
 vignette: >
-  %\VignetteIndexEntry{Examples of gamljGlm}
+  %\VignetteIndexEntry{Examples of gamljGlm()}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
