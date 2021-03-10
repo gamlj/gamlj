@@ -23,10 +23,10 @@ Deprecated. Please use `residuals()`
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGlm(
+gmod<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)
- preds<-gamlj_residuals(obj)
+ preds<-gamlj_residuals(gmod)
  
 }
 \author{

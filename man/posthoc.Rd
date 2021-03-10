@@ -30,11 +30,11 @@ are returned.
 \examples{
 data(fivegroups)
 fivegroups$Group<-factor(fivegroups$Group)
-mod<-gamlj::gamljGlm(
+gmod<-gamlj::gamljGlm(
   formula = Score ~Group,
   data = fivegroups)
 
-posthoc(mod,formula =~Group)
+posthoc(gmod,formula =~Group)
 }
 \author{
 Marcello Gallucci
