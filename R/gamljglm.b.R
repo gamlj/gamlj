@@ -8,6 +8,7 @@ gamljGlmClass <- R6::R6Class(
     .postHocRows=NA,
     .init=function() {
       ginfo("init")
+      class(private$.results) <- c('gamlj', class(private$.results))
       private$.names64<-names64$new()
       n64<-private$.names64
       dep<-self$options$dep

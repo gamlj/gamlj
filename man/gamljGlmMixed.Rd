@@ -6,6 +6,7 @@
 \usage{
 gamljGlmMixed(
   data,
+  formula = NULL,
   dep = NULL,
   factors = NULL,
   covs = NULL,
@@ -46,12 +47,13 @@ gamljGlmMixed(
   modelSelection = "logistic",
   custom_family = "gaussian",
   custom_link = "identity",
-  cimethod = "wald",
-  formula
+  cimethod = "wald"
 )
 }
 \arguments{
 \item{data}{the data as a data frame}
+
+\item{formula}{(optional) the formula to use. The syntax is the same used in [lme4::lmer()]. See the examples}
 
 \item{dep}{a string naming the dependent variable from \code{data},
 variable must be numeric}
@@ -181,8 +183,6 @@ gaussian, binomial, gamma and inverse_gaussian .}
 identity, log and inverse, onemu2 (for 1/mu^2).}
 
 \item{cimethod}{.}
-
-\item{formula}{(optional) the formula to use. The syntax is the same used in [lme4::lmer()]. See the examples}
 }
 \value{
 A results object containing:

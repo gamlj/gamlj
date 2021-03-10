@@ -259,6 +259,7 @@ gobj2<-gamlj::gamljMixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = data, postHoc = list(c("time","group")))
 
+
 ph<-gobj2$postHocs[[1]]$asDF
 test<-ph[ph$c1=="0" & ph$c2=="1" & ph$c3=="6" & ph$c4=="1", ]
 

@@ -19,8 +19,8 @@
 #'        cluster = "subj",
 #'        randomTerms=list(list(c("cond","subj"))))
 #'        
-#' @param formula (optional) the formula to use. The syntax is the same used in [lme4::lmer()]. See the examples
 #' @param data the data as a data frame
+#' @param formula (optional) the formula to use. The syntax is the same used in [lme4::lmer()]. See the examples
 #' @param dep a string naming the dependent variable from \code{data},
 #'   variable must be numeric
 #' @param factors a vector of strings naming the fixed factors from
@@ -136,6 +136,7 @@
 #' @export
 gamljGlmMixed <- function(
   data,
+  formula=NULL,
   dep = NULL,
   factors = NULL,
   covs = NULL,
@@ -179,8 +180,8 @@ gamljGlmMixed <- function(
   modelSelection = "logistic",
   custom_family = "gaussian",
   custom_link = "identity",
-  cimethod = "wald",
-  formula) {
+  cimethod = "wald"
+  ) {
   
   if ( ! requireNamespace('jmvcore'))
     stop('gamljGlmMixed requires jmvcore to be installed (restart may be required)')
