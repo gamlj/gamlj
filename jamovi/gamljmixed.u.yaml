@@ -272,6 +272,12 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+          - type: Label
+            label: Dependent variable 
+            children:
+                     - type: ComboBox
+                       name: dep_scale
+
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -447,14 +453,13 @@ children:
             label: Residuals-Predicted plot
       - type: Label
         label: By clusters
-        children: 
+        children:
           - type: CheckBox
             name: clusterBoxplot
             label: Residuals boxplot
           - type: CheckBox
             name: randHist
             label: Random coefficients histogram
-
   - type: CollapseBox
     label: Options
     style: inline
@@ -476,3 +481,15 @@ children:
             name: cimethod_boot
             optionName: cimethod
             optionPart: boot
+      - type: Label
+        label: DF Method
+        children:
+          - type: RadioButton
+            name: dfmethod_Satterthwaite
+            optionName: dfmethod
+            optionPart: Satterthwaite
+          - type: RadioButton
+            name: dfmethod_Kenward-Roger
+            optionName: dfmethod
+            optionPart: Kenward-Roger
+

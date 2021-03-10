@@ -145,7 +145,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 }
 
 .mf.summary.multinom<-function(model) {
-  
+
      sumr<-summary(model)
      rcof<-sumr$coefficients
      cof<-as.data.frame(matrix(rcof,ncol=1))
@@ -179,7 +179,6 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.multinom<-function(model) {
-
       ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
       colnames(ano)<-c("test","df","p")
       as.data.frame(ano, stringsAsFactors = F)
@@ -187,36 +186,42 @@ mf.anova<- function(x,...) UseMethod(".anova")
   }
   
 .anova.lm<-function(model) {
-    ano<-car::Anova(model,test="F",type=3, singular.ok=T)
-    colnames(ano)<-c("ss","df","f","p")
-    if (length(grep("Intercept",rownames(ano),fixed=T))>0)
-        dss<-ano[-1,]
-    else
-        dss<-ano
+        ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+        colnames(ano)<-c("ss","df","f","p")
+        dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
+        tots<-list(ss=sum(ano$ss),df=sum(ano$df))
+        reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
+        ss<-summary(model)
+        p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
+        modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        mods<-list(ss=sum(dss$ss),
+               df= ss$fstatistic[[2]],
+               f=ss$fstatistic[[1]],
+               p=p,
+               etaSq=modeta[[1]],etaSqP=modeta[[1]],
+               omegaSq=modomega[[1]],
+               epsilonSq=modepsilon[[1]])
     
-    sumr<-summary(model)
-    errDF<-sumr$fstatistic[3]
-    modDF<-sumr$fstatistic[2]
-    modF<-sumr$fstatistic[1]
-    errSS<-dss$ss[length(dss$ss)]
-    errMS<-errSS/errDF
-    r2<-sumr$r.squared
-    totalSS<-1/((1-r2)*(1/errSS))
-    modSS<-totalSS-errSS
-    modp<-1 - stats::pf(modF, modDF, errDF) 
-    modRow<-c(ss=modSS,df=modDF,F=modF,p=modp)
-    ss<-rbind(modRow,dss)
-    ss$ms<-ss$ss/ss$df
-    ss$etaSq<-ss$ss/(totalSS)
-    ss$etaSqP <- ss$ss / (ss$ss + errSS)
-    ss$omegaSq <- (ss$ss - (ss$df * errMS)) / (totalSS + errMS)
-    lt<-length(ss$df)
-    ss[lt,c("f","p","etaSq","etaSqP","omegaSq")]<-NA
-    ss
+        etap<-effectsize::eta_squared(model,partial = T,verbose = F)
+        eta<-effectsize::eta_squared(model,partial = F,verbose = F)
+        eps<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        omega<-effectsize::omega_squared(model,partial = T,verbose = F)
+        epsilon<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        dss$etaSq<-eta[,2]
+        dss$etaSqP<-etap[,2]
+        dss$omegaSq<-omega[,2]
+        dss$epsilonSq<-epsilon[,2]
+        reslist<-listify(dss)
+        reslist<-append_list(reslist,reds,"Residuals")
+        reslist<-append_list(reslist,tots,"Totals")
+        reslist<-prepend_list(reslist,mods,"Model")
+    reslist
 }
 
-.anova.glmerMod<-function(model) {
-  ginfo(".anova.glmerMod")
+.anova.glmerMod<-function(model,df="Satterthwaite") {
+  ginfo("using .anova.glmerMod")
   ano<-.car.anova(model)
   names(ano)<-c("test","df1","p")
   ano  
@@ -235,10 +240,8 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
   ano<-stats::anova(model,ddf=df)
-        
   if (dim(ano)[1]==0)
     return(ano)
-  
   if (dim(ano)[2]==4) {
     ano<-.car.anova(model,df)
   } else {
@@ -342,10 +345,16 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
   
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
-     if (modelType %in% c("linear","mixed"))
+     if (modelType %in% c("linear","mixed")) {
        ### here I need the dv to be really numeric
-       data[[dep]] <- as.numeric(as.character(data[[dep]]))  
-     
+       data[[dep]] <- as.numeric(as.character(data[[dep]]))
+       clusterdata<-NULL
+       if (is.something(cluster))
+         clusterdata<-data[[jmvcore::toB64(cluster)]]
+
+       if ("dep_scale" %in% names(options)) 
+           data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
+     }
        if ( any(is.na(data[[dep]])) ) {
           nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
           return(paste(nice,"model requires a numeric dependent variable"))
@@ -458,7 +467,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
      if (method=="wald")
                method<-"Wald"
      
-      mark(paste("C.I for glmerMod with method",method))
       ci<-try(stats::confint(model,method=method,level=level))
       if (jmvcore::isError(ci)) 
         return(.confint.format(ci,parameters))
@@ -472,7 +480,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
   }
 
 .confint.glmerMod<-function(model,level,parameters,method="wald")  {
-  mark(paste("C.I for glmerMod with method",method))
   if (method=="wald")
         method="Wald"
   ci<-stats::confint(model,level=level,method=method)
@@ -505,9 +512,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 }
 
 
-
 ########### to be removed and update with mi.xxx #########
-
 
 mf.aliased<- function(x,...) UseMethod(".aliased")
 
@@ -530,3 +535,25 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   FALSE
   
 }
+
+
+########### set the model call for R in a reasonable way #########
+
+mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
+
+.setModelCall.default<-function(model,info) {
+  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
+  call<-paste0(info$command,"(",coptions,", data=data)")
+  model$call<-call
+  model
+}
+
+.setModelCall.lmerMod<-function(model,info) {
+  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
+  call<-paste0(info$command,"(",coptions,", data=data)")
+  model@call<-as.call(str2lang(call))
+  model
+}
+.setModelCall.glmerMod<-function(model,info) 
+        .setModelCall.lmerMod(model,info)
+  

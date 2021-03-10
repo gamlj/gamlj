@@ -1,0 +1,190 @@
+---
+title: "Examples of gamljGlm()"
+author: Marcello Gallucci
+date: '`r Sys.Date()`'
+output: 
+  
+     rmarkdown::html_vignette:
+          css: style.css
+     html_document:
+         includes:
+            in_header: ganalytics.txt
+         toc: true
+         toc_float:
+             collapsed: false
+         css: style.css
+vignette: >
+  %\VignetteIndexEntry{Examples of gamljGlm()}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "",
+  fig.align = "center",
+  fig.height = 4,
+  fig.width = 6
+)
+options(digits=3)
+
+```
+
+```{r setup}
+library(gamlj)
+```
+
+# Linear models in GAMLj
+
+In this example we run a moderated regression analysis with simple slopes analysis and simple slopes graphs. Data are from   [Cohen et al 2003](http://psycnet.apa.org/record/2002-18109-000) and can be downloaded  [here](https://github.com/mcfanda/gamlj_docs/blob/master/data/exercise.csv). 
+
+# The research design
+
+The research is about physical endurance associated with age and physical exercise. 245 participants were measured while jogging on a treadmill. Endurance was measured in minutes ('yendu' in the file). Participants' age (`xage` in years) and number of years of physical exercise (`zexer` in years) were recorded as well 
+
+```{r }
+data<-read.csv("https://raw.githubusercontent.com/mcfanda/gamlj_docs/master/data/exercise.csv")
+summary(data[,c("xage","zexer","yendu")])
+
+```
+
+
+The researcher is interested in studying the relationships between endurance, age, and exercising, with the hypothesis that the effect of age (expected to be  negative) is moderated by exercise, such that the more participants work out (higher levels of `exer`) the less age negatively affects endurance. 
+
+# Understanding the problem
+
+We can think about this analytic problem as a multiple regression, where the effect of age and exercise can be estimated while keeping constant the other variable. However, the researcher puts forward a _moderation hypothesis_, because s/he expects the effect of age to change for different levels of exercising. We than need an interaction between age and exercise.
+
+We first run a multiple regression (to warm up), then we estimate a multiple regression with an interaction (moderated regression) and we probe the interaction with a simple slope analysis and simple slope graphs. Technical details can be found in [Cohen et al 2003](http://psycnet.apa.org/record/2002-18109-000), or in [Preacher website](http://quantpsy.org/interact/interactions.htm).
+
+# Multiple regression
+
+GAMLj GML function minimum setup only requires to specify the formula of the model and the dataframe. The formula interface is the same one uses in `lm()` function.
+```{r warning=FALSE, message=FALSE}
+mod1<-gamljGlm(formula = yendu~xage+zexer, data=data)
+mod1
+```
+
+
+
+The object `mod' is an R6 object which contains all the results tables and some additional function that can be used in subsequent analyses. Tables are pretty printed, but they can be modified or manipulated by trasforming them in dataframes as follows:
+
+```{r }
+anofaDF<-mod1$main$anova$asDF
+anofaDF
+```
+
+
+## Results
+
+Results show three tables. Table info contains information about the overall model. The Anova omnibus tests table contains the results of the `car:Anova()` function, with the addition of the partial $\eta^2$ index for each effect and the inferential test for the whole model. The `Fixed effect parameter estimates` table contains the `summary()` results. For each coefficient the confidence interval is also reported.
+
+A special note should be made for the intercept. The intercept is the expected value (the mean) of the dependent variable, estimated for all independent variables equal to their means. This is because in gamljGlm(), continuous variables are centered to their mean by default. In case one wants the independent variables not to be centered, one can select a different scaling with the option `scaling`.
+
+Additional effect size indexes can be asked with the option `effectSize`. 
+
+```{r }
+mod2<-gamljGlm(formula = yendu~xage+zexer, 
+              data=data,
+              effectSize = c("beta", "eta","partEta","omega","epsilon"))
+mod2$main$anova
+```
+
+The same analysis can be done by updating the model with the `update()` function. Almost all the options available in `gamljGlm()` can be added to a model by running `update(mod,...)` where `...` is any option or options accepted by `gamljGlm()`.
+
+
+```{r }
+mod2_2<-update(mod1,effectSize = c("beta", "eta","partEta","omega","epsilon"))
+mod2_2$main$anova
+```
+
+
+
+# Moderated regression
+
+To include the interaction we simply add the interaction effect in the formula.
+
+```{r warning=FALSE, message=FALSE}
+mod3<-gamljGlm(formula = yendu~xage*zexer, data=data)
+mod3
+```
+
+## Results
+
+Because variables are centered to their means, the first-order coefficients can be interpreted as "average" effects. 
+One can also report the betas ($\beta$). The estimates of the betas are correct also in the presence of the interaction, because the variables are standardized before the interaction term is computed.
+
+## Simple Slopes
+
+We can now probe the interaction. One can re-run the model adding the appropriate options to ask for simple effects or one can use the `gamlj_simpleffects()` function, which is a convenience function to add simple effects to a pre-existing model. The function  `gamlj_simpleffects()`, however, only returns the simple effects tables, not the full model.
+
+
+
+```{r warning=FALSE, message=FALSE}
+#mod4<-gamljGlm(formula = yendu~xage*zexer,
+#               data=data,
+#               simpleVariable = "xage",
+#               simpleModerator = "zexer")
+### equivalent results :
+gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer")
+```
+
+In this way we obtain the effect of age computed for high exercise (`zexer` centered to 1 SD above average), the main effect of age (`zexer` centered to its mean) and the effect of age computed for low exercise (`zexer` centered to -1 SD above average). `gamlGLM()` produces both the F-tests and the parameter estimates for the simple slopes. We focus on the latter table now.
+
+
+One can change the conditioning levels of the moderators with the `simpleScale` option (defaul is `mean_sd` for mean plus/minus one SD), either added to the `gamljGlm()` function or to the `gamlj_simpleEffects()` function. If one wants to use the percentiles (25%,50%,75%), for instance, one can run the following.
+
+```{r warning=FALSE, message=FALSE}
+gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer",simpleScale="percent")
+```
+
+The simple effects are now changed, because they are estimated for a different set of values of the moderator.
+
+One can further tweak the appearance of the tables by selecting a different value/labels  in `simpleScaleLabels` option. Options are "labels", "values" and "values_labels". The latter outputs the values and the labels of the conditioning values.
+
+```{r warning=FALSE, message=FALSE}
+gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer",
+                    simpleScale="percent", 
+                    simpleScaleLabels="values_labels")
+```
+
+
+
+## Simple Slopes Plot
+
+We can get a clear picture of the interaction by asking for a plot. Also the plot module takes care of centering the variables in a way that makes the plot clearly understandable. 
+
+
+The options needed in `gamljGlm()` are `plotHAxis` for the x-axis variable and  `plotSepLines` for the moderator. At which three levels of the moderator the separate lines are computed is decided by the option `simpleScale` as for the simple effects. 
+
+
+```{r warning=FALSE, message=FALSE}
+mod4<-gamljGlm(formula = yendu~xage*zexer, data=data, 
+               plotHAxis = "xage",plotSepLines = "zexer",plotError = "ci")
+plot(mod4)
+```
+
+The nice plot we get shows the simple effects (simple equations to be precise) with the prediction confidence intervals indicated by the colored shades around the lines. If needed, the confidence intervals can be substituted with the standard errors of the estimates or they can be removed completely.
+
+We use the`plot()` function. The function, applied to a `gamlj` results object, returns one plot if it is present in the model, returned as a ggplot2 object. If more than one plot is present, a list of plots is returned. FALSE is returned if no plot is present or defined. The function `plot()` can also be use to add new plots or to add options to the plots.
+
+For instance, if we want to give a more honest account of the model fit, we can visualize the simple slopes over the the actual data. The function `plot()` produces a new plot after adding any options accepted by `gamljGlm()`
+
+```{r warning=FALSE, message=FALSE}
+plot(mod4,plotRaw=T)
+```
+
+Any plot produced by `gamljGlm` or `plot()` can be obtained as a ggplot2 object for futher manipolations or usage. For instance, one can change the theme of the plot:
+
+```{r warning=FALSE, message=FALSE}
+myplot<-plot(mod4)
+myplot+ggplot2::theme_grey()
+
+```
+
+
+
+[back to top](#linear-models-in-gamlj)

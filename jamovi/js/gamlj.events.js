@@ -34,7 +34,7 @@ const events = {
     },
     
     onChange_simpleSupplier: function(ui) {
-          console.log("change simple");
+//          console.log("change simple in gamlj");
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
         this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
@@ -49,7 +49,7 @@ const events = {
     },
 
      onChange_model: function(ui) {
-        console.log("model changed");
+//        console.log("model changed");
         if (typeof ui.effectSize_RR !== 'undefined' ) {
               ui.effectSize_RR.setValue(false);
         }
@@ -189,6 +189,7 @@ var updatePostHocSupplier = function(ui, context) {
 };
 
 var filterModelTerms = function(ui, context) {
+//    console.log("filterModelTerms in gamlj");
     var termsList = context.cloneArray(ui.modelTerms.value(), []);
     var diff = context.findChanges("termsList", termsList, true, FormatDef.term);
 

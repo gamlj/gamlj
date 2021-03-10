@@ -1,5 +1,5 @@
 title: General Linear Model
-name: gamljGLM
+name: gamljGlm
 jus: '2.0'
 compilerMode: tame
 events:
@@ -38,7 +38,7 @@ children:
               change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
-    style: inline
+    style: list
     children:
       - type: Label
         label: Effect Size
@@ -60,6 +60,10 @@ children:
           - name: effectSize_omega
             type: CheckBox
             optionPart: omega
+            optionName: effectSize
+          - name: effectSize_epsilon
+            type: CheckBox
+            optionPart: epsilon
             optionName: effectSize
       - type: Label
         label: Confidence Intervals
@@ -101,11 +105,8 @@ children:
                   change: './gamlj.events::onChange_modelTerms'
                 template:
                   type: TermLabel
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: CheckBox
-            name: fixedIntercept
+      - type: CheckBox
+        name: fixedIntercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -204,6 +205,11 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+          - type: Label
+            label: Dependent variable
+            children:
+              - type: ComboBox
+                name: dep_scale
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -373,7 +379,7 @@ children:
         name: qq
         label: Q-Q plot of residuals
       - type: CheckBox
-        name:  normPlot
+        name: normPlot
         label: Residuals histogram
       - type: CheckBox
         name: residPlot

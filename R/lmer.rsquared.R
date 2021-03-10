@@ -109,6 +109,7 @@ r.squared.merMod <- function(mdl){
 
 .rsquared.glmm <- function(varF, varRand, varResid = NULL, varDisp = NULL, family, link,
                            mdl.aic, mdl.class, null.fixef = NULL){
+  varDist<-0
   if(family == "gaussian"){
     # Only works with identity link
     if(link != "identity")
@@ -149,7 +150,7 @@ r.squared.merMod <- function(mdl){
   
   # Bind R^2s into a matrix and return with AIC values
   data.frame(Class=mdl.class, Family = family, Link = link,
-             Marginal=Rm, Conditional=Rc, AIC=mdl.aic)
+             Marginal=Rm, Conditional=Rc, AIC=mdl.aic, varDist=varDist,varDisp=varDisp)
 }
 
 family_link.stop <- function(family, link){

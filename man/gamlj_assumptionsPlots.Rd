@@ -4,10 +4,10 @@
 \alias{gamlj_assumptionsPlots}
 \title{Extract assumptions checking plots from a GAMLj results object}
 \usage{
-gamlj_assumptionsPlots(gobj)
+gamlj_assumptionsPlots(object)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*#'}
+\item{object}{a gamlj results object of the class `gamlj*Results``}
 }
 \value{
 a list of lists with titles and ggplot objects

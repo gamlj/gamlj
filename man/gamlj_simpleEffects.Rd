@@ -5,7 +5,7 @@
 \title{Update a GAMLj results by passing new simple effects directives}
 \usage{
 gamlj_simpleEffects(
-  gobj,
+  object,
   variable = NULL,
   moderator = NULL,
   threeway = NULL,
@@ -13,7 +13,7 @@ gamlj_simpleEffects(
 )
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 
 \item{variable}{the independent variable name}
 
@@ -24,7 +24,7 @@ gamlj_simpleEffects(
 \item{...}{any other options accepted by the gamlj_* function}
 }
 \value{
-an object of class GAMLj* as the input object
+Two tables with simple effects parameters estimates and ANOVA tables
 }
 \description{
 This function re-estimates a GAMLj model with new simple effects directives

@@ -44,7 +44,7 @@ const events = {
         this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
     onChange_model: function(ui) {
-        console.log("model changed");
+//        console.log("model changed");
         ui.dep.setValue(null);
       }
 

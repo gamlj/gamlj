@@ -4,10 +4,10 @@
 \alias{gamlj_data}
 \title{Extract data transformed by GAMLj to run R analyses in line with gamlj setup}
 \usage{
-gamlj_data(gobj)
+gamlj_data(object)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 }
 \value{
 a dataset
@@ -19,9 +19,9 @@ models in R with other R packages with the same setup used by GAMLj
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGLM(formula = performance ~ hours,
+obj<-gamlj::gamljGlm(formula = performance ~ hours,
                 data = qsport,
-                scaling = list(list(var="hours",type="standardized")))
+                scaling = c(hours="standardized"))
 
 gdata<-gamlj_data(obj)
 lm(performance ~ hours,data=gdata)

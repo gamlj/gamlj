@@ -21,6 +21,7 @@ items:
          title: ""
     clearWith:
         - dep
+        - dep_scale
         - randomTerms
         - modelTerms
         - fixedIntercept
@@ -37,9 +38,11 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - randomTerms
         - correlatedEffects
         - fixedIntercept
+        - dfmethod
     items:
            - name: anova
              title: Fixed Effect Omnibus tests
@@ -51,9 +54,12 @@ items:
                          - reml
                          - contrasts
                          - scaling
+                         - dep_scale
                          - randomTerms
                          - correlatedEffects
                          - fixedIntercept
+                         - dfmethod
+
              columns:
                     - name: name
                       title: ""
@@ -81,6 +87,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -129,6 +136,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -162,6 +170,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -192,10 +201,12 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
                     - randomTerms
+
              columns:
                    - name: test
                      title: "Test"
@@ -249,6 +260,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - randomTerms
         - correlatedEffects
         - postHocCorr
@@ -293,18 +305,13 @@ items:
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    items:
-            - name: Anova
-              title: Simple Effects ANOVA
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
+    clearWith:
                  - dep
                  - modelTerms
                  - reml
                  - contrasts
                  - scaling
+                 - dep_scale
                  - randomTerms
                  - correlatedEffects
                  - fixedIntercept
@@ -315,6 +322,13 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
               columns:
                  - name: threeway
                    title: ""
@@ -349,15 +363,6 @@ items:
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
-              clearWith:
-                     - dep
-                     - cluster
-                     - modelTerms
-                     - contrasts
-                     - fixedIntercept
-                     - simpleScale
-                     - ciWidth
-                     
               columns:
                      - name: threeway
                        title: " "
@@ -410,6 +415,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - simpleScaleLabels
         - randomTerms
         - correlatedEffects
@@ -455,6 +461,7 @@ items:
         - plotError
         - ciWidth
         - scaling
+        - dep_scale
         - plotRaw
         - plotDvScale
         - fixedIntercept
@@ -486,6 +493,7 @@ items:
            - plotError
            - ciWidth
            - scaling
+           - dep_scale
            - modelTerms
            - fixedIntercept
            - simpleScale
@@ -546,6 +554,8 @@ items:
           clearWith:
             - dep
             - modelTerms
+            - dep_scale
+          
         - name: residPlot
           title: Residual-Predicted Scatterplot
           visible: (residPlot)
@@ -557,6 +567,7 @@ items:
           requiresData: true
           clearWith:
             - dep
+            - dep_scale
             - modelTerms
         - name: clusterBoxplot
           title: Residuals by cluster boxplot
@@ -565,6 +576,7 @@ items:
           visible: (clusterBoxplot)
           clearWith:
             - dep
+            - dep_scale
             - modelTerms
           template:
              title: $key
@@ -580,6 +592,7 @@ items:
           visible: (randHist)
           clearWith:
             - dep
+            - dep_scale
             - modelTerms
           template:
              title: $key

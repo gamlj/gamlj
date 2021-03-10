@@ -1,4 +1,3 @@
-#' @import lmerTest
 
 GAMLj_DEBUG=F
 GAMLj_INFO=F
@@ -158,3 +157,4 @@ letter_pepsilon2<-paste(greek_vector["epsilon"],'\u00B2',"p",sep="")
 
 
 ##########################
+

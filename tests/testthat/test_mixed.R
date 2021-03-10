@@ -1,12 +1,13 @@
 context("mixed")
 
 data("subjects_by_stimuli")
-data<-subjects_by_stimuli
-data$cond<-factor(data$cond)
+
+subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),
-  data = data, plotHAxis = cond,
+  data = subjects_by_stimuli,
+  plotHAxis = cond,
   residPlot=T, randHist = T, clusterBoxplot = T
 )
 infotable<-model$info$asDF
@@ -21,7 +22,7 @@ testthat::test_that("info is ok", {
 ftable<-model$main$anova$asDF
 
 testthat::test_that("f-table is ok", {
-  expect_equal(ftable[1,4],2949)
+  testthat::expect_equal(ftable[1,4],2949)
 })
 
 ptable<-model$main$fixed$asDF
@@ -40,7 +41,7 @@ testthat::test_that("p-table is ok", {
 })
 
 testthat::test_that("a descplot is produced", {
-  testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
+  testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 })
 
 testthat::test_that("a  residplot is produced", {
@@ -63,14 +64,14 @@ model<-gamlj::gamljMixed(
   modelTerms = "cond",
   cluster = "subj",
   randomTerms = list(list(c("Intercept","subj"))),
-  data = data
+  data = subjects_by_stimuli
 )
 
 
 ftable<-model$main$anova$asDF
 
 testthat::test_that("list interface is ok", {
-  expect_equal(ftable[1,4],2949)
+  testthat::expect_equal(ftable[1,4],2949)
 })
 
 
@@ -109,27 +110,38 @@ testthat::test_that("uncorrelated works", {
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =formula,
-  data = data, plotHAxis = cond,
+  data = subjects_by_stimuli, plotHAxis = cond,
   lrtRandomEffects=T  
 )
 testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
 )
 
+testthat::test_that("mixed plot works",
+                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+)
 
 
 adddata<-subjects_by_stimuli
 adddata$x<-rnorm(length(adddata$nrow))
 
 formula<-y~1+cond+x+(1+cond|subj)+(1|stimulus)
+adddata$cond<-factor(adddata$cond)
+model<-gamlj::gamljMixed(
+  formula =formula,
+  data = adddata, 
+  scaling = c(x="standardized")
+  
+)
+
+testthat::test_that("standardizing with more clusters",
+                    testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
+)
 
 model<-gamlj::gamljMixed(
   formula =formula,
   data = adddata, 
-  scaling = list(list(
-    var="x",
-    type="standardized"))
-  
+  scaling = c("x"="clusterbasedstandardized")
 )
 
 testthat::test_that("standardizing with more clusters",
@@ -147,8 +159,8 @@ model<-gamlj::gamljMixed(
 testthat::test_that("some poly", {
   testthat::expect_lt(model$main$anova$asDF[2,2],0.43)
   testthat::expect_gt(model$main$anova$asDF[2,2],0.31)
-  
 })
+
 
 model<-gamlj::gamljMixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
@@ -156,7 +168,6 @@ model<-gamlj::gamljMixed(
   scaling = list(list(
     var="beer",
     type="standardized")))
-model
 
 testthat::test_that("standardizing", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.8506,tolerance = .002)
@@ -167,7 +178,7 @@ model<-gamlj::gamljMixed(
   data = data,
   scaling = list(list(
     var="beer",
-    type="cluster-based-standardized")))
+    type="clusterbasedstandardized")))
 
 testthat::test_that("cluster-based-standardizing", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.6111,tolerance = .002)
@@ -178,9 +189,9 @@ model<-gamlj::gamljMixed(
   data = data,
   scaling = list(list(
     var="beer",
-    type="cluster-based centered")))
+    type="clusterbasedcentered")))
 
-testthat::test_that("cluster-based centering", {
+testthat::test_that("cluster-based-centering", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.6070,tolerance = .002)
 })
 
@@ -209,7 +220,7 @@ testthat::test_that("ranova works",
 
 testthat::test_that("plot works",{
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
-                    testthat::expect_true(ggplot2::is.ggplot(gamlj::gamlj_ggplot(model)))
+                    testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 }
 )
 

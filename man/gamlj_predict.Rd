@@ -2,29 +2,28 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_predict}
 \alias{gamlj_predict}
-\title{Extract the predicted values of the model estimated by GAMLj}
+\title{Predicted values from GAMLj models}
 \usage{
 gamlj_predict(gobj, re.form = NULL, type = "response")
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{gobj}{a gamlj results object of the class `gamlj*Results`}
 
 \item{re.form}{if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.}
 
-\item{type}{the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial model the default are the predicted probabilities. The "link" gives the scale of the linear predictors; 
-is on the scale of the linear predictors; The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+\item{type}{the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial models the default is to compute the predicted probabilities.  "link" gives the scale of the linear predictors; 
+is on the scale of the linear predictors;  The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
 Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}}
 }
 \value{
 a R object of the class of the estimated model
 }
 \description{
-This function returns the predicted values model as a R object. It is usefull to run additional 
-analysis in R with model fitted scores.
+Deprecated. Please use `predict()`
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGLM(
+obj<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)
  preds<-gamlj_predict(obj)

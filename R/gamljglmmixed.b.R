@@ -52,7 +52,7 @@ gamljGlmMixedClass <- R6::R6Class(
       if (getout) 
         return(FALSE)
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,modelType)
+      data<-mf.checkData(self$options,data,modelType=modelType)
       
       if (!is.data.frame(data))
         jmvcore::reject(data)
@@ -76,7 +76,7 @@ gamljGlmMixedClass <- R6::R6Class(
       infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
       ep<-mi.explainPrediction(modelType,data,dep)
       if (!is.null(ep))
-        infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
+        infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
       infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="More is better"))
       infoTable$addRow(rowKey="r2m",list(info="R-squared",comm="Marginal"))
@@ -98,8 +98,9 @@ gamljGlmMixedClass <- R6::R6Class(
       
       ## random table
       aTable<-self$results$main$random
-      aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
 
+      
+      
       ## anova Table 
       if (length(modelTerms)>0) {
         aTable<- self$results$main$anova
@@ -214,11 +215,17 @@ gamljGlmMixedClass <- R6::R6Class(
         realgroups<-n64$nicenames(grp)
         realnames<-n64$nicenames(vcv$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
+        r2<-try(r.squared(model),silent = TRUE)
+        
+        
         for (i in 1:dim(vcv)[1]) {
-               if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                  icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+1)
-               else
-                  icc<-""
+               icc<-""
+             if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") {
+                 if (!jmvcore::isError(r2)) {
+                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+r2$varDist)
+                 }
+               }
+
           
                if (i<=randomTable$rowCount)
                    randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
@@ -286,13 +293,16 @@ gamljGlmMixedClass <- R6::R6Class(
 
                ### prepare info table #########       
            ginfo("updating the info table")
+           ep<-mi.explainPrediction(modelType,data,dep)
+           if (!is.null(ep))
+             infoTable$setRow(rowKey="dir",list(comm=ep[2]))
+           
            info.call<-n64$translate(as.character(model@call)[[2]])
            info.title<-paste("Generalized mixed model" )
            info.aic<-round(stats::extractAIC(model)[2],digits=2)
            info.loglik<-lme4::llikAIC(model)$AICtab['logLik']
            info.bic<-stats::BIC(model)
            info.dev<-stats::deviance(model)
-           r2<-try(r.squared(model),silent = TRUE)
            if (jmvcore::isError(r2)){
                    note<-"R-squared cannot be computed."
                    info.r2m<-NaN        
@@ -472,6 +482,11 @@ gamljGlmMixedClass <- R6::R6Class(
         lm = do.call(lme4::glmer.nb, list(formula=form,
                                        data=data))
         model<-mi.model_check(lm)
+        attr(model,"refit")<-list(lib="lme4",
+                                  command="glmer.nb",
+                                  coptions=list(formula=private$.names64$translate(form)),
+                                  eoptions=list(formula=private$.names64$translate(form)))
+        
         return(model)
         
       }
@@ -486,6 +501,13 @@ gamljGlmMixedClass <- R6::R6Class(
                                        control=ctr))
         model<-mi.model_check(lm)
         info<-attr(model,"infoTable")
+        ### save info for R refit ####
+        cfamily<-paste0(afamily$family,"(",afamily$link,")")
+        attr(model,"refit")<-list(lib="lme4",
+                                  command="glmer",
+                                  coptions=list(formula=private$.names64$translate(form),family=cfamily),
+                                  eoptions=list(formula=private$.names64$translate(form),family=afamily,nAGQ=nAGQ,control=ctr))
+        
         if (info$conv==TRUE)
           break()
         
@@ -701,48 +723,24 @@ gamljGlmMixedClass <- R6::R6Class(
   if (!is.something(value))
     return('')
 
-#  if (name == 'dep') {
-#    option$value<-paste0("'",value,"'") 
-#  }
-    
+
   if (option$name %in% c('factors', 'dep', 'covs', 'cluster', 'modelTerms','randomTerms'))
     return('')
+
+  if (name =='scaling') {
+    vec<-sourcifyList(option,"centered")
+    return(vec)
+  }
+  if (name =='contrasts') {
+    vec<-sourcifyList(option,"simple")
+    return(vec)
+  }
+  if (name == 'postHoc') {
+    if (length(value) == 0)
+      return('')
+  }
   
 
-    
-  if (name == 'scaling') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'centered')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-  }
-  if (name == 'contrasts') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'simple')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-  }  else if (name == 'postHoc') {
-    if (length(value) == 0)
-      return('')
-  }
-  
-#  if (name == "randomTerms") {
-#    newvalue<-private$.buildreffects(self$options$randomTerms,self$options$correlatedEffects)
-#    newvalue<-private$.names64$translate(newvalue)
-#    return(paste0(name,"=",newvalue))
-#  }
   super$.sourcifyOption(option)
 }
 ))

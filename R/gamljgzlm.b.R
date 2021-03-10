@@ -57,7 +57,7 @@ gamljGzlmClass <- R6::R6Class(
       infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
       ep<-mi.explainPrediction(modelType,data,dep)
       if (!is.null(ep))
-              infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
+              infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
       infoTable$addRow(rowKey="r2",list(info="R-squared",comm="Proportion of reduction of error"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
@@ -200,10 +200,13 @@ gamljGzlmClass <- R6::R6Class(
         ginfo("Parameters have been estimated")
         self$results$.setModel(model)
         ### coefficients summary results ####
+        capture.output({
         parameters<-try(mf.summary(model))
+        })
         mi.check_estimation(parameters,n64)
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
+        
         parameters<-mf.confint(model,ciWidth,parameters)
         out.fillTable(estimatesTable,parameters)        
         estimatesTable$setState(attributes(parameters))
@@ -213,6 +216,9 @@ gamljGzlmClass <- R6::R6Class(
         
         ### fill info table #########   
         modelType<-self$options$modelSelection
+        ep<-mi.explainPrediction(modelType,data,dep)
+        if (!is.null(ep))
+          infoTable$setRow(rowKey="dir",list(comm=ep[2]))
         infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
@@ -370,16 +376,35 @@ gamljGzlmClass <- R6::R6Class(
     modelType<-self$options$modelSelection
     afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
     if (modelType=="multinomial") {
-      mod<-nnet::multinom(form,data,model = T)
-      mod$call$formula<-as.formula(mod)
-      return(mod)
+      mark("Estimating multinomial")
+      model<-nnet::multinom(form,data,model = T)
+      model$call$formula<-as.formula(model)
+      ### save info for R refit ####
+      attr(model,"refit")<-list(lib="nnet",
+                                command="multinom",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form),model=TRUE))
+      return(model)
     }
     if (modelType=="nb") {
-      mod<-MASS::glm.nb(form,data)
-      return(mod)
+      model<-MASS::glm.nb(form,data)
+      ### save info for R refit ####
+      attr(model,"refit")<-list(lib="MASS",
+                                command="glm.nb",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form)))
+      
+      return(model)
     }
-    mod<-stats::glm(form,data,family=afamily)
-    mod
+    model<-stats::glm(form,data,family=afamily)
+    ### save info for R refit ####
+    cfamily<-paste0(afamily$family,"(",afamily$link,")")
+    attr(model,"refit")<-list(command="glm",
+                              coptions=list(formula=private$.names64$translate(form),family=cfamily),
+                              eoptions=list(formula=private$.names64$translate(form),family=afamily))
+    
+  
+    model
   },
   
 
@@ -483,30 +508,15 @@ gamljGzlmClass <- R6::R6Class(
   if (option$name %in% c('factors', 'dep', 'covs', 'modelTerms'))
     return('')
   
-  if (name == 'scaling') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'centered')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
+  if (name =='scaling') {
+    vec<-sourcifyList(option,"centered")
+    return(vec)
   }
-  if (name == 'contrasts') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'simple')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-  }  else if (name == 'postHoc') {
+  if (name =='contrasts') {
+    vec<-sourcifyList(option,"simple")
+    return(vec)
+  }
+  if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }

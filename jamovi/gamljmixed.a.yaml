@@ -5,6 +5,7 @@ menuGroup: Linear Models
 version: '2.0.0'
 jas: '1.2'
 completeWhenFilled: false
+export: false
 description:
     main: Mixed Linear Model
     R:
@@ -374,17 +375,45 @@ options:
               - name: type
                 type: List
                 options:
-                  - centered
-                  - standardized
-                  - cluster-based-centered
-                  - cluster-based-standardized
-                  - none
-
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Centered clusterwise
+                      name:  clusterbasedcentered
+                    - title: z-scores clusterwise
+                      name:  clusterbasedstandardized
+                    - title: Log
+                      name: 'log'
+                    - title: None
+                      name: 'none'
                 default: centered 
       description:
           R: >
             a list of lists specifying the covariates scaling,
             one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: z-scores
+            name: standardized
+          - title: Centered clusterwise
+            name:  clusterbasedcentered
+          - title: z-scores clusterwise
+            name:  clusterbasedstandardized
+          - title: Log
+            name:  log
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
 
 
 ############ mixed model specifics ##############
@@ -465,6 +494,17 @@ options:
         - name: boot
           title: Bootstrap (very slow)
 
+    - name: dfmethod
+      title: DF Method
+      type: List
+      default: Satterthwaite
+      options:
+        - name: Satterthwaite
+          title: Satterthwaite
+        - name:  Kenward-Roger
+          title: "Kenward-Roger"
+
+
 
     - name: qq
       title: Q-Q plot of residuals
@@ -513,6 +553,7 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide histogram of random Coefficients
+
 
 
 ...

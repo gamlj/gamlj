@@ -49,3 +49,4 @@ vignettes/*.pdf
 
 # docs sources
 
+inst/doc

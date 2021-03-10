@@ -130,7 +130,7 @@ mi.getValueDf<- function(x,...) UseMethod(".getValueDf")
 
 .getValueDf.default<-function(model) {
   value <- sum(stats::residuals(model, type = "pearson")^2)
-  result <- value/df.residual(model)
+  result <- value/stats::df.residual(model)
   return(result)
 }
 .getValueDf.multinom<-function(model) {
@@ -185,7 +185,6 @@ mi.initContrastCode<-function(data,options,results,n64) {
 }
 
 mi.initInterceptInfo<-function(options, results) {
-  mark(options$interceptInfo)
   if (!options$interceptInfo || !options$fixedIntercept) 
       return()
   aTable<-results$main$interceptTable
@@ -216,21 +215,18 @@ mi.initEffectSizeInfo<-function(options, results, terms, ciWidth) {
 
 
 mi.explainPrediction<-function(modelType,data,dep){
-  
+  dlevs<-levels(data[[jmvcore::toB64(dep)]])
   if (modelType %in% c("logistic")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=1)/P(y=0)"
     dircomm<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
     return(c(dirvalue,dircomm))
   }
   if (modelType %in% c("probit")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=1)"
     dircomm<-paste("P(",dep,"=",dlevs[2],")")
     return(c(dirvalue,dircomm))
   }
   if (modelType %in% c("multinomial")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=x)/P(x=0)"
     dircomm<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
     return(c(dirvalue,dircomm))
