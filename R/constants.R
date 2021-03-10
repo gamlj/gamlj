@@ -10,6 +10,7 @@ TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
 ################ model info for gzlm ###############
+
 DINFO<-list()
 DINFO[["gaussian"]]<-c("Gaussian","Normal distribution of residual")
 DINFO[["poisson"]]<-c("Poisson","Model for count data")
