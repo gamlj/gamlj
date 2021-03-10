@@ -32,10 +32,10 @@ Returns residuals values from the estimated model
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGlm(
+gmod<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)
- preds<-residuals(obj)
+ preds<-residuals(gmod)
  
 }
 \author{

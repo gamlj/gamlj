@@ -23,10 +23,10 @@ Deprecated. Please use `predict()`
 }
 \examples{
 data("qsport")
-obj<-gamlj::gamljGlm(
+gmod<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)
- preds<-gamlj_predict(obj)
+ preds<-gamlj_predict(gmod)
  
 }
 \author{

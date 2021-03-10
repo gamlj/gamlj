@@ -24,12 +24,12 @@ plots present in the `gamlj*Results` object. If one plot is present, it is retur
 }
 \examples{
 data(qsport)
-mod<-gamlj::gamljGlm(
+gmod<-gamlj::gamljGlm(
   formula = performance ~ hours,
   data = qsport)
 
-plot(mod,plotHAxis = "hours")
-plot(mod,formula=~hours)
+plot(gmod,plotHAxis = "hours")
+plot(gmod,formula=~hours)
 }
 \author{
 Marcello Gallucci

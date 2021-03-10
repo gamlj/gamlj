@@ -32,11 +32,11 @@ are returned.
 data(winkel)
 wicksell$time<-factor(wicksell$time)
 wicksell$group<-factor(wicksell$group) 
-gobj<-gamlj::gamljMixed(
+gmod<-gamlj::gamljMixed(
    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
    data = wicksell)
 
-simpleEffects(mod,formula =~time:group)
+simpleEffects(gmod,formula =~time:group)
 }
 \author{
 Marcello Gallucci
