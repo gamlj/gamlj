@@ -116,17 +116,26 @@ gposthoc.populate<-function(model,options,tables) {
     .labs64<-sapply(.cont, function(a) {
       sapply(strsplit(as.character(a),"[- ,/]"),trimws,USE.NAMES = F,simplify = F)
     })
+    .labs<-sapply(.labs64,jmvcore::fromB64,simplify = F)
     labs64<-do.call("rbind",.labs64)
-    colnames(labs64)<-paste0("c",1:ncol(labs64))
+    labs<-do.call("rbind",.labs)
+    cols<-paste0("c",1:ncol(labs64))
+    colnames(labs64)<-cols
+    colnames(labs)<-cols
+    
     if ("df" %in% names(tableData))
         if (tableData$df[1]==Inf) {
            table$getColumn("test")$setTitle("z")
            table$getColumn("df")$setVisible(FALSE)
         }
+    tableData<-cbind(labs,tableData)
+    sortstring<-paste0("order(",paste0("tableData$",cols,collapse = ","),")")
+    tableData<-tableData[eval(parse(text = sortstring)),]
+    
     for (i in 1:nrow(tableData)) {
-      row<-tableData[i,]
-      l<-jmvcore::fromB64(labs64[i,])
-      table$setRow(rowNo=i, values=c(row,l))
+      arow<-tableData[i,]
+      table$setRow(rowNo=i, values=arow)
+      
     }
   }
   ginfo("Populate posthoc done")

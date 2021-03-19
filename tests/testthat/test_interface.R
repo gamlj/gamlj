@@ -120,7 +120,7 @@ testthat::test_that("glmixed predict", {
 
 rmod0<-gamlj_model(mod)
 
-rmod1<-glmer(formula = pass ~ 1 + math + (1 | school), family = binomial(logit), 
+rmod1<-lme4::glmer(formula = pass ~ 1 + math + (1 | school), family = binomial(logit), 
              data = schoolexam)
 
 
@@ -144,7 +144,7 @@ mplot<-plot(mod1)
 testthat::test_that("plot ok", 
   testthat::expect_true(ggplot2::is.ggplot(mplot))
 )
-library(gamlj)
+data("wicksell")
 wicksell$time<-factor(wicksell$time)
 wicksell$group<-factor(wicksell$group)
 
@@ -152,13 +152,13 @@ gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = wicksell)
 
-r1<-posthoc(gobj)
-r2<-posthoc(gobj,formula=~group+group:time,postHocCorr=c("bonf","holm"))
+r1<-gamlj::posthoc(gobj)
+r2<-gamlj::posthoc(gobj,formula=~group+group:time,postHocCorr=c("bonf","holm"))
 tab<-r2[[2]]$asDF
-
 testthat::test_that("posthoc function", {
                     testthat::expect_false(r1)
-                    testthat::expect_equal(tab[6,8],4.42730,tolerance = tol)
+                    testthat::expect_equal(tab[6,8],6.86382,tolerance = tol)
+                    testthat::expect_true(tab[3,4]==1)
 }
 )
 
@@ -170,7 +170,7 @@ r1<-simpleEffects(gobj)
 r2<-simpleEffects(gobj,formula=~group:time,postHocCorr=c("bonf","holm"))
 tab<-r2[[2]]$asDF
 
-testthat::test_that("posthoc function", {
+testthat::test_that("simple effect function", {
   testthat::expect_false(r1)
   testthat::expect_equal(tab[4,8],-1.4187,tolerance = tol)
 }
