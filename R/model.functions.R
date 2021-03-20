@@ -28,24 +28,24 @@
 
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
-.getModelData.default<-function(model) {
-     return(model$model)
+    .getModelData.default<-function(model) {
+         return(model$model)
 }
 
 .getModelData.glmerMod<-function(model) 
-  return(.getModelData.lmer(model))
+      return(.getModelData.lmer(model))
 
 .getModelData.glmer<-function(model) 
-  return(.getModelData.lmer(model))
+      return(.getModelData.lmer(model))
 
 .getModelData.merModLmerTest<-function(model) 
-     return(.getModelData.lmer(model))
+      return(.getModelData.lmer(model))
 
 .getModelData.lmerModLmerTest<-function(model) 
-  return(.getModelData.lmer(model))
+      return(.getModelData.lmer(model))
 
 .getModelData.lmer<-function(model) 
-  return(model@frame)
+      return(model@frame)
 
 
 
@@ -55,37 +55,37 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 mf.summary<- function(x,...) UseMethod(".mf.summary")
 
-.mf.summary.default<-function(model) {
-      return(FALSE)
+    .mf.summary.default<-function(model) {
+          return(FALSE)
 }
 
 .fix_coeffs<-function(parameters, coeffs) {
 
-  if (length(coeffs)==dim(parameters)[1]) {
-    return(as.data.frame(parameters))
+    if (length(coeffs)==dim(parameters)[1]) {
+        return(as.data.frame(parameters))
   }
   
   ### fix missing coefficients ########
-  all_coefs<-data.frame(all=coeffs)
-  rownames(all_coefs)<-names(coeffs)
-  all_coefs$order<-1:length(all_coefs$all)
-  res<-merge(parameters,all_coefs,by="row.names",all=T)
-  res<-res[order(res$order),]
-  rownames(res)<-res$Row.names
-  res[,c("Row.names", "order","all")]<-NULL
+    all_coefs<-data.frame(all=coeffs)
+    rownames(all_coefs)<-names(coeffs)
+    all_coefs$order<-1:length(all_coefs$all)
+    res<-merge(parameters,all_coefs,by="row.names",all=T)
+    res<-res[order(res$order),]
+    rownames(res)<-res$Row.names
+    res[,c("Row.names", "order","all")]<-NULL
   ########################
   res
 }
   
 .mf.summary.lm<-function(model){
-  smr<-summary(model)
-  params<-smr$coefficients
-  params<-.fix_coeffs(params,smr$aliased)
-  if (nrow(params)[1]==0)
-    return(as.data.frame(NULL))
-  params$df<-smr$df[2]
-  colnames(params)<-c("estimate","se","t","p","df")
-  params
+    smr<-summary(model)
+    params<-smr$coefficients
+    params<-.fix_coeffs(params,smr$aliased)
+    if (nrow(params)[1]==0)
+        return(as.data.frame(NULL))
+    params$df<-smr$df[2]
+    colnames(params)<-c("estimate","se","t","p","df")
+    params
   ###########################à
   as.data.frame(params,stringsAsFactors = F)
 }
@@ -94,29 +94,28 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
        .mf.summary.lmer(model)
 
 .mf.summary.lmerModLmerTest<-function(model)
-  .mf.summary.lmer(model)
+      .mf.summary.lmer(model)
 
 .mf.summary.glmerMod<-function(model) {
-  smr<-summary(model)
-  params<-stats::coef(smr)
-  all_coefs<-lme4::fixef(model,add.dropped=T)
-  params<-.fix_coeffs(params,all_coefs)
-  if (nrow(params)[1]==0)
-    return(as.data.frame(NULL))
-  expb<-exp(params[,"Estimate"])  
-  params<-cbind(params,expb)
-  colnames(params)<-c("estimate","se","z","p","expb")
+    smr<-summary(model)
+    params<-stats::coef(smr)
+    all_coefs<-lme4::fixef(model,add.dropped=T)
+    params<-.fix_coeffs(params,all_coefs)
+    if (nrow(params)[1]==0)
+        return(as.data.frame(NULL))
+    expb<-exp(params[,"Estimate"])  
+    params<-cbind(params,expb)
+    colnames(params)<-c("estimate","se","z","p","expb")
   as.data.frame(params,stringsAsFactors = F)
 }
 .mf.summary.lmerMod<-function(model)
-  .mf.summary.lmer(model)
+      .mf.summary.lmer(model)
 
 .mf.summary.lmer<-function(model) {
-       ss<-summary(model)$coefficients
-       ss<-as.data.frame(ss,stringsAsFactors = F)
+    ss<-summary(model)$coefficients
+    ss<-as.data.frame(ss,stringsAsFactors = F)
        
-      if (dim(ss)[2]==3) {
-        
+    if (dim(ss)[2]==3) {
           ano<-car::Anova(model,test="F",type=3)
           lnames<-rownames(ss)
           matching<-which(lnames %in% rownames(ss))
@@ -127,9 +126,9 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
           ss<-ss[,c(1,2,4,3,5)]       
           if (any(is.null(ss$df)))
                attr(ss,"warning")<-"lmer.df"
-      }
-      colnames(ss)<-c("estimate","se","df","t","p")
-      ss
+    }
+    colnames(ss)<-c("estimate","se","df","t","p")
+  ss
 }
 
 .mf.summary.glm<-function(model) {
@@ -168,7 +167,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 mf.anova<- function(x,...) UseMethod(".anova")
 
 .anova.default<-function(model) {
- stop("no suitable model found") 
+       stop("no suitable model found") 
 }
   
 .anova.glm<-function(model) {
@@ -179,9 +178,9 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.multinom<-function(model) {
-      ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-      colnames(ano)<-c("test","df","p")
-      as.data.frame(ano, stringsAsFactors = F)
+        ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+        colnames(ano)<-c("test","df","p")
+        as.data.frame(ano, stringsAsFactors = F)
       
   }
   
@@ -196,6 +195,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
         modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
         modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
         modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        
         mods<-list(ss=sum(dss$ss),
                df= ss$fstatistic[[2]],
                f=ss$fstatistic[[1]],
