@@ -210,6 +210,11 @@ children:
             children:
               - type: ComboBox
                 name: dep_scale
+          - type: LayoutBox
+            margin: large
+            children:
+              - type: Output
+                name: save_predicted
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
