@@ -130,7 +130,7 @@ items:
                       format: zto
 
            - name: effectSizeTable
-             title: Effect Size Indeces
+             title: Effect Size Indices
              type: Table
              visible: (effectSizeInfo)
              description: a table of effect size indeces
