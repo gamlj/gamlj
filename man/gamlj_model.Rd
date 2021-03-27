@@ -16,7 +16,7 @@ a R object from lm(), glm(), lmer() or glmer()
 Return the estimated model object of the class lm, lmer, glm depending on the model.
 }
 \examples{
-data("qsport")
+data('qsport')
 obj<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)

@@ -292,8 +292,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "standardized",
                     "log"),
                 default="none")
-            private$..save_predicted <- jmvcore::OptionOutput$new(
-                "save_predicted")
+            private$..predicted <- jmvcore::OptionOutput$new(
+                "predicted")
+            private$..residuals <- jmvcore::OptionOutput$new(
+                "residuals")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -333,7 +335,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..interceptInfo)
             self$.addOption(private$..effectSizeInfo)
             self$.addOption(private$..dep_scale)
-            self$.addOption(private$..save_predicted)
+            self$.addOption(private$..predicted)
+            self$.addOption(private$..residuals)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -374,7 +377,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         interceptInfo = function() private$..interceptInfo$value,
         effectSizeInfo = function() private$..effectSizeInfo$value,
         dep_scale = function() private$..dep_scale$value,
-        save_predicted = function() private$..save_predicted$value),
+        predicted = function() private$..predicted$value,
+        residuals = function() private$..residuals$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -414,7 +418,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..interceptInfo = NA,
         ..effectSizeInfo = NA,
         ..dep_scale = NA,
-        ..save_predicted = NA)
+        ..predicted = NA,
+        ..residuals = NA)
 )
 
 gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -430,7 +435,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
         assumptions = function() private$.items[["assumptions"]],
-        save_predicted = function() private$.items[["save_predicted"]]),
+        predicted = function() private$.items[["predicted"]],
+        residuals = function() private$.items[["residuals"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -1089,8 +1095,24 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "dep_scale")))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
-                name="save_predicted",
-                title="Predicted"))},
+                name="predicted",
+                title="Predicted Vales",
+                varTitle="`GLM_PRED_${ dep }`",
+                varDescription="Predicted values",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs")))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="residuals",
+                title="Residuals Vales",
+                varTitle="`GLM_RES_${ dep }`",
+                varDescription="Residuals values",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs")))},
         .setModel=function(x) private$..model <- x))
 
 gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

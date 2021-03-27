@@ -130,6 +130,8 @@ gposthoc.populate <- function(model, options, tables) {
         tableData <- cbind(labs, tableData)
         sortstring <- paste0("order(", paste0("tableData$", cols, collapse = ","), ")")
         tableData <- tableData[eval(parse(text = sortstring)), ]
+        for (col in cols)
+            tableData[,col]<-as.character(tableData[,col])
 
         for (i in 1:nrow(tableData)) {
             arow <- tableData[i, ]

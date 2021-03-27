@@ -18,10 +18,10 @@ transformed according to GAMLj options. It is usefull to run additional
 models in R with other R packages with the same setup used by GAMLj
 }
 \examples{
-data("qsport")
+data('qsport')
 gmod<-gamlj::gamljGlm(formula = performance ~ hours,
                 data = qsport,
-                scaling = c(hours="standardized"))
+                scaling = c(hours='standardized'))
 
 gdata<-gamlj_data(gmod)
 lm(performance ~ hours,data=gdata)

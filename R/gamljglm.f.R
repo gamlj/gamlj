@@ -136,6 +136,7 @@ gamljGlm <- function(
   contrasts = NULL,
   showRealNames = TRUE,
   showContrastCode = FALSE,
+  custom_contrast=list(),
   plotHAxis = NULL,
   plotSepLines = NULL,
   plotSepPlots = NULL,
@@ -233,7 +234,7 @@ gamljGlm <- function(
      scaling<-lapply(names(scaling), function(a) list(var=a,type=scaling[[a]]))
   if (is.something(names(contrasts))) 
     contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
-  
+  mark(custom_contrast)
   
     
     

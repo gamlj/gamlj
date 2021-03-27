@@ -280,6 +280,22 @@ gamljGlmClass <- R6::R6Class(
         private$.populateLevenes(model)
         private$.populateNormTest(model)
         
+        if (self$options$predicted && self$results$predicted$isNotFilled()) {
+          ginfo("Saving predicted")
+          p<-stats::predict(model,type="response")
+          # we need the rownames in case there are missing in the datasheet
+          pdf <- data.frame(predicted=p, row.names=rownames(private$.data))
+          self$results$predicted$setValues(p)
+        }
+        if (self$options$residuals && self$results$residuals$isNotFilled()) {
+          ginfo("Saving residuals")
+          p<-stats::resid(model)
+          # we need the rownames in case there are missing in the datasheet
+          pdf <- data.frame(residuals=p, row.names=rownames(private$.data))
+          self$results$residuals$setValues(pdf)
+        }
+        
+        
     },
   .cleandata=function() {
       Sys.setlocale("LC_NUMERIC", "C")

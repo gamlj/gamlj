@@ -576,3 +576,21 @@ items:
             - dep
             - modelTerms
             - dep_scale
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`GLM_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`GLM_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs

@@ -21,7 +21,7 @@
 
 \item{...}{additional arguments for specific residuals methods.}
 
-\item{type}{the type of residuals for generalized models. The alternatives are: "deviance" (default), "pearson", "working", "response", and "partial". Can be abbreviated.
+\item{type}{the type of residuals for generalized models. The alternatives are: 'deviance' (default), 'pearson', 'working', 'response', and 'partial'. Can be abbreviated.
 Cf. \code{\link[stats:residuals]{stats::residuals()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}}}
 }
 \value{
@@ -31,7 +31,7 @@ a R object of the class of the estimated model
 Returns residuals values from the estimated model
 }
 \examples{
-data("qsport")
+data('qsport')
 gmod<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)

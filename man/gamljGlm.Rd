@@ -17,6 +17,7 @@ gamljGlm(
   contrasts = NULL,
   showRealNames = TRUE,
   showContrastCode = FALSE,
+  custom_contrast = list(),
   plotHAxis = NULL,
   plotSepLines = NULL,
   plotSepPlots = NULL,

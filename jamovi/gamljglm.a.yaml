@@ -492,5 +492,13 @@ options:
          R: >
            Re-scale the dependent variable.
 
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
 ...
 
