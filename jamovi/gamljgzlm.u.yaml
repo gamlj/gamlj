@@ -427,3 +427,16 @@ children:
           - type: CheckBox
             name: eCovs
             enable: (eDesc)
+  - type: CollapseBox
+    label: Options
+    style: inline
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Save
+        children:
+          - type: Output
+            name: predicted
+          - type: Output
+            name: residuals

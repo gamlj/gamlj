@@ -294,6 +294,11 @@ gamljGzlmClass <- R6::R6Class(
         gposthoc.populate(model,self$options,self$results$postHocs)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
         
+        mf.savePredRes(self$options,self$results,model) 
+        
+        
+        
+        
 
     },
   .cleandata=function() {

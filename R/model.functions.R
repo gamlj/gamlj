@@ -556,4 +556,29 @@ mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
 }
 .setModelCall.glmerMod<-function(model,info) 
         .setModelCall.lmerMod(model,info)
-  
+
+
+
+#######################
+
+mf.savePredRes<-function(options,results,model) {
+
+        if (options$predicted && results$predicted$isNotFilled()) {
+            ginfo("Saving predicted")
+          mark(class(model))
+            if ("multinom" %in% class(model))  type="probs" else type="response"
+            p<-stats::predict(model,type=type)
+  # we need the rownames in case there are missing in the datasheet
+            pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(model)))
+            results$predicted$setValues(p)
+              }
+        if (options$residuals && results$residuals$isNotFilled()) {
+            ginfo("Saving residuals")
+            p<-stats::resid(model)
+  # we need the rownames in case there are missing in the datasheet
+            pdf <- data.frame(residuals=p, row.names=rownames(mf.getModelData(model)))
+            results$residuals$setValues(pdf)
+        }
+}
+
+

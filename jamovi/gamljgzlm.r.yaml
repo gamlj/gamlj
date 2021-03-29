@@ -463,3 +463,21 @@ items:
            - custom_family
            - custom_link
 
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`GzLM_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`GzLM_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs
