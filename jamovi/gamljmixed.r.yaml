@@ -601,3 +601,21 @@ items:
              width: 450
              height: 400
 
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`Mix_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`Mix_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs

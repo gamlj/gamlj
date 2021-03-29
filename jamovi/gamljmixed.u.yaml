@@ -492,4 +492,11 @@ children:
             name: dfmethod_Kenward-Roger
             optionName: dfmethod
             optionPart: Kenward-Roger
+      - type: Label
+        label: Save
+        children:
+          - type: Output
+            name: predicted
+          - type: Output
+            name: residuals
 

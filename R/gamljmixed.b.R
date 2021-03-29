@@ -332,6 +332,24 @@ gamljMixedClass <- R6::R6Class(
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
         private$.populateNormTest(model)
+        
+        if (self$options$predicted && self$results$predicted$isNotFilled()) {
+          ginfo("Saving predicted")
+          p<-stats::predict(model,type="response")
+          # we need the rownames in case there are missing in the datasheet
+          pdf <- data.frame(predicted=p, row.names=rownames(private$.data))
+          self$results$predicted$setValues(p)
+        }
+        if (self$options$residuals && self$results$residuals$isNotFilled()) {
+          ginfo("Saving residuals")
+          p<-stats::resid(model)
+          # we need the rownames in case there are missing in the datasheet
+          pdf <- data.frame(residuals=p, row.names=rownames(private$.data))
+          self$results$residuals$setValues(pdf)
+        }
+        
+        
+        
     },
   .buildreffects=function(terms,correl=TRUE) {
  

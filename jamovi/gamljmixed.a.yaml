@@ -554,6 +554,13 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide histogram of random Coefficients
 
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
 
 
 ...
