@@ -79,12 +79,13 @@ gamljGlmMixedClass <- R6::R6Class(
       if (!is.null(ep))
         infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
-      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="More is better"))
+      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="Unconditioal Log-Likelihood"))
+      infoTable$addRow(rowKey="2log",list(info="-2*LogLikel.",comm="Unconditioal absolute deviance"))
+      infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional relative deviance"))
       infoTable$addRow(rowKey="r2m",list(info="R-squared",comm="Marginal"))
       infoTable$addRow(rowKey="r2c",list(info="R-squared",comm= "Conditional"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
-      infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
       infoTable$addRow(rowKey="valdf",list(info="Chi-squared/DF",comm="Overdispersion indicator"))
       infoTable$addRow(rowKey="conv",list(info="Converged",comm=""))
@@ -302,6 +303,7 @@ gamljGlmMixedClass <- R6::R6Class(
            info.title<-paste("Generalized mixed model" )
            info.aic<-round(stats::extractAIC(model)[2],digits=2)
            info.loglik<-lme4::llikAIC(model)$AICtab['logLik']
+           info.2log<--2*info.loglik
            info.bic<-stats::BIC(model)
            info.dev<-stats::deviance(model)
            if (jmvcore::isError(r2)){
@@ -317,6 +319,7 @@ gamljGlmMixedClass <- R6::R6Class(
            infoTable$setRow(rowKey="aic",list(value=info.aic))
            infoTable$setRow(rowKey="bic",list(value=info.bic))
            infoTable$setRow(rowKey="log",list(value=info.loglik))
+           infoTable$setRow(rowKey="2log",list(value=info.2log))
            infoTable$setRow(rowKey="dev",list(value=info.dev))
            infoTable$setRow(rowKey="r2m",list(value=info.r2m))
            infoTable$setRow(rowKey="r2c",list(value=info.r2c))
