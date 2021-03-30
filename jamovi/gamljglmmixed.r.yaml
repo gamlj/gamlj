@@ -473,3 +473,22 @@ items:
   - name: plotnotes
     type: Html
     visible: false
+
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`MzLM_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`MixzLM_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs

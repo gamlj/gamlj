@@ -348,6 +348,9 @@ gamljGlmMixedClass <- R6::R6Class(
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
+        
+        mf.savePredRes(self$options,self$results,model) 
+        
 
     },
   .buildreffects=function(terms,correl=TRUE) {

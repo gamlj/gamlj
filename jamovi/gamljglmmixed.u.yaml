@@ -508,3 +508,10 @@ children:
             name: cimethod_boot
             optionName: cimethod
             optionPart: boot
+      - type: Label
+        label: Save
+        children:
+                - type: Output
+                  name: predicted
+                - type: Output
+                  name: residuals

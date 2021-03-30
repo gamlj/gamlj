@@ -325,6 +325,10 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "wald",
                     "profile",
                     "boot"))
+            private$..predicted <- jmvcore::OptionOutput$new(
+                "predicted")
+            private$..residuals <- jmvcore::OptionOutput$new(
+                "residuals")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -367,6 +371,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
             self$.addOption(private$..cimethod)
+            self$.addOption(private$..predicted)
+            self$.addOption(private$..residuals)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -409,7 +415,9 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         modelSelection = function() private$..modelSelection$value,
         custom_family = function() private$..custom_family$value,
         custom_link = function() private$..custom_link$value,
-        cimethod = function() private$..cimethod$value),
+        cimethod = function() private$..cimethod$value,
+        predicted = function() private$..predicted$value,
+        residuals = function() private$..residuals$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -451,7 +459,9 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..modelSelection = NA,
         ..custom_family = NA,
         ..custom_link = NA,
-        ..cimethod = NA)
+        ..cimethod = NA,
+        ..predicted = NA,
+        ..residuals = NA)
 )
 
 gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -466,7 +476,9 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
-        plotnotes = function() private$.items[["plotnotes"]]),
+        plotnotes = function() private$.items[["plotnotes"]],
+        predicted = function() private$.items[["predicted"]],
+        residuals = function() private$.items[["residuals"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -996,7 +1008,27 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
-                visible=FALSE))},
+                visible=FALSE))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="predicted",
+                title="Predicted Vales",
+                varTitle="`MzLM_PRED_${ dep }`",
+                varDescription="Predicted values",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs")))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="residuals",
+                title="Residuals Vales",
+                varTitle="`MixzLM_RES_${ dep }`",
+                varDescription="Residuals values",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs")))},
         .setModel=function(x) private$..model <- x))
 
 gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

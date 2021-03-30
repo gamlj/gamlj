@@ -555,5 +555,14 @@ options:
           title: Bootstrap (very slow)
 
 
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
+
 ...
 
