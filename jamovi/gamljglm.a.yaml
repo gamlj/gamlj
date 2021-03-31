@@ -492,6 +492,9 @@ options:
          R: >
            Re-scale the dependent variable.
 
+
+
+
     - name: predicted
       title: Predicted
       type: Output            
@@ -499,6 +502,24 @@ options:
     - name: residuals
       title: Residuals
       type: Output            
+
+    - name: atest
+      hidden: true
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: opt
+                type: Variable
+                content: $key
+              - name: value
+                type: List
+                options:
+                    - title: opt
+                      name: opt
+
 
 ...
 

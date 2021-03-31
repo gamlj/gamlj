@@ -134,6 +134,7 @@ gamljGlm <- function(
   showParamsCI = TRUE,
   paramCIWidth = 95,
   contrasts = NULL,
+  custom_contrasts=NULL,
   showRealNames = TRUE,
   showContrastCode = FALSE,
   plotHAxis = NULL,
@@ -234,6 +235,18 @@ gamljGlm <- function(
   
   if (is.something(names(contrasts))) 
     contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
+
+   ropts<-NULL
+   if (is.something(custom_contrasts)) {
+     .names<-names(custom_contrasts)
+     .values<-lapply(1:length(.names), function(i) {
+       list(var=.names[i],type=custom_contrasts[[i]])
+     })
+     ropts<-list(list(opt="custom_contrasts",value=.values))
+   }
+   
+  ####
+  
     options <- gamljGlmOptions$new(
     dep = dep,
     factors = factors,
@@ -272,7 +285,8 @@ gamljGlm <- function(
     residPlot = residPlot,
     interceptInfo = interceptInfo,
     effectSizeInfo = effectSizeInfo,
-    dep_scale = dep_scale)
+    dep_scale = dep_scale,
+    atest=ropts)
 
   analysis <- gamljGlmClass$new(
     options = options,

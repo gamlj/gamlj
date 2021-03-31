@@ -9,14 +9,6 @@ mod<-gamlj::gamljGlmMixed(
   cimethod = "wald")
 
 
-#mod$info
-rmod<-gamlj::gamlj_model(mod)
- deviance(rmod)  # relative conditional
- rmod@resp$aic() # absolute conditional
--2*logLik(rmod) # abbsolute unconditional
-
-lme4::llikAIC(rmod)$AICtab['logLik']
-logLik(rmod)
 
 val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)
 val2<-round(as.numeric(as.character(mod$info$asDF$value[9])),digits = 3)
