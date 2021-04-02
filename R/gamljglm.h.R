@@ -46,8 +46,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             residPlot = FALSE,
             interceptInfo = FALSE,
             effectSizeInfo = FALSE,
-            dep_scale = "none",
-            atest = NULL, ...) {
+            dep_scale = "none", ...) {
 
             super$initialize(
                 package="gamlj",
@@ -297,25 +296,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
-            private$..atest <- jmvcore::OptionArray$new(
-                "atest",
-                atest,
-                hidden=TRUE,
-                items="(covs)",
-                default=NULL,
-                template=jmvcore::OptionGroup$new(
-                    "atest",
-                    NULL,
-                    elements=list(
-                        jmvcore::OptionVariable$new(
-                            "opt",
-                            NULL,
-                            content="$key"),
-                        jmvcore::OptionList$new(
-                            "value",
-                            NULL,
-                            options=list(
-                                "opt")))))
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -357,7 +337,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..dep_scale)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
-            self$.addOption(private$..atest)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -399,8 +378,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         effectSizeInfo = function() private$..effectSizeInfo$value,
         dep_scale = function() private$..dep_scale$value,
         predicted = function() private$..predicted$value,
-        residuals = function() private$..residuals$value,
-        atest = function() private$..atest$value),
+        residuals = function() private$..residuals$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -441,8 +419,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..effectSizeInfo = NA,
         ..dep_scale = NA,
         ..predicted = NA,
-        ..residuals = NA,
-        ..atest = NA)
+        ..residuals = NA)
 )
 
 gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

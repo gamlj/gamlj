@@ -17,7 +17,7 @@ gamljGlmClass <- R6::R6Class(
       factors<-self$options$factors
       covs<-self$options$covs
       ciWidth<-self$options$paramCIWidth
-      mark("atest init",self$options$atest)
+
       ### here we initialize the info table ####
       infoTable<-self$results$info
 

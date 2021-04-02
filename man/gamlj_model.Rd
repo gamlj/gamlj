@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_model}
 \alias{gamlj_model}
-\title{Extract the R model object contained in the GAMLj results}
+\title{Extract the R model}
 \usage{
 gamlj_model(object)
 }

@@ -106,13 +106,13 @@ conditioning <- R6::R6Class("conditioning", public = list(labels_type = "labels"
 }, makeLabels = function(obj, span) {
     if (length(obj) == 1) {
         if (obj == "mean_sd") {
-            res <- list(method = "mean_sd", span = span, labels = (c(paste0("Mean-", span, "·", "SD"), "Mean", paste0("Mean+", span, "·", 
+            res <- list(method = "mean_sd", span = span, labels = (c(paste0("Mean-", span, "-", "SD"), "Mean", paste0("Mean+", span, "-", 
                 "SD"))), values = NULL)
             return(res)
         }
         if (obj == "percent") {
             if (span == 1) span <- 25
-            res <- list(method = "percent", span = span, labels = c(paste0(50 - span, "%"), "50%", paste0(50 + span, "%")), values = NULL)
+            res <- list(method = "percent", span = span, labels = c(paste0(50 - span, "xxx"), "50xx", paste0(50 + span, "xxx")), values = NULL)
             return(res)
         }
     }

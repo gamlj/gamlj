@@ -1,13 +1,16 @@
 context("gzlmixed")
 data("schoolexam")
-
+names(schoolexam)
 mod<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math+( 1 +math| school ),
+  formula = pass ~ 1 + math*activity+( 1 +math| school ),
   data = schoolexam,
   plotHAxis = math,
   correlatedEffects = "nocorr",
   cimethod = "wald")
 
+mod
+
+model<-gamlj_model(mod)
 
 
 val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)

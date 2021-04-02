@@ -1,5 +1,5 @@
 
-#' Update a GAMLj model by passing only the new options
+#' Update a GAMLj model 
 #'
 #' Re-estimates a GAMLj model applying new options to the original model
 #'
@@ -123,7 +123,7 @@ plot.gamlj <- function(x, formula = NULL, ...) {
     }
 }
 
-#' Extract assumptions checking plots from a GAMLj results object 
+#' Assumptions checking plots
 #' 
 #' This function returns a list of plots as a ggplot objects produced by the assumptions checking options, such
 #' as `residPlot`, `normPlot` (for continuous dependent variable models), `randHist` and `clusterBoxplot` (for mixed models).
@@ -192,11 +192,11 @@ gamlj_simpleEffects <- function(object, variable = NULL, moderator = NULL, three
 
 
 
-#' Extract data transformed by GAMLj to run R analyses in line with gamlj setup
+#' Extract data 
 #'
 #' This function returns a dataset with the variables in the GAMLj model 
 #' transformed according to GAMLj options. It is usefull to run additional 
-#' models in R with other R packages with the same setup used by GAMLj
+#' models with other R packages with the same setup used by GAMLj
 #'
 #' @param object a gamlj results object of the class `gamlj*Results`
 #'  
@@ -375,7 +375,7 @@ residuals.gamljGlmMixedResults <- function(object, type = "deviance", ...) {
 
 
 
-#' Extract the R model object contained in the GAMLj results 
+#' Extract the R model  
 #'
 #' Return the estimated model object of the class lm, lmer, glm depending on the model.
 #'
