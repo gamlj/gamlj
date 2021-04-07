@@ -43,6 +43,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             correlatedEffects = "corr",
             reml = TRUE,
             lrtRandomEffects = FALSE,
+            ciRE = FALSE,
             plotRandomEffects = FALSE,
             cimethod = "wald",
             dfmethod = "Satterthwaite",
@@ -285,6 +286,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "lrtRandomEffects",
                 lrtRandomEffects,
                 default=FALSE)
+            private$..ciRE <- jmvcore::OptionBool$new(
+                "ciRE",
+                ciRE,
+                default=FALSE)
             private$..plotRandomEffects <- jmvcore::OptionBool$new(
                 "plotRandomEffects",
                 plotRandomEffects,
@@ -368,6 +373,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..correlatedEffects)
             self$.addOption(private$..reml)
             self$.addOption(private$..lrtRandomEffects)
+            self$.addOption(private$..ciRE)
             self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..cimethod)
             self$.addOption(private$..dfmethod)
@@ -416,6 +422,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         correlatedEffects = function() private$..correlatedEffects$value,
         reml = function() private$..reml$value,
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
+        ciRE = function() private$..ciRE$value,
         plotRandomEffects = function() private$..plotRandomEffects$value,
         cimethod = function() private$..cimethod$value,
         dfmethod = function() private$..dfmethod$value,
@@ -463,6 +470,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..correlatedEffects = NA,
         ..reml = NA,
         ..lrtRandomEffects = NA,
+        ..ciRE = NA,
         ..plotRandomEffects = NA,
         ..cimethod = NA,
         ..dfmethod = NA,
@@ -674,6 +682,16 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="var", 
                                     `title`="Variance", 
                                     `type`="number"),
+                                list(
+                                    `name`="cilow", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(ciRE)"),
+                                list(
+                                    `name`="cihig", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(ciRE)"),
                                 list(
                                     `name`="icc", 
                                     `title`="ICC", 
