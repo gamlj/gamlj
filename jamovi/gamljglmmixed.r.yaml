@@ -163,6 +163,14 @@ items:
                     - name: var
                       title: "Variance"
                       type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (ciRE)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (ciRE)
                     - name: icc
                       title: "ICC"
                       type: number

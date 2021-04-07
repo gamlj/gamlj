@@ -45,7 +45,6 @@ children:
                 optionPart: nb
                 events:
                   change: './gamlj.events::onChange_model'
-
           - type: Label
             label: Custom Model
             children:
@@ -227,6 +226,14 @@ children:
                     name: correlatedEffects_block
                     optionName: correlatedEffects
                     optionPart: block
+          - type: Label
+            label: Tests
+            children:
+              - type: LayoutBox
+                margin: large
+                children:
+                  - name: ciRE
+                    type: CheckBox
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -511,7 +518,7 @@ children:
       - type: Label
         label: Save
         children:
-                - type: Output
-                  name: predicted
-                - type: Output
-                  name: residuals
+          - type: Output
+            name: predicted
+          - type: Output
+            name: residuals

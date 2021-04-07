@@ -99,6 +99,8 @@
 #'   be used rather than ML
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
 #'   random effects
+#' @param ciRE \code{TRUE} or \code{FALSE} (default), produce random effects confidence intervals based on profile method
+
 #' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
 #'   effects predicted values in the plot
 #' @param cimethod .
@@ -156,6 +158,7 @@ gamljMixed <- function(
   fixedIntercept = TRUE,
   showParamsCI = TRUE,
   paramCIWidth = 95,
+  ciRE= FALSE,
   contrasts = NULL,
   showRealNames = TRUE,
   showContrastCode = FALSE,

@@ -20,6 +20,8 @@ gamljGlmMixedClass <- R6::R6Class(
       fixedIntercept<-self$options$fixedIntercept
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
+      ciWidth<-self$options$paramCIWidth
+      
       
             
       getout<-FALSE
@@ -100,7 +102,11 @@ gamljGlmMixedClass <- R6::R6Class(
       
       ## random table
       aTable<-self$results$main$random
-
+      if (self$options$ciRE==TRUE) {
+        aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
+        aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
+      }
+      
       
       
       ## anova Table 
@@ -123,7 +129,6 @@ gamljGlmMixedClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
-      ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
@@ -209,31 +214,59 @@ gamljGlmMixedClass <- R6::R6Class(
        ginfo("...done")
        ###### variances ###########
        vc<-as.data.frame(lme4::VarCorr(model))
-       vcv<-vc[is.na(vc[,3]),]
-       vcv$var1[is.na(vcv$var1)]<-""
+       params<-vc[is.na(vc[,3]),]
+       params$var1[is.na(params$var1)]<-""
        .sigma<-sigma(model)
        .sigma2<-sigma(model)^2
-        grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
+        grp<-unlist(lapply(params$grp, function(a) gsub("\\.[0-9]$","",a)))
         realgroups<-n64$nicenames(grp)
-        realnames<-n64$nicenames(vcv$var1)
+        realnames<-n64$nicenames(params$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
         r2<-try(r.squared(model),silent = TRUE)
         
+        ### RE confidence intervals ###
+        if (self$options$ciRE==TRUE) {
+          ginfo("Estimating CI for RE")
+          test<-try({
+            pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
+            ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100)
+            colnames(ci)<-c("cilow","cihig")
+            params<-cbind(params,ci)
+          })
+          if (jmvcore::isError(test)) {
+            randomTable$setNote("reci","Random effects C.I. cannot be computed")
+          }
+          ginfo("done")
+        }
         
-        for (i in 1:dim(vcv)[1]) {
+        
+        for (i in 1:dim(params)[1]) {
                icc<-""
              if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") {
                  if (!jmvcore::isError(r2)) {
-                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+r2$varDist)
+                   icc<-params$sdcor[i]^2/(params$sdcor[i]^2+r2$varDist)
                  }
                }
 
           
                if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],
+                                                    name=realnames[[i]],
+                                                    std=params$sdcor[i],
+                                                    var=params$vcov[i],
+                                                    cilow=params$cilow[i],
+                                                    cihig=params$cihig[i],
+                                                    icc=icc))
                  else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
-               }
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],
+                                                     name=realnames[[i]],
+                                                     std=params$sdcor[i],
+                                                     var=params$vcov[i],
+                                                     cilow=params$cilow[i],
+                                                     cihig=params$cihig[i],
+                                                     icc=icc))
+        }
+                                                     
                if (!("Residuals" %in% grp))
                  randomTable$addRow(rowKey=i+1, list(groups="Residuals",name="",std=.sigma,var=.sigma2))
 

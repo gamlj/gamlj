@@ -469,8 +469,23 @@ options:
             for the adaptive Gauss-Hermite log-likelihood approximation,
             nAGQ argument controls the number of nodes in the quadrature formula. A positive integer
 
+    - name: lrtRandomEffects
+      title: LRT for Random Effects
+      type: Bool
+      default: false
+      hidden: true
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), LRT for the random effects
 
 
+    - name: ciRE
+      title: Random Effect C.I. (slow)
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), confidence intervals for the random effects
 
     - name: effectSize
       title: Effect Size
