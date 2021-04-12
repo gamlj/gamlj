@@ -1,43 +1,46 @@
 context("gzlmixed")
 data("schoolexam")
-
 mod<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math+( 1 | school ),
+  formula = pass ~ 1 + math*activity+( 1 +math| school ),
   data = schoolexam,
   plotHAxis = math,
   correlatedEffects = "nocorr",
   cimethod = "wald")
 
 
+model<-gamlj_model(mod)
+
 val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)
 val2<-round(as.numeric(as.character(mod$info$asDF$value[9])),digits = 3)
-val3<-as.character(mod$info$asDF$value[14])
+val3<-as.numeric(as.character(mod$info$asDF$value[7]))
+val4<-as.numeric(as.character(mod$info$asDF$value[14]))
 
 testthat::test_that("info table is fine",{
-                    testthat::expect_equal(val1,-2826.509)
-                    testthat::expect_equal(val2, 5659.02)
-                    testthat::expect_equal(val3, "yes")
+                    testthat::expect_equal(val1,-2785.064)
+                    testthat::expect_equal(val2, 0.039)
+                    testthat::expect_equal(val3, 5570.128,tolerance = .001)
+                    testthat::expect_equal(val4, 0.9566,tolerance = .001)
                     
                     })
 
-val1<-round(as.numeric(as.character(mod$main$anova$asDF$test)),digits = 3)
-val2<-round(as.numeric(as.character(mod$main$anova$asDF$p)),digits = 5)
+val1<-round(as.numeric(as.character(mod$main$anova$asDF$test[[1]])),digits = 3)
+val2<-round(as.numeric(as.character(mod$main$anova$asDF$p[[2]])),digits = 5)
 val3<-as.character(mod$main$anova$asDF$name[1])
 
 testthat::test_that("anova table is fine",{
-  testthat::expect_equal(val1,90.855)
+  testthat::expect_equal(val1,95.125)
   testthat::expect_equal(val2, 0)
   testthat::expect_equal(val3, "math")
   
 })
 
-val1<-round(as.numeric(as.character(mod$main$fixed$asDF[1,5])),digits = 3)
-val2<-round(as.numeric(as.character(mod$main$fixed$asDF[2,7])),digits = 3)
+val1<-round(as.numeric(as.character(mod$main$fixed$asDF[1,5])),digits = 4)
+val2<-round(as.numeric(as.character(mod$main$fixed$asDF[2,7])),digits = 4)
 val3<-as.character(mod$main$fixed$asDF[2,1])
 
 testthat::test_that("params table is fine",{
-  testthat::expect_equal(val1,0.716)
-  testthat::expect_equal(val2, 9.532)
+  testthat::expect_equal(val1,0.7104)
+  testthat::expect_equal(val2, 9.7532)
   testthat::expect_equal(val3, "math")
   
 })
@@ -45,7 +48,7 @@ testthat::test_that("params table is fine",{
 val1<-round(as.numeric(as.character(mod$main$random$asDF[1,3])),digits = 3)
 
 testthat::test_that("vars table is fine",{
-  testthat::expect_equal(val1,1.312)
+  testthat::expect_equal(val1,1.34)
 
 })
 
@@ -58,7 +61,7 @@ mod<-gamlj::gamljGlmMixed(
   cimethod = "wald")
   )
 
-val1<-as.character(mod$info$asDF$value[14])
+val1<-as.character(mod$info$asDF$value[15])
 
 testthat::test_that("fail",{
   testthat::expect_equal(val1,"no")
@@ -111,14 +114,12 @@ mod<-gamlj::gamljGlmMixed(
   cimethod = "wald",
   postHoc = ~fem:mar)
 
-model<-glmer(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs,family = poisson())
-
-model<-glmer.nb(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs)
-
+#model<-glmer(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs,family = poisson())
+#model<-glmer.nb(q ~ 1 + fem*mar +( 1 | program ),data=phdpubs)
 
 testthat::test_that("negative binomial", {
     testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")
-    testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[8])),3201.73)
+    testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[10])),3201.73)
     testthat::expect_equal(as.character(mod$postHocs[[1]]$asDF[1,1]),"Men")
     testthat::expect_equal(mod$postHocs[[1]]$asDF[1,6],0.9350,tol=.0001)
     

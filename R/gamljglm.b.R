@@ -17,7 +17,7 @@ gamljGlmClass <- R6::R6Class(
       factors<-self$options$factors
       covs<-self$options$covs
       ciWidth<-self$options$paramCIWidth
-      
+
       ### here we initialize the info table ####
       infoTable<-self$results$info
 
@@ -279,6 +279,9 @@ gamljGlmClass <- R6::R6Class(
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)        
         private$.populateLevenes(model)
         private$.populateNormTest(model)
+        
+        mf.savePredRes(self$options,self$results,model) 
+          
         
     },
   .cleandata=function() {

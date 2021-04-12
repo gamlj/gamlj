@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_model}
 \alias{gamlj_model}
-\title{Extract the R model object contained in the GAMLj results}
+\title{Extract the R model}
 \usage{
 gamlj_model(object)
 }
@@ -16,7 +16,7 @@ a R object from lm(), glm(), lmer() or glmer()
 Return the estimated model object of the class lm, lmer, glm depending on the model.
 }
 \examples{
-data("qsport")
+data('qsport')
 obj<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)

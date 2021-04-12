@@ -52,23 +52,22 @@ gamljGlm(
 
 \item{formula}{(optional) an object of class \code{\link[stats]{formula}} (or one that can be coerced to that class): a symbolic description of the model to be fitted.}
 
-\item{dep}{a string naming the dependent variable from \code{data}; the
-variable must be numeric. No needed if \code{formula} is used.}
+\item{dep}{a string naming the dependent variable; the
+variable must be numeric. Not needed if \code{formula} is used.}
 
-\item{factors}{a vector of strings naming the fixed factors from
-\code{data}. No needed if \code{formula} is used.}
+\item{factors}{a vector of strings naming the fixed factors. Not needed if \code{formula} is used.}
 
-\item{covs}{a vector of strings naming the covariates from \code{data}. No
+\item{covs}{a vector of strings naming the covariates (continuous variables). Not
 needed if \code{formula} is used.}
 
 \item{modelTerms}{a list of character vectors describing fixed effects
-terms. No needed if \code{formula} is used.}
+terms. Not needed if \code{formula} is used.}
 
 \item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept. No needed if \code{formula} is used.}
+fixed intercept. Not needed if \code{formula} is used.}
 
 \item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
-in table}
+in tables}
 
 \item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
@@ -171,10 +170,11 @@ scatterplot of the residuals against predicted}
 \item{effectSizeInfo}{\code{TRUE} or \code{FALSE} (default), provide
 ìnformation about the effect size indexes}
 
-\item{dep_scale}{Re-scale the dependent variable.}
+\item{dep_scale}{Re-scale the dependent variable. It can be \code{'centered'} to the mean, \code{'standardized'}, log-transformed \code{'log'} or \code{'none'}.
+\code{'none'} (default) leaves the variable as it is.}
 }
 \value{
-A results object containing:
+A results object of class \code{gamlj}, \code{gamlj},\code{gamljGlmResults} containing:
 \tabular{llllll}{
   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr

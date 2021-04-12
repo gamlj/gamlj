@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in jamovi
 name: gamlj
-version: 2.4.0
+version: 2.4.5
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -97,13 +97,6 @@ datasets:
     tags:
       - Poisson
       - GzLM
-  - name: temptime
-    path: temptime.csv
-    description: |
-      Simulated data for individual growth models.
-    tags:
-      - Mixed models
-      - Individual growth model
   - name: schoolexam
     path: schoolexam.csv
     description: |

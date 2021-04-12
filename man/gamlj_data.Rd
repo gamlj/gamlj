@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_data}
 \alias{gamlj_data}
-\title{Extract data transformed by GAMLj to run R analyses in line with gamlj setup}
+\title{Extract data}
 \usage{
 gamlj_data(object)
 }
@@ -15,13 +15,13 @@ a dataset
 \description{
 This function returns a dataset with the variables in the GAMLj model 
 transformed according to GAMLj options. It is usefull to run additional 
-models in R with other R packages with the same setup used by GAMLj
+models with other R packages with the same setup used by GAMLj
 }
 \examples{
-data("qsport")
+data('qsport')
 gmod<-gamlj::gamljGlm(formula = performance ~ hours,
                 data = qsport,
-                scaling = c(hours="standardized"))
+                scaling = c(hours='standardized'))
 
 gdata<-gamlj_data(gmod)
 lm(performance ~ hours,data=gdata)

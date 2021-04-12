@@ -119,6 +119,11 @@ mi.getDummiesNames<-function(varname,data) {
     varname
 }
 
+mi.getBIC<- function(x,...) UseMethod(".getBIC")
+
+.getBIC.default<-function(model)
+  return(round(stats::BIC(model),digits = 3))
+
 
 mi.getAIC<- function(x,...) UseMethod(".getAIC")
 

@@ -10,18 +10,17 @@
 #'
 #' @param data the data as a data frame
 #' @param formula (optional) an object of class \code{\link[stats]{formula}} (or one that can be coerced to that class): a symbolic description of the model to be fitted. 
-#' @param dep a string naming the dependent variable from \code{data}; the
-#'   variable must be numeric. No needed if \code{formula} is used.
-#' @param factors a vector of strings naming the fixed factors from
-#'   \code{data}. No needed if \code{formula} is used.
-#' @param covs a vector of strings naming the covariates from \code{data}. No
+#' @param dep a string naming the dependent variable; the
+#'   variable must be numeric. Not needed if \code{formula} is used.
+#' @param factors a vector of strings naming the fixed factors. Not needed if \code{formula} is used.
+#' @param covs a vector of strings naming the covariates (continuous variables). Not
 #'   needed if \code{formula} is used.
 #' @param modelTerms a list of character vectors describing fixed effects
-#'   terms. No needed if \code{formula} is used.
+#'   terms. Not needed if \code{formula} is used.
 #' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. No needed if \code{formula} is used.
+#'   fixed intercept. Not needed if \code{formula} is used.
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
-#'   in table
+#'   in tables
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
 #' @param contrasts   a named vector of the form \code{c(var1='type', var2='type2')} specifying the type of contrast to use,
@@ -93,8 +92,9 @@
 #'   ìnformation about the intercept (F test, effect size indexes)
 #' @param effectSizeInfo \code{TRUE} or \code{FALSE} (default), provide
 #'   ìnformation about the effect size indexes
-#' @param dep_scale Re-scale the dependent variable.
-#' @return A results object containing:
+#' @param dep_scale Re-scale the dependent variable. It can be \code{'centered'} to the mean, \code{'standardized'}, log-transformed \code{'log'} or \code{'none'}.
+#'   \code{'none'} (default) leaves the variable as it is. 
+#' @return A results object of class \code{gamlj}, \code{gamlj},\code{gamljGlmResults} containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -231,14 +231,13 @@ gamljGlm <- function(
   ### fix some options when passed by R ####
   if (is.something(names(scaling))) 
      scaling<-lapply(names(scaling), function(a) list(var=a,type=scaling[[a]]))
+  
   if (is.something(names(contrasts))) 
     contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
+
+   
+  ####
   
-  
-    
-    
-    
-    
     options <- gamljGlmOptions$new(
     dep = dep,
     factors = factors,

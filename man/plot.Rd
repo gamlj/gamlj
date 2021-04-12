@@ -28,7 +28,7 @@ gmod<-gamlj::gamljGlm(
   formula = performance ~ hours,
   data = qsport)
 
-plot(gmod,plotHAxis = "hours")
+plot(gmod,plotHAxis = 'hours')
 plot(gmod,formula=~hours)
 }
 \author{

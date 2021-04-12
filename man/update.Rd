@@ -5,7 +5,7 @@
 \alias{update.gamljGzlmResults}
 \alias{update.gamljMixedResults}
 \alias{update.gamljGlmMixedResults}
-\title{Update a GAMLj model by passing only the new options}
+\title{Update a GAMLj model}
 \usage{
 \method{update}{gamljGlmResults}(object, ...)
 

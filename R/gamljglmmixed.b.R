@@ -20,6 +20,8 @@ gamljGlmMixedClass <- R6::R6Class(
       fixedIntercept<-self$options$fixedIntercept
       modelType<-self$options$modelSelection
       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
+      ciWidth<-self$options$paramCIWidth
+      
       
             
       getout<-FALSE
@@ -79,12 +81,13 @@ gamljGlmMixedClass <- R6::R6Class(
       if (!is.null(ep))
         infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
-      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="More is better"))
+      infoTable$addRow(rowKey="log",list(info="LogLikel.",comm="Unconditioal Log-Likelihood"))
+      infoTable$addRow(rowKey="2log",list(info="-2*LogLikel.",comm="Unconditioal absolute deviance"))
+      infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional relative deviance"))
       infoTable$addRow(rowKey="r2m",list(info="R-squared",comm="Marginal"))
       infoTable$addRow(rowKey="r2c",list(info="R-squared",comm= "Conditional"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
       infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
-      infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Conditional"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
       infoTable$addRow(rowKey="valdf",list(info="Chi-squared/DF",comm="Overdispersion indicator"))
       infoTable$addRow(rowKey="conv",list(info="Converged",comm=""))
@@ -99,7 +102,11 @@ gamljGlmMixedClass <- R6::R6Class(
       
       ## random table
       aTable<-self$results$main$random
-
+      if (self$options$ciRE==TRUE) {
+        aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
+        aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
+      }
+      
       
       
       ## anova Table 
@@ -122,7 +129,6 @@ gamljGlmMixedClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
-      ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
@@ -208,31 +214,59 @@ gamljGlmMixedClass <- R6::R6Class(
        ginfo("...done")
        ###### variances ###########
        vc<-as.data.frame(lme4::VarCorr(model))
-       vcv<-vc[is.na(vc[,3]),]
-       vcv$var1[is.na(vcv$var1)]<-""
+       params<-vc[is.na(vc[,3]),]
+       params$var1[is.na(params$var1)]<-""
        .sigma<-sigma(model)
        .sigma2<-sigma(model)^2
-        grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
+        grp<-unlist(lapply(params$grp, function(a) gsub("\\.[0-9]$","",a)))
         realgroups<-n64$nicenames(grp)
-        realnames<-n64$nicenames(vcv$var1)
+        realnames<-n64$nicenames(params$var1)
         realnames<-lapply(realnames,lf.nicifyTerms)
         r2<-try(r.squared(model),silent = TRUE)
         
+        ### RE confidence intervals ###
+        if (self$options$ciRE==TRUE) {
+          ginfo("Estimating CI for RE")
+          test<-try({
+            pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
+            ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100)
+            colnames(ci)<-c("cilow","cihig")
+            params<-cbind(params,ci)
+          })
+          if (jmvcore::isError(test)) {
+            randomTable$setNote("reci","Random effects C.I. cannot be computed")
+          }
+          ginfo("done")
+        }
         
-        for (i in 1:dim(vcv)[1]) {
+        
+        for (i in 1:dim(params)[1]) {
                icc<-""
              if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)") {
                  if (!jmvcore::isError(r2)) {
-                   icc<-vcv$sdcor[i]^2/(vcv$sdcor[i]^2+r2$varDist)
+                   icc<-params$sdcor[i]^2/(params$sdcor[i]^2+r2$varDist)
                  }
                }
 
           
                if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
+                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],
+                                                    name=realnames[[i]],
+                                                    std=params$sdcor[i],
+                                                    var=params$vcov[i],
+                                                    cilow=params$cilow[i],
+                                                    cihig=params$cihig[i],
+                                                    icc=icc))
                  else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],name=realnames[[i]],std=vcv$sdcor[i],var=vcv$sdcor[i]^2,icc=icc))
-               }
+                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],
+                                                     name=realnames[[i]],
+                                                     std=params$sdcor[i],
+                                                     var=params$vcov[i],
+                                                     cilow=params$cilow[i],
+                                                     cihig=params$cihig[i],
+                                                     icc=icc))
+        }
+                                                     
                if (!("Residuals" %in% grp))
                  randomTable$addRow(rowKey=i+1, list(groups="Residuals",name="",std=.sigma,var=.sigma2))
 
@@ -302,6 +336,7 @@ gamljGlmMixedClass <- R6::R6Class(
            info.title<-paste("Generalized mixed model" )
            info.aic<-round(stats::extractAIC(model)[2],digits=2)
            info.loglik<-lme4::llikAIC(model)$AICtab['logLik']
+           info.2log<--2*info.loglik
            info.bic<-stats::BIC(model)
            info.dev<-stats::deviance(model)
            if (jmvcore::isError(r2)){
@@ -317,6 +352,7 @@ gamljGlmMixedClass <- R6::R6Class(
            infoTable$setRow(rowKey="aic",list(value=info.aic))
            infoTable$setRow(rowKey="bic",list(value=info.bic))
            infoTable$setRow(rowKey="log",list(value=info.loglik))
+           infoTable$setRow(rowKey="2log",list(value=info.2log))
            infoTable$setRow(rowKey="dev",list(value=info.dev))
            infoTable$setRow(rowKey="r2m",list(value=info.r2m))
            infoTable$setRow(rowKey="r2c",list(value=info.r2c))
@@ -348,6 +384,9 @@ gamljGlmMixedClass <- R6::R6Class(
         gposthoc.populate(model,self$options,self$results$postHocs)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
+        
+        mf.savePredRes(self$options,self$results,model) 
+        
 
     },
   .buildreffects=function(terms,correl=TRUE) {

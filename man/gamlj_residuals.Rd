@@ -9,7 +9,7 @@ gamlj_residuals(gobj, type = "response")
 \arguments{
 \item{gobj}{a gamlj results object of the class `gamlj*Results`}
 
-\item{type}{the type of the residuals for generalized models. The alternatives are: "deviance" (default), "pearson", "working", "response", and "partial". Can be abbreviated., 
+\item{type}{the type of the residuals for generalized models. The alternatives are: 'deviance' (default), 'pearson', 'working', 'response', and 'partial'. Can be abbreviated., 
 cf.  \code{\link[stats:residuals.lm]{stats::residuals.lm()}}}
 }
 \value{
@@ -22,7 +22,7 @@ Deprecated. Please use `residuals()`
 \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}}
 }
 \examples{
-data("qsport")
+data('qsport')
 gmod<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)

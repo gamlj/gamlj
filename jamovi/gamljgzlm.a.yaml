@@ -453,6 +453,16 @@ options:
       description:
          R: >
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
+           
+           
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
 
 ...
 

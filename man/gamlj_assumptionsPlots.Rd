@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_assumptionsPlots}
 \alias{gamlj_assumptionsPlots}
-\title{Extract assumptions checking plots from a GAMLj results object}
+\title{Assumptions checking plots}
 \usage{
 gamlj_assumptionsPlots(object)
 }

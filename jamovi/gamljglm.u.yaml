@@ -397,3 +397,10 @@ children:
             name: interceptInfo
           - type: CheckBox
             name: effectSizeInfo
+      - type: Label
+        label: Save
+        children:
+          - type: Output
+            name: predicted
+          - type: Output
+            name: residuals

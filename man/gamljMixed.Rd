@@ -13,6 +13,7 @@ gamljMixed(
   fixedIntercept = TRUE,
   showParamsCI = TRUE,
   paramCIWidth = 95,
+  ciRE = FALSE,
   contrasts = NULL,
   showRealNames = TRUE,
   showContrastCode = FALSE,
@@ -75,6 +76,8 @@ in table}
 
 \item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
 the confidence interval width for the parameter estimates}
+
+\item{ciRE}{\code{TRUE} or \code{FALSE} (default), produce random effects confidence intervals based on profile method}
 
 \item{contrasts}{a named vector of the form \code{c(var1='type', var2='type2')} specifying the type of contrast to use,
 one of \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'}, \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}.

@@ -21,8 +21,8 @@
 
 \item{...}{additional arguments for specific predict methods other than the ones specified here.}
 
-\item{type}{the type of prediction required. The default is on the scale of the response variables ("response"); Thus for  binomial models the default is to compute the predicted probabilities.  "link" gives the scale of the linear predictors; 
-is on the scale of the linear predictors;  The "terms" option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
+\item{type}{the type of prediction required. The default is on the scale of the response variables ('response'); Thus for  binomial models the default is to compute the predicted probabilities.  'link' gives the scale of the linear predictors; 
+is on the scale of the linear predictors;  The 'terms' option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
 Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}}
 
 \item{re.form}{(formula, NULL, or NA) specify which random effects to condition on when predicting. If NULL, include all random effects; if NA or ~0, include no random effects. Used only for the mixed models.}
@@ -34,7 +34,7 @@ a R object of the class of the estimated model
 Returns predicted values from the estimated model
 }
 \examples{
-data("qsport")
+data('qsport')
 gmod<-gamlj::gamljGlm(
    formula = performance ~ hours,
    data = qsport)

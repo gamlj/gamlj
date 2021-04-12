@@ -277,6 +277,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "1/mu^2",
                     "sqrt"),
                 default="identity")
+            private$..predicted <- jmvcore::OptionOutput$new(
+                "predicted")
+            private$..residuals <- jmvcore::OptionOutput$new(
+                "residuals")
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -312,6 +316,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..modelSelection)
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
+            self$.addOption(private$..predicted)
+            self$.addOption(private$..residuals)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -347,7 +353,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         effectSize = function() private$..effectSize$value,
         modelSelection = function() private$..modelSelection$value,
         custom_family = function() private$..custom_family$value,
-        custom_link = function() private$..custom_link$value),
+        custom_link = function() private$..custom_link$value,
+        predicted = function() private$..predicted$value,
+        residuals = function() private$..residuals$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -382,7 +390,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..effectSize = NA,
         ..modelSelection = NA,
         ..custom_family = NA,
-        ..custom_link = NA)
+        ..custom_link = NA,
+        ..predicted = NA,
+        ..residuals = NA)
 )
 
 gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -396,7 +406,9 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         simpleEffects = function() private$.items[["simpleEffects"]],
         emeansTables = function() private$.items[["emeansTables"]],
         descPlot = function() private$.items[["descPlot"]],
-        descPlots = function() private$.items[["descPlots"]]),
+        descPlots = function() private$.items[["descPlots"]],
+        predicted = function() private$.items[["predicted"]],
+        residuals = function() private$.items[["residuals"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -910,7 +922,27 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "cvalue",
                         "modelSelection",
                         "custom_family",
-                        "custom_link"))))},
+                        "custom_link"))))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="predicted",
+                title="Predicted Vales",
+                varTitle="`GzLM_PRED_${ dep }`",
+                varDescription="Predicted values",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs")))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="residuals",
+                title="Residuals Vales",
+                varTitle="`GzLM_RES_${ dep }`",
+                varDescription="Residuals values",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs")))},
         .setModel=function(x) private$..model <- x))
 
 gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

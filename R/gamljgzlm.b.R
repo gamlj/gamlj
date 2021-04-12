@@ -62,6 +62,7 @@ gamljGzlmClass <- R6::R6Class(
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
       infoTable$addRow(rowKey="r2",list(info="R-squared",comm="Proportion of reduction of error"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
+      infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
       infoTable$addRow(rowKey="devdf",list(info="Chi-squared/DF",comm="Overdispersion indicator"))
@@ -222,6 +223,8 @@ gamljGzlmClass <- R6::R6Class(
           infoTable$setRow(rowKey="dir",list(comm=ep[2]))
         infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
         infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
+        infoTable$setRow(rowKey="bic",list(value=mi.getBIC(model)))
+        
         infoTable$setRow(rowKey="dev",list(value=model$deviance))
         infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
         infoTable$setRow(rowKey="devdf",list(value=mi.getValueDf(model)))
@@ -293,6 +296,11 @@ gamljGzlmClass <- R6::R6Class(
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
+        
+        mf.savePredRes(self$options,self$results,model) 
+        
+        
+        
         
 
     },

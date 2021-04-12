@@ -137,8 +137,8 @@ plot(mod2,formula=~Species,plotRaw=T,plotError="ci")
 
 ```
 
-In addition, the plot can be saved in a variable an manipulated as any other ggplot object, for instance to change the theme or add a title.
-s
+In addition, the plot can be saved in a variable and manipulated as any other ggplot object, for instance to change the theme or add a title.
+
 ```{r warning=FALSE, message=FALSE}
 p<-plot(mod,plotHAxis="Sepal.Width", plotSepLines="Petal.Length", plotRaw=T,plotError="ci")
 p+ggplot2::ggtitle("A nice plot")+ggplot2::theme_minimal()
