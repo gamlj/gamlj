@@ -114,7 +114,7 @@ children:
           update: './mixed.events::onUpdate_randomSupplier'
         children:
           - type: TargetLayoutBox
-            transferAction: interactions
+            transferAction: none
             children:
               - type: ListBox
                 name: randomTerms
