@@ -301,9 +301,8 @@ gplots.twoWaysPlot <- function(image, theme, depName, groupName, linesName, erro
                 size = 2) else p <- p + ggplot2::geom_point(data = rawData, aes_string(x = "x", y = "y"), show.legend = FALSE, alpha = 0.5, shape = 16, size = 2)
     }
 
-    p <- p + ggplot2::geom_line(data = gdata, aes_string(x = "group", y = "fit", group = "lines", colour = "lines"), size = 1.2)  ## removed , position=dodge
+    p <- p + ggplot2::geom_line(data = gdata, aes_string(x = "group", y = "fit", group = "lines", colour = "lines"), size = 1.2, position=dodge)  ##  position=dodge  creates an issue, don't remember which
     p <- p + ggplot2::labs(x = groupName, y = depName, colour = clabel)
-    # p <- p + ggplot2::scale_y_continuous(limits=c(min(image$state$range), max(image$state$range)))
 
     
     if (is.factor(image$state$data$group)) {
@@ -313,9 +312,9 @@ gplots.twoWaysPlot <- function(image, theme, depName, groupName, linesName, erro
             data <- stats::aggregate(data$y, list(data$cluster, data$group), mean)
             names(data) <- c("cluster", "group", "y")
             p <- p + ggplot2::geom_point(data = data, aes_string(x = "group", y = "y", group = "cluster"), color = "gray64", show.legend = F, 
-                shape = 12, alpha = 0.5, size = 0.5)
+                shape = 12, alpha = 0.5, size = 0.5,position=dodge)
             p <- p + ggplot2::geom_line(data = data, aes_string(x = "group", y = "y", group = "cluster"), color = "gray64", size = 0.3, 
-                alpha = 0.3, show.legend = F)
+                alpha = 0.3, show.legend = F,position=dodge)
         }
         p <- p + ggplot2::geom_point(data = gdata, aes_string(x = "group", y = "fit", group = "lines", colour = "lines"), shape = 16, size = 4, 
             position = dodge)
