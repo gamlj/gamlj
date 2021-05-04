@@ -416,6 +416,7 @@ gamljMixedClass <- R6::R6Class(
       dataRaw <- self$data
       data <- list()
       for (factor in factors) {
+
         ### we need this for Rinterface ####
         if (!("factor" %in% class(dataRaw[[factor]]))) {
           warning(paste("Warning, variable",factor," has been coerced to factor"))

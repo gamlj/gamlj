@@ -252,7 +252,7 @@ var updateScaling = function(ui, variableList, context) {
             }
         }
         if (found === null)
-            list3.push({ var: variableList[i], type: "centered" });
+            list3.push({ var: variableList[i], type: "none" });
         else
             list3.push(found);
     }
