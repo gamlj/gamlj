@@ -1,6 +1,6 @@
 
-j_DEBUG=T
-j_INFO=T
+j_DEBUG=F
+j_INFO=F
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
 DUMMY_TAIL<-"_._._"
