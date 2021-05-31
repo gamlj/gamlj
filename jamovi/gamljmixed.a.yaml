@@ -572,5 +572,21 @@ options:
       type: Output            
 
 
+### this is for model comparisons
+
+    - name: modelcomparison
+      title: Store model
+      type: Bool
+      default: false
+
+    - name: modelid
+      title: Model ID
+      type: String            
+    - name: modeldescription
+      title: Model Description
+      type: String            
+
+
+
 ...
 

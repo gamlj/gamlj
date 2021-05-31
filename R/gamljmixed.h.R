@@ -52,7 +52,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             normPlot = FALSE,
             residPlot = FALSE,
             clusterBoxplot = FALSE,
-            randHist = FALSE, ...) {
+            randHist = FALSE,
+            modelcomparison = FALSE,
+            modelid = NULL,
+            modeldescription = NULL, ...) {
 
             super$initialize(
                 package="gamlj",
@@ -337,6 +340,16 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
+            private$..modelcomparison <- jmvcore::OptionBool$new(
+                "modelcomparison",
+                modelcomparison,
+                default=FALSE)
+            private$..modelid <- jmvcore::OptionString$new(
+                "modelid",
+                modelid)
+            private$..modeldescription <- jmvcore::OptionString$new(
+                "modeldescription",
+                modeldescription)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
@@ -385,6 +398,9 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..randHist)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
+            self$.addOption(private$..modelcomparison)
+            self$.addOption(private$..modelid)
+            self$.addOption(private$..modeldescription)
         }),
     active = list(
         dep = function() private$..dep$value,
@@ -433,7 +449,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         clusterBoxplot = function() private$..clusterBoxplot$value,
         randHist = function() private$..randHist$value,
         predicted = function() private$..predicted$value,
-        residuals = function() private$..residuals$value),
+        residuals = function() private$..residuals$value,
+        modelcomparison = function() private$..modelcomparison$value,
+        modelid = function() private$..modelid$value,
+        modeldescription = function() private$..modeldescription$value),
     private = list(
         ..dep = NA,
         ..factors = NA,
@@ -481,7 +500,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..clusterBoxplot = NA,
         ..randHist = NA,
         ..predicted = NA,
-        ..residuals = NA)
+        ..residuals = NA,
+        ..modelcomparison = NA,
+        ..modelid = NA,
+        ..modeldescription = NA)
 )
 
 gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

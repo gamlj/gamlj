@@ -503,3 +503,24 @@ children:
           - type: Output
             name: residuals
 
+  - type: CollapseBox
+    label: Model Comparison
+    style: list
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Store Model for Comparison
+        children:
+          - type: CheckBox
+            name: modelcomparison
+          - type: TextBox
+            name: modelid
+            format: string
+            width: large
+            enable: (modelcomparison)
+          - type: TextBox
+            name: modeldescription
+            format: string
+            width: largest
+            enable: (modelcomparison)
