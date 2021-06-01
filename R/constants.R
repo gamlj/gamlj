@@ -3,8 +3,11 @@ j_DEBUG=F
 j_INFO=F
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
+### this should be removed ###
 DUMMY_TAIL<-"_._._"
 
+
+FACTOR_SYMBOL="._._._."
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
