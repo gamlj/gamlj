@@ -11,20 +11,28 @@ Variable <- R6::R6Class(
     nlevels=NULL,
     contrast_values=NULL,
     contrast_labels=NULL,
+    levels_labels=NULL,
     method=NULL,
-    initialize=function(var,data,options) {
+    initialize=function(var,options) {
       self$name<-var
-      private$.data<-data
       self$options<-options
-      self$checkVariable()
+      self$vars=var
+      
     },
-    checkVariable=function() { 
+    checkVariable=function(data) { 
+      
       if (private$.set==TRUE)
-        return()
+        return(self)
+      
       var<-self$name
+      vardata<-data[[var]]
+      if (is.null(vardata)) {
+          self$errors<-paste("Variable",var,"not in the data")
+          return(self)
+      }
+
       if (var %in% self$options$factors) {
         self$type="factor"
-        vardata<-private$.data[[var]]
         if (!is.factor(vardata)) {
           self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to factor"))
           vardata<-factor(vardata)
@@ -46,7 +54,6 @@ Variable <- R6::R6Class(
       
       if (var %in% self$options$covs) {
         self$type="numeric"
-        vardata<-private$.data[[var]]
         if (is.factor(vardata)) {
           self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced numeric"))
           vardata<-jmvcore::toNumeric(vardata)
@@ -56,29 +63,50 @@ Variable <- R6::R6Class(
         private$.paramsnames<-tob64(var)
         
         if (length(vardata)==0)
-          return()
+          return(self)
         
+        labels_type<-ifelse(is.null(self$options$simpleScaleLabels),"values",self$options$simpleScaleLabels)
+
         if (self$options$simpleScale=="mean_sd")  {
-              .span<-1
+              .span<-ifelse(is.null(self$options$cvalue),1,self$options$cvalue)
+              .labs<-c(paste0("Mean-", .span, "\u00B7", "SD"), "Mean", paste0("Mean+", .span, "\u00B7","SD"))
               .mean <- mean(vardata)
               .sd <- sd(vardata)
-               self$levels=c(.mean - (.span * .sd), .mean, .mean + (.span * .sd))
+               self$levels=round(c(.mean - (.span * .sd), .mean, .mean + (.span * .sd)),digits = 3)
                self$method="mean_sd"
+               if (labels_type == "values") 
+                 self$levels_labels<-self$levels
+               if (labels_type == "labels") 
+                 self$levels_labels<-.labs
+               if (labels_type == "values_labels") { 
+                 self$levels_labels<-paste(.labs,self$levels,sep="=")
+               }
         }
         if (self$options$simpleScale=="percent") {
-              .span=.25
-              self$levels<-(round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span)), digits = 3)) 
+               
+              .lspan<-ifelse(is.null(self$options$percvalue),25,self$options$percvalue)
+              .span<-.lspan/100
+              
+              .labs<-c(paste0("50-", .lspan,"\u0025"), "50\u0025", paste0("50+", .lspan,"\u0025"))
+              
+              self$levels<-round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span)), digits = 3) 
               self$method="percent"
+              if (labels_type == "values") 
+                self$levels_labels<-self$levels
+
+              if (labels_type == "labels") 
+                 self$levels_labels<-.labs
+              
+              if (labels_type == "values_labels") { 
+                self$levels_labels<-paste(.labs,self$levels,sep="=")
+              }
         }
-        
-                  
-        
-        
         self$nlevels=3
         private$.set=TRUE
         
-        
       }
+      return(self)  
+      
     }
   ), # end of public
   private=list(

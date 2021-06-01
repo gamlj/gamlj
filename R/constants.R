@@ -8,6 +8,9 @@ DUMMY_TAIL<-"_._._"
 
 
 FACTOR_SYMBOL="._._._."
+INTERACTION_SYMBOL="._._._.X._._._."
+
+
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
