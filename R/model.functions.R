@@ -186,6 +186,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
   
 .anova.lm<-function(model) {
         ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+        mark(ano)
         colnames(ano)<-c("ss","df","f","p")
         dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
         tots<-list(ss=sum(ano$ss),df=sum(ano$df))
