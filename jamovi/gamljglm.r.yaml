@@ -36,7 +36,7 @@ items:
         - dep_scale
         - fixedIntercept
     items:
-           - name: interceptTable
+           - name: intercept
              title: Intercept Information
              type: Table
              visible: (interceptInfo)
@@ -129,7 +129,7 @@ items:
                       visible: (effectSize:epsilon)
                       format: zto
 
-           - name: effectSizeTable
+           - name: effectsizes
              title: Effect Size Indices
              type: Table
              visible: (effectSizeInfo)
@@ -163,8 +163,8 @@ items:
                       type: number
              refs: effectsize
 
-           - name: fixed
-             title: Fixed Effects Parameter Estimates
+           - name: coefficients
+             title:  Parameter Estimates (Coefficients)
              type: Table
              clearWith:
                     - dep
@@ -190,11 +190,11 @@ items:
                     - name: se
                       title: "SE"
                       type: number
-                    - name: cilow
+                    - name: ci.lower
                       type: number
                       title: Lower
                       visible: (showParamsCI)
-                    - name: cihig
+                    - name: ci.upper
                       type: number
                       title: Upper
                       visible: (showParamsCI)
@@ -221,48 +221,60 @@ items:
              type: Array
              description: an array of contrast coefficients tables
              visible: (showContrastCode)
+             items: (factors)
              clearWith:
                     - contrasts
              template:
                    title:  $key
                    type: Table
                    columns:
-                         - name: rnames
+                         - name: cname
                            title: 'Name'
                            type: text
                            visible: (showRealNames)
-                         - name: clabs
+                         - name: clab
                            title: 'Contrast'
                            type: text
+                         - name: bogus
+                           title: 'bogus'
+                           type: text
+                           visible: false
 
 
-  - name: postHocs
+  - name: posthoc
     title: Post Hoc Tests
     type: Array
     description: an array of post-hoc tables
-    items: (postHoc)
+    items: (posthoc)
     clearWith:
         - dep
         - modelTerms
         - contrasts
         - scaling
         - dep_scale
+        - posthoc
         - postHocCorr
     template:
-        clearWith: []
         title:  ""
         type: Table
+        clearWith:
+              - posthoc
+  
         columns:
-        - name: contrast
-          title: ""
-          type: number
-          visible: false
-        - name: estimate
+        - name: diff
           title: Difference
           type: number
         - name: se
           title: SE
           type: number
+        - name: ci.lower
+          type: number
+          title: Lower
+          visible: (showParamsCI)
+        - name: ci.upper
+          type: number
+          title: Upper
+          visible: (showParamsCI)
         - name: test
           title: t
           type: number
@@ -310,19 +322,12 @@ items:
                  - simpleScaleLabels
 
     items:
-            - name: Anova
+            - name: anova
               title: Simple Effects ANOVA
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
               columns:
-                 - name: threeway
-                   title: ""
-                   visible: (simple3way)
-                   combineBelow: true
-                 - name: moderator
-                   title: ""
-                   combineBelow: true
                  - name: F.ratio
                    title: F
                    type: number
@@ -356,18 +361,11 @@ items:
                    visible: (effectSize:epsilon)
                    format: zto
 
-            - name: Params
+            - name: coefficients
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
               columns:
-                     - name: threeway
-                       title: " "
-                       visible: (simple3way)
-                       combineBelow: true
-                     - name: moderator
-                       title: " "
-                       combineBelow: true
                      - name: contrast
                        title: "contrast"
                        type: text
@@ -377,11 +375,11 @@ items:
                      - name: SE
                        title: "SE"
                        type: number
-                     - name: lower.CL
+                     - name: ci.lower
                        type: number
                        title: Lower
                        visible: (showParamsCI)
-                     - name: upper.CL
+                     - name: ci.upper
                        type: number
                        title: Upper
                        visible: (showParamsCI)
@@ -402,11 +400,11 @@ items:
 
 
 
-  - name: emeansTables
+  - name: emmeans
     title: Estimated Marginal Means 
     type: Array
     description: an array of predicted means tables
-    visible: (eDesc)
+    visible: false
     clearWith:
         - dep
         - modelTerms
@@ -416,6 +414,7 @@ items:
         - fixedIntercept
         - simpleScaleLabels
         - ciWidth
+        - emmeans
 
     template:
         title:  $key
@@ -431,10 +430,10 @@ items:
         - name: df
           title: df
           type: number
-        - name: lower.CL
+        - name: ci.lower
           title: Lower 
           type: number
-        - name: upper.CL
+        - name: ci.upper
           title: Upper
           type: number
 

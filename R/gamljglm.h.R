@@ -23,12 +23,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotDvScale = FALSE,
             plotError = "none",
             ciWidth = 95,
-            postHoc = NULL,
-            eDesc = FALSE,
-            eCovs = FALSE,
+            emmeans = NULL,
+            posthoc = NULL,
             simpleVariable = NULL,
-            simpleModerator = NULL,
-            simple3way = NULL,
+            simpleModerators = NULL,
             simpleScale = "mean_sd",
             cvalue = 1,
             percvalue = 25,
@@ -162,29 +160,21 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 min=50,
                 max=99.9,
                 default=95)
-            private$..postHoc <- jmvcore::OptionTerms$new(
-                "postHoc",
-                postHoc,
+            private$..emmeans <- jmvcore::OptionTerms$new(
+                "emmeans",
+                emmeans,
                 default=NULL)
-            private$..eDesc <- jmvcore::OptionBool$new(
-                "eDesc",
-                eDesc,
-                default=FALSE)
-            private$..eCovs <- jmvcore::OptionBool$new(
-                "eCovs",
-                eCovs,
-                default=FALSE)
+            private$..posthoc <- jmvcore::OptionTerms$new(
+                "posthoc",
+                posthoc,
+                default=NULL)
             private$..simpleVariable <- jmvcore::OptionVariable$new(
                 "simpleVariable",
                 simpleVariable,
                 default=NULL)
-            private$..simpleModerator <- jmvcore::OptionVariable$new(
-                "simpleModerator",
-                simpleModerator,
-                default=NULL)
-            private$..simple3way <- jmvcore::OptionVariable$new(
-                "simple3way",
-                simple3way,
+            private$..simpleModerators <- jmvcore::OptionVariables$new(
+                "simpleModerators",
+                simpleModerators,
                 default=NULL)
             private$..simpleScale <- jmvcore::OptionList$new(
                 "simpleScale",
@@ -314,12 +304,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotDvScale)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
-            self$.addOption(private$..postHoc)
-            self$.addOption(private$..eDesc)
-            self$.addOption(private$..eCovs)
+            self$.addOption(private$..emmeans)
+            self$.addOption(private$..posthoc)
             self$.addOption(private$..simpleVariable)
-            self$.addOption(private$..simpleModerator)
-            self$.addOption(private$..simple3way)
+            self$.addOption(private$..simpleModerators)
             self$.addOption(private$..simpleScale)
             self$.addOption(private$..cvalue)
             self$.addOption(private$..percvalue)
@@ -356,12 +344,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotDvScale = function() private$..plotDvScale$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
-        postHoc = function() private$..postHoc$value,
-        eDesc = function() private$..eDesc$value,
-        eCovs = function() private$..eCovs$value,
+        emmeans = function() private$..emmeans$value,
+        posthoc = function() private$..posthoc$value,
         simpleVariable = function() private$..simpleVariable$value,
-        simpleModerator = function() private$..simpleModerator$value,
-        simple3way = function() private$..simple3way$value,
+        simpleModerators = function() private$..simpleModerators$value,
         simpleScale = function() private$..simpleScale$value,
         cvalue = function() private$..cvalue$value,
         percvalue = function() private$..percvalue$value,
@@ -397,12 +383,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotDvScale = NA,
         ..plotError = NA,
         ..ciWidth = NA,
-        ..postHoc = NA,
-        ..eDesc = NA,
-        ..eCovs = NA,
+        ..emmeans = NA,
+        ..posthoc = NA,
         ..simpleVariable = NA,
-        ..simpleModerator = NA,
-        ..simple3way = NA,
+        ..simpleModerators = NA,
         ..simpleScale = NA,
         ..cvalue = NA,
         ..percvalue = NA,
@@ -429,9 +413,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         model = function() private$..model,
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
-        postHocs = function() private$.items[["postHocs"]],
+        posthoc = function() private$.items[["posthoc"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
-        emeansTables = function() private$.items[["emeansTables"]],
+        emmeans = function() private$.items[["emmeans"]],
         descPlot = function() private$.items[["descPlot"]],
         descPlots = function() private$.items[["descPlots"]],
         assumptions = function() private$.items[["assumptions"]],
@@ -469,10 +453,10 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    interceptTable = function() private$.items[["interceptTable"]],
+                    intercept = function() private$.items[["intercept"]],
                     anova = function() private$.items[["anova"]],
-                    effectSizeTable = function() private$.items[["effectSizeTable"]],
-                    fixed = function() private$.items[["fixed"]],
+                    effectsizes = function() private$.items[["effectsizes"]],
+                    coefficients = function() private$.items[["coefficients"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
                 public=list(
@@ -490,7 +474,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "fixedIntercept"))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="interceptTable",
+                            name="intercept",
                             title="Intercept Information",
                             visible="(interceptInfo)",
                             clearWith=list(
@@ -597,7 +581,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="effectSizeTable",
+                            name="effectsizes",
                             title="Effect Size Indices",
                             visible="(effectSizeInfo)",
                             clearWith=list(
@@ -633,8 +617,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             refs="effectsize"))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="fixed",
-                            title="Fixed Effects Parameter Estimates",
+                            name="coefficients",
+                            title="Parameter Estimates (Coefficients)",
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
@@ -663,12 +647,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
@@ -695,6 +679,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="contrastCodeTables",
                             title="Contrast Coefficients",
                             visible="(showContrastCode)",
+                            items="(factors)",
                             clearWith=list(
                                 "contrasts"),
                             template=jmvcore::Table$new(
@@ -702,44 +687,56 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 title="$key",
                                 columns=list(
                                     list(
-                                        `name`="rnames", 
+                                        `name`="cname", 
                                         `title`="Name", 
                                         `type`="text", 
                                         `visible`="(showRealNames)"),
                                     list(
-                                        `name`="clabs", 
+                                        `name`="clab", 
                                         `title`="Contrast", 
-                                        `type`="text")))))}))$new(options=options))
+                                        `type`="text"),
+                                    list(
+                                        `name`="bogus", 
+                                        `title`="bogus", 
+                                        `type`="text", 
+                                        `visible`=FALSE)))))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
-                name="postHocs",
+                name="posthoc",
                 title="Post Hoc Tests",
-                items="(postHoc)",
+                items="(posthoc)",
                 clearWith=list(
                     "dep",
                     "modelTerms",
                     "contrasts",
                     "scaling",
                     "dep_scale",
+                    "posthoc",
                     "postHocCorr"),
                 template=jmvcore::Table$new(
                     options=options,
-                    clearWith=list(),
                     title="",
+                    clearWith=list(
+                        "posthoc"),
                     columns=list(
                         list(
-                            `name`="contrast", 
-                            `title`="", 
-                            `type`="number", 
-                            `visible`=FALSE),
-                        list(
-                            `name`="estimate", 
+                            `name`="diff", 
                             `title`="Difference", 
                             `type`="number"),
                         list(
                             `name`="se", 
                             `title`="SE", 
                             `type`="number"),
+                        list(
+                            `name`="ci.lower", 
+                            `type`="number", 
+                            `title`="Lower", 
+                            `visible`="(showParamsCI)"),
+                        list(
+                            `name`="ci.upper", 
+                            `type`="number", 
+                            `title`="Upper", 
+                            `visible`="(showParamsCI)"),
                         list(
                             `name`="test", 
                             `title`="t", 
@@ -775,8 +772,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    Anova = function() private$.items[["Anova"]],
-                    Params = function() private$.items[["Params"]]),
+                    anova = function() private$.items[["anova"]],
+                    coefficients = function() private$.items[["coefficients"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -800,19 +797,10 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "simpleScaleLabels"))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="Anova",
+                            name="anova",
                             title="Simple Effects ANOVA",
                             visible=FALSE,
                             columns=list(
-                                list(
-                                    `name`="threeway", 
-                                    `title`="", 
-                                    `visible`="(simple3way)", 
-                                    `combineBelow`=TRUE),
-                                list(
-                                    `name`="moderator", 
-                                    `title`="", 
-                                    `combineBelow`=TRUE),
                                 list(
                                     `name`="F.ratio", 
                                     `title`="F", 
@@ -855,19 +843,10 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="Params",
+                            name="coefficients",
                             title="Parameter Estimates for simple effects",
                             visible=FALSE,
                             columns=list(
-                                list(
-                                    `name`="threeway", 
-                                    `title`=" ", 
-                                    `visible`="(simple3way)", 
-                                    `combineBelow`=TRUE),
-                                list(
-                                    `name`="moderator", 
-                                    `title`=" ", 
-                                    `combineBelow`=TRUE),
                                 list(
                                     `name`="contrast", 
                                     `title`="contrast", 
@@ -881,12 +860,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="lower.CL", 
+                                    `name`="ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="upper.CL", 
+                                    `name`="ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
@@ -910,9 +889,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `format`="zto,pvalue"))))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
-                name="emeansTables",
+                name="emmeans",
                 title="Estimated Marginal Means",
-                visible="(eDesc)",
+                visible=FALSE,
                 clearWith=list(
                     "dep",
                     "modelTerms",
@@ -921,7 +900,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "dep_scale",
                     "fixedIntercept",
                     "simpleScaleLabels",
-                    "ciWidth"),
+                    "ciWidth",
+                    "emmeans"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="$key",
@@ -940,11 +920,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="df", 
                             `type`="number"),
                         list(
-                            `name`="lower.CL", 
+                            `name`="ci.lower", 
                             `title`="Lower", 
                             `type`="number"),
                         list(
-                            `name`="upper.CL", 
+                            `name`="ci.upper", 
                             `title`="Upper", 
                             `type`="number")))))
             self$add(jmvcore::Image$new(

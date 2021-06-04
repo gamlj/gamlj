@@ -6,6 +6,7 @@ const events = {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
+        
 
     },
 
@@ -23,6 +24,7 @@ const events = {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
+        updateEmmeansSupplier(ui, this);
 
     },
 
@@ -37,8 +39,7 @@ const events = {
 //          console.log("change simple in gamlj");
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
-        this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
-        this.checkValue(ui.simple3way, false, values, FormatDef.variable);
+//        this.checkValue(ui.simpleModerators, true, values, FormatDef.variable);
     },
 
     onUpdate_simpleSupplier: function(ui) {
@@ -68,12 +69,22 @@ const events = {
 
     onChange_postHocSupplier: function(ui) {
         let values = this.itemsToValues(ui.postHocSupplier.value());
-        this.checkValue(ui.postHoc, true, values, FormatDef.term);
+//        this.checkValue(ui.postHoc, true, values, FormatDef.term);
     },
 
     onUpdate_postHocSupplier: function(ui) {
         updatePostHocSupplier(ui, this);
     },
+
+    onChange_emmeansSupplier: function(ui) {
+        let values = this.itemsToValues(ui.emmeansSupplier.value());
+        this.checkValue(ui.emmeans, true, values, FormatDef.term);
+    },
+
+    onUpdate_emmeansSupplier: function(ui) {
+        updateEmmeansSupplier(ui, this);
+    },
+
     
     onUpdate_modelSupplier: function(ui) {
             let factorsList = this.cloneArray(ui.factors.value(), []);
@@ -188,6 +199,21 @@ var updatePostHocSupplier = function(ui, context) {
     ui.postHocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
 };
 
+var updateEmmeansSupplier = function(ui, context) {
+    var termsList = context.cloneArray(ui.modelTerms.value(), []);
+    var list = [];
+    for (var j = 0; j < termsList.length; j++) {
+        var term = termsList[j];
+
+        if (unique(term).length===term.length)
+              list.push(term);
+    }
+    ui.emmeansSupplier.setValue(context.valuesToItems(list, FormatDef.term));
+};
+
+
+
+
 var filterModelTerms = function(ui, context) {
 //    console.log("filterModelTerms in gamlj");
     var termsList = context.cloneArray(ui.modelTerms.value(), []);
@@ -268,7 +294,10 @@ var containsCovariate = function(value, covariates) {
     return false;
 };
 
-
+var unique = function(avec) {
+  
+  return(avec.filter((v, i, a) => a.indexOf(v) === i));
+};
 
 
 

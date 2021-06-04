@@ -62,9 +62,30 @@ bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
 ######### tables #########
 
+j.expand_table<-function(table,alist,type="text", superTitle=NULL,append=FALSE) {
+ 
+  j<-0
+  if (append) {
+    j<-length(table$columns)-1
+  }
+  
+  keys<-make.names(tob64(alist),unique = T)
+  labels<-alist
+  for (i in seq_along(keys)) {
+    table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type)
+  }
+
+
+  
+}
+  
+
 
 j.init_table<-function(table,obj,ci=FALSE,ciroot="",ciformat="{}% Confidence Intervals",ciwidth,indent=NULL,spaceby=NULL) {
 
+  if (is.null(obj))
+      return()
+  
   square<-length(dim(obj))>1
   if (ci) {
     l<-paste0(ciroot,"ci.lower")
@@ -73,8 +94,10 @@ j.init_table<-function(table,obj,ci=FALSE,ciroot="",ciformat="{}% Confidence Int
     table$getColumn(u)$setSuperTitle(jmvcore::format(ciformat, ciwidth))
   }
   j.fill_table(table,obj,append=T,spaceby=spaceby)
+  table$setVisible(TRUE)
 
 }
+
 j.init_table_append<-function(table,obj, indent=NULL) {
   
   last<-table$rowCount

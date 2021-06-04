@@ -4,103 +4,111 @@ gamljGlmClass <- R6::R6Class(
   private=list(
     .model=NA,
     .names64=NA,
-    .cov_condition=conditioning$new(),
-    .postHocRows=NA,
+    .data_machine=NULL,
+    .estimate_machine=NULL,
+    .ready=NULL,
     .init=function() {
       ginfo("init")
+      
       class(private$.results) <- c('gamlj', class(private$.results))
-      private$.names64<-names64$new()
-      n64<-private$.names64
-      dep<-self$options$dep
-      modelTerms<-self$options$modelTerms
-      fixedIntercept<-self$options$fixedIntercept
-      factors<-self$options$factors
-      covs<-self$options$covs
-      ciWidth<-self$options$paramCIWidth
-
-      ### here we initialize the info table ####
-      infoTable<-self$results$info
-
-      if (is.null(self$options$dep)) {
-        infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
+      
+      private$.ready<-readiness(self$options)
+      if (!private$.ready$ready) {
+        if(private$.ready$report)
+          self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
         return()
       }
       
-      # this allows intercept only model to be passed by syntax interface
-      aOne<-which(unlist(modelTerms)=="1")
-      if (is.something(aOne)) {
-        modelTerms[[aOne]]<-NULL
-        fixedIntercept=TRUE
+      ### set up the R6 workhourse class
+      
+      data_machine<-Datamatic$new(self$options,self$data)
+      estimate_machine<-Syntax$new(self$options,data_machine)
+
+      ### info table ###
+      j.init_table(self$results$info,estimate_machine$tab_info) 
+
+      ### anova table ###
+      j.init_table(self$results$main$anova,estimate_machine$tab_anova) 
+
+      ### estimates table ###
+      j.init_table(self$results$main$coefficients,estimate_machine$tab_coefficients, ci=T,ciwidth=self$options$ciWidth)
+
+      if (!is.something(self$options$factors))
+        self$results$main$coefficients$getColumn('label')$setVisible(FALSE)
+      
+      ### intercept table ###
+      j.init_table(self$results$main$intercept,estimate_machine$tab_intercept) 
+      
+      ### effectsizes table ###
+      j.init_table(self$results$main$effectsizes,estimate_machine$tab_effectsizes) 
+      
+      
+      ### estimate marginal means
+      
+      if (is.something(self$options$emmeans)) {
+  
+              self$results$emmeans$setVisible(TRUE)
+              for (i in seq_along(self$options$emmeans)) {
+                    term<-self$options$emmeans[[i]]
+                    aTable <- self$results$emmeans$addItem(key = jmvcore::stringifyTerm(term))
+                    j.expand_table(aTable,term)
+                    j.init_table(aTable,estimate_machine$tab_emmeans[[i]], ci=T,ciwidth=self$options$ciWidth)
+              } 
+      
+      }
+      
+      ### simple effects ####
+      if (is.something(estimate_machine$tab_simpleAnova)) {
+
+         j.expand_table(self$results$simpleEffects$anova,self$options$simpleModerators) 
+         j.init_table(self$results$simpleEffects$anova,estimate_machine$tab_simpleAnova)
+        
+         j.expand_table(self$results$simpleEffects$coefficients,self$options$simpleModerators) 
+         j.init_table(self$results$simpleEffects$coefficients,estimate_machine$tab_simpleCoefficients, ci=T,ciwidth=self$options$ciWidth)
+
       }
 
+      ### posthoc ####
       
-      data<-private$.cleandata()
-      
-      
-      modelFormula<-lf.constructFormula(dep,modelTerms,fixedIntercept)
-      dep64<-jmvcore::toB64(dep)
-      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
-      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,fixedIntercept))
-      
-      infoTable$addRow(rowKey="est",list(info="Estimate",value="Linear model fit by OLS"))
-      infoTable$addRow(rowKey="call",list(info="Call",value=n64$translate(modelFormula)))
-      infoTable$addRow(rowKey="r2m",list(info="R-squared"))
-      infoTable$addRow(rowKey="r2c",list(info="Adj. R-squared"))
-      ### initialize conditioning of covariates
-      if (is.something(covs)) {
-      span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
-      private$.cov_condition<-conditioning$new(covs,self$options$simpleScale,span)
+      if (is.something(self$options$posthoc)) {
+        
+        for (i in seq_along(self$options$posthoc)) {
+          term<-self$options$posthoc[[i]]
+          aTable<-self$results$posthoc$get(key = term)
+          aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
+          
+          j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison")
+          j.init_table(aTable,estimate_machine$tab_posthoc[[i]])
+        } 
+        
       }
-      #####################
 
+      if (is.something(estimate_machine$tab_contrastcodes)) {
+        
+          
+        for (i in seq_along(self$options$factors)) {
+          term<-self$options$factors[[i]]
+          aTable<-self$results$main$contrastCodeTables$get(key = term)
+          eTable<-estimate_machine$tab_contrastcodes[[i]]
+          levels_pos<-seq_len(length(names(eTable))-2)
+          j.expand_table(aTable,names(eTable)[levels_pos],append=T,type="number") 
+          names(eTable)[levels_pos]<-tob64(names(eTable)[levels_pos])
+          j.init_table(aTable,eTable)
+        
 
-      ## anova Table 
-      aTable<- self$results$main$anova
-      if (length(modelTerms)>0) {
-          aTable$addRow(rowKey=1, list(name="Model"))
-          mynames64<-attr(terms(as.formula(formula64)),"term.labels")
-          aterms<-n64$nicenames(mynames64)  
-          for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(aterms[[i]],raise=T)
-                  aTable$addRow(rowKey=i+1, list(name=lab))
-          }
-         aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
-         aTable$addRow(rowKey=i+3, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
-         
-         aTable$addFormat(col=1, rowNo=i+2, format=jmvcore::Cell.BEGIN_END_GROUP)
-         aTable$addFormat(col=1, rowNo=2, format=jmvcore::Cell.BEGIN_GROUP)
-         
+        }
       }
-      ### we want to output SS error and total for intercept-only models ######
-      if (length(modelTerms) == 0) {
-        aTable$addRow(rowKey=1, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq=""))
-        aTable$addRow(rowKey=2, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq=""))
-      }
-      ## fixed effects parameters
-
-      aTable<-self$results$main$fixed
-      mynames64<-colnames(model.matrix(formula64,data))
-      terms<-n64$nicenames(mynames64)  
-      labels<-n64$nicelabels(mynames64)
-      aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
-
-      ## hide effects labels if no factor is there
-      if (!is.something(factors))
-         aTable$getColumn('label')$setVisible(FALSE)
-        # other inits
-      mi.initInterceptInfo(self$options,self$results)
-      mi.initEffectSizeInfo(self$options,self$results,aterms,ciWidth)
+      
       
       gplots.initPlots(self,data,private$.cov_condition)
-      gposthoc.init(data,self$options, self$results$postHocs)     
-      gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
-      gsimple.init(data,self$options,self$results$simpleEffects)
-      mi.initContrastCode(data,self$options,self$results,n64)
+      
+      private$.data_machine<-data_machine
+      private$.estimate_machine<-estimate_machine
+      
     },
     .run=function() {
+      return()
+      private$.data_machine$cleandata(self$data)
       n64<-private$.names64
       ginfo("run")
       ciWidthp<-self$options$paramCIWidth/100

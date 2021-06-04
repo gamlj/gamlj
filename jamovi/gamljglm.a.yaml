@@ -234,32 +234,20 @@ options:
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width for the plots.
 
+    - name: emmeans
+      title: Estimated Marginal Means
+      type: Terms
+      default:
+      description:
+          R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
 
-    - name: postHoc
+
+    - name: posthoc
       title: Post Hoc Tests
       type: Terms
       default:
       description:
           R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
-
-
-    - name: eDesc
-      title: Estimated Marginal Means
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide lsmeans statistics
-
-    - name: eCovs
-      title: Include covariates
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide lsmeans statistics conditioned to 
-            different values of the continuous variables in the model. Which levels of
-            the continuous variable should be used is set by the `simpleScale` option.
 
 
     - name: simpleVariable
@@ -270,22 +258,13 @@ options:
           R: >
             The variable for which the simple effects (slopes) are computed
 
-    - name: simpleModerator
-      title: Moderator
-      type: Variable
+    - name: simpleModerators
+      title: Moderators
+      type: Variables
       default:
       description:
           R: >
             the variable that provides the levels at which the simple effects are computed
-
-    - name: simple3way
-      title: Breaking variable
-      type: Variable
-      default:
-      description:
-          R: >
-            a moderator of the two-way interaction which is probed
-
 
     - name: simpleScale
       title: Covariates conditioning

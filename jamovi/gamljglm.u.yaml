@@ -227,7 +227,7 @@ children:
             label: ''
             children:
               - type: ListBox
-                name: postHoc
+                name: posthoc
                 isTarget: true
                 template:
                   type: TermLabel
@@ -341,28 +341,30 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleModerator
+                name: simpleModerators
                 isTarget: true
-                maxItemCount: 1
-          - type: TargetLayoutBox
-            children:
-              - type: VariablesListBox
-                name: simple3way
-                isTarget: true
-                maxItemCount: 1
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: Display
+      - type: Supplier
+        name: emmeansSupplier
+        persistentItems: false
+        stretchFactor: 1
+        format: term
+        events:
+          change: './gamlj.events::onChange_emmeansSupplier'
+          update: './gamlj.events::onUpdate_emmeansSupplier'
         children:
-          - type: CheckBox
-            name: eDesc
-          - type: CheckBox
-            name: eCovs
-            enable: (eDesc)
+          - type: TargetLayoutBox
+            label: ''
+            children:
+              - type: ListBox
+                name: emmeans
+                isTarget: true
+                template:
+                  type: TermLabel
   - type: CollapseBox
     label: Assumption Checks
     collapsed: true
