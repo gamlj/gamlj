@@ -405,3 +405,8 @@ children:
             name: predicted
           - type: Output
             name: residuals
+  - type: LayoutBox
+    margin: large
+    children:
+      - type: ComboBox
+        name: modelSelection

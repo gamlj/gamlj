@@ -6,6 +6,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Options,
     public = list(
         initialize = function(
+            modelSelection = "lm",
             dep = NULL,
             factors = NULL,
             covs = NULL,
@@ -52,6 +53,13 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 requiresData=TRUE,
                 ...)
 
+            private$..modelSelection <- jmvcore::OptionList$new(
+                "modelSelection",
+                modelSelection,
+                hidden=FALSE,
+                options=list(
+                    "lm"),
+                default="lm")
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
@@ -72,6 +80,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..covs <- jmvcore::OptionVariables$new(
                 "covs",
                 covs,
+                suggested=list(
+                    "continuous"),
                 permitted=list(
                     "numeric"),
                 default=NULL)
@@ -287,6 +297,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
 
+            self$.addOption(private$..modelSelection)
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
@@ -327,6 +338,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..residuals)
         }),
     active = list(
+        modelSelection = function() private$..modelSelection$value,
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
@@ -366,6 +378,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value),
     private = list(
+        ..modelSelection = NA,
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
@@ -442,7 +455,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     list(
                         `name`="value", 
                         `type`="text", 
-                        `title`="")),
+                        `title`="Value"),
+                    list(
+                        `name`="specs", 
+                        `type`="text", 
+                        `title`="Comment")),
                 clearWith=list(
                     "dep",
                     "factors",

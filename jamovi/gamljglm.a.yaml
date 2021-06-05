@@ -39,6 +39,13 @@ options:
       description:
           R: the data as a data frame
 
+    - name: modelSelection
+      type: List
+      hidden: false
+      options:
+        - name: lm
+      default: lm
+
     - name: dep
       title: Dependent Variable
       type: Variable
@@ -67,6 +74,8 @@ options:
     - name: covs
       title: Covariates
       type: Variables
+      suggested:
+        - continuous
       permitted:
         - numeric
       default:

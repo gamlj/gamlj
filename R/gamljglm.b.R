@@ -22,7 +22,7 @@ gamljGlmClass <- R6::R6Class(
       ### set up the R6 workhourse class
       
       data_machine<-Datamatic$new(self$options,self$data)
-      estimate_machine<-Syntax$new(self$options,data_machine)
+      estimate_machine<-Estimate$new(self$options,data_machine)
 
       ### info table ###
       j.init_table(self$results$info,estimate_machine$tab_info) 
@@ -107,10 +107,24 @@ gamljGlmClass <- R6::R6Class(
       
     },
     .run=function() {
-      return()
-      private$.data_machine$cleandata(self$data)
-      n64<-private$.names64
       ginfo("run")
+      
+      private$.ready<-readiness(self$options)
+      if (!private$.ready$ready) {
+        return()
+      }
+      
+      
+      data<-private$.data_machine$cleandata(self$data)
+      private$.estimate_machine$estimate(data)
+      
+      j.fill_table(self$results$main$coefficients,private$.estimate_machine$tab_coefficients)
+
+      mark("end")
+      return()
+      
+  
+      
       ciWidthp<-self$options$paramCIWidth/100
       # collect some option
       dep <- self$options$dep

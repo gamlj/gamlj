@@ -71,8 +71,6 @@ Syntax <- R6::R6Class(
           private=list(
             .datamatic=NULL,
             .constructFormula=function() {
-              
-              
               # this allows intercept only model to be passed by syntax interface
               intercept<-self$options$fixedIntercept
               modelTerms<-self$options$modelTerms

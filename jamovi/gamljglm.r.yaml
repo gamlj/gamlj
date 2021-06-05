@@ -16,7 +16,10 @@ items:
          title: "Info"
        - name: value
          type: text
-         title: ""
+         title: "Value"
+       - name: specs
+         type: text
+         title: "Comment"
     clearWith:
         - dep
         - factors

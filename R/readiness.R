@@ -11,13 +11,7 @@ if(!is.something(options$dep)) {
     return(result)
 } 
   
-  if(!is.something(options$factors) &  !is.something(options$covs)) {
-    result$ready <- FALSE
-    result$report <- TRUE
-    result$reason <- glue::glue("Please define an independent variables")
-    return(result)
-  } 
-  
+
   
   return(result)
 }
