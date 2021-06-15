@@ -9,6 +9,25 @@ Dispatch <- R6::R6Class(
     initialize=function(options,vars) {
       self$vars<-vars
       self$options<-options
+    },
+    ### this requires that sooner or later something should be a Dispatch object ###
+    absorbe_warnings=function(obj) {
+
+      if (!is.something(obj))
+         return()
+      
+      if (inherits(obj,"Dispatch")) {
+              wars<-obj$warnings
+              if (!is.something(wars))
+                    return()
+              for (topicname in names(wars)) {
+                      topic<-wars[[topicname]]
+                      for (t in topic) 
+                              self$warnings<-list(topic=topicname,message=t)
+              }
+       } else
+            for (aobj in obj)
+                 self$absorbe_warnings(aobj)
     }
     
   ),
@@ -26,7 +45,6 @@ Dispatch <- R6::R6Class(
               topic[[length(topic)+1]]<-obj$message
               topic<-unique(topic)
               private$.warnings[[obj$topic]]<-topic
-              
           },
         errors=function(obj) {
  

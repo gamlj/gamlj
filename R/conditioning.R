@@ -61,7 +61,9 @@ conditioning <- R6::R6Class("conditioning", public = list(labels_type = "labels"
     obj$labels <- values
     if (length(obj$labels) != length(obj$values)) warning("Updated labels have different dimension than their values")
     private$cond_specs[[var]] <- obj
-}, values = function(var, decode = FALSE) {
+}, 
+
+values = function(var, decode = FALSE) {
     res <- list()
     if (decode) var <- jmvcore::fromB64(var)
     specs <- private$cond_specs[var]

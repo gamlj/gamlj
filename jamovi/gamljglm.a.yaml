@@ -41,7 +41,7 @@ options:
 
     - name: modelSelection
       type: List
-      hidden: false
+      hidden: true
       options:
         - name: lm
       default: lm
@@ -76,6 +76,7 @@ options:
       type: Variables
       suggested:
         - continuous
+        - ordinal
       permitted:
         - numeric
       default:
@@ -192,11 +193,12 @@ options:
 
     - name: plotSepPlots
       title: Separate plots
-      type: Variable
+      type: Variables
       default:
+      
       description:
           R: >
-            a string naming the variable defining the levels for multiple plots
+            a list of string naming the variables defining the levels for multiple plots
 
     - name: plotRaw
       title: Observed scores

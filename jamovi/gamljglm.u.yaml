@@ -269,22 +269,23 @@ children:
         children:
           - type: TargetLayoutBox
             children:
-              - type: VariablesListBox
-                name: plotHAxis
-                isTarget: true
-                maxItemCount: 1
+                - type: VariablesListBox
+                  name: plotHAxis
+                  isTarget: true
+                  maxItemCount: 1
           - type: TargetLayoutBox
             children:
-              - type: VariablesListBox
-                name: plotSepLines
-                isTarget: true
-                maxItemCount: 1
+                - type: VariablesListBox
+                  name: plotSepLines
+                  isTarget: true
+                  maxItemCount: 1
+
           - type: TargetLayoutBox
             children:
-              - type: VariablesListBox
-                name: plotSepPlots
-                isTarget: true
-                maxItemCount: 1
+                - type: VariablesListBox
+                  name: plotSepPlots
+                  isTarget: true
+
       - type: LayoutBox
         margin: large
         style: inline
@@ -405,8 +406,3 @@ children:
             name: predicted
           - type: Output
             name: residuals
-  - type: LayoutBox
-    margin: large
-    children:
-      - type: ComboBox
-        name: modelSelection

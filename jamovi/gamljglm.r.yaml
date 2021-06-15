@@ -31,14 +31,37 @@ items:
   - name: main
     type: Group
     title: Model Results
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - fixedIntercept
     items:
+           - name: r2
+             title: Model Fit
+             type: Table
+             description: a table of R
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - fixedIntercept
+             rows: 1
+             columns:
+                    - name: r1
+                      title: R²
+                      type: number
+                    - name: r2
+                      title: Adj. R²
+                      type: number
+                    - name:  df1
+                      title: Num df
+                      type: integer
+                    - name:  df2
+                      title: Den df
+                      type: integer
+                    - name: f
+                      title: F
+                      type: number
+                    - name: p
+                      title: p
+                      type: number
+                      format: zto,pvalue
+  
            - name: intercept
              title: Intercept Information
              type: Table
@@ -53,8 +76,9 @@ items:
                          - fixedIntercept
                          - effectSize
                          - interceptInfo
+             rows: 1             
              columns:
-                    - name: name
+                    - name: source
                       title: ""
                       type: text
                     - name:  df
@@ -105,7 +129,7 @@ items:
                     - name: df
                       title: df
                       type: integer
-                    - name: f
+                    - name: test
                       title: F
                       type: number
                     - name: p
@@ -158,10 +182,10 @@ items:
                     - name: estimate
                       title: Estimate
                       type: number
-                    - name: cilow
+                    - name: ci.lower
                       title: Lower
                       type: number
-                    - name: cihig
+                    - name: ci.upper
                       title: Higher
                       type: number
              refs: effectsize
@@ -176,7 +200,6 @@ items:
                     - scaling
                     - dep_scale
                     - fixedIntercept
-                    - effectSize
                     - paramCIWidth
 
              columns:
@@ -205,6 +228,7 @@ items:
                       type: number
                       title: β
                       visible: (effectSize:beta)
+                      format: zto
                     - name: df
                       title: "df"
                       type: number
@@ -264,7 +288,7 @@ items:
               - posthoc
   
         columns:
-        - name: diff
+        - name: estimate
           title: Difference
           type: number
         - name: se
@@ -283,23 +307,23 @@ items:
           type: number
         - name: df
           title: df
-          type: number
-        - name: p
+          type: integer
+        - name: none
           title: p
           type: number
           format: zto,pvalue
           visible: (postHocCorr:none)
-        - name: pbonf
+        - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
           visible: (postHocCorr:bonf)
-        - name: ptukey
+        - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
           visible: (postHocCorr:tukey)
-        - name: pholm
+        - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
@@ -317,8 +341,7 @@ items:
                  - dep_scale
                  - fixedIntercept
                  - simpleVariable
-                 - simpleModerator
-                 - simple3way
+                 - simpleModerators
                  - simpleScale
                  - cvalue
                  - percvalue
@@ -330,24 +353,34 @@ items:
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
+              clearWith:
+                 - dep
+                 - modelTerms
+                 - contrasts
+                 - scaling
+                 - dep_scale
+                 - fixedIntercept
+                 - simpleVariable
+                 - simpleModerators
+                 - simpleScale
+                 - cvalue
+                 - percvalue
+                 - simpleScaleLabels
+
               columns:
-                 - name: F.ratio
+                 - name: test
                    title: F
                    type: number
                  - name: df1
                    title: Num df
-                   type: number
+                   type: integer
                  - name: df2
                    title: Den df
-                   type: number
-                 - name: p.value
+                   type: integer
+                 - name: p
                    title: p
                    type: number
                    format: zto,pvalue
-                 - name: etaSq
-                   title: η²
-                   type: number
-                   visible: (effectSize:eta)
                  - name: etaSqP
                    title: η²p
                    type: number
@@ -368,14 +401,28 @@ items:
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
+              clearWith:
+                 - dep
+                 - modelTerms
+                 - contrasts
+                 - scaling
+                 - dep_scale
+                 - fixedIntercept
+                 - simpleVariable
+                 - simpleModerators
+                 - simpleScale
+                 - cvalue
+                 - percvalue
+                 - simpleScaleLabels
+
               columns:
                      - name: contrast
-                       title: "contrast"
+                       title: "Effect"
                        type: text
                      - name: estimate
                        title: "Estimate"
                        type: number
-                     - name: SE
+                     - name: se
                        title: "SE"
                        type: number
                      - name: ci.lower
@@ -388,19 +435,87 @@ items:
                        visible: (showParamsCI)
                      - name: df
                        title: "df"
-                       type: number
-                     - name: t.ratio
+                       type: integer
+                     - name: test
                        title: "t"
                        type: number
-                     - name: z.ratio
-                       title: "z"
-                       type: number
-                       visible: false
-                     - name: p.value
+                     - name: p
                        title: "p"
                        type: number
                        format: zto,pvalue
 
+
+  - name: simpleInteractions
+    title: Simple Interactions 
+    type: Array
+    description: an array of simple interactions tables
+    visible: false
+    clearWith:
+        - dep
+        - modelTerms
+        - contrasts
+        - scaling
+        - dep_scale
+        - fixedIntercept
+        - simpleScaleLabels
+        - ciWidth
+        - emmeans
+
+    template:
+        title:  Simple Interactions - $key 
+        type: Group
+        clearWith: []
+        items:
+           - type: Table
+             name: interactionAnova
+             title: ANOVA test -  $key
+             columns:
+                   - name: effect
+                     title: 'Effect'
+                     type: text
+                   - name: f
+                     title: F
+                     type: number
+                   - name: df1
+                     title: df1
+                     type: integer
+                   - name: df2
+                     title: df2
+                     type: integer
+                   - name: p
+                     title: p
+                     type: number
+                     format: zto,pvalue
+
+           - type: Table
+             name: interactionCoefficients
+             title: Parameter Estimates for -  $key
+             columns:
+                   - name: effect
+                     title: 'Effect'
+                     type: text
+                   - name: estimate
+                     title: Estimate
+                     type: number
+                   - name: se
+                     title: SE
+                     type: number
+                   - name: df
+                     title: df
+                     type: integer
+                   - name: ci.lower
+                     title: Lower 
+                     type: number
+                   - name: ci.upper
+                     title: Upper
+                     type: number
+                   - name: t
+                     title: t
+                     type: number
+                   - name: p
+                     title: p
+                     type: number
+                     format: zto,pvalue
 
 
   - name: emmeans
@@ -420,19 +535,19 @@ items:
         - emmeans
 
     template:
-        title:  $key
+        title:  Estimate Marginal Means - $key
         type: Table
         clearWith: []
         columns:
-        - name: emmean
+        - name: estimate
           title: 'Mean'
           type: number
-        - name: SE
+        - name: se
           title: SE
           type: number
         - name: df
           title: df
-          type: number
+          type: integer
         - name: ci.lower
           title: Lower 
           type: number
@@ -441,44 +556,17 @@ items:
           type: number
 
 
-  - name: descPlot
-    title: Plots
-    visible: (plotHAxis)
-    type: Image
-    description: a descriptives plot
-    width: 500
-    height: 300
-    renderFun: .descPlot
-    clearWith:
-        - dep
-        - plotHAxis
-        - plotSepLines
-        - plotSepPlots
-        - plotError
-        - ciWidth
-        - scaling
-        - dep_scale
-        - plotRaw
-        - plotDvScale
-        - fixedIntercept
-        - simpleScale
-        - simpleScaleLabels
-        - modelTerms
-        - percvalue
-        - cvalue
 
-
-  - name: descPlots
+  - name: mainPlots
     title: Results Plots
     type: Array
     description: an array of results plots
-    visible: (plotSepPlots)
     template:
           title: $key
           type: Image
-          renderFun: .descPlot
-          width: 500
-          height: 300
+          renderFun: .mainPlot
+          width: 600
+          height: 400
 
           clearWith:
            - dep
@@ -497,6 +585,7 @@ items:
            - plotRaw
            - percvalue
            - cvalue
+
   - name: assumptions
     title: Assumption Checks
     type: Group
@@ -578,6 +667,13 @@ items:
             - dep
             - modelTerms
             - dep_scale
+
+  - name: plotnotes
+    type: Html
+    visible: false
+
+
+
   - name: predicted
     title: Predicted Vales
     type: Output            

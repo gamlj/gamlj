@@ -280,7 +280,7 @@ items:
 
     items:
             - name: Anova
-              title: Simple Effects ANOVA
+              title: "ANOVA: Simple Effects for" 
               type: Table
               description: a table of ANOVA for simple effects
               visible: false

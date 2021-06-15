@@ -11,6 +11,8 @@ Variable <- R6::R6Class(
     type=NULL,
     levels=NULL,
     original_levels=NULL,
+    original_descriptive=NULL,
+    descriptive=NULL,
     nlevels=NULL,
     contrast_values=NULL,
     contrast_labels=NULL,
@@ -47,11 +49,13 @@ Variable <- R6::R6Class(
         self$type="factor"
         self$levels<-levels(vardata)
         self$levels_labels<-levels(vardata)
-        
         self$nlevels<-length(self$levels)
+        
         self$paramsnames<-paste0(var,1:(self$nlevels-1))
         self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$nlevels-1))
 
+        self$descriptive=c(0,1)
+        
         cont<-lapply(self$options$contrasts,function(a) a$type)
         names(cont)<-sapply(self$options$contrasts,function(a) a$var)
         ctype<-ifelse(var %in% names(cont),cont[[var]],"simple") 
@@ -70,16 +74,14 @@ Variable <- R6::R6Class(
         self$type="numeric"
         scaling<-sapply(self$options$scaling,function(a) a$type)
         names(scaling)<-unlist(sapply(self$options$scaling,function(a) a$var))
-
         if (var %in% names(scaling))
              self$scaling<-scaling[[var]]
         else
              self$scaling<-"centered"
         
-        if (is.factor(vardata)) {
-          self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced numeric"))
-          vardata<-jmvcore::toNumeric(vardata)
-        }
+        if (is.factor(vardata)) 
+          self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to numeric"))
+        
         self$paramsnames<-var
         self$paramsnames64<-tob64(var)
         self$nlevels=3
@@ -104,6 +106,11 @@ Variable <- R6::R6Class(
            return(private$.continuous_values(vardata))
       }
       
+      contrast_codes=function(type) {
+        
+        private$.contrast_values(self$levels,type)
+        
+      }
       
     }
   ), # end of public
@@ -331,6 +338,10 @@ Variable <- R6::R6Class(
 
       if (is.null(vardata))
            return(NULL)
+
+      if (is.factor(vardata)) 
+           vardata<-jmvcore::toNumeric(vardata)
+           
       
       private$.update_levels(vardata)
       
@@ -338,7 +349,7 @@ Variable <- R6::R6Class(
       method<-self$scaling
       
       by<-self$hasCluster
-      
+
       if (method=="centered") 
         vardata<-scale(vardata,scale = F)  
       if (method=="cluster-based centered") {    
@@ -357,8 +368,10 @@ Variable <- R6::R6Class(
     
     .update_levels=function(vardata) {
       
-      
       self$original_levels<-self$levels
+      self$original_descriptive<-self$descriptive
+      
+      self$descriptive=c(min(vardata,na.rm = TRUE),max(vardata,na.rm = TRUE))
       
       labels_type<-ifelse(is.null(self$options$simpleScaleLabels),"values",self$options$simpleScaleLabels)
       ### when called by init, force labels because we cannot compute the values
@@ -444,12 +457,13 @@ Datamatic <- R6::R6Class(
           if (is.something(alabel)) {
             if (length(term)>1) 
               alabel<-paste0("(",alabel,")")
-            term[[i]]<-alabel
+            term[[i]]<-paste0(alabel,paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
           }
         }
+        term<-gsub(IMPROBABLE_SEQ,"",jmvcore::stringifyTerm(term,raise = T),fixed = T)
         return(term)
       })
-      return(fromb64(labs,self$vars))
+      return(unlist(fromb64(labs,self$vars)))
       
       
     }
@@ -460,6 +474,10 @@ Datamatic <- R6::R6Class(
        
        self$variables<-lapply(self$vars,function(var) Variable$new(var,self$options)$checkVariable(data))
        names(self$variables)<-unlist(lapply(self$variables,function(var) var$name64))
+       ### we get all the warnings from the variables ###
+       self$absorbe_warnings(self$variables)
+       ### TODO: the same for errors ####
+
        labels<-list()
        for (var in self$variables) 
            for (i in seq_along(var$paramsnames64)) {

@@ -1,77 +1,3 @@
-
-
-gposthoc.init = function(data, options, tables) {
-
-    if (!is.something(options$postHoc)) 
-        return()
-
-    ginfo("Init posthoc...")
-    bs <- options$factors
-    phTerms <- options$postHoc
-    modelType <- "linear"
-    if ("modelSelection" %in% names(options)) 
-        modelType <- options$modelSelection
-
-    
-    bsLevels <- list()
-    for (i in seq_along(bs)) bsLevels[[bs[i]]] <- levels(data[[jmvcore::toB64(bs[i])]])
-
-    nDepLevels <- 1
-    off <- 0
-    if (modelType == "multinomial") {
-        dep <- options$dep
-        depLevels <- levels(data[[jmvcore::toB64(dep)]])
-        nDepLevels <- length(depLevels)
-        off <- 1
-    }
-    diff_label = "Difference"
-
-    if (modelType %in% c("logistic", "poisson", "poiover", "nb")) {
-        diff_label = "exp(B)"
-    }
-
-    
-
-    for (j in seq_len(nDepLevels)) for (ph in phTerms) {
-        table <- tables$get(key = ph)
-        table$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(ph)))
-        nc <- 0
-        ##### set the columns ###########
-        for (i in seq_along(ph)) {
-            nc <- nc + 1
-            table$addColumn(name = paste0("c", nc), title = ph[i], type = "text", superTitle = "Comparison", combineBelow = FALSE, index = nc + 
-                off)
-        }
-        nc <- nc + 1
-        table$addColumn(name = "sep", title = "", type = "text", content = "-", superTitle = "Comparison", format = "narrow", index = nc + 
-            off)
-
-        for (i in seq_along(ph)) {
-            nc <- nc + 1
-            table$addColumn(name = paste0("c", nc - 1), title = ph[i], type = "text", superTitle = "Comparison", index = nc + off)
-        }
-        ##### fix the difference column label
-        table$getColumn("estimate")$setTitle(diff_label)
-        ##### set the rows ###########
-
-        eg <- nrow(expand.grid(bsLevels[ph]))
-        nRows <- (eg * (eg - 1))/2
-        for (i in seq_len(nRows)) {
-            table$addRow(rowKey = ((j * 100) + i), list(sep = "-"))
-            if (modelType == "multinomial") 
-                table$setRow(rowKey = ((j * 100) + i), list(dep = depLevels[j]))
-            #### make rows look nicer ###
-            if (i == 1) 
-                table$addFormat(rowKey = ((j * 100) + i), col = 1, jmvcore::Cell.BEGIN_GROUP)
-            if (i == nRows) 
-                table$addFormat(rowKey = ((j * 100) + i), col = 1, jmvcore::Cell.END_GROUP)
-        }
-    }
-    ginfo("Init done...")
-
-}
-
-
 gposthoc.populate <- function(model, options, tables) {
 
     if (!is.something(options$postHoc)) 
@@ -132,12 +58,9 @@ gposthoc.populate <- function(model, options, tables) {
         tableData <- tableData[eval(parse(text = sortstring)), ]
         for (col in cols)
             tableData[,col]<-as.character(tableData[,col])
+        
 
-        for (i in 1:nrow(tableData)) {
-            arow <- tableData[i, ]
-            table$setRow(rowNo = i, values = arow)
-
-        }
+        tableData
     }
     ginfo("Populate posthoc done")
 

@@ -1,26 +1,31 @@
+mf.addEffectSize<- function(x,...) UseMethod(".addEffectSize")
 
-##### function to check results ####
 
-.which.class<-function(model) {
-  if (class(model)[[1]]=="glm")
-    return("glm")
-  if ("lm" %in% class(model))
-      return("lm")
-  if ("lmerModLmerTest" %in% class(model))
-    return("lmer")
-  if ("merModLmerTest" %in% class(model))
-      return("lmer")
-  if ("lmerMod" %in% class(model))
-      return("lmer")
-  if ("glmerMod" %in% class(model))
-    return("lmer")
-  
-  if ("multinom" %in% class(model))
-    return("multinomial")
-  
+.addEffectSize.default<-function(atable) {
+  mark(class(atable))
+  return(atable)
 }
 
-###### model estimation and checks ##############
+.addEffectSize.summary_emm<-function(atable) {
+  
+  atable$etaSqP<-effectsize::eta_squared(atable)[,1]
+  atable$omegaSq<-effectsize::F_to_omega2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
+  atable$epsilonSq<-effectsize::F_to_epsilon2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
+  
+  
+  return(atable)
+}
+
+
+.addEffectSize.summary_emm<-function(atable) {
+  
+  atable$etaSqP<-effectsize::F_to_eta2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
+  atable$omegaSq<-effectsize::F_to_omega2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
+  atable$epsilonSq<-effectsize::F_to_epsilon2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
+    
+  
+  return(atable)
+}
 
 
 
@@ -184,40 +189,30 @@ mf.anova<- function(x,...) UseMethod(".anova")
       
   }
   
-.anova.lm<-function(model) {
-        ano<-car::Anova(model,test="F",type=3, singular.ok=T)
-        colnames(ano)<-c("ss","df","f","p")
-        dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
-        tots<-list(ss=sum(ano$ss),df=sum(ano$df))
-        reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
-        ss<-summary(model)
-        p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
-        modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-        modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-        modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-        
-        mods<-list(ss=sum(dss$ss),
-               df= ss$fstatistic[[2]],
-               f=ss$fstatistic[[1]],
-               p=p,
-               etaSq=modeta[[1]],etaSqP=modeta[[1]],
-               omegaSq=modomega[[1]],
-               epsilonSq=modepsilon[[1]])
+.anova.model_lm<-function(anovaobj) {
+
+  a<-anovaobj[row.names(anovaobj)!="(Intercept)",]
+
+  if (dim(a)[1]<2) {
+    results<-as.data.frame(rbind(a,a))
+    results$source<-c("Residuals","Total")
+    names(results)<-c("ss","df", "test", "p","source")
+    return(results)
     
-        etap<-effectsize::eta_squared(model,partial = T,verbose = F)
-        eta<-effectsize::eta_squared(model,partial = F,verbose = F)
-        eps<-effectsize::epsilon_squared(model,partial = T,verbose = F)
-        omega<-effectsize::omega_squared(model,partial = T,verbose = F)
-        epsilon<-effectsize::epsilon_squared(model,partial = T,verbose = F)
-        dss$etaSq<-eta[,2]
-        dss$etaSqP<-etap[,2]
-        dss$omegaSq<-omega[,2]
-        dss$epsilonSq<-epsilon[,2]
-        reslist<-listify(dss)
-        reslist<-append_list(reslist,reds,"Residuals")
-        reslist<-append_list(reslist,tots,"Totals")
-        reslist<-prepend_list(reslist,mods,"Model")
-    reslist
+  }
+  w<-cbind(effectsize::eta_squared(a,partial=F)[1:2],
+           effectsize::eta_squared(a,partial = T)[2],
+           effectsize::omega_squared(a)[2],
+           effectsize::epsilon_squared(a)[2])
+  params<-parameters::model_parameters(a)
+  results<-merge(params,w,by="Parameter",all= T,sort = F)
+  names(results)<-c("source","ss","df", "ms", "test", "p",  "etaSq", "etaSqP", "omegaSq","epsilonSq")
+  tots<-results[nrow(results),]
+  tots$source<-"Total"
+  tots$ss<-sum(results$ss)
+  tots$df<-sum(results$df)
+  results[nrow(results)+1,]<-tots
+  results
 }
 
 .anova.glmerMod<-function(model,df="Satterthwaite") {
@@ -338,65 +333,30 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
   NULL  
 }
 
-mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
-     
-     if (!is.data.frame(data))
-         jmvcore::reject(data)
-  
-     dep=jmvcore::toB64(options$dep)
-     ########## check the dependent variable ##########
-     if (modelType %in% c("linear","mixed")) {
-       ### here I need the dv to be really numeric
-       data[[dep]] <- as.numeric(as.character(data[[dep]]))
-       clusterdata<-NULL
-       if (is.something(cluster))
-         clusterdata<-data[[jmvcore::toB64(cluster)]]
 
-       if ("dep_scale" %in% names(options)) 
-           data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
-     }
-       if ( any(is.na(data[[dep]])) ) {
-          nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
-          return(paste(nice,"model requires a numeric dependent variable"))
-       }
-               
-     if  (modelType=="poisson" || modelType=="nb" || modelType=="poiover") {
-         ### here I need the dv to be really numeric
-       data[[dep]] <- as.numeric(as.character(data[[dep]]))
-       if (any(data[[dep]]<0))
-             return("Poisson-like models require all positive numbers in the dependent variable")
-     }
-     ####### check the covariates usability and center them##########
-     covs=options$covs
-     scaling=options$scaling
-     scalingVars<-sapply(scaling,function(a) a$var)
-     clusterdata<-NULL
-     if (is.something(cluster))
-           clusterdata<-data[[jmvcore::toB64(cluster)]]
-     for (cov in covs) {
-       cov64<-jmvcore::toB64(cov) 
-       data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
-       if (any(is.na(data[[cov64]])))
-          return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
-       w<-which(scalingVars==cov)
-       type<-ifelse(is.something(w),scaling[[w]][['type']],"centered")
-       data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=clusterdata)  
 
-     }
-     # check factors
-     factors=options$factors
-     
-     for (factorName in factors) {
-       factorName<-jmvcore::toB64(factorName)
-       lvls <- base::levels(data[[factorName]])
-       if (length(lvls) == 1)
-         return(paste("Factor ",jmvcore::fromB64(factorName),"contains only a single level"))
-       else if (length(lvls) == 0)
-         return(paste("Factor ",jmvcore::fromB64(factorName),"contains no data"))
-     }
-     
-     data
+############# produces anova/deviance table in a somehow stadard format ##########
+mf.fixTable<- function(x,...) UseMethod(".fixtable")
+
+.fixtable.default<-function(atable) {
+  warning("fixTable: unknown method for class", class(atable)) 
+  return(atable)
 }
+
+.fixtable.simple_lm<-function(atable) {
+ 
+  atable$etaSqP<-as.numeric(effectsize::F_to_eta2(f = atable$test,df = atable$df1,df_error = atable$df2)[,1])
+  atable$omegaSq<-as.numeric(effectsize::F_to_omega2(f = atable$test,df = atable$df1,df_error = atable$df2)[,1])
+  atable$epsilonSq<-as.numeric(effectsize::F_to_omega2(f = atable$test,df = atable$df1,df_error = atable$df2)[,1])
+  as.data.frame(atable)  
+  
+  
+  
+}
+
+
+
+
 
 
 ###### confidence intervals ##########
@@ -559,26 +519,5 @@ mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
 
 
 
-#######################
-
-mf.savePredRes<-function(options,results,model) {
-
-        if (options$predicted && results$predicted$isNotFilled()) {
-            ginfo("Saving predicted")
-          mark(class(model))
-            if ("multinom" %in% class(model))  type="probs" else type="response"
-            p<-stats::predict(model,type=type)
-  # we need the rownames in case there are missing in the datasheet
-            pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(model)))
-            results$predicted$setValues(p)
-              }
-        if (options$residuals && results$residuals$isNotFilled()) {
-            ginfo("Saving residuals")
-            p<-stats::resid(model)
-  # we need the rownames in case there are missing in the datasheet
-            pdf <- data.frame(residuals=p, row.names=rownames(mf.getModelData(model)))
-            results$residuals$setValues(pdf)
-        }
-}
 
 

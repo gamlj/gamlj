@@ -116,7 +116,7 @@ WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across intera
 #### GLM Specifics ##########
 
 WARNS["glm.zeromodel"]<-"SS are computed for predicted values equal to zero"
-
+WARNS["nointercept"]<-"With zero intercept, the first factor coefficients are the estimated means of the factor levels"
 
 ### end of warnings ###
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))

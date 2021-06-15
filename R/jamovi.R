@@ -62,15 +62,15 @@ bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
 ######### tables #########
 
-j.expand_table<-function(table,alist,type="text", superTitle=NULL,append=FALSE) {
+j.expand_table<-function(table,alist,type="text", keys=alist,superTitle=NULL,append=FALSE,names64=TRUE) {
  
   j<-0
   if (append) {
     j<-length(table$columns)-1
   }
-  
-  keys<-make.names(tob64(alist),unique = T)
+  if (names64)    keys<-tob64(keys) else  keys<-make.names(keys,unique = T)
   labels<-alist
+
   for (i in seq_along(keys)) {
     table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type)
   }
@@ -81,7 +81,15 @@ j.expand_table<-function(table,alist,type="text", superTitle=NULL,append=FALSE) 
   
 
 
-j.init_table<-function(table,obj,ci=FALSE,ciroot="",ciformat="{}% Confidence Intervals",ciwidth,indent=NULL,spaceby=NULL) {
+j.init_table<-function(table,
+                       obj,
+                       ci=FALSE,
+                       ciroot="",
+                       ciformat="{}% Confidence Intervals",
+                       ciwidth,
+                       indent=NULL,
+                       spaceby=NULL,
+                       title=NULL) {
 
   if (is.null(obj))
       return()
@@ -93,7 +101,13 @@ j.init_table<-function(table,obj,ci=FALSE,ciroot="",ciformat="{}% Confidence Int
     table$getColumn(l)$setSuperTitle(jmvcore::format(ciformat, ciwidth))
     table$getColumn(u)$setSuperTitle(jmvcore::format(ciformat, ciwidth))
   }
-  j.fill_table(table,obj,append=T,spaceby=spaceby)
+  if (!is.logical(obj))
+        j.fill_table(table,obj,append=T,spaceby=spaceby)
+  
+  if (is.something(title))
+    table$setTitle(title)
+  
+  
   table$setVisible(TRUE)
 
 }
@@ -138,7 +152,9 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
                   t[which(is.na(t))]<-""
               FUNC(i+last,t)
    }
-  
+  if (is.numeric(spaceby)) 
+             spaceby<-onames[spaceby]
+   
   if ("..space.." %in% onames)
               spaceby<-"..space.."
    
@@ -146,13 +162,12 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
 
     col<-lapply(obj,function(x) x[[spaceby]])
     rows<-unlist(lapply(unlist(unique(col)),function(x) min(which(col==x))))
-    mark(spaceby)
-    
-    mark("space",rows)
+
     for (j in rows)
       table$addFormat(rowNo=j+last,col=1,jmvcore::Cell.BEGIN_GROUP)
     
   }
+  table$setState("stuffed")
   table$setVisible(TRUE)
 }
 

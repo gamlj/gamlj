@@ -6,6 +6,7 @@ const events = {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
+        updatePlotsSupplier(ui, this);
         
 
     },
@@ -25,6 +26,8 @@ const events = {
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updateEmmeansSupplier(ui, this);
+        updatePlotsSupplier(ui, this);
+
 
     },
 
@@ -32,14 +35,13 @@ const events = {
         let values = this.itemsToValues(ui.plotsSupplier.value());
         this.checkValue(ui.plotHAxis, false, values, FormatDef.variable);
         this.checkValue(ui.plotSepLines, false, values, FormatDef.variable);
-        this.checkValue(ui.plotSepPlots, false, values, FormatDef.variable);
+        this.checkValue(ui.plotSepPlots, true, values, FormatDef.variable);
     },
     
     onChange_simpleSupplier: function(ui) {
-//          console.log("change simple in gamlj");
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
-//        this.checkValue(ui.simpleModerators, true, values, FormatDef.variable);
+        this.checkValue(ui.simpleModerators, true, values, FormatDef.variable);
     },
 
     onUpdate_simpleSupplier: function(ui) {
@@ -50,7 +52,6 @@ const events = {
     },
 
      onChange_model: function(ui) {
-//        console.log("model changed");
         if (typeof ui.effectSize_RR !== 'undefined' ) {
               ui.effectSize_RR.setValue(false);
         }
@@ -215,7 +216,7 @@ var updateEmmeansSupplier = function(ui, context) {
 
 
 var filterModelTerms = function(ui, context) {
-//    console.log("filterModelTerms in gamlj");
+  
     var termsList = context.cloneArray(ui.modelTerms.value(), []);
     var diff = context.findChanges("termsList", termsList, true, FormatDef.term);
 

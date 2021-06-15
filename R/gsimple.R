@@ -88,7 +88,8 @@ gsimple.init <- function(data, options, tables, n64 = NULL, cov_condition = NULL
 
     if ("showExpbCI" %in% names(options) && options$showExpbCI == TRUE) {
         simpleEffectsParams$getColumn("lower.ECL")$setSuperTitle(jmvcore::format("{}% Exp(B) Confidence Interval", interval))
-        simpleEffectsParams$getColumn("upper.ECL")$setSuperTitle(jmvcore::format("{}% Exp(B) Confidence Interval", interval))
+        simpleEffectsParams$getColumn(
+            "upper.ECL")$setSuperTitle(jmvcore::format("{}% Exp(B) Confidence Interval", interval))
         simpleEffectsParams$getColumn("lower.ECL")$setVisible(TRUE)
         simpleEffectsParams$getColumn("upper.ECL")$setVisible(TRUE)
 
