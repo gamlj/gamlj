@@ -12,106 +12,106 @@ children:
       - type: LayoutBox
         margin: large
         children:
-             - type: Label
-               label: Continuous dependent variable
-               children:
-                 - type: RadioButton
-                   name: modelSelection_linear
-                   optionName: modelSelection
-                   optionPart: linear
-                   events:
-                      change: './gamlj.events::onChange_model'
-             - type: Label
-               label: Frequencies
-               children:
-                 - type: RadioButton
-                   name: modelSelection_poisson
-                   optionName: modelSelection
-                   optionPart: poisson
-                   events:
-                      change: './gamlj.events::onChange_model'
-                 - name: modelSelection_poiover
-                   type: RadioButton
-                   optionName: modelSelection
-                   optionPart: poiover
-                   events:
-                      change: './gamlj.events::onChange_model'
-                 - type: RadioButton
-                   name: modelSelection_nb
-                   optionName: modelSelection
-                   optionPart: nb
-                   events:
-                      change: './gamlj.events::onChange_model'
-      
+          - type: Label
+            label: Continuous dependent variable
+            children:
+              - type: RadioButton
+                name: modelSelection_linear
+                optionName: modelSelection
+                optionPart: linear
+                events:
+                  change: './gamlj.events::onChange_model'
+          - type: Label
+            label: Frequencies
+            children:
+              - type: RadioButton
+                name: modelSelection_poisson
+                optionName: modelSelection
+                optionPart: poisson
+                events:
+                  change: './gamlj.events::onChange_model'
+              - name: modelSelection_poiover
+                type: RadioButton
+                optionName: modelSelection
+                optionPart: poiover
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_nb
+                optionName: modelSelection
+                optionPart: nb
+                events:
+                  change: './gamlj.events::onChange_model'
       - type: LayoutBox
         margin: large
         children:
-            - type: Label
-              label: Categorical dependent variable
-              children:
-                     - type: RadioButton
-                       name: modelSelection_logistic
-                       optionName: modelSelection
-                       optionPart: logistic
-                       events:
-                          change: './gamlj.events::onChange_model'
-                     - type: RadioButton
-                       name: modelSelection_probit
-                       optionName: modelSelection
-                       optionPart: probit
-                       events:
-                            change: './gamlj.events::onChange_model'
-                     - type: RadioButton
-                       name: modelSelection_multinomial
-                       optionName: modelSelection
-                       optionPart: multinomial
-                       
-            - type: Label
-              label: Custom Model
-              children:
-                     - type: RadioButton
-                       name: modelSelection_custom
-                       optionName: modelSelection
-                       optionPart: custom
-                       events:
-                          change: './gamlj.events::onChange_model'
-                     - type: ComboBox
-                       name: custom_family
-                       enable: (modelSelection_custom)
-                     - type: ComboBox
-                       name: custom_link
-                       enable: (modelSelection_custom)
-
+          - type: Label
+            label: Categorical dependent variable
+            children:
+              - type: RadioButton
+                name: modelSelection_logistic
+                optionName: modelSelection
+                optionPart: logistic
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_probit
+                optionName: modelSelection
+                optionPart: probit
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: RadioButton
+                name: modelSelection_multinomial
+                optionName: modelSelection
+                optionPart: multinomial
+          - type: Label
+            label: Custom Model
+            children:
+              - type: RadioButton
+                name: modelSelection_custom
+                optionName: modelSelection
+                optionPart: custom
+                events:
+                  change: './gamlj.events::onChange_model'
+              - type: ComboBox
+                name: custom_family
+                enable: (modelSelection_custom)
+              - type: ComboBox
+                name: custom_link
+                enable: (modelSelection_custom)
   - type: VariableSupplier
     name: variablesupplier
+    suggested:
+      - continuous
+      - nominal
+      - ordinal
     persistentItems: false
     stretchFactor: 1
     children:
-               - type: TargetLayoutBox
-                 children:
-                          - type: VariablesListBox
-                            name: dep
-                            maxItemCount: 1
-                            isTarget: true
-                            itemDropBehaviour: overwrite
-               - type: TargetLayoutBox
-                 children:
-                          - type: VariablesListBox
-                            name: factors
-                            isTarget: true
-                            events:
-                                change: './gamlj.events::onChange_factors'
-               - type: TargetLayoutBox
-                 children:
-                          - type: VariablesListBox
-                            name: covs
-                            height: small
-                            isTarget: true
-                            events:
-                                 change: './gamlj.events::onChange_covariates'
+      - type: TargetLayoutBox
+        children:
+          - type: VariablesListBox
+            name: dep
+            maxItemCount: 1
+            isTarget: true
+            itemDropBehaviour: overwrite
+      - type: TargetLayoutBox
+        children:
+          - type: VariablesListBox
+            name: factors
+            isTarget: true
+            events:
+              change: './gamlj.events::onChange_factors'
+      - type: TargetLayoutBox
+        children:
+          - type: VariablesListBox
+            name: covs
+            isTarget: true
+            events:
+              change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
-    style: inline
+    style: list
     children:
       - type: Label
         label: Effect Size
@@ -127,11 +127,10 @@ children:
             optionPart: RR
             optionName: effectSize
             enable: (modelSelection_logistic)
-
       - type: Label
-        label: Confidence Intervals 
+        label: Confidence Intervals
         margin: large
-        style: list
+        style: list-inline
         children:
           - name: showExpbCI
             type: CheckBox
@@ -142,8 +141,7 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI || showExpbCI)
-
+            enable: (showParamsCI)
   - type: CollapseBox
     label: Model
     collapsed: true
@@ -154,11 +152,10 @@ children:
         label: Components
         persistentItems: true
         stretchFactor: 1
-        higherOrders: true
         format: term
+        higherOrders: true
         events:
-              update: './gamlj.events::onUpdate_modelSupplier'
-
+          update: './gamlj.events::onUpdate_modelSupplier'
         children:
           - type: TargetLayoutBox
             transferAction: interactions
@@ -172,11 +169,8 @@ children:
                   change: './gamlj.events::onChange_modelTerms'
                 template:
                   type: TermLabel
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: CheckBox
-            name: fixedIntercept
+      - type: CheckBox
+        name: fixedIntercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -275,6 +269,9 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+          - type: Label
+            label: Dependent variable
+            children: []
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -286,14 +283,14 @@ children:
         stretchFactor: 1
         format: term
         events:
-          update: './gamlj.events::onUpdate_postHocSupplier'
           change: './gamlj.events::onChange_postHocSupplier'
+          update: './gamlj.events::onUpdate_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
             children:
               - type: ListBox
-                name: postHoc
+                name: posthoc
                 isTarget: true
                 template:
                   type: TermLabel
@@ -310,6 +307,10 @@ children:
               - name: postHocCorr_bonf
                 type: CheckBox
                 optionPart: bonf
+                optionName: postHocCorr
+              - name: postHocCorr_tukey
+                type: CheckBox
+                optionPart: tukey
                 optionName: postHocCorr
               - name: postHocCorr_holm
                 type: CheckBox
@@ -346,7 +347,6 @@ children:
               - type: VariablesListBox
                 name: plotSepPlots
                 isTarget: true
-                maxItemCount: 1
       - type: LayoutBox
         margin: large
         style: inline
@@ -393,8 +393,8 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          update: './gamlj.events::onUpdate_simpleSupplier'
           change: './gamlj.events::onChange_simpleSupplier'
+          update: './gamlj.events::onUpdate_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -405,34 +405,42 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleModerator
+                name: simpleModerators
                 isTarget: true
-                maxItemCount: 1
-          - type: TargetLayoutBox
-            children:
-              - type: VariablesListBox
-                name: simple3way
-                isTarget: true
-                maxItemCount: 1
+      - type: CheckBox
+        name: simpleInteractions
+        label: Simple interactions
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: Display
+      - type: Supplier
+        name: emmeansSupplier
+        persistentItems: false
+        stretchFactor: 1
+        format: term
+        events:
+          change: './gamlj.events::onChange_emmeansSupplier'
+          update: './gamlj.events::onUpdate_emmeansSupplier'
         children:
-          - type: CheckBox
-            name: eDesc
-          - type: CheckBox
-            name: eCovs
-            enable: (eDesc)
+          - type: TargetLayoutBox
+            label: ''
+            children:
+              - type: ListBox
+                name: emmeans
+                isTarget: true
+                template:
+                  type: TermLabel
   - type: CollapseBox
     label: Options
     style: inline
     collapsed: true
     stretchFactor: 1
     children:
+      - type: Label
+        label: Additional Info
+        children: []
       - type: Label
         label: Save
         children:

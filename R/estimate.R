@@ -52,6 +52,8 @@ Estimate <- R6::R6Class("Estimate",
                               results$residuals$setValues(pdf)
                             }
                           },
+                          #### we need this here because emmeans needs a contrast that
+                          ###  we can control in terms of variable type
                           
                           interaction_contrast=function(levels,datamatic=NULL) {
                             nvar<-length(datamatic)
@@ -82,34 +84,36 @@ Estimate <- R6::R6Class("Estimate",
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
+                            mark("estimating the model")
+                            results<-try_hard(eval(parse(text=private$.syntax())))
+                            model<-results$obj
+                            self$warnings<-list(topic="info", message=results$warning)
+                            self$errors<-results$error
+                            if (!self$hasIntercept & is.something(self$options$factors)) 
+                                     self$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
                             
-                            form<-self$formula64
-                            if (self$options$modelSelection=="lm") {
-                              ### estimte the model ###
-                                  results<-try_hard(stats::lm(form, data=data))
-                                  model<-results$obj
-                                  self$warnings<-list(topic="info", message=results$warning)
-                                  self$errors<-results$error
-                                  attr(model,"refit")<-list(command="lm",
-                                                      coptions=list(formula=self$formula),
-                                                      eoptions=list(formula=self$formula))
-                                  if (!self$hasIntercept & is.something(self$options$factors)) {
-                                    self$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
+                            if (length(model$coefficients)>0) {
+                              
+                                    results<-try_hard(parameters::parameters(model,exponentiate=FALSE))
+                                    if (is.something(results$warning))
+                                        self$warnings<-list(topic="tab_coefficients",message=results$warning)
+                                    coefficients<-as.data.frame(results$obj)
+                                    coefficients$CI<-NULL
+                                    names(coefficients)<-c("source","estimate","se","ci.lower","ci.upper","t","df","p")
+                                    
+                                    if (self$option("effectSize","expb")) {
+                                        ex<-as.data.frame(parameters::parameters(model,exponentiate=TRUE))
+                                        ex<-ex[,c("Coefficient","CI_low" ,"CI_high")]
+                                        names(ex)<-c("expb","expb.ci.lower","expb.ci.upper")
+                                        coefficients<-cbind(coefficients,ex)
+                                    }
+                                    if (self$option("effectSize","beta"))
+                                          coefficients$beta<-procedure.beta(model)
+                                    mark(coefficients)
+                                    self$tab_coefficients<-private$.fix_names(coefficients)
                                   }
                             
-                            
-                                  self$summary<-summary(model)
-                                  if (length(model$coefficients)>0) {
-                                        results<-try_hard(parameters::parameters(model))
-                                        if (is.something(results$warning))
-                                            self$warnings<-list(topic="tab_coefficients",message=results$warning)
-                                        coefficients<-as.data.frame(parameters::parameters(model))
-                                        coefficients$CI<-NULL
-                                        names(coefficients)<-c("source","estimate","se","ci.lower","ci.upper","t","df","p")
-                                        coefficients$beta<-procedure.beta(model)
-                                        self$tab_coefficients<-private$.fix_names(coefficients)
-                                  }
-                            }
+                            mark("done")
                             self$model<-model
                           },
                           .estimateTests=function() {
@@ -160,7 +164,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           .estimateIntercept=function() {
                             
-                             if (!self$options$interceptInfo || ! self$options$fixedIntercept) 
+                             if (is.null(self$tab_intercept)) 
                                 return()
                             
                                 ss<-self$summary

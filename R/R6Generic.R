@@ -10,7 +10,21 @@ Dispatch <- R6::R6Class(
       self$vars<-vars
       self$options<-options
     },
-    ### this requires that sooner or later something should be a Dispatch object ###
+    ####### eval option that may not exist ####
+    
+    option=function(val,spec=NULL) {
+      
+        res<-hasName(self$options,val)
+        if (res) {
+          res<-is.something(self$options[[val]])
+          if (!is.null(spec))
+              res<-(spec %in% self$options[[val]])
+        }
+        res      
+      
+    },
+    
+    ### this requires that sooner or later something is a Dispatch object ###
     absorbe_warnings=function(obj) {
 
       if (!is.something(obj))

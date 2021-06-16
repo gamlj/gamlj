@@ -18,7 +18,7 @@ Variable <- R6::R6Class(
     contrast_labels=NULL,
     levels_labels=NULL,
     method=NULL,
-    scaling=NULL,
+    scaling="none",
     hasCluster=NULL,
     initialize=function(var,options) {
       self$name<-var
@@ -64,9 +64,12 @@ Variable <- R6::R6Class(
         self$method=ctype
       }
 
+      ### check dependent variables ###
       if (var %in% self$options$dep) {
-        self$type<-"numeric"
-        self$scaling<-self$options$dep_scale
+           self$type=class(vardata)
+           if (self$options$modelSelection=="logistic" & length(levels(vardata))>2)
+                stop("Logistic models require dichotomous dependent variables")
+           if (self$option("dep_scale")) self$scaling<-self$options$dep_scale
       }
         
             

@@ -351,7 +351,6 @@ mf.fixTable<- function(x,...) UseMethod(".fixtable")
   as.data.frame(atable)  
   
   
-  
 }
 
 

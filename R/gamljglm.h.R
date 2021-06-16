@@ -6,7 +6,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Options,
     public = list(
         initialize = function(
-            modelSelection = "lm",
             dep = NULL,
             factors = NULL,
             covs = NULL,
@@ -36,6 +35,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             postHocCorr = list(
                 "bonf"),
             scaling = NULL,
+            modelSelection = "lm",
             effectSize = list(
                 "beta",
                 "partEta"),
@@ -54,13 +54,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 requiresData=TRUE,
                 ...)
 
-            private$..modelSelection <- jmvcore::OptionList$new(
-                "modelSelection",
-                modelSelection,
-                hidden=TRUE,
-                options=list(
-                    "lm"),
-                default="lm")
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
@@ -249,6 +242,17 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "log",
                                 "none"),
                             default="centered"))))
+            private$..predicted <- jmvcore::OptionOutput$new(
+                "predicted")
+            private$..residuals <- jmvcore::OptionOutput$new(
+                "residuals")
+            private$..modelSelection <- jmvcore::OptionList$new(
+                "modelSelection",
+                modelSelection,
+                hidden=TRUE,
+                options=list(
+                    "lm"),
+                default="lm")
             private$..effectSize <- jmvcore::OptionNMXList$new(
                 "effectSize",
                 effectSize,
@@ -298,12 +302,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "standardized",
                     "log"),
                 default="none")
-            private$..predicted <- jmvcore::OptionOutput$new(
-                "predicted")
-            private$..residuals <- jmvcore::OptionOutput$new(
-                "residuals")
 
-            self$.addOption(private$..modelSelection)
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
@@ -332,6 +331,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..simpleScaleLabels)
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..scaling)
+            self$.addOption(private$..predicted)
+            self$.addOption(private$..residuals)
+            self$.addOption(private$..modelSelection)
             self$.addOption(private$..effectSize)
             self$.addOption(private$..homoTest)
             self$.addOption(private$..qq)
@@ -341,11 +343,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..interceptInfo)
             self$.addOption(private$..effectSizeInfo)
             self$.addOption(private$..dep_scale)
-            self$.addOption(private$..predicted)
-            self$.addOption(private$..residuals)
         }),
     active = list(
-        modelSelection = function() private$..modelSelection$value,
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
@@ -374,6 +373,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         simpleScaleLabels = function() private$..simpleScaleLabels$value,
         postHocCorr = function() private$..postHocCorr$value,
         scaling = function() private$..scaling$value,
+        predicted = function() private$..predicted$value,
+        residuals = function() private$..residuals$value,
+        modelSelection = function() private$..modelSelection$value,
         effectSize = function() private$..effectSize$value,
         homoTest = function() private$..homoTest$value,
         qq = function() private$..qq$value,
@@ -382,11 +384,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         residPlot = function() private$..residPlot$value,
         interceptInfo = function() private$..interceptInfo$value,
         effectSizeInfo = function() private$..effectSizeInfo$value,
-        dep_scale = function() private$..dep_scale$value,
-        predicted = function() private$..predicted$value,
-        residuals = function() private$..residuals$value),
+        dep_scale = function() private$..dep_scale$value),
     private = list(
-        ..modelSelection = NA,
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
@@ -415,6 +414,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..simpleScaleLabels = NA,
         ..postHocCorr = NA,
         ..scaling = NA,
+        ..predicted = NA,
+        ..residuals = NA,
+        ..modelSelection = NA,
         ..effectSize = NA,
         ..homoTest = NA,
         ..qq = NA,
@@ -423,9 +425,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..residPlot = NA,
         ..interceptInfo = NA,
         ..effectSizeInfo = NA,
-        ..dep_scale = NA,
-        ..predicted = NA,
-        ..residuals = NA)
+        ..dep_scale = NA)
 )
 
 gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

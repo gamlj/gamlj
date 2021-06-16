@@ -37,12 +37,14 @@ LINFO[["inverse"]]<-c("1/mu","Inverse of y")
 LINFO[["sqrt"]]<-c("Square root","Square root of y")
 
 MINFO<-list()
-MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
+MINFO[["lm"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
                         "call"="glm",emmeanTitle="Mean")
-MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
-                         "call"="glm",emmeanTitle="Mean Count")
+
 MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
                           "call"="glm",emmeanTitle="Prob.")
+
+MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
+                         "call"="glm",emmeanTitle="Mean Count")
 MINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
                         "call"="glm",emmeanTitle="Prob.")
 
@@ -58,6 +60,36 @@ MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
 
 MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
                          "call"="glm",emmeanTitle="Mean")
+
+
+RINFO<-list()
+RINFO[["lm"]]<-list("call"="stats::lm",options=list(data="data"))
+
+RINFO[["logistic"]]<-list("call"="stats::glm",options=list(data="data",family="binomial"))
+
+
+RINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
+                         "call"="glm",emmeanTitle="Mean Count")
+RINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
+                        "call"="glm",emmeanTitle="Prob.")
+
+RINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
+                             "call"="multinom",emmeanTitle="Prob.")
+
+RINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
+                    "call"="glm(er).nb",emmeanTitle="Mean Count")
+
+
+RINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
+                         "call"="glm",emmeanTitle="Mean Count")
+
+MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
+                        "call"="glm",emmeanTitle="Mean")
+
+
+
+
+
 
 
 ###############################################################

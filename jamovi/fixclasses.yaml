@@ -1,8 +1,0 @@
-- name: gamljglm
-  class: gamljGlm
-- name: gamljmixed
-  class: gamljMixed
-- name: gamljglmmixed
-  class: gamljGlmMixed
-- name: gamljgzlm
-  class: gamljGzlm

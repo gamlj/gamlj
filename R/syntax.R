@@ -105,12 +105,12 @@ Syntax <- R6::R6Class(
 
               ### anova table ###
               
-              if (is.something(self$options$modelTerms))
+              if (self$option("modelTerms"))
                   self$tab_anova<-lapply(self$options$modelTerms, function(x) list(name=.stringifyTerm(x)))
-              
-              self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
-              self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
-              
+              if (self$options$modelSelection=="lm") {
+                    self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
+                    self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
+              }  
               ### parameter estimates ####
               .terms<-colnames(model.matrix(as.formula(self$formula64),self$datamatic$data_structure64))
               .terms<-jmvcore::decomposeTerms(.terms)
@@ -124,7 +124,7 @@ Syntax <- R6::R6Class(
 
             ### effect sizes table ###
               
-            if (self$options$effectSizeInfo) {
+            if (self$option("effectSizeInfo")) {
                 alist<-list()
                 for (term in self$options$modelTerms) {
                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
@@ -138,7 +138,7 @@ Syntax <- R6::R6Class(
               
               
             ### estimated marginal means ###
-            if (is.something(self$options$emmeans)) {
+            if (self$option("emmeans")) {
               
                .terms<-tob64(self$options$emmeans)
                alist<-lapply(.terms, function(.term) {
@@ -149,7 +149,7 @@ Syntax <- R6::R6Class(
             } 
 
               ### posthoc means ###
-              if (is.something(self$options$posthoc)) {
+              if (self$option("posthoc")) {
                  
                 self$tab_posthoc<-lapply(self$options$posthoc, function(.term) {
                   p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
@@ -230,7 +230,15 @@ Syntax <- R6::R6Class(
 
             },
 
-            .check_models=function() {
+
+            .syntax=function() {
+
+              info<-RINFO[[self$options$modelSelection]]
+              call<-info$call
+              opts<-info$options
+              opts$formula=as.character(self$formula64)
+              optsstring<-paste(sapply(names(opts),function(a) paste(a,opts[[a]],sep="=")),collapse=",")
+              paste0(call,"(",optsstring,")")
             }
             
 

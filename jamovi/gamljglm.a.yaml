@@ -39,12 +39,6 @@ options:
       description:
           R: the data as a data frame
 
-    - name: modelSelection
-      type: List
-      hidden: true
-      options:
-        - name: lm
-      default: lm
 
     - name: dep
       title: Dependent Variable
@@ -388,7 +382,25 @@ options:
              one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
 
-######### specs here ##########
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
+
+
+#!#!# #### specs here #####
+
+    - name: modelSelection
+      type: List
+      hidden: true
+      options:
+        - name: lm
+      default: lm
+
 
     - name: effectSize
       title: Effect Size
@@ -493,13 +505,6 @@ options:
 
 
 
-    - name: predicted
-      title: Predicted
-      type: Output            
-
-    - name: residuals
-      title: Residuals
-      type: Output            
 
 
 ...
