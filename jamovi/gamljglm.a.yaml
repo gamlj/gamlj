@@ -277,6 +277,14 @@ options:
           R: >
             the variable that provides the levels at which the simple effects are computed
 
+    - name: simpleInteractions
+      title: Simple Interactions
+      type: Bool
+      default: false
+      description:
+          R: >
+            should simple Interactions be computed
+
     - name: simpleScale
       title: Covariates conditioning
       type: List

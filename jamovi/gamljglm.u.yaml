@@ -344,6 +344,11 @@ children:
               - type: VariablesListBox
                 name: simpleModerators
                 isTarget: true
+      - type: CheckBox
+        name: simpleInteractions
+        label: Simple interactions
+               
+                
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true

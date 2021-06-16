@@ -72,7 +72,7 @@ j.expand_table<-function(table,alist,type="text", keys=alist,superTitle=NULL,app
   labels<-alist
 
   for (i in seq_along(keys)) {
-    table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type)
+    table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type, combineBelow=TRUE)
   }
 
 

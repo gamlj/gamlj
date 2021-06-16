@@ -186,7 +186,9 @@ gamljGlmClass <- R6::R6Class(
       j.add_warnings(self$results$simpleEffects$coefficients,private$.estimate_machine,"tab_simpleCoefficients")
       
       ### simple interactions
-      
+      mark("simple")
+      mark(private$.estimate_machine$tab_simpleInteractionCoefficients)
+      mark("int")
       if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
         
         for (i in seq_along(private$.estimate_machine$tab_simpleInteractionCoefficients)) {

@@ -28,6 +28,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             posthoc = NULL,
             simpleVariable = NULL,
             simpleModerators = NULL,
+            simpleInteractions = FALSE,
             simpleScale = "mean_sd",
             cvalue = 1,
             percvalue = 25,
@@ -187,6 +188,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "simpleModerators",
                 simpleModerators,
                 default=NULL)
+            private$..simpleInteractions <- jmvcore::OptionBool$new(
+                "simpleInteractions",
+                simpleInteractions,
+                default=FALSE)
             private$..simpleScale <- jmvcore::OptionList$new(
                 "simpleScale",
                 simpleScale,
@@ -320,6 +325,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simpleVariable)
             self$.addOption(private$..simpleModerators)
+            self$.addOption(private$..simpleInteractions)
             self$.addOption(private$..simpleScale)
             self$.addOption(private$..cvalue)
             self$.addOption(private$..percvalue)
@@ -361,6 +367,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         posthoc = function() private$..posthoc$value,
         simpleVariable = function() private$..simpleVariable$value,
         simpleModerators = function() private$..simpleModerators$value,
+        simpleInteractions = function() private$..simpleInteractions$value,
         simpleScale = function() private$..simpleScale$value,
         cvalue = function() private$..cvalue$value,
         percvalue = function() private$..percvalue$value,
@@ -401,6 +408,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..posthoc = NA,
         ..simpleVariable = NA,
         ..simpleModerators = NA,
+        ..simpleInteractions = NA,
         ..simpleScale = NA,
         ..cvalue = NA,
         ..percvalue = NA,

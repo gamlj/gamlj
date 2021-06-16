@@ -28,6 +28,7 @@ Estimate <- R6::R6Class("Estimate",
                             private$.estimateEffectSizes()
                             private$.estimateIntercept()
                             private$.estimateSimpleEffects()
+                            private$.estimateSimpleInteractions()
                             private$.estimateEmmeans()
                             
                             ginfo("Estimation is done...")
@@ -226,13 +227,20 @@ Estimate <- R6::R6Class("Estimate",
                             tables<-procedure.simpleEffects(self)
                             self$tab_simpleAnova<-tables[[1]]
                             self$tab_simpleCoefficients<-tables[[2]]
-                            adds<-procedure.simpleInteractions(self)
-                            self$tab_simpleInteractionCoefficients<-adds[[1]]
-                            self$tab_simpleInteractionAnova<-adds[[2]]
+
+                          },
+                          
+                          .estimateSimpleInteractions=function() {
+                            
+                            if (!is.something(self$tab_simpleInteractionAnova))
+                              return()
+                            
+                            tables<-procedure.simpleInteractions(self)
+                            self$tab_simpleInteractionCoefficients<-tables[[1]]
+                            self$tab_simpleInteractionAnova<-tables[[2]]
                             
                           },
                           
-
                           .fix_names=function(atable) {
                             
                             .terms<-jmvcore::decomposeTerms(atable$source)

@@ -152,12 +152,10 @@ procedure.emmeans<-function(obj) {
     ## first we get the levels of covs at which to condition the estimation ##
     ## we also get the labels for those values ####
     conditions<-list()
-    labels<-list()
     for (.term in term64) {
       var<-obj$datamatic$variables[[.term]]
       if( var$type=="numeric") {
         conditions[[.term]]<-var$levels 
-        labels[[.term]]<-var$levels_labels 
       }
     }
     ### now we get the estimated means #######
@@ -166,8 +164,15 @@ procedure.emmeans<-function(obj) {
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","ci.lower","ci.upper")
    
-    ### change the labels for continuous variables ###
+    ### fix the labels  ###
 
+    for (.name in term64) {
+      res[[.name]]<-factor(res[[.name]])
+      levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+      res[[.name]]<-as.character(res[[.name]])
+    }
+    
+    
     for (.name in names(labels)) {
       vardata<-tableData[[.name]]
       labs<-labels[[.name]]
@@ -215,59 +220,53 @@ procedure.simpleEffects<-function(obj) {
       }
     }
     ### now we get the estimated means #######
-    referenceGrid<-emmeans::emmeans(obj$model,specs=c(variable64,term64),at=conditions,nesting = NULL,lmer.df = "Satterthwaite")
     if (varobj$type=="factor") {
             ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
+            referenceGrid<-emmeans::emmeans(obj$model,specs=c(variable64,term64),at=conditions,nesting = NULL,lmer.df = "Satterthwaite")
             estimates<-emmeans::contrast(referenceGrid,
                                          by=term64,
                                          method =.local.emmc,datamatic=varobj)
-            params<-as.data.frame(estimates)
+            res<-as.data.frame(estimates)
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
-            params<-cbind(params,ci[,c(ncol(ci)-1,ncol(ci))])
-            names(params)<-c("contrast",term64,"estimate","se","df","test","p","ci.lower","ci.upper")
+            res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
+            names(res)<-c("contrast",term64,"estimate","se","df","test","p","ci.lower","ci.upper")
 
     }
     else {
             args<-list(obj$model,specs = term64, var = variable64, at = conditions,infer=c(T,T))
             estimates <- do.call(emmeans::emtrends, args)
-            params <- as.data.frame(estimates)
-            names(params)<-c(term64,"estimate","se","df","ci.lower","ci.upper","test","p")
-            params$contrast<-varobj$name
+            res <- as.data.frame(estimates)
+            names(res)<-c(term64,"estimate","se","df","ci.lower","ci.upper","test","p")
+            res$contrast<-varobj$name
 
     }
-    ## then we fix the covs labels
-    for (.name in names(labels)) {
-      vardata<-params[[.name]]
-      labs<-labels[[.name]]
-      values<-unique(vardata)
-      for (i in seq_along(values))
-        vardata[vardata==values[i]]<-labs[i]
-      params[[.name]]<-vardata
+
+    for (.name in term64) {
+      res[[.name]]<-factor(res[[.name]])
+      levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+      res[[.name]]<-as.character(res[[.name]])
     }
-    ### make sure they are not factors or stuff    
-    for (.name in vars) 
-      params[[.name]]<-as.character(params[[.name]])
+    res$contrast<-as.character(res$contrast)
     
+    params<-res
+
     ### now we build the anova table ###à
-    anova<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
-    names(anova)<-c(term64,"df1","df2","test","p")
+    res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
+    names(res)<-c(term64,"df1","df2","test","p")
 
-    ## than we fix the covs labels
-    for (.name in names(labels)) {
-      vardata<-anova[[.name]]
-      labs<-labels[[.name]]
-      values<-unique(vardata)
-      for (i in seq_along(values))
-        vardata[vardata==values[i]]<-labs[i]
-      anova[[.name]]<-vardata
+    ### fix labels and make sure they are not factors or stuff    
+    for (.name in term64) {
+      res[[.name]]<-factor(res[[.name]])
+      levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+      res[[.name]]<-as.character(res[[.name]])
     }
-    ### make fix dependending of the type of model ###    
-    class(anova)<-c(paste0("simple_",obj$options$modelSelection),class(anova))
-    anova<-mf.fixTable(anova)
     
-    ### make sure they are not factors or stuff    
-    for (.name in term64) 
-         anova[[.name]]<-as.character(anova[[.name]])
+    
+    ### make fix dependending of the type of model ###    
+    class(res)<-c(paste0("simple_",obj$options$modelSelection),class(res))
+    anova<-mf.fixTable(res)
+    
+    
 
   ginfo("End of Simple Effects")
   return(list(anova,params))
@@ -317,36 +316,61 @@ procedure.simpleInteractions<-function(obj) {
             
             names(conditions)<-term64
             conditions<-conditions[sapply(conditions, function(x) is.something(x))]
+            .names<-setdiff(term64,mods)
             
-            results<-try_hard(emmeans::emtrends(obj$model,specs = term64, var = variable64, at = conditions))
+            if (varobj$type=="numeric")
+                  results<-try_hard(emmeans::emtrends(obj$model,specs = term64, var = variable64, at = conditions))
+            else  { 
+                  results<-try_hard(emmeans::emmeans(obj$model,specs = c(variable64,term64), at = conditions))
+                  .names<-c(variable64,.names)
+                  
+            }
             obj$warnings<-list(topic="simpleInteractions",message=results$warning)
             obj$errors<-results$error
             emgrid<-results$obj 
-            .names<-setdiff(term64,mods)
             ### we need the interaction contrast to be in obj because it should count the times
             ## it is called to know which variable should be contrasted
             .datamatic<-rev(sapply(.names, function(.name) obj$datamatic$variables[[.name]]))
+            
             opts<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
             results<-try_hard(do.call(emmeans::contrast,opts))
             obj$warnings<-list(topic="simpleInteractions",message=results$warning)
             obj$errors<-results$error
             resgrid<-results$obj 
-            
+
+            ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
             res<-as.data.frame(resgrid)
-            names(res)[(ncol(res)-4):ncol(res)]<-c("estimate","se","df","t","p")
-            res$focal<-variable
+            res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
+            names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","t","p","ci.lower","ci.upper")
             names(res)[1:length(.names)]<-.names
-            labnames<-c("focal",.names)
+            
+            if (varobj$type=="numeric") {
+                    res$focal<-variable
+                    labnames<-c("focal",.names)
+            } else
+                    labnames<-.names
             res$effect<-apply(res[,labnames],1,jmvcore::stringifyTerm)
             
             for (.name in mods) {
+               res[[.name]]<-factor(res[[.name]])
+               levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
                res[[.name]]<-as.character(res[[.name]])
             }
             
             params[[length(params)+1]]<-res
             res<-emmeans::test(resgrid,by=mods,join=T)
             names(res)[(ncol(res)-3):ncol(res)]<-c("df1","df2","f","p")
+            
+            if (varobj$type=="numeric") 
+               res$effect<-jmvcore::stringifyTerm(c(variable,fromb64(.names)))
+            else
+               res$effect<-jmvcore::stringifyTerm(c(fromb64(.names)))
+            
+            
+            
             for (.name in mods) {
+              res[[.name]]<-factor(res[[.name]])
+              levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
               res[[.name]]<-as.character(res[[.name]])
             }
             
