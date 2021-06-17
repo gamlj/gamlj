@@ -84,82 +84,51 @@ Estimate <- R6::R6Class("Estimate",
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
-                            mark("estimating the model")
-                            results<-try_hard(eval(parse(text=private$.syntax())))
-                            model<-results$obj
-                            self$warnings<-list(topic="info", message=results$warning)
-                            self$errors<-results$error
-                            if (!self$hasIntercept & is.something(self$options$factors)) 
-                                     self$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
                             
-                            if (length(model$coefficients)>0) {
+                              results<-try_hard(eval(parse(text=private$.syntax())))
+                              self$model<-results$obj
+                              self$warnings<-list(topic="info", message=results$warning)
+                              self$errors<-list(topic="info", message=results$warning)
+                            
+                              if (is.something(self$errors))
+                                       stop(self$errors)
                               
-                                    results<-try_hard(parameters::parameters(model,exponentiate=FALSE))
+                              if (!self$hasIntercept & is.something(self$options$factors)) 
+                                       self$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
+                            
+                              if (length(self$model$coefficients)>0) {
+                                    results<-try_hard(parameters::parameters(self$model,exponentiate=FALSE))
                                     if (is.something(results$warning))
                                         self$warnings<-list(topic="tab_coefficients",message=results$warning)
-                                    coefficients<-as.data.frame(results$obj)
+                                        coefficients<-as.data.frame(results$obj)
                                     coefficients$CI<-NULL
                                     names(coefficients)<-c("source","estimate","se","ci.lower","ci.upper","t","df","p")
                                     
                                     if (self$option("effectSize","expb")) {
-                                        ex<-as.data.frame(parameters::parameters(model,exponentiate=TRUE))
+                                        ex<-as.data.frame(parameters::parameters(self$model,exponentiate=TRUE))
                                         ex<-ex[,c("Coefficient","CI_low" ,"CI_high")]
                                         names(ex)<-c("expb","expb.ci.lower","expb.ci.upper")
                                         coefficients<-cbind(coefficients,ex)
                                     }
                                     if (self$option("effectSize","beta"))
-                                          coefficients$beta<-procedure.beta(model)
-                                    mark(coefficients)
+                                          coefficients$beta<-procedure.beta(self$model)
+                                    
                                     self$tab_coefficients<-private$.fix_names(coefficients)
                                   }
                             
-                            mark("done")
-                            self$model<-model
                           },
                           .estimateTests=function() {
-                            if (self$options$modelSelection=="lm") {
+
+                                if (!self$isProper) 
+                                              self$warnings<-list(topic="tab_anova",message=WARNS["glm.zeromodel"])
+                                
+                                self$tab_anova<-mf.anova(self$model,self)
                             
-                                      if (length(coef(self$model))==0) {
-                                        results<-try_hard({
-                                          self$anova<-stats::anova(self$model)
-                                          self$warnings<-list(topic="tab_anova",message=WARNS["glm.zeromodel"])
-                                        })
-
-                                      } else {
-                                          results<-try_hard({
-                                          self$anova<-car::Anova(self$model,type=3)
-                                          })
-                                      }
-                                      self$warnings<-list(topic="tab_anova",message=results$error)
-                                      if (results$error!=FALSE)
-                                              return()
-                                      self$warnings<-list(topic="tab_anova",results$warning)
-                                      class(self$anova)<-c(self$subclass,class(self$anova))
-                                      self$tab_anova<-mf.anova(self$anova)
-                                      
-                            }
-
                             },
                           .estimateFit=function() {
-                            
-                            if (self$options$modelSelection=="lm") {
                               
-                                  ss<-self$summary
-                                  results<-list()
-                                  results$df1<-ss$fstatistic[["numdf"]]
-                                  results$df2<-ss$fstatistic[["dendf"]]
-                                  results$r1<-ss$r.squared
-                                  results$r2<-ss$adj.r.squared
-                                  if (hasName(ss,"fstatistic")) {
-                                      results$f<-ss$fstatistic[["value"]]
-                                      results$p<-stats::pf(results$f,results$df1,results$df1, lower.tail = FALSE)
-                                  } else 
-                                      self$warnings<-list(topic="tab_r2",message="Inferential tests cannot be computed")
-                                  
-                                  self$tab_r2<-list(results)
-                                  
-                            }
-                            
+                                self$tab_r2<-mf.R2(self$model,self)
+
                           },
                           
                           .estimateIntercept=function() {
@@ -167,7 +136,7 @@ Estimate <- R6::R6Class("Estimate",
                              if (is.null(self$tab_intercept)) 
                                 return()
                             
-                                ss<-self$summary
+                                ss<-summary(self$model)
                                 tt<-ss$coefficients[1,3]
                                 f<-tt^2
                                 df<-stats::df.residual(self$model)
@@ -182,19 +151,19 @@ Estimate <- R6::R6Class("Estimate",
                                                               omegaSq=omega[1,1],
                                                               epsilonSq=epsilon[1,1],
                                                               p=p))
-                                
                             
+                                
                             
                           },
                           .estimateEffectSizes=function() {
                             
                             if (!is.something(self$tab_effectsizes))
                               return()
-                            
-                            eta<-effectsize::eta_squared(self$anova,partial = F,ci=self$ciwidth,verbose=F)
-                            peta<-effectsize::eta_squared(self$anova,partial = T,ci=self$ciwidth,verbose=F)
-                            omega<-  effectsize::omega_squared(self$anova,partial = T,ci=self$ciwidth,verbose=F)
-                            epsilon<-  effectsize::epsilon_squared(self$anova,partial = T,ci=self$ciwidth,verbose=F)
+                            anova<-car::Anova(self$model,type=3)
+                            eta<-effectsize::eta_squared(anova,partial = F,ci=self$ciwidth,verbose=F)
+                            peta<-effectsize::eta_squared(anova,partial = T,ci=self$ciwidth,verbose=F)
+                            omega<-  effectsize::omega_squared(anova,partial = T,ci=self$ciwidth,verbose=F)
+                            epsilon<-  effectsize::epsilon_squared(anova,partial = T,ci=self$ciwidth,verbose=F)
                             alist<-list()
                             for (i in seq_along(eta$Parameter)) {
                               alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],ci.lower=eta[i,4],ci.upper=eta[i,5])

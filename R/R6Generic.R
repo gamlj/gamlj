@@ -16,7 +16,11 @@ Dispatch <- R6::R6Class(
       
         res<-hasName(self$options,val)
         if (res) {
-          res<-is.something(self$options[[val]])
+          if (is.logical(self$options[[val]]))
+              res<-self$options[[val]]
+          else
+              res<-is.something(self$options[[val]])
+
           if (!is.null(spec))
               res<-(spec %in% self$options[[val]])
         }
@@ -61,15 +65,31 @@ Dispatch <- R6::R6Class(
               private$.warnings[[obj$topic]]<-topic
           },
         errors=function(obj) {
- 
-                    if (missing(obj))
-                            return(private$.errors)
-                     if (is.null(obj))
-                            return()
-                     if (obj==FALSE)
-                           return()
-                     obj<-fromb64(obj,self$vars)
-                     private$.errors[[length(private$.errors)+1]]<-obj
+          
+          if (missing(obj))
+            return(private$.errors)
+
+          if (!is.list(obj))
+             stop("Errors require a named list with topic and message")
+          
+          if (!hasName(obj,"topic"))
+              stop("Errors require a named list with topic and message")
+  
+          if (!hasName(obj,"message"))
+            stop("Errors require a named list with topic and message")
+          
+          if (is.null(obj$message))
+            return()
+          
+          if (obj$message==FALSE)
+            return()
+          
+          obj<-fromb64(obj,self$vars)
+          topic<-private$.errors[[obj$topic]]
+          topic[[length(topic)+1]]<-obj$message
+          topic<-unique(topic)
+          private$.errors[[obj$topic]]<-topic
+
         }
         
   ),

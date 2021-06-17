@@ -42,20 +42,17 @@ items:
                          - fixedIntercept
              rows: 1
              columns:
-                    - name: r1
+                    - name: r2
                       title: R²
                       type: number
-                    - name: r2
+                    - name: ar2
                       title: Adj. R²
                       type: number
-                    - name:  df1
-                      title: Num df
+                    - name:  df
+                      title: df
                       type: integer
-                    - name:  df2
-                      title: Den df
-                      type: integer
-                    - name: f
-                      title: F
+                    - name: test
+                      title: X²
                       type: number
                     - name: p
                       title: p
@@ -79,15 +76,12 @@ items:
                     - name: name
                       title: ""
                       type: text
-                    - name: ss
-                      title: SS
+                    - name: test
+                      title: X²
                       type: number
                     - name: df
                       title: df
                       type: integer
-                    - name: test
-                      title: F
-                      type: number
                     - name: p
                       title: p
                       type: number
@@ -136,11 +130,11 @@ items:
                     - name: expb.ci.lower
                       type: number
                       title: Lower
-                      visible: (showExpbCI)
+                      visible: (effectSize:expb & showExpbCI)
                     - name: expb.ci.upper
                       type: number
                       title: Upper
-                      visible: (showExpbCI)
+                      visible: (effectSize:expb & showExpbCI)
                     - name: t
                       title: "z"
                       type: number
@@ -212,11 +206,8 @@ items:
           title: Upper
           visible: (showParamsCI)
         - name: test
-          title: t
+          title: z
           type: number
-        - name: df
-          title: df
-          type: integer
         - name: none
           title: p
           type: number
@@ -267,7 +258,6 @@ items:
                  - modelTerms
                  - contrasts
                  - scaling
-                 - dep_scale
                  - fixedIntercept
                  - simpleVariable
                  - simpleModerators
@@ -278,33 +268,15 @@ items:
 
               columns:
                  - name: test
-                   title: F
+                   title: X²
                    type: number
                  - name: df1
-                   title: Num df
-                   type: integer
-                 - name: df2
-                   title: Den df
+                   title: df
                    type: integer
                  - name: p
                    title: p
                    type: number
                    format: zto,pvalue
-                 - name: etaSqP
-                   title: η²p
-                   type: number
-                   visible: (effectSize:partEta)
-                   format: zto
-                 - name: omegaSq
-                   title: ω²p
-                   type: number
-                   visible: (effectSize:omega)
-                   format: zto
-                 - name: epsilonSq
-                   title: ε²p
-                   type: number
-                   visible: (effectSize:epsilon)
-                   format: zto
 
             - name: coefficients
               title: Parameter Estimates for simple effects
@@ -342,11 +314,8 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
-                     - name: df
-                       title: "df"
-                       type: integer
                      - name: test
-                       title: "t"
+                       title: "z"
                        type: number
                      - name: p
                        title: "p"
@@ -383,13 +352,10 @@ items:
                      title: 'Effect'
                      type: text
                    - name: f
-                     title: F
+                     title: X²
                      type: number
                    - name: df1
-                     title: df1
-                     type: integer
-                   - name: df2
-                     title: df2
+                     title: df
                      type: integer
                    - name: p
                      title: p
@@ -409,9 +375,6 @@ items:
                    - name: se
                      title: SE
                      type: number
-                   - name: df
-                     title: df
-                     type: integer
                    - name: ci.lower
                      title: Lower 
                      type: number

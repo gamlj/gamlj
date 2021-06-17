@@ -465,24 +465,20 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             rows=1,
                             columns=list(
                                 list(
-                                    `name`="r1", 
+                                    `name`="r2", 
                                     `title`="R\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="r2", 
+                                    `name`="ar2", 
                                     `title`="Adj. R\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="df1", 
-                                    `title`="Num df", 
+                                    `name`="df", 
+                                    `title`="df", 
                                     `type`="integer"),
                                 list(
-                                    `name`="df2", 
-                                    `title`="Den df", 
-                                    `type`="integer"),
-                                list(
-                                    `name`="f", 
-                                    `title`="F", 
+                                    `name`="test", 
+                                    `title`="X\u00B2", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -507,17 +503,13 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="", 
                                     `type`="text"),
                                 list(
-                                    `name`="ss", 
-                                    `title`="SS", 
+                                    `name`="test", 
+                                    `title`="X\u00B2", 
                                     `type`="number"),
                                 list(
                                     `name`="df", 
                                     `title`="df", 
                                     `type`="integer"),
-                                list(
-                                    `name`="test", 
-                                    `title`="F", 
-                                    `type`="number"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -572,12 +564,12 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="expb.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
-                                    `visible`="(showExpbCI)"),
+                                    `visible`="(effectSize:expb & showExpbCI)"),
                                 list(
                                     `name`="expb.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(showExpbCI)"),
+                                    `visible`="(effectSize:expb & showExpbCI)"),
                                 list(
                                     `name`="t", 
                                     `title`="z", 
@@ -652,12 +644,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `visible`="(showParamsCI)"),
                         list(
                             `name`="test", 
-                            `title`="t", 
+                            `title`="z", 
                             `type`="number"),
-                        list(
-                            `name`="df", 
-                            `title`="df", 
-                            `type`="integer"),
                         list(
                             `name`="none", 
                             `title`="p", 
@@ -717,7 +705,6 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "scaling",
-                                "dep_scale",
                                 "fixedIntercept",
                                 "simpleVariable",
                                 "simpleModerators",
@@ -728,39 +715,17 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             columns=list(
                                 list(
                                     `name`="test", 
-                                    `title`="F", 
+                                    `title`="X\u00B2", 
                                     `type`="number"),
                                 list(
                                     `name`="df1", 
-                                    `title`="Num df", 
-                                    `type`="integer"),
-                                list(
-                                    `name`="df2", 
-                                    `title`="Den df", 
+                                    `title`="df", 
                                     `type`="integer"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"),
-                                list(
-                                    `name`="etaSqP", 
-                                    `title`="\u03B7\u00B2p", 
-                                    `type`="number", 
-                                    `visible`="(effectSize:partEta)", 
-                                    `format`="zto"),
-                                list(
-                                    `name`="omegaSq", 
-                                    `title`="\u03C9\u00B2p", 
-                                    `type`="number", 
-                                    `visible`="(effectSize:omega)", 
-                                    `format`="zto"),
-                                list(
-                                    `name`="epsilonSq", 
-                                    `title`="\u03B5\u00B2p", 
-                                    `type`="number", 
-                                    `visible`="(effectSize:epsilon)", 
-                                    `format`="zto"))))
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
@@ -803,12 +768,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="df", 
-                                    `title`="df", 
-                                    `type`="integer"),
-                                list(
                                     `name`="test", 
-                                    `title`="t", 
+                                    `title`="z", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -854,15 +815,11 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `type`="text"),
                                     list(
                                         `name`="f", 
-                                        `title`="F", 
+                                        `title`="X\u00B2", 
                                         `type`="number"),
                                     list(
                                         `name`="df1", 
-                                        `title`="df1", 
-                                        `type`="integer"),
-                                    list(
-                                        `name`="df2", 
-                                        `title`="df2", 
+                                        `title`="df", 
                                         `type`="integer"),
                                     list(
                                         `name`="p", 
@@ -886,10 +843,6 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="se", 
                                         `title`="SE", 
                                         `type`="number"),
-                                    list(
-                                        `name`="df", 
-                                        `title`="df", 
-                                        `type`="integer"),
                                     list(
                                         `name`="ci.lower", 
                                         `title`="Lower", 

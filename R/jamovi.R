@@ -72,7 +72,8 @@ j.expand_table<-function(table,alist,type="text", keys=alist,superTitle=NULL,app
   labels<-alist
 
   for (i in seq_along(keys)) {
-    table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type, combineBelow=TRUE)
+    cb <- (i<length(keys)  | length(keys)==1) 
+    table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type, combineBelow=cb)
   }
 
 
@@ -173,13 +174,13 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
 
 j.add_warnings<-function(atable,adispatch,atopic) {
   
-  if (!is.something(adispatch$warnings[[atopic]]))
-       return()
+  if (!is.something(adispatch$warnings[[atopic]]) & !is.something(adispatch$errors[[atopic]]))
+         return()
   
-  if (atable$rowCount==0)
-        atable$setError(paste(adispatch$warnings[[atopic]],collapse = "; "))
-  else
-      for (i in seq_along(adispatch$warnings[[atopic]]))
+  if (is.something(adispatch$errors[[atopic]])) 
+            atable$setError(paste(adispatch$errors[[atopic]],collapse = "; "))
+  
+  for (i in seq_along(adispatch$warnings[[atopic]]))
                atable$setNote(i,adispatch$warnings[[atopic]][[i]])
 
   atable$setVisible(TRUE)

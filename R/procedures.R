@@ -69,6 +69,7 @@ procedure.posthoc <- function(Obj) {
     .cont <- as.character(tableData$contrast)
     .cont <- gsub(" - ", "-", .cont, fixed = T)
     .cont <- gsub(" / ", "/", .cont, fixed = T)
+
     
     .labs64 <- sapply(.cont, function(a) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
@@ -265,9 +266,15 @@ procedure.simpleEffects<-function(obj) {
     ### make fix dependending of the type of model ###    
     class(res)<-c(paste0("simple_",obj$options$modelSelection),class(res))
     anova<-mf.fixTable(res)
+    ### check some stuff 
+    .all <- c(term64,variable64)
+    test <- sapply(.all,function(x) .is.scaleDependent(obj$model,x))
+    .issues <- .all[test]
+    if (is.something(test))
+      obj$warnings<-list(topic="tab_simpleAnova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
     
     
-
+    
   ginfo("End of Simple Effects")
   return(list(anova,params))
 
@@ -326,7 +333,7 @@ procedure.simpleInteractions<-function(obj) {
                   
             }
             obj$warnings<-list(topic="simpleInteractions",message=results$warning)
-            obj$errors<-results$error
+            obj$errors<-list(topic="simpleInteractions",message=results$error)
             emgrid<-results$obj 
             ### we need the interaction contrast to be in obj because it should count the times
             ## it is called to know which variable should be contrasted
@@ -335,7 +342,7 @@ procedure.simpleInteractions<-function(obj) {
             opts<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
             results<-try_hard(do.call(emmeans::contrast,opts))
             obj$warnings<-list(topic="simpleInteractions",message=results$warning)
-            obj$errors<-results$error
+            obj$errors<-list(topic="simpleInteractions",message=results$error)
             resgrid<-results$obj 
 
             ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
@@ -377,6 +384,8 @@ procedure.simpleInteractions<-function(obj) {
             anovas[[length(anovas)+1]]<-res
             j<-j-1
         }
+      
+
       ginfo("simple Interactions ended")
       
       return(list(params,anovas))
@@ -384,6 +393,20 @@ procedure.simpleInteractions<-function(obj) {
 
   
 
-  
+### this tells if a model term is dependent on the interaction
+.is.scaleDependent<-function(model,term) {
+  if (is.null(term))
+    return(FALSE)
+  try({
+    modelterms<-stats::terms(model)
+    modelterms<-attr(modelterms,"term.labels")
+    nterm<-paste(term,collapse = ":")
+    count<-length(grep(nterm,modelterms,fixed=T))
+    if (count>1)
+      return(TRUE)
+  })
+  FALSE
+}
+
 
 

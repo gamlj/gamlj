@@ -63,9 +63,9 @@ MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
 
 
 RINFO<-list()
-RINFO[["lm"]]<-list("call"="stats::lm",options=list(data="data"))
-
-RINFO[["logistic"]]<-list("call"="stats::glm",options=list(data="data",family="binomial"))
+RINFO[["lm"]]         <-  list(call="stats::lm",options=list(data="data"))
+RINFO[["linear"]]     <-  list(call="stats::glm",options=list(data="data",family="gaussian"))
+RINFO[["logistic"]]   <-  list("call"="stats::glm",options=list(data="data",family="binomial"))
 
 
 RINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),

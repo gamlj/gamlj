@@ -102,26 +102,22 @@ gamljGlmClass <- R6::R6Class(
         
       }
         
-      
-      
-
       ### posthoc ####
       
       if (is.something(self$options$posthoc)) {
         
         for (i in seq_along(self$options$posthoc)) {
-          term<-self$options$posthoc[[i]]
-          aTable<-self$results$posthoc$get(key = term)
-          aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
-          j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
-          j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
+            term<-self$options$posthoc[[i]]
+            aTable<-self$results$posthoc$get(key = term)
+            aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
+            j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
+            j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
         } 
         
       }
 
       if (is.something(estimate_machine$tab_contrastcodes)) {
-        
-          
+
         for (i in seq_along(self$options$factors)) {
           term<-self$options$factors[[i]]
           aTable<-self$results$main$contrastCodeTables$get(key = term)
@@ -130,8 +126,6 @@ gamljGlmClass <- R6::R6Class(
           j.expand_table(aTable,names(eTable)[levels_pos],append=T,type="number",names64=FALSE) 
           names(eTable)[levels_pos]<-make.names(names(eTable)[levels_pos])
           j.init_table(aTable,eTable)
-        
-
         }
       }
       plotter_machine$initPlots()
@@ -157,11 +151,11 @@ gamljGlmClass <- R6::R6Class(
       
       ## R2 table ###
       j.fill_table(self$results$main$r2,private$.estimate_machine$tab_r2)
-      j.add_warnings(self$results$main$anova,private$.estimate_machine,"tab_r2")
+      j.add_warnings(self$results$main$r2,private$.estimate_machine,"tab_r2")
       
       ## Intercept table ###
       j.fill_table(self$results$main$intercept,private$.estimate_machine$tab_intercept)
-      j.add_warnings(self$results$main$anova,private$.estimate_machine,"tab_intercept")
+      j.add_warnings(self$results$main$intercept,private$.estimate_machine,"tab_intercept")
       
       ## anova table ###
       j.fill_table(self$results$main$anova,private$.estimate_machine$tab_anova)
@@ -209,7 +203,9 @@ gamljGlmClass <- R6::R6Class(
           j.fill_table(aTable,private$.estimate_machine$tab_posthoc[[i]])
         } 
       }
-
+      
+    ###  emmeans 
+      
       if (is.something(private$.estimate_machine$tab_emmeans)) {
         
         for (i in seq_along(self$options$emmeans)) {

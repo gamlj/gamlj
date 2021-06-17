@@ -102,6 +102,36 @@ gamljGzlmClass <- R6::R6Class(
       
       
       
+      ### simple interactions ######
+      
+      if (is.something(estimate_machine$tab_simpleInteractionCoefficients)) {
+        
+        self$results$simpleInteractions$setVisible(TRUE)
+        ### moderators should be reverted in order so they make sense
+        terms<-c(self$options$simpleVariable,self$options$simpleModerators)
+        for (i in seq_along(estimate_machine$tab_simpleInteractionCoefficients)) {
+          aGroup <- self$results$simpleInteractions$addItem(key = i)
+          aTable<-aGroup$interactionCoefficients
+          term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
+          j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
+          title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
+          j.init_table(aTable,FALSE, ci=T,ciwidth=self$options$ciWidth,title=title)
+          
+          aTable<-aGroup$interactionAnova
+          j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")
+          title<-paste("ANOVA test for simple interaction",  jmvcore::stringifyTerm(term))
+          j.init_table(aTable,FALSE, ci=F,title=title)
+          
+          title<-paste("Simple interaction:",  jmvcore::stringifyTerm(term))
+          aGroup$setTitle(title)
+          
+        } 
+        
+        
+      }
+      
+      
+      
       
       ### posthoc ####
       
@@ -157,14 +187,56 @@ gamljGzlmClass <- R6::R6Class(
       j.add_warnings(self$results$info,private$.data_machine,"data")
       j.add_warnings(self$results$info,private$.estimate_machine,"info")
       
+      ## R2 table ###
+      j.fill_table(self$results$main$r2,private$.estimate_machine$tab_r2)
+      j.add_warnings(self$results$main$r2,private$.estimate_machine,"tab_r2")
       
       
+      ## anova table ###
+      j.fill_table(self$results$main$anova,private$.estimate_machine$tab_anova)
+      j.add_warnings(self$results$main$anova,private$.estimate_machine,"tab_anova")
+
       ### parameter estimates
       j.fill_table(self$results$main$coefficients,private$.estimate_machine$tab_coefficients)
       j.add_warnings(self$results$main$coefficients,private$.estimate_machine,"tab_coefficients")
       
+      
+      ### post hoc
+      
+      if (is.something(private$.estimate_machine$tab_posthoc)) {
         
-
+        for (i in seq_along(self$options$posthoc)) {
+          term<-self$options$posthoc[[i]]
+          aTable<-self$results$posthoc$get(key = term)
+          j.fill_table(aTable,private$.estimate_machine$tab_posthoc[[i]])
+        } 
+      }
+      
+      ### simple effects
+      j.fill_table(self$results$simpleEffects$anova,private$.estimate_machine$tab_simpleAnova)
+      j.add_warnings(self$results$simpleEffects$anova,private$.estimate_machine,"tab_simpleAnova")
+      
+      j.fill_table(self$results$simpleEffects$coefficients,private$.estimate_machine$tab_simpleCoefficients)
+      j.add_warnings(self$results$simpleEffects$coefficients,private$.estimate_machine,"tab_simpleCoefficients")
+      
+      ### simple interactions
+      if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
+        
+        for (i in seq_along(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
+          aGroup <- self$results$simpleInteractions$get(key = i)
+          aTable<-aGroup$interactionCoefficients
+          j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionCoefficients[[i]],append = T)
+          aTable<-aGroup$interactionAnova
+          j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionAnova[[i]],append = T)
+          
+          
+        } 
+      }
+      
+      
+      
+      
+      
     },
   .estimate=function(form,data) {
     modelType<-self$options$modelSelection

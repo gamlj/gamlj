@@ -171,14 +171,27 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 ############# produces anova/deviance table in a somehow stadard format ##########
 mf.anova<- function(x,...) UseMethod(".anova")
 
-.anova.default<-function(model) {
+.anova.default<-function(model,obj) {
+       mark(model)
        stop("no suitable model found") 
 }
   
-.anova.glm<-function(model) {
+.anova.glm<-function(model,obj) {
 
-        ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-        colnames(ano)<-c("test","df","p")
+        if (!obj$hasTerms) {
+          obj$warnings  <-  list(topic="tab_anova",message="Omnibus tests cannot be computed")
+          return(NULL)
+        }
+        anoobj        <-  try_hard(car::Anova(model,test="LR",type=3,singular.ok=T))
+        obj$errors    <-  list(topic="tab_anova",message=anoobj$error)
+        obj$warnings  <-  list(topic="tab_anova",message=anoobj$warning)
+        
+
+        if (!isFALSE(anoobj$error))
+            return(NULL)
+        
+        ano           <-  anoobj$obj
+        colnames(ano) <-  c("test","df","p")
         as.data.frame(ano, stringsAsFactors = F)
 }
 
@@ -189,29 +202,44 @@ mf.anova<- function(x,...) UseMethod(".anova")
       
   }
   
-.anova.model_lm<-function(anovaobj) {
+.anova.lm<-function(model,obj) {
 
-  a<-anovaobj[row.names(anovaobj)!="(Intercept)",]
+  anoobj        <-  try_hard(car::Anova(model,test="F",type=3,singular.ok=T))
+  obj$errors    <-  list(topic="tab_anova",message=anoobj$error)
+  obj$warnings  <-  list(topic="tab_anova",message=anoobj$warning)
 
-  if (dim(a)[1]<2) {
-    results<-as.data.frame(rbind(a,a))
-    results$source<-c("Residuals","Total")
-    names(results)<-c("ss","df", "test", "p","source")
-    return(results)
+  if (!isFALSE(anoobj$error))
+         return(NULL)
+      
+
+  ano<-anoobj$obj[row.names(anoobj$obj)!="(Intercept)",]
+  
+  if (!obj$hasTerms) {
+
+       results         <-  as.data.frame(rbind(ano,ano))
+       results$source  <-  c("Residuals","Total")
+       names(results)  <-  c("ss","df", "test", "p","source")
+       return(results)
     
   }
-  w<-cbind(effectsize::eta_squared(a,partial=F)[1:2],
-           effectsize::eta_squared(a,partial = T)[2],
-           effectsize::omega_squared(a)[2],
-           effectsize::epsilon_squared(a)[2])
-  params<-parameters::model_parameters(a)
-  results<-merge(params,w,by="Parameter",all= T,sort = F)
-  names(results)<-c("source","ss","df", "ms", "test", "p",  "etaSq", "etaSqP", "omegaSq","epsilonSq")
-  tots<-results[nrow(results),]
-  tots$source<-"Total"
-  tots$ss<-sum(results$ss)
-  tots$df<-sum(results$df)
-  results[nrow(results)+1,]<-tots
+
+  suppressMessages({
+    
+  w                          <-  cbind(effectsize::eta_squared(anoobj$obj,partial=F)[1:2],
+                                       effectsize::eta_squared(anoobj$obj,partial = T)[2],
+                                       effectsize::omega_squared(anoobj$obj)[2],
+                                       effectsize::epsilon_squared(anoobj$obj)[2])
+
+  
+  })
+  params                     <-  parameters::model_parameters(ano)
+  results                    <-  merge(params,w,by="Parameter",all= T,sort = F)
+  names(results)             <-  c("source","ss","df", "ms", "test", "p",  "etaSq", "etaSqP", "omegaSq","epsilonSq")
+  tots                       <-  results[nrow(results),]
+  tots$source                <-  "Total"
+  tots$ss                    <-  sum(results$ss)
+  tots$df                    <-  sum(results$df)
+  results[nrow(results)+1,]  <-  tots
   results
 }
 
@@ -299,39 +327,56 @@ mf.getModelFactors<-function(model) {
 } 
 
 
-mf.getModelMessages<-function(model) {
-  message<-list(conv=TRUE,msg=NULL,singular=FALSE)
-  if (.which.class(model)=="lmer") {
-      message['msg']=model@optinfo$conv$lme4$messages
-      message["singular"]<-lme4::isSingular(model,tol = 1e-04)
-      if (message["singular"]==TRUE)
-         message['msg']="The fit is singular"
-  }
-  message
-}
+############# produces R2  ##########
 
+mf.R2<- function(model,...) UseMethod(".R2") 
 
-mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
-  if (modelSelection=="linear")
-       return(stats::gaussian())
-  if (modelSelection=="logistic")
-       return(stats::binomial())
-  if (modelSelection=="poisson")
-    return(stats::poisson())
-  if (modelSelection=="multinomial")
-    return(list(family="multinomial",link="slogit"))
-  if (modelSelection=="nb")
-    return(list(family="nb",link="log"))
+.R2.default<-function(model,obj) {
+      mark(class(model))
+      obj$errors<-list(topic="tab_r2",message=paste("R2 cannot be computed for model",class(model)))
+      return(NULL)
+      }
 
-    if (modelSelection=="poiover")
-      return(stats::quasipoisson())
-  if (modelSelection=="probit")
-    return(stats::binomial("probit"))
-  if (modelSelection=="custom")
-    return(do.call(custom_family,list(custom_link)))
+.R2.glm<-function(model,obj) {
   
-  NULL  
+  alist       <-  list()
+  # mcFadden and adjusted
+  alist$r2    <-  1-(model$deviance/model$null.deviance)
+  alist$ar2   <-  1-((model$deviance+2*length(model$coefficients))/model$null.deviance)
+  
+  if (alist$ar2<0)
+      alist$ar2 <- 0
+  
+  if (any(sapply(alist,is.null)))
+            obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
+
+  results     <-  .compare_null_model(model)
+  alist$test  <-  results$Deviance
+  alist$df    <-  results$Df
+  alist$p     <-  results$`Pr(>Chi)`
+  
+  return(list(alist))
 }
+
+.R2.lm<-function(model,obj) {
+  
+  ss<-summary(model)
+  results<-list()
+  results$df1<-ss$fstatistic[["numdf"]]
+  results$df2<-ss$fstatistic[["dendf"]]
+  results$r1<-ss$r.squared
+  results$r2<-ss$adj.r.squared
+  if (hasName(ss,"fstatistic")) {
+    results$f<-ss$fstatistic[["value"]]
+    results$p<-stats::pf(results$f,results$df1,results$df1, lower.tail = FALSE)
+  } else {
+    obj$warnings<-list(topic="tab_r2",message="R-squared tests cannot be computed")
+  
+  }
+    list(results)
+
+}
+
 
 
 
@@ -518,5 +563,15 @@ mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
 
 
 
+######### model comparisons ########
 
+.compare_null_model<-function(model) {
+  
+            dep     <-  attr(terms(model),"variables")[[2]]
+            form    <-  paste(dep,"~ 1")
+            data    <-  mf.getModelData(model)
+            model0  <-  stats::update(model,form,data=data,evaluate=T)
+            results <-  stats::anova(model0,model,test = "LRT")
 
+            results[2,]
+}

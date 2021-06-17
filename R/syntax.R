@@ -10,6 +10,8 @@ Syntax <- R6::R6Class(
               formula64=NULL,
               factorinfo=NULL,
               hasIntercept=TRUE,
+              hasTerms=FALSE,
+              isProper=NULL,
               tab_info=NULL,
               tab_anova=NULL,
               tab_coefficients=NULL,
@@ -83,9 +85,11 @@ Syntax <- R6::R6Class(
                 modelTerms[[aOne]]<-NULL
                 self$hasIntercept=TRUE
               }
+              self$hasTerms <-(length(modelTerms)>0)
+              self$isProper <-(self$hasIntercept | self$hasTerms)
               
-                sep="+"
-                if (length(modelTerms)==0) sep=""
+              sep<-"+"
+                if (!self$hasTerms) sep=""
                 rform<-jmvcore::composeFormula(NULL,modelTerms)
                 rform<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),rform)
                 self$formula<-rform
@@ -105,12 +109,17 @@ Syntax <- R6::R6Class(
 
               ### anova table ###
               
-              if (self$option("modelTerms"))
+              if (self$hasTerms)
                   self$tab_anova<-lapply(self$options$modelTerms, function(x) list(name=.stringifyTerm(x)))
+              
               if (self$options$modelSelection=="lm") {
                     self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
                     self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
               }  
+              ### we need at least a row otherwise we cannot add notes to the table
+              if (is.null(self$tab_anova))
+                    self$tab_anova[[1]]<-list(test="")
+              
               ### parameter estimates ####
               .terms<-colnames(model.matrix(as.formula(self$formula64),self$datamatic$data_structure64))
               .terms<-jmvcore::decomposeTerms(.terms)
@@ -120,10 +129,16 @@ Syntax <- R6::R6Class(
                                                               label=labels[[x]]))
               self$tab_coefficients<-lapply(.terms, function(t) list(source=""))
 
-
-
-            ### effect sizes table ###
               
+            ### intercept info table ###
+              
+              if (self$option("interceptInfo")) {
+               self$tab_intercept<-list(source="(Intercept)") 
+                
+              }
+                
+            ### effect sizes table ###
+
             if (self$option("effectSizeInfo")) {
                 alist<-list()
                 for (term in self$options$modelTerms) {
@@ -232,13 +247,18 @@ Syntax <- R6::R6Class(
 
 
             .syntax=function() {
+              
+                info         <- RINFO[[self$options$modelSelection]]
+                call         <- info$call
+                opts         <- info$options
+                opts$formula <- as.character(self$formula64)
+                optsstring   <- paste(sapply(names(opts),function(a) paste(a,opts[[a]],sep="=")),collapse=",")
+                astring      <- paste0(call,"(",optsstring,")")
+                
+                return(astring)
 
-              info<-RINFO[[self$options$modelSelection]]
-              call<-info$call
-              opts<-info$options
-              opts$formula=as.character(self$formula64)
-              optsstring<-paste(sapply(names(opts),function(a) paste(a,opts[[a]],sep="=")),collapse=",")
-              paste0(call,"(",optsstring,")")
+              
+              
             }
             
 
