@@ -16,10 +16,11 @@ items:
          title: "Info"
        - name: value
          type: text
-         title: "Value"
+         title: ""
        - name: specs
          type: text
-         title: "Comment"
+         title: ""
+
     clearWith:
         - dep
         - factors
@@ -562,7 +563,7 @@ items:
     type: Array
     description: an array of results plots
     template:
-          title: $key
+          title: ""
           type: Image
           renderFun: .mainPlot
           width: 600
@@ -585,6 +586,7 @@ items:
            - plotRaw
            - percvalue
            - cvalue
+           - plotOriginalScale
 
   - name: assumptions
     title: Assumption Checks

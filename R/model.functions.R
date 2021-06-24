@@ -195,12 +195,9 @@ mf.anova<- function(x,...) UseMethod(".anova")
         as.data.frame(ano, stringsAsFactors = F)
 }
 
-.anova.multinom<-function(model) {
-        ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-        colnames(ano)<-c("test","df","p")
-        as.data.frame(ano, stringsAsFactors = F)
-      
-  }
+.anova.multinom<-function(model,obj)
+                .anova.glm(model,obj)
+  
   
 .anova.lm<-function(model,obj) {
 
@@ -327,57 +324,6 @@ mf.getModelFactors<-function(model) {
 } 
 
 
-############# produces R2  ##########
-
-mf.R2<- function(model,...) UseMethod(".R2") 
-
-.R2.default<-function(model,obj) {
-      mark(class(model))
-      obj$errors<-list(topic="tab_r2",message=paste("R2 cannot be computed for model",class(model)))
-      return(NULL)
-      }
-
-.R2.glm<-function(model,obj) {
-  
-  alist       <-  list()
-  # mcFadden and adjusted
-  alist$r2    <-  1-(model$deviance/model$null.deviance)
-  alist$ar2   <-  1-((model$deviance+2*length(model$coefficients))/model$null.deviance)
-  
-  if (alist$ar2<0)
-      alist$ar2 <- 0
-  
-  if (any(sapply(alist,is.null)))
-            obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
-
-  results     <-  .compare_null_model(model)
-  alist$test  <-  results$Deviance
-  alist$df    <-  results$Df
-  alist$p     <-  results$`Pr(>Chi)`
-  
-  return(list(alist))
-}
-
-.R2.lm<-function(model,obj) {
-  
-  ss<-summary(model)
-  results<-list()
-  results$df1<-ss$fstatistic[["numdf"]]
-  results$df2<-ss$fstatistic[["dendf"]]
-  results$r1<-ss$r.squared
-  results$r2<-ss$adj.r.squared
-  if (hasName(ss,"fstatistic")) {
-    results$f<-ss$fstatistic[["value"]]
-    results$p<-stats::pf(results$f,results$df1,results$df1, lower.tail = FALSE)
-  } else {
-    obj$warnings<-list(topic="tab_r2",message="R-squared tests cannot be computed")
-  
-  }
-    list(results)
-
-}
-
-
 
 
 ############# produces anova/deviance table in a somehow stadard format ##########
@@ -396,6 +342,61 @@ mf.fixTable<- function(x,...) UseMethod(".fixtable")
   as.data.frame(atable)  
   
   
+}
+
+
+############# some models are not built in standard way, here we fix them ##########
+mf.fixModel<- function(x,...) UseMethod(".fixModel")
+
+.fixModel.default<-function(model) {
+  return(model)
+}
+
+.fixModel.multinom<-function(model) {
+  
+  model$call$formula <- as.formula(model)
+  return(model)
+}
+
+
+
+
+####### check if a model converged ###### 
+
+mf.converged<- function(x,...) UseMethod(".converged")
+
+.converged.default<-function(model) {
+  
+  if ("converged" %in% names(model))
+    conv<-model$converged
+  else
+    conv<-TRUE
+  conv
+}
+.converged.glmerMod<-function(model) 
+  .converged.glmerMerMod(model)
+
+.converged.glmerMerMod<-function(model) {
+  
+  if (!is.null(model@optinfo$conv$lme4$code))
+    conv<-FALSE
+  else
+    conv<-TRUE
+  conv
+}
+
+.converged.lmerMerMod<-function(model) {
+  
+  if (!is.null(model@optinfo$conv$lme4$code))
+    conv<-FALSE
+  else
+    conv<-TRUE
+  conv
+}
+
+.converged.multinom<-function(model) {
+  
+  model$convergence==0
 }
 
 
@@ -563,15 +564,3 @@ mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
 
 
 
-######### model comparisons ########
-
-.compare_null_model<-function(model) {
-  
-            dep     <-  attr(terms(model),"variables")[[2]]
-            form    <-  paste(dep,"~ 1")
-            data    <-  mf.getModelData(model)
-            model0  <-  stats::update(model,form,data=data,evaluate=T)
-            results <-  stats::anova(model0,model,test = "LRT")
-
-            results[2,]
-}

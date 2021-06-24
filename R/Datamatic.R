@@ -54,7 +54,7 @@ Variable <- R6::R6Class(
         self$paramsnames<-paste0(var,1:(self$nlevels-1))
         self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$nlevels-1))
 
-        self$descriptive=c(0,1)
+        self$descriptive=list(min=0,max=1)
         
         cont<-lapply(self$options$contrasts,function(a) a$type)
         names(cont)<-sapply(self$options$contrasts,function(a) a$var)
@@ -67,9 +67,24 @@ Variable <- R6::R6Class(
       ### check dependent variables ###
       if (var %in% self$options$dep) {
            self$type=class(vardata)
-           if (self$options$modelSelection=="logistic" & length(levels(vardata))>2)
-                stop("Logistic models require dichotomous dependent variables")
-           if (self$option("dep_scale")) self$scaling<-self$options$dep_scale
+           if (self$type=="factor") {
+                 self$descriptive=list(min=0,max=1)
+                 self$levels<-levels(vardata)
+                 self$levels_labels<-levels(vardata)
+                 self$nlevels<-length(self$levels)
+                 self$contrast_values<-private$.contrast_values(self$levels, "dummy")
+                 self$contrast_labels<-private$.contrast_labels(self$levels,  "dummy")
+                 self$method="dummy"
+                 
+           } else {
+             
+             if (self$option("dep_scale")) 
+                 self$scaling<-self$options$dep_scale
+                 self$contrast_labels<-self$name
+
+           }
+
+
       }
         
             
@@ -85,6 +100,7 @@ Variable <- R6::R6Class(
         if (is.factor(vardata)) 
           self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to numeric"))
         
+        self$contrast_labels<-self$name
         self$paramsnames<-var
         self$paramsnames64<-tob64(var)
         self$nlevels=3
@@ -362,7 +378,11 @@ Variable <- R6::R6Class(
         vardata<-scale(vardata,scale = T)  
       if (method=="cluster-based standardized")     
         vardata<-unlist(tapply(vardata,by,scale,scale=T))
+
+      if (method=="log") 
+        vardata<-log(vardata)  
       
+            
       private$.update_levels(vardata)
       
       as.numeric(vardata)
@@ -373,28 +393,27 @@ Variable <- R6::R6Class(
       
       self$original_levels<-self$levels
       self$original_descriptive<-self$descriptive
-      
-      self$descriptive=c(min(vardata,na.rm = TRUE),max(vardata,na.rm = TRUE))
-      
       labels_type<-ifelse(is.null(self$options$simpleScaleLabels),"values",self$options$simpleScaleLabels)
       ### when called by init, force labels because we cannot compute the values
+      ### if not, we can compute the descriptive
       if (length(vardata)==0)
            labels_type="labels"
+      else
+          self$descriptive<-list(min=min(vardata,na.rm = TRUE),
+                              max=max(vardata,na.rm = TRUE),
+                              mean=mean(vardata,na.rm = TRUE),
+                              sd=sd(vardata,na.rm = TRUE))
+      
       
       if (self$options$simpleScale=="mean_sd")  {
+        
         .span<-ifelse(is.null(self$options$cvalue),1,self$options$cvalue)
         .labs<-c(paste0("Mean-", .span, "\u00B7", "SD"), "Mean", paste0("Mean+", .span, "\u00B7","SD"))
         .mean <- mean(vardata)
         .sd <- sd(vardata)
         self$levels=round(c(.mean - (.span * .sd), .mean, .mean + (.span * .sd)),digits = 3)
         self$method="mean_sd"
-        if (labels_type == "values") 
-          self$levels_labels<-self$levels
-        if (labels_type == "labels") 
-          self$levels_labels<-.labs
-        if (labels_type == "values_labels") { 
-          self$levels_labels<-paste(.labs,self$levels,sep="=")
-        }
+
       }
       if (self$options$simpleScale=="percent") {
         
@@ -404,18 +423,30 @@ Variable <- R6::R6Class(
         .labs<-c(paste0("50-", .lspan,"\u0025"), "50\u0025", paste0("50+", .lspan,"\u0025"))
         
         self$levels<-round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span)), digits = 3) 
+          
         self$method="percent"
-        if (labels_type == "values") 
-          self$levels_labels<-self$levels
-        
-        if (labels_type == "labels") 
-          self$levels_labels<-.labs
-        
-        if (labels_type == "values_labels") { 
-          self$levels_labels<-paste(.labs,self$levels,sep="=")
-        }
       }
       
+      if (labels_type == "labels") 
+        self$levels_labels<-.labs
+      
+      if (labels_type == "values") 
+        self$levels_labels<-self$levels
+      
+      if (labels_type == "uvalues") 
+        self$levels_labels<-self$original_levels
+      
+      
+      if (labels_type == "values_labels") 
+        self$levels_labels<-paste(.labs,self$levels,sep="=")
+      
+      if (labels_type == "uvalues_labels") 
+        self$levels_labels<-paste(.labs,self$original_levels,sep="=")
+  
+      if (all(!is.nan(self$levels)) &  all(!is.na(self$levels)))
+            if(any(duplicated(self$levels))) {
+        stop(paste0("Problems in covariates conditioning for variable ",self$name,". Quantiles are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
+      }
       
     }
     
@@ -434,7 +465,9 @@ Datamatic <- R6::R6Class(
   public=list(
     variables=NULL,
     data_structure64=NULL,
+    dep=NULL,
     labels=NULL,
+    N=NULL,
     initialize=function(options,data) {
       super$initialize(options=options,vars=unlist(c(options$dep,options$factors,options$covs)))
       private$.inspect_data(data)
@@ -449,6 +482,7 @@ Datamatic <- R6::R6Class(
       }
       attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       data64 <- jmvcore::naOmit(data64)
+      self$N<-dim(data64)[1]
       return(data64)
 
     },
@@ -490,6 +524,7 @@ Datamatic <- R6::R6Class(
            }
        self$labels<-labels
        self$data_structure64<-self$cleandata(data)
+       self$dep<-self$variables[[tob64(self$options$dep)]]
        }
 
 

@@ -26,20 +26,26 @@ Syntax <- R6::R6Class(
               tab_posthoc=NULL,
               tab_contrastcodes=NULL,
               tab_r2=NULL,
+              tab_fit=NULL,
+              tab_relativerisk=NULL,
               datamatic=NULL,
+              infomatic=NULL,
               initialize=function(options,datamatic) {
+                
                 super$initialize(options=options,vars=datamatic$vars)
                 self$datamatic<-datamatic
                 #### we prepare the model syntax
                 private$.constructFormula()
+                
+                ### infomatic class takes care of all info about different model
+                self$infomatic<-Infomatic$new(options,datamatic)
+                
                 
                 ## prepare tables for init
                 private$.make_structure()
 
 
 
-                # here we prepare the variables. Factors are expanded to dummies and all variables are B64 named
-                # this produce two lists of terms, in plain names self$lav_terms and in B64 private$.lav_terms
 
 
                 } # here initialize ends
@@ -104,8 +110,11 @@ Syntax <- R6::R6Class(
             .make_structure=function() {
               
               #### info table ####
-              self$tab_info[[1]]<-list(info="Estimate",value="Linear model fit by OLS",specs="")
-              self$tab_info[[2]]<-list(info="Call",value=self$formula,specs="")
+              self$tab_info                   <-  self$infomatic$info_table()
+              self$tab_info[["call"]]$specs   <-  self$formula
+              
+              if (self$option("dep_scale"))
+                    self$tab_info[["dep"]]<-list(info="Y transform",value=self$options$dep_scale)
 
               ### anova table ###
               
@@ -119,15 +128,20 @@ Syntax <- R6::R6Class(
               ### we need at least a row otherwise we cannot add notes to the table
               if (is.null(self$tab_anova))
                     self$tab_anova[[1]]<-list(test="")
+
+              #### additional fit indeces ####
+
+              if (is.something(self$infomatic$fit))
+                  self$tab_fit<-self$infomatic$info_fit()
+
               
               ### parameter estimates ####
               .terms<-colnames(model.matrix(as.formula(self$formula64),self$datamatic$data_structure64))
-              .terms<-jmvcore::decomposeTerms(.terms)
-              terms<-fromb64(.terms,self$vars)
-              labels<-self$datamatic$get_params_labels(.terms)
-              self$tab_coefficients<-lapply(seq_along(terms), function(x) list(source=.stringifyTerm(terms[x]),
-                                                              label=labels[[x]]))
-              self$tab_coefficients<-lapply(.terms, function(t) list(source=""))
+              .len<-length(.terms)
+              if (self$options$modelSelection=="multinomial") {
+                .len  <- .len * (self$datamatic$dep$nlevels-1)
+              }
+              self$tab_coefficients<-lapply(1:.len, function(t) list(source=""))
 
               
             ### intercept info table ###
@@ -157,11 +171,18 @@ Syntax <- R6::R6Class(
               
                .terms<-tob64(self$options$emmeans)
                alist<-lapply(.terms, function(.term) {
-                     p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
-                     rep(list(emmeans=""),p)
+                     nrow<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
+                     if (self$options$modelSelection=="multinomial") {
+                        nrow<-nrow*(self$datamatic$dep$nlevels)
+                     }
+                     
+                     rep(list(emmeans=""),nrow)
                })
                self$tab_emmeans<-alist
-            } 
+               emm<-self$infomatic$emmeans
+               if (!is.null(emm))
+                   self$warnings<-list(topic="tab_emmeans",message=paste("Expected means are expressed as",emm))
+            }
 
               ### posthoc means ###
               if (self$option("posthoc")) {
@@ -170,8 +191,10 @@ Syntax <- R6::R6Class(
                   p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
                   nrow<-p*(p-1)/2
                   ncol<-(length(.term)*2)+1
+                  if (self$options$modelSelection=="multinomial") {
+                      nrow<-nrow*(self$datamatic$dep$nlevels)
+                  }
                   df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
-                  l<-length(.term)
                   .names<-c(.term,"vs",.term)
                   names(df)<-.names
                   df$vs="-"
@@ -195,6 +218,9 @@ Syntax <- R6::R6Class(
                 anovap<-prod(unlist(lapply(.terms,function(t) self$datamatic$variables[[t]]$nlevels)))
                 self$tab_simpleAnova<-data.frame(F.ratio=rep("",anovap))
                 coefsp<-anovap*neffects
+                if (self$options$modelSelection=="multinomial")
+                       coefsp <- coefsp * (self$datamatic$dep$nlevels-1)
+                
                 self$tab_simpleCoefficients<-data.frame(contrast=rep("",coefsp))
 
               }
@@ -241,26 +267,23 @@ Syntax <- R6::R6Class(
 
                 }
                 
-  
-
-            },
-
-
-            .syntax=function() {
-              
-                info         <- RINFO[[self$options$modelSelection]]
-                call         <- info$call
-                opts         <- info$options
-                opts$formula <- as.character(self$formula64)
-                optsstring   <- paste(sapply(names(opts),function(a) paste(a,opts[[a]],sep="=")),collapse=",")
-                astring      <- paste0(call,"(",optsstring,")")
-                
-                return(astring)
-
-              
-              
-            }
+              ### here are specific calls ########
             
+              ### relative risk
+              if (self$option("effectSize","RR")) {
+
+                    simtab  <-  self$tab_coefficients
+                    
+                    if (self$hasIntercept)
+                          simtab  <-  simtab[-1]
+                  
+                    self$tab_relativerisk<-simtab
+              }
+              
+
+            }
+
+
 
           ) # end of private
 ) # End Rclass

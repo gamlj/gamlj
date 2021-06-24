@@ -4,7 +4,7 @@ title: Generalized Linear Models
 menuGroup: Linear Models
 version: '1.5.2'
 jas: '1.2'
-export: false
+export: true
 description:
     main: Generalized Linear Model
     R:
@@ -35,6 +35,14 @@ formula:
         from: rhs
         type: terms
 options:
+
+    - name: caller
+      type: String
+      default: "glm"
+      hidden: true
+      
+      
+      
     - name: data
       type: Data
       description:
@@ -206,6 +214,22 @@ options:
           R: >
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
+    - name: plotLp
+      title: Linear predictor 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use linear predictor rather than response scale.
+
+    - name: plotOriginalScale
+      title: Covariate scale 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use original scale for covariates.
+
 
     - name: plotError
       title: Error Bar Definition
@@ -319,11 +343,17 @@ options:
           title: Values
         - name: values_labels
           title: Values + Labels
+        - name:  uvalues
+          title: Unscaled Values
+        - name: uvalues_labels
+          title: Unscaled Values + Labels
+
       default: labels
       description:
           R: >
             how the levels of a continuous moderator should appear in tables and plots: `labels`,
-            `values` and `values_labels`. 
+            `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the
+            variable orginal levels, before scaling.
 
 
 ############ generic with some specs ###########
@@ -428,7 +458,6 @@ options:
           title: Probit
         - name: custom
           title: Custom
-          
         - name: multinomial
           title: Multinomial
       default: linear

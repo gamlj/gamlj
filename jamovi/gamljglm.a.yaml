@@ -5,7 +5,7 @@ menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
 completeWhenFilled: false
-export: false
+export: true
 description:
     main: |
            General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
@@ -38,6 +38,11 @@ options:
       type: Data
       description:
           R: the data as a data frame
+
+    - name: caller
+      type: String
+      default: "lm"
+      hidden: true
 
 
     - name: dep
@@ -210,6 +215,14 @@ options:
           R: >
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
+    - name: plotOriginalScale
+      title: Covariate scale 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use original scale for covariates.
+
 
     - name: plotError
       title: Error Bar Definition
@@ -323,11 +336,18 @@ options:
           title: Values
         - name: values_labels
           title: Values + Labels
+        - name:  uvalues
+          title: Unscaled Values
+        - name: uvalues_labels
+          title: Unscaled Values + Labels
+
       default: labels
       description:
           R: >
             how the levels of a continuous moderator should appear in tables and plots: `labels`,
-            `values` and `values_labels`. 
+            `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the
+            variable orginal levels, before scaling.
+
 
 
 ############ generic with some specs ###########

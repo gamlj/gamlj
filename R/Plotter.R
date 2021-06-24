@@ -11,13 +11,16 @@ Plotter <- R6::R6Class(
       scatterClabel=NULL,
       scatterY=NULL,
       scatterX=NULL,
+      scatterXscale=FALSE,
       scatterZ=NULL,
       scatterBars=FALSE,
+      scatterRaw=FALSE,
       initialize=function(operator,results) {
             super$initialize(options=operator$options,vars=operator$vars)
             private$.results<-results
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
+            self$scatterRaw<-self$options$plotRaw
       },
 
       initPlots=function() {
@@ -31,7 +34,6 @@ Plotter <- R6::R6Class(
         
       },
       scatterPlot=function(image) {
-        
 
         ## collect the data 
         data<-self$plotData[[image$key]]
@@ -58,7 +60,7 @@ Plotter <- R6::R6Class(
 
         #### plot the actual data if required 
         
-        if (self$options$plotRaw) {
+        if (self$scatterRaw) {
           
           rawdata<-self$rawData[[image$key]]
           y<-self$scatterY$name64
@@ -95,7 +97,8 @@ Plotter <- R6::R6Class(
                                     .aestetics,
                                      size = 1.2, 
                                      position=self$scatterDodge)
-        
+
+
         ### plot the points for factors
         if (self$scatterX$type=="factor")
               p <- p +  ggplot2::geom_point(data = data,
@@ -106,7 +109,14 @@ Plotter <- R6::R6Class(
         
         p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, colour = self$scatterClabel)
         
-        
+        if (self$scatterXscale) {
+             
+          o<-ggplot2::ggplot_build(p)
+          values<-o$layout$panel_params[[1]]$x$breaks
+          newlabs<-private$.rescale(self$scatterX,values)
+          p<-p+ggplot2::scale_x_continuous(labels= newlabs)
+        }
+           
         
         return(p)        
       }
@@ -126,10 +136,12 @@ Plotter <- R6::R6Class(
             y<-self$options$dep
             x<-self$options$plotHAxis
             z<-self$options$plotSepLines
-            dims<-1
-             
+
             moderators<-self$options$plotSepPlots
             dims<-unlist(lapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$nlevels))
+
+            if (!is.something(dims))
+                dims<-1
             
              n<-prod(dims)
              for (i in seq_len(n)) {
@@ -168,12 +180,14 @@ Plotter <- R6::R6Class(
       
       moderators<-self$options$plotSepPlots
 
-      ### compute the expected values to be plotted ###
-      data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
+      
       ### give a range to the y-axis, if needed
       if (self$options$plotDvScale)
-           self$scatterRange<-private$.datamatic$variables[[self$scatterY$name64]]$descriptive
+               self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
       
+      ### compute the expected values to be plotted ###
+      data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
+
       #### compute the levels combinations
       #### first, gets all levels of factors and covs. Then creates the combinations and select the rows of the
       #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
@@ -182,7 +196,18 @@ Plotter <- R6::R6Class(
       #### TODO: this is abstruse, try changing it
       
       dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
+
       rawData<-mf.getModelData(private$.operator$model)
+
+      ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
+        dep64  <- tob64(self$options$dep)
+        depobj <- private$.datamatic$variables[[dep64]]
+       
+        if (depobj$type=="factor") {
+           levels(rawData[[dep64]])<-0:(depobj$nlevels-1)
+           rawData[[dep64]]<-as.numeric(as.character(rawData[[dep64]]))
+        }
+           
       
       if (is.something(dims))  {
              grid<-expand.grid(dims,stringsAsFactors = FALSE)
@@ -200,7 +225,7 @@ Plotter <- R6::R6Class(
                 localdata<-data[eval(parse(text=sel)),]
                 self$plotData[[i]]<-localdata
                 
-                if (self$options$plotRaw) {
+                if (self$scatterRaw) {
                     if (length(selectable)>0) {
                         sel<-paste(paste0("data$",.sel64,sep=""),paste0('"',selgrid[i,],'"'),sep="==",collapse = " & ")
                         raw<-rawData[eval(parse(text=sel)),]
@@ -215,7 +240,8 @@ Plotter <- R6::R6Class(
              aplot<-resultsgroup$get(key=resultsgroup$itemKeys[[1]])
              aplot$setTitle(jmvcore::stringifyTerm(c(self$scatterX$name,self$scatterZ$name)))
              self$plotData[[1]]<-data
-             if (self$options$plotRaw) self$rawData[[1]]<-rawData
+             if (self$scatterRaw) 
+                  self$rawData[[1]]<-rawData
 
       }
       
@@ -239,18 +265,32 @@ Plotter <- R6::R6Class(
       xobj<-private$.datamatic$variables[[x64]]
       
       if (xobj$type=="numeric") {
-        conditions[[x64]]<-pretty(xobj$descriptive,n=10)
+           conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
+           if (self$option("plotOriginalScale"))
+                 self$scatterXscale<-TRUE
       }
-      
       allterm64<-c(x64,term64)
 
+      type="response"
+      if (self$option("plotLp")) {
+          type<-"link"
+          self$scatterRaw<-FALSE
+          self$scatterRange<-NULL
+        
+      }
+      
+
       ### now we get the estimated means #######
-      results<-try_hard(emmeans::emmeans(private$.operator$model,specs=allterm64,
-                                      at=conditions,nesting = NULL,
-                                      options  = list(level = private$.operator$ciwidth)))
+      
+      results<-try_hard(emmeans::emmeans(private$.operator$model,
+                                         specs=allterm64,
+                                         at=conditions,
+                                         type=type,
+                                         nesting = NULL,
+                                         options  = list(level = private$.operator$ciwidth)))
 
       self$warnings<-list("topic"="plot",message=results$warning)
-      self$warnings<-list("topic"="plot",message=results$error)
+      self$errors<-list("topic"="plot",message=results$error)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####
@@ -269,6 +309,25 @@ Plotter <- R6::R6Class(
               levels(tableData[[term]])<-private$.datamatic$variables[[term]]$levels_labels
       }
       tableData
+      
+    },
+    .rescale=function(varobj,values) {
+      
+      
+      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
+      len <- max(min(len,na.rm = T),0)
+      if (varobj$scaling=="centered")
+          values<-values+varobj$original_descriptive$mean
+      if (varobj$scaling=="standardized") 
+        values<-varobj$original_descriptive$sd*values+varobj$original_descriptive$mean
+      if (varobj$scaling=="standardized") 
+        values<-varobj$original_descriptive$sd*values+varobj$original_descriptive$mean
+      if (varobj$scaling=="log") 
+        values<-exp(values)
+      
+      values<-round(values,digits = len)
+
+      values
       
     }
     

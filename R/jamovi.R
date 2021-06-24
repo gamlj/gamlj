@@ -62,18 +62,20 @@ bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
 ######### tables #########
 
-j.expand_table<-function(table,alist,type="text", keys=alist,superTitle=NULL,append=FALSE,names64=TRUE) {
+j.expand_table<-function(table,alist,type="text", keys=alist,superTitle=NULL,append=FALSE,names64=TRUE,startAt=1) {
  
-  j<-0
   if (append) {
-    j<-length(table$columns)-1
+    startAt<-length(table$columns)
   }
   if (names64)    keys<-tob64(keys) else  keys<-make.names(keys,unique = T)
   labels<-alist
-
+  
+  startAt<-startAt-1
   for (i in seq_along(keys)) {
+    j<-startAt+i
     cb <- (i<length(keys)  | length(keys)==1) 
-    table$addColumn(name = keys[[i]], title = labels[[i]], index = (i+j), superTitle = superTitle, type=type, combineBelow=cb)
+    if (keys[[i]]=="vs") cb=FALSE
+    table$addColumn(name = keys[[i]], title = labels[[i]], index = j, superTitle = superTitle, type=type, combineBelow=cb)
   }
 
 
@@ -133,7 +135,8 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
 
   if (!is.something(obj))
     return()
-  
+
+
   last<-start-1
   if (append)  last<-table$rowCount
   

@@ -29,9 +29,20 @@ gamljGzlmClass <- R6::R6Class(
       
       ### r2 table does not need initializing ###
       
+      ### additional indices table ###
+      j.init_table(self$results$main$fit,estimate_machine$tab_fit)
+      
+      
       ### anova table ###
       j.init_table(self$results$main$anova,estimate_machine$tab_anova) 
+
       
+      ### relative risk table ###
+      j.init_table(self$results$main$relativerisk,estimate_machine$tab_relativerisk,ci=TRUE,ciwidth=self$options$ciWidth) 
+      if (!is.something(self$options$factors))
+        self$results$main$relativerisk$getColumn('label')$setVisible(FALSE)
+      
+            
       ### estimates table ###
       j.init_table(self$results$main$coefficients,estimate_machine$tab_coefficients, 
                    ci=T,ciformat="{}% C.I.", ciwidth=self$options$ciWidth)
@@ -83,7 +94,7 @@ gamljGzlmClass <- R6::R6Class(
           aGroup <- self$results$simpleInteractions$addItem(key = i)
           aTable<-aGroup$interactionCoefficients
           term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
-          j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
+          j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator",startAt=2)
           title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
           j.init_table(aTable,FALSE, ci=T,ciwidth=self$options$ciWidth,title=title)
           
@@ -141,7 +152,11 @@ gamljGzlmClass <- R6::R6Class(
           term<-self$options$posthoc[[i]]
           aTable<-self$results$posthoc$get(key = term)
           aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
-          j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
+          j.expand_table(aTable,
+                         names(estimate_machine$tab_posthoc[[i]]),
+                         superTitle="Comparison",
+                         names64=FALSE,
+                         startAt=2)
           j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
         } 
         
@@ -183,7 +198,14 @@ gamljGzlmClass <- R6::R6Class(
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
       
-      ## posssible main problems to report
+      if (is.something(private$.estimate_machine$errors)) 
+            stop(paste(private$.estimate_machine$errors,collapse = " ; "))
+      
+      
+      
+      ## info table and posssible main problems to report
+      j.fill_table(self$results$info,private$.estimate_machine$tab_info) 
+      
       j.add_warnings(self$results$info,private$.data_machine,"data")
       j.add_warnings(self$results$info,private$.estimate_machine,"info")
       
@@ -191,10 +213,20 @@ gamljGzlmClass <- R6::R6Class(
       j.fill_table(self$results$main$r2,private$.estimate_machine$tab_r2)
       j.add_warnings(self$results$main$r2,private$.estimate_machine,"tab_r2")
       
+      ## additional fit indices table ###
+      
+      j.fill_table(self$results$main$fit,private$.estimate_machine$tab_fit)
+      j.add_warnings(self$results$main$fit,private$.estimate_machine,"tab_fit")
       
       ## anova table ###
       j.fill_table(self$results$main$anova,private$.estimate_machine$tab_anova)
       j.add_warnings(self$results$main$anova,private$.estimate_machine,"tab_anova")
+
+      ## relative risk table ###
+      j.fill_table(self$results$main$relativerisk,private$.estimate_machine$tab_relativerisk)
+      j.add_warnings(self$results$main$relativerisk,private$.estimate_machine,"tab_relativerisk")
+      
+      
 
       ### parameter estimates
       j.fill_table(self$results$main$coefficients,private$.estimate_machine$tab_coefficients)
@@ -233,48 +265,42 @@ gamljGzlmClass <- R6::R6Class(
         } 
       }
       
+      ###  emmeans 
       
+      if (is.something(private$.estimate_machine$tab_emmeans)) {
+        
+        for (i in seq_along(self$options$emmeans)) {
+          term<-self$options$emmeans[[i]]
+          aTable<-self$results$emmeans$get(key = jmvcore::stringifyTerm(term))
+          j.fill_table(aTable,private$.estimate_machine$tab_emmeans[[i]])
+          j.add_warnings(aTable,private$.estimate_machine,"tab_emmeans")
+        } 
+      }
       
+      private$.plotter_machine$preparePlots()
+      j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
       
+      #save model preds and resids            
+      private$.estimate_machine$savePredRes(self$results) 
+      
+      private$.plotter_machine$preparePlots()
+      j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
+
+    },
+
+    .mainPlot=function(image, ggtheme, theme, ...) {
+      
+      if (is.something(private$.estimate_machine$errors))
+          return()
+      
+      plot<-private$.plotter_machine$scatterPlot(image)
+      plot<-plot + ggtheme
+      
+      return(plot)
       
     },
-  .estimate=function(form,data) {
-    modelType<-self$options$modelSelection
-    afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
-    if (modelType=="multinomial") {
-      mark("Estimating multinomial")
-      model<-nnet::multinom(form,data,model = T)
-      model$call$formula<-as.formula(model)
-      ### save info for R refit ####
-      attr(model,"refit")<-list(lib="nnet",
-                                command="multinom",
-                                coptions=list(formula=private$.names64$translate(form)),
-                                eoptions=list(formula=private$.names64$translate(form),model=TRUE))
-      return(model)
-    }
-    if (modelType=="nb") {
-      model<-MASS::glm.nb(form,data)
-      ### save info for R refit ####
-      attr(model,"refit")<-list(lib="MASS",
-                                command="glm.nb",
-                                coptions=list(formula=private$.names64$translate(form)),
-                                eoptions=list(formula=private$.names64$translate(form)))
-      
-      return(model)
-    }
-    model<-stats::glm(form,data,family=afamily)
-    ### save info for R refit ####
-    cfamily<-paste0(afamily$family,"(",afamily$link,")")
-    attr(model,"refit")<-list(command="glm",
-                              coptions=list(formula=private$.names64$translate(form),family=cfamily),
-                              eoptions=list(formula=private$.names64$translate(form),family=afamily))
     
-  
-    model
-  },
-  
-
-
+    
 
 
 .formula=function() {

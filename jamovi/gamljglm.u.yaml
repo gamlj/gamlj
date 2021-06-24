@@ -204,6 +204,14 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+                  - name: simpleScaleLabels_uvalues
+                    type: RadioButton
+                    optionName: simpleScaleLabels
+                    optionPart: uvalues
+                  - name: simpleScaleLabels_uvalues_labels
+                    type: RadioButton
+                    optionName: simpleScaleLabels
+                    optionPart: uvalues_labels
           - type: Label
             label: Dependent variable
             children:
@@ -269,23 +277,21 @@ children:
         children:
           - type: TargetLayoutBox
             children:
-                - type: VariablesListBox
-                  name: plotHAxis
-                  isTarget: true
-                  maxItemCount: 1
+              - type: VariablesListBox
+                name: plotHAxis
+                isTarget: true
+                maxItemCount: 1
           - type: TargetLayoutBox
             children:
-                - type: VariablesListBox
-                  name: plotSepLines
-                  isTarget: true
-                  maxItemCount: 1
-
+              - type: VariablesListBox
+                name: plotSepLines
+                isTarget: true
+                maxItemCount: 1
           - type: TargetLayoutBox
             children:
-                - type: VariablesListBox
-                  name: plotSepPlots
-                  isTarget: true
-
+              - type: VariablesListBox
+                name: plotSepPlots
+                isTarget: true
       - type: LayoutBox
         margin: large
         style: inline
@@ -319,6 +325,11 @@ children:
                 name: plotRaw
               - type: CheckBox
                 name: plotDvScale
+          - type: Label
+            label: Use
+            children:
+              - type: CheckBox
+                name: plotOriginalScale
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -347,8 +358,6 @@ children:
       - type: CheckBox
         name: simpleInteractions
         label: Simple interactions
-               
-                
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true

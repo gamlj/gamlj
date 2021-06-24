@@ -4,7 +4,7 @@ title: Generalized Mixed Models
 menuGroup: Linear Models
 version: '2.0.0'
 jas: '1.2'
-export: false
+export: true
 completeWhenFilled: false
 description:
     main: Generalized Mixed Linear Model

@@ -146,6 +146,9 @@ gamljGlmClass <- R6::R6Class(
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
       
+      ### info table ###
+      j.fill_table(self$results$info,private$.estimate_machine$tab_info) 
+      
       j.add_warnings(self$results$info,private$.data_machine,"data")
       j.add_warnings(self$results$info,private$.estimate_machine,"info")
       
@@ -230,34 +233,13 @@ gamljGlmClass <- R6::R6Class(
 
 
 .mainPlot=function(image, ggtheme, theme, ...) {
-
+  
   plot<-private$.plotter_machine$scatterPlot(image)
   plot<-plot + ggtheme
   
   return(plot)
   
-  depName <- self$options$dep
-  groupName <- self$options$plotHAxis
-  linesName <- self$options$plotSepLines
-  plotsName <- self$options$plotSepPlots
-  errorType <- self$options$plotError
-  ciWidth   <- self$options$ciWidth
-  
-  
-  if (errorType=="ci")
-    errorType<-paste0(ciWidth,"% ",toupper(errorType))
-  
-  if ( ! is.null(linesName)) {
-    p<-gplots.twoWaysPlot(image,ggtheme,depName,groupName,linesName,errorType)
-  } else {
-    p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType)
-  }       
-  return(p)
 },
-
-
-
-
 
 
 

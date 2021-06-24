@@ -58,12 +58,18 @@ procedure.posthoc <- function(Obj) {
     if (is.character(none)) 
       Obj$warnings<-list(topic="posthoc", WARNS["ph.nojoy"]) 
     else {
-        tableData <- as.data.frame(none)
+        tableData <- as.data.frame(none, stringAsFactors = FALSE)
         tableData$contrast <- as.character(tableData$contrast)
-        colnames(tableData) <- c("contrast", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
-        tableData$bonf <- bonferroni[, 6]
-        tableData$holm <- holm[, 6]
-        tableData$tukey <- tukey[, 6]
+        
+        if (length(names(tableData)!=8))
+          
+              colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
+        else
+              colnames(tableData) <- c("contrast", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
+        
+        tableData$bonf <- bonferroni$p.value
+        tableData$holm <- holm$p.value
+        tableData$tukey <- tukey$pvalue
       }
     
     .cont <- as.character(tableData$contrast)
@@ -84,6 +90,10 @@ procedure.posthoc <- function(Obj) {
 #    tableData <- tableData[eval(parse(text = sortstring)), ]
     for (col in cols)
       tableData[,col]<-as.character(tableData[,col])
+    
+    if ("Response" %in% names(tableData))
+        tableData$Response<-as.character(tableData$Response)
+
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
   ginfo("Populate posthoc done")
@@ -106,32 +116,27 @@ procedure.posthoc <- function(Obj) {
       labs <- referenceGrid@grid[terms]
       newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
-      table <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(ci,TRUE))
+      results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(ci,TRUE))
       
     })
-  table
+  results
 }
 
-.posthoc.multinom <- function(model, term, adjust) {
+.posthoc.multinom <- function(model, term, adjust,ci=FALSE) {
+  
   results <- try({
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)
     tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
     data <- mf.getModelData(model)
     suppressMessages({
-      
       referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
-#      newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
-#      referenceGrid@grid[terms] <- newlabs
-      res <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(TRUE,TRUE))
-      
-      
+      newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
+      referenceGrid@grid[terms] <- newlabs
+      results <- summary(graphics::pairs(referenceGrid, by=dep, adjust = adjust),infer = c(ci,TRUE))
     })
-    res <- as.data.frame(res)
-    res[, dep] <- NULL
-    res
   })
   
   return(results)
@@ -150,6 +155,11 @@ procedure.emmeans<-function(obj) {
   for (term in terms) {
     ### we need to reverse the term because emmeans order levels in a strange way
     term64<-tob64(rev(term))
+    
+    ## include the dependent for multinomial ##
+    if (obj$options$modelSelection=="multinomial")
+        term64<-c(obj$datamatic$dep$name64,term64)
+    
     ## first we get the levels of covs at which to condition the estimation ##
     ## we also get the labels for those values ####
     conditions<-list()
@@ -160,7 +170,12 @@ procedure.emmeans<-function(obj) {
       }
     }
     ### now we get the estimated means #######
-    referenceGrid<-emmeans::emmeans(obj$model,specs=term64,at=conditions,nesting = NULL,lmer.df = "Satterthwaite")
+    referenceGrid<-emmeans::emmeans(obj$model,
+                                    specs=term64,
+                                    at=conditions,
+                                    type="response",
+                                    nesting = NULL,
+                                    lmer.df = "Satterthwaite")
     tableData<-as.data.frame(referenceGrid)
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","ci.lower","ci.upper")
@@ -168,25 +183,16 @@ procedure.emmeans<-function(obj) {
     ### fix the labels  ###
 
     for (.name in term64) {
-      res[[.name]]<-factor(res[[.name]])
-      levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
-      res[[.name]]<-as.character(res[[.name]])
+      tableData[[.name]]<-factor(tableData[[.name]])
+      levels(tableData[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+      tableData[[.name]]<-as.character(tableData[[.name]])
     }
+
+    ## rename the dependent for multinomial ##
+    if (obj$options$modelSelection=="multinomial")
+         names(tableData)[1]<-"Response"
     
-    
-    for (.name in names(labels)) {
-      vardata<-tableData[[.name]]
-      labs<-labels[[.name]]
-      values<-unique(vardata)
-      for (i in seq_along(values))
-                vardata[vardata==values[i]]<-labs[i]
-      tableData[[.name]]<-vardata
-    }
-    
-    ### make sure they are not factors or stuff    
-    for (.name in term64) 
-        tableData[[.name]]<-as.character(tableData[[.name]])
-    
+        
     results[[length(results)+1]]<-tableData
   }
   
@@ -195,10 +201,12 @@ procedure.emmeans<-function(obj) {
 }  
   
 
+procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
-procedure.simpleEffects<-function(obj) {
+
+.simpleEffects.default<-function(model,obj) {
   
-  ginfo("Simple Effects")
+  ginfo("Generic Simple Effects")
   variable<-obj$options$simpleVariable
   variable64<-tob64(variable)
   term<-obj$options$simpleModerators
@@ -221,32 +229,47 @@ procedure.simpleEffects<-function(obj) {
       }
     }
     ### now we get the estimated means #######
+    
     if (varobj$type=="factor") {
-            ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
-            referenceGrid<-emmeans::emmeans(obj$model,specs=c(variable64,term64),at=conditions,nesting = NULL,lmer.df = "Satterthwaite")
-            estimates<-emmeans::contrast(referenceGrid,
-                                         by=term64,
-                                         method =.local.emmc,datamatic=varobj)
-            res<-as.data.frame(estimates)
+      ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
+      referenceGrid<-emmeans::emmeans(model,
+                                      specs=c(variable64,term64),
+                                      at=conditions,
+                                      nesting = NULL,
+                                      lmer.df = "Satterthwaite")
+      estimates<-emmeans::contrast(referenceGrid,
+                                   by=term64,
+                                   method =.local.emmc,
+                                   datamatic=varobj)
+      
+      
+    }
+    else {
+      args<-list(obj$model,specs = term64, var = variable64, at = conditions,infer=c(T,T))
+      estimates <- do.call(emmeans::emtrends, args)
+      
+    }
+    ##
+    res<-as.data.frame(estimates)
+
+    if (varobj$type=="factor") {
+      
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
             res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
             names(res)<-c("contrast",term64,"estimate","se","df","test","p","ci.lower","ci.upper")
-
-    }
-    else {
-            args<-list(obj$model,specs = term64, var = variable64, at = conditions,infer=c(T,T))
-            estimates <- do.call(emmeans::emtrends, args)
-            res <- as.data.frame(estimates)
+            
+    } else {
             names(res)<-c(term64,"estimate","se","df","ci.lower","ci.upper","test","p")
             res$contrast<-varobj$name
-
     }
-
+    
+    
     for (.name in term64) {
-      res[[.name]]<-factor(res[[.name]])
-      levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
-      res[[.name]]<-as.character(res[[.name]])
+            res[[.name]]<-factor(res[[.name]])
+            levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+            res[[.name]]<-as.character(res[[.name]])
     }
+    
     res$contrast<-as.character(res$contrast)
     
     params<-res
@@ -261,20 +284,18 @@ procedure.simpleEffects<-function(obj) {
       levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
       res[[.name]]<-as.character(res[[.name]])
     }
-    
-    
+
     ### make fix dependending of the type of model ###    
     class(res)<-c(paste0("simple_",obj$options$modelSelection),class(res))
     anova<-mf.fixTable(res)
     ### check some stuff 
     .all <- c(term64,variable64)
-    test <- sapply(.all,function(x) .is.scaleDependent(obj$model,x))
+    test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
     .issues <- .all[test]
-    if (is.something(test))
+    if (is.something(.issues))
       obj$warnings<-list(topic="tab_simpleAnova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
     
-    
-    
+
   ginfo("End of Simple Effects")
   return(list(anova,params))
 
@@ -295,7 +316,82 @@ procedure.simpleEffects<-function(obj) {
 }
 
 
-## this is hubly supercool ###
+
+
+.simpleEffects.multinom<-function(model,obj) {
+
+        mark("multinom simple effects")
+  
+        levels <-lapply(obj$options$simpleModerators, function(x) {
+    
+                if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
+                        seq_along(obj$datamatic$variables[[tob64(x)]]$levels)
+                else 
+                        obj$datamatic$variables[[tob64(x)]]$levels
+            })
+  
+  
+        vars  <- lapply(obj$options$simpleModerators, function(x) obj$datamatic$variables[[tob64(x)]])
+  
+        rows  <- expand.grid(levels)
+        names(rows)  <-  tob64(obj$options$simpleModerators)
+        variable64   <-  tob64(obj$options$simpleVariable)
+        varobj       <-  obj$datamatic$variables[[variable64]]
+  
+        .names       <-  names(rows)
+         parameters  <-  data.frame()
+         anovas  <-  data.frame()
+         
+         data64      <-  mf.getModelData(model)
+         
+         for (i in 1:nrow(rows)) {
+                .data1<-data64
+                 for (.name in .names) {
+                        if (is.factor(.data1[[.name]]))
+                               contrasts(.data1[[.name]])<-contr.treatment(nlevels(.data1[[.name]]),base = rows[i,.name])
+                        else
+                               .data1[[.name]]<-.data1[[.name]]-rows[i,.name]
+                 }
+                 .model  <-  update(model,data=.data1)
+                 params  <-  as.data.frame(parameters::parameters(.model))
+                 params  <-  params[params$Parameter %in% varobj$paramsnames64,]
+                 params[,.names]  <-  rows[i,]         
+                 parameters  <-  rbind(parameters,params)
+                 oneanova <- car::Anova(.model,test="LR",type=3,singular.ok=T)
+                 oneanova <- oneanova[rownames(oneanova) %in% varobj$name64,]
+                 oneanova[,.names]  <-  rows[i,]         
+                 anovas   <- rbind(anovas,oneanova)
+    
+         }
+         names(parameters)[1:8]<-c("contrast","estimate","se","nothing","ci.lower","ci.upper","test","df","p")
+         
+         for (.name in .names) {
+           parameters[[.name]]<-factor(parameters[[.name]])
+           levels(parameters[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+           parameters[[.name]]<-as.character(parameters[[.name]])
+         }
+         ### fix labels for  the response contrasts
+         parameters$Response<-factor(parameters$Response)
+         levels(parameters$Response)<-unlist(obj$datamatic$dep$contrast_labels)
+         parameters$Response<-as.character(parameters$Response)
+         
+         ### fix labels for the contrast column ###
+         parameters$contrast<-factor(parameters$contrast)
+         levels(parameters$contrast)<-unlist(varobj$contrast_labels)
+         parameters$contrast<-as.character(parameters$contrast)
+         
+         names(anovas)[1:3]<-c("test","df1","p")
+         
+         for (.name in .names) {
+           anovas[[.name]]<-factor(anovas[[.name]])
+           levels(anovas[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+           anovas[[.name]]<-as.character(anovas[[.name]])
+         }
+         
+
+         return(list(anovas,parameters))
+}
+## this is humbly supercool ###
 ## we want the simple interactions nested in the highest interaction required
 procedure.simpleInteractions<-function(obj) {
   
@@ -407,6 +503,8 @@ procedure.simpleInteractions<-function(obj) {
   })
   FALSE
 }
+
+
 
 
 

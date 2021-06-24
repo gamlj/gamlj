@@ -33,8 +33,13 @@ mod<-gamlj::gamljGzlm(
   simpleVariable = "write",
   simpleModerator = "honors",
   plotHAxis = "write",
-  showContrastCode=T
+  showContrastCode=T,
+  plotOriginalScale=T
   )
+
+
+
+
 
 r.anova<-mod$main$anova$asDF
 r.show<-as.character(mod$main$contrastCodeTables[[1]]$asDF[1,3])

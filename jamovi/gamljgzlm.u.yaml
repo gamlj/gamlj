@@ -269,9 +269,14 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
-          - type: Label
-            label: Dependent variable
-            children: []
+                  - name: simpleScaleLabels_uvalues
+                    type: RadioButton
+                    optionName: simpleScaleLabels
+                    optionPart: uvalues
+                  - name: simpleScaleLabels_uvalues_labels
+                    type: RadioButton
+                    optionName: simpleScaleLabels
+                    optionPart: uvalues_labels
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -378,10 +383,17 @@ children:
             children:
               - type: CheckBox
                 name: plotRaw
-                enable: (!modelSelection_multinomial)
+                enable: (!modelSelection_multinomial && !plotLp)
               - type: CheckBox
                 name: plotDvScale
-                enable: (!modelSelection_multinomial)
+                enable: (!modelSelection_multinomial && !plotLp)
+              - type: CheckBox
+                name: plotLp
+          - type: Label
+            label: Use
+            children:
+              - type: CheckBox
+                name: plotOriginalScale
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

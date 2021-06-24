@@ -5,7 +5,7 @@ menuGroup: Linear Models
 version: '2.0.0'
 jas: '1.2'
 completeWhenFilled: false
-export: false
+export: true
 description:
     main: Mixed Linear Model
     R:

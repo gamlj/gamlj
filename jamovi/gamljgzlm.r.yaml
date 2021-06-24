@@ -16,10 +16,11 @@ items:
          title: "Info"
        - name: value
          type: text
-         title: "Value"
+         title: ""
        - name: specs
          type: text
-         title: "Comment"
+         title: ""
+
     clearWith:
         - dep
         - factors
@@ -48,6 +49,8 @@ items:
                     - name: ar2
                       title: Adj. R²
                       type: number
+                      visible: (!modelSelection:multinomial)
+
                     - name:  df
                       title: df
                       type: integer
@@ -58,10 +61,30 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
+           - name: fit
+             title: Additional indices
+             type: Table
+             visible: true
+             columns:
+                    - name: info
+                      type: text
+                      title: "Info"
+                    - name: value
+                      type: text
+                      title: "Value"
+                    - name: specs
+                      type: text
+                      title: "Comment"
+             clearWith:
+                  - dep
+                  - factors
+                  - cov
+                  - modelTerms
+                  - fixedIntercept
   
 
            - name: anova
-             title: ANOVA Omnibus tests
+             title:  Omnibus tests
              type: Table
              description: a table of ANOVA results
              clearWith:
@@ -101,6 +124,11 @@ items:
                     - paramCIWidth
 
              columns:
+                    - name: Response
+                      title: Response contrast
+                      type: text
+                      visible: (modelSelection:multinomial)
+                      combineBelow: true
                     - name: source
                       title: "Names"
                       type: text
@@ -137,6 +165,48 @@ items:
                       visible: (effectSize:expb & showExpbCI)
                     - name: t
                       title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+           - name: relativerisk
+             title: Relative risk
+             type: Table
+             visible: (effectSize:RR)
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - fixedIntercept
+                    - effectSize
+                    - ciWidth
+             columns:
+                    - name: source
+                      title: "Names"
+                      type: text
+                      visible: (showRealNames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "RR"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: ci.lower
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: ci.upper
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+                    - name: test
+                      title: X²
                       type: number
                     - name: p
                       title: "p"
@@ -191,6 +261,11 @@ items:
               - posthoc
   
         columns:
+        - name: Response
+          title: Response level
+          type: text
+          visible: (modelSelection:multinomial)
+          combineBelow: true
         - name: estimate
           title: Difference
           type: number
@@ -297,6 +372,11 @@ items:
                  - simpleScaleLabels
 
               columns:
+                     - name: Response
+                       title: Response contrast
+                       type: text
+                       visible: (modelSelection:multinomial)
+
                      - name: contrast
                        title: "Effect"
                        type: text
@@ -309,11 +389,11 @@ items:
                      - name: ci.lower
                        type: number
                        title: Lower
-                       visible: (showParamsCI)
+                       visible: (showParamsCI || showExpbCI)
                      - name: ci.upper
                        type: number
                        title: Upper
-                       visible: (showParamsCI)
+                       visible: (showParamsCI || showExpbCI)
                      - name: test
                        title: "z"
                        type: number
@@ -411,15 +491,16 @@ items:
         type: Table
         clearWith: []
         columns:
+        - name: Response
+          title: Response level
+          type: text
+          visible: (modelSelection:multinomial)
         - name: estimate
           title: 'Mean'
           type: number
         - name: se
           title: SE
           type: number
-        - name: df
-          title: df
-          type: integer
         - name: ci.lower
           title: Lower 
           type: number
@@ -434,7 +515,7 @@ items:
     type: Array
     description: an array of results plots
     template:
-          title: $key
+          title: ""
           type: Image
           renderFun: .mainPlot
           width: 600
@@ -457,6 +538,8 @@ items:
            - plotRaw
            - percvalue
            - cvalue
+           - plotLp
+           - plotOriginalScale
 
 
   - name: plotnotes
@@ -483,3 +566,5 @@ items:
         - dep
         - factors
         - covs
+
+
