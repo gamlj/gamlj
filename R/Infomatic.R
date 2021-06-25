@@ -154,7 +154,9 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "probabilities"
               
         ### compute direction ###
-        self$direction     <-   c("y","Dependent variable counts")
+        theory             <-   "P(Y=j)/P(Y=0)"
+        actual             <-  paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
+        self$direction     <-   c(theory, actual)
         self$deptype       <-   "factor"
         self$depnlevels    <-   -3
         self$fit<-c("lik" , "aic",  "bic",  "dev")

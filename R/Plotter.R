@@ -13,6 +13,7 @@ Plotter <- R6::R6Class(
       scatterX=NULL,
       scatterXscale=FALSE,
       scatterZ=NULL,
+      scatterModerators=NULL,
       scatterBars=FALSE,
       scatterRaw=FALSE,
       initialize=function(operator,results) {
@@ -136,8 +137,15 @@ Plotter <- R6::R6Class(
             y<-self$options$dep
             x<-self$options$plotHAxis
             z<-self$options$plotSepLines
-
             moderators<-self$options$plotSepPlots
+            
+            if (self$options$modelSelection=="multinomial") {
+              
+                     moderators < c(z,moderators)
+                     z   <- self$options$dep
+            }
+            
+            
             dims<-unlist(lapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$nlevels))
 
             if (!is.something(dims))
@@ -151,6 +159,8 @@ Plotter <- R6::R6Class(
              ### some options here 
              self$scatterX<-private$.datamatic$variables[[tob64(x)]]
              self$scatterY<-private$.datamatic$variables[[tob64(y)]]
+             self$scatterModerators<-moderators
+             
              if (is.something(z))
                      self$scatterZ<-private$.datamatic$variables[[tob64(z)]]
              
@@ -178,7 +188,7 @@ Plotter <- R6::R6Class(
 
       resultsgroup<-private$.results$get("mainPlots")
       
-      moderators<-self$options$plotSepPlots
+      moderators<-self$scatterModerators
 
       
       ### give a range to the y-axis, if needed
@@ -210,12 +220,13 @@ Plotter <- R6::R6Class(
            
       
       if (is.something(dims))  {
+        
              grid<-expand.grid(dims,stringsAsFactors = FALSE)
             .names<-names(grid)
             .names64<-tob64(.names)
              selectable<-intersect(.names,self$options$factors)
              selgrid<-as.data.frame(grid[,selectable])
-             .sel64<-tob64(selectable)
+            .sel64<-tob64(selectable)
 
              for (i in 1:nrow(grid)) {
                 label<-paste(.names,grid[i,],sep="=",collapse = " , ")
@@ -276,7 +287,6 @@ Plotter <- R6::R6Class(
           type<-"link"
           self$scatterRaw<-FALSE
           self$scatterRange<-NULL
-        
       }
       
 

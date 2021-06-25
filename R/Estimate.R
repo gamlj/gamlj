@@ -120,7 +120,6 @@ Estimate <- R6::R6Class("Estimate",
                               results<-try_hard(do.call(FUNC,opts))
                               self$model<-results$obj
                               self$warnings<-list(topic="info", message=results$warning)
-                              self$errors<-list(topic="info", message=results$error)
                               if (!isFALSE(results$error))
                                  stop(results$error)
                               
@@ -256,9 +255,11 @@ Estimate <- R6::R6Class("Estimate",
                             if (!is.something(self$tab_simpleAnova))
                               return()
                             
-                            tables<-procedure.simpleEffects(self$model,self)
-                            self$tab_simpleAnova<-tables[[1]]
-                            self$tab_simpleCoefficients<-tables[[2]]
+                            results<-try_hard(procedure.simpleEffects(self$model,self))
+                            self$warnings  <- results$warning
+                            self$errors    <- results$error
+                            self$tab_simpleAnova         <-  results$obj[[1]]
+                            self$tab_simpleCoefficients  <-  results$obj[[2]]
 
                           },
                           

@@ -422,6 +422,8 @@ children:
       - type: CheckBox
         name: simpleInteractions
         label: Simple interactions
+        enable: (!modelSelection_multinomial)
+
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
