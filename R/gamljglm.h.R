@@ -996,8 +996,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 template=R6::R6Class(
                     inherit = jmvcore::Group,
                     active = list(
-                        interactionAnova = function() private$.items[["interactionAnova"]],
-                        interactionCoefficients = function() private$.items[["interactionCoefficients"]]),
+                        anova = function() private$.items[["anova"]],
+                        coefficients = function() private$.items[["coefficients"]]),
                     private = list(),
                     public=list(
                         initialize=function(options) {
@@ -1008,7 +1008,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 clearWith=list())
                             self$add(jmvcore::Table$new(
                                 options=options,
-                                name="interactionAnova",
+                                name="anova",
                                 title="ANOVA test -  $key",
                                 columns=list(
                                     list(
@@ -1034,7 +1034,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `format`="zto,pvalue"))))
                             self$add(jmvcore::Table$new(
                                 options=options,
-                                name="interactionCoefficients",
+                                name="coefficients",
                                 title="Parameter Estimates for -  $key",
                                 columns=list(
                                     list(

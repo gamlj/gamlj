@@ -11,7 +11,6 @@ Estimate <- R6::R6Class("Estimate",
                           model=NULL,
                           summary=NULL,
                           anova=NULL,
-                          optimizer=NULL,
                           ciwidth=NULL,
                           subclass=NULL,
                           initialize=function(options,datamatic) {
@@ -22,6 +21,8 @@ Estimate <- R6::R6Class("Estimate",
                           estimate = function(data) {
                             private$.estimateModel(data)
                             private$.estimateTests()
+                            private$.estimateFitIndices()
+                            private$.estimateRandom()
                             private$.estimatePostHoc()
                             private$.estimateEffectSizes()
                             private$.estimateIntercept()
@@ -116,14 +117,14 @@ Estimate <- R6::R6Class("Estimate",
                                         opts[[opt]]<-self$infomatic$calloptions[[opt]]    
                               
                               FUNC<-eval(parse(text=self$infomatic$rcall))
-
+                              
                               results<-try_hard(do.call(FUNC,opts))
                               self$model<-results$obj
                               self$warnings<-list(topic="info", message=results$warning)
                               if (!isFALSE(results$error))
                                  stop(results$error)
                               
-                              self$model<-mf.fixModel(self$model)
+                              self$model<-mf.fixModel(self$model,self)
 
 
                           },
@@ -132,8 +133,9 @@ Estimate <- R6::R6Class("Estimate",
                                 ### update info table
                                 self$tab_info[["sample"]]$value<-self$datamatic$N
                                 
-                                if (is.something(self$optimizer))
-                                     self$tab_info[["opt"]]$value<-self$optimizer
+                                ## TODO: generalize if other models need an optimizer other than lmer
+                                if (isTRUE(self$infomatic))
+                                     self$tab_info[["optim"]]$value<-self$model@optinfo$optimizer
                                 
                                 self$tab_info[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
                                 
@@ -144,39 +146,116 @@ Estimate <- R6::R6Class("Estimate",
                                 ### coefficients table ###
                                 
                                 if (self$isProper) {
-                                  
-                                    results      <-  try_hard(parameters::parameters(self$model,exponentiate=FALSE))
-                                    
-                                    if (is.something(results$warning))
-                                            self$warnings<-list(topic="tab_coefficients",message=results$warning)
-
-                                    coefficients       <-  as.data.frame(results$obj)
-                                    coefficients$CI    <-  NULL
-                                    names(coefficients)[1:8]<-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
-                                  
-                                   if (self$option("effectSize","expb")) {
-                                         ex            <-  as.data.frame(parameters::parameters(self$model,exponentiate=TRUE))
-                                         ex            <-  ex[,c("Coefficient","CI_low" ,"CI_high")]
-                                         names(ex)     <-  c("expb","expb.ci.lower","expb.ci.upper")
-                                         coefficients  <-  cbind(coefficients,ex)
-                                   }
-                                    
-                                   if (self$option("effectSize","beta"))
-                                         coefficients$beta  <-  procedure.beta(self$model)
-                                  
-                                   self$tab_coefficients  <-  private$.fix_names(coefficients)
+                                    coefficients       <-  mf.parameters(self$model,self)
+                                    coefficients       <-  private$.fix_names(coefficients)
+                                    self$tab_coefficients  <-  coefficients
                                 }
                                 
                                 
 
                                 ### other table ###
-
-                                self$tab_anova<-mf.anova(self$model,self)
+                                
+                                 self$tab_anova<-mf.anova(self$model,self)
+                                
                                 if (!self$isProper) 
                                   self$warnings<-list(topic="tab_anova",message=WARNS["glm.zeromodel"])
                                 
                                 self$tab_r2<-fit.R2(self$model,self)
-                                self$tab_fit<-fit.indices(self$model,self)
+                                
+                                
+                          },
+                          .estimateFitIndices=function() {
+                            
+                            for (name in names(self$tab_fit)) {
+                              
+                              if (name=="lik")
+                                  self$tab_fit[["lik"]]$value<-as.numeric(stats::logLik(self$model))
+                              if (name=="aic")
+                                  self$tab_fit[["aic"]]$value<-stats::AIC(self$model)
+                              if (name=="bic")
+                                  self$tab_fit[["bic"]]$value<-stats::BIC(self$model)
+                              if (name=="dev")
+                                  self$tab_fit[["dev"]]$value<-stats::deviance(self$model)
+                              if (name=="drf")
+                                  self$tab_fit[["dfr"]]$value<-stats::df.residual(self$model)
+                              if (name=="over") {
+                                  value <- sum(stats::residuals(self$model, type = "pearson")^2)
+                                  result <- value/stats::df.residual(self$model)
+                                  self$tab_fit[["over"]]$value<-result
+                              }
+                        
+                            }
+                            
+                            
+                          },
+                          .estimateRandom=function() {
+                            
+                                ### random components data frame ######
+                                  if (is.null(self$tab_random))
+                                      return()
+                                  vc<-as.data.frame(lme4::VarCorr(self$model))
+                                  variances<-which(is.na(vc$var2))
+                                  covariances<-which(!is.na(vc$var2))
+                                  params<-vc[variances,]
+                                  names(params)<-c("groups","name","nothing","var","std")
+                                  params$groups <- fromb64(params$groups,self$vars)
+                                  params$name <- fromb64(params$name,self$vars)
+                                  params$icc<-params$var/(params$var+params$var[length(params$var)])
+                                  params$icc[length(params$icc)]<-NA
+                                  
+                                  ### confidence intervals
+                                  ci_covariances<-NULL
+                                  if (self$option("ciRE")) {
+                                    
+                                      method     <-  ifelse(self$options$cimethod=="wald","Wald",self$options$cimethod)
+                                      results    <-  try_hard(stats::profile(self$model,which="theta_",optimizer=self$model@optinfo$optimizer,prof.scale=c("varcov")))
+
+                                      self$warnings<-list(topic="tab_random",message=results$warning)
+
+                                      ci         <-  as.data.frame(confint(results$obj,parm = "theta_",level = self$ciwidth, method=method))
+                                      names(ci)  <-  c("ci.lower","ci.upper")
+                                      ci_var_pos <-  unlist(lapply(names(lme4::getME(self$model,"theta")), function(n) length(strsplit(n,".",fixed = T)[[1]][-1])==1))
+                                      ci_variances <- ci[ci_var_pos,]
+                                      ci_covariances <- ci[!ci_var_pos,]
+                                      params<-cbind(params,ci_variances)
+                                      self$warnings<-list(topic="tab_random",message="C.I. are computed with the profile method")
+                                  }
+
+                                  self$tab_random<-params
+                                  ngrp<-vapply(self$model@flist,nlevels,1)
+                                  .names<-fromb64(names(ngrp))
+                                  info<-paste("Number of Obs:", self$model@devcomp$dims[[1]],", groups:",paste(.names),ngrp,collapse = ", ")
+                                  self$warnings<-list(topic="tab_random",message=info)
+
+
+                                if (is.something(covariances)) {
+                                  
+                                  params<-vc[covariances,]
+                                  params$grp<-fromb64(params$grp,self$vars)
+                                  params$var1<-fromb64(params$var1,self$vars)
+                                  params$var2<-fromb64(params$var2,self$vars)
+                                  if (is.something(ci_covariances))
+                                     params<-cbind(params,ci_covariances)
+                                  
+                                  self$tab_randomCov<-params
+
+                                }
+                          
+
+                                #### LRT for random effects ####
+                                if (self$option("lrtRandomEffects")) {
+                                  
+                                  results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
+                                  self$warnings<-list(topic="tab_randomTests",message=results$warning)
+                                  if (!isFALSE(results$error))
+                                     self$errors<-list(topic="tab_randomTests",message=paste("LR tests cannot be computed",results$error))
+                                  else {
+                                    ranova_test<-results$obj[-1,]
+                                    ranova_test$test<-fromb64(rownames(results$obj[-1,]),self$vars)
+                                    self$tab_randomTests<-ranova_test
+                                  }
+                                }
+                                
 
                             },
 
@@ -254,14 +333,12 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (!is.something(self$tab_simpleAnova))
                               return()
-                            
                             results<-try_hard(procedure.simpleEffects(self$model,self))
-                            self$warnings  <- results$warning
-                            self$errors    <- results$error
+                            self$warnings  <- list(topic="tab_simpleAnova",message=results$warning)
+                            self$errors    <- list(topic="tab_simpleAnova",message=results$error)
                             self$tab_simpleAnova         <-  results$obj[[1]]
                             self$tab_simpleCoefficients  <-  results$obj[[2]]
-
-                          },
+                        },
                           
                           .estimateSimpleInteractions=function() {
                             
@@ -294,3 +371,22 @@ Estimate <- R6::R6Class("Estimate",
                           
                         ) #end of private
 )  # end of class
+
+
+### additional functions usefull for estimation of some model ###
+
+estimate_lmer<-function(...) {
+  opts<-list(...)
+  data<-opts$data
+  reml<-opts$reml
+  for (opt in opts$optimizers) {
+      
+            model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
+            if (mf.converged(model))
+            break()
+  }
+#  this is required for lmerTest::ranova to work
+  model@call$control<-lme4::lmerControl(optimizer=opt)
+  ### done
+  model
+}

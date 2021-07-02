@@ -56,13 +56,11 @@ procedure.posthoc <- function(Obj) {
       
     })  # suppressWarnings
     if (is.character(none)) 
-      Obj$warnings<-list(topic="posthoc", WARNS["ph.nojoy"]) 
+      Obj$warnings<-list(topic="posthoc", message=WARNS["ph.nojoy"]) 
     else {
         tableData <- as.data.frame(none, stringAsFactors = FALSE)
         tableData$contrast <- as.character(tableData$contrast)
-        
-        if (length(names(tableData)!=8))
-          
+        if (length(names(tableData))==9)
               colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
         else
               colnames(tableData) <- c("contrast", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
@@ -251,7 +249,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     }
     ##
     res<-as.data.frame(estimates)
-
+mark(res)
     if (varobj$type=="factor") {
       
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
@@ -263,7 +261,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
             res$contrast<-varobj$name
     }
     
-    
+mark(res)    
     for (.name in term64) {
             res[[.name]]<-factor(res[[.name]])
             levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
@@ -273,7 +271,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     res$contrast<-as.character(res$contrast)
     
     params<-res
-
+mark(params)
     ### now we build the anova table ###à
     res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
     names(res)<-c(term64,"df1","df2","test","p")

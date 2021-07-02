@@ -6,6 +6,7 @@ Plotter <- R6::R6Class(
   public=list(
       plotData=list(),
       rawData=list(),
+      randomData=list(),
       scatterRange=NULL,
       scatterDodge=NULL,
       scatterClabel=NULL,
@@ -13,6 +14,7 @@ Plotter <- R6::R6Class(
       scatterX=NULL,
       scatterXscale=FALSE,
       scatterZ=NULL,
+      scatterCluster=NULL,
       scatterModerators=NULL,
       scatterBars=FALSE,
       scatterRaw=FALSE,
@@ -81,6 +83,29 @@ Plotter <- R6::R6Class(
         }
         ##### END OF RAW DATA #############
         
+        if (!is.null(self$randomData)) {
+          
+          randomData<-self$randomData[[image$key]]
+          if ("z" %in% names(randomData)) {
+                      .aesrandom<-ggplot2::aes_string(x = "x", y = "y", group="cluster", colour="z")
+                       p <- p + ggplot2::geom_line(data = randomData, 
+                                                  .aesrandom, 
+                                                  size = 0.4, 
+                                                  alpha = .50)
+          }
+          else { 
+                      .aesrandom<-ggplot2::aes_string(x = "x", y = "y", group="cluster")
+                      p <- p + ggplot2::geom_line(data = randomData, 
+                                                  .aesrandom,
+                                                  color="gray74",
+                                                  size = 0.4, 
+                                                  alpha = .80)
+                      
+          }
+
+        }
+        
+        
         
         ######### fix the bars ##########        
         if (self$scatterBars) {
@@ -140,7 +165,6 @@ Plotter <- R6::R6Class(
             moderators<-self$options$plotSepPlots
             
             if (self$options$modelSelection=="multinomial") {
-              
                      moderators < c(z,moderators)
                      z   <- self$options$dep
             }
@@ -199,7 +223,7 @@ Plotter <- R6::R6Class(
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
 
       #### compute the levels combinations
-      #### first, gets all levels of factors and covs. Then creates the combinations and select the rows of the
+      #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
       #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
       ### for the raw data, it selects only if the moderator is a factor, whereas all data for the 
       ### continuous are retained
@@ -208,6 +232,30 @@ Plotter <- R6::R6Class(
       dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
 
       rawData<-mf.getModelData(private$.operator$model)
+      
+      ### here we deal with plotting random effects, if needed
+      randomData<-NULL
+      if (self$option("plotRandomEffects")) {
+        
+        newdata<-rawData
+        mvars<-names(newdata)
+        self$scatterCluster<-private$.datamatic$variables[[tob64(self$options$cluster[[1]])]]
+        tozero<-setdiff(mvars,c(self$scatterX$name64,self$scatterY$name64,self$scatterCluster$name64))
+        toaggregate<-list()
+        for(v in tozero)
+          if (!is.factor(newdata[,v])) {
+            center<-mean(newdata[,v])
+            newdata[,v]<-center
+          } else {
+            d<-dim(contrasts(newdata[,v]))
+            contrasts(newdata[,v])<-matrix(0,d[1],d[2])
+          }
+        y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
+        # end of zeroing 
+        randomData<-as.data.frame(cbind(y,rawData))
+        self$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
+
+      }
 
       ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
         dep64  <- tob64(self$options$dep)
@@ -237,27 +285,64 @@ Plotter <- R6::R6Class(
                 self$plotData[[i]]<-localdata
                 
                 if (self$scatterRaw) {
-                    if (length(selectable)>0) {
-                        sel<-paste(paste0("data$",.sel64,sep=""),paste0('"',selgrid[i,],'"'),sep="==",collapse = " & ")
-                        raw<-rawData[eval(parse(text=sel)),]
-                    } else
-                        raw<-rawData
+                       if (length(selectable)>0) {
+                            sel<-paste(paste0("data$",.sel64,sep=""),paste0('"',selgrid[i,],'"'),sep="==",collapse = " & ")
+                            raw<-rawData[eval(parse(text=sel)),]
+                       } else
+                            raw<-rawData
                     
-                    self$rawData[[i]]<-rawData
+                      self$rawData[[i]]<-raw
                 }
-              }
+                
+                if (!is.null(randomData)) {
+                       if (length(selectable)>0) {
+                              sel<-paste(paste0("randomData$",.sel64,sep=""),paste0('"',selgrid[i,],'"'),sep="==",collapse = " & ")
+                              rdata<-randomData[eval(parse(text=sel)),]
+                       } else 
+                              rdata<-randomData
+                         
+                        if (is.something(self$scatterZ) && self$scatterZ$type=="factor") {
+                                   selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]], rdata[[self$scatterZ$name64]])
+                                   .rnames<-c("cluster","x","z","y")
+                        }
+                        else {
+                                   selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
+                                   .rnames<-c("cluster","x","y")
+                                   
+                        }
 
-      }  else {
+                        rdata<- stats::aggregate(rdata$y, selectorlist, mean)
+                        names(rdata)<-.rnames
+                        self$randomData[[i]]<-rdata
+                }
+             }
+
+            }  else {
              aplot<-resultsgroup$get(key=resultsgroup$itemKeys[[1]])
              aplot$setTitle(jmvcore::stringifyTerm(c(self$scatterX$name,self$scatterZ$name)))
              self$plotData[[1]]<-data
              if (self$scatterRaw) 
                   self$rawData[[1]]<-rawData
-
+             
+             if (!is.null(randomData)) {
+               
+               rdata<-randomData
+               if (is.something(self$scatterZ) && self$scatterZ$type=="factor") {
+                   selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]], rdata[[self$scatterZ$name64]])
+                  .rnames<-c("cluster","x","z","y")
+               }
+               else {
+                  selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
+                 .rnames<-c("cluster","x","y")
+                 
+               }
+               rdata<- stats::aggregate(rdata$y, selectorlist, mean)
+               names(rdata)<-.rnames
+               self$randomData[[1]]<-rdata
+               
+             }
       }
-      
-      
-      
+
     },
     
     .estimate=function(x,term) {

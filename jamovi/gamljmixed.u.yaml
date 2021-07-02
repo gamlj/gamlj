@@ -176,7 +176,6 @@ children:
                     name: lrtRandomEffects
                   - name: ciRE
                     type: CheckBox
-
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -276,11 +275,10 @@ children:
                     optionName: simpleScaleLabels
                     optionPart: values_labels
           - type: Label
-            label: Dependent variable 
+            label: Dependent variable
             children:
-                     - type: ComboBox
-                       name: dep_scale
-
+              - type: ComboBox
+                name: dep_scale
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -292,14 +290,14 @@ children:
         stretchFactor: 1
         format: term
         events:
-          change: './mixed.events::onChange_postHocSupplier'
-          update: './mixed.events::onUpdate_postHocSupplier'
+          change: './gamlj.events::onChange_postHocSupplier'
+          update: './gamlj.events::onUpdate_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
             children:
               - type: ListBox
-                name: postHoc
+                name: posthoc
                 isTarget: true
                 template:
                   type: TermLabel
@@ -352,7 +350,6 @@ children:
               - type: VariablesListBox
                 name: plotSepPlots
                 isTarget: true
-                maxItemCount: 1
       - type: LayoutBox
         margin: large
         style: inline
@@ -388,6 +385,11 @@ children:
                 name: plotDvScale
               - type: CheckBox
                 name: plotRandomEffects
+          - type: LayoutBox
+            margin: large
+            children:
+              - type: CheckBox
+                name: plotOriginalScale
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -399,8 +401,8 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './mixed.events::onChange_simpleSupplier'
-          update: './mixed.events::onUpdate_simpleSupplier'
+          change: './gamlj.events::onChange_simpleSupplier'
+          update: './gamlj.events::onUpdate_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -411,28 +413,33 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleModerator
+                name: simpleModerators
                 isTarget: true
-                maxItemCount: 1
-          - type: TargetLayoutBox
-            children:
-              - type: VariablesListBox
-                name: simple3way
-                isTarget: true
-                maxItemCount: 1
+      - type: CheckBox
+        name: simpleInteractions
+        label: Simple interactions
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: Display
+      - type: Supplier
+        name: emmeansSupplier
+        persistentItems: false
+        stretchFactor: 1
+        format: term
+        events:
+          change: './gamlj.events::onChange_emmeansSupplier'
+          update: './gamlj.events::onUpdate_emmeansSupplier'
         children:
-          - type: CheckBox
-            name: eDesc
-          - type: CheckBox
-            name: eCovs
-            enable: (eDesc)
+          - type: TargetLayoutBox
+            label: ''
+            children:
+              - type: ListBox
+                name: emmeans
+                isTarget: true
+                template:
+                  type: TermLabel
   - type: CollapseBox
     label: Assumption Checks
     collapsed: true
@@ -502,25 +509,3 @@ children:
             name: predicted
           - type: Output
             name: residuals
-
-  - type: CollapseBox
-    label: Model Comparison
-    style: list
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: Label
-        label: Store Model for Comparison
-        children:
-          - type: CheckBox
-            name: modelcomparison
-          - type: TextBox
-            name: modelid
-            format: string
-            width: large
-            enable: (modelcomparison)
-          - type: TextBox
-            name: modeldescription
-            format: string
-            width: largest
-            enable: (modelcomparison)

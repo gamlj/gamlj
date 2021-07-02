@@ -92,13 +92,13 @@ gamljGzlmClass <- R6::R6Class(
         terms<-c(self$options$simpleVariable,self$options$simpleModerators)
         for (i in seq_along(estimate_machine$tab_simpleInteractionCoefficients)) {
           aGroup <- self$results$simpleInteractions$addItem(key = i)
-          aTable<-aGroup$interactionCoefficients
+          aTable<-aGroup$coefficients
           term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
           j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator",startAt=2)
           title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
           j.init_table(aTable,FALSE, ci=T,ciwidth=self$options$ciWidth,title=title)
           
-          aTable<-aGroup$interactionAnova
+          aTable<-aGroup$anova
           j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")
           title<-paste("ANOVA test for simple interaction",  jmvcore::stringifyTerm(term))
           j.init_table(aTable,FALSE, ci=F,title=title)
@@ -256,9 +256,9 @@ gamljGzlmClass <- R6::R6Class(
         
         for (i in seq_along(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
           aGroup <- self$results$simpleInteractions$get(key = i)
-          aTable<-aGroup$interactionCoefficients
+          aTable<-aGroup$coefficients
           j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionCoefficients[[i]],append = T)
-          aTable<-aGroup$interactionAnova
+          aTable<-aGroup$anova
           j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionAnova[[i]],append = T)
           
           
@@ -292,6 +292,8 @@ gamljGzlmClass <- R6::R6Class(
       
       if (is.something(private$.estimate_machine$errors))
           return()
+      if (!is.something(image$key))
+        return()
       
       plot<-private$.plotter_machine$scatterPlot(image)
       plot<-plot + ggtheme

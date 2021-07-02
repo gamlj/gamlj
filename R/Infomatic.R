@@ -16,6 +16,8 @@ Infomatic <- R6::R6Class(
     deptype=NULL,
     depnlevels=NULL,
     calloptions=NULL,
+    r2=NULL,
+    optimized=FALSE,
     initialize=function(options,datamatic) {
       self$modeltype<-options$modelSelection
       dep<-options$dep
@@ -120,8 +122,6 @@ Infomatic <- R6::R6Class(
         self$rcall         <-   "MASS::glm.nb"
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
-        
-        ### compute direction ###
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
         
@@ -136,8 +136,6 @@ Infomatic <- R6::R6Class(
         self$rcall         <-    FUNCS[[options$caller]]
         self$link          <-    options$custom_link
         self$emmeans       <-   "the response metric"
-        
-        ### compute direction ###
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
         
@@ -152,15 +150,29 @@ Infomatic <- R6::R6Class(
         self$calloptions   <-    list(model=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "probabilities"
-              
         ### compute direction ###
         theory             <-   "P(Y=j)/P(Y=0)"
         actual             <-  paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
         self$direction     <-   c(theory, actual)
+        #########################
         self$deptype       <-   "factor"
         self$depnlevels    <-   -3
-        self$fit<-c("lik" , "aic",  "bic",  "dev")
+        self$fit           <-   c("lik" , "aic",  "bic",  "dev")
         
+      }
+      
+      if (self$modeltype=="lmer") {
+        
+        self$model         <-   c("Mixed Model","Linear Mixed model for continuous y")
+        self$distribution  <-    "gaussian"
+        self$call          <-    "lmer"
+        self$rcall         <-    "estimate_lmer"
+        self$calloptions   <-    list(reml=options$reml,optimizers=c("bobyqa","Nelder_Mead","nloptwrap"))
+        self$optimized     <-   TRUE
+        self$direction     <-   c("y","Dependend variable scores")
+        self$deptype       <-   c("numeric","integer")
+        self$fit           <-   c("lik" , "aic",  "bic")
+        self$r2            <-   c("Marginal","Conditional")   
       }
       
       
@@ -178,7 +190,10 @@ Infomatic <- R6::R6Class(
         alist[["link"]]   <-  private$.link()
       
       if (is.something(self$direction))
-        alist[["dir"]]   <-  private$.dir()
+             alist[["dir"]]   <-  private$.dir()
+     
+       if (self$optimized)
+             alist[["optim"]]<-list(info="Optimizer",value="",specs="") 
       
       alist[["sample"]]   <-  list(info="Sample size",value="",specs="")
       alist[["conv"]]   <-  list(info="Converged",value="no yet", specs="")

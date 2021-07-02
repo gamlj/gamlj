@@ -26,9 +26,6 @@ Variable <- R6::R6Class(
       self$vars=var
       self$name64<-tob64(var)
       
-      if (hasName(options,"cluster")) {
-         self$hasCluster<-options$cluster[[1]]
-      }
 
     },
     checkVariable=function(data) { 
@@ -104,6 +101,17 @@ Variable <- R6::R6Class(
         self$paramsnames<-var
         self$paramsnames64<-tob64(var)
         self$nlevels=3
+      }
+      
+      if (self$option("cluster")) {
+        if (self$name %in% self$options$cluster) {
+            self$type="factor"
+            self$levels<-levels(vardata)
+            self$levels_labels<-levels(vardata)
+            self$nlevels<-length(self$levels)
+        } else
+           self$hasCluster<-self$options$cluster[1]
+           
       }
       return(self)  
       
@@ -269,7 +277,7 @@ Variable <- R6::R6Class(
         }
         return(labels)
       }
-      mark("no contrast definition met")
+      ginfo("no contrast definition met")
       
       all <- paste(levels, collapse=', ')
       for (i in seq_len(nLevels-1))
@@ -344,7 +352,7 @@ Variable <- R6::R6Class(
         }
         return(labels)
       }
-      mark("no contrast definition met")
+      ginfo("no contrast definition met")
       
       all <- paste(levels, collapse=', ')
       for (i in seq_len(nLevels-1))
@@ -469,7 +477,12 @@ Datamatic <- R6::R6Class(
     labels=NULL,
     N=NULL,
     initialize=function(options,data) {
-      super$initialize(options=options,vars=unlist(c(options$dep,options$factors,options$covs)))
+      vars<-unlist(c(options$dep,options$factors,options$covs))
+      
+      if (hasName(options,"cluster"))
+               vars<-c(vars,options$cluster)
+      
+      super$initialize(options=options,vars=vars)
       private$.inspect_data(data)
 
     },
@@ -488,16 +501,26 @@ Datamatic <- R6::R6Class(
     },
     get_params_labels=function(terms) {
       
+      ### here we want to gather the labels of the effects. If the variable is continuous, its name is passed on
+      ### if the variable is categorical (a contrast is required), it is passed. 
+      ### however, we need to change the formatting depending on the type of label
+      
       labs<-lapply(terms, function(term) {
         for (i in seq_along(term)) {
           alabel<-self$labels[[ term[[i]] ]]
           if (is.something(alabel)) {
-            if (length(term)>1) 
-              alabel<-paste0("(",alabel,")")
-            term[[i]]<-paste0(alabel,paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
+            ## if it is a contrast and its part of an interaction, we put paranthesis around
+            if (length(term)>1 & length(grep(FACTOR_SYMBOL,term[[i]]))>0) {
+                 alabel<-paste0("(",alabel,")")
+                 ### we want to avoid that an interactin (1-0)*(1-0) becomes (1-0)^2, so we trick 
+                 ### mvcore::stringifyTerm by adding a different string to each label
+                 term[[i]]<-paste0(alabel,paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
+            } else
+                 term[[i]]<-alabel
           }
         }
         term<-gsub(IMPROBABLE_SEQ,"",jmvcore::stringifyTerm(term,raise = T),fixed = T)
+
         return(term)
       })
       return(unlist(fromb64(labs,self$vars)))

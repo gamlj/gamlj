@@ -3,9 +3,16 @@
 fit.R2<- function(model,...) UseMethod(".R2") 
 
 .R2.default<-function(model,obj) {
-  mark(class(model))
-  obj$errors<-list(topic="tab_r2",message=paste("R2 cannot be computed for model",class(model)))
-  return(NULL)
+  results<-try_hard(performance::r2(model,tolerance =1e-09))
+  if (!isFALSE(results$error))
+        obj$errors<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
+  if (is.na(results$obj))
+       obj$warnings<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
+  
+    
+  obj$warnings<-list(topic="tab_r2",message=results$warning)
+  results$obj
+
 }
 
 .R2.glm<-function(model,obj) {
@@ -28,6 +35,8 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
   return(list(alist))
 }
+
+
 
 .R2.multinom<-function(model,obj) {
 
@@ -68,6 +77,29 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
 }
 
+
+.R2.lmerModLmerTest<-function(model,obj) {
+  
+  alist<-list()
+  r2<-.R2.default(model,obj)
+  if (is.na(r2))
+      return(NULL)
+  tests<-fit.compare_null_model(model,type="m")
+  tests$r2<-r2$R2_marginal
+  alist[[1]]<-tests
+  if (!is.na(r2$R2_conditional)) {
+      tests<-fit.compare_null_model(model,type="c")
+      tests$r2<-r2$R2_conditional
+      alist[[2]]<-tests
+  } else
+      tests<-list(r2="")
+  alist[[2]]<-tests
+  alist
+
+  
+}
+
+
 ######### model comparisons ########
 
 fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
@@ -92,6 +124,22 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   results$df    <- results$`   df`
   results$p    <- results$`Pr(Chi)`
   results[2,]
+}
+
+.compare_null_model.lmerModLmerTest<-function(model,type="c") {
+  
+  data    <-  mf.getModelData(model)
+
+  if (type=="c") {
+          form<-as.formula(paste(formula(model)[[2]],"~1"))
+          model0<-stats::lm(form,data=data)
+  } else  {
+          form<-update(formula(model),paste("~ 1 + (",lme4::findbars(formula(model)),")"))
+          model0  <-  stats::update(model, form ,data=data)
+  }
+  results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
+  names(results)<-c("nothing1","nothing2","nothing3","df","test","p")
+  results[2,c("df","test","p")]
 }
 
 

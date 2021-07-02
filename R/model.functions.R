@@ -2,7 +2,6 @@ mf.addEffectSize<- function(x,...) UseMethod(".addEffectSize")
 
 
 .addEffectSize.default<-function(atable) {
-  mark(class(atable))
   return(atable)
 }
 
@@ -52,6 +51,50 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 .getModelData.lmer<-function(model) 
       return(model@frame)
 
+
+
+############# produces to get parameters in a somehow standard format ##########
+
+mf.parameters<- function(x,...) UseMethod(".parameters")
+
+.parameters.default<-function(model,obj) {
+  
+      .coefficients        <-  as.data.frame(parameters::parameters(model, ci=obj$ciwidth),stringAsFactors=FALSE)
+      .coefficients$CI     <-  NULL
+      names(.coefficients) <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
+  
+      if (obj$option("effectSize","expb")) {
+               ex            <-  as.data.frame(parameters::parameters(model,exponentiate=TRUE))
+               ex            <-  ex[,c("Coefficient","CI_low" ,"CI_high")]
+               names(ex)     <-  c("expb","expb.ci.lower","expb.ci.upper")
+              .coefficients  <-  cbind(.coefficients,ex)
+      }
+     if (obj$option("effectSize","beta"))
+           .coefficients$beta  <-  procedure.beta(model)
+      
+      return(.coefficients)
+}
+
+.parameters.lmerModLmerTest<-function(model,obj) {
+  
+  .summary<-summary(model)
+  
+  .coefficients         <-  as.data.frame(.summary$coefficients)
+  names(.coefficients)  <-  c("estimate","se","df","t","p")
+  .coefficients$source  <-  rownames(.coefficients)
+  
+  if (obj$options$showParamsCI)
+    test<-try({
+      method<-ifelse(obj$options$cimethod=="wald","Wald",obj$options$cimethod)
+      ci   <-  confint(model,parm = "beta_",level = obj$ciwidth, method=method)
+      colnames(ci)  <-  c("ci.lower","ci.upper")
+     .coefficients  <-  cbind(.coefficients,ci)
+    })
+  if (jmvcore::isError(test)) {
+    obj$warnings   <-   list(topic="tab_coefficients",message="Random effects C.I. cannot be computed")
+  }
+  return(.coefficients)
+}
 
 
 
@@ -168,12 +211,11 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
      ss
 }
   
-############# produces anova/deviance table in a somehow stadard format ##########
+############# produces anova/deviance table in a somehow standard format ##########
 mf.anova<- function(x,...) UseMethod(".anova")
 
 .anova.default<-function(model,obj) {
-       mark(model)
-       stop("no suitable model found") 
+       stop(".anova: no suitable model found") 
 }
   
 .anova.glm<-function(model,obj) {
@@ -248,61 +290,40 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
   
 
-.anova.lmerModLmerTest<-function(model,df="Satterthwaite") 
-   .anova.merModLmerTest(model,df) 
+.anova.lmerModLmerTest<-function(model,obj) 
+   .anova.merModLmerTest(model,obj) 
      
-.anova.lmerMod<-function(model,df) 
-       .anova.merModLmerTest(model,df) 
-         
-.anova.merMod<-function(model,df="Satterthwaite") 
-           .anova.merModLmerTest(model,df) 
-             
-.anova.merModLmerTest<-function(model,df="Satterthwaite") {
+.anova.merModLmerTest<-function(model,obj) {
 
+  if (!obj$hasTerms)
+     return()
+  
+  df<-obj$options$dfmethod
+  
   ano<-stats::anova(model,ddf=df)
-  if (dim(ano)[1]==0)
+  if (dim(ano)[1]==0) {
+    obj$warnings<-list(topic="tab_anova",message="F-Tests cannot be computed without fixed effects")
     return(ano)
+  }
   if (dim(ano)[2]==4) {
     ano<-.car.anova(model,df)
+    obj$warnings<-list(topic="tab_anova",message="Degrees of freedom computed with method Kenward-Roger")
+    
   } else {
-  ano<-ano[,c(5,3,4,6)]
-  attr(ano,"method")<-df
-  attr(ano,"statistic")<-"F"
+    obj$warnings<-list(topic="tab_anova",message=paste("Degrees of freedom computed with method",df))
   }
-  if (!all(is.na(ano[,3])==F)) {
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
     # the factors. Here we try to fix it.
-    ginfo("lmerTest problems with df: try to fix it")
-    whichone<-is.na(ano[,3])
-    rn<-rownames(ano[whichone,])
-    smr<-summary(model,ddf=df)
-    coefz<-as.data.frame(smr$coefficients)
-    coefz<-coefz[rownames(smr$coefficients) %in% rn,3:5]
-
-    if (dim(coefz)[1]!=length(rn))
-      ano<-.car.anova(model,df)
-    else {
-        coefz<-data.frame(coefz)
-        
-        if (dim(coefz)[2]==1)
-          coefz<-as.data.frame(t(coefz))
-        rownames(coefz)<-rn
-        coefz[,2]<-coefz[,2]^2
-        coefz$df1<-1
-        coefz<-coefz[,c(2,4,1,3)]
-        ano[rownames(ano) %in% rownames(coefz),]<-coefz
-        attr(ano,"method")<-df
-        attr(ano,"statistic")<-"F"
-    }
-  }
-  # here we fix the column names depending on the estimation that succeeded
-  if (attr(ano,"statistic")=="Chisq")
-     names(ano)<-c("test","df1","p")
-  else 
-    names(ano)<-c("test","df1","df2","p")
+    # now we use lmerTest>3.1 that does not seem to have this problem. Check anyway in testing
+  
+  test<-length(grep("F value",names(ano),fixed=T))>0
+  if (test)
+      names(ano)<-c("ss","ms","df1","df2","f","p")
+  else
+      stop("fix anova with chisq")
   
   return(ano)
-  
+
 }
 
 .car.anova<-function(model,df) {
@@ -330,7 +351,6 @@ mf.getModelFactors<-function(model) {
 mf.fixTable<- function(x,...) UseMethod(".fixtable")
 
 .fixtable.default<-function(atable) {
-  warning("fixTable: unknown method for class", class(atable)) 
   return(atable)
 }
 
@@ -348,11 +368,19 @@ mf.fixTable<- function(x,...) UseMethod(".fixtable")
 ############# some models are not built in standard way, here we fix them ##########
 mf.fixModel<- function(x,...) UseMethod(".fixModel")
 
-.fixModel.default<-function(model) {
+.fixModel.default<-function(model,obj=NULL) {
   return(model)
 }
 
-.fixModel.multinom<-function(model) {
+.fixModel.lmerModLmerTest<-function(model,obj=NULL) {
+  
+  if (lme4::isSingular(model))
+      obj$warnings<-list(topic="info",message=WARNS[["lmer.singular"]])
+
+  return(model)
+}
+
+.fixModel.multinom<-function(model,obj=NULL) {
   
   model$call$formula <- as.formula(model)
   return(model)

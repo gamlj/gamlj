@@ -60,7 +60,8 @@ Dispatch <- R6::R6Class(
                            return()
               obj<-fromb64(obj,self$vars)
               topic<-private$.warnings[[obj$topic]]
-              topic[[length(topic)+1]]<-obj$message
+              msg<-private$.translate(obj$message)
+              topic[[length(topic)+1]]<-msg
               topic<-unique(topic)
               private$.warnings[[obj$topic]]<-topic
           },
@@ -96,7 +97,16 @@ Dispatch <- R6::R6Class(
   
   private = list(
      .warnings=list(),
-     .errors=list()
+     .errors=list(),
+     .translate=function(msg) {
+         
+       for (w in TRANSWARNS) {
+         if (length(grep(w$original,msg,fixed = T))>0)
+             return(w$new)
+       }
+       return(msg)
+
+     }
   )
 )
 

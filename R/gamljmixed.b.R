@@ -3,625 +3,284 @@ gamljMixedClass <- R6::R6Class(
   "gamljMixedClass",
   inherit=gamljMixedBase,
   private=list(
-    .model=NA,
-    .names64=NA,
-    .cov_condition=conditioning$new(),
-    .postHocRows=NA,
+    .ready=NULL,
+    .data_machine=NULL,
+    .estimate_machine=NULL,
+    .plotter_machine=NULL,
     .init=function() {
+      
       ginfo("init")
+      
       class(private$.results) <- c('gamlj', class(private$.results))
-      private$.names64<-names64$new()
-      n64<-private$.names64
-      reml<-self$options$reml
-      infoTable<-self$results$info
-      dep<-self$options$dep
-      modelTerms<-self$options$modelTerms
-      factors<-self$options$factors
-      covs<-self$options$covs
-      fixedIntercept<-self$options$fixedIntercept
-      emmeans::emm_options(lmerTest.limit = 25000)  
-      ciWidth<-self$options$paramCIWidth
       
-            
-      getout<-FALSE
-      if (is.null(dep)) {
-        infoTable$addRow(rowKey="gs1",list(info="Get started",value="Select the dependent variable"))
-        getout<-TRUE
-      }
-      if (is.null(self$options$cluster)) {
-        infoTable$addRow(rowKey="gs2",list(info="Get started",value="Select at least one cluster variable"))
-        getout=TRUE
-      }
-      if (!is.something(unlist(self$options$randomTerms))) {
-        infoTable$addRow(rowKey="gs3",list(info="Get started",value="Select at least one term in Random Effects"))
-        getout=TRUE
+      private$.ready<-readiness(self$options)
+      if (!private$.ready$ready) {
+        if(private$.ready$report)
+          self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
+        return()
       }
       
-      aOne<-which(unlist(modelTerms)=="1")
-      if (is.something(aOne)) {
-        modelTerms[[aOne]]<-NULL
-        fixedIntercept=TRUE
-      }
+      ### set up the R6 workhorse class
       
-      if (length(modelTerms) == 0 && fixedIntercept==FALSE) {
-        if (is.null(factors) && is.null(covs))
-          infoTable$addRow(rowKey="gs4",list(info="Optional",value="Select factors and covariates"))
-        else
-          jmvcore::reject("Please specify a model")            
-        getout<-TRUE
-      }
+      data_machine<-Datamatic$new(self$options,self$data)
+      estimate_machine<-Estimate$new(self$options,data_machine)
+      plotter_machine<-Plotter$new(estimate_machine,self$results)
       
-      if (getout) 
-        return(FALSE)
-
-      data<-private$.cleandata()
+      ### info table ###
+      j.init_table(self$results$info,estimate_machine$tab_info) 
+      j.add_warnings(self$results$info,estimate_machine,"tab_info")
       
-      ### initialize conditioning of covariates
-      if (is.something(self$options$covs)) {
-      span<-ifelse(self$options$simpleScale=="mean_sd",self$options$cvalue,self$options$percvalue)
-      private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
-      }
-      #####################
-      #### info table #####
-      infoTable<-self$results$info
-      infoTable$addRow(rowKey="est",list(info="Estimate"))
-      infoTable$addRow(rowKey="call",list(info="Call"))
-      infoTable$addRow(rowKey="aic",list(info="AIC"))
-      infoTable$addRow(rowKey="bic",list(info="BIC"))
-      infoTable$addRow(rowKey="log",list(info="LogLikel."))
-      infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
-      infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
-      infoTable$addRow(rowKey="conv",list(info="Converged"))
-      infoTable$addRow(rowKey="opt",list(info="Optimizer"))
+      ### r2 table  ###
+      j.init_table(self$results$main$r2,estimate_machine$tab_r2)
       
+      ### additional indices table ###
+      j.init_table(self$results$main$fit,estimate_machine$tab_fit)
       
-      ## random table
-      aTable<-self$results$main$random
-      aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
-
-      if (self$options$ciRE==TRUE) {
-            aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
-            aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
-      }
-
-      ## anova Table 
-      if (length(modelTerms)>0) {
-          aTable<- self$results$main$anova
-          for (i in seq_along(modelTerms)) 
-                  aTable$addRow(rowKey=i, list(name=" "))
-      }
+      ### anova table ###
+      j.init_table(self$results$main$anova,estimate_machine$tab_anova) 
       
-      ## fixed effects parameters
-      modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
-      
-      aTable<-self$results$main$fixed
-      dep64<-jmvcore::toB64(dep)
-      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
-      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,self$options$fixedIntercept))
-      mynames64<-colnames(model.matrix(formula64,data))
-      terms<-n64$nicenames(mynames64)  
-      labels<-n64$nicelabels(mynames64)
-      aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-
-      for(i in seq_along(terms)) 
-          aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
+      ### estimates table ###
+      j.init_table(self$results$main$coefficients,estimate_machine$tab_coefficients, ci=T,ciwidth=self$options$ciWidth)
       
       if (!is.something(self$options$factors))
-           aTable$getColumn('label')$setVisible(FALSE)
+        self$results$main$coefficients$getColumn('label')$setVisible(FALSE)
+
+      ### random component table ###
+      j.init_table(self$results$main$random,estimate_machine$tab_random, ci=T,ciwidth=self$options$ciWidth)
       
-       
       
-        # other inits
-        gplots.initPlots(self,data,private$.cov_condition)
-        gposthoc.init(data,self$options, self$results$postHocs)     
-        gmeans.init(data,self$options,self$results$emeansTables,private$.cov_condition)
-        gsimple.init(data,self$options,self$results$simpleEffects)
-        mi.initContrastCode(data,self$options,self$results,n64)
+
+      ### estimate marginal means
+      
+      if (is.something(self$options$emmeans)) {
         
-        note<-self$results$plotnotes
-        note$setVisible(FALSE)
+        self$results$emmeans$setVisible(TRUE)
+        for (i in seq_along(self$options$emmeans)) {
+          term<-self$options$emmeans[[i]]
+          spaceby=NULL
+          if (length(term)>1) spaceby<-1
+          
+          aTable <- self$results$emmeans$addItem(key = jmvcore::stringifyTerm(term))
+          j.expand_table(aTable,term)
+          j.init_table(aTable,estimate_machine$tab_emmeans[[i]], ci=T,ciwidth=self$options$ciWidth,spaceby = spaceby)
+        } 
         
+      }
+      
+      ### simple effects ####
+      if (is.something(estimate_machine$tab_simpleAnova)) {
+        
+        j.expand_table(self$results$simpleEffects$anova,self$options$simpleModerators) 
+        title<-paste("Omnibus test for variable",self$options$simpleVariable)
+        j.init_table(self$results$simpleEffects$anova,estimate_machine$tab_simpleAnova,title=title)
+        title<-paste("Parameter estimates for variable",self$options$simpleVariable)
+        j.expand_table(self$results$simpleEffects$coefficients,self$options$simpleModerators,superTitle = "Moderators") 
+        j.init_table(self$results$simpleEffects$coefficients,estimate_machine$tab_simpleCoefficients, ci=T,ciwidth=self$options$ciWidth,title=title)
+        
+      }
+      
+      ### simple interactions ######
+      
+      if (is.something(estimate_machine$tab_simpleInteractionCoefficients)) {
+        
+        self$results$simpleInteractions$setVisible(TRUE)
+        ### moderators should be reverted in order so they make sense
+        terms<-c(self$options$simpleVariable,self$options$simpleModerators)
+        for (i in seq_along(estimate_machine$tab_simpleInteractionCoefficients)) {
+          aGroup <- self$results$simpleInteractions$addItem(key = i)
+          aTable<-aGroup$interactionCoefficients
+          term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
+          j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
+          title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
+          j.init_table(aTable,FALSE, ci=T,ciwidth=self$options$ciWidth,title=title)
+          
+          aTable<-aGroup$interactionAnova
+          j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")
+          title<-paste("ANOVA test for simple interaction",  jmvcore::stringifyTerm(term))
+          j.init_table(aTable,FALSE, ci=F,title=title)
+          
+          title<-paste("Simple interaction:",  jmvcore::stringifyTerm(term))
+          aGroup$setTitle(title)
+          
+        } 
+        
+        
+      }
+      
+      ### posthoc ####
+      
+      if (is.something(self$options$posthoc)) {
+        
+        for (i in seq_along(self$options$posthoc)) {
+          term<-self$options$posthoc[[i]]
+          aTable<-self$results$posthoc$get(key = term)
+          aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
+          j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
+          j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
+        } 
+        
+      }
+      
+      if (is.something(estimate_machine$tab_contrastcodes)) {
+        
+        for (i in seq_along(self$options$factors)) {
+          term<-self$options$factors[[i]]
+          aTable<-self$results$main$contrastCodeTables$get(key = term)
+          eTable<-estimate_machine$tab_contrastcodes[[i]]
+          levels_pos<-seq_len(length(names(eTable))-2)
+          j.expand_table(aTable,names(eTable)[levels_pos],append=T,type="number",names64=FALSE) 
+          names(eTable)[levels_pos]<-make.names(names(eTable)[levels_pos])
+          j.init_table(aTable,eTable)
+        }
+      }
+      plotter_machine$initPlots()
+      
+      private$.data_machine<-data_machine
+      private$.estimate_machine<-estimate_machine
+      private$.plotter_machine<-plotter_machine
+      
+      
+      
+      
+      
+      emmeans::emm_options(lmerTest.limit = 25000)  
+      #### info table #####
+      # infoTable<-self$results$info
+      # infoTable$addRow(rowKey="est",list(info="Estimate"))
+      # infoTable$addRow(rowKey="call",list(info="Call"))
+      # infoTable$addRow(rowKey="aic",list(info="AIC"))
+      # infoTable$addRow(rowKey="bic",list(info="BIC"))
+      # infoTable$addRow(rowKey="log",list(info="LogLikel."))
+      # infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
+      # infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
+      # infoTable$addRow(rowKey="conv",list(info="Converged"))
+      # infoTable$addRow(rowKey="opt",list(info="Optimizer"))
+      # 
+      # 
+      # ## random table
+      # aTable<-self$results$main$random
+      # aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
+
+
     },
     .run=function() {
-      n64<-private$.names64
       ginfo("run")
-      # collect some option
-      dep <- self$options$dep
       
-      if (is.null(dep))
+      private$.ready<-readiness(self$options)
+      if (!private$.ready$ready) {
+        return()
+      }
+      
+      
+      data<-private$.data_machine$cleandata(self$data)
+      private$.estimate_machine$estimate(data)
+      
+
+      
+      
+      ## info table and posssible main problems to report
+      j.fill_table(self$results$info,private$.estimate_machine$tab_info) 
+      
+      j.add_warnings(self$results$info,private$.data_machine,"data")
+      j.add_warnings(self$results$info,private$.estimate_machine,"info",reset=TRUE)
+      
+      ## R2 table ###
+      j.fill_table(self$results$main$r2,private$.estimate_machine$tab_r2)
+      j.add_warnings(self$results$main$r2,private$.estimate_machine,"tab_r2")
+      
+      ## additional fit indices table ###
+      
+      j.fill_table(self$results$main$fit,private$.estimate_machine$tab_fit)
+      j.add_warnings(self$results$main$fit,private$.estimate_machine,"tab_fit")
+      
+      ## anova table ###
+      j.fill_table(self$results$main$anova,private$.estimate_machine$tab_anova)
+      j.add_warnings(self$results$main$anova,private$.estimate_machine,"tab_anova")
+
+
+      ### parameter estimates
+      j.fill_table(self$results$main$coefficients,private$.estimate_machine$tab_coefficients)
+      j.add_warnings(self$results$main$coefficients,private$.estimate_machine,"tab_coefficients")
+      
+      ## random table ###
+      j.fill_table(self$results$main$random,private$.estimate_machine$tab_random)
+      j.add_warnings(self$results$main$random,private$.estimate_machine,"tab_random")
+      j.fill_table(self$results$main$randomCov,private$.estimate_machine$tab_randomCov,append = T)
+      
+      j.fill_table(self$results$main$randomTests,private$.estimate_machine$tab_randomTests,append = T)
+      j.add_warnings(self$results$main$randomTests,private$.estimate_machine,"tab_randomTests")
+      
+            
+            
+      ### post hoc
+      
+      if (is.something(private$.estimate_machine$tab_posthoc)) {
+        
+        for (i in seq_along(self$options$posthoc)) {
+          term<-self$options$posthoc[[i]]
+          aTable<-self$results$posthoc$get(key = term)
+          j.fill_table(aTable,private$.estimate_machine$tab_posthoc[[i]])
+        } 
+      }
+      
+      ### simple effects
+      j.fill_table(self$results$simpleEffects$anova,private$.estimate_machine$tab_simpleAnova)
+      j.add_warnings(self$results$simpleEffects$anova,private$.estimate_machine,"tab_simpleAnova")
+      
+      j.fill_table(self$results$simpleEffects$coefficients,private$.estimate_machine$tab_simpleCoefficients)
+      j.add_warnings(self$results$simpleEffects$coefficients,private$.estimate_machine,"tab_simpleCoefficients")
+      
+      ### simple interactions
+      if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
+        
+        for (i in seq_along(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
+          aGroup <- self$results$simpleInteractions$get(key = i)
+          aTable<-aGroup$coefficients
+          j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionCoefficients[[i]],append = T)
+          aTable<-aGroup$anova
+          j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionAnova[[i]],append = T)
+          
+          
+        } 
+      }
+      
+      ###  emmeans 
+      
+      if (is.something(private$.estimate_machine$tab_emmeans)) {
+        
+        for (i in seq_along(self$options$emmeans)) {
+          term<-self$options$emmeans[[i]]
+          aTable<-self$results$emmeans$get(key = jmvcore::stringifyTerm(term))
+          j.fill_table(aTable,private$.estimate_machine$tab_emmeans[[i]])
+          j.add_warnings(aTable,private$.estimate_machine,"tab_emmeans")
+        } 
+      }
+      
+      #save model preds and resids            
+      private$.estimate_machine$savePredRes(self$results) 
+      
+      private$.plotter_machine$preparePlots()
+      j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
+      
+        
+        
+    },
+    
+    .mainPlot=function(image, ggtheme, theme, ...) {
+      
+      if (is.something(private$.estimate_machine$errors))
+        return()
+      if (!is.something(image$key))
         return()
       
-      factors <- self$options$factors
-      covs <- self$options$covs
-      clusters<-self$options$cluster
-      reml<-self$options$reml
-      dfmethod<-self$options$dfmethod
+      plot<-private$.plotter_machine$scatterPlot(image)
+      plot<-plot + ggtheme
       
-      if (self$options$simpleScale=="mean_sd" && self$options$cvalue==0)
-          return()
-      if (self$options$simpleScale=="percent" && self$options$percvalue==0)
-         return()
- 
-      ###############      
-      modelTerms<-self$options$modelTerms
-      modelFormula<-private$.modelFormula()
-      if (modelFormula==FALSE)  
-          return()
-    
-      
-      ### collect the tables #######
-      infoTable<-self$results$info
-      estimatesTable <- self$results$main$fixed
-      randomTable <- self$results$main$random
-      randomCovTable<-self$results$main$randomCov
-      anovaTable<-self$results$main$anova
-
-      ##### clean the data ####
-      data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType="mixed")
-      if (!is.data.frame(data))
-        reject(data)
-      if (is.something(covs)) {
-        names(data)<-jmvcore::fromB64(names(data))
-        private$.cov_condition$storeValues(data)
-        names(data)<-jmvcore::toB64(names(data))
-        private$.cov_condition$labels_type=self$options$simpleScaleLabels
-      }
-
-      ## saving the whole set of results proved to be too heavy for memory issues.
-      ## so we estimate the model every time. In case it is not needed, we just trick
-      ## the module to believe that the other results are saved, when in reality we
-      ## just leave them the way they are :-)
-       ginfo("the model has been estimated")
-       ##### model ####
-       model<- try(private$.estimate(modelFormula, data=data, REML=reml))
-       mi.check_estimation(model,n64)
-       model<-mi.model_check(model)
-       private$.model <- model
-       self$results$.setModel(model)
-       ginfo("...done")
-
-       ### random components data frame ######
-       vc<-as.data.frame(lme4::VarCorr(model))
-       params<-vc[is.na(vc[,3]),]
-       params$var1[is.na(params$var1)]<-""
-       grp<-unlist(lapply(params$grp, function(a) gsub("\\.[0-9]$","",a)))
-       realgroups<-n64$nicenames(grp)
-       realnames<-n64$nicenames(params$var1)
-       realnames<-lapply(realnames,lf.nicifyTerms)
-       
-       ### RE confidence intervals ###
-       if (self$options$ciRE==TRUE) {
-           ginfo("Estimating CI for RE")
-           test<-try({
-                 pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
-                 ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100)
-                 colnames(ci)<-c("cilow","cihig")
-                 params<-cbind(params,ci)
-                 })
-           if (jmvcore::isError(test)) {
-                 randomTable$setNote("reci","Random effects C.I. cannot be computed")
-            }
-            ginfo("done")
-       }
-       for (i in 1:dim(params)[1]) {
-            if (!is.null(realnames[[i]]) && realnames[[i]]=="(Intercept)")
-                   icc<-params$sdcor[i]^2/(params$sdcor[i]^2+params$sdcor[dim(params)[1]]^2)
-             else
-                   icc<-""
-             if (i<=randomTable$rowCount)
-                   randomTable$setRow(rowNo=i, list(groups=realgroups[[i]],
-                                                    name=realnames[[i]],
-                                                    std=params$sdcor[i],
-                                                    var=params$vcov[i],
-                                                    cilow=params$cilow[i],
-                                                    cihig=params$cihig[i],
-                                                    icc=icc))
-             else
-                   randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],
-                                                     name=realnames[[i]],
-                                                     std=params$sdcor[i],
-                                                     var=params$vcov[i],
-                                                     cilow=params$cilow[i],
-                                                     cihig=params$cihig[i],
-                                                     icc=icc))
-       }
-        N<-as.numeric(model@devcomp$dims['n'])
-        groups<-vapply(model@flist,nlevels,1)
-        info<-paste("Number of Obs:", N,", groups:",paste(n64$nicenames(names(groups)),groups,collapse = ", "))
-        randomTable$setState(list("warning"=info))
-        
-        ### Covariance among random effects ###
-        vcv<-vc[!is.na(vc[,3]),]
-        grp<-unlist(lapply(vcv$grp, function(a) gsub("\\.[0-9]$","",a)))
-        realgroups<-n64$nicenames(grp)
-        realnames1<-lapply(n64$nicenames(vcv$var1),lf.nicifyTerms)
-        realnames2<-lapply(n64$nicenames(vcv$var2),lf.nicifyTerms)
-        if (dim(vcv)[1]>0) {
-             for (i in 1:dim(vcv)[1]) {
-                   randomCovTable$addRow(rowKey=realgroups[[i]], list(groups=realgroups[[i]],name1=realnames1[[i]],name2=realnames2[[i]],cov=vcv$sdcor[i]))
-             }
-            randomCovTable$setVisible(TRUE)
-        }
-         
-               
-
-        
-       ### anova results ####
-       if (is.null(anovaTable$state)) {
-             ginfo("compute the Anova stuff")
-             anova_res<-data.frame()
-             if (length(modelTerms)==0) {
-                  attr(anova_res,"warning")<-"F-Tests cannot be computed without fixed effects"
-             } else {
-                  suppressWarnings({anova_res <- try(mf.anova(model,df=dfmethod ), silent=TRUE) })
-                  mi.check_estimation(anova_res,n64)   
-                  if (length(modelTerms)==0) {
-                       attr(anova_res,"warning")<-append(attr(anova_res,"warning"),"F-Tests cannot be computed without fixed effects")
-                   } else {
-                       rawlabels<-rownames(anova_res)
-                       labels<-n64$nicenames(rawlabels)
-                       for (i in seq_len(dim(anova_res)[1])) {
-                           tableRow<-anova_res[i,]  
-                           anovaTable$setRow(rowNo=i,tableRow)
-                           anovaTable$setRow(rowNo=i,list(name=lf.nicifyTerms(labels[[i]])))
-                       }
-                       if (attr(anova_res,"statistic")=="Chisq") {
-                           attr(anova_res,"warning")<-append(attr(anova_res,"warning"),WARNS["lmer.chisq"])
-                           anovaTable$getColumn('test')$setTitle("Chi-squared")
-                           anovaTable$getColumn('df1')$setTitle("df")
-                           anovaTable$getColumn('df2')$setVisible(FALSE)
-                        } else
-                           attr(anova_res,"warning")<-append(attr(anova_res,"warning"),paste(attr(anova_res,"method"),"method for degrees of freedom"))
-                   }
-                   anovaTable$setState(list(warning=attr(anova_res,"warning")))
-             }
-       } else ginfo("Anova results recycled")
-                    
-       if (is.null(estimatesTable$state)) {
-                 ### coefficients summary results ####
-                 parameters<-try(mf.summary(model))
-                 ginfo("...done")
-                 if (nrow(parameters)>0) {
-                  #### confidence intervals ######
-                       ciWidth<-self$options$paramCIWidth/100
-                       parameters<-mf.confint(model,ciWidth,parameters,method=self$options$cimethod)
-                       rownames(parameters)<-n64$nicenames(rownames(parameters))
-                  ##### fill the table ############
-                       for (i in 1:nrow(parameters)) {
-                             tableRow=parameters[i,]
-                             estimatesTable$setRow(rowNo=i,tableRow)
-                       }
-                 }
-                 estimatesTable$setState(list(warning=attr(parameters,"warning")))
-                 ### prepare info table #########       
-                 ginfo("updating the info table")
-                 info.call<-n64$translate(as.character(model@call)[[2]])
-                 info.title<-paste("Linear mixed model fit by",ifelse(reml,"REML","ML"))
-                 info.aic<-round(stats::extractAIC(model)[2],digits=4)
-                 info.bic<-round(stats::BIC(model),digits=4)
-                 loglik<-lme4::llikAIC(model)
-                 info.loglik<-ifelse("logLik" %in% names(loglik),loglik['logLik'],loglik['REML'])
-                 info.loglik<-as.numeric(info.loglik)
-
-                 r2<-try(r.squared(model),silent = TRUE)
-                 if (jmvcore::isError(r2)){
-                   note<-"R-squared cannot be computed."
-                   attr(model,"warning")<-append(attr(model,"warning"),note)
-                   info.r2m<-NaN        
-                   info.r2c<-NaN
-                 } else {
-                   info.r2m<-r2[[4]]        
-                   info.r2c<-r2[[5]]     
-                 }
-                 infoTable$setRow(rowKey="est", list(value=info.title))
-                 infoTable$setRow(rowKey="call",list(value=info.call))
-                 infoTable$setRow(rowKey="aic",list(value=info.aic))
-                 infoTable$setRow(rowKey="bic",list(value=info.bic))
-                 infoTable$setRow(rowKey="log",list(value=info.loglik))
-                 infoTable$setRow(rowKey="r2m",list(value=info.r2m))
-                 infoTable$setRow(rowKey="r2c",list(value=info.r2c))
-                 modelInfo<-attr(model,"infoTable" )
-                 conv<-ifelse(modelInfo$conv,"yes","no")
-                 infoTable$setRow(rowKey="conv",list(value=conv))
-                 if (modelInfo$conv==FALSE)
-                   opt<-paste(OPTIMIZERS,collapse=", ")
-                 else 
-                   opt<-model@optinfo$optimizer
-                 infoTable$setRow(rowKey="opt",list(value=opt))
-                 ### end of info table ###
-                 infoTable$setState(list(warning=attr(model,"warning")))
-               } else ginfo("infotable and parameters recycled")
-               
-        #### LRT for random effects ####
-        lrtTable<-self$results$main$lrtRandomEffectsTable
-        if (self$options$lrtRandomEffects) {
-          .warning=NULL
-          ranova_test<-try(as.data.frame(lmerTest::ranova(model)[-1,]))
-          if (jmvcore::isError(ranova_test)) {
-            message <- jmvcore::extractErrorMessage(ranova_test)
-            .warning=paste(message,". LRT cannot be computed")
-          } else {
-            ranova_test$test<-n64$translate(rownames(ranova_test))
-            ranova_test$test<-as.character(ranova_test$test)
-            for (i in seq_len(nrow(ranova_test)))
-              lrtTable$addRow(rowKey=i,ranova_test[i,])
-          }
-          lrtTable$setVisible(TRUE)
-          lrtTable$setState(list(warning=.warning))
-        }
-        
-        out.infotable_footnotes(infoTable,attr(model,"infoTable"))        
-        out.table_notes(infoTable)
-        out.table_notes(anovaTable)
-        out.table_notes(estimatesTable)
-        out.table_notes(randomTable)
-        out.table_notes(lrtTable)
-        
-        private$.preparePlots(model)
-        private$.prepareRandHist()
-        private$.prepareClusterBoxplot()
-        gposthoc.populate(model,self$options,self$results$postHocs)
-        gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
-        gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
-        private$.populateNormTest(model)
-        
-        mf.savePredRes(self$options,self$results,model) 
-        
-        
-        
-    },
-  .buildreffects=function(terms,correl=TRUE) {
- 
-    ## this is for R. It overrides the correlatedEffect option 
-    if (length(terms)>1)
-         correl<-"block"
-    # remove empty sublists
-    terms<-terms[sapply(terms, function(a) !is.null(unlist(a)))]
-    # split in sublists if option=nocorr
-    if (correl=="nocorr") {
-      termslist<-terms[[1]]
-      terms<-lapply(termslist,list)
-    }
-    rterms<-""    
-    for(i in seq_along(terms)) {
-      one<-terms[[i]]
-      one64<-lapply(one,jmvcore::toB64)
-      flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
-      res<-do.call("rbind",flatterms)
-      if (length(unique(res[,2]))>1 && correl=="block")
-         jmvcore::reject("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
-      res<-tapply(res[,1],res[,2],paste)
-      res<-sapply(res, function(x) paste(x,collapse = " + "))
-      test<-grep(jmvcore::toB64("Intercept"),res,fixed=TRUE)
-      if (is.something(test))
-        res<-gsub(jmvcore::toB64("Intercept"),1,res)
-      else
-        res[[1]]<-paste(0,res[[1]],sep = "+")
-      form<-paste(res,names(res),sep=" | ")
-      form<-paste("(",form,")")
-      rterms<-paste(rterms,form,sep = "+")
-    }
-    rterms<-paste(rterms,collapse = "")
-    rterms
-  },
-  .cleandata=function() {
-      Sys.setlocale("LC_NUMERIC", "C")
-      n64<-private$.names64
-      dep <- self$options$dep
-      factors <- self$options$factors
-      covs <- self$options$covs
-      clusters<-self$options$cluster
-      dataRaw <- self$data
-      data <- list()
-      for (factor in factors) {
-
-        ### we need this for Rinterface ####
-        if (!("factor" %in% class(dataRaw[[factor]]))) {
-          warning(paste("Warning, variable",factor," has been coerced to factor"))
-          dataRaw[[factor]]<-factor(dataRaw[[factor]])
-        }
-        data[[jmvcore::toB64(factor)]] <- dataRaw[[factor]]
-        levels <- base::levels(data[[jmvcore::toB64(factor)]])
-        stats::contrasts(data[[jmvcore::toB64(factor)]]) <- lf.createContrasts(levels,"simple")
-        n64$addFactor(factor,levels)
-        n64$addLabel(factor,lf.contrastLabels(levels, "simple")) 
-        attr(data[[jmvcore::toB64(factor)]],"jcontrast")<-"simple"
-      }
-      
-      for (contrast in self$options$contrasts) {
-        levels <- base::levels(data[[jmvcore::toB64(contrast$var)]])
-        stats::contrasts(data[[jmvcore::toB64(contrast$var)]]) <- lf.createContrasts(levels, contrast$type)
-        n64$addLabel(contrast$var,lf.contrastLabels(levels, contrast$type)) 
-        attr(data[[jmvcore::toB64(contrast$var)]],"jcontrast")<-contrast$type
-      }
-      
-      if ( ! is.null(dep)) {
-        data[[jmvcore::toB64(dep)]] <- jmvcore::toNumeric(dataRaw[[dep]])
-        n64$addVar(dep)
-      }
-      for (cluster in clusters) {
-        data[[jmvcore::toB64(cluster)]] <- as.factor(dataRaw[[cluster]])
-        n64$addVar(cluster)
-      }
-      
-      for (covariate in covs) {
-        data[[jmvcore::toB64(covariate)]] <- jmvcore::toNumeric(dataRaw[[covariate]])
-        n64$addVar(covariate)
-      }
-      private$.names64<-n64
-      attr(data, 'row.names') <- seq_len(length(data[[1]]))
-      attr(data, 'class') <- 'data.frame'      
-      data <- jmvcore::naOmit(data)
-      return(data)
+      return(plot)
       
     },
-    .estimate = function(form, data,REML=TRUE) {
-      ## there is a bug in LmerTest and it does not work
-      ## when called within an restricted environment such as a function.
-      ## the do.call is a workaround.
-      
-      for (opt in OPTIMIZERS) {
-          ctr=lme4::lmerControl(optimizer = opt)
-          lm = do.call(lmerTest::lmer, list(formula=form, data=data,REML=REML,control=ctr))
-          model<-mi.model_check(lm)
-          info<-attr(model,"infoTable")
-          if (info$conv==TRUE)
-             break()
-      }
-
-      ## set info for R refit ###
-      attr(model,"refit")<-list(lib="lme4",
-                                command="lmer",
-                                coptions=list(formula=private$.names64$translate(form),REML=REML),
-                                eoptions=list(formula=private$.names64$translate(form),REML=REML,control=ctr))
-      return(model)
-    },
-    .modelFormula=function() {
-      
-      if (!is.something(unlist(self$options$randomTerms))) 
-         return(FALSE)
-
-      if (!is.null(self$options$dep))  {
-        dep<-jmvcore::toB64(self$options$dep)
-      } else return(FALSE)
-      
-      rands<-self$options$randomTerms
-      
-      rands<-private$.buildreffects(rands,self$options$correlatedEffects)
-
-      modelTerms64<-sapply(self$options$modelTerms,jmvcore::toB64)
-      fixed<-lf.constructFormula(dep,modelTerms64,self$options$fixedIntercept)
-      mf<-paste(fixed,rands,sep =  "")
-      mf
-    },
-
-
-.preparePlots=function(model) {
-  
-  depName <- self$options$dep
-  dep64 <- jmvcore::toB64(depName)
-  groupName <- self$options$plotHAxis
-  groupName64 <- jmvcore::toB64(groupName)
-  
-  if (length(depName) == 0 || length(groupName) == 0)
-    return()
-  
-  linesName <- self$options$plotSepLines
-  plotsName <- self$options$plotSepPlots
-  if (is.null(linesName))
-      plotsName<-NULL
-  
-  errorBarType<-self$options$plotError
-  ciWidth   <- self$options$ciWidth
-  optionRaw<-self$options$plotRaw
-  optionRange<-self$options$plotDvScale
-  referToData<-(optionRaw || optionRange)
-  plotScale<-self$options$simpleScale
-  offset<-ifelse(self$options$simpleScale=="percent",self$options$percvalue,self$options$cvalue)
-  
-  
-  
-  if (referToData)
-    rawData=gplots.rawData(model,depName,groupName,linesName,plotsName)
-  else 
-    rawData<-NULL
-  ### this is specific of mixed model #####
-  preds<-c(groupName,linesName,plotsName)
-  preds64<-jmvcore::toB64(preds)
-  clusters<-jmvcore::toB64(self$options$cluster)
-  cluster<-clusters[which(clusters %in% names(model@cnms))][[1]]
-  
-  preds64<-c(cluster,preds64)
-  if (self$options$plotRandomEffects) {
     
-    data<-model@frame
-    # here we set all model predictors but the x-axis variable to zero
-    # to smooth random effects predicted values
-    mvars<-names(data)
-    tozero<-setdiff(mvars,c(groupName64,clusters,dep64))
-    newdata<-data
-    toaggregate<-list()
-    for(v in tozero)
-      if (!is.factor(newdata[,v])) {
-        center<-mean(newdata[,v])
-        newdata[,v]<-center
-      } else {
-        d<-dim(contrasts(newdata[,v]))
-        contrasts(newdata[,v])<-matrix(0,d[1],d[2])
-      }
-    pd<-stats::predict(model,type="response",newdata=newdata,allow.new.levels=TRUE)
     
-    # end of zeroing 
-    
-    randomData<-as.data.frame(cbind(pd,data[,preds64]))
-    pnames<-c("cluster","group","lines","plots")
-    names(randomData)<-c("y",pnames[1:length(preds64)])
-    note<-self$results$plotnotes
-    note$setContent(paste('<i>Note</i>: Random effects are plotted by',jmvcore::fromB64(cluster)))
-    note$setVisible(TRUE)
-  } else
-    randomData<-NULL
-  predData<-gplots.preparePlotData(model,
-                               groupName,
-                               linesName,
-                               plotsName,
-                               errorBarType,
-                               ciWidth,
-                               conditioning=private$.cov_condition)
- 
-  yAxisRange <- gplots.range(model,depName,predData,rawData)
-  
-  if (!optionRaw)
-    rawData<-NULL
-  
-  ### this for mixed only ###
-  if (!is.null(randomData)) {
-             yAxisRange[which.max(yAxisRange)]<-max(max(randomData$y),max(yAxisRange))
-             yAxisRange[which.min(yAxisRange)]<-min(min(randomData$y),min(yAxisRange))
-    }
-  
-  gplots.images(self,data=predData,raw=rawData,range=yAxisRange,randomData=randomData)
-  
-  ####### random effect plots #########
-
-
-},
-
-.descPlot=function(image, ggtheme, theme, ...) {
-
-  if (is.null(image$state))
-    return(FALSE)
-  
-  depName <- self$options$dep
-  groupName <- self$options$plotHAxis
-  linesName <- self$options$plotSepLines
-  plotsName <- self$options$plotSepPlots
-  errorType <- self$options$plotError
-  ciWidth   <- self$options$ciWidth
-  order<-1
-
-  if (self$options$plotRandomEffects) {
-       mterms<-self$options$modelTerms
-       forder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
-       mterms<-self$options$randomTerms
-       rorder<-1
-       if (is.something(grep(groupName,mterms)))
-           rorder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
-       order<-max(forder,rorder)
-  }
-  if (errorType=="ci")
-    errorType<-paste0(ciWidth,"% ",toupper(errorType))
-  
-  if ( ! is.null(linesName)) {
-    p<-gplots.twoWaysPlot(image,ggtheme,depName,groupName,linesName,errorType,order=order)
-  } else {
-    p<-gplots.oneWayPlot(image,ggtheme,depName,groupName,errorType,order=order)
-  }       
-  return(p)
-},
-
 
 .qqPlot=function(image, ggtheme, theme, ...) {
 
@@ -839,7 +498,7 @@ gamljMixedClass <- R6::R6Class(
 
 .formula = function() {
 
-  private$.names64$translate(private$.modelFormula())
+  private$.estimate_machine$formula
   
 },
 .sourcifyOption = function(option) {

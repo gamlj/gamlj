@@ -3,11 +3,8 @@ j_DEBUG=T
 j_INFO=T
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
-### this should be removed ###
-DUMMY_TAIL<-"_._._"
 
-
-FACTOR_SYMBOL="._._._."
+FACTOR_SYMBOL="$_$_$_$"
 INTERACTION_SYMBOL="._._._.X._._._."
 
 
@@ -60,6 +57,7 @@ will be estimated"
 WARNS["lmer.nogood"]<-"Results may be uninterpretable or misleading. Try to refine your model."
 WARNS["lmer.chisq"]<-"ML estimation of F-Tests failed. Chi-squared tests were performed."
 WARNS["lmer.singular"]<-"(Almost) singular fit. Maybe random coefficients variances are too small or correlations among them too large."
+WARNS["r2.nogood"]<-"R-squared cannot be computed for this model"
 
 ######### posst hoc ###################
 WARNS["ph.nojoy"]<-"Post-hoc tests cannot be estimated. Try simplifying your model removing interactions or covariates"
@@ -77,16 +75,9 @@ WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 
 ###############################################################
 
-
-########## contrast definition info ################
-
-CONTR<-list()
-
-
-######## lme4 optimizers #########
-
-OPTIMIZERS<-c("bobyqa","Nelder_Mead","nloptwrap")
-
+TRANSWARNS<-list()
+TRANSWARNS[[1]]<-list(original="Respecify random",new="Random component variances may be to small to compute R-squares")
+TRANSWARNS[[2]]<-list(original="odel failed to converge with",new="There were problems in model convergence. Results may be bias. Try to specify a different random component.")
 
 
 

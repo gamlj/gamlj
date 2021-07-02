@@ -140,9 +140,14 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
   last<-start-1
   if (append)  last<-table$rowCount
   
+  maxrow<-table$rowCount
 
-  FUNC<-function(i,w) table$setRow(rowNo=i,w)
-  if (append)   FUNC<-function(i,w) table$addRow(rowKey=i,w)
+  insert<-function(i,w) {
+    if (i>maxrow)
+        table$addRow(rowKey=i,w)
+    else
+        table$setRow(rowNo=i,w)
+  }
 
   if (inherits(obj,"data.frame")) 
       obj<-lapply(1:nrow(obj),function(i) obj[i,])
@@ -154,7 +159,7 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
               t<-obj[[i]]
               if (fixNA) 
                   t[which(is.na(t))]<-""
-              FUNC(i+last,t)
+              insert(i+last,t)
    }
   if (is.numeric(spaceby)) 
              spaceby<-onames[spaceby]
@@ -175,7 +180,11 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
   table$setVisible(TRUE)
 }
 
-j.add_warnings<-function(atable,adispatch,atopic) {
+j.add_warnings<-function(atable,adispatch,atopic,reset=FALSE) {
+
+  if (reset) {
+    mark("atable footnote",atable$footnotes)
+  }
   
   if (!is.something(adispatch$warnings[[atopic]]) & !is.something(adispatch$errors[[atopic]]))
          return()
@@ -183,7 +192,10 @@ j.add_warnings<-function(atable,adispatch,atopic) {
   if (is.something(adispatch$errors[[atopic]])) 
             atable$setError(paste(adispatch$errors[[atopic]],collapse = "; "))
   
-  for (i in seq_along(adispatch$warnings[[atopic]]))
+  if (inherits(atable,"Html"))
+          atable$setContent(paste(adispatch$warnings[[atopic]],collapse = "; "))
+  else
+      for (i in seq_along(adispatch$warnings[[atopic]])) 
                atable$setNote(i,adispatch$warnings[[atopic]][[i]])
 
   atable$setVisible(TRUE)

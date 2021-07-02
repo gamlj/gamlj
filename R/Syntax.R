@@ -28,6 +28,10 @@ Syntax <- R6::R6Class(
               tab_r2=NULL,
               tab_fit=NULL,
               tab_relativerisk=NULL,
+              tab_random=NULL,
+              tab_randomCov=NULL,
+              tab_randomTests=NULL,
+              
               datamatic=NULL,
               infomatic=NULL,
               initialize=function(options,datamatic) {
@@ -83,26 +87,32 @@ Syntax <- R6::R6Class(
           ),
           private=list(
             .constructFormula=function() {
+              
               # this allows intercept only model to be passed by syntax interface
               self$hasIntercept<-self$options$fixedIntercept
               modelTerms<-self$options$modelTerms
               aOne<-which(unlist(self$options$modelTerms)=="1")
+              
               if (is.something(aOne)) {
                 modelTerms[[aOne]]<-NULL
                 self$hasIntercept=TRUE
               }
+              
               self$hasTerms <-(length(modelTerms)>0)
               self$isProper <-(self$hasIntercept | self$hasTerms)
               
+              rands<-NULL
+              if (self$option("randomTerms")) 
+                     rands<-private$.buildreffects()
+
               sep<-"+"
                 if (!self$hasTerms) sep=""
-                rform<-jmvcore::composeFormula(NULL,modelTerms)
-                rform<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),rform)
-                self$formula<-rform
 
-                rform<-jmvcore::composeFormula(NULL,tob64(modelTerms))
-                rform<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),rform)
-                self$formula64<-rform
+                fixed<-jmvcore::composeFormula(NULL,tob64(modelTerms))
+                fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed)
+                self$formula64<-trimws(paste(fixed,rands,sep =  ""))
+                self$formula<-fromb64(self$formula64,self$vars)
+
                 
               
             },
@@ -115,6 +125,15 @@ Syntax <- R6::R6Class(
               
               if (self$option("dep_scale"))
                     self$tab_info[["dep"]]<-list(info="Y transform",value=self$options$dep_scale)
+              
+              if (is.something(self$infomatic$r2)) {
+                 
+                 self$tab_r2<-lapply(self$infomatic$r2, function(x) list(type=x))
+              }
+              
+              ## some warnings ###
+              if (self$option("cimethod","boot"))
+                  self$warnings<-list(topic="tab_info",message="Bootstrap C.I. are being computed, this may take a while")
 
               ### anova table ###
               
@@ -134,9 +153,8 @@ Syntax <- R6::R6Class(
               if (is.something(self$infomatic$fit))
                   self$tab_fit<-self$infomatic$info_fit()
 
-              
               ### parameter estimates ####
-              .terms<-colnames(model.matrix(as.formula(self$formula64),self$datamatic$data_structure64))
+              .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
               .len<-length(.terms)
               if (self$options$modelSelection=="multinomial") {
                 .len  <- .len * (self$datamatic$dep$nlevels-1)
@@ -280,8 +298,58 @@ Syntax <- R6::R6Class(
                     self$tab_relativerisk<-simtab
               }
               
+              if (self$option("randomTerms")) {
+                count<-sum(unlist(sapply(self$options$randomTerms, length)))
+                self$tab_random<-rep(list(groups=""),count+1)
+              }
+              
 
+            },
+            .buildreffects=function() {
+              
+              terms  <-  self$options$randomTerms
+              ## this is for R. It overrides the correlatedEffect option 
+              if (length(terms)>1)
+                   correl  <-  "block"
+              
+              # remove empty sublists
+              terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
+              
+              # split in sublists if option=nocorr
+              if (self$options$correlatedEffects=="nocorr") {
+                termslist<-terms[[1]]
+                terms<-lapply(termslist,list)
+              }
+              rterms<-""    
+              for(i in seq_along(terms)) {
+                one<-terms[[i]]
+                one64<-lapply(one,jmvcore::toB64)
+                flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
+                res<-do.call("rbind",flatterms)
+                ### check blocks coherence
+                if (length(unique(res[,2]))>1 && correl=="block")
+                    stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
+                
+                res<-tapply(res[,1],res[,2],paste)
+                res<-sapply(res, function(x) paste(x,collapse = " + "))
+                
+                ### delat with intercept ###
+                test<-grep(jmvcore::toB64("Intercept"),res,fixed=TRUE)
+                if (is.something(test))
+                  res<-gsub(jmvcore::toB64("Intercept"),1,res)
+                else
+                  res[[1]]<-paste(0,res[[1]],sep = "+")
+                
+                ### compose ####
+                form<-paste(res,names(res),sep=" | ")
+                form<-paste("(",form,")")
+                rterms<-paste(rterms,form,sep = "+")
+              }
+              ## paste and return ``
+              rterms<-paste(rterms,collapse = "")
+              rterms
             }
+            
 
 
 

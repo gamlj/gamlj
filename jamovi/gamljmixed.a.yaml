@@ -46,6 +46,20 @@ options:
       type: Data
       description:
           R: the data as a data frame
+          
+          
+    - name: caller
+      type: String
+      default: "lmer"
+      hidden: true
+
+    - name: modelSelection
+      type: List
+      hidden: true
+      options:
+        - name: "lmer"
+      default: "lmer"
+          
 
     - name: dep
       title: Dependent Variable
@@ -167,8 +181,6 @@ options:
             `TRUE` or `FALSE` (default), provide contrast coefficients tables
 
 
-
-
     - name: plotHAxis
       title: Horizontal axis
       type: Variable
@@ -184,16 +196,20 @@ options:
       default:
       description:
           R: >
-            a string naming the variable represented as separate lines on the
+            a string naming the variable represented as separate lines in the
             plot
 
     - name: plotSepPlots
       title: Separate plots
-      type: Variable
+      type: Variables
       default:
+      
       description:
           R: >
-            the variable for whose levels multiple plots are computed
+            a list of string naming the variables defining the levels for multiple plots
+
+
+
 
     - name: plotRaw
       title: Observed scores
@@ -242,29 +258,20 @@ options:
             interval width
 
 
-    - name: postHoc
+    - name: posthoc
       title: Post Hoc Tests
       type: Terms
       default:
       description:
-          R: a list of terms to perform post-hoc tests on
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
 
 
-    - name: eDesc
+    - name: emmeans
       title: Estimated Marginal Means
-      type: Bool
-      default: false
+      type: Terms
+      default:
       description:
-          R: >
-            `TRUE` or `FALSE` (default), provide lsmeans statistics
-
-    - name: eCovs
-      title: Include covariates
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide lsmeans statistics
+          R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
 
 
     - name: simpleVariable
@@ -275,21 +282,14 @@ options:
           R: >
             The variable for which the simple effects (slopes) are computed
 
-    - name: simpleModerator
-      title: Moderator
-      type: Variable
+    - name: simpleModerators
+      title: Moderators
+      type: Variables
       default:
       description:
           R: >
             the variable that provides the levels at which the simple effects computed
 
-    - name: simple3way
-      title: Breaking variable
-      type: Variable
-      default:
-      description:
-          R: >
-            a moderator of the two-way interaction which is probed
 
 
     - name: simpleScale
@@ -339,6 +339,14 @@ options:
              decide the labeling of simple effects in tables and plots. 
              `labels` indicates that only labels are used, such as `Mean` and 
              `Mean + 1 SD`. `values` uses the actual values as labels. `values_labels` uses both.
+
+    - name: simpleInteractions
+      title: Simple Interactions
+      type: Bool
+      default: false
+      description:
+          R: >
+            should simple Interactions be computed
 
 
 ############ generic with some specs ###########
@@ -491,6 +499,15 @@ options:
             `TRUE` or `FALSE` (default), add random effects predicted values in the
             plot
             
+    - name: plotOriginalScale
+      title: Covariate scale 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use original scale for covariates.
+
+            
     - name: cimethod
       title: CI Method
       type: List
@@ -570,22 +587,6 @@ options:
     - name: residuals
       title: Residuals
       type: Output            
-
-
-### this is for model comparisons
-
-    - name: modelcomparison
-      title: Store model
-      type: Bool
-      default: false
-
-    - name: modelid
-      title: Model ID
-      type: String            
-    - name: modeldescription
-      title: Model Description
-      type: String            
-
 
 
 ...

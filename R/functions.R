@@ -38,7 +38,6 @@ is.something <- function(x, ...) UseMethod(".is.something")
 .is.something.logical <- function(obj) !is.na(obj)
 
 
-
 #### This function run an expression and returns any warnings or errors without stopping the execution.
 #### It does not reterun the results, so the expr should assign a valut to the results
 #### something like try_hard({a<-3^2}) and not a<-try_hard(3^2)

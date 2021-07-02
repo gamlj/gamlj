@@ -425,7 +425,7 @@ items:
         clearWith: []
         items:
            - type: Table
-             name: interactionAnova
+             name: anova
              title: ANOVA test -  $key
              columns:
                    - name: effect
@@ -443,7 +443,7 @@ items:
                      format: zto,pvalue
 
            - type: Table
-             name: interactionCoefficients
+             name: coefficients
              title: Parameter Estimates for -  $key
              columns:
                    - name: effect
