@@ -20,6 +20,7 @@ Variable <- R6::R6Class(
     method=NULL,
     scaling="none",
     hasCluster=NULL,
+    isBetween=TRUE,
     initialize=function(var,options) {
       self$name<-var
       self$options<-options
@@ -118,19 +119,31 @@ Variable <- R6::R6Class(
     },
     get_values=function(data) {
       
-      vardata<-data[[self$name]]
-      
+       vardata<-data[[self$name64]]
+       
       if (self$type=="factor") {
         if (!is.factor(vardata)) {
           vardata<-factor(vardata)
           self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to factor"))
         }
         contrasts(vardata)<-self$contrast_values
+        
+        # check if is within or between in case of repeated measures
+        
+        if (is.something(self$hasCluster) && self$type=="factor" && length(vardata)>0) {
+          tt<-table(data[[tob64( self$hasCluster[[1]])]],vardata)
+          tt<-apply(tt,1,function(t) max(t)==sum(t))
+          mark(self$name,tt)
+          if (!all(tt))
+             self$isBetween<-FALSE
+        }
+        mark(self$name,self$isBetween)
         return(vardata)
 
       }
       else {
-           return(private$.continuous_values(vardata))
+        ### this should work with data, not variable
+           return(private$.continuous_values(data))
       }
       
       contrast_codes=function(type) {
@@ -360,11 +373,13 @@ Variable <- R6::R6Class(
       return(labels)
     },
     
-    .continuous_values=function(vardata) {
+    .continuous_values=function(data) {
       
 
-      if (is.null(vardata))
-           return(NULL)
+      if (nrow(data)==0)
+           return(data[[self$name64]])
+
+      vardata<-data[[self$name64]]
 
       if (is.factor(vardata)) 
            vardata<-jmvcore::toNumeric(vardata)
@@ -375,21 +390,25 @@ Variable <- R6::R6Class(
       
       method<-self$scaling
       
-      by<-self$hasCluster
+    
+      if (is.something(self$hasCluster))
+            by<-data[[tob64(self$hasCluster)]]
 
       if (method=="centered") 
         vardata<-scale(vardata,scale = F)  
-      if (method=="cluster-based centered") {    
+      if (method=="clusterbasedcentered") {    
         vardata<-unlist(tapply(vardata,by,scale,scale=F))
       }
       if (method=="standardized") 
         vardata<-scale(vardata,scale = T)  
-      if (method=="cluster-based standardized")     
+      if (method=="clusterbasedstandardized")     
         vardata<-unlist(tapply(vardata,by,scale,scale=T))
 
-      if (method=="log") 
+      if (method=="log") {
         vardata<-log(vardata)  
-      
+        if (any(is.nan(vardata)))
+          self$errors<-list(topic="info",message=paste("Negative values found in variable",self$name,". Log transform not applicable."))
+      }
             
       private$.update_levels(vardata)
       
@@ -486,16 +505,20 @@ Datamatic <- R6::R6Class(
       private$.inspect_data(data)
 
     },
-    cleandata=function(data) {
+
+     cleandata=function(data) {
       
-      data64<-data
-      names(data64)<-tob64(names(data))
+      data64          <-   data
+      names(data64)   <-   tob64(names(data))
+
       for (var in self$variables) {
-            data64[[var$name64]]<-var$get_values(data)
+                      data64[[var$name64]]   <-  var$get_values(data64)
       }
+      
       attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       data64 <- jmvcore::naOmit(data64)
       self$N<-dim(data64)[1]
+      self$absorbe_issues(self$variables)
       return(data64)
 
     },
@@ -534,10 +557,7 @@ Datamatic <- R6::R6Class(
        
        self$variables<-lapply(self$vars,function(var) Variable$new(var,self$options)$checkVariable(data))
        names(self$variables)<-unlist(lapply(self$variables,function(var) var$name64))
-       ### we get all the warnings from the variables ###
-       self$absorbe_warnings(self$variables)
-       ### TODO: the same for errors ####
-
+       
        labels<-list()
        for (var in self$variables) 
            for (i in seq_along(var$paramsnames64)) {

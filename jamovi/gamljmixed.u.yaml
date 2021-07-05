@@ -385,11 +385,12 @@ children:
                 name: plotDvScale
               - type: CheckBox
                 name: plotRandomEffects
-          - type: LayoutBox
-            margin: large
+          - type: Label
+            label: Use
             children:
               - type: CheckBox
                 name: plotOriginalScale
+                
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

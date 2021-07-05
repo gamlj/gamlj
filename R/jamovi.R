@@ -183,7 +183,8 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
 j.add_warnings<-function(atable,adispatch,atopic,reset=FALSE) {
 
   if (reset) {
-    mark("atable footnote",atable$footnotes)
+    for (a in atable$notes)
+       a$note<-NULL
   }
   
   if (!is.something(adispatch$warnings[[atopic]]) & !is.something(adispatch$errors[[atopic]]))

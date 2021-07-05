@@ -83,8 +83,11 @@ Estimate <- R6::R6Class("Estimate",
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
+                              
+                              ### check the dependent variable ####
+                              if (is.something(self$datamatic$errors))
+                                  stop(unlist(self$datamatic$errors))
                             
-                              ### check the dependent variable #### 
                               if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
                                     t2  <-  paste(self$infomatic$deptype,collapse = " or ")
                                     t1  <-  self$datamatic$dep$type
@@ -134,7 +137,7 @@ Estimate <- R6::R6Class("Estimate",
                                 self$tab_info[["sample"]]$value<-self$datamatic$N
                                 
                                 ## TODO: generalize if other models need an optimizer other than lmer
-                                if (isTRUE(self$infomatic))
+                                if (isTRUE(self$infomatic$optimized))
                                      self$tab_info[["optim"]]$value<-self$model@optinfo$optimizer
                                 
                                 self$tab_info[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
@@ -244,7 +247,8 @@ Estimate <- R6::R6Class("Estimate",
 
                                 #### LRT for random effects ####
                                 if (self$option("lrtRandomEffects")) {
-                                  
+                                  ## this is required bu lmerTest::ranova() wich looks in the parent for data
+                                  data<-self$model@frame
                                   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
                                   self$warnings<-list(topic="tab_randomTests",message=results$warning)
                                   if (!isFALSE(results$error))
@@ -348,6 +352,7 @@ Estimate <- R6::R6Class("Estimate",
                             tables<-procedure.simpleInteractions(self)
                             self$tab_simpleInteractionCoefficients<-tables[[1]]
                             self$tab_simpleInteractionAnova<-tables[[2]]
+                            mark(self$tab_simpleInteractionAnova)
                             
                           },
                           

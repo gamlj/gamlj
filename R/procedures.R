@@ -167,13 +167,17 @@ procedure.emmeans<-function(obj) {
         conditions[[.term]]<-var$levels 
       }
     }
+    df<-NULL
+    if (obj$option("dfmethod"))
+        df<-tolower(obj$options$dfmethod)
+    
     ### now we get the estimated means #######
     referenceGrid<-emmeans::emmeans(obj$model,
                                     specs=term64,
                                     at=conditions,
                                     type="response",
                                     nesting = NULL,
-                                    lmer.df = "Satterthwaite")
+                                    lmer.df = df)
     tableData<-as.data.frame(referenceGrid)
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","ci.lower","ci.upper")
@@ -227,6 +231,9 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       }
     }
     ### now we get the estimated means #######
+    df<-NULL
+    if (obj$option("dfmethod"))
+      df<-tolower(obj$options$dfmethod)
     
     if (varobj$type=="factor") {
       ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
@@ -234,7 +241,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
                                       specs=c(variable64,term64),
                                       at=conditions,
                                       nesting = NULL,
-                                      lmer.df = "Satterthwaite")
+                                      lmer.df = df)
       estimates<-emmeans::contrast(referenceGrid,
                                    by=term64,
                                    method =.local.emmc,
@@ -243,13 +250,13 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       
     }
     else {
-      args<-list(obj$model,specs = term64, var = variable64, at = conditions,infer=c(T,T))
+      args<-list(obj$model,specs = term64, var = variable64, at = conditions,infer=c(T,T),lmer.df=df)
       estimates <- do.call(emmeans::emtrends, args)
       
     }
     ##
     res<-as.data.frame(estimates)
-mark(res)
+    
     if (varobj$type=="factor") {
       
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
@@ -261,7 +268,6 @@ mark(res)
             res$contrast<-varobj$name
     }
     
-mark(res)    
     for (.name in term64) {
             res[[.name]]<-factor(res[[.name]])
             levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
@@ -271,7 +277,7 @@ mark(res)
     res$contrast<-as.character(res$contrast)
     
     params<-res
-mark(params)
+
     ### now we build the anova table ###à
     res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
     names(res)<-c(term64,"df1","df2","test","p")
@@ -318,8 +324,7 @@ mark(params)
 
 .simpleEffects.multinom<-function(model,obj) {
 
-        mark("multinom simple effects")
-  
+
         levels <-lapply(obj$options$simpleModerators, function(x) {
     
                 if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
@@ -403,6 +408,11 @@ procedure.simpleInteractions<-function(obj) {
       termobj<-sapply(term64,function(term) obj$datamatic$variables[[term]])
       n<-length(term64)
       j<-n
+      
+      df<-NULL
+      if (obj$option("dfmethod"))
+        df<-tolower(obj$options$dfmethod)
+      
       params<-list()
       anovas<-list()
       while(j>1) {
@@ -420,9 +430,9 @@ procedure.simpleInteractions<-function(obj) {
             .names<-setdiff(term64,mods)
             
             if (varobj$type=="numeric")
-                  results<-try_hard(emmeans::emtrends(obj$model,specs = term64, var = variable64, at = conditions))
+                  results<-try_hard(emmeans::emtrends(obj$model,specs = term64, var = variable64, at = conditions,lmer.df=df))
             else  { 
-                  results<-try_hard(emmeans::emmeans(obj$model,specs = c(variable64,term64), at = conditions))
+                  results<-try_hard(emmeans::emmeans(obj$model,specs = c(variable64,term64), at = conditions,lmer.df=df))
                   .names<-c(variable64,.names)
                   
             }

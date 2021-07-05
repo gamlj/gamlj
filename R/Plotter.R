@@ -301,7 +301,7 @@ Plotter <- R6::R6Class(
                        } else 
                               rdata<-randomData
                          
-                        if (is.something(self$scatterZ) && self$scatterZ$type=="factor") {
+                        if (is.something(self$scatterZ) && self$scatterZ$type=="factor" && self$scatterZ$isBetween) {
                                    selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]], rdata[[self$scatterZ$name64]])
                                    .rnames<-c("cluster","x","z","y")
                         }
@@ -327,7 +327,7 @@ Plotter <- R6::R6Class(
              if (!is.null(randomData)) {
                
                rdata<-randomData
-               if (is.something(self$scatterZ) && self$scatterZ$type=="factor") {
+               if (is.something(self$scatterZ) && self$scatterZ$type=="factor" && self$scatterZ$isBetween) {
                    selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]], rdata[[self$scatterZ$name64]])
                   .rnames<-c("cluster","x","z","y")
                }

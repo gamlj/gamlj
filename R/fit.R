@@ -84,7 +84,14 @@ fit.R2<- function(model,...) UseMethod(".R2")
   r2<-.R2.default(model,obj)
   if (is.na(r2))
       return(NULL)
-  tests<-fit.compare_null_model(model,type="m")
+  results<-try_hard(fit.compare_null_model(model,type="m"))
+  
+  if (!isFALSE(results$error)) {
+      obj$errors<-list(topic="tab_r2",message="R-squared cannot be computed")
+      return()
+  }
+  
+  tests<-results$obj
   tests$r2<-r2$R2_marginal
   alist[[1]]<-tests
   if (!is.na(r2$R2_conditional)) {
@@ -137,6 +144,11 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
           form<-update(formula(model),paste("~ 1 + (",lme4::findbars(formula(model)),")"))
           model0  <-  stats::update(model, form ,data=data)
   }
+  ### please note that here we use performance::test_likelihoodratio, which compute the LRT 
+  ### on the esimated models, no matter what REML is. If one compares the results with 
+  ### lmerTest::anova() they are slightly different because the latter re-estimate the models
+  ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
+  
   results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
   names(results)<-c("nothing1","nothing2","nothing3","df","test","p")
   results[2,c("df","test","p")]

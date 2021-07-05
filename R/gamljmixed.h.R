@@ -1125,12 +1125,16 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `type`="text"),
                                     list(
                                         `name`="f", 
-                                        `title`="X\u00B2", 
+                                        `title`="F", 
                                         `type`="number"),
                                     list(
                                         `name`="df1", 
                                         `title`="df", 
-                                        `type`="integer"),
+                                        `type`="number"),
+                                    list(
+                                        `name`="df2", 
+                                        `title`="df", 
+                                        `type`="number"),
                                     list(
                                         `name`="p", 
                                         `title`="p", 

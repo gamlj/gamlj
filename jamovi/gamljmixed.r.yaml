@@ -531,11 +531,15 @@ items:
                      title: 'Effect'
                      type: text
                    - name: f
-                     title: X²
+                     title: F
                      type: number
                    - name: df1
                      title: df
-                     type: integer
+                     type: number
+                   - name: df2
+                     title: df
+                     type: number
+
                    - name: p
                      title: p
                      type: number

@@ -29,23 +29,27 @@ Dispatch <- R6::R6Class(
     },
     
     ### this requires that sooner or later something is a Dispatch object ###
-    absorbe_warnings=function(obj) {
+    absorbe_issues=function(obj) {
 
       if (!is.something(obj))
          return()
-      
       if (inherits(obj,"Dispatch")) {
               wars<-obj$warnings
-              if (!is.something(wars))
-                    return()
+              errs<-obj$errors
               for (topicname in names(wars)) {
                       topic<-wars[[topicname]]
                       for (t in topic) 
                               self$warnings<-list(topic=topicname,message=t)
               }
+              for (topicname in names(errs)) {
+                topic<-errs[[topicname]]
+                for (t in topic) 
+                  self$errors<-list(topic=topicname,message=t)
+              }
+
        } else
-            for (aobj in obj)
-                 self$absorbe_warnings(aobj)
+            for (aobj in obj) 
+                 self$absorbe_issues(aobj)
     }
     
   ),

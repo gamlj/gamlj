@@ -18,6 +18,8 @@ Infomatic <- R6::R6Class(
     calloptions=NULL,
     r2=NULL,
     optimized=FALSE,
+    df=NULL,
+    
     initialize=function(options,datamatic) {
       self$modeltype<-options$modelSelection
       dep<-options$dep
@@ -172,7 +174,8 @@ Infomatic <- R6::R6Class(
         self$direction     <-   c("y","Dependend variable scores")
         self$deptype       <-   c("numeric","integer")
         self$fit           <-   c("lik" , "aic",  "bic")
-        self$r2            <-   c("Marginal","Conditional")   
+        self$r2            <-   c("Marginal","Conditional")
+        self$df            <-   options$dfmethod
       }
       
       
@@ -194,6 +197,9 @@ Infomatic <- R6::R6Class(
      
        if (self$optimized)
              alist[["optim"]]<-list(info="Optimizer",value="",specs="") 
+
+      if (is.something(self$df))
+        alist[["df"]]<-list(info="DF method",value=self$df,specs="") 
       
       alist[["sample"]]   <-  list(info="Sample size",value="",specs="")
       alist[["conv"]]   <-  list(info="Converged",value="no yet", specs="")

@@ -77,8 +77,17 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.lmerModLmerTest<-function(model,obj) {
   
-  .summary<-summary(model)
+  results<-try_hard(summary(model,ddf=obj$options$dfmethod))
   
+  if (!isFALSE(results$error)) {
+    obj$errors<-list(topic="tab_coefficients",message=results$error)
+    return()
+  }
+  
+  obj$warnings<-list(topic="tab_coefficients",message=results$warning)
+  
+  .summary<-results$obj
+    
   .coefficients         <-  as.data.frame(.summary$coefficients)
   names(.coefficients)  <-  c("estimate","se","df","t","p")
   .coefficients$source  <-  rownames(.coefficients)
@@ -93,6 +102,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
   if (jmvcore::isError(test)) {
     obj$warnings   <-   list(topic="tab_coefficients",message="Random effects C.I. cannot be computed")
   }
+  
   return(.coefficients)
 }
 
@@ -289,18 +299,21 @@ mf.anova<- function(x,...) UseMethod(".anova")
   ano  
 }
   
-
-.anova.lmerModLmerTest<-function(model,obj) 
-   .anova.merModLmerTest(model,obj) 
-     
-.anova.merModLmerTest<-function(model,obj) {
+.anova.lmerModLmerTest<-function(model,obj) {
 
   if (!obj$hasTerms)
      return()
   
   df<-obj$options$dfmethod
+  results        <-  try_hard(stats::anova(model,type="3",ddf=df))
+  obj$errors    <-  list(topic="tab_anova",message=results$error)
+  obj$warnings  <-  list(topic="tab_anova",message=results$warning)
+
+  if (!isFALSE(results$error))
+      return()
   
-  ano<-stats::anova(model,ddf=df)
+  ano<-results$obj
+  
   if (dim(ano)[1]==0) {
     obj$warnings<-list(topic="tab_anova",message="F-Tests cannot be computed without fixed effects")
     return(ano)
@@ -309,13 +322,10 @@ mf.anova<- function(x,...) UseMethod(".anova")
     ano<-.car.anova(model,df)
     obj$warnings<-list(topic="tab_anova",message="Degrees of freedom computed with method Kenward-Roger")
     
-  } else {
-    obj$warnings<-list(topic="tab_anova",message=paste("Degrees of freedom computed with method",df))
-  }
+  } 
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
     # the factors. Here we try to fix it.
     # now we use lmerTest>3.1 that does not seem to have this problem. Check anyway in testing
-  
   test<-length(grep("F value",names(ano),fixed=T))>0
   if (test)
       names(ano)<-c("ss","ms","df1","df2","f","p")
@@ -413,7 +423,8 @@ mf.converged<- function(x,...) UseMethod(".converged")
   conv
 }
 
-.converged.lmerMerMod<-function(model) {
+.converged.lmerModLmerTest<-function(model) {
+
   
   if (!is.null(model@optinfo$conv$lme4$code))
     conv<-FALSE

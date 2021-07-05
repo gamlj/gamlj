@@ -77,7 +77,7 @@ WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 
 TRANSWARNS<-list()
 TRANSWARNS[[1]]<-list(original="Respecify random",new="Random component variances may be to small to compute R-squares")
-TRANSWARNS[[2]]<-list(original="odel failed to converge with",new="There were problems in model convergence. Results may be bias. Try to specify a different random component.")
+TRANSWARNS[[2]]<-list(original="odel failed to converge with",new="There were problems in model convergence. Results may be biased. Try to specify a different random component.")
 
 
 
