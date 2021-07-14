@@ -268,18 +268,27 @@ gamljGlmClass <- R6::R6Class(
 
 
 .qqPlot=function(image, ggtheme, theme, ...) {
+
+  if (!private$.ready$ready) 
+    return()
   
   plot<-private$.plotter_machine$qqplot(theme,ggtheme)
   return(plot)
   
 },
 .normPlot=function(image, ggtheme, theme, ...) {
+
+  if (!private$.ready$ready) 
+    return()
   
   plot<-private$.plotter_machine$normplot(theme,ggtheme)
   return(plot)
 },
 
 .residPlot=function(image, ggtheme, theme, ...) {
+
+  if (!private$.ready$ready) 
+    return()
   
   plot<-private$.plotter_machine$residplot(theme,ggtheme)
   

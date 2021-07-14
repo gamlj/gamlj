@@ -289,6 +289,9 @@ gamljMixedClass <- R6::R6Class(
 
 .qqPlot=function(image, ggtheme, theme, ...) {
   
+      if (!private$.ready$ready) 
+          return()
+
       plot<-private$.plotter_machine$qqplot(theme,ggtheme)
       return(plot)
   
@@ -296,20 +299,29 @@ gamljMixedClass <- R6::R6Class(
 
 .normPlot=function(image, ggtheme, theme, ...) {
   
+    if (!private$.ready$ready) 
+        return()
+  
     plot<-private$.plotter_machine$normplot(theme,ggtheme)
     return(plot)
   
 },
 
-.residPlot=function(image, ggtheme, theme, ...) {
+.residPlot=function(image, theme, ggtheme, ...) {
 
-  plot<-private$.plotter_machine$residplot(theme,ggtheme)
+  if (!private$.ready$ready) 
+       return()
+  
+  plot<-private$.plotter_machine$residPlot(ggtheme,theme)
   
   return(plot)
 },
 
 
 .clusterBoxplot=function(image, ggtheme, theme, ...) {
+
+  if (!private$.ready$ready) 
+    return()
   
   if (!self$options$clusterBoxplot)
     return()
@@ -322,6 +334,9 @@ gamljMixedClass <- R6::R6Class(
 
 .randHist=function(image, ggtheme, theme, ...) {
 
+  if (!private$.ready$ready) 
+    return()
+  
   if (!self$options$randHist)
     return()
   

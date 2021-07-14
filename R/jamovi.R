@@ -45,10 +45,11 @@ fromb64<- function(x,...) UseMethod(".fromb64")
       obj<-jmvcore::fromB64(obj)
       if (length(fac)>1) obj<-paste0(obj,fac[[2]])
   } else {
-    for (r in ref)
-      obj<-gsub(jmvcore::toB64(r),r,obj,fixed = T)
-      obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
-      obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
+    for (r in ref) 
+          obj<-stringr::str_replace_all(obj,paste0("\\b",jmvcore::toB64(r),"\\b"),r)
+
+    obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
+    obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
   }
   
   obj

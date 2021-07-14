@@ -541,10 +541,10 @@ Datamatic <- R6::R6Class(
           alabel<-self$labels[[ term[[i]] ]]
           if (is.something(alabel)) {
             ## if it is a contrast and its part of an interaction, we put paranthesis around
-            if (length(term)>1 & length(grep(FACTOR_SYMBOL,term[[i]]))>0) {
+            if (length(term)>1 & length(grep(FACTOR_SYMBOL,term[[i]],fixed = T))>0) {
                  alabel<-paste0("(",alabel,")")
-                 ### we want to avoid that an interactin (1-0)*(1-0) becomes (1-0)^2, so we trick 
-                 ### mvcore::stringifyTerm by adding a different string to each label
+                 ### we want to avoid that an interaction (1-0)*(1-0) becomes (1-0)^2, so we trick 
+                 ### jmvcore::stringifyTerm by adding a different string to each label
                  term[[i]]<-paste0(alabel,paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
             } else
                  term[[i]]<-alabel

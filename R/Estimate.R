@@ -41,7 +41,7 @@ Estimate <- R6::R6Class("Estimate",
                                 if ("multinom" %in% class(self$model))  type="probs" else type="response"
                                 p<-stats::predict(self$model,type=type)
                               # we need the rownames in case there are missing in the datasheet
-                                pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(model)))
+                                pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(self$model)))
                                 results$predicted$setValues(p)
                             }
                             if (self$options$residuals && results$residuals$isNotFilled()) {
@@ -118,8 +118,7 @@ Estimate <- R6::R6Class("Estimate",
                                  if(self$datamatic$variables[[tob64(t)]]$isBetween)
                                      self$warnings<-list(topic="info",message=paste("Variable",t,"does not seem to vary across clusters but its effects are set random."))
                               }
-                              mark(terms)
-                              
+
                           }
                             
                              ### end of checks ###

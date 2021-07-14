@@ -194,7 +194,7 @@ Plotter <- R6::R6Class(
         return(plot)
 
       },
-      residplot=function(theme,ggtheme)  {
+      residPlot=function(ggtheme,theme)  {
         
         if (!self$option("residPlot"))
           return()

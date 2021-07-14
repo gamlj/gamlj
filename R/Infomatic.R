@@ -251,7 +251,7 @@ Infomatic <- R6::R6Class(
 ###### info definition for models ##########
 
 DINFO<-list()
-DINFO[["gaussian"]]<-c("Gaussian","Normal distribution of residual")
+DINFO[["gaussian"]]<-c("Gaussian","Normal distribution of residuals")
 DINFO[["poisson"]]<-c("Poisson","Model for count data")
 DINFO[["binomial"]]<-c("Binomial","Dichotomous event distribution of y")
 DINFO[["multinomial"]]<-c("Multinomial","Multi-event distribution of y")
