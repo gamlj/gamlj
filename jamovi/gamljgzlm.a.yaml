@@ -259,6 +259,18 @@ options:
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width for the plots.
 
+    - name: cimethod
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name: wald
+          title: Wald (fast)
+        - name:  profile
+          title: Profile (slow)
+        - name: boot
+          title: Bootstrap (very slow)
+
     - name: emmeans
       title: Estimated Marginal Means
       type: Terms

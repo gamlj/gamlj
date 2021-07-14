@@ -121,6 +121,15 @@ options:
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width for the parameter estimates
 
+    - name: cimethod
+      title: CI Method
+      type: List
+      default: standard
+      options:
+        - name:  standard
+          title: Standard (fast)
+        - name: boot
+          title: Bootstrap (very slow)
 
 
     - name: contrasts

@@ -49,7 +49,7 @@ procedure.posthoc <- function(Obj) {
     ## so the final table will look sorted in a more sensible way
     termB64 <- jmvcore::composeTerm(jmvcore::toB64(rev(ph)))
     suppressWarnings({
-      none <- .posthoc(model, termB64, "none",ci=TRUE)
+      none <- .posthoc(model, termB64, "none",ci=TRUE, bootstrap=(Obj$options$cimethod=="boot"))
       bonferroni <- .posthoc(model, termB64, "bonferroni")
       holm <- .posthoc(model, termB64, "holm")
       tukey <- .posthoc(model, termB64, "tukey")
@@ -94,6 +94,9 @@ procedure.posthoc <- function(Obj) {
 
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
+  if (Obj$options$cimethod=="boot")
+       Obj$warnings<-list(topic="tab_posthoc",message="Bootstrap confidence intervals")
+    
   ginfo("Populate posthoc done")
 
     postHocTables
@@ -104,7 +107,7 @@ procedure.posthoc <- function(Obj) {
 ###### post hoc ##########
 .posthoc <- function(x, ...) UseMethod(".posthoc")
 
-.posthoc.default <- function(model, term, adjust,ci=FALSE) {
+.posthoc.default <- function(model, term, adjust,ci=FALSE, bootstrap=FALSE) {
 
     termf <- stats::as.formula(paste("~", term))
     data <- mf.getModelData(model)
@@ -115,6 +118,15 @@ procedure.posthoc <- function(Obj) {
       newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(ci,TRUE))
+      if (bootstrap & ci) {
+        
+        model<-parameters::bootstrap_model(model)
+        referenceGrid <- emmeans::emmeans(model, termf, type = "response", data = data)
+        ci_results<-summary(graphics::pairs(referenceGrid))
+        results$lower.CL<-ci_results$lower.HPD
+        results$upper.CL<-ci_results$upper.HPD
+        
+      }
       
     })
   results

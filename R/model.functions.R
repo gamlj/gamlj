@@ -59,12 +59,21 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
   
-      .coefficients        <-  as.data.frame(parameters::parameters(model, ci=obj$ciwidth),stringAsFactors=FALSE)
-      .coefficients$CI     <-  NULL
+      .bootstrap           <-  obj$options$cimethod=="boot"
+      .coefficients        <-  as.data.frame(parameters::parameters(
+                                                                   model,
+                                                                   ci=obj$ciwidth,
+                                                                   df_method=obj$optons$cimethod),stringAsFactors=FALSE)
+     .coefficients$CI     <-  NULL
       names(.coefficients) <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
-  
+      if (.bootstrap) {
+              bootci<-as.data.frame(parameters::parameters(model,ci=obj$ciwidth,bootstrap=TRUE),stringAsFactors=FALSE)
+              .coefficients$ci.lower  <-  bootci$CI_low
+              .coefficients$ci.upper  <-  bootci$CI_high
+              obj$warnings<-list(topic="tab_coefficients",message="Bootstrap confidence intervals")
+      }
       if (obj$option("effectSize","expb")) {
-               ex            <-  as.data.frame(parameters::parameters(model,exponentiate=TRUE))
+               ex            <-  as.data.frame(parameters::parameters(model,exponentiate=TRUE,bootstrap=.bootstrap))
                ex            <-  ex[,c("Coefficient","CI_low" ,"CI_high")]
                names(ex)     <-  c("expb","expb.ci.lower","expb.ci.upper")
               .coefficients  <-  cbind(.coefficients,ex)
@@ -442,118 +451,6 @@ mf.converged<- function(x,...) UseMethod(".converged")
 
 
 
-
-###### confidence intervals ##########
-
-mf.confint<- function(x,...) UseMethod(".confint")
-
-.confint.default<-function(model,level,parameters,method=NULL) {
-  ginfo("CI model unknown",class(model))  
-  return(FALSE)
-  
-}
-
-.confint.format<-function(ci,parameters) {
-  att<-attr(parameters,"warning")
-  if (length(ci)==0) {
-    att<-append(att,"C.I. cannot be computed")
-    attr(parameters,"warning")<-att
-    return(parameters)
-  }
-  if (jmvcore::isError(ci)) {
-    message <- jmvcore::extractErrorMessage(ci)
-    att<-append(att,paste(message,"C.I. cannot be computed"))
-    ci<-NULL
-  } else {
-    if (any(is.na(ci)))
-       att<-append(att,paste("Some C.I. cannot be computed"))
-    if (nrow(ci)==nrow(parameters)) {
-         parameters<-cbind(parameters,ci)
-    } else {
-         parameters$order<-1:dim(parameters)[1]
-         parameters<-merge(ci,parameters,by="row.names",all.y=TRUE)
-         parameters<-parameters[order(parameters$order),]
-         parameters$order<-NULL
-    }
-#    parameters<-cbind(parameters,ci)
-    attr(parameters,"warning")<-att
-  }
-  return(parameters)
-  
-}
-.confint.lm<-function(model,level,parameters)  {
-    ci<-try(stats::confint(model,level=level))
-    ci<-data.frame(ci)
-    colnames(ci)<-c("cilow","cihig")
-   .confint.format(ci,parameters)
-}
-.confint.glm<-function(model,level,parameters) {  
-     ci<-try(stats::confint(model,level = level))
-     if (jmvcore::isError(ci)) 
-       return(.confint.format(ci,parameters))
-     if (is.null(dim(ci)))
-       ci<-matrix(ci,ncol=2)
-     ci<-data.frame(ci)
-     colnames(ci)<-c("cilow","cihig")
-     ci["ecilow"]<-exp(ci["cilow"])     
-     ci["ecihig"]<-exp(ci["cihig"])
-     .confint.format(ci,parameters)
-    
-}
-
-.confint.merModLmerTest<-function(model,level,parameters,method="wald") 
-                                return(.confint.lmer(model,level,parameters,method=method))
-
-.confint.lmerModLmerTest<-function(model,level,parameters,method="wald") 
-  return(.confint.lmer(model,level,parameters,method=method))
-
-.confint.lmer<-function(model,level,parameters,method="wald")  {
-     if (method=="wald")
-               method<-"Wald"
-     
-      ci<-try(stats::confint(model,method=method,level=level))
-      if (jmvcore::isError(ci)) 
-        return(.confint.format(ci,parameters))
-      
-      ci<-ci[!is.na(ci[,1]),]
-      if (is.null(dim(ci)))
-          ci<-matrix(ci,ncol=2)
-      ci<-data.frame(ci)
-      colnames(ci)<-c("cilow","cihig")
-      .confint.format(ci,parameters)
-  }
-
-.confint.glmerMod<-function(model,level,parameters,method="wald")  {
-  if (method=="wald")
-        method="Wald"
-  ci<-stats::confint(model,level=level,method=method)
-  w<-grep(".sig",rownames(ci),fixed=T,invert = T)
-  ci<-ci[w,]
-  if (is.null(dim(ci)))
-    ci<-matrix(ci,ncol=2)
-  ci<-data.frame(ci)
-  colnames(ci)<-c("cilow","cihig")
-  ci["ecilow"]<-exp(ci["cilow"])     
-  ci["ecihig"]<-exp(ci["cihig"])
-  .confint.format(ci,parameters)
-}
-
-
-.confint.multinom <- function (object, level, parameters) 
-  {
-  ci<-stats::confint(object,level=level)
-  cim<-NULL
-  for (i in seq_len(dim(ci)[3]))
-     cim<-rbind(cim,(ci[,,i]))
-  cim<-as.data.frame(cim)
-  rownames(cim)<-1:length(cim[,1])
-  rownames(parameters)<-1:length(cim[,1])
-  colnames(cim)<-c("cilow","cihig")
-  cim["ecilow"]<-exp(cim["cilow"])     
-  cim["ecihig"]<-exp(cim["cihig"])
-  .confint.format(cim,parameters)
-
-}
 
 
 ########### to be removed and update with mi.xxx #########

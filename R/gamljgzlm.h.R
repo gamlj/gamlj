@@ -26,6 +26,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotOriginalScale = FALSE,
             plotError = "none",
             ciWidth = 95,
+            cimethod = "wald",
             emmeans = NULL,
             posthoc = NULL,
             simpleVariable = NULL,
@@ -170,6 +171,14 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 min=50,
                 max=99.9,
                 default=95)
+            private$..cimethod <- jmvcore::OptionList$new(
+                "cimethod",
+                cimethod,
+                default="wald",
+                options=list(
+                    "wald",
+                    "profile",
+                    "boot"))
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -320,6 +329,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
+            self$.addOption(private$..cimethod)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simpleVariable)
@@ -360,6 +370,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotOriginalScale = function() private$..plotOriginalScale$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
+        cimethod = function() private$..cimethod$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simpleVariable = function() private$..simpleVariable$value,
@@ -399,6 +410,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotOriginalScale = NA,
         ..plotError = NA,
         ..ciWidth = NA,
+        ..cimethod = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simpleVariable = NA,
@@ -1153,6 +1165,7 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   plots, respectively.
 #' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width for the plots.
+#' @param cimethod .
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -1240,6 +1253,7 @@ gamljGzlm <- function(
     plotOriginalScale = FALSE,
     plotError = "none",
     ciWidth = 95,
+    cimethod = "wald",
     emmeans = NULL,
     posthoc = NULL,
     simpleVariable = NULL,
@@ -1339,6 +1353,7 @@ gamljGzlm <- function(
         plotOriginalScale = plotOriginalScale,
         plotError = plotError,
         ciWidth = ciWidth,
+        cimethod = cimethod,
         emmeans = emmeans,
         posthoc = posthoc,
         simpleVariable = simpleVariable,

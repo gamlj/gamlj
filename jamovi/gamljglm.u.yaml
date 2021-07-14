@@ -407,6 +407,17 @@ children:
     stretchFactor: 1
     children:
       - type: Label
+        label: CI Method
+        children:
+          - type: RadioButton
+            name: cimethod_standard
+            optionName: cimethod
+            optionPart: standard
+          - type: RadioButton
+            name: cimethod_boot
+            optionName: cimethod
+            optionPart: boot
+      - type: Label
         label: Additional Info
         children:
           - type: CheckBox

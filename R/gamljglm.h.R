@@ -14,6 +14,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             fixedIntercept = TRUE,
             showParamsCI = TRUE,
             paramCIWidth = 95,
+            cimethod = "standard",
             contrasts = NULL,
             showRealNames = TRUE,
             showContrastCode = FALSE,
@@ -105,6 +106,13 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 min=50,
                 max=99.9,
                 default=95)
+            private$..cimethod <- jmvcore::OptionList$new(
+                "cimethod",
+                cimethod,
+                default="standard",
+                options=list(
+                    "standard",
+                    "boot"))
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -324,6 +332,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
+            self$.addOption(private$..cimethod)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
             self$.addOption(private$..showContrastCode)
@@ -368,6 +377,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
+        cimethod = function() private$..cimethod$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
         showContrastCode = function() private$..showContrastCode$value,
@@ -411,6 +421,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..fixedIntercept = NA,
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
+        ..cimethod = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
         ..showContrastCode = NA,
@@ -1305,6 +1316,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   in table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
+#' @param cimethod .
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
@@ -1424,6 +1436,7 @@ gamljGlm <- function(
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
+    cimethod = "standard",
     contrasts = NULL,
     showRealNames = TRUE,
     showContrastCode = FALSE,
@@ -1528,6 +1541,7 @@ gamljGlm <- function(
         fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
+        cimethod = cimethod,
         contrasts = contrasts,
         showRealNames = showRealNames,
         showContrastCode = showContrastCode,

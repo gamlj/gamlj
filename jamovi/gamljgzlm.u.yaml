@@ -453,8 +453,21 @@ children:
     stretchFactor: 1
     children:
       - type: Label
-        label: Additional Info
-        children: []
+        label: CI Method
+        children:
+          - type: RadioButton
+            name: cimethod_wald
+            optionName: cimethod
+            optionPart: wald
+          - type: RadioButton
+            name: cimethod_profile
+            optionName: cimethod
+            optionPart: profile
+          - type: RadioButton
+            name: cimethod_boot
+            optionName: cimethod
+            optionPart: boot
+
       - type: Label
         label: Save
         children:

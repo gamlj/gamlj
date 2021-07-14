@@ -211,6 +211,7 @@ gamljGlmClass <- R6::R6Class(
           term<-self$options$posthoc[[i]]
           aTable<-self$results$posthoc$get(key = term)
           j.fill_table(aTable,private$.estimate_machine$tab_posthoc[[i]])
+          j.add_warnings(aTable,private$.estimate_machine,"tab_posthoc")
         } 
       }
       
