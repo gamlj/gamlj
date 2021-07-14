@@ -532,13 +532,22 @@ options:
 
 
 
-    - name: qq
+    - name: qqplot
       title: Q-Q plot of residuals
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+
+    - name: homoTest
+      title: Residual Variances Homogeneity tests
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), perform homogeneity tests
+
 
     - name: normTest
       title: Normality of residuals

@@ -32,8 +32,13 @@ Plotter <- R6::R6Class(
 
       },
       preparePlots=function(image, ggtheme, theme, ...) {
-        
+        ## here are the plots that require some preparations. Other types of plots 
+        ## are not prepared because they can be handled directly by the plot call
+        ## each function skips if the plot is not required
+
         private$.prepareMainPlot()
+        private$.prepareClusterBoxplot()
+        private$.prepareRandHist()
         
       },
       scatterPlot=function(image) {
@@ -82,8 +87,7 @@ Plotter <- R6::R6Class(
                                         show.legend = FALSE, alpha = 0.5, shape = 16)
         }
         ##### END OF RAW DATA #############
-        
-        if (!is.null(self$randomData)) {
+        if (is.something(self$randomData)) {
           
           randomData<-self$randomData[[image$key]]
           if ("z" %in% names(randomData)) {
@@ -145,7 +149,128 @@ Plotter <- R6::R6Class(
            
         
         return(p)        
-      }
+      },
+      
+      qqplot=function(theme,ggtheme)  {
+        
+              if (!self$option("qqplot"))
+                         return()
+        
+              if (!is.something(private$.operator$model))
+                         return()
+
+              residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
+              df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
+              plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
+                          geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
+                          geom_point(aes(x=x,y=y), size=2, colour=theme$color[1]) +
+                          xlab("Theoretical Quantiles") +
+                          ylab("Standardized Residuals") 
+      
+               plot+ggtheme
+      },
+      
+      normplot=function(theme,ggtheme)  {
+        
+        if (!self$option("normPlot"))
+          return()
+        
+        if (!is.something(private$.operator$model))
+          return()
+        
+        fill <- theme$fill[2]
+        color <- theme$color[1]
+        data <- as.data.frame(stats::residuals(private$.operator$model))
+        names(data) <- "x"
+        # library(ggplot2)
+        plot <- ggplot2::ggplot(data = data, aes_string(x = "x")) + labs(x = "Residuals", y = "density")
+        
+        plot <- plot + ggplot2::geom_histogram(aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
+        plot <- plot + ggplot2::stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))
+        
+        themeSpec <- theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+        plot <- plot + ggtheme + themeSpec
+        
+        return(plot)
+
+      },
+      residplot=function(theme,ggtheme)  {
+        
+        if (!self$option("residPlot"))
+          return()
+        
+        if (!is.something(private$.operator$model))
+          return()
+        
+            fill <- theme$fill[2]
+            color <- theme$color[1]
+            data <- data.frame()
+            data <- as.data.frame(stats::residuals(private$.operator$model))
+            names(data) <- "res"
+            data$pred <- stats::predict(private$.operator$model)
+      
+              # library(ggplot2)
+            plot <- ggplot(data = data, aes_string(x = "pred", y = "res")) + labs(x = "Predicted", y = "Residuals")
+      
+            plot <- plot + geom_point(shape = 21, color = color, fill = fill)
+            plot <- plot + ggtheme
+            return(plot)
+      },
+      
+      clusterBoxplot=function(image,ggtheme,theme)  {
+        
+        ########## working here ##########
+
+        if (!self$option("clusterBoxplot"))
+          return()
+        
+
+        if (!is.something(private$.operator$model) )
+          return(FALSE)
+        
+        cluster<-image$state$cluster
+
+        fmodel<-lme4::fortify.merMod(private$.operator$model)
+        plot<-ggplot(fmodel, aes_string(cluster,".resid")) + geom_boxplot() + coord_flip()
+        plot<-plot+xlab(fromb64(cluster))+ylab("Residuals")
+        plot<-plot+ ggtheme 
+
+        return(plot)
+        
+      },
+        randHist=function(image,ggtheme,theme)  {
+  
+  
+              if (!self$option("randHist"))
+                  return()
+  
+  
+              if (!is.something(private$.operator$model) )
+                  return(FALSE)
+ 
+              label<-image$state$label
+              data<-image$state$data
+              fill <- theme$fill[2]
+              color <- theme$color[1]
+              alpha <- 0.4
+              plot <- ggplot(data=data, aes(x=x)) +
+                            labs(x="Coefficients", y='density')
+          
+              plot <- plot + geom_histogram(aes(y=..density..), position="identity",
+                                        stat="bin", color=color, fill=fill)
+              plot <- plot + stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
+          
+              themeSpec <- theme(axis.text.y=element_blank(),
+                             axis.ticks.y=element_blank())
+              plot <- plot + ggtheme + themeSpec
+          
+          
+          return(plot)
+  
+  
+        }
+
+      
       
   ), # end of public
   private = list(
@@ -343,6 +468,56 @@ Plotter <- R6::R6Class(
              }
       }
 
+    },
+    .prepareClusterBoxplot=function() {
+      
+      if (!self$option("clusterBoxplot"))
+        return()
+      
+      ### we get the clusters from the model because the model may contain less cluster variables than selected
+      clusters<-names(private$.operator$model@cnms)
+      
+      resultsgroup<-private$.results$assumptions$clusterBoxplot
+
+      for (cluster in clusters) {
+        title<-paste("Clustering variable:", fromb64(cluster))
+        id<-cluster
+        resultsgroup$addItem(id)
+        resultsgroup$get(key=id)$setTitle(title)
+        resultsgroup$get(key=id)$setState(list(cluster=cluster,label=fromb64(cluster)))
+        
+      }
+    },
+    .prepareRandHist=function() {
+      
+      if (!self$option("randHist"))
+        return()
+      
+  
+      if (!is.something(private$.operator$model))
+            return()
+      
+      res<-lme4::ranef(private$.operator$model)
+      clusters64<-names(res)
+      
+      resultsgroup<-private$.results$assumptions$randHist
+      
+      for (cluster in clusters64) {
+        clusterres<-res[[cluster]]
+        vars<-names(clusterres)
+        for (v in vars) {
+          data<-data.frame(clusterres[,v])
+          names(data)<-"x"
+          label<-fromb64(v,self$vars)
+          title<-paste("Coefficient",label," random across",fromb64(cluster))
+          id<-paste0(v,cluster)
+          resultsgroup$addItem(id)
+          resultsgroup$get(key=id)$setTitle(title)
+          resultsgroup$get(key=id)$setState(list(data=data,label=label))
+        }
+        
+      }
+      
     },
     
     .estimate=function(x,term) {

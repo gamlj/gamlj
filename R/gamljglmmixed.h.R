@@ -22,6 +22,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             plotSepPlots = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
+            plotOriginalScale = FALSE,
             plotError = "none",
             ciWidth = 95,
             postHoc = NULL,
@@ -149,6 +150,10 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             private$..plotDvScale <- jmvcore::OptionBool$new(
                 "plotDvScale",
                 plotDvScale,
+                default=FALSE)
+            private$..plotOriginalScale <- jmvcore::OptionBool$new(
+                "plotOriginalScale",
+                plotOriginalScale,
                 default=FALSE)
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
@@ -357,6 +362,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
+            self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..postHoc)
@@ -404,6 +410,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         plotSepPlots = function() private$..plotSepPlots$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
+        plotOriginalScale = function() private$..plotOriginalScale$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         postHoc = function() private$..postHoc$value,
@@ -450,6 +457,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..plotSepPlots = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
+        ..plotOriginalScale = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..postHoc = NA,
@@ -1130,6 +1138,8 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   statistics
 #' @param plotDvScale \code{TRUE} or \code{FALSE} (default), scale the plot
 #'   Y-Axis to the max and the min of the dependent variable observed scores.
+#' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
+#'   original scale for covariates.
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively
@@ -1235,6 +1245,7 @@ gamljGlmMixed <- function(
     plotSepPlots = NULL,
     plotRaw = FALSE,
     plotDvScale = FALSE,
+    plotOriginalScale = FALSE,
     plotError = "none",
     ciWidth = 95,
     postHoc = NULL,
@@ -1348,6 +1359,7 @@ gamljGlmMixed <- function(
         plotSepPlots = plotSepPlots,
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
+        plotOriginalScale = plotOriginalScale,
         plotError = plotError,
         ciWidth = ciWidth,
         postHoc = postHoc,

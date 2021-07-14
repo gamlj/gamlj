@@ -443,6 +443,12 @@ children:
                 name: plotRandomEffects
               - type: CheckBox
                 name: plotLinearPred
+          - type: Label
+            label: Use
+            children:
+              - type: CheckBox
+                name: plotOriginalScale
+                
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

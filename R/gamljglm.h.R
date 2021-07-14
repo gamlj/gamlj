@@ -42,7 +42,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "beta",
                 "partEta"),
             homoTest = FALSE,
-            qq = FALSE,
+            qqplot = FALSE,
             normTest = FALSE,
             normPlot = FALSE,
             residPlot = FALSE,
@@ -282,9 +282,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "homoTest",
                 homoTest,
                 default=FALSE)
-            private$..qq <- jmvcore::OptionBool$new(
-                "qq",
-                qq,
+            private$..qqplot <- jmvcore::OptionBool$new(
+                "qqplot",
+                qqplot,
                 default=FALSE)
             private$..normTest <- jmvcore::OptionBool$new(
                 "normTest",
@@ -351,7 +351,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..modelSelection)
             self$.addOption(private$..effectSize)
             self$.addOption(private$..homoTest)
-            self$.addOption(private$..qq)
+            self$.addOption(private$..qqplot)
             self$.addOption(private$..normTest)
             self$.addOption(private$..normPlot)
             self$.addOption(private$..residPlot)
@@ -395,7 +395,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         modelSelection = function() private$..modelSelection$value,
         effectSize = function() private$..effectSize$value,
         homoTest = function() private$..homoTest$value,
-        qq = function() private$..qq$value,
+        qqplot = function() private$..qqplot$value,
         normTest = function() private$..normTest$value,
         normPlot = function() private$..normPlot$value,
         residPlot = function() private$..residPlot$value,
@@ -438,7 +438,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..modelSelection = NA,
         ..effectSize = NA,
         ..homoTest = NA,
-        ..qq = NA,
+        ..qqplot = NA,
         ..normTest = NA,
         ..normPlot = NA,
         ..residPlot = NA,
@@ -1143,7 +1143,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 active = list(
                     homoTest = function() private$.items[["homoTest"]],
                     normTest = function() private$.items[["normTest"]],
-                    qq = function() private$.items[["qq"]],
+                    qqplot = function() private$.items[["qqplot"]],
                     normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]]),
                 private = list(),
@@ -1161,8 +1161,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             rows=1,
                             columns=list(
                                 list(
-                                    `name`="F", 
-                                    `type`="number"),
+                                    `name`="test", 
+                                    `type`="number", 
+                                    `title`="F"),
                                 list(
                                     `name`="df1", 
                                     `type`="integer"),
@@ -1178,14 +1179,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="normTest",
                             title="Test for Normality of residuals",
                             visible="(normTest)",
-                            rows=2,
                             columns=list(
                                 list(
-                                    `name`="test", 
+                                    `name`="name", 
                                     `title`="Test", 
                                     `type`="number"),
                                 list(
-                                    `name`="stat", 
+                                    `name`="test", 
                                     `title`="Statistics", 
                                     `type`="number"),
                                 list(
@@ -1194,9 +1194,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `format`="zto,pvalue"))))
                         self$add(jmvcore::Image$new(
                             options=options,
-                            name="qq",
+                            name="qqplot",
                             title="Q-Q Plot",
-                            visible="(qq)",
+                            visible="(qqplot)",
                             width=450,
                             height=400,
                             renderFun=".qqPlot",
@@ -1367,7 +1367,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   Default is \code{"beta"} and \code{"parEta"}.
 #' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
-#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+#' @param qqplot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
@@ -1399,7 +1399,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
 #'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
-#'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
 #'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
@@ -1452,7 +1452,7 @@ gamljGlm <- function(
                 "beta",
                 "partEta"),
     homoTest = FALSE,
-    qq = FALSE,
+    qqplot = FALSE,
     normTest = FALSE,
     normPlot = FALSE,
     residPlot = FALSE,
@@ -1553,7 +1553,7 @@ gamljGlm <- function(
         modelSelection = modelSelection,
         effectSize = effectSize,
         homoTest = homoTest,
-        qq = qq,
+        qqplot = qqplot,
         normTest = normTest,
         normPlot = normPlot,
         residPlot = residPlot,

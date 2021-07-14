@@ -392,7 +392,7 @@ children:
         name: normTest
         label: Test normality of residuals
       - type: CheckBox
-        name: qq
+        name: qqplot
         label: Q-Q plot of residuals
       - type: CheckBox
         name: normPlot

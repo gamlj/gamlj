@@ -29,6 +29,7 @@ Estimate <- R6::R6Class("Estimate",
                             private$.estimateSimpleEffects()
                             private$.estimateSimpleInteractions()
                             private$.estimateEmmeans()
+                            private$.estimateAssumptions()
                             
                             ginfo("Estimation is done...")
                           }, # end of publich function estimate
@@ -47,7 +48,7 @@ Estimate <- R6::R6Class("Estimate",
                                 ginfo("Saving residuals")
                                 p<-stats::resid(self$model)
                               # we need the rownames in case there are missing in the datasheet
-                              pdf <- data.frame(residuals=p, row.names=rownames(mf.getModelData(model)))
+                              pdf <- data.frame(residuals=p, row.names=rownames(mf.getModelData(self$model)))
                               results$residuals$setValues(pdf)
                             }
                           },
@@ -108,6 +109,18 @@ Estimate <- R6::R6Class("Estimate",
                                                stop(paste(self$infomatic$model[1],"requires a minimum of",abs(nreq),"levels"))
                                  }
                             }
+                            
+                            ## check random effects for mixed
+                            
+                            if (self$infomatic$caller=="lmer") {
+                              terms<-setdiff(unlist(unlist(self$options$randomTerms)),unlist(c("Intercept",self$options$cluster)))
+                              for (t in terms) {
+                                 if(self$datamatic$variables[[tob64(t)]]$isBetween)
+                                     self$warnings<-list(topic="info",message=paste("Variable",t,"does not seem to vary across clusters but its effects are set random."))
+                              }
+                              mark(terms)
+                              
+                          }
                             
                              ### end of checks ###
                             
@@ -352,9 +365,60 @@ Estimate <- R6::R6Class("Estimate",
                             tables<-procedure.simpleInteractions(self)
                             self$tab_simpleInteractionCoefficients<-tables[[1]]
                             self$tab_simpleInteractionAnova<-tables[[2]]
-                            mark(self$tab_simpleInteractionAnova)
+           
                             
                           },
+                        
+                         .estimateAssumptions=function() {
+                           
+                           if (self$option("homoTest")) {
+                             
+                             factors<-intersect(unique(unlist(self$options$modelTerms)),self$options$factors)
+                             
+                             if (length(factors)>0) {
+                               factors64<-tob64(factors)
+                               data<-mf.getModelData(self$model)
+                               data$res<-stats::residuals(self$model)
+                               rhs <- paste0('`', factors64, '`', collapse=':')
+                               formula <- as.formula(paste0('`res`~', rhs))
+                               result <- car::leveneTest(formula, data, center="mean")
+                               self$tab_levene<-list(list(
+                                       test=result[1,'F value'],
+                                       df1=result[1,'Df'],
+                                       df2=result[2,'Df'],
+                                       p=result[1,'Pr(>F)']))
+                             } else {
+                               
+                               self$warnings<-list(topic="tab_levene",message="Levene's test requires at least one factor in the model")
+                               
+                             }
+                             
+                             if (is.something(self$tab_normtest)) {
+                               
+                               self$tab_normtest<-list()
+                               
+                               resids<-stats::residuals(self$model)
+                               ### komogorov-smirnov
+                               test<-stats::ks.test(resids,"pnorm",mean(resids),sd(resids))
+                               self$tab_normtest[[1]]<-list(test=test$statistic,p=test$p.value)
+                               
+                               ### shapiro-wilk
+                               
+                               test<-try_hard(stats::shapiro.test(resids))
+                               
+                               if (!isFALSE(test$error))
+                                   self$warnings<-list(topic="tab_normtest",message="Shapiro-Wilk not available due to the very large number of cases")
+                               else
+                                   self$tab_normtest[[2]]<-list(test=test$obj$statistic,p=test$obj$p.value)
+                               
+
+                             }
+
+                             
+                           }
+                           
+
+                         },
                           
                           .fix_names=function(atable) {
                             

@@ -128,6 +128,14 @@ gamljGlmClass <- R6::R6Class(
           j.init_table(aTable,eTable)
         }
       }
+      
+      #### normality assuption test ####
+      if (is.something(estimate_machine$tab_normtest))
+        j.init_table(self$results$assumptions$normTest,estimate_machine$tab_normtest)
+      
+      
+      
+      
       plotter_machine$initPlots()
       
       private$.data_machine<-data_machine
@@ -217,6 +225,23 @@ gamljGlmClass <- R6::R6Class(
         } 
       }
       
+      ###### levene's test #######
+      if (self$options$homoTest) {
+        j.fill_table(self$results$assumptions$homoTest,private$.estimate_machine$tab_levene)
+        j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_levene")
+        
+      }
+      
+      ###### normality test #######
+      
+      if (self$options$normTest) {
+        j.fill_table(self$results$assumptions$normTest,private$.estimate_machine$tab_normtest)
+        j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_normtest")
+        
+      }
+      
+      
+      
       private$.plotter_machine$preparePlots()
       j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
       
@@ -243,38 +268,21 @@ gamljGlmClass <- R6::R6Class(
 
 
 .qqPlot=function(image, ggtheme, theme, ...) {
-  dep <- self$options$dep
-  factors <- self$options$factors
-  model<-private$.model      
-  if (is.null(model) )
-    return(FALSE)
   
-  data <- model$model
-  residuals <- as.numeric(scale(residuals(model)))
-  df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
-  plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
-          geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
-          geom_point(aes(x=x,y=y), size=2, colour=theme$color[1]) +
-          xlab("Theoretical Quantiles") +
-          ylab("Standardized Residuals") +ggtheme
-  
+  plot<-private$.plotter_machine$qqplot(theme,ggtheme)
   return(plot)
+  
 },
 .normPlot=function(image, ggtheme, theme, ...) {
   
-  model<-private$.model      
-  if (is.null(model) )
-    return(FALSE)
-  plot<-gplots.normPlot(model,ggtheme,theme)
+  plot<-private$.plotter_machine$normplot(theme,ggtheme)
   return(plot)
 },
 
 .residPlot=function(image, ggtheme, theme, ...) {
   
-  model<-private$.model      
-  if (is.null(model) )
-    return(FALSE)
-  plot<-gplots.residPlot(model,ggtheme,theme)
+  plot<-private$.plotter_machine$residplot(theme,ggtheme)
+  
   return(plot)
 },
 

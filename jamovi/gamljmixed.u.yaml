@@ -390,7 +390,6 @@ children:
             children:
               - type: CheckBox
                 name: plotOriginalScale
-                
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -454,7 +453,9 @@ children:
             name: normTest
             label: Test normality of residuals
           - type: CheckBox
-            name: qq
+            name: homoTest
+          - type: CheckBox
+            name: qqplot
             label: Q-Q plot of residuals
           - type: CheckBox
             name: normPlot

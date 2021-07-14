@@ -654,27 +654,47 @@ items:
     title: Assumption Checks
     type: Group
     items:
+        - name: homoTest
+          title: Test for Homogeneity of Residual Variances (Levene's)
+          type: Table
+          description: a table of homogeneity tests
+          visible: (homoTest)
+          rows: 1
+          columns:
+            - name: test
+              type: number
+              title: F
+
+            - name: df1
+              type: integer
+
+            - name: df2
+              type: integer
+
+            - name: p
+              type: number
+              format: zto,pvalue
+    
         - name: normTest
           title: Test for Normality of residuals
           type: Table
           description: a table of normality tests
           visible: (normTest)
-          rows: 2
           columns:
-            - name: test
+            - name: name
               title: Test
               type: number
 
-            - name: stat
+            - name: test
               title: Statistics
               type: number
             - name: p
               type: number
               format: zto,pvalue
 
-        - name: qq
+        - name: qqplot
           title: Q-Q Plot
-          visible: (qq)
+          visible: (qqplot)
           type: Image
           description: a q-q plot
           width: 450

@@ -3,6 +3,7 @@ Infomatic <- R6::R6Class(
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   public=list(
+    caller=NULL,
     modeltype=NULL,
     model=NULL,
     distribution=NULL,
@@ -22,6 +23,7 @@ Infomatic <- R6::R6Class(
     
     initialize=function(options,datamatic) {
       self$modeltype<-options$modelSelection
+      self$caller<-options$caller
       dep<-options$dep
       dlevs<-datamatic$variables[[tob64(dep)]]$levels_labels
       

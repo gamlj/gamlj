@@ -133,6 +133,12 @@ gamljMixedClass <- R6::R6Class(
           j.init_table(aTable,eTable)
         }
       }
+      
+
+      if (is.something(estimate_machine$tab_normtest))
+            j.init_table(self$results$assumptions$normTest,estimate_machine$tab_normtest)
+      
+            
       plotter_machine$initPlots()
       
       private$.data_machine<-data_machine
@@ -144,22 +150,6 @@ gamljMixedClass <- R6::R6Class(
       
       
       emmeans::emm_options(lmerTest.limit = 25000)  
-      #### info table #####
-      # infoTable<-self$results$info
-      # infoTable$addRow(rowKey="est",list(info="Estimate"))
-      # infoTable$addRow(rowKey="call",list(info="Call"))
-      # infoTable$addRow(rowKey="aic",list(info="AIC"))
-      # infoTable$addRow(rowKey="bic",list(info="BIC"))
-      # infoTable$addRow(rowKey="log",list(info="LogLikel."))
-      # infoTable$addRow(rowKey="r2m",list(info="R-squared Marginal"))
-      # infoTable$addRow(rowKey="r2c",list(info="R-squared Conditional"))
-      # infoTable$addRow(rowKey="conv",list(info="Converged"))
-      # infoTable$addRow(rowKey="opt",list(info="Optimizer"))
-      # 
-      # 
-      # ## random table
-      # aTable<-self$results$main$random
-      # aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
 
 
     },
@@ -256,6 +246,20 @@ gamljMixedClass <- R6::R6Class(
         } 
       }
       
+      if (self$options$homoTest) {
+               j.fill_table(self$results$assumptions$homoTest,private$.estimate_machine$tab_levene)
+               j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_levene")
+        
+      }
+      
+      if (self$options$normTest) {
+        j.fill_table(self$results$assumptions$normTest,private$.estimate_machine$tab_normtest)
+        j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_normtest")
+        
+      }
+      
+      
+      
       #save model preds and resids            
       private$.estimate_machine$savePredRes(self$results) 
       
@@ -263,6 +267,7 @@ gamljMixedClass <- R6::R6Class(
       j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
       
         
+      
         
     },
     
@@ -283,65 +288,24 @@ gamljMixedClass <- R6::R6Class(
     
 
 .qqPlot=function(image, ggtheme, theme, ...) {
+  
+      plot<-private$.plotter_machine$qqplot(theme,ggtheme)
+      return(plot)
+  
+  },
 
-  if (!self$options$qq)
-    return()
-  
-  model<-private$.model      
-  if (!is.something(model) )
-    return(FALSE)
-  
-  residuals <- as.numeric(scale(residuals(model)))
-  df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
-  plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
-          geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
-          geom_point(aes(x=x,y=y), size=2, colour=theme$color[1]) +
-          xlab("Theoretical Quantiles") +
-          ylab("Standardized Residuals") +ggtheme
-  
-  plot
-},
 .normPlot=function(image, ggtheme, theme, ...) {
-  if (!self$options$normPlot)
-    return()
-  model<-private$.model      
-  if (!is.something(model) )
-    return(FALSE)
-  plot<-gplots.normPlot(model,ggtheme,theme)
-  return(plot)
+  
+    plot<-private$.plotter_machine$normplot(theme,ggtheme)
+    return(plot)
+  
 },
 
 .residPlot=function(image, ggtheme, theme, ...) {
 
-  if (!self$options$residPlot)
-    return()
-  model<-private$.model      
-  if (!is.something(model) )
-    return(FALSE)
-  plot<-gplots.residPlot(model,ggtheme,theme)
+  plot<-private$.plotter_machine$residplot(theme,ggtheme)
   
   return(plot)
-},
-
-.prepareClusterBoxplot=function() {
-  
-  if (!self$options$clusterBoxplot)
-    return()
-  
-  model<-private$.model
-  if (!is.something(model))
-    return()
-  n64<-private$.names64
-  clusters64<-names(model@cnms)
-  image<-self$results$assumptions$clusterBoxplot
-  for (cluster in clusters64) {
-    label<-n64$nicenames(cluster)
-    title<-paste("Clustering variable:",jmvcore::fromB64(cluster))
-    id<-cluster
-    image$addItem(id)
-    image$get(key=id)$setTitle(title)
-    image$get(key=id)$setState(list(cluster=cluster,label=label))
-    }
 },
 
 
@@ -350,99 +314,24 @@ gamljMixedClass <- R6::R6Class(
   if (!self$options$clusterBoxplot)
     return()
   
-  model<-private$.model      
-  if (!is.something(model) )
-    return(FALSE)
-  label<-image$state$label
-  cluster<-image$state$cluster
-  fmodel<-lme4::fortify.merMod(model)
-  plot<-ggplot(fmodel, aes_string(cluster,".resid")) + geom_boxplot() + coord_flip()
-  plot<-plot+xlab(jmvcore::fromB64(cluster))+ylab("Residuals")
-  plot<-plot+ ggtheme 
-  note<-self$results$plotnotes
-  note$setContent(paste('<i>Note</i>: Residuals plotted by',jmvcore::fromB64(cluster)))
-  note$setVisible(TRUE)
+  plot<-private$.plotter_machine$clusterBoxplot(image,ggtheme,theme)
   
   return(plot)
 },
 
-.prepareRandHist=function() {
-  
-  if (!self$options$randHist)
-    return()
-  
-  model<-private$.model
-  if ((!self$options$randHist) | !is.something(model))
-     return()
-  n64<-private$.names64
-  res<-lme4::ranef(model)
-  clusters64<-names(res)
-  image<-self$results$assumptions$randHist
-  for (cluster in clusters64) {
-       clusterres<-res[[cluster]]
-       vars<-names(clusterres)
-       for (v in vars) {
-           data<-data.frame(clusterres[,v])
-           names(data)<-"x"
-           label<-n64$nicenames(v)
-           title<-paste("Coefficient",label," random across",jmvcore::fromB64(cluster))
-           id<-paste0(v,cluster)
-           image$addItem(id)
-           image$get(key=id)$setTitle(title)
-           image$get(key=id)$setState(list(data=data,label=label))
-       }
-
-  }
-
-
-},
 
 .randHist=function(image, ggtheme, theme, ...) {
 
   if (!self$options$randHist)
     return()
   
-  label<-image$state$label
-  data<-image$state$data
-  fill <- theme$fill[2]
-  color <- theme$color[1]
-  alpha <- 0.4
-  plot <- ggplot(data=data, aes(x=x)) +
-    labs(x="Coefficients", y='density')
-  
-  plot <- plot + geom_histogram(aes(y=..density..), position="identity",
-                                stat="bin", color=color, fill=fill)
-  plot <- plot + stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
-  
-  themeSpec <- theme(axis.text.y=element_blank(),
-                     axis.ticks.y=element_blank())
-  plot <- plot + ggtheme + themeSpec
-  
+  plot<-private$.plotter_machine$randHist(image,ggtheme,theme)
   
   return(plot)
 },
 
 
 
-.populateNormTest=function(model) {
-  
-  if ( ! self$options$normTest)
-    return()
-  table <- self$results$get('assumptions')$get('normTest')
-  
-  rr<-residuals(model)
-  ks<-ks.test(rr,"pnorm",mean(rr),sd(rr))
-  table$setRow(rowNo=1, values=list(test="Kolmogorov-Smirnov",stat=ks$statistic,p=ks$p.value))
-  
-  st<-try(shapiro.test(rr))
-  if (jmvcore::isError(st)) {
-    table$setNote("noshapiro","Shapiro-Wilk not available due to too large number of cases")
-    table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat="",p=""))
-  }
-  else
-    table$setRow(rowNo=2, values=list(test="Shapiro-Wilk",stat=st$statistic,p=st$p.value))
-  
-},
 
 
 .marshalFormula= function(formula, data, name) {

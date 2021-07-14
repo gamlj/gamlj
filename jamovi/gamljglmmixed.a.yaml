@@ -220,6 +220,15 @@ options:
              of the dependent variable observed scores.
 
 
+    - name: plotOriginalScale
+      title: Original scale 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use original scale for covariates.
+
+
     - name: plotError
       title: Error Bar Definition
       type: List

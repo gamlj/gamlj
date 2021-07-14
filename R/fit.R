@@ -3,13 +3,15 @@
 fit.R2<- function(model,...) UseMethod(".R2") 
 
 .R2.default<-function(model,obj) {
+  
   results<-try_hard(performance::r2(model,tolerance =1e-09))
   if (!isFALSE(results$error))
         obj$errors<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
-  if (is.na(results$obj))
+  if (length(results$obj)==1 && is.na(results$obj)) {
        obj$warnings<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
+       return(NULL)    
+  }
   
-    
   obj$warnings<-list(topic="tab_r2",message=results$warning)
   results$obj
 
@@ -82,7 +84,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
   alist<-list()
   r2<-.R2.default(model,obj)
-  if (is.na(r2))
+  if (is.null(r2))
       return(NULL)
   results<-try_hard(fit.compare_null_model(model,type="m"))
   

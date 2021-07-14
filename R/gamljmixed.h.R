@@ -49,7 +49,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotOriginalScale = FALSE,
             cimethod = "wald",
             dfmethod = "Satterthwaite",
-            qq = FALSE,
+            qqplot = FALSE,
+            homoTest = FALSE,
             normTest = FALSE,
             normPlot = FALSE,
             residPlot = FALSE,
@@ -323,9 +324,13 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=list(
                     "Satterthwaite",
                     "Kenward-Roger"))
-            private$..qq <- jmvcore::OptionBool$new(
-                "qq",
-                qq,
+            private$..qqplot <- jmvcore::OptionBool$new(
+                "qqplot",
+                qqplot,
+                default=FALSE)
+            private$..homoTest <- jmvcore::OptionBool$new(
+                "homoTest",
+                homoTest,
                 default=FALSE)
             private$..normTest <- jmvcore::OptionBool$new(
                 "normTest",
@@ -393,7 +398,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..cimethod)
             self$.addOption(private$..dfmethod)
-            self$.addOption(private$..qq)
+            self$.addOption(private$..qqplot)
+            self$.addOption(private$..homoTest)
             self$.addOption(private$..normTest)
             self$.addOption(private$..normPlot)
             self$.addOption(private$..residPlot)
@@ -444,7 +450,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotOriginalScale = function() private$..plotOriginalScale$value,
         cimethod = function() private$..cimethod$value,
         dfmethod = function() private$..dfmethod$value,
-        qq = function() private$..qq$value,
+        qqplot = function() private$..qqplot$value,
+        homoTest = function() private$..homoTest$value,
         normTest = function() private$..normTest$value,
         normPlot = function() private$..normPlot$value,
         residPlot = function() private$..residPlot$value,
@@ -494,7 +501,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotOriginalScale = NA,
         ..cimethod = NA,
         ..dfmethod = NA,
-        ..qq = NA,
+        ..qqplot = NA,
+        ..homoTest = NA,
         ..normTest = NA,
         ..normPlot = NA,
         ..residPlot = NA,
@@ -1250,8 +1258,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
+                    homoTest = function() private$.items[["homoTest"]],
                     normTest = function() private$.items[["normTest"]],
-                    qq = function() private$.items[["qq"]],
+                    qqplot = function() private$.items[["qqplot"]],
                     normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]],
                     clusterBoxplot = function() private$.items[["clusterBoxplot"]],
@@ -1265,17 +1274,37 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Assumption Checks")
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="normTest",
-                            title="Test for Normality of residuals",
-                            visible="(normTest)",
-                            rows=2,
+                            name="homoTest",
+                            title="Test for Homogeneity of Residual Variances (Levene's)",
+                            visible="(homoTest)",
+                            rows=1,
                             columns=list(
                                 list(
                                     `name`="test", 
+                                    `type`="number", 
+                                    `title`="F"),
+                                list(
+                                    `name`="df1", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="df2", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="normTest",
+                            title="Test for Normality of residuals",
+                            visible="(normTest)",
+                            columns=list(
+                                list(
+                                    `name`="name", 
                                     `title`="Test", 
                                     `type`="number"),
                                 list(
-                                    `name`="stat", 
+                                    `name`="test", 
                                     `title`="Statistics", 
                                     `type`="number"),
                                 list(
@@ -1284,9 +1313,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `format`="zto,pvalue"))))
                         self$add(jmvcore::Image$new(
                             options=options,
-                            name="qq",
+                            name="qqplot",
                             title="Q-Q Plot",
-                            visible="(qq)",
+                            visible="(qqplot)",
                             width=450,
                             height=400,
                             renderFun=".qqPlot",
@@ -1494,8 +1523,10 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   original scale for covariates.
 #' @param cimethod .
 #' @param dfmethod .
-#' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+#' @param qqplot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
+#' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#'   tests
 #' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
 #' @param normPlot \code{TRUE} or \code{FALSE} (default), provide a histogram
@@ -1526,8 +1557,9 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
+#'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
 #'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
-#'   \code{results$assumptions$qq} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
 #'   \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
@@ -1588,7 +1620,8 @@ gamljMixed <- function(
     plotOriginalScale = FALSE,
     cimethod = "wald",
     dfmethod = "Satterthwaite",
-    qq = FALSE,
+    qqplot = FALSE,
+    homoTest = FALSE,
     normTest = FALSE,
     normPlot = FALSE,
     residPlot = FALSE,
@@ -1701,7 +1734,8 @@ gamljMixed <- function(
         plotOriginalScale = plotOriginalScale,
         cimethod = cimethod,
         dfmethod = dfmethod,
-        qq = qq,
+        qqplot = qqplot,
+        homoTest = homoTest,
         normTest = normTest,
         normPlot = normPlot,
         residPlot = residPlot,

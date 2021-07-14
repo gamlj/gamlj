@@ -223,7 +223,7 @@ options:
             `TRUE` or `FALSE` (default), use linear predictor rather than response scale.
 
     - name: plotOriginalScale
-      title: Covariate scale 
+      title: Original scale 
       type: Bool
       default: false
       description:

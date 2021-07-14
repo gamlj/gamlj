@@ -216,7 +216,7 @@ options:
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
     - name: plotOriginalScale
-      title: Covariate scale 
+      title: Original scale 
       type: Bool
       default: false
       description:
@@ -455,7 +455,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), perform homogeneity tests
     
-    - name: qq
+    - name: qqplot
       title: Q-Q plot of residuals
       type: Bool
       default: false

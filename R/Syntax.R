@@ -8,7 +8,6 @@ Syntax <- R6::R6Class(
           public=list(
               formula=NULL,
               formula64=NULL,
-              factorinfo=NULL,
               hasIntercept=TRUE,
               hasTerms=FALSE,
               isProper=NULL,
@@ -31,6 +30,8 @@ Syntax <- R6::R6Class(
               tab_random=NULL,
               tab_randomCov=NULL,
               tab_randomTests=NULL,
+              tab_levene=NULL,
+              tab_normtest=NULL,
               
               datamatic=NULL,
               infomatic=NULL,
@@ -38,10 +39,11 @@ Syntax <- R6::R6Class(
                 
                 super$initialize(options=options,vars=datamatic$vars)
                 self$datamatic<-datamatic
+                
                 #### we prepare the model syntax
                 private$.constructFormula()
                 
-                ### infomatic class takes care of all info about different model
+                ### infomatic class takes care of all info about different models
                 self$infomatic<-Infomatic$new(options,datamatic)
                 
                 
@@ -86,6 +88,7 @@ Syntax <- R6::R6Class(
            
           ),
           private=list(
+            
             .constructFormula=function() {
               
               # this allows intercept only model to be passed by syntax interface
@@ -112,8 +115,6 @@ Syntax <- R6::R6Class(
                 fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed)
                 self$formula64<-trimws(paste(fixed,rands,sep =  ""))
                 self$formula<-fromb64(self$formula64,self$vars)
-
-                
               
             },
   
@@ -127,8 +128,9 @@ Syntax <- R6::R6Class(
                     self$tab_info[["dep"]]<-list(info="Y transform",value=self$options$dep_scale)
               
               if (is.something(self$infomatic$r2)) {
-                 
+                
                  self$tab_r2<-lapply(self$infomatic$r2, function(x) list(type=x))
+                 
               }
               
               ## some warnings ###
@@ -266,9 +268,7 @@ Syntax <- R6::R6Class(
               }
                 
               
-                
-              
-                            
+
               ### Contrast coding explanation ####
               
               if (self$options$showContrastCode) {
@@ -279,7 +279,6 @@ Syntax <- R6::R6Class(
                     names(values)<-paste("Level",focal$levels,sep="=")
                     values$cname<-focal$paramsnames
                     values$clab<-unlist(focal$contrast_labels)
-                    
                     values
                     })
 
@@ -303,12 +302,21 @@ Syntax <- R6::R6Class(
                 self$tab_random<-rep(list(groups=""),count+1)
               }
               
+              if (self$option("normTest")) {
+                self$tab_normtest<-list(list(name="Kolmogorov-Smirnov"),
+                                        list(name="Shapiro-Wilk"))
+
+              }
+              
+
+              
 
             },
             .buildreffects=function() {
               
               terms  <-  self$options$randomTerms
               ## this is for R. It overrides the correlatedEffect option 
+              correl<-TRUE
               if (length(terms)>1)
                    correl  <-  "block"
               
