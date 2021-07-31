@@ -21,7 +21,7 @@ Variable <- R6::R6Class(
     scaling="none",
     hasCluster=NULL,
     nClusters=0,
-    isBetween=TRUE,
+    isBetween=FALSE,
     initialize=function(var,options) {
       self$name<-var
       self$options<-options
@@ -49,7 +49,6 @@ Variable <- R6::R6Class(
         self$levels<-levels(vardata)
         self$levels_labels<-levels(vardata)
         self$nlevels<-length(self$levels)
-        
         self$paramsnames<-paste0(var,1:(self$nlevels-1))
         self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$nlevels-1))
 
@@ -107,32 +106,44 @@ Variable <- R6::R6Class(
       
       if (self$option("cluster")) {
         if (self$name %in% self$options$cluster) {
-            self$type="factor"
+            self$type="cluster"
             self$levels<-levels(vardata)
             self$levels_labels<-levels(vardata)
             self$nlevels<-length(self$levels)
-        } else
+        } else {
            self$hasCluster<-self$options$cluster[1]
            self$nClusters<-length(self$options$cluster)
+        }
       }
+        
       return(self)  
       
     },
     get_values=function(data) {
       
        vardata<-data[[self$name64]]
+
+       if (self$type=="cluster") 
+         if (!is.factor(vardata)) {
+           vardata<-factor(vardata)
+           self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been coerced to factor"))
+           return(vardata)
+         }
        
-      if (self$type=="factor") {
-        if (!is.factor(vardata)) {
-          vardata<-factor(vardata)
-          self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to factor"))
-        }
-        contrasts(vardata)<-self$contrast_values
-        
+       
+       
+       if (self$type=="factor") {
+         
+          if (!is.factor(vardata)) {
+              self$errors<-list(topic="data",message=paste("Variable",self$name,"is not a factor"))
+              return()
+          }
+       
+                
         ## check if is within or between in case of repeated measures
         ## because tables can be very long to build, we examine only the first and the last
         ## cluster. In the majority of the case the guess is good
-        if (is.something(self$hasCluster) && self$type=="factor" && length(vardata)>0) {
+        if (is.something(self$hasCluster) && length(vardata)>0) {
           cluster64<-tob64(self$hasCluster[[1]])
           levs<-unique(data[[cluster64]])
           testdata<-data[data[[cluster64]]==levs[1],self$name64]
@@ -141,18 +152,21 @@ Variable <- R6::R6Class(
           testdata<-data[data[[cluster64]]==levs[length(levs)],self$name64]
           tt<-table(testdata)
           test2=(max(tt)!=sum(tt))
-          if (all(c(test1,test2)))
-               self$isBetween<-FALSE
+          if (!all(c(test1,test2)))
+               self$isBetween<-TRUE
         }
         
-        
+        contrasts(vardata)<-self$contrast_values
+        ### fix levels ####
+        levels(vardata)<-paste0(LEVEL_SYMBOL,levels(vardata))
         return(vardata)
 
       }
-      else {
-        ### this should work with data, not variable
-           return(private$.continuous_values(data))
-      }
+    
+        ### if we are here, it means this is a continuos variable
+        ### we need to pass the data for when clustering is needed
+         return(private$.continuous_values(data))
+      },
       
       contrast_codes=function(type) {
         
@@ -160,7 +174,7 @@ Variable <- R6::R6Class(
         
       }
       
-    }
+  
   ), # end of public
   private=list(
     .data=NULL,
@@ -406,12 +420,16 @@ Variable <- R6::R6Class(
         vardata<-scale(vardata,scale = F)  
       if (method=="clusterbasedcentered") {    
         vardata<-unlist(tapply(vardata,by,scale,scale=F))
+        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster))
       }
       if (method=="standardized") 
         vardata<-scale(vardata,scale = T)  
-      if (method=="clusterbasedstandardized")     
+      if (method=="clusterbasedstandardized") {    
         vardata<-unlist(tapply(vardata,by,scale,scale=T))
-
+        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster))
+        
+      }
+      
       if (method=="log") {
         vardata<-log(vardata)  
         if (any(is.nan(vardata)))
@@ -507,7 +525,7 @@ Datamatic <- R6::R6Class(
       vars<-unlist(c(options$dep,options$factors,options$covs))
       
       if (hasName(options,"cluster"))
-               vars<-c(vars,options$cluster)
+               vars<-c(options$cluster,vars)
       
       super$initialize(options=options,vars=vars)
       private$.inspect_data(data)

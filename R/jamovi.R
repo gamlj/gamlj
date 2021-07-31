@@ -48,10 +48,11 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     for (r in ref) 
           obj<-stringr::str_replace_all(obj,paste0("\\b",jmvcore::toB64(r),"\\b"),r)
 
-    obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
-    obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
   }
-  
+   obj<-gsub(LEVEL_SYMBOL,"",obj,fixed = T)
+   obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
+   obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
+   
   obj
 }
 
@@ -184,10 +185,10 @@ j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) 
 j.add_warnings<-function(atable,adispatch,atopic,reset=FALSE) {
 
   if (reset) {
-    for (a in atable$notes)
+    for (a in atable$notes) 
        a$note<-NULL
+    
   }
-  
   if (!is.something(adispatch$warnings[[atopic]]) & !is.something(adispatch$errors[[atopic]]))
          return()
   

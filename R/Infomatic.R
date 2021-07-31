@@ -47,7 +47,7 @@ Infomatic <- R6::R6Class(
         self$call          <-   CALLS[[options$caller]]
         self$rcall         <-   FUNCS[[options$caller]]
         self$link         <-  "identity"
-        self$direction    <-   c("y","Dependend variable scores")
+        self$direction    <-   c("y","Dependent variable scores")
         self$deptype      <-   c("numeric","integer")
         
       }
@@ -260,14 +260,14 @@ DINFO[["quasi-poisson"]]<-c("Quasi-Poisson","Rare event with overdispersion")
 DINFO[["Gamma"]]<-c("Gamma","Skewed continuous distribution")
 
 LINFO<-list()
-LINFO[["identity"]]<-c("Identity","Coefficients in the same scale of y")
-LINFO[["log"]]<-c("log","Coefficients are in the log(y) scale")
-LINFO[["logit"]]<-c("Logit","Log of the odd of y=1 over y=0")
-LINFO[["slogit"]]<-c("Logit","Log of the odd of each level of y over y=0")
-LINFO[["probit"]]<-c("Probit","Inverse of normal CDF for P(y=1)")
-LINFO[["1/mu^2"]]<-c("1/mu^2","Inverse of y squared")
-LINFO[["inverse"]]<-c("1/mu","Inverse of y")
-LINFO[["sqrt"]]<-c("Square root","Square root of y")
+LINFO[["identity"]]   <-  c("Identity","Coefficients in the same scale of y")
+LINFO[["log"]]        <-  c("log","Coefficients are in the log(y) scale")
+LINFO[["logit"]]      <-  c("Logit","Log of the odd of y=1 over y=0")
+LINFO[["slogit"]]     <-  c("Logit","Log of the odd of each level of y over y=0")
+LINFO[["probit"]]     <-  c("Probit","Inverse of normal CDF for P(y=1)")
+LINFO[["1/mu^2"]]     <-  c("1/mu^2","Inverse of y squared")
+LINFO[["inverse"]]    <-  c("1/mu","Inverse of y")
+LINFO[["sqrt"]]       <-  c("Square root","Square root of y")
 
 
 CALLS<-list()
@@ -284,7 +284,6 @@ FIT[["dev"]]   <-  list(info="Deviance",       specs="Less is better")
 FIT[["dfr"]]   <-  list(info="Residual DF",    specs="")
 FIT[["over"]]  <-  list(info="Chi-squared/DF", specs="Overdispersion indicator")
 
-names(FIT)
 
 
 .explainPrediction=function() {

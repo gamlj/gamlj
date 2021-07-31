@@ -111,7 +111,7 @@ children:
               change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
-    style: list
+    style: inline
     children:
       - type: Label
         label: Effect Size
@@ -130,7 +130,7 @@ children:
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: showExpbCI
             type: CheckBox

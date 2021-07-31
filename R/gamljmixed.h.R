@@ -1250,7 +1250,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "percvalue",
                         "cvalue",
                         "plotOriginalScale",
-                        "plotRandomEffects"))))
+                        "plotRandomEffects",
+                        "randomTerms",
+                        "modelTerms"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",

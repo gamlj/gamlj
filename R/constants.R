@@ -5,6 +5,8 @@ j_INFO=T
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
 
 FACTOR_SYMBOL="$_$_$_$"
+LEVEL_SYMBOL="$.$.$.$"
+
 INTERACTION_SYMBOL="._._._.X._._._."
 
 

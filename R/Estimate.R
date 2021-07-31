@@ -191,7 +191,7 @@ Estimate <- R6::R6Class("Estimate",
                                   self$tab_fit[["bic"]]$value<-stats::BIC(self$model)
                               if (name=="dev")
                                   self$tab_fit[["dev"]]$value<-stats::deviance(self$model)
-                              if (name=="drf")
+                              if (name=="dfr")
                                   self$tab_fit[["dfr"]]$value<-stats::df.residual(self$model)
                               if (name=="over") {
                                   value <- sum(stats::residuals(self$model, type = "pearson")^2)
@@ -425,7 +425,6 @@ Estimate <- R6::R6Class("Estimate",
                             .rownames        <-  unlist(lapply(fromb64(.terms,self$vars),jmvcore::stringifyTerm,raise=T))
                             atable$source    <-  .rownames
                             atable$label     <-  self$datamatic$get_params_labels(.terms)
-
                             if ("Response" %in% names(atable)) {
                                    atable$Response          <-  factor(atable$Response)
                                    levels(atable$Response)  <-  unlist(self$datamatic$dep$contrast_labels)

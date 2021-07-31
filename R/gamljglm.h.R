@@ -12,6 +12,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs = NULL,
             modelTerms = NULL,
             fixedIntercept = TRUE,
+            nestedModelTerms = NULL,
+            nestedFixedIntercept = TRUE,
             showParamsCI = TRUE,
             paramCIWidth = 95,
             cimethod = "standard",
@@ -95,6 +97,14 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..fixedIntercept <- jmvcore::OptionBool$new(
                 "fixedIntercept",
                 fixedIntercept,
+                default=TRUE)
+            private$..nestedModelTerms <- jmvcore::OptionTerms$new(
+                "nestedModelTerms",
+                nestedModelTerms,
+                default=NULL)
+            private$..nestedFixedIntercept <- jmvcore::OptionBool$new(
+                "nestedFixedIntercept",
+                nestedFixedIntercept,
                 default=TRUE)
             private$..showParamsCI <- jmvcore::OptionBool$new(
                 "showParamsCI",
@@ -330,6 +340,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs)
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
+            self$.addOption(private$..nestedModelTerms)
+            self$.addOption(private$..nestedFixedIntercept)
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..cimethod)
@@ -375,6 +387,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs = function() private$..covs$value,
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
+        nestedModelTerms = function() private$..nestedModelTerms$value,
+        nestedFixedIntercept = function() private$..nestedFixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         cimethod = function() private$..cimethod$value,
@@ -419,6 +433,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs = NA,
         ..modelTerms = NA,
         ..fixedIntercept = NA,
+        ..nestedModelTerms = NA,
+        ..nestedFixedIntercept = NA,
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
         ..cimethod = NA,
@@ -1312,6 +1328,10 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   terms. Not needed if \code{formula} is used.
 #' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
+#' @param nestedModelTerms a list of character vectors describing nested model
+#'   fixed effects terms.
+#' @param nestedFixedIntercept \code{TRUE} (default) or \code{FALSE},
+#'   estimates nested fixed intercept. Not needed if \code{formula} is used.
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
@@ -1434,6 +1454,8 @@ gamljGlm <- function(
     covs = NULL,
     modelTerms = NULL,
     fixedIntercept = TRUE,
+    nestedModelTerms = NULL,
+    nestedFixedIntercept = TRUE,
     showParamsCI = TRUE,
     paramCIWidth = 95,
     cimethod = "standard",
@@ -1529,6 +1551,7 @@ gamljGlm <- function(
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
     if (inherits(modelTerms, "formula")) modelTerms <- jmvcore::decomposeFormula(modelTerms)
+    if (inherits(nestedModelTerms, "formula")) nestedModelTerms <- jmvcore::decomposeFormula(nestedModelTerms)
     if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
     if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
 
@@ -1539,6 +1562,8 @@ gamljGlm <- function(
         covs = covs,
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
+        nestedModelTerms = nestedModelTerms,
+        nestedFixedIntercept = nestedFixedIntercept,
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
         cimethod = cimethod,

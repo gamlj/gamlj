@@ -10,6 +10,7 @@ Syntax <- R6::R6Class(
               formula64=NULL,
               hasIntercept=TRUE,
               hasTerms=FALSE,
+              clusters=NULL,
               isProper=NULL,
               tab_info=NULL,
               tab_anova=NULL,
@@ -247,8 +248,8 @@ Syntax <- R6::R6Class(
               
               ##### simple interactions ######
               
-              if (self$options$simpleInteractions)
-                  if (is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators)) {
+              if (self$options$simpleInteractions) {
+                  if (is.something(self$options$simpleVariable) & length(self$options$simpleModerators)>1 ) {
                       params<-list()
                 ### moderators should be reverted in order to match emmeans 
                     .term<-rev(self$options$simpleModerators)
@@ -265,8 +266,9 @@ Syntax <- R6::R6Class(
                 ### and the results of the definitions should be revered as well
                    self$tab_simpleInteractionCoefficients<-rev(params)
                    self$tab_simpleInteractionAnova<-rev(params)
+                  }
+              
               }
-                
               
 
               ### Contrast coding explanation ####
@@ -338,15 +340,22 @@ Syntax <- R6::R6Class(
                 if (length(unique(res[,2]))>1 && correl=="block")
                     stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
                 
+                self$clusters<-c(self$clusters,unique(res[,2]))
+                
                 res<-tapply(res[,1],res[,2],paste)
                 res<-sapply(res, function(x) paste(x,collapse = " + "))
-                
                 ### delat with intercept ###
-                test<-grep(jmvcore::toB64("Intercept"),res,fixed=TRUE)
-                if (is.something(test))
-                  res<-gsub(jmvcore::toB64("Intercept"),1,res)
-                else
-                  res[[1]]<-paste(0,res[[1]],sep = "+")
+                for (i in seq_along(res)) {
+                      test<-grep(jmvcore::toB64("Intercept"),res[[i]],fixed=TRUE)
+                      if (is.something(test))
+                        res[[i]]<-gsub(jmvcore::toB64("Intercept"),1,res[[i]])
+                      else 
+                        res[[i]]<-paste("0 + ",res[[i]])
+                }
+#                if (is.something(test))
+#                  res<-gsub(jmvcore::toB64("Intercept"),1,res)
+#                else
+#                  res[[1]]<-paste(0,res[[1]],sep = "+")
                 
                 ### compose ####
                 form<-paste(res,names(res),sep=" | ")

@@ -70,7 +70,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   results$r2<-ss$adj.r.squared
   if (hasName(ss,"fstatistic")) {
     results$f<-ss$fstatistic[["value"]]
-    results$p<-stats::pf(results$f,results$df1,results$df1, lower.tail = FALSE)
+    results$p<-stats::pf(results$f,results$df1,results$df2, lower.tail = FALSE)
   } else {
     obj$warnings<-list(topic="tab_r2",message="R-squared tests cannot be computed")
     
@@ -116,7 +116,9 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 .compare_null_model.default<-function(model) {
   
   data    <-  mf.getModelData(model)
-  model0  <-  stats::update(model,~ 1 ,data=data,evaluate=T)
+  int<-attr(terms(model),"intercept")
+  form<- as.formula(paste("~",int))
+  model0  <-  stats::update(model,form ,data=data,evaluate=T)
   results <-  stats::anova(model0,model,test = "LRT")
   results$test  <-  results$Deviance
   results$df    <-  results$Df
@@ -127,7 +129,9 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 .compare_null_model.negbin<-function(model) {
   
   data    <-  mf.getModelData(model)
-  model0  <-  stats::update(model, ~1 ,data=data,evaluate=T)
+  int<-attr(terms(model),"intercept")
+  form<- as.formula(paste("~",int))
+  model0  <-  stats::update(model,form ,data=data,evaluate=T)
   results <-  stats::anova(model0,model)
   results$test  <- results$`LR stat.`
   results$df    <- results$`   df`
@@ -139,18 +143,26 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   
   data    <-  mf.getModelData(model)
 
+  int<-attr(terms(model),"intercept")
+  
   if (type=="c") {
-          form<-as.formula(paste(formula(model)[[2]],"~1"))
+
+          form<-as.formula(paste(formula(model)[[2]],"~",int))
           model0<-stats::lm(form,data=data)
+          
   } else  {
-          form<-update(formula(model),paste("~ 1 + (",lme4::findbars(formula(model)),")"))
+    
+          re<-lme4::findbars(formula(model))
+          re<-paste("(",re,")",collapse = "+")
+          form<-update(formula(model),paste("~",int," + ",re))
           model0  <-  stats::update(model, form ,data=data)
+          
   }
   ### please note that here we use performance::test_likelihoodratio, which compute the LRT 
   ### on the esimated models, no matter what REML is. If one compares the results with 
   ### lmerTest::anova() they are slightly different because the latter re-estimate the models
   ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
-  
+
   results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
   names(results)<-c("nothing1","nothing2","nothing3","df","test","p")
   results[2,c("df","test","p")]

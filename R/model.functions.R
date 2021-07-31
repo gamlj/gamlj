@@ -65,7 +65,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                                                    ci=obj$ciwidth,
                                                                    df_method=obj$optons$cimethod),stringAsFactors=FALSE)
      .coefficients$CI     <-  NULL
-      names(.coefficients) <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
+      names(.coefficients)[1:8] <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
       if (.bootstrap) {
               bootci<-as.data.frame(parameters::parameters(model,ci=obj$ciwidth,bootstrap=TRUE),stringAsFactors=FALSE)
               .coefficients$ci.lower  <-  bootci$CI_low
@@ -78,9 +78,11 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                names(ex)     <-  c("expb","expb.ci.lower","expb.ci.upper")
               .coefficients  <-  cbind(.coefficients,ex)
       }
-     if (obj$option("effectSize","beta"))
-           .coefficients$beta  <-  procedure.beta(model)
-      
+     if (obj$option("effectSize","beta")) {
+            
+       estim<-parameters::parameters(model,standardize="refit")
+       .coefficients$beta  <-  estim$Coefficient
+     }
       return(.coefficients)
 }
 
@@ -322,7 +324,6 @@ mf.anova<- function(x,...) UseMethod(".anova")
       return()
   
   ano<-results$obj
-  
   if (dim(ano)[1]==0) {
     obj$warnings<-list(topic="tab_anova",message="F-Tests cannot be computed without fixed effects")
     return(ano)

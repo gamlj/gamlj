@@ -11,7 +11,6 @@ procedure.beta<- function(x,...) UseMethod(".beta")
   }
   z<-update(model,data)
   parameters::parameters(z)$Coefficient
-
 }
 
 

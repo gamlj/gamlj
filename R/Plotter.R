@@ -364,7 +364,7 @@ Plotter <- R6::R6Class(
         
         newdata<-rawData
         mvars<-names(newdata)
-        self$scatterCluster<-private$.datamatic$variables[[tob64(self$options$cluster[[1]])]]
+        self$scatterCluster<-private$.datamatic$variables[[private$.operator$clusters[[1]]]]
         tozero<-setdiff(mvars,c(self$scatterX$name64,self$scatterY$name64,self$scatterCluster$name64))
         toaggregate<-list()
         for(v in tozero)
@@ -573,7 +573,12 @@ Plotter <- R6::R6Class(
         tableData$lower<-NULL
         tableData$upper<-NULL
       }
-
+      
+      if (xobj$type=="factor") {
+             tableData[[xobj$name64]]<-factor(tableData[[xobj$name64]])
+             levels(tableData[[xobj$name64]])<-private$.datamatic$variables[[xobj$name64]]$levels_labels
+      }
+        
       for (term in term64) {
               tableData[[term]]<-factor(tableData[[term]])
               levels(tableData[[term]])<-private$.datamatic$variables[[term]]$levels_labels

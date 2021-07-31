@@ -101,7 +101,7 @@ options:
 
 
     - name: showParamsCI
-      title: Confidence intervals
+      title: For estimates (B)
       type: Bool
       default: true
       description:

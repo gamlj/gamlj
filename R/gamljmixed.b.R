@@ -170,9 +170,9 @@ gamljMixedClass <- R6::R6Class(
       
       ## info table and posssible main problems to report
       j.fill_table(self$results$info,private$.estimate_machine$tab_info) 
-      
-      j.add_warnings(self$results$info,private$.data_machine,"data")
+  
       j.add_warnings(self$results$info,private$.estimate_machine,"info",reset=TRUE)
+      j.add_warnings(self$results$info,private$.data_machine,"data")
       
       ## R2 table ###
       j.fill_table(self$results$main$r2,private$.estimate_machine$tab_r2)

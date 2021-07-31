@@ -106,6 +106,34 @@ children:
                   type: TermLabel
       - type: CheckBox
         name: fixedIntercept
+
+  - type: CollapseBox
+    label: Models Comparison
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: Supplier
+        name: nestedModelSupplier
+        label: Full Model
+        persistentItems: true
+        stretchFactor: 1
+        format: term
+        events:
+          update: './gamlj.events::onUpdate_nestedModelSupplier'
+        children:
+          - type: TargetLayoutBox
+            children:
+              - type: ListBox
+                name: nestedModelTerms
+                valueFilter: unique
+                isTarget: true
+                itemDropBehaviour: emptyspace
+                template:
+                  type: TermLabel
+      - type: CheckBox
+        name: nestedFixedIntercept
+
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
