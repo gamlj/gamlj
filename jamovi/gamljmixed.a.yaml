@@ -228,6 +228,13 @@ options:
              `TRUE` or `FALSE` (default), scale the plot Y-Axis to the max and the min
              of the dependent variable observed scores.
 
+    - name: plotLinesTypes
+      title: Varying line types 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use different linetypes per levels.
 
     - name: plotError
       title: Error Bar Definition

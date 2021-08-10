@@ -26,6 +26,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotRaw = FALSE,
             plotDvScale = FALSE,
             plotOriginalScale = FALSE,
+            plotLinesTypes = FALSE,
             plotError = "none",
             ciWidth = 95,
             emmeans = NULL,
@@ -179,6 +180,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..plotOriginalScale <- jmvcore::OptionBool$new(
                 "plotOriginalScale",
                 plotOriginalScale,
+                default=FALSE)
+            private$..plotLinesTypes <- jmvcore::OptionBool$new(
+                "plotLinesTypes",
+                plotLinesTypes,
                 default=FALSE)
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
@@ -354,6 +359,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
             self$.addOption(private$..plotOriginalScale)
+            self$.addOption(private$..plotLinesTypes)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..emmeans)
@@ -401,6 +407,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
         plotOriginalScale = function() private$..plotOriginalScale$value,
+        plotLinesTypes = function() private$..plotLinesTypes$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         emmeans = function() private$..emmeans$value,
@@ -447,6 +454,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotRaw = NA,
         ..plotDvScale = NA,
         ..plotOriginalScale = NA,
+        ..plotLinesTypes = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..emmeans = NA,
@@ -1164,7 +1172,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "plotRaw",
                         "percvalue",
                         "cvalue",
-                        "plotOriginalScale"))))
+                        "plotOriginalScale",
+                        "plotLinesTypes"))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1359,6 +1368,8 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   range equal to the range of the observed values.
 #' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
 #'   original scale for covariates.
+#' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
+#'   linetypes per levels.
 #' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
@@ -1468,6 +1479,7 @@ gamljGlm <- function(
     plotRaw = FALSE,
     plotDvScale = FALSE,
     plotOriginalScale = FALSE,
+    plotLinesTypes = FALSE,
     plotError = "none",
     ciWidth = 95,
     emmeans = NULL,
@@ -1576,6 +1588,7 @@ gamljGlm <- function(
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
         plotOriginalScale = plotOriginalScale,
+        plotLinesTypes = plotLinesTypes,
         plotError = plotError,
         ciWidth = ciWidth,
         emmeans = emmeans,

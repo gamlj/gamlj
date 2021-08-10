@@ -587,6 +587,7 @@ items:
            - percvalue
            - cvalue
            - plotOriginalScale
+           - plotLinesTypes
 
   - name: assumptions
     title: Assumption Checks

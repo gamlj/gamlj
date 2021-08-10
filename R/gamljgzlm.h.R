@@ -24,6 +24,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotDvScale = FALSE,
             plotLp = FALSE,
             plotOriginalScale = FALSE,
+            plotLinesTypes = FALSE,
             plotError = "none",
             ciWidth = 95,
             cimethod = "wald",
@@ -156,6 +157,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..plotOriginalScale <- jmvcore::OptionBool$new(
                 "plotOriginalScale",
                 plotOriginalScale,
+                default=FALSE)
+            private$..plotLinesTypes <- jmvcore::OptionBool$new(
+                "plotLinesTypes",
+                plotLinesTypes,
                 default=FALSE)
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
@@ -327,6 +332,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotDvScale)
             self$.addOption(private$..plotLp)
             self$.addOption(private$..plotOriginalScale)
+            self$.addOption(private$..plotLinesTypes)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..cimethod)
@@ -368,6 +374,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotDvScale = function() private$..plotDvScale$value,
         plotLp = function() private$..plotLp$value,
         plotOriginalScale = function() private$..plotOriginalScale$value,
+        plotLinesTypes = function() private$..plotLinesTypes$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         cimethod = function() private$..cimethod$value,
@@ -408,6 +415,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotDvScale = NA,
         ..plotLp = NA,
         ..plotOriginalScale = NA,
+        ..plotLinesTypes = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..cimethod = NA,
@@ -1160,6 +1168,8 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   rather than response scale.
 #' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
 #'   original scale for covariates.
+#' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
+#'   linetypes per levels.
 #' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
@@ -1251,6 +1261,7 @@ gamljGzlm <- function(
     plotDvScale = FALSE,
     plotLp = FALSE,
     plotOriginalScale = FALSE,
+    plotLinesTypes = FALSE,
     plotError = "none",
     ciWidth = 95,
     cimethod = "wald",
@@ -1351,6 +1362,7 @@ gamljGzlm <- function(
         plotDvScale = plotDvScale,
         plotLp = plotLp,
         plotOriginalScale = plotOriginalScale,
+        plotLinesTypes = plotLinesTypes,
         plotError = plotError,
         ciWidth = ciWidth,
         cimethod = cimethod,

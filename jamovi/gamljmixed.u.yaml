@@ -390,6 +390,9 @@ children:
             children:
               - type: CheckBox
                 name: plotOriginalScale
+              - type: CheckBox
+                name: plotLinesTypes
+                
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

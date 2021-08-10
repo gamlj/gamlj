@@ -55,8 +55,15 @@ Plotter <- R6::R6Class(
                     
         } else {
                      names(data)[1:2]<-c("x","z")
+                     if (isFALSE(self$options$plotLinesTypes)) {
                     .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", colour = "z")
                     .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",color = "z" ,fill="z")
+                     } else {
+                       
+                       .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", linetype = "z")
+                       .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",linetype = "z" ,fill="z")
+                       
+                     }
         }
         
         ## initializa plot 
@@ -136,8 +143,10 @@ Plotter <- R6::R6Class(
                                             shape = 21, size = 4, fill="white",
                                             position = self$scatterDodge)
         
-        
-        p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, colour = self$scatterClabel)
+        if (isFALSE(self$options$plotLinesTypes))
+           p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, colour = self$scatterClabel)
+        else
+          p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, linetype = self$scatterClabel)
         
         if (self$scatterXscale) {
              
@@ -267,11 +276,8 @@ Plotter <- R6::R6Class(
           
           return(plot)
   
-  
         }
 
-      
-      
   ), # end of public
   private = list(
     .datamatic=FALSE,
@@ -317,7 +323,7 @@ Plotter <- R6::R6Class(
              if (self$options$plotError != "none") {
                self$scatterBars<-TRUE
                self$scatterDodge <- ggplot2::position_dodge(0.2)
-               self$scatterClabel <- paste(x, paste0("(", toupper(self$options$plotError), ")"), sep = "\n")
+               self$scatterClabel <- paste(self$scatterZ$name, paste0("(", toupper(self$options$plotError), ")"), sep = "\n")
              } else {
                self$scatterDodge<-ggplot2::position_dodge(0)
                self$scatterClabel <- self$scatterZ$name
@@ -355,8 +361,11 @@ Plotter <- R6::R6Class(
       #### TODO: this is abstruse, try changing it
       
       dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
-
       rawData<-mf.getModelData(private$.operator$model)
+      for (var in names(rawData)) {
+        if (is.factor(rawData[[var]]))
+           levels(rawData[[var]])<-gsub(LEVEL_SYMBOL,"",levels(rawData[[var]]),fixed = T)
+      }
       
       ### here we deal with plotting random effects, if needed
       randomData<-NULL

@@ -228,6 +228,14 @@ options:
           R: >
             `TRUE` or `FALSE` (default), use original scale for covariates.
 
+    - name: plotLinesTypes
+      title: Varying line types 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use different linetypes per levels.
+
 
     - name: plotError
       title: Error Bar Definition
