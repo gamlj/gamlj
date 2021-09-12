@@ -100,22 +100,6 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
-    - name: nestedModelTerms
-      title: Nested Model Terms
-      type: Terms
-      default:
-      description:
-          R: >
-            a list of character vectors describing nested model fixed effects terms.
-
-    - name: nestedFixedIntercept
-      title: Intercept
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, estimates nested fixed intercept. Not needed if `formula` is used.
-
 
 
     - name: showParamsCI

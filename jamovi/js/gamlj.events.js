@@ -80,7 +80,6 @@ const events = {
     onChange_emmeansSupplier: function(ui) {
         let values = this.itemsToValues(ui.emmeansSupplier.value());
         this.checkValue(ui.emmeans, true, values, FormatDef.term);
-        this.checkValue(ui.nestedModelTerms, true, values, FormatDef.term);
 
     },
 
@@ -94,8 +93,6 @@ const events = {
             let covariatesList = this.cloneArray(ui.covs.value(), []);
             var variablesList = factorsList.concat(covariatesList);
             ui.modelSupplier.setValue(this.valuesToItems(variablesList, FormatDef.variable));
-    },
-    onUpdate_nestedModelSupplier: function(ui) {
     }
 
 };
@@ -216,7 +213,6 @@ var updateEmmeansSupplier = function(ui, context) {
               list.push(term);
     }
     ui.emmeansSupplier.setValue(context.valuesToItems(list, FormatDef.term));
-    ui.nestedModelSupplier.setValue(context.valuesToItems(list, FormatDef.term));
 
 };
 
