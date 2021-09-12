@@ -159,6 +159,7 @@ gamljMixedClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
+      model<- try(private$.estimate(modelFormula, data=data, REML=reml))
       data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType="mixed")
       if (!is.data.frame(data))
         reject(data)
@@ -168,7 +169,6 @@ gamljMixedClass <- R6::R6Class(
         names(data)<-jmvcore::toB64(names(data))
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
-
       ## saving the whole set of results proved to be too heavy for memory issues.
       ## so we estimate the model every time. In case it is not needed, we just trick
       ## the module to believe that the other results are saved, when in reality we
@@ -176,6 +176,7 @@ gamljMixedClass <- R6::R6Class(
        ginfo("the model has been estimated")
        ##### model ####
        model<- try(private$.estimate(modelFormula, data=data, REML=reml))
+       
        mi.check_estimation(model,n64)
        model<-mi.model_check(model)
        private$.model <- model

@@ -350,8 +350,8 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))
        clusterdata<-NULL
-       if (is.something(cluster))
-         clusterdata<-data[[jmvcore::toB64(cluster)]]
+       if (is.something(cluster)) 
+         clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
 
        if ("dep_scale" %in% names(options)) 
            data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
@@ -373,7 +373,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      scalingVars<-sapply(scaling,function(a) a$var)
      clusterdata<-NULL
      if (is.something(cluster))
-           clusterdata<-data[[jmvcore::toB64(cluster)]]
+           clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
      for (cov in covs) {
        cov64<-jmvcore::toB64(cov) 
        data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
