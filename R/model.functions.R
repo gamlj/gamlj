@@ -12,13 +12,15 @@
       return("lmer")
   if ("lmerMod" %in% class(model))
       return("lmer")
+  if ("glmerMod" %in% class(model))
+    return("lmer")
+  
   if ("multinom" %in% class(model))
     return("multinomial")
   
 }
 
-
-
+###### model estimation and checks ##############
 
 
 
@@ -26,17 +28,24 @@
 
 mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
-.getModelData.default<-function(model) 
-     return(model$model)
+    .getModelData.default<-function(model) {
+         return(model$model)
+}
+
+.getModelData.glmerMod<-function(model) 
+      return(.getModelData.lmer(model))
+
+.getModelData.glmer<-function(model) 
+      return(.getModelData.lmer(model))
 
 .getModelData.merModLmerTest<-function(model) 
-     return(.getModelData.lmer(model))
+      return(.getModelData.lmer(model))
 
 .getModelData.lmerModLmerTest<-function(model) 
-  return(.getModelData.lmer(model))
+      return(.getModelData.lmer(model))
 
 .getModelData.lmer<-function(model) 
-  return(model@frame)
+      return(model@frame)
 
 
 
@@ -46,35 +55,67 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 
 mf.summary<- function(x,...) UseMethod(".mf.summary")
 
-.mf.summary.default<-function(model) {
-      return(FALSE)
+    .mf.summary.default<-function(model) {
+          return(FALSE)
+}
+
+.fix_coeffs<-function(parameters, coeffs) {
+
+    if (length(coeffs)==dim(parameters)[1]) {
+        return(as.data.frame(parameters))
+  }
+  
+  ### fix missing coefficients ########
+    all_coefs<-data.frame(all=coeffs)
+    rownames(all_coefs)<-names(coeffs)
+    all_coefs$order<-1:length(all_coefs$all)
+    res<-merge(parameters,all_coefs,by="row.names",all=T)
+    res<-res[order(res$order),]
+    rownames(res)<-res$Row.names
+    res[,c("Row.names", "order","all")]<-NULL
+  ########################
+  res
 }
   
 .mf.summary.lm<-function(model){
-  smr<-summary(model)
-  if (dim(smr$coefficients)[1]==0)
-    return(NULL)
-  ss<-as.data.frame(smr$coefficients)
-  ss$df<-smr$df[2]
-  colnames(ss)<-c("estimate","se","t","p","df")
-  as.data.frame(ss,stringsAsFactors = F)
+    smr<-summary(model)
+    params<-smr$coefficients
+    params<-.fix_coeffs(params,smr$aliased)
+    if (nrow(params)[1]==0)
+        return(as.data.frame(NULL))
+    params$df<-smr$df[2]
+    colnames(params)<-c("estimate","se","t","p","df")
+    params
+  ###########################à
+  as.data.frame(params,stringsAsFactors = F)
 }
 
 .mf.summary.merModLmerTest<-function(model)
        .mf.summary.lmer(model)
 
 .mf.summary.lmerModLmerTest<-function(model)
-  .mf.summary.lmer(model)
+      .mf.summary.lmer(model)
 
+.mf.summary.glmerMod<-function(model) {
+    smr<-summary(model)
+    params<-stats::coef(smr)
+    all_coefs<-lme4::fixef(model,add.dropped=T)
+    params<-.fix_coeffs(params,all_coefs)
+    if (nrow(params)[1]==0)
+        return(as.data.frame(NULL))
+    expb<-exp(params[,"Estimate"])  
+    params<-cbind(params,expb)
+    colnames(params)<-c("estimate","se","z","p","expb")
+  as.data.frame(params,stringsAsFactors = F)
+}
 .mf.summary.lmerMod<-function(model)
-  .mf.summary.lmer(model)
+      .mf.summary.lmer(model)
 
 .mf.summary.lmer<-function(model) {
-       ss<-summary(model)$coefficients
-       ss<-as.data.frame(ss,stringsAsFactors = F)
+    ss<-summary(model)$coefficients
+    ss<-as.data.frame(ss,stringsAsFactors = F)
        
-      if (dim(ss)[2]==3) {
-        
+    if (dim(ss)[2]==3) {
           ano<-car::Anova(model,test="F",type=3)
           lnames<-rownames(ss)
           matching<-which(lnames %in% rownames(ss))
@@ -85,22 +126,25 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
           ss<-ss[,c(1,2,4,3,5)]       
           if (any(is.null(ss$df)))
                attr(ss,"warning")<-"lmer.df"
-      }
-      colnames(ss)<-c("estimate","se","df","t","p")
-      ss
+    }
+    colnames(ss)<-c("estimate","se","df","t","p")
+  ss
 }
 
 .mf.summary.glm<-function(model) {
-     
-     ss<-summary(model)$coefficients
-     expb<-exp(ss[,"Estimate"])  
-     ss<-cbind(ss,expb)
-     colnames(ss)<-c("estimate","se","z","p","expb")
-     as.data.frame(ss,stringsAsFactors = F)
+     smr<-summary(model)
+     params<-smr$coefficients
+     params<-.fix_coeffs(params,smr$aliased)
+     if (nrow(params)[1]==0)
+        return(as.data.frame(NULL))
+     expb<-exp(params[,"Estimate"])  
+     params<-cbind(params,expb)
+     colnames(params)<-c("estimate","se","z","p","expb")
+     as.data.frame(params,stringsAsFactors = F)
 }
 
 .mf.summary.multinom<-function(model) {
-  
+
      sumr<-summary(model)
      rcof<-sumr$coefficients
      cof<-as.data.frame(matrix(rcof,ncol=1))
@@ -123,7 +167,7 @@ mf.summary<- function(x,...) UseMethod(".mf.summary")
 mf.anova<- function(x,...) UseMethod(".anova")
 
 .anova.default<-function(model) {
- stop("no suitable model found") 
+       stop("no suitable model found") 
 }
   
 .anova.glm<-function(model) {
@@ -134,41 +178,56 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.multinom<-function(model) {
-
-      ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
-      colnames(ano)<-c("test","df","p")
-      as.data.frame(ano, stringsAsFactors = F)
+        ano<-car::Anova(model,test="LR",type=3,singular.ok=T)
+        colnames(ano)<-c("test","df","p")
+        as.data.frame(ano, stringsAsFactors = F)
       
   }
   
 .anova.lm<-function(model) {
-    ano<-car::Anova(model,test="F",type=3, singular.ok=T)
-    colnames(ano)<-c("ss","df","f","p")
-    if (length(grep("Intercept",rownames(ano),fixed=T))>0)
-        dss<-ano[-1,]
-    else
-        dss<-ano
+        ano<-car::Anova(model,test="F",type=3, singular.ok=T)
+        ano<-ano[rownames(ano)!="(Intercept)",]
+        colnames(ano)<-c("ss","df","f","p")
+        dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
+        tots<-list(ss=sum(ano$ss),df=sum(ano$df))
+        reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
+        ss<-summary(model)
+        p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
+        modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
+        
+        mods<-list(ss=sum(dss$ss),
+               df= ss$fstatistic[[2]],
+               f=ss$fstatistic[[1]],
+               p=p,
+               etaSq=modeta[[1]],etaSqP=modeta[[1]],
+               omegaSq=modomega[[1]],
+               epsilonSq=modepsilon[[1]])
     
-    sumr<-summary(model)
-    errDF<-sumr$fstatistic[3]
-    modDF<-sumr$fstatistic[2]
-    modF<-sumr$fstatistic[1]
-    errSS<-dss$ss[length(dss$ss)]
-    errMS<-errSS/errDF
-    r2<-sumr$r.squared
-    totalSS<-1/((1-r2)*(1/errSS))
-    modSS<-totalSS-errSS
-    modp<-1 - stats::pf(modF, modDF, errDF) 
-    modRow<-c(ss=modSS,df=modDF,F=modF,p=modp)
-    ss<-rbind(modRow,dss)
-    ss$ms<-ss$ss/ss$df
-    ss$etaSq<-ss$ss/(totalSS)
-    ss$etaSqP <- ss$ss / (ss$ss + errSS)
-    ss$omegaSq <- (ss$ss - (ss$df * errMS)) / (totalSS + errMS)
-    lt<-length(ss$df)
-    ss[lt,c("f","p","etaSq","etaSqP","omegaSq")]<-NA
-    ss
+        etap<-effectsize::eta_squared(model,partial = T,verbose = F)
+        eta<-effectsize::eta_squared(model,partial = F,verbose = F)
+        eps<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        omega<-effectsize::omega_squared(model,partial = T,verbose = F)
+        epsilon<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        dss$etaSq<-eta[,2]
+        dss$etaSqP<-etap[,2]
+        dss$omegaSq<-omega[,2]
+        dss$epsilonSq<-epsilon[,2]
+        reslist<-listify(dss)
+        reslist<-append_list(reslist,reds,"Residuals")
+        reslist<-append_list(reslist,tots,"Totals")
+        reslist<-prepend_list(reslist,mods,"Model")
+    reslist
 }
+
+.anova.glmerMod<-function(model,df="Satterthwaite") {
+  ginfo("using .anova.glmerMod")
+  ano<-.car.anova(model)
+  names(ano)<-c("test","df1","p")
+  ano  
+}
+  
 
 .anova.lmerModLmerTest<-function(model,df="Satterthwaite") 
    .anova.merModLmerTest(model,df) 
@@ -181,15 +240,9 @@ mf.anova<- function(x,...) UseMethod(".anova")
              
 .anova.merModLmerTest<-function(model,df="Satterthwaite") {
 
-  ### this check is needed for adjust to different versions of lmertest
-#  if (class(model)=="merModLmerTest")
-#        ano<-lmerTest:::anova(model,ddf=df)
-#  else
-        ano<-stats::anova(model,ddf=df)
-        
+  ano<-stats::anova(model,ddf=df)
   if (dim(ano)[1]==0)
     return(ano)
-  
   if (dim(ano)[2]==4) {
     ano<-.car.anova(model,df)
   } else {
@@ -213,7 +266,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
         coefz<-data.frame(coefz)
         
         if (dim(coefz)[2]==1)
-        coefz<-as.data.frame(t(coefz))
+          coefz<-as.data.frame(t(coefz))
         rownames(coefz)<-rn
         coefz[,2]<-coefz[,2]^2
         coefz$df1<-1
@@ -234,7 +287,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
-  ginfo("lmerTest failed: anava uses car::Anova")
+  ginfo("mf.anova uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
@@ -253,15 +306,18 @@ mf.getModelFactors<-function(model) {
 
 
 mf.getModelMessages<-function(model) {
-  message<-list()
+  message<-list(conv=TRUE,msg=NULL,singular=FALSE)
   if (.which.class(model)=="lmer") {
-    return(model@optinfo$conv$lme4$messages)
+      message['msg']=model@optinfo$conv$lme4$messages
+      message["singular"]<-lme4::isSingular(model,tol = 1e-04)
+      if (message["singular"]==TRUE)
+         message['msg']="The fit is singular"
   }
   message
 }
 
 
-mf.give_family<-function(modelSelection) {
+mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
   if (modelSelection=="linear")
        return(stats::gaussian())
   if (modelSelection=="logistic")
@@ -269,24 +325,37 @@ mf.give_family<-function(modelSelection) {
   if (modelSelection=="poisson")
     return(stats::poisson())
   if (modelSelection=="multinomial")
-    return("multinomial")
+    return(list(family="multinomial",link="slogit"))
   if (modelSelection=="nb")
-      return("nb")
-  if (modelSelection=="poiover")
+    return(list(family="nb",link="log"))
+
+    if (modelSelection=="poiover")
       return(stats::quasipoisson())
   if (modelSelection=="probit")
     return(stats::binomial("probit"))
+  if (modelSelection=="custom")
+    return(do.call(custom_family,list(custom_link)))
   
   NULL  
 }
 
-mf.checkData<-function(options,data,modelType="linear") {
+mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
+     
+     if (!is.data.frame(data))
+         jmvcore::reject(data)
+  
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
-     if (modelType %in% c("linear","mixed"))
+     if (modelType %in% c("linear","mixed")) {
        ### here I need the dv to be really numeric
-       data[[dep]] <- as.numeric(as.character(data[[dep]]))  
-     
+       data[[dep]] <- as.numeric(as.character(data[[dep]]))
+       clusterdata<-NULL
+       if (is.something(cluster)) 
+         clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
+
+       if ("dep_scale" %in% names(options)) 
+           data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
+     }
        if ( any(is.na(data[[dep]])) ) {
           nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
           return(paste(nice,"model requires a numeric dependent variable"))
@@ -298,14 +367,22 @@ mf.checkData<-function(options,data,modelType="linear") {
        if (any(data[[dep]]<0))
              return("Poisson-like models require all positive numbers in the dependent variable")
      }
-     ####### check the covariates usability ##########
+     ####### check the covariates usability and center them##########
      covs=options$covs
-     
+     scaling=options$scaling
+     scalingVars<-sapply(scaling,function(a) a$var)
+     clusterdata<-NULL
+     if (is.something(cluster))
+           clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
      for (cov in covs) {
-       cov<-jmvcore::toB64(cov) 
-       data[[cov]]<-as.numeric(as.character(data[[cov]]))
-       if (any(is.na(data[[cov]])))
-          return(paste("Covariate",jmvcore::fromB64(cov), "cannot be converted to a numeric variable"))
+       cov64<-jmvcore::toB64(cov) 
+       data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
+       if (any(is.na(data[[cov64]])))
+          return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
+       w<-which(scalingVars==cov)
+       type<-ifelse(is.something(w),scaling[[w]][['type']],"centered")
+       data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=clusterdata)  
+
      }
      # check factors
      factors=options$factors
@@ -327,51 +404,127 @@ mf.checkData<-function(options,data,modelType="linear") {
 
 mf.confint<- function(x,...) UseMethod(".confint")
 
-.confint.default<-function(model,level) 
+.confint.default<-function(model,level,parameters,method=NULL) {
+  ginfo("CI model unknown",class(model))  
   return(FALSE)
-
-.confint.lm<-function(model,level) 
-    return(stats::confint(model,level = level))
   
-.confint.glm<-function(model,level) {  
-    ci<-stats::confint(model,level = level)
-    return(ci)
 }
 
-.confint.merModLmerTest<-function(model,level) 
-                                return(.confint.lmer(model,level))
+.confint.format<-function(ci,parameters) {
+  att<-attr(parameters,"warning")
+  if (length(ci)==0) {
+    att<-append(att,"C.I. cannot be computed")
+    attr(parameters,"warning")<-att
+    return(parameters)
+  }
+  if (jmvcore::isError(ci)) {
+    message <- jmvcore::extractErrorMessage(ci)
+    att<-append(att,paste(message,"C.I. cannot be computed"))
+    ci<-NULL
+  } else {
+    if (any(is.na(ci)))
+       att<-append(att,paste("Some C.I. cannot be computed"))
+    if (nrow(ci)==nrow(parameters)) {
+         parameters<-cbind(parameters,ci)
+    } else {
+         parameters$order<-1:dim(parameters)[1]
+         parameters<-merge(ci,parameters,by="row.names",all.y=TRUE)
+         parameters<-parameters[order(parameters$order),]
+         parameters$order<-NULL
+    }
+#    parameters<-cbind(parameters,ci)
+    attr(parameters,"warning")<-att
+  }
+  return(parameters)
+  
+}
+.confint.lm<-function(model,level,parameters)  {
+    ci<-try(stats::confint(model,level=level))
+    ci<-data.frame(ci)
+    colnames(ci)<-c("cilow","cihig")
+   .confint.format(ci,parameters)
+}
+.confint.glm<-function(model,level,parameters) {  
+     ci<-try(stats::confint(model,level = level))
+     if (jmvcore::isError(ci)) 
+       return(.confint.format(ci,parameters))
+     if (is.null(dim(ci)))
+       ci<-matrix(ci,ncol=2)
+     ci<-data.frame(ci)
+     colnames(ci)<-c("cilow","cihig")
+     ci["ecilow"]<-exp(ci["cilow"])     
+     ci["ecihig"]<-exp(ci["cihig"])
+     .confint.format(ci,parameters)
+    
+}
 
-.confint.lmerModLmerTest<-function(model,level) 
-  return(.confint.lmer(model,level))
+.confint.merModLmerTest<-function(model,level,parameters,method="wald") 
+                                return(.confint.lmer(model,level,parameters,method=method))
 
-.confint.lmer<-function(model,level)  {
+.confint.lmerModLmerTest<-function(model,level,parameters,method="wald") 
+  return(.confint.lmer(model,level,parameters,method=method))
 
-      ci<-stats::confint(model,method="Wald",level=level)
+.confint.lmer<-function(model,level,parameters,method="wald")  {
+     if (method=="wald")
+               method<-"Wald"
+     
+      ci<-try(stats::confint(model,method=method,level=level))
+      if (jmvcore::isError(ci)) 
+        return(.confint.format(ci,parameters))
+      
       ci<-ci[!is.na(ci[,1]),]
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
-      return(ci)
+      ci<-data.frame(ci)
+      colnames(ci)<-c("cilow","cihig")
+      .confint.format(ci,parameters)
   }
 
-.confint.multinom <- function (object, level = 0.95, ...) 
+.confint.glmerMod<-function(model,level,parameters,method="wald")  {
+  if (method=="wald")
+        method="Wald"
+  ci<-stats::confint(model,level=level,method=method)
+  w<-grep(".sig",rownames(ci),fixed=T,invert = T)
+  ci<-ci[w,]
+  if (is.null(dim(ci)))
+    ci<-matrix(ci,ncol=2)
+  ci<-data.frame(ci)
+  colnames(ci)<-c("cilow","cihig")
+  ci["ecilow"]<-exp(ci["cilow"])     
+  ci["ecihig"]<-exp(ci["cihig"])
+  .confint.format(ci,parameters)
+}
+
+
+.confint.multinom <- function (object, level, parameters) 
   {
   ci<-stats::confint(object,level=level)
   cim<-NULL
   for (i in seq_len(dim(ci)[3]))
      cim<-rbind(cim,(ci[,,i]))
-  return(cim)
+  cim<-as.data.frame(cim)
+  rownames(cim)<-1:length(cim[,1])
+  rownames(parameters)<-1:length(cim[,1])
+  colnames(cim)<-c("lower.CL","upper.CL")
+  cim["lower.ECL"]<-exp(cim["lower.CL"])     
+  cim["upper.ECL"]<-exp(cim["upper.CL"])
+  .confint.format(cim,parameters)
+
 }
 
 
-
 ########### to be removed and update with mi.xxx #########
-
 
 mf.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
   aliased<-stats::alias(model)
   (!is.null(aliased$Complete))
+}
+
+.aliased.glmerMod<-function(model) {
+  rank<-attr(model@pp$X,"msgRankdrop")
+  return((!is.null(rank)))
 }
 
 .aliased.lmerMod<-function(model) {
@@ -383,3 +536,49 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   FALSE
   
 }
+
+
+########### set the model call for R in a reasonable way #########
+
+mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
+
+.setModelCall.default<-function(model,info) {
+  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
+  call<-paste0(info$command,"(",coptions,", data=data)")
+  model$call<-call
+  model
+}
+
+.setModelCall.lmerMod<-function(model,info) {
+  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
+  call<-paste0(info$command,"(",coptions,", data=data)")
+  model@call<-as.call(str2lang(call))
+  model
+}
+.setModelCall.glmerMod<-function(model,info) 
+        .setModelCall.lmerMod(model,info)
+
+
+
+#######################
+
+mf.savePredRes<-function(options,results,model) {
+
+        if (options$predicted && results$predicted$isNotFilled()) {
+            ginfo("Saving predicted")
+            if ("multinom" %in% class(model))  type="probs" else type="response"
+            p<-stats::predict(model,type=type)
+  # we need the rownames in case there are missing in the datasheet
+            pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(model)))
+            results$predicted$setValues(p)
+              }
+        if (options$residuals && results$residuals$isNotFilled()) {
+            ginfo("Saving residuals")
+            p<-stats::resid(model)
+  # we need the rownames in case there are missing in the datasheet
+            pdf <- data.frame(residuals=p, row.names=rownames(mf.getModelData(model)))
+            results$residuals$setValues(pdf)
+        }
+}
+
+

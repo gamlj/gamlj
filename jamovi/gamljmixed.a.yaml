@@ -2,9 +2,10 @@
 name: gamljMixed
 title: Mixed Model
 menuGroup: Linear Models
-version: '1.5.2'
+version: '2.0.0'
 jas: '1.2'
 completeWhenFilled: false
+export: false
 description:
     main: Mixed Linear Model
     R:
@@ -374,17 +375,45 @@ options:
               - name: type
                 type: List
                 options:
-                  - centered
-                  - standardized
-                  - cluster-based centered
-                  - cluster-based standardized
-                  - none
-
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Centered clusterwise
+                      name:  clusterbasedcentered
+                    - title: z-scores clusterwise
+                      name:  clusterbasedstandardized
+                    - title: Log
+                      name: 'log'
+                    - title: None
+                      name: 'none'
                 default: centered 
       description:
           R: >
             a list of lists specifying the covariates scaling,
             one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: z-scores
+            name: standardized
+          - title: Centered clusterwise
+            name:  clusterbasedcentered
+          - title: z-scores clusterwise
+            name:  clusterbasedstandardized
+          - title: Log
+            name:  log
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
 
 
 ############ mixed model specifics ##############
@@ -444,6 +473,15 @@ options:
           R: >
             `TRUE` or `FALSE` (default), LRT for the random effects
 
+    - name: ciRE
+      title: Random Effect C.I. (slow)
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), confidence intervals for the random effects
+
+
     - name: plotRandomEffects
       title: Random effects  
       type: Bool
@@ -453,6 +491,86 @@ options:
             `TRUE` or `FALSE` (default), add random effects predicted values in the
             plot
             
+    - name: cimethod
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name: wald
+          title: Wald (fast)
+        - name:  profile
+          title: Profile (slow)
+        - name: boot
+          title: Bootstrap (very slow)
+
+    - name: dfmethod
+      title: DF Method
+      type: List
+      default: Satterthwaite
+      options:
+        - name: Satterthwaite
+          title: Satterthwaite
+        - name:  Kenward-Roger
+          title: "Kenward-Roger"
+
+
+
+    - name: qq
+      title: Q-Q plot of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+
+    - name: normTest
+      title: Normality of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a test for normality of residuals
+    - name: normPlot
+      title: Histogram of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+
+
+    - name: residPlot
+      title: Residuals-Predicted scatterplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+
+    - name: clusterBoxplot
+      title: Residuals by cluster boxplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a boxplot of random effects by the first defined clustering variable
+
+    - name: randHist
+      title: Histogram of random Coefficients
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide histogram of random Coefficients
+
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
 
 ...
 

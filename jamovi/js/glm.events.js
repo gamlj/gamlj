@@ -138,12 +138,13 @@ var updatePostHocSupplier = function(ui, context) {
     for (var j = 0; j < termsList.length; j++) {
         var term = termsList[j];
         if (containsCovariate(term, covariatesList) === false)
-            list.push(term)
+            list.push(term);
     }
     ui.postHocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
 };
 
 var filterModelTerms = function(ui, context) {
+    // console.log("filterModelsTerms in glm");
     var termsList = context.cloneArray(ui.modelTerms.value(), []);
     var diff = context.findChanges("termsList", termsList, true, FormatDef.term);
 
@@ -153,7 +154,9 @@ var filterModelTerms = function(ui, context) {
         for (var i = 0; i < diff.removed.length; i++) {
             var item = diff.removed[i];
             for (var j = 0; j < termsList.length; j++) {
-                if (FormatDef.term.contains(termsList[j], item)) {
+//                if (FormatDef.term.contains(termsList[j], item)) {
+                if (FormatDef.term.isEqual(termsList[j], item)) {
+
                     termsList.splice(j, 1);
                     j -= 1;
                     itemsRemoved = true;
@@ -185,7 +188,7 @@ var updateContrasts = function(ui, variableList, context) {
             }
         }
         if (found === null)
-            list3.push({ var: variableList[i], type: "deviation" });
+            list3.push({ var: variableList[i], type: "simple" });
         else
             list3.push(found);
     }
@@ -210,7 +213,6 @@ var updateScaling = function(ui, variableList, context) {
         else
             list3.push(found);
     }
-
     ui.scaling.setValue(list3);
 };
 

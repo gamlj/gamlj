@@ -8,13 +8,14 @@ gamljGzlmClass <- R6::R6Class(
     .postHocRows=NA,
     .init=function() {
       ginfo("init")
+      class(private$.results) <- c('gamlj', class(private$.results))
       private$.names64<-names64$new()
       n64<-private$.names64
       factors<-self$options$factors
       covs<-self$options$covs
       modelTerms<-self$options$modelTerms
       modelType<-self$options$modelSelection
-      afamily<-mf.give_family(modelType)
+      afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
       dep<-self$options$dep
       fixedIntercept<-self$options$fixedIntercept
       
@@ -43,23 +44,28 @@ gamljGzlmClass <- R6::R6Class(
          jmvcore::reject(data)
 
       modelFormula<-lf.constructFormula(dep,modelTerms,self$options$fixedIntercept)
+      dep64<-jmvcore::toB64(dep)
+      modelTerms64<-lapply(modelTerms,jmvcore::toB64)
+      formula64<-as.formula(lf.constructFormula(dep64,modelTerms64,fixedIntercept))
+      
       
       infoTable<-self$results$info
       info<-MINFO[[modelType]]
+      info$link<-LINFO[[afamily$link]]
+      info$distribution<-DINFO[[afamily$family]]
       infoTable$addRow(rowKey="mod",list(info="Model Type",value=info$name[[1]],comm=info$name[[2]]))
       infoTable$addRow(rowKey="call",list(info="Call",comm=n64$translate(modelFormula),value=info$call))
       infoTable$addRow(rowKey="link",list(info="Link function",value=info$link[[1]],comm=info$link[[2]]))
       ep<-mi.explainPrediction(modelType,data,dep)
       if (!is.null(ep))
-              infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=ep[2]))
+              infoTable$addRow(rowKey="dir",list(info="Direction",value=ep[1],comm=""))
       infoTable$addRow(rowKey="family",list(info="Distribution",value=info$distribution[[1]],comm=info$distribution[[2]]))
       infoTable$addRow(rowKey="r2",list(info="R-squared",comm="Proportion of reduction of error"))
       infoTable$addRow(rowKey="aic",list(info="AIC",comm="Less is better"))
+      infoTable$addRow(rowKey="bic",list(info="BIC",comm="Less is better"))
       infoTable$addRow(rowKey="dev",list(info="Deviance",comm="Less is better"))
       infoTable$addRow(rowKey="resdf",list(info="Residual DF",comm=""))
-      
-      if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
-        infoTable$addRow(rowKey="devdf",list(info="Value/DF",comm="Close to 1 is better"))
+      infoTable$addRow(rowKey="devdf",list(info="Chi-squared/DF",comm="Overdispersion indicator"))
       
       infoTable$addRow(rowKey="conv",list(info="Converged",comm="Whether the estimation found a solution"))
       if ("note" %in% names(info))
@@ -71,12 +77,16 @@ gamljGzlmClass <- R6::R6Class(
       private$.cov_condition<-conditioning$new(self$options$covs,self$options$simpleScale,span)
       }
       #####################
-
+      
+      
       ## anova Table 
       if (length(modelTerms)>0) {
           aTable<- self$results$main$anova
+          mynames64<-attr(terms(as.formula(formula64)),"term.labels")
+          terms<-n64$nicenames(mynames64)  
+          
           for (i in seq_along(modelTerms)) {
-                  lab<-jmvcore::stringifyTerm(modelTerms[[i]],raise=T)
+                  lab<-jmvcore::stringifyTerm(terms[[i]],raise=T)
                   aTable$addRow(rowKey=i, list(name=lab))
           }
       }
@@ -93,9 +103,8 @@ gamljGzlmClass <- R6::R6Class(
       ciWidth<-self$options$paramCIWidth
       aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-
-      if (modelType=="linear")
-        aTable$getColumn("expb")$setVisible(FALSE)
+      aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      aTable$getColumn('ecihig')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
       
       if (!is.something(self$options$factors))
         aTable$getColumn('label')$setVisible(FALSE)
@@ -109,7 +118,24 @@ gamljGzlmClass <- R6::R6Class(
            for(i in seq_along(terms)) {
               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
            }
-        # other inits
+
+      ## relative risks
+      if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
+        
+           aTable<-self$results$main$relativerisk
+           aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           
+           if (self$options$fixedIntercept==TRUE & length(terms)>1 ) {
+               terms<-terms[2:length(terms)]
+               labels<-labels[2:length(labels)]        
+           }
+           for(i in seq_along(terms)) {
+               aTable$addRow(rowKey=i,list(source=jmvcore::stringifyTerm(terms[[i]],raise=T),label=lf.nicifyLabels(labels[i])))
+           }
+      }
+      
+      # other inits
 
         gplots.initPlots(self,data,private$.cov_condition)
         gposthoc.init(data,self$options, self$results$postHocs)     
@@ -125,6 +151,7 @@ gamljGzlmClass <- R6::R6Class(
       factors <- self$options$factors
       covs <- self$options$covs
       modelType<-self$options$modelSelection
+      ciWidth<-self$options$paramCIWidth/100
       if (is.null(dep)) 
         return()
       
@@ -148,12 +175,10 @@ gamljGzlmClass <- R6::R6Class(
 
       ##### clean the data ####
       data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,modelType)
+      data<-mf.checkData(self$options,data,modelType=modelType)
       if (!is.data.frame(data))
         jmvcore::reject(data)
-      for (scaling in self$options$scaling) {
-        data[[jmvcore::toB64(scaling$var)]]<-lf.scaleContinuous(data[[jmvcore::toB64(scaling$var)]],scaling$type)  
-      }
+
       
       if (!is.null(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
@@ -161,147 +186,127 @@ gamljGzlmClass <- R6::R6Class(
         names(data)<-jmvcore::toB64(names(data))
         private$.cov_condition$labels_type=self$options$simpleScaleLabels
       }
+
+      ##### model ####
+      ## we estimate it every time
       
-      
-               
-               ##### model ####
-               ## for some reason the (g)lm model is very heavy to save in table$state
-               ## so we estimate it every time
-           
-               model_test <- try({
-                           model<-private$.estimate(modelFormula, data=data)
-                           wars<-warnings()
-                       })
-               if (jmvcore::isError(model_test)) {
-                        msg<-jmvcore::extractErrorMessage(model_test)
-                        msg<-n64$translate(msg)
-                        jmvcore::reject(msg, code='error')
-               }
+      model<- try(private$.estimate(modelFormula, data=data))
+      mi.check_estimation(model,n64)
+      model<-mi.model_check(model)
       private$.model <- model
       
       ### if it worked before, we skip building the tables, 
       ### otherwise we store a flag  in parameters table state so next time we know it worked
 
       if (is.null(estimatesTable$state)) {
-               ginfo("anova and parameters have been estimated")
-               test_summary<-try(model_summary<-summary(model))
-               if (jmvcore::isError(test_summary)) {
-                   msg <- jmvcore::extractErrorMessage(test_summary)
-                   msg<-n64$translate(msg)
-                   jmvcore::reject(msg, code='error')
-               }
-            
-      ### coefficients summary results ####
-      
-               test_parameters<-try(parameters<-mf.summary(model))
-               if (jmvcore::isError(test_parameters)) {
-                    msg <- jmvcore::extractErrorMessage(test_parameters)
-                    msg<-n64$translate(msg)
-                    jmvcore::reject(msg, code='error')
-               }
-      
-                if (!is.null(attr(parameters,"warning"))) 
-                    estimatesTable$setNote(attr(parameters,"warning"),WARNS[as.character(attr(parameters,"warning"))])
-  
-               
-               ### anova results ####
-               anova_res<-NULL
-               if (length(modelTerms)==0) {
-                   anovaTable$setNote("warning","Tests cannot be computed")
-               } else {
-                   suppressWarnings({
-                   anova_test <- try(anova_res<-mf.anova(model)) # end suppressWarnings
-                 })
-                   if (jmvcore::isError(anova_test)) 
-                      jmvcore::reject(jmvcore::extractErrorMessage(anova_test), code='error')
-               }
-
-               
-             
-               ### fill info table #########   
-               modelType<-self$options$modelSelection
-               
-               infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
-               infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
-               infoTable$setRow(rowKey="dev",list(value=model$deviance))
-               infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
-               if (modelType=="nb" || modelType=="poiover" || modelType=="poisson")
-                 infoTable$setRow(rowKey="devdf",list(value=mi.getValueDf(model)))
-               if (modelType=="poiover") {
-                 infoTable$setRow(rowKey="r2",list(comm="Not available for quasi-poisson"))
-                 infoTable$setRow(rowKey="aic",list(comm="Not available for quasi-poisson"))
-               }
-               infoTable$setRow(rowKey="conv",mi.converged(model))
-               
-               
-               ### end of info table ###
-        
-               # anova table ##
-                ### we still need to check for modelTerms, because it may be a intercept only model, where no F is computed
-                 if (length(modelTerms)>0) {
-                       rawlabels<-rownames(anova_res)
-                       labels<-n64$nicenames(rawlabels)
-                       trows<-dim(anova_res)[1]
-                       for (i in seq_len(trows)) {
-                              tableRow<-anova_res[i,]  
-                              anovaTable$setRow(rowNo=i,tableRow)
-                       }
-
-                      messages<-mf.getModelMessages(model)
-                      for (i in seq_along(messages)) {
-                              anovaTable$setNote(names(messages)[i],messages[[i]])
-                              infoTable$setNote(names(messages)[i],messages[[i]])
-                      }
-                      if (length(messages)>0) {
-                           infoTable$setNote("lmer.nogood",WARNS["lmer.nogood"])
-                      }
-
-                 }
-    
-
-        ### parameter table ####
+        ginfo("Parameters have been estimated")
+        self$results$.setModel(model)
+        ### coefficients summary results ####
+        capture.output({
+        parameters<-try(mf.summary(model))
+        })
+        mi.check_estimation(parameters,n64)
         #### confidence intervals ######
         ciWidth<-self$options$paramCIWidth/100
-        if (self$options$showParamsCI) {
-             citry<-try({
-                 ci<-mf.confint(model,level=ciWidth)
-                 colnames(ci)<-c("cilow","cihig")
-                 parameters<-cbind(parameters,ci) 
-                 })
-              if (jmvcore::isError(citry)) {
-                  message <- jmvcore::extractErrorMessage(citry)
-                  estimatesTable$setNote("cicrash",paste(message,". CI cannot be computed"))
-              }
-        }
-        rownames(parameters)<-n64$nicenames(rownames(parameters))
-
-        for (i in 1:nrow(parameters)) {
-                tableRow=parameters[i,]
-                estimatesTable$setRow(rowNo=i,tableRow)
-          }
-
         
-       if (mf.aliased(model)) {
-          estimatesTable$setNote("aliased",WARNS["ano.aliased"])
-          infoTable$setNote("aliased",WARNS["ano.aliased"])
+        parameters<-mf.confint(model,ciWidth,parameters)
+        out.fillTable(estimatesTable,parameters)        
+        estimatesTable$setState(attributes(parameters))
        }
-        estimatesTable$setState(TRUE)
+       ### anova results ####
+      if (is.null(anovaTable$state)) {
         
-  
-        # end of check state
+        ### fill info table #########   
+        modelType<-self$options$modelSelection
+        ep<-mi.explainPrediction(modelType,data,dep)
+        if (!is.null(ep))
+          infoTable$setRow(rowKey="dir",list(comm=ep[2]))
+        infoTable$setRow(rowKey="r2",list(value=mi.rsquared(model)))
+        infoTable$setRow(rowKey="aic",list(value=mi.getAIC(model)))
+        infoTable$setRow(rowKey="bic",list(value=mi.getBIC(model)))
+        
+        infoTable$setRow(rowKey="dev",list(value=model$deviance))
+        infoTable$setRow(rowKey="resdf",list(value=mi.getResDf(model)))
+        infoTable$setRow(rowKey="devdf",list(value=mi.getValueDf(model)))
+        if (modelType=="poiover") {
+          infoTable$setRow(rowKey="aic",list(comm="Not available for quasi-poisson"))
+        }
+        infoTable$setRow(rowKey="conv",list(value=ifelse(mi.converged(model),"yes","no")))
+        infoTable$setState(list(warning=attr(model,"warning")))
+        
+        
+        ### end of info table ###
+        
+        
+        ### anova results ####
+        anova_res<-data.frame()
+        if (length(modelTerms)==0) {
+          attr(anova_res,"warning")<-"Omnisbus Tests cannot be computed"
+        } else {
+          suppressWarnings({anova_res <- try(mf.anova(model)) })
+          err<-mi.warn_estimation(anova_res,n64)
+          if (is.something(err))
+            attr(anova_res,"warning")<-"Omnisbus Tests cannot be computed"
+          else {
+             out.fillTable(anovaTable,anova_res)
+          }
+        }
+
+        anovaTable$setState(attributes(anova_res)) 
+        ####### end of anova table ###########
+        
         } else
-          ginfo("anova and parameters have been recycled")
-    
+          ginfo("anova has been recycled")
+
+        ############   Relative Risks      ##################
+        if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
+          data$id_id_id<-seq_len(dim(data)[1])
+          levs<-levels(data[[jmvcore::toB64(dep)]])
+          data[,jmvcore::toB64(dep)]<-as.numeric(data[[jmvcore::toB64(dep)]]==levs[2])
+          geemodel<-try(geepack::geeglm(as.formula(modelFormula), family = poisson(link = "log"), id = id_id_id, corstr = "exchangeable", data = data))
+          if (!jmvcore::isError(geemodel)) {
+          summ<-summary(geemodel)
+          estimate<-summ$coefficients
+          names(estimate)[1]<-"estimate"
+          last<-length(estimate[,1])
+          
+          if ("(Intercept)" %in% rownames(estimate) & last>1) {
+            estimate<-estimate[2:last,] 
+          }
+          pp<-abs(qnorm( (1-ciWidth) / 2 ))
+          estimate$cilow<-estimate$estimate- pp * estimate$Std.err
+          estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
+          estimate<-as.matrix(estimate[,c("estimate","cilow","cihig")])
+          estimate[]<-vapply(estimate, exp,numeric(1))
+          table<-self$results$main$relativerisk
+          for (i in 1:nrow(estimate))
+            table$setRow(rowKey=i,estimate[i,])
+          }
+      
+        }      
+      iatt<-attr(model,"infoTable")
+      out.infotable_footnotes(infoTable,iatt)
+      out.table_notes(infoTable)
+      out.table_notes(estimatesTable)
+      out.table_notes(anovaTable)
+      
+      
+        ####################################
         private$.preparePlots(private$.model)
         gsimple.populate(model,self$options,self$results$simpleEffects,private$.cov_condition)
         gposthoc.populate(model,self$options,self$results$postHocs)
         gmeans.populate(model,self$options,self$results$emeansTables,private$.cov_condition)
         
+        mf.savePredRes(self$options,self$results,model) 
+        
+        
+        
+        
 
     },
   .cleandata=function() {
+      Sys.setlocale("LC_NUMERIC", "C")
       n64<-private$.names64
-      
       dep <- self$options$dep
       factors <- self$options$factors
       covs <- self$options$covs
@@ -378,26 +383,39 @@ gamljGzlmClass <- R6::R6Class(
     },
   .estimate=function(form,data) {
     modelType<-self$options$modelSelection
+    afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
     if (modelType=="multinomial") {
-      mod<-nnet::multinom(form,data,model = T)
-      mod$call$formula<-as.formula(mod)
-      return(mod)
+      mark("Estimating multinomial")
+      model<-nnet::multinom(form,data,model = T)
+      model$call$formula<-as.formula(model)
+      ### save info for R refit ####
+      attr(model,"refit")<-list(lib="nnet",
+                                command="multinom",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form),model=TRUE))
+      return(model)
     }
     if (modelType=="nb") {
-      mod<-MASS::glm.nb(form,data)
-      return(mod)
+      model<-MASS::glm.nb(form,data)
+      ### save info for R refit ####
+      attr(model,"refit")<-list(lib="MASS",
+                                command="glm.nb",
+                                coptions=list(formula=private$.names64$translate(form)),
+                                eoptions=list(formula=private$.names64$translate(form)))
+      
+      return(model)
     }
+    model<-stats::glm(form,data,family=afamily)
+    ### save info for R refit ####
+    cfamily<-paste0(afamily$family,"(",afamily$link,")")
+    attr(model,"refit")<-list(command="glm",
+                              coptions=list(formula=private$.names64$translate(form),family=cfamily),
+                              eoptions=list(formula=private$.names64$translate(form),family=afamily))
     
-    stats::glm(form,data,family=mf.give_family(modelType))
+  
+    model
   },
   
-      .modelFormula=function() {
-
-      if (!is.null(self$options$dep))  {
-        dep<-jmvcore::toB64(self$options$dep)
-      } else return(FALSE)
-      private$.fixedFormula()
-    },
 
 
 .preparePlots=function(model) {
@@ -499,30 +517,15 @@ gamljGzlmClass <- R6::R6Class(
   if (option$name %in% c('factors', 'dep', 'covs', 'modelTerms'))
     return('')
   
-  if (name == 'scaling') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'centered')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
+  if (name =='scaling') {
+    vec<-sourcifyList(option,"centered")
+    return(vec)
   }
-  if (name == 'contrasts') {
-    i <- 1
-    while (i <= length(value)) {
-      item <- value[[i]]
-      if (item$type == 'simple')
-        value[[i]] <- NULL
-      else
-        i <- i + 1
-    }
-    if (length(value) == 0)
-      return('')
-  }  else if (name == 'postHoc') {
+  if (name =='contrasts') {
+    vec<-sourcifyList(option,"simple")
+    return(vec)
+  }
+  if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
   }

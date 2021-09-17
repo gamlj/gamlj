@@ -12,6 +12,8 @@ mi.update<-function(table,modelType,data=NULL,dep=NULL) {
 }
 
 
+
+
 ######### rsquared ##########
 
 mi.rsquared<- function(x,...) UseMethod(".rsquared")
@@ -38,26 +40,45 @@ mi.rsquared<- function(x,...) UseMethod(".rsquared")
 }
 
 
-####### confergence ############################
+####### convergence ############################
 
 mi.converged<- function(x,...) UseMethod(".converged")
 
-.converged_test<-function(logicValue) {
-  value<-ifelse(logicValue,"yes","no")
-  comm<-ifelse(logicValue,"A solution was found","Results may be misleading")
-  list(value=value,comm=comm)
+.converged.default<-function(model) {
+
+     if ("converged" %in% names(model))
+        conv<-model$converged
+     else
+        conv<-TRUE
+     conv
+}
+.converged.glmerMod<-function(model) 
+  .converged.glmerMerMod(model)
+    
+.converged.glmerMerMod<-function(model) {
+  
+  if (!is.null(model@optinfo$conv$lme4$code))
+    conv<-FALSE
+  else
+    conv<-TRUE
+  conv
 }
 
-.converged.default<-function(model) {
-  
-    .converged_test(model$converged)
-  
+.converged.lmerMerMod<-function(model) {
+            
+              if (!is.null(model@optinfo$conv$lme4$code))
+                  conv<-FALSE
+              else
+                  conv<-TRUE
+              conv
 }
+
 .converged.multinom<-function(model) {
 
-      .converged_test(model$convergence==0)
-  
+      model$convergence==0
 }
+
+
 
 ########### aliazed coefficients #########
 
@@ -66,6 +87,13 @@ mi.aliased<- function(x,...) UseMethod(".aliased")
 .aliased.default<-function(model) {
     aliased<-stats::alias(model)
     (!is.null(aliased$Complete))
+}
+
+.aliased.lm<-function(model) {
+  if (model$rank==0)
+    return(FALSE)
+  aliased<-stats::alias(model)
+  (!is.null(aliased$Complete))
 }
 
 .aliased.lmerMerMod<-function(model) {
@@ -91,20 +119,23 @@ mi.getDummiesNames<-function(varname,data) {
     varname
 }
 
+mi.getBIC<- function(x,...) UseMethod(".getBIC")
+
+.getBIC.default<-function(model)
+  return(round(stats::BIC(model),digits = 3))
+
 
 mi.getAIC<- function(x,...) UseMethod(".getAIC")
 
 .getAIC.default<-function(model)
-  return(model$aic)
+  return(round(stats::extractAIC(model)[2],digits = 3))
 
-.getAIC.multinom<-function(model)
-  return(model$AIC)
 
 mi.getValueDf<- function(x,...) UseMethod(".getValueDf")
 
 .getValueDf.default<-function(model) {
   value <- sum(stats::residuals(model, type = "pearson")^2)
-  result <- value/model$df.residual
+  result <- value/stats::df.residual(model)
   return(result)
 }
 .getValueDf.multinom<-function(model) {
@@ -118,6 +149,11 @@ mi.getResDf<- function(x,...) UseMethod(".getResDf")
 }
 .getResDf.multinom<-function(model) {
   return(model$edf)
+}
+
+.getResDf.glmerMod<-function(model) {
+  ss<-summary(model)
+  return(ss$AICtab["df.resid"])
 }
 
 mi.initContrastCode<-function(data,options,results,n64) {
@@ -153,25 +189,49 @@ mi.initContrastCode<-function(data,options,results,n64) {
   
 }
 
+mi.initInterceptInfo<-function(options, results) {
+  if (!options$interceptInfo || !options$fixedIntercept) 
+      return()
+  aTable<-results$main$interceptTable
+  aTable$addRow(rowKey=1, values=list(name="(Intercept)"))
+}
 
+mi.initEffectSizeInfo<-function(options, results, terms, ciWidth) {
+  if (!options$effectSizeInfo) 
+    return()
+  aTable<-results$main$effectSizeTable
+  aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+  aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+  i<-1
+  j<-1
+
+  for (term in terms) {
+    aTable$addRow(rowKey=j,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_eta2))
+    aTable$addRow(rowKey=j+1,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_peta2))
+    aTable$addRow(rowKey=j+2,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_pomega2))
+    aTable$addRow(rowKey=j+3,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_pepsilon2))
+
+    aTable$addFormat(col=1, rowNo=j, format=jmvcore::Cell.BEGIN_GROUP)
+    aTable$addFormat(col=1, rowNo=j, format=jmvcore::Cell.BEGIN_END_GROUP)
+    i<-i+1
+    j<-j+4
+  }
+}
 
 
 mi.explainPrediction<-function(modelType,data,dep){
-  
+  dlevs<-levels(data[[jmvcore::toB64(dep)]])
   if (modelType %in% c("logistic")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=1)/P(y=0)"
     dircomm<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
     return(c(dirvalue,dircomm))
   }
   if (modelType %in% c("probit")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=1)"
     dircomm<-paste("P(",dep,"=",dlevs[2],")")
     return(c(dirvalue,dircomm))
   }
   if (modelType %in% c("multinomial")) {
-    dlevs<-levels(data[[jmvcore::toB64(dep)]])
     dirvalue<-"P(y=x)/P(x=0)"
     dircomm<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
     return(c(dirvalue,dircomm))
@@ -235,6 +295,91 @@ mi.dependencies<-function(model,term,what) {
   FALSE
 }
 
+
+mi.check_estimation<-function(model,n64) {
+  if (jmvcore::isError(model)) {
+      msg<-jmvcore::extractErrorMessage(model)
+      if (msg=="Unknown error")
+          msg="The estimation of the model could not be completed. Please refine the model"
+      ### this should be made programatic #####
+      msg<-gsub("nAGQ","Precision/speed parameter",msg,fixed=T)
+      ###
+      msg<-n64$translate(msg)
+      jmvcore::reject(msg, code='error')
+  }
+}
+
+mi.warn_estimation<-function(model,n64) {
+  if (jmvcore::isError(model)) {
+    msg<-jmvcore::extractErrorMessage(model)
+    n64$translate(msg)
+  }
+}
+
+###### check model characteristics ############
+
+mi.model_check<- function(model) {
+  att<-list(conv=mi.converged(model),
+                 aliased=mi.aliased(model),
+                 singular=mi.isSingular(model))
+  attr(model,"infoTable")<-att  
+  attr(model,"warning")<-mi.warnings(model)
+  model
+}
+######## check for singularity of fit  ##########
+
+mi.isSingular<- function(x,...) UseMethod(".mi.isSingular")
+
+.mi.isSingular.default<-function(model) {
+  return(FALSE)
+}
+
+.mi.isSingular.lmerMod<-function(model) {
+ lme4::isSingular(model)
+}
+
+######## check model warnings ##########
+
+mi.warnings<- function(x,...) UseMethod(".mi.warnings")
+
+.mi.warnings.default<-function(model) {
+  return(NULL)
+}
+
+.mi.warnings.glm<-function(model) {
+
+   family<-family(model)
+
+   if (family$family=="poisson" | family$family=="quasipoisson") 
+     if (all.equal(as.numeric(model$y), as.integer(model$y))!=TRUE)
+       return("Warnings: Poisson model requires the values of dependent variable to be integers. Results may be misleading ")
+
+     if (length(grep("Negative Binomial",family$family))>0) 
+       if (all.equal(as.numeric(model$y), as.integer(model$y))!=TRUE)
+          return("Warnings: Negative Binomial model requires the values of dependent variable to be integers. Results may be misleading ")
+}
+
+.mi.warnings.glmerMod<-function(model) {
+         .warnings<-.mi.warnings.lmerMod(model)
+         family<-family(model)
+         
+         if (family$family=="poisson" | family$family=="quasipoisson")  {
+           y<-model@frame[,1]
+           if (all.equal(as.numeric(y), as.integer(y))!=TRUE)
+             .warnings<-c(.warnings,"Warnings: Poisson model requires the values of dependent variable to be integers. Results may be misleading ")
+         }
+         if (length(grep("Negative Binomial",family$family))>0) {
+           y<-model@frame[,1]
+           if (all.equal(as.numeric(y), as.integer(y))!=TRUE)
+             .warnings<-c(.warnings,"Warnings: Negative Binomial model requires the values of dependent variable to be integers. Results may be misleading ")
+         }
+         .warnings
+}
+.mi.warnings.lmerMod<-function(model) {
+  msg<-model@optinfo$conv$lme4$messages
+  return(msg)
+  
+}
 
 
 

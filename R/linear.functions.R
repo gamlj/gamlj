@@ -206,19 +206,24 @@ lf.contrastLabels=function(levels, type) {
 }
 
 lf.scaleContinuous<-function(var,method,by=NULL) {
-
+  
   if (method=="centered") 
           var<-scale(var,scale = F)  
-  if (method=="cluster-based centered") {    
+  if (method=="clusterbasedcentered") 
           var<-unlist(tapply(var,by,scale,scale=F))
-          print(tapply(var,by,mean))
-  }
   if (method=="standardized") 
           var<-scale(var,scale = T)  
-  if (method=="cluster-based standardized")     
+  if (method=="clusterbasedstandardized")     
           var<-unlist(tapply(var,by,scale,scale=T))
+  if (method=="log") {
+    if (any(var<=0))
+      jmvcore::reject("Log transformation requires all positive numbers in the original variable")
+    else
+      var<-log(var)
+  }
   as.numeric(var)
 }
+
 
 
 

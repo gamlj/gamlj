@@ -2,12 +2,12 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_data}
 \alias{gamlj_data}
-\title{Extract data transformed by GAMLj to run R analyses in line with gamlj setup}
+\title{Extract data}
 \usage{
-gamlj_data(gobj)
+gamlj_data(object)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 }
 \value{
 a dataset
@@ -15,15 +15,15 @@ a dataset
 \description{
 This function returns a dataset with the variables in the GAMLj model 
 transformed according to GAMLj options. It is usefull to run additional 
-models in R with other R packages with the same setup used by GAMLj
+models with other R packages with the same setup used by GAMLj
 }
 \examples{
-data("qsport")
-obj<-gamlj::gamljGLM(formula = performance ~ hours,
+data('qsport')
+gmod<-gamlj::gamljGlm(formula = performance ~ hours,
                 data = qsport,
-                scaling = list(list(var="hours",type="standardized")))
+                scaling = c(hours='standardized'))
 
-gdata<-gamlj_data(obj)
+gdata<-gamlj_data(gmod)
 lm(performance ~ hours,data=gdata)
 }
 \author{

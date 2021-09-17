@@ -4,7 +4,7 @@ title: Generalized Linear Models
 menuGroup: Linear Models
 version: '1.5.2'
 jas: '1.2'
-
+export: false
 description:
     main: Generalized Linear Model
     R:
@@ -88,12 +88,19 @@ options:
 
 
     - name: showParamsCI
-      title: Confidence intervals
+      title: For estimates
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE`  or `FALSE` (default), parameters CI in table
+    - name: showExpbCI
+      title: For exp(B)
       type: Bool
       default: true
       description:
           R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
+            `TRUE` (default) or `FALSE` , exp(B) CI in table
 
 
     - name: paramCIWidth
@@ -106,7 +113,6 @@ options:
           R: >
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width for the parameter estimates
-
 
 
     - name: contrasts
@@ -374,6 +380,8 @@ options:
       options:
           - name: expb
             title: Odd Ratios (expB)
+          - name: RR
+            title: Relative Risk (RR)
       default:
           - expb
           
@@ -393,6 +401,8 @@ options:
           title: Logistic
         - name: probit
           title: Probit
+        - name: custom
+          title: Custom
           
         - name: multinomial
           title: Multinomial
@@ -400,6 +410,59 @@ options:
       description:
           R: >
             Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
+
+
+    - name: custom_family
+      title: Distribution
+      type: List
+      options:
+          - title: Gaussian
+            name: 'gaussian'
+          - title: Binomial
+            name:  'binomial'
+          - title: Poisson
+            name:  'poisson'
+          - title: Inverse gaussian
+            name: 'inverse.gaussian'
+          - title: Gamma
+            name: 'Gamma'
+
+      default: "gaussian"
+      description:
+         R: >
+           Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
+
+    - name: custom_link
+      title: Link Function
+      type: List
+      options:
+          - title: Identity
+            name: 'identity'
+          - title: Logit
+            name:  'logit'
+          - title: Log
+            name:  'log'
+          - title: Inverse
+            name: 'inverse'
+          - title: Inverse squared
+            name: '1/mu^2'
+          - title: Square root
+            name: 'sqrt'
+
+      default: "identity"
+      description:
+         R: >
+           Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
+           
+           
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
 
 ...
 

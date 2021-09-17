@@ -1,9 +1,7 @@
 ---
-name:  gamljGLM
+name:  gamljGlm
 title: General Linear Model
 jrs: '1.0'
-
-
 items:
   - name: model
     type: Property
@@ -35,8 +33,53 @@ items:
         - modelTerms
         - contrasts
         - scaling
+        - dep_scale
         - fixedIntercept
     items:
+           - name: interceptTable
+             title: Intercept Information
+             type: Table
+             visible: (interceptInfo)
+             description: a table of information for the model intercept
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - contrasts
+                         - scaling
+                         - dep_scale
+                         - fixedIntercept
+                         - effectSize
+                         - interceptInfo
+             columns:
+                    - name: name
+                      title: ""
+                      type: text
+                    - name:  df
+                      title: df
+                      type: integer
+                    - name: f
+                      title: F
+                      type: number
+                    - name: p
+                      title: p
+                      type: number
+                      format: zto,pvalue
+                    - name: etaSqP
+                      title: η²p
+                      type: number
+                      visible: (effectSize:partEta)
+                      format: zto
+                    - name: omegaSq
+                      title: ω²p
+                      type: number
+                      visible: (effectSize:omega)
+                      format: zto
+                    - name: epsilonSq
+                      title: ε²p
+                      type: number
+                      visible: (effectSize:epsilon)
+                      format: zto
+
            - name: anova
              title: ANOVA Omnibus tests
              type: Table
@@ -46,6 +89,7 @@ items:
                          - modelTerms
                          - contrasts
                          - scaling
+                         - dep_scale
                          - fixedIntercept
                          - effectSize
              columns:
@@ -75,10 +119,50 @@ items:
                       visible: (effectSize:partEta)
                       format: zto
                     - name: omegaSq
-                      title: ω²
+                      title: ω²p
                       type: number
                       visible: (effectSize:omega)
                       format: zto
+                    - name: epsilonSq
+                      title: ε²p
+                      type: number
+                      visible: (effectSize:epsilon)
+                      format: zto
+
+           - name: effectSizeTable
+             title: Effect Size Indices
+             type: Table
+             visible: (effectSizeInfo)
+             description: a table of effect size indeces
+            
+             clearWith:
+                         - dep
+                         - modelTerms
+                         - contrasts
+                         - scaling
+                         - fixedIntercept
+                         - effectSize
+                         - dep_scale
+                         
+             columns:
+                    - name: effect
+                      title: Effect
+                      combineBelow: true
+                      type: text
+                    - name: name
+                      title: Statistics
+                      type: text
+                    - name: estimate
+                      title: Estimate
+                      type: number
+                    - name: cilow
+                      title: Lower
+                      type: number
+                    - name: cihig
+                      title: Higher
+                      type: number
+             refs: effectsize
+
            - name: fixed
              title: Fixed Effects Parameter Estimates
              type: Table
@@ -87,8 +171,10 @@ items:
                     - modelTerms
                     - contrasts
                     - scaling
+                    - dep_scale
                     - fixedIntercept
                     - effectSize
+                    - paramCIWidth
 
              columns:
                     - name: source
@@ -160,6 +246,7 @@ items:
         - modelTerms
         - contrasts
         - scaling
+        - dep_scale
         - postHocCorr
     template:
         clearWith: []
@@ -207,17 +294,12 @@ items:
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    items:
-            - name: Anova
-              title: Simple Effects ANOVA
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
+    clearWith:
                  - dep
                  - modelTerms
                  - contrasts
                  - scaling
+                 - dep_scale
                  - fixedIntercept
                  - simpleVariable
                  - simpleModerator
@@ -226,6 +308,13 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
               columns:
                  - name: threeway
                    title: ""
@@ -247,19 +336,30 @@ items:
                    title: p
                    type: number
                    format: zto,pvalue
+                 - name: etaSq
+                   title: η²
+                   type: number
+                   visible: (effectSize:eta)
+                 - name: etaSqP
+                   title: η²p
+                   type: number
+                   visible: (effectSize:partEta)
+                   format: zto
+                 - name: omegaSq
+                   title: ω²p
+                   type: number
+                   visible: (effectSize:omega)
+                   format: zto
+                 - name: epsilonSq
+                   title: ε²p
+                   type: number
+                   visible: (effectSize:epsilon)
+                   format: zto
 
             - name: Params
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
-              clearWith:
-                     - dep
-                     - modelTerms
-                     - contrasts
-                     - fixedIntercept
-                     - simpleScale
-                     - ciWidth
-
               columns:
                      - name: threeway
                        title: " "
@@ -312,6 +412,7 @@ items:
         - modelTerms
         - contrasts
         - scaling
+        - dep_scale
         - fixedIntercept
         - simpleScaleLabels
         - ciWidth
@@ -354,6 +455,7 @@ items:
         - plotError
         - ciWidth
         - scaling
+        - dep_scale
         - plotRaw
         - plotDvScale
         - fixedIntercept
@@ -384,6 +486,7 @@ items:
            - plotError
            - ciWidth
            - scaling
+           - dep_scale
            - modelTerms
            - fixedIntercept
            - simpleScale
@@ -445,3 +548,49 @@ items:
           clearWith:
             - dep
             - modelTerms
+            - dep_scale
+
+        - name: normPlot
+          title: Residual histogram
+          visible: (normPlot)
+          type: Image
+          description: Residual histogram
+          width: 450
+          height: 400
+          renderFun: .normPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+        - name: residPlot
+          title: Residual-Predicted Scatterplot
+          visible: (residPlot)
+          type: Image
+          description: Residual Predicted plot
+          width: 450
+          height: 400
+          renderFun: .residPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+            - dep_scale
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`GLM_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`GLM_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs

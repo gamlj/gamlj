@@ -35,18 +35,6 @@ NULL
 #' data(subjects_on_stimuli)
 NULL
 
-#' Individual growth model data
-#'
-#' Data for Individual growth model data examples
-#'
-#' @docType data
-#' @name temptime
-#' @usage data(temptime)
-#' @keywords datasets
-#' @examples
-#' data(temptime)
-NULL
-
 #' School data for testing
 #'
 #' Data for different examples
@@ -79,7 +67,7 @@ NULL
 #' @name wicksell
 #' @usage data(wicksell)
 #' @keywords datasets
-#' @references David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~dhowell/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
+#' @references David C. Howell, Overview of Mixed Models \url{https://www.uvm.edu/~statdhtx/StatPages/Mixed-Models-Repeated/Mixed-Models-Overview.html}
 #' @examples
 #' data(wicksell)
 NULL
@@ -94,4 +82,42 @@ NULL
 #' @keywords datasets
 #' @examples
 #' data(fivegroups)
+NULL
+
+#' Poisson data
+#'
+#'  Simulated data of a poisson distributed dependent variables with some independent variabes
+#'
+#' @docType data
+#' @name poissonacts
+#' @usage data(poissonacts)
+#' @keywords datasets
+#' @examples
+#' data(poissonacts)
+NULL
+
+
+#' Clustered data for logistic regression
+#'
+#' Simulated data for testing logistic mixed models. 
+#' Simulation of pupils data clustered across schools with a dichotomous outcome  
+#'
+#' @docType data
+#' @name schoolexam
+#' @usage data(schoolexam)
+#' @keywords datasets
+#' @examples
+#' data(schoolexam)
+NULL
+
+#' Clustered data for Negative Binomial model
+#'
+#' Modified version of a dataset in Long, J. S., & Freese, J. (2006). Regression models for categorical dependent variables using Stata. Stata press.
+#' Data present number of articles published by PhD students in a three year period with some predictors. Data are clustered by program.
+#' @docType data
+#' @name phdpubs
+#' @usage data(phdpubs)
+#' @keywords datasets
+#' @examples
+#' data(phdpubs)
 NULL

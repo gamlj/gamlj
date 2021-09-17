@@ -5,6 +5,9 @@ jrs: '1.0'
 
 
 items:
+  - name: model
+    type: Property
+    description: The underlying `glm` object
 
   - name: info
     title: Model Info
@@ -24,8 +27,12 @@ items:
         - factors
         - cov
         - modelTerms
+        - fixedIntercept
+        - modelSelection
+        - custom_family
+        - custom_link
     refs: gamlj
-
+    
 
   - name: main
     type: Group
@@ -36,6 +43,10 @@ items:
         - contrasts
         - scaling
         - fixedIntercept
+        - modelSelection
+        - custom_family
+        - custom_link
+
     items:
            - name: anova
              title: Loglikelihood ratio tests
@@ -48,6 +59,10 @@ items:
                          - scaling
                          - fixedIntercept
                          - effectSize
+                         - modelSelection
+                         - custom_family
+                         - custom_link
+                 
              columns:
                     - name: name
                       title: ""
@@ -63,7 +78,7 @@ items:
                       type: number
                       format: zto,pvalue
            - name: fixed
-             title: Fixed Effects Parameter Estimates
+             title: Parameter Estimates
              type: Table
              clearWith:
                     - dep
@@ -72,7 +87,13 @@ items:
                     - scaling
                     - fixedIntercept
                     - effectSize
-
+                    - showParamsCI
+                    - showExpbCI
+                    - paramCIWidth
+                    - modelSelection
+                    - custom_family
+                    - custom_link
+ 
              columns:
                     - name: dep
                       title: "Response Contrasts"
@@ -104,6 +125,15 @@ items:
                       title: "exp(B)"
                       type: number
                       visible: (effectSize:expb)
+                    - name: ecilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: ecihig
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+
                     - name: z
                       title: "z"
                       type: number
@@ -111,6 +141,39 @@ items:
                       title: "p"
                       type: number
                       format: zto,pvalue
+           - name: relativerisk
+             title: Relative risk
+             type: Table
+             visible: (effectSize:RR)
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - fixedIntercept
+                    - effectSize
+                    - ciWidth
+
+             columns:
+                    - name: source
+                      title: "Names"
+                      type: text
+                      visible: (showRealNames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "RR"
+                      type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (showExpbCI)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (showExpbCI)
+
 
 
 
@@ -122,6 +185,7 @@ items:
              visible: (showContrastCode)
              clearWith:
                     - contrasts
+
              template:
                    title:  $key
                    type: Table
@@ -146,6 +210,10 @@ items:
         - contrasts
         - scaling
         - postHocCorr
+        - modelSelection
+        - custom_family
+        - custom_link
+
     template:
         clearWith: []
         title:  ""
@@ -193,13 +261,7 @@ items:
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    items:
-            - name: Anova
-              title: Simple Effects ANOVA
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
+    clearWith:
                  - dep
                  - modelTerms
                  - contrasts
@@ -212,7 +274,16 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+                 - modelSelection
+                 - custom_family
+                 - custom_link
 
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
               columns:
                  - name: threeway
                    title: ""
@@ -236,13 +307,6 @@ items:
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
-              clearWith:
-                     - dep
-                     - modelTerms
-                     - contrasts
-                     - fixedIntercept
-                     - simpleScale
-                     - ciWidth
               columns:
                      - name: dep
                        title: "Response Contrasts"
@@ -273,6 +337,24 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
+                     - name: expb
+                       title: "exp(B)"
+                       type: number
+                       visible: (effectSize:expb)
+                     - name: lower.ECL
+                       type: number
+                       title: Lower
+                       visible: (showExpbCI)
+                     - name: upper.ECL
+                       type: number
+                       title: Upper
+                       visible: (showExpbCI)
+                     - name: df
+                       title: "df"
+                       type: number
+                     - name: t.ratio
+                       title: "t"
+                       type: number
                      - name: z.ratio
                        title: "z"
                        type: number
@@ -280,6 +362,7 @@ items:
                        title: "p"
                        type: number
                        format: zto,pvalue
+                       
 
 
 
@@ -296,6 +379,9 @@ items:
         - fixedIntercept
         - simpleScaleLabels
         - ciWidth
+        - modelSelection
+        - custom_family
+        - custom_link
 
     template:
         title:  $key
@@ -340,6 +426,10 @@ items:
         - modelTerms
         - percvalue
         - cvalue
+        - modelSelection
+        - custom_family
+        - custom_link
+
   - name: descPlots
     title: Results Plots
     type: Array
@@ -369,4 +459,25 @@ items:
            - modelTerms
            - percvalue
            - cvalue
+           - modelSelection
+           - custom_family
+           - custom_link
 
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`GzLM_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`GzLM_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs

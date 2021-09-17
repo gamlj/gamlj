@@ -1,12 +1,15 @@
 # History files
 .Rhistory
 .Rapp.history
+.Rhistor*
 
 # Session Data files
 .RData
 
 # jamovi
 build/
+build*/
+
 temp/
 *.jmo
 newversion.R
@@ -46,3 +49,4 @@ vignettes/*.pdf
 
 # docs sources
 
+inst/doc

@@ -2,13 +2,18 @@
 % Please edit documentation in R/rinterface.R
 \name{gamlj_simpleEffects}
 \alias{gamlj_simpleEffects}
-\title{Update a GAMLj results by passing new simple effects directives}
+\title{Deprecated simple effects}
 \usage{
-gamlj_simpleEffects(gobj, variable = NULL, moderator = NULL,
-  threeway = NULL, ...)
+gamlj_simpleEffects(
+  object,
+  variable = NULL,
+  moderator = NULL,
+  threeway = NULL,
+  ...
+)
 }
 \arguments{
-\item{gobj}{a gamlj results object of the class GAMLj*}
+\item{object}{a gamlj results object of the class `gamlj*Results`}
 
 \item{variable}{the independent variable name}
 
@@ -19,10 +24,11 @@ gamlj_simpleEffects(gobj, variable = NULL, moderator = NULL,
 \item{...}{any other options accepted by the gamlj_* function}
 }
 \value{
-an object of class GAMLj* as the input object
+Two tables with simple effects parameters estimates and ANOVA tables
 }
 \description{
-This function re-estimates a GAMLj model with new simple effects directives
+Deprecated, please use `simpleffects`
+#'
 }
 \author{
 Marcello Gallucci

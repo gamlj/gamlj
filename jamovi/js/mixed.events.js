@@ -30,7 +30,7 @@ const events = {
 
     onChange_randomSupplier: function(ui){
         let supplierList = this.itemsToValues(ui.randomSupplier.value());
-        console.log("change in random supplier");
+//        console.log("change in random supplier");
         var changes = this.findChanges("randomSupplier",supplierList,rtermFormat);
         if (changes.removed.length>0) {
           var randomTerms = this.cloneArray(ui.randomTerms.value(),[]);
@@ -93,7 +93,7 @@ const events = {
 
 
     onEvent_addRandomTerm: function(ui) {
-        console.log("addRandomTerm does nothing");
+//        console.log("addRandomTerm does nothing");
     },
     onEvent_randomTerms_preprocess: function(ui, data) {
  //       for(var j = 0; j < data.items.length; j++) {
@@ -101,7 +101,7 @@ const events = {
 //      }
     },
     onEvent_corr: function(ui, data) {
-          console.log("Correlation structure changed");
+      //    console.log("Correlation structure changed");
           fixRandomEffects(ui,this);
 
     },    
@@ -109,7 +109,7 @@ const events = {
 
    onEvent_nothing: function(ui, data) {
            // remove error notes if any
-          console.log("I didn't do anything");
+//          console.log("I didn't do anything");
     }    
 
 };
@@ -345,8 +345,7 @@ var updateRandomSupplier = function(ui, context) {
      }
     }
     context.sortArraysByLength(alist);
-    console.log("random supplierList");
-    console.log(alist);
+//    console.log("random supplierList");
       var formatted=context.valuesToItems(alist, rtermFormat);
 //    var busyList = context.cloneArray(ui.randomTerms.value(), []);
 //    var busyForm = context.valuesToItems(busyList, rtermFormat);
@@ -359,9 +358,8 @@ var updateRandomSupplier = function(ui, context) {
 
 
 var filterRandomTerms = function(ui, context) {
-    console.log("filter random effects");  
+//    console.log("filter random effects");  
     var termsList = context.cloneArray(ui.randomTerms.value(), []);
-    console.log(termsList);
     var unique = termsList.filter((v, i, a) => a.indexOf(v) === i); 
     if (unique.length!=termsList.length)
       ui.randomTerms.setValue(unique);

@@ -5,6 +5,10 @@ jrs: '1.0'
 
 items:
 
+  - name: model
+    type: Property
+    description: The underlying `lm` object
+
   - name: info
     title: Model Info
     type: Table
@@ -17,8 +21,11 @@ items:
          title: ""
     clearWith:
         - dep
+        - dep_scale
         - randomTerms
         - modelTerms
+        - fixedIntercept
+
     refs: gamlj
 
 
@@ -31,9 +38,11 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - randomTerms
         - correlatedEffects
         - fixedIntercept
+        - dfmethod
     items:
            - name: anova
              title: Fixed Effect Omnibus tests
@@ -45,9 +54,12 @@ items:
                          - reml
                          - contrasts
                          - scaling
+                         - dep_scale
                          - randomTerms
                          - correlatedEffects
                          - fixedIntercept
+                         - dfmethod
+
              columns:
                     - name: name
                       title: ""
@@ -75,9 +87,12 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
+                    - paramCIWidth
+
              columns:
                     - name: source
                       title: "Names"
@@ -121,6 +136,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -140,6 +156,14 @@ items:
                     - name: var
                       title: "Variance"
                       type: number
+                    - name: cilow
+                      type: number
+                      title: Lower
+                      visible: (ciRE)
+                    - name: cihig
+                      type: number
+                      title: Upper
+                      visible: (ciRE)
                     - name: icc
                       title: "ICC"
                       type: number
@@ -154,6 +178,7 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
@@ -184,10 +209,12 @@ items:
                     - reml
                     - contrasts
                     - scaling
+                    - dep_scale
                     - randomTerms
                     - correlatedEffects
                     - fixedIntercept
                     - randomTerms
+
              columns:
                    - name: test
                      title: "Test"
@@ -241,6 +268,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - randomTerms
         - correlatedEffects
         - postHocCorr
@@ -285,18 +313,13 @@ items:
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    items:
-            - name: Anova
-              title: Simple Effects ANOVA
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
+    clearWith:
                  - dep
                  - modelTerms
                  - reml
                  - contrasts
                  - scaling
+                 - dep_scale
                  - randomTerms
                  - correlatedEffects
                  - fixedIntercept
@@ -307,6 +330,13 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+
+    items:
+            - name: Anova
+              title: Simple Effects ANOVA
+              type: Table
+              description: a table of ANOVA for simple effects
+              visible: false
               columns:
                  - name: threeway
                    title: ""
@@ -341,15 +371,6 @@ items:
               title: Parameter Estimates for simple effects
               type: Table
               visible: false
-              clearWith:
-                     - dep
-                     - cluster
-                     - modelTerms
-                     - contrasts
-                     - fixedIntercept
-                     - simpleScale
-                     - ciWidth
-                     
               columns:
                      - name: threeway
                        title: " "
@@ -402,6 +423,7 @@ items:
         - reml
         - contrasts
         - scaling
+        - dep_scale
         - simpleScaleLabels
         - randomTerms
         - correlatedEffects
@@ -447,6 +469,7 @@ items:
         - plotError
         - ciWidth
         - scaling
+        - dep_scale
         - plotRaw
         - plotDvScale
         - fixedIntercept
@@ -478,6 +501,7 @@ items:
            - plotError
            - ciWidth
            - scaling
+           - dep_scale
            - modelTerms
            - fixedIntercept
            - simpleScale
@@ -488,7 +512,118 @@ items:
            - randomTerms
            - percvalue
            - cvalue
-
   - name: plotnotes
     type: Html
     visible: false
+
+  - name: assumptions
+    title: Assumption Checks
+    type: Group
+    items:
+        - name: normTest
+          title: Test for Normality of residuals
+          type: Table
+          description: a table of normality tests
+          visible: (normTest)
+          rows: 2
+          columns:
+            - name: test
+              title: Test
+              type: number
+
+            - name: stat
+              title: Statistics
+              type: number
+            - name: p
+              type: number
+              format: zto,pvalue
+
+        - name: qq
+          title: Q-Q Plot
+          visible: (qq)
+          type: Image
+          description: a q-q plot
+          width: 450
+          height: 400
+          renderFun: .qqPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+        - name: normPlot
+          title: Residual histogram
+          visible: (normPlot)
+          type: Image
+          description: Residual histogram
+          width: 450
+          height: 400
+          renderFun: .normPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - modelTerms
+            - dep_scale
+          
+        - name: residPlot
+          title: Residual-Predicted Scatterplot
+          visible: (residPlot)
+          type: Image
+          description: Residual Predicted plot
+          width: 450
+          height: 400
+          renderFun: .residPlot
+          requiresData: true
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+        - name: clusterBoxplot
+          title: Residuals by cluster boxplot
+          type: Array
+          description: Residuals boxplot by cluster
+          visible: (clusterBoxplot)
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .clusterBoxplot
+             width: 450
+             height: 400
+
+        - name: randHist
+          title: Random coefficients histogram
+          type: Array
+          description: an array of random coefficients histograms
+          visible: (randHist)
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .randHist
+             width: 450
+             height: 400
+
+  - name: predicted
+    title: Predicted Vales
+    type: Output            
+    varTitle: '`Mix_PRED_${ dep }`'
+    varDescription: Predicted values
+    clearWith:
+        - dep
+        - factors
+        - covs
+  - name: residuals
+    title: Residuals Vales
+    type: Output            
+    varTitle: '`Mix_RES_${ dep }`'
+    varDescription: Residuals values
+    clearWith:
+        - dep
+        - factors
+        - covs

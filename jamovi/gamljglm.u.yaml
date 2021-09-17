@@ -1,5 +1,5 @@
 title: General Linear Model
-name: gamljGLM
+name: gamljGlm
 jus: '2.0'
 compilerMode: tame
 events:
@@ -32,13 +32,12 @@ children:
         children:
           - type: VariablesListBox
             name: covs
-            height: small
             isTarget: true
             events:
               change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
-    style: inline
+    style: list
     children:
       - type: Label
         label: Effect Size
@@ -60,7 +59,11 @@ children:
           - name: effectSize_omega
             type: CheckBox
             optionPart: omega
-            optionName: effectSize    
+            optionName: effectSize
+          - name: effectSize_epsilon
+            type: CheckBox
+            optionPart: epsilon
+            optionName: effectSize
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -87,7 +90,7 @@ children:
         format: term
         higherOrders: true
         events:
-                  update: './gamlj.events::onUpdate_modelSupplier'
+          update: './gamlj.events::onUpdate_modelSupplier'
         children:
           - type: TargetLayoutBox
             transferAction: interactions
@@ -101,11 +104,8 @@ children:
                   change: './gamlj.events::onChange_modelTerms'
                 template:
                   type: TermLabel
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: CheckBox
-            name: fixedIntercept
+      - type: CheckBox
+        name: fixedIntercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -171,10 +171,10 @@ children:
                     name: simpleScale_mean_sd
                     optionName: simpleScale
                     optionPart: mean_sd
-                    children: 
-                          - type: TextBox
-                            name: cvalue
-                            format: number
+                    children:
+                      - type: TextBox
+                        name: cvalue
+                        format: number
                   - name: simpleScale_percent
                     type: RadioButton
                     optionName: simpleScale
@@ -204,6 +204,11 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+          - type: Label
+            label: Dependent variable
+            children:
+              - type: ComboBox
+                name: dep_scale
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -248,7 +253,6 @@ children:
                 type: CheckBox
                 optionPart: holm
                 optionName: postHocCorr
-
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -373,3 +377,29 @@ children:
       - type: CheckBox
         name: qq
         label: Q-Q plot of residuals
+      - type: CheckBox
+        name: normPlot
+        label: Residuals histogram
+      - type: CheckBox
+        name: residPlot
+        label: Residuals-Predicted plot
+  - type: CollapseBox
+    label: Options
+    style: inline
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Additional Info
+        children:
+          - type: CheckBox
+            name: interceptInfo
+          - type: CheckBox
+            name: effectSizeInfo
+      - type: Label
+        label: Save
+        children:
+          - type: Output
+            name: predicted
+          - type: Output
+            name: residuals

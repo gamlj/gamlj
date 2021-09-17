@@ -1,12 +1,11 @@
 context("glm")
-gamlj_options("debug",FALSE)
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = ToothGrowth,
   dep = "len",
   factors = "supp",
   modelTerms = ~ supp,
-  
 )
+
 res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {
@@ -19,7 +18,7 @@ test_that("glm estimates are correct", {
 
 data("hsbdemo")
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~1
 )
@@ -28,7 +27,7 @@ test_that("intercept only works",
           expect_equal(round(mod$main$fixed$asDF[1,2],digits=2),51.85)
           )
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   ciWidth=90,
@@ -62,18 +61,30 @@ test_that("glm CI width", {
 hsbdemo$c1<-factor(rep(c(1,0),length(hsbdemo$id)/2))
 hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~c1*c2,
-  postHoc = list("c1")
+  postHoc = list("c1",c("c1","c2"))
 )
 
 test_that("glm labels do not square", {
   expect_equal(as.character(mod$main$fixed$asDF[4,1]),"c11:c21")
 })
 
+ph<-mod$postHocs
+ph1<-ph[[1]]$asDF
+ph2<-ph[[2]]$asDF
 
-mod<-gamlj::gamljGLM(
+testthat::test_that("postoh in glm", {
+  testthat::expect_equal(as.character(ph1[1,1]),"0")
+  testthat::expect_equal(ph1[1,4],0.52)
+  testthat::expect_equal(as.character(ph2[4,1]),"0")
+  testthat::expect_equal(ph2[6,6],13.46)
+  
+})
+
+
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   postHoc = list("schtyp")
@@ -84,24 +95,40 @@ test_that("glm posthoc", {
   expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"public")
 })
 
+
+
+mod<-gamlj::gamljGlm(
+  data = hsbdemo,
+  formula=science~math+schtyp+math:schtyp,
+  effectSizeInfo = T
+)
+tab<-mod$main$effectSizeTable$asDF
+
+testthat::test_that("glm effectsize", {
+  testthat::expect_equal(tab[4,3],.2198,tol=.0001)
+  testthat::expect_equal(tab[10,5],.029999,tol=.00001)
+})
+
+
+
 data<-hsbdemo
 names(data)[3]<-c("Gender (test ?)")
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   data = data,
   formula=science~math+`Gender (test ?)`+math:`Gender (test ?)`,
   simpleModerator = `Gender (test ?)`,
   simpleVariable = math
 )
 se.params<-mod$simpleEffects$Params$asDF
-test_that("glm weird names", {
-  expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
-  expect_equal(as.character(se.params[2,1]),"male")
-  expect_equal(round(se.params[1,5],digits=5),0.80708)
+testthat::test_that("glm weird names", {
+  testthat::expect_equal(as.character(mod$main$fixed$asDF[3,1]),"Gender (test ?)1")
+  testthat::expect_equal(as.character(se.params[2,1]),"male")
+  testthat::expect_equal(round(se.params[1,5],digits=5),0.80708)
 })
 
 data$sex<-factor(data$`Gender (test ?)`,levels=c("male","female"))
 
-mod2<-gamlj::gamljGLM(
+mod2<-gamlj::gamljGlm(
   data = data,
   formula=science~math+sex+math:sex,
   simpleVariable = math,
@@ -114,8 +141,24 @@ test_that("glm weird names", {
   expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
 })
 
+mod3<-gamlj::gamljGlm(
+  data = data,
+  formula=science~math+math:`Gender (test ?)`+`Gender (test ?)`,
+  simpleModerator = `Gender (test ?)`,
+  simpleVariable = math
+)
 
-expect_warning(mod<-gamlj::gamljGLM(
+res<-mod$main$anova$asDF
+res3<-mod3$main$anova$asDF
+
+testthat::test_that("glm order does not count", {
+  testthat::expect_equal(res[2,4],res3[2,4])
+  testthat::expect_equal(as.character(res[4,1]),as.character(res3[4,1]))
+})
+
+
+expect_warning(
+  mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   eDesc = T,
@@ -136,23 +179,30 @@ test_that("glm assumptions", {
   expect_equal(round(res2[1,3],2),0.86)
 })
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = science ~ math + schtyp + schtyp:math,
-  data = data,
+  data = hsbdemo,
   contrasts = list(list(
       var="schtyp",
-      type="deviation"))
+      type="deviation")),
+  qq=T
 )
-
 res<-mod$main$fixed$asDF
 
-test_that("glm contrasts", {
-  expect_equal(round(res[3,3],2),-2.45)
-  expect_equal(round(res[1,3],2),18.55)
+testthat::test_that("glm contrasts", {
+  testthat::expect_equal(round(res[3,3],2),-0.11)
+  testthat::expect_equal(round(res[1,3],2),51.96)
+})
+
+plot<-mod$assumptions$qq$plot$fun()
+
+testthat::test_that("glm assumptions plot", {
+  testthat::expect_true(ggplot2::is.ggplot(plot))
 })
 
 
-mod<-gamlj::gamljGLM(
+
+mod<-gamlj::gamljGlm(
   formula = science ~ math + I(math^2),
   data = data
 )
@@ -165,7 +215,7 @@ test_that("glm contrasts", {
 })
 
 
-mod<-gamlj::gamljGLM(
+mod<-gamlj::gamljGlm(
   formula = read ~ 1,  data = data
 )
 res<-mod$main$anova$asDF
@@ -174,12 +224,19 @@ test_that("glm intercept only model", {
   expect_equal(round(res[2,2],2),20919.42)
 })
 
-mod<-gamlj::gamljGLM(
+
+
+mod<-gamlj::gamljGlm(
   formula = read ~ 1,  data = data,
   fixedIntercept=FALSE
 )
+
 res<-mod$main$anova$asDF
 test_that("glm zero-intercept model", {
   expect_equal(as.character(res$name[1]),"Residuals")
   expect_equal(round(res[2,2],2),566514)
 })
+
+
+
+
