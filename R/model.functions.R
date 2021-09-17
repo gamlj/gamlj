@@ -566,7 +566,6 @@ mf.savePredRes<-function(options,results,model) {
 
         if (options$predicted && results$predicted$isNotFilled()) {
             ginfo("Saving predicted")
-          mark(class(model))
             if ("multinom" %in% class(model))  type="probs" else type="response"
             p<-stats::predict(model,type=type)
   # we need the rownames in case there are missing in the datasheet

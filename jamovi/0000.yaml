@@ -6,7 +6,7 @@ jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: '2020-11-14'
+date: '2021-09-20'
 type: R
 description: >-
   A suite for estimation of linear models, such as the general linear model,
