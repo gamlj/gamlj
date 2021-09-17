@@ -241,25 +241,24 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
         results <- rbind(results, ano)
         param <- mf.summary(.model)
         citry <- try({
-            ci <- mf.confint(.model, level = ciWidth)
-            colnames(ci) <- c("lower.CL", "upper.CL")
-            param <- cbind(ci, param)
+            param <- mf.confint(.model, level = ciWidth, param)
         })
         param <- param[param$variable %in% contrast, ]
         params <- rbind(params, param)
     }
-
     results <- as.data.frame(results)
+    
     names(results) <- c("chisq", "df", "p.value")
     results <- cbind(vals, results)
     ff <- .fixLabels(results, preds, cov_conditioning)
     .levs[["dep"]] <- levels(factor(params[["dep"]]))
     .levs <- .levs[c("dep", preds)]
     levs <- expand.grid(.levs)
-    params <- cbind(levs, params)
+    params <- cbind(levs[,-1], params)
+    
     names(ff)[1:length(lnames)] <- lnames
-    names(params)[2:(length(lnames) + 1)] <- lnames
-    names(params)[-(1:(length(lnames) + 1))] <- c("lower.CL", "upper.CL", "estimate", "dep", "variable", "SE", "expb", "z.ratio", "p.value")
+    names(params)[1:length(lnames)] <- lnames
+    names(params)[-(1:(length(lnames)))] <- c("estimate", "dep", "variable", "SE", "expb", "z.ratio", "p.value", "lower.CL", "upper.CL","lower.ECL", "upper.ECL")
     for (name in lnames) {
         ff[, name] <- as.character(ff[, name])
         params[, name] <- as.character(params[, name])

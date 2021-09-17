@@ -505,9 +505,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
   cim<-as.data.frame(cim)
   rownames(cim)<-1:length(cim[,1])
   rownames(parameters)<-1:length(cim[,1])
-  colnames(cim)<-c("cilow","cihig")
-  cim["ecilow"]<-exp(cim["cilow"])     
-  cim["ecihig"]<-exp(cim["cihig"])
+  colnames(cim)<-c("lower.CL","upper.CL")
+  cim["lower.ECL"]<-exp(cim["lower.CL"])     
+  cim["upper.ECL"]<-exp(cim["upper.CL"])
   .confint.format(cim,parameters)
 
 }
