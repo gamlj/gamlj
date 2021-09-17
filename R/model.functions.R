@@ -350,8 +350,8 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))
        clusterdata<-NULL
-       if (is.something(cluster))
-         clusterdata<-data[[jmvcore::toB64(cluster)]]
+       if (is.something(cluster)) 
+         clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
 
        if ("dep_scale" %in% names(options)) 
            data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
@@ -373,7 +373,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      scalingVars<-sapply(scaling,function(a) a$var)
      clusterdata<-NULL
      if (is.something(cluster))
-           clusterdata<-data[[jmvcore::toB64(cluster)]]
+           clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
      for (cov in covs) {
        cov64<-jmvcore::toB64(cov) 
        data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
@@ -505,9 +505,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
   cim<-as.data.frame(cim)
   rownames(cim)<-1:length(cim[,1])
   rownames(parameters)<-1:length(cim[,1])
-  colnames(cim)<-c("cilow","cihig")
-  cim["ecilow"]<-exp(cim["cilow"])     
-  cim["ecihig"]<-exp(cim["cihig"])
+  colnames(cim)<-c("lower.CL","upper.CL")
+  cim["lower.ECL"]<-exp(cim["lower.CL"])     
+  cim["upper.ECL"]<-exp(cim["upper.CL"])
   .confint.format(cim,parameters)
 
 }
@@ -566,7 +566,6 @@ mf.savePredRes<-function(options,results,model) {
 
         if (options$predicted && results$predicted$isNotFilled()) {
             ginfo("Saving predicted")
-          mark(class(model))
             if ("multinom" %in% class(model))  type="probs" else type="response"
             p<-stats::predict(model,type=type)
   # we need the rownames in case there are missing in the datasheet
