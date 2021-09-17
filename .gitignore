@@ -8,7 +8,7 @@
 # jamovi
 build/
 temp/
-gamlj.jmo
+*.jmo
 newversion.R
 problems/
 local/
