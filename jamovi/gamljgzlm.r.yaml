@@ -113,11 +113,11 @@ items:
                     - name: se
                       title: "SE"
                       type: number
-                    - name: cilow
+                    - name: lower.CL
                       type: number
                       title: Lower
                       visible: (showParamsCI)
-                    - name: cihig
+                    - name: upper.CL
                       type: number
                       title: Upper
                       visible: (showParamsCI)
@@ -125,11 +125,11 @@ items:
                       title: "exp(B)"
                       type: number
                       visible: (effectSize:expb)
-                    - name: ecilow
+                    - name: lower.ECL
                       type: number
                       title: Lower
                       visible: (showExpbCI)
-                    - name: ecihig
+                    - name: upper.ECL
                       type: number
                       title: Upper
                       visible: (showExpbCI)
@@ -165,11 +165,11 @@ items:
                     - name: estimate
                       title: "RR"
                       type: number
-                    - name: cilow
+                    - name: lower.ECL
                       type: number
                       title: Lower
                       visible: (showExpbCI)
-                    - name: cihig
+                    - name: upper.CL
                       type: number
                       title: Upper
                       visible: (showExpbCI)

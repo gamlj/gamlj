@@ -349,9 +349,6 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      if (modelType %in% c("linear","mixed")) {
        ### here I need the dv to be really numeric
        data[[dep]] <- as.numeric(as.character(data[[dep]]))
-       clusterdata<-NULL
-       if (is.something(cluster)) 
-         clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
 
        if ("dep_scale" %in% names(options)) 
            data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
@@ -374,6 +371,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      clusterdata<-NULL
      if (is.something(cluster))
            clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
+     
      for (cov in covs) {
        cov64<-jmvcore::toB64(cov) 
        data[[cov64]]<-as.numeric(as.character(data[[cov64]]))
@@ -432,7 +430,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
          parameters<-parameters[order(parameters$order),]
          parameters$order<-NULL
     }
-#    parameters<-cbind(parameters,ci)
     attr(parameters,"warning")<-att
   }
   return(parameters)
@@ -441,7 +438,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 .confint.lm<-function(model,level,parameters)  {
     ci<-try(stats::confint(model,level=level))
     ci<-data.frame(ci)
-    colnames(ci)<-c("cilow","cihig")
+    colnames(ci)<-c("lower.CL","upper.CL")
    .confint.format(ci,parameters)
 }
 .confint.glm<-function(model,level,parameters) {  
@@ -451,9 +448,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
      if (is.null(dim(ci)))
        ci<-matrix(ci,ncol=2)
      ci<-data.frame(ci)
-     colnames(ci)<-c("cilow","cihig")
-     ci["ecilow"]<-exp(ci["cilow"])     
-     ci["ecihig"]<-exp(ci["cihig"])
+     colnames(ci)<-c("lower.CL","upper.CL")
+     ci["lower.ECL"]<-exp(ci["lower.CL"])     
+     ci["upper.ECL"]<-exp(ci["upper.CL"])
      .confint.format(ci,parameters)
     
 }
@@ -476,7 +473,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
       ci<-data.frame(ci)
-      colnames(ci)<-c("cilow","cihig")
+      colnames(ci)<-c("lower.CL","upper.CL")
       .confint.format(ci,parameters)
   }
 
@@ -489,9 +486,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
   if (is.null(dim(ci)))
     ci<-matrix(ci,ncol=2)
   ci<-data.frame(ci)
-  colnames(ci)<-c("cilow","cihig")
-  ci["ecilow"]<-exp(ci["cilow"])     
-  ci["ecihig"]<-exp(ci["cihig"])
+  colnames(ci)<-c("lower.CL","upper.CL")
+  ci["lower.ECL"]<-exp(ci["lower.CL"])     
+  ci["upper.ECL"]<-exp(ci["upper.CL"])
   .confint.format(ci,parameters)
 }
 

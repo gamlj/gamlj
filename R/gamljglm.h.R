@@ -623,11 +623,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Estimate", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="lower.CL", 
                                     `title`="Lower", 
                                     `type`="number"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="upper.CL", 
                                     `title`="Higher", 
                                     `type`="number")),
                             refs="effectsize"))
@@ -663,12 +663,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="lower.CL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="upper.CL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),

@@ -542,12 +542,12 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="lower.CL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="upper.CL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
@@ -557,12 +557,12 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number", 
                                     `visible`="(effectSize:expb)"),
                                 list(
-                                    `name`="ecilow", 
+                                    `name`="lower.ECL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showExpbCI)"),
                                 list(
-                                    `name`="ecihig", 
+                                    `name`="upper.ECL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showExpbCI)"),
@@ -603,12 +603,12 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="RR", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="lower.ECL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showExpbCI)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="upper.CL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showExpbCI)"))))

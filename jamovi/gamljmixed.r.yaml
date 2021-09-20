@@ -92,6 +92,7 @@ items:
                     - correlatedEffects
                     - fixedIntercept
                     - paramCIWidth
+                    - cimethod
 
              columns:
                     - name: source
@@ -107,11 +108,11 @@ items:
                     - name: se
                       title: "SE"
                       type: number
-                    - name: cilow
+                    - name: lower.CL
                       type: number
                       title: Lower
                       visible: (showParamsCI)
-                    - name: cihig
+                    - name: upper.CL
                       type: number
                       title: Upper
                       visible: (showParamsCI)
@@ -141,7 +142,7 @@ items:
                     - correlatedEffects
                     - fixedIntercept
                     - randomTerms
-
+                    - cimethod
              columns:
                     - name: groups
                       title: "Groups"
@@ -156,11 +157,11 @@ items:
                     - name: var
                       title: "Variance"
                       type: number
-                    - name: cilow
+                    - name: lower.CL
                       type: number
                       title: Lower
                       visible: (ciRE)
-                    - name: cihig
+                    - name: upper.CL
                       type: number
                       title: Upper
                       visible: (ciRE)

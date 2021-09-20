@@ -10,8 +10,8 @@ res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {
   expect_equal(params[2], -3.70)
-  expect_equal(round(res$cihig[2],2), 0.17)
-  expect_equal(round(res$cilow[2],2),-7.57)
+  expect_equal(round(res$upper.CL[2],2), 0.17)
+  expect_equal(round(res$lower.CL[2],2),-7.57)
   expect_equal(round(res$p[2],2),0.06)
   expect_equal(round(as.numeric(as.character(mod$info$asDF[[2]][[3]])),3),0.059)
 })
