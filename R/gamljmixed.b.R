@@ -196,9 +196,13 @@ gamljMixedClass <- R6::R6Class(
        if (self$options$ciRE==TRUE) {
            ginfo("Estimating CI for RE")
            test<-try({
-                 pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
-                 ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100)
+
+#                pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
+#                 ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100, oldNames=FALSE)
+                 ci<-confint(model,parm = "theta_",level = self$options$paramCIWidth/100, oldNames=FALSE,prof.scale="varcov")
                  colnames(ci)<-c("lower.CL","upper.CL")
+                 where<-grep("cov_",rownames(ci),fixed = T,invert = T)
+                 ci<-ci[where,]
                  params<-cbind(params,ci)
                  })
            if (jmvcore::isError(test)) {

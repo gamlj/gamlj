@@ -636,12 +636,12 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `type`="number", 
                                     `visible`="(effectSize:expb)"),
                                 list(
-                                    `name`="elower.CL", 
+                                    `name`="lower.ECL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showExpbCI)"),
                                 list(
-                                    `name`="eupper.CL", 
+                                    `name`="upper.ECL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showExpbCI)"),
