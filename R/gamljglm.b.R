@@ -82,8 +82,8 @@ gamljGlmClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
-      aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
 
@@ -483,10 +483,10 @@ gamljGlmClass <- R6::R6Class(
   j<-1
   i<-1
   for (i in seq_along(eta$Parameter)) {
-       aTable$setRow(rowNo=j,list(estimate=eta[[2]][i],cilow=eta$CI_low[i],cihig=eta$CI_high[i]))
-       aTable$setRow(rowNo=j+1,list(estimate=peta[[2]][i],cilow=peta$CI_low[i],cihig=peta$CI_high[i]))
-       aTable$setRow(rowNo=j+2,list(estimate=omega[[2]][i],cilow=omega$CI_low[i],cihig=omega$CI_high[i]))
-       aTable$setRow(rowNo=j+3,list(estimate=epsilon[[2]][i],cilow=epsilon$CI_low[i],cihig=epsilon$CI_high[i]))
+       aTable$setRow(rowNo=j,list(estimate=eta[[2]][i],lower.CL=eta$CI_low[i],upper.CL=eta$CI_high[i]))
+       aTable$setRow(rowNo=j+1,list(estimate=peta[[2]][i],lower.CL=peta$CI_low[i],upper.CL=peta$CI_high[i]))
+       aTable$setRow(rowNo=j+2,list(estimate=omega[[2]][i],lower.CL=omega$CI_low[i],upper.CL=omega$CI_high[i]))
+       aTable$setRow(rowNo=j+3,list(estimate=epsilon[[2]][i],lower.CL=epsilon$CI_low[i],upper.CL=epsilon$CI_high[i]))
     j<-j+4
   }
 

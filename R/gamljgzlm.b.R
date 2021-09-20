@@ -101,10 +101,10 @@ gamljGzlmClass <- R6::R6Class(
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
       ciWidth<-self$options$paramCIWidth
-      aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      aTable$getColumn('ecilow')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
-      aTable$getColumn('ecihig')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('lower.ECL')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
+      aTable$getColumn('upper.ECL')$setSuperTitle(jmvcore::format('{}% Exp(B) Confidence Interval', ciWidth))
       
       if (!is.something(self$options$factors))
         aTable$getColumn('label')$setVisible(FALSE)
@@ -123,8 +123,8 @@ gamljGzlmClass <- R6::R6Class(
       if (self$options$modelSelection=="logistic" && "RR" %in% self$options$effectSize) {
         
            aTable<-self$results$main$relativerisk
-           aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-           aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+           aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
            
            if (self$options$fixedIntercept==TRUE & length(terms)>1 ) {
                terms<-terms[2:length(terms)]
@@ -274,9 +274,9 @@ gamljGzlmClass <- R6::R6Class(
             estimate<-estimate[2:last,] 
           }
           pp<-abs(qnorm( (1-ciWidth) / 2 ))
-          estimate$cilow<-estimate$estimate- pp * estimate$Std.err
-          estimate$cihig<-estimate$estimate+ pp * estimate$Std.err
-          estimate<-as.matrix(estimate[,c("estimate","cilow","cihig")])
+          estimate$lower.CL<-estimate$estimate- pp * estimate$Std.err
+          estimate$upper.CL<-estimate$estimate+ pp * estimate$Std.err
+          estimate<-as.matrix(estimate[,c("estimate","lower.CL","upper.CL")])
           estimate[]<-vapply(estimate, exp,numeric(1))
           table<-self$results$main$relativerisk
           for (i in 1:nrow(estimate))

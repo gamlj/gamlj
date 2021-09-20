@@ -80,8 +80,8 @@ gamljMixedClass <- R6::R6Class(
       aTable$addRow(rowKey="res",list(groups="Residuals",name=""))
 
       if (self$options$ciRE==TRUE) {
-            aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
-            aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
+            aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
+            aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('Variance {}% C.I.', ciWidth))
       }
 
       ## anova Table 
@@ -101,8 +101,8 @@ gamljMixedClass <- R6::R6Class(
       mynames64<-colnames(model.matrix(formula64,data))
       terms<-n64$nicenames(mynames64)  
       labels<-n64$nicelabels(mynames64)
-      aTable$getColumn('cilow')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
-      aTable$getColumn('cihig')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
+      aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
 
       for(i in seq_along(terms)) 
           aTable$addRow(rowKey=i,list(source=lf.nicifyTerms(terms[[i]]),label=lf.nicifyLabels(labels[[i]])))
@@ -198,7 +198,7 @@ gamljMixedClass <- R6::R6Class(
            test<-try({
                  pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
                  ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100)
-                 colnames(ci)<-c("cilow","cihig")
+                 colnames(ci)<-c("lower.CL","upper.CL")
                  params<-cbind(params,ci)
                  })
            if (jmvcore::isError(test)) {
@@ -216,16 +216,16 @@ gamljMixedClass <- R6::R6Class(
                                                     name=realnames[[i]],
                                                     std=params$sdcor[i],
                                                     var=params$vcov[i],
-                                                    cilow=params$cilow[i],
-                                                    cihig=params$cihig[i],
+                                                    lower.CL=params$lower.CL[i],
+                                                    upper.CL=params$upper.CL[i],
                                                     icc=icc))
              else
                    randomTable$addRow(rowKey=i, list(groups=realgroups[[i]],
                                                      name=realnames[[i]],
                                                      std=params$sdcor[i],
                                                      var=params$vcov[i],
-                                                     cilow=params$cilow[i],
-                                                     cihig=params$cihig[i],
+                                                     lower.CL=params$lower.CL[i],
+                                                     upper.CL=params$upper.CL[i],
                                                      icc=icc))
        }
         N<-as.numeric(model@devcomp$dims['n'])

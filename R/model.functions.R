@@ -432,7 +432,6 @@ mf.confint<- function(x,...) UseMethod(".confint")
          parameters<-parameters[order(parameters$order),]
          parameters$order<-NULL
     }
-#    parameters<-cbind(parameters,ci)
     attr(parameters,"warning")<-att
   }
   return(parameters)
@@ -441,7 +440,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
 .confint.lm<-function(model,level,parameters)  {
     ci<-try(stats::confint(model,level=level))
     ci<-data.frame(ci)
-    colnames(ci)<-c("cilow","cihig")
+    colnames(ci)<-c("lower.CL","upper.CL")
    .confint.format(ci,parameters)
 }
 .confint.glm<-function(model,level,parameters) {  
@@ -451,9 +450,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
      if (is.null(dim(ci)))
        ci<-matrix(ci,ncol=2)
      ci<-data.frame(ci)
-     colnames(ci)<-c("cilow","cihig")
-     ci["ecilow"]<-exp(ci["cilow"])     
-     ci["ecihig"]<-exp(ci["cihig"])
+     colnames(ci)<-c("lower.CL","upper.CL")
+     ci["lower.ECL"]<-exp(ci["lower.CL"])     
+     ci["upper.ECL"]<-exp(ci["upper.CL"])
      .confint.format(ci,parameters)
     
 }
@@ -476,7 +475,7 @@ mf.confint<- function(x,...) UseMethod(".confint")
       if (is.null(dim(ci)))
           ci<-matrix(ci,ncol=2)
       ci<-data.frame(ci)
-      colnames(ci)<-c("cilow","cihig")
+      colnames(ci)<-c("lower.CL","upper.CL")
       .confint.format(ci,parameters)
   }
 
@@ -489,9 +488,9 @@ mf.confint<- function(x,...) UseMethod(".confint")
   if (is.null(dim(ci)))
     ci<-matrix(ci,ncol=2)
   ci<-data.frame(ci)
-  colnames(ci)<-c("cilow","cihig")
-  ci["ecilow"]<-exp(ci["cilow"])     
-  ci["ecihig"]<-exp(ci["cihig"])
+  colnames(ci)<-c("lower.CL","upper.CL")
+  ci["lower.ECL"]<-exp(ci["lower.CL"])     
+  ci["upper.ECL"]<-exp(ci["upper.CL"])
   .confint.format(ci,parameters)
 }
 

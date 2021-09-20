@@ -627,12 +627,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="lower.CL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="upper.CL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
@@ -683,12 +683,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Variance", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="lower.CL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(ciRE)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="upper.CL", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(ciRE)"),
