@@ -18,8 +18,8 @@ mod<-gamlj::gamljGzlm(
 res<-mod$main$fixed$asDF
 testthat::test_that("glm estimates are correct", {
   testthat::expect_equal(as.character(res[3,1]), "honors1")
-  testthat::expect_equal(res$cilow[2],-0.20408,tolerance=tol)
-  testthat::expect_equal(res$cihig[2],.1703,tolerance=tol)
+  testthat::expect_equal(res$lower.CL[2],-0.20408,tolerance=tol)
+  testthat::expect_equal(res$upper.CL[2],.1703,tolerance=tol)
   testthat::expect_equal(res$p[2],0.8079,tolerance=tol)
   testthat::expect_equal(as.numeric(as.character(mod$info$asDF[[2]][[6]])),0.0459,tolerance=tol)
 })
