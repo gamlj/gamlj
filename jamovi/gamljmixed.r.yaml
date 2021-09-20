@@ -92,6 +92,7 @@ items:
                     - correlatedEffects
                     - fixedIntercept
                     - paramCIWidth
+                    - cimethod
 
              columns:
                     - name: source
@@ -141,7 +142,7 @@ items:
                     - correlatedEffects
                     - fixedIntercept
                     - randomTerms
-
+                    - cimethod
              columns:
                     - name: groups
                       title: "Groups"

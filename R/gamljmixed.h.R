@@ -607,7 +607,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
-                                "paramCIWidth"),
+                                "paramCIWidth",
+                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -663,7 +664,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
-                                "randomTerms"),
+                                "randomTerms",
+                                "cimethod"),
                             columns=list(
                                 list(
                                     `name`="groups", 

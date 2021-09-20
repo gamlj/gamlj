@@ -195,15 +195,27 @@ gamljMixedClass <- R6::R6Class(
        ### RE confidence intervals ###
        if (self$options$ciRE==TRUE) {
            ginfo("Estimating CI for RE")
+           method<-self$options$cimethod
+           if (method=="wald") method="profile"
            test<-try({
-
-#                pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
-#                 ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100, oldNames=FALSE)
-                 ci<-confint(model,parm = "theta_",level = self$options$paramCIWidth/100, oldNames=FALSE,prof.scale="varcov")
+                ci<-confint(model,parm = "theta_",
+                         level = self$options$paramCIWidth/100, 
+                         oldNames=FALSE,
+                         method=method)
+                ci[,1]<-ci[,1]^2
+                ci[,2]<-ci[,2]^2
+                
+                if (any(is.na(ci[,1]))) {
+                  rnames<-rownames(ci)
+                  pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
+                  ci<-confint(pp,parm = "theta_",level = self$options$paramCIWidth/100)
+                  rownames(ci)<-rnames
+                }
                  colnames(ci)<-c("lower.CL","upper.CL")
-                 where<-grep("cov_",rownames(ci),fixed = T,invert = T)
-                 ci<-ci[where,]
-                 params<-cbind(params,ci)
+                 mark(ci)
+                 where<-grep("cor_",rownames(ci),fixed = T,invert = T)
+                 civars<-ci[where,]
+                 params<-cbind(params,civars)
                  })
            if (jmvcore::isError(test)) {
                  randomTable$setNote("reci","Random effects C.I. cannot be computed")
