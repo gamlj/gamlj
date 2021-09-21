@@ -473,6 +473,9 @@ children:
             name: clusterBoxplot
             label: Residuals boxplot
           - type: CheckBox
+            name: clusterResPred
+            label: Residuals-Predcted by cluster
+          - type: CheckBox
             name: randHist
             label: Random coefficients histogram
   - type: CollapseBox

@@ -56,6 +56,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             normPlot = FALSE,
             residPlot = FALSE,
             clusterBoxplot = FALSE,
+            clusterResPred = FALSE,
             randHist = FALSE, ...) {
 
             super$initialize(
@@ -353,6 +354,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "clusterBoxplot",
                 clusterBoxplot,
                 default=FALSE)
+            private$..clusterResPred <- jmvcore::OptionBool$new(
+                "clusterResPred",
+                clusterResPred,
+                default=FALSE)
             private$..randHist <- jmvcore::OptionBool$new(
                 "randHist",
                 randHist,
@@ -410,6 +415,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..normPlot)
             self$.addOption(private$..residPlot)
             self$.addOption(private$..clusterBoxplot)
+            self$.addOption(private$..clusterResPred)
             self$.addOption(private$..randHist)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
@@ -463,6 +469,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         normPlot = function() private$..normPlot$value,
         residPlot = function() private$..residPlot$value,
         clusterBoxplot = function() private$..clusterBoxplot$value,
+        clusterResPred = function() private$..clusterResPred$value,
         randHist = function() private$..randHist$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value),
@@ -515,6 +522,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..normPlot = NA,
         ..residPlot = NA,
         ..clusterBoxplot = NA,
+        ..clusterResPred = NA,
         ..randHist = NA,
         ..predicted = NA,
         ..residuals = NA)
@@ -1273,6 +1281,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     qqplot = function() private$.items[["qqplot"]],
                     normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]],
+                    clusterResPred = function() private$.items[["clusterResPred"]],
                     clusterBoxplot = function() private$.items[["clusterBoxplot"]],
                     randHist = function() private$.items[["randHist"]]),
                 private = list(),
@@ -1359,6 +1368,21 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "dep",
                                 "dep_scale",
                                 "modelTerms")))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterResPred",
+                            title="Residuals vs Predicted by cluster",
+                            visible="(clusterResPred)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterResPred",
+                                width=450,
+                                height=400)))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterBoxplot",
@@ -1547,6 +1571,8 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   scatterplot of the residuals against predicted
 #' @param clusterBoxplot \code{TRUE} or \code{FALSE} (default), provide a
 #'   boxplot of random effects by the first defined clustering variable
+#' @param clusterResPred \code{TRUE} or \code{FALSE} (default), residuals vs
+#'   predicted by the first defined clustering variable
 #' @param randHist \code{TRUE} or \code{FALSE} (default), provide histogram of
 #'   random Coefficients
 #' @param formula (optional) the formula to use, see the examples
@@ -1574,6 +1600,7 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
+#'   \code{results$assumptions$clusterResPred} \tab \tab \tab \tab \tab Residuals vs Predicted by cluster \cr
 #'   \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
 #'   \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
 #'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
@@ -1639,6 +1666,7 @@ gamljMixed <- function(
     normPlot = FALSE,
     residPlot = FALSE,
     clusterBoxplot = FALSE,
+    clusterResPred = FALSE,
     randHist = FALSE,
     formula) {
 
@@ -1754,6 +1782,7 @@ gamljMixed <- function(
         normPlot = normPlot,
         residPlot = residPlot,
         clusterBoxplot = clusterBoxplot,
+        clusterResPred = clusterResPred,
         randHist = randHist)
 
     analysis <- gamljMixedClass$new(

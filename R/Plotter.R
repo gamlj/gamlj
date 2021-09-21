@@ -38,6 +38,8 @@ Plotter <- R6::R6Class(
 
         private$.prepareMainPlot()
         private$.prepareClusterBoxplot()
+        private$.prepareClusterResPred()
+        
         private$.prepareRandHist()
         
       },
@@ -247,6 +249,29 @@ Plotter <- R6::R6Class(
         return(plot)
         
       },
+      clusterResPred=function(image,ggtheme,theme)  {
+        
+        ########## working here ##########
+        
+        if (!self$option("clusterResPred"))
+          return()
+        
+        
+        if (!is.something(private$.operator$model) )
+          return(FALSE)
+        
+        cluster<-image$state$cluster
+        data<-lme4::fortify.merMod(private$.operator$model)
+        plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = ".fitted", y = ".resid",color=cluster)) 
+        plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
+        
+        plot <- plot + ggplot2::geom_point(shape = 21)
+        plot <- plot + ggtheme
+        
+        return(plot)
+        
+      },
+      
         randHist=function(image,ggtheme,theme)  {
   
   
@@ -497,6 +522,26 @@ Plotter <- R6::R6Class(
         
       }
     },
+    .prepareClusterResPred=function() {
+      
+      if (!self$option("clusterResPred"))
+        return()
+      
+      ### we get the clusters from the model because the model may contain less cluster variables than selected
+      clusters<-names(private$.operator$model@cnms)
+      
+      resultsgroup<-private$.results$assumptions$clusterResPred
+      
+      for (cluster in clusters) {
+        title<-paste("Clustering variable:", fromb64(cluster))
+        id<-cluster
+        resultsgroup$addItem(id)
+        resultsgroup$get(key=id)$setTitle(title)
+        resultsgroup$get(key=id)$setState(list(cluster=cluster,label=fromb64(cluster)))
+        
+      }
+    },
+    
     .prepareRandHist=function() {
       
       if (!self$option("randHist"))

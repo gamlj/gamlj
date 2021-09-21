@@ -96,16 +96,17 @@ j.init_table<-function(table,
                        spaceby=NULL,
                        title=NULL) {
 
-  if (is.null(obj))
-      return()
-  
-  square<-length(dim(obj))>1
   if (ci) {
     l<-paste0(ciroot,"ci.lower")
     u<-paste0(ciroot,"ci.upper")
     table$getColumn(l)$setSuperTitle(jmvcore::format(ciformat, ciwidth))
     table$getColumn(u)$setSuperTitle(jmvcore::format(ciformat, ciwidth))
   }
+  if (is.null(obj))
+    return()
+  
+  square<-length(dim(obj))>1
+  
   if (!is.logical(obj))
         j.fill_table(table,obj,append=T,spaceby=spaceby)
   

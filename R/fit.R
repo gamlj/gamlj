@@ -123,6 +123,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   results$test  <-  results$Deviance
   results$df    <-  results$Df
   results$p     <-  results$`Pr(>Chi)`
+  mark(is.na(results$p[2]))
   results[2,]
 }
 

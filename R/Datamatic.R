@@ -123,12 +123,14 @@ Variable <- R6::R6Class(
       
        vardata<-data[[self$name64]]
 
-       if (self$type=="cluster") 
+       if (self$type=="cluster") {
          if (!is.factor(vardata)) {
            vardata<-factor(vardata)
            self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been coerced to factor"))
-           return(vardata)
          }
+         return(vardata)
+         
+       }
        
        
        
@@ -414,7 +416,7 @@ Variable <- R6::R6Class(
       
     
       if (is.something(self$hasCluster))
-            by<-data[[tob64(self$hasCluster)]]
+            by<-factor(paste("a",as.character(data[[tob64(self$hasCluster)]])))
 
       if (method=="centered") 
         vardata<-scale(vardata,scale = F)  
@@ -443,7 +445,6 @@ Variable <- R6::R6Class(
     },
     
     .update_levels=function(vardata) {
-      
       self$original_levels<-self$levels
       self$original_descriptive<-self$descriptive
       labels_type<-ifelse(is.null(self$options$simpleScaleLabels),"values",self$options$simpleScaleLabels)

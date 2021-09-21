@@ -47,6 +47,7 @@ gamljMixedClass <- R6::R6Class(
 
       ### random component table ###
       j.init_table(self$results$main$random,estimate_machine$tab_random, ci=T,ciwidth=self$options$ciWidth)
+      j.init_table(self$results$main$randomCov,private$.estimate_machine$tab_randomCov,ci=T,ciwidth=self$options$ciWidth)
       
       
 
@@ -259,7 +260,6 @@ gamljMixedClass <- R6::R6Class(
       }
       
       
-      
       #save model preds and resids            
       private$.estimate_machine$savePredRes(self$results) 
       
@@ -317,6 +317,15 @@ gamljMixedClass <- R6::R6Class(
   return(plot)
 },
 
+.clusterResPred=function(image, theme, ggtheme, ...) {
+  
+  if (!private$.ready$ready) 
+    return()
+  
+  plot<-private$.plotter_machine$clusterResPred(image,ggtheme,theme)
+  
+  return(plot)
+},
 
 .clusterBoxplot=function(image, ggtheme, theme, ...) {
 

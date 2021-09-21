@@ -588,6 +588,14 @@ options:
           R: >
             `TRUE` or `FALSE` (default), provide a boxplot of random effects by the first defined clustering variable
 
+    - name: clusterResPred
+      title: Residuals vs Predcted by cluster 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), residuals vs predicted by the first defined clustering variable
+
     - name: randHist
       title: Histogram of random Coefficients
       type: Bool

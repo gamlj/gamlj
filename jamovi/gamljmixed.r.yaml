@@ -732,6 +732,23 @@ items:
             - dep
             - dep_scale
             - modelTerms
+
+        - name: clusterResPred
+          title: Residuals vs Predicted by cluster 
+          type: Array
+          description: Residuals vs Predicted by cluster
+          visible: (clusterResPred)
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .clusterResPred
+             width: 450
+             height: 400
+
         - name: clusterBoxplot
           title: Residuals by cluster boxplot
           type: Array
