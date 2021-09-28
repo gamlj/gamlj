@@ -95,9 +95,9 @@ Variable <- R6::R6Class(
         else
              self$scaling<-"centered"
         
-        if (is.factor(vardata)) 
+        if (is.factor(vardata)) {
           self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to numeric"))
-        
+        }
         self$contrast_labels<-self$name
         self$paramsnames<-var
         self$paramsnames64<-tob64(var)
@@ -120,6 +120,7 @@ Variable <- R6::R6Class(
       
     },
     get_values=function(data) {
+
       
        vardata<-data[[self$name64]]
 
@@ -157,14 +158,15 @@ Variable <- R6::R6Class(
           if (!all(c(test1,test2)))
                self$isBetween<-TRUE
         }
-        
         contrasts(vardata)<-self$contrast_values
         ### fix levels ####
         levels(vardata)<-paste0(LEVEL_SYMBOL,levels(vardata))
+        
         return(vardata)
 
       }
     
+
         ### if we are here, it means this is a continuos variable
         ### we need to pass the data for when clustering is needed
          return(private$.continuous_values(data))
@@ -401,7 +403,7 @@ Variable <- R6::R6Class(
       
 
       if (nrow(data)==0)
-           return(data[[self$name64]])
+           return(jmvcore::toNumeric(data[[self$name64]]))
 
       vardata<-data[[self$name64]]
 

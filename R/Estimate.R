@@ -217,7 +217,9 @@ Estimate <- R6::R6Class("Estimate",
                                   params$name <- fromb64(params$name,self$vars)
                                   params$icc<-params$var/(params$var+params$var[length(params$var)])
                                   params$icc[length(params$icc)]<-NA
-                                  
+                                  mark("icc")
+                                  mark(params$icc)
+                                  mark(performance::icc(self$model,))
                                   ### confidence intervals
                                   ci_covariances<-NULL
                                   if (self$option("ciRE")) {
