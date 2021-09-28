@@ -60,10 +60,17 @@ children:
                 optionPart: probit
                 events:
                   change: './gamlj.events::onChange_model'
+              - name: modelSelection_ordinal
+                type: RadioButton
+                optionName: modelSelection
+                optionPart: ordinal
+
               - type: RadioButton
                 name: modelSelection_multinomial
                 optionName: modelSelection
                 optionPart: multinomial
+                events:
+                  change: './gamlj.events::onChange_model'
           - type: Label
             label: Custom Model
             children:
@@ -396,7 +403,6 @@ children:
                 name: plotOriginalScale
               - type: CheckBox
                 name: plotLinesTypes
-                
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -426,7 +432,6 @@ children:
         name: simpleInteractions
         label: Simple interactions
         enable: (!modelSelection_multinomial)
-
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
@@ -470,7 +475,6 @@ children:
             name: cimethod_boot
             optionName: cimethod
             optionPart: boot
-
       - type: Label
         label: Save
         children:

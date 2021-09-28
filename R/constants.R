@@ -99,7 +99,7 @@ greek_vector <- c( # lowercase Greek letters
   infinity ='\u221e', leftrightarrow ='\u21d4', forall='\u2200', exist ='\u2203', notexist ='\u2204',
   emptyset ='\u2205', elementof='\u2208', notelementof='\u2209', proportional='\u221d',
   asymptoticallyEqual='\u2243', notasymptoticallyEqual='\u2244', approxEqual='\u2245', almostEqual='\u2248',
-  leq='\u2264', geq='\u2265', muchless='\u226a', muchgreater='\u226b', leftarrow='\u21d0', rightarrow='\u21d2',
+  leq='\u2264', lt="\u003c",gt="\u003e", geq='\u2265', muchless='\u226a', muchgreater='\u226b', leftarrow='\u21d0', rightarrow='\u21d2',
   equal='\uff1d', notEqual='\u2260', integral='\u222b', doubleintegral='\u222c', tripleintegral='\u222d',
   logicalAnd='\u2227', logicalOr='\u2228', intersection='\u2229', union='\u222a')
 

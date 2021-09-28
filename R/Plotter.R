@@ -44,8 +44,13 @@ Plotter <- R6::R6Class(
         
       },
       scatterPlot=function(image) {
-
+        
+        ## debug: return this to see what error is in the plotter code ### 
+#        pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
+#        return(pp)
+        
         ## collect the data 
+        
         data<-self$plotData[[image$key]]
         
         ### prepare aestetics for one or two way scatterplot
@@ -320,7 +325,7 @@ Plotter <- R6::R6Class(
             z<-self$options$plotSepLines
             moderators<-self$options$plotSepPlots
             
-            if (self$options$modelSelection=="multinomial") {
+            if (self$options$modelSelection=="multinomial" | self$options$modelSelection=="ordinal") {
                      moderators < c(z,moderators)
                      z   <- self$options$dep
             }
@@ -371,9 +376,6 @@ Plotter <- R6::R6Class(
       moderators<-self$scatterModerators
 
       
-      ### give a range to the y-axis, if needed
-      if (self$options$plotDvScale)
-               self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
       
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
@@ -415,16 +417,28 @@ Plotter <- R6::R6Class(
         self$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
 
       }
+      ### end of random ###
+
+      ### deal with Y ####
+        dep64  <- self$scatterY$name64
+
+        ### give a range to the y-axis, if needed
+        if (self$options$plotDvScale)
+          self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
 
       ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
-        dep64  <- tob64(self$options$dep)
-        depobj <- private$.datamatic$variables[[dep64]]
-       
-        if (depobj$type=="factor") {
-           levels(rawData[[dep64]])<-0:(depobj$nlevels-1)
+      
+        if (self$scatterY$type=="factor") {
+           levels(rawData[[dep64]])<-0:(self$scatterY$nlevels-1)
            rawData[[dep64]]<-as.numeric(as.character(rawData[[dep64]]))
         }
-           
+        if (self$option("modelSelection","ordinal")) {
+          rawData[[dep64]]<-rawData[[dep64]]+1
+          self$scatterRange<-c(1,self$scatterY$nlevels)
+          self$scatterRange<-c(0,1)
+          
+        }
+        
       
       if (is.something(dims))  {
         
@@ -596,11 +610,16 @@ Plotter <- R6::R6Class(
       }
       allterm64<-c(x64,term64)
 
-      type="response"
+      type <- "response"
+      mode <- NULL
+      
       if (self$option("plotLp")) {
           type<-"link"
           self$scatterRaw<-FALSE
           self$scatterRange<-NULL
+      }
+      if (self$option("modelSelection","ordinal")) {
+        mode<-"prob"
       }
       
 
@@ -610,9 +629,11 @@ Plotter <- R6::R6Class(
                                          specs=allterm64,
                                          at=conditions,
                                          type=type,
+                                         mode=mode,
                                          nesting = NULL,
                                          options  = list(level = private$.operator$ciwidth)))
 
+      
       self$warnings<-list("topic"="plot",message=results$warning)
       self$errors<-list("topic"="plot",message=results$error)
       referenceGrid<-results$obj

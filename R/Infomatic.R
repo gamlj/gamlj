@@ -145,6 +145,25 @@ Infomatic <- R6::R6Class(
         
       }
 
+      if (self$modeltype=="ordinal") {
+        
+        self$model         <-   c("Ordinal GLM","Proportional odds logistic")
+        self$distribution  <-    "logistic"
+        self$call          <-    "ordinal"
+        self$rcall         <-    "ordinal::clm"
+        self$calloptions   <-    list(link="logit",model=TRUE)
+        self$link          <-    "logit"
+        self$emmeans       <-   "expected class"
+        ### compute direction ###
+        theory             <-     paste('P(Y',greek_vector['leq'],'j)/P(Y', greek_vector['gt'],' j)')
+        actual             <-     paste("j=",paste(dlevs,collapse = " | "))
+        self$direction     <-   c(theory, actual)
+        #########################
+        self$deptype       <-   "factor"
+        self$fit           <-   c("lik" , "aic",  "bic",  "dev")
+        
+      }
+      
       if (self$modeltype=="multinomial") {
         
         self$model         <-   c("Multinomial Model","Model for categorical y")
@@ -258,6 +277,7 @@ DINFO[["multinomial"]]<-c("Multinomial","Multi-event distribution of y")
 DINFO[["nb"]]<-c("Negative binomial","Rare event with overdispersion")
 DINFO[["quasi-poisson"]]<-c("Quasi-Poisson","Rare event with overdispersion")
 DINFO[["Gamma"]]<-c("Gamma","Skewed continuous distribution")
+DINFO[["logistic"]]<-c("Logistic","")
 
 LINFO<-list()
 LINFO[["identity"]]   <-  c("Identity","Coefficients in the same scale of y")

@@ -477,6 +477,9 @@ options:
           title: Probit
         - name: custom
           title: Custom
+        - name: ordinal
+          title: Ordinal (proportional odds)
+
         - name: multinomial
           title: Multinomial
       default: linear

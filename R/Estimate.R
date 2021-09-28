@@ -430,8 +430,10 @@ Estimate <- R6::R6Class("Estimate",
                                    levels(atable$Response)  <-  unlist(self$datamatic$dep$contrast_labels)
                                    atable$Response          <-  as.character(atable$Response)
                             }
+                            if ("Component" %in% names(atable))
+                                               atable$source[atable$Component=="alpha"]<-"Threshold"
                             
-                            atable
+                            return(atable)
 
                           }
                           

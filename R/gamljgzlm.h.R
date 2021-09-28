@@ -290,6 +290,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "logistic",
                     "probit",
                     "custom",
+                    "ordinal",
                     "multinomial"),
                 default="linear")
             private$..custom_family <- jmvcore::OptionList$new(
@@ -520,8 +521,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="ar2", 
                                     `title`="Adj. R\u00B2", 
-                                    `type`="number", 
-                                    `visible`="(!modelSelection:multinomial)"),
+                                    `type`="number"),
                                 list(
                                     `name`="df", 
                                     `title`="df", 
@@ -610,7 +610,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `combineBelow`=TRUE),
                                 list(
                                     `name`="source", 
-                                    `title`="Names", 
+                                    `title`="Name", 
                                     `type`="text", 
                                     `visible`="(showRealNames)"),
                                 list(

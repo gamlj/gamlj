@@ -27,7 +27,9 @@ gamljGzlmClass <- R6::R6Class(
       ### info table ###
       j.init_table(self$results$info,estimate_machine$tab_info) 
       
-      ### r2 table does not need initializing ###
+      ### r2 table  ###
+      if (self$options$modelSelection %in% c("multinomial","ordinal"))
+             self$results$main$r2$getColumn("ar2")$setVisible(FALSE)
       
       ### additional indices table ###
       j.init_table(self$results$main$fit,estimate_machine$tab_fit)
@@ -50,7 +52,7 @@ gamljGzlmClass <- R6::R6Class(
                    ci=T,ciroot="expb.",ciformat="{}% Exp(B) C.I.",ciwidth=self$options$ciWidth)
       
             
-      if (!is.something(self$options$factors))
+      if (!is.something(self$options$factors) & (self$options$modelSelection==FALSE))
         self$results$main$coefficients$getColumn('label')$setVisible(FALSE)
       
 

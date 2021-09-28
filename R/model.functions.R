@@ -245,6 +245,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
           obj$warnings  <-  list(topic="tab_anova",message="Omnibus tests cannot be computed")
           return(NULL)
         }
+
         anoobj        <-  try_hard(car::Anova(model,test="LR",type=3,singular.ok=T))
         obj$errors    <-  list(topic="tab_anova",message=anoobj$error)
         obj$warnings  <-  list(topic="tab_anova",message=anoobj$warning)
@@ -259,9 +260,31 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.multinom<-function(model,obj)
-                .anova.glm(model,obj)
-  
-  
+                      .anova.glm(model,obj)
+
+.anova.clm<-function(model,obj) {
+    
+    if (!obj$hasTerms) {
+      obj$warnings  <-  list(topic="tab_anova",message="Omnibus tests cannot be computed")
+      return(NULL)
+    }
+    
+    anoobj        <-  try_hard(car::Anova(model,test="Chisq",type=3,singular.ok=T))
+    obj$errors    <-  list(topic="tab_anova",message=anoobj$error)
+    obj$warnings  <-  list(topic="tab_anova",message=anoobj$warning)
+    
+    
+    if (!isFALSE(anoobj$error))
+      return(NULL)
+    
+    ano           <-  anoobj$obj
+    mark(model)
+    mark(ano)
+    colnames(ano) <-  c("df","test","p")
+    as.data.frame(ano, stringsAsFactors = F)
+  }
+
+
 .anova.lm<-function(model,obj) {
 
   anoobj        <-  try_hard(car::Anova(model,test="F",type=3,singular.ok=T))

@@ -159,7 +159,11 @@ procedure.emmeans<-function(obj) {
   
   ginfo("Estimated Marginal Means")
   terms<-obj$options$emmeans
-
+  mode<-NULL
+  if (obj$option("modelSelection","ordinal"))
+    mode<-"mean.class"
+  
+  type<-"response"
   results<-list()
   for (term in terms) {
     ### we need to reverse the term because emmeans order levels in a strange way
@@ -186,7 +190,8 @@ procedure.emmeans<-function(obj) {
     referenceGrid<-emmeans::emmeans(obj$model,
                                     specs=term64,
                                     at=conditions,
-                                    type="response",
+                                    type=type,
+                                    mode=mode,
                                     nesting = NULL,
                                     lmer.df = df)
     tableData<-as.data.frame(referenceGrid)

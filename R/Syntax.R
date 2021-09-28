@@ -101,6 +101,11 @@ Syntax <- R6::R6Class(
                 modelTerms[[aOne]]<-NULL
                 self$hasIntercept=TRUE
               }
+              if (self$options$modelSelection=="ordinal") {
+                self$hasIntercept=TRUE
+                if (self$options$fixedIntercept==FALSE)
+                   self$warnings<-list(topic="tab_info",message="Ordinal regression requires the intercept. It has been added to the model")
+              }
               
               self$hasTerms <-(length(modelTerms)>0)
               self$isProper <-(self$hasIntercept | self$hasTerms)
@@ -162,6 +167,10 @@ Syntax <- R6::R6Class(
               if (self$options$modelSelection=="multinomial") {
                 .len  <- .len * (self$datamatic$dep$nlevels-1)
               }
+              if (self$options$modelSelection=="ordinal") {
+                .len  <- .len + (self$datamatic$dep$nlevels-2)
+              }
+              
               self$tab_coefficients<-lapply(1:.len, function(t) list(source=""))
 
               

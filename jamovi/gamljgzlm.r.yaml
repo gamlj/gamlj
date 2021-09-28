@@ -49,8 +49,6 @@ items:
                     - name: ar2
                       title: Adj. R²
                       type: number
-                      visible: (!modelSelection:multinomial)
-
                     - name:  df
                       title: df
                       type: integer
@@ -130,7 +128,7 @@ items:
                       visible: (modelSelection:multinomial)
                       combineBelow: true
                     - name: source
-                      title: "Names"
+                      title: "Name"
                       type: text
                       visible: (showRealNames)
                     - name: label

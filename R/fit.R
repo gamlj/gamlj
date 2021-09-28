@@ -3,8 +3,7 @@
 fit.R2<- function(model,...) UseMethod(".R2") 
 
 .R2.default<-function(model,obj) {
-  
-  results<-try_hard(performance::r2(model,tolerance =1e-09))
+    results<-try_hard(performance::r2(model,tolerance =1e-09))
   if (!isFALSE(results$error))
         obj$errors<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
   if (length(results$obj)==1 && is.na(results$obj)) {
@@ -18,7 +17,6 @@ fit.R2<- function(model,...) UseMethod(".R2")
 }
 
 .R2.glm<-function(model,obj) {
-  
   alist       <-  list()
   # mcFadden and adjusted
   alist$r2    <-  1-(model$deviance/model$null.deviance)
@@ -38,8 +36,26 @@ fit.R2<- function(model,...) UseMethod(".R2")
   return(list(alist))
 }
 
+.R2.clm<-function(model,obj) {
+  
+  alist       <-  list()
+  results     <-  fit.compare_null_model(model)
+  # mcFadden 
 
+  alist$r2    <-  1-(results$deviance/results$null.deviance)
+  alist$ar2   <-  ""
 
+  if (is.null(alist$r2))
+    obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
+  
+  results     <-  fit.compare_null_model(model)
+  alist$test  <-  results$test
+  alist$df    <-  results$df
+  alist$p     <-  results$`Pr(>Chisq)`
+  return(list(alist))
+  
+}
+  
 .R2.multinom<-function(model,obj) {
 
   
@@ -109,6 +125,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
 }
 
 
+
 ######### model comparisons ########
 
 fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
@@ -123,9 +140,24 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   results$test  <-  results$Deviance
   results$df    <-  results$Df
   results$p     <-  results$`Pr(>Chi)`
-  mark(is.na(results$p[2]))
   results[2,]
 }
+
+
+.compare_null_model.clm<-function(model) {
+  
+  form<- as.formula("~1")
+  model0  <-  stats::update(model,form ,evaluate=T)
+  .results <-  stats::anova(model0,model)
+  results<-.results[2,]
+  results$deviance<--2*.results$logLik[2]
+  results$null.deviance<--2*.results$logLik[1]
+  results$test  <-  results$LR.stat
+  results$df    <-  results$df
+  results$p     <-  results$`Pr(Chi)`
+  results
+}
+
 
 .compare_null_model.negbin<-function(model) {
   
@@ -169,6 +201,17 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   results[2,c("df","test","p")]
 }
 
+null.deviance<-function(model) {
+      int<-attr(terms(model),"intercept")
+      form<- as.formula(paste("~",int))
+      model0  <-  stats::update(model,form ,evaluate=T)
+      stats::deviance(model0)
+}
+
+
+deviance<- function(object,...) UseMethod("stats::deviance")
+
+deviance.clm<-function(object) as.numeric(-2*stats::logLik(object))
 
 #### additional fit indices
 
