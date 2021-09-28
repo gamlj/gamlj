@@ -393,7 +393,7 @@ children:
                 optionName: plotScale
                 optionPart: response
               - type: RadioButton
-                name: plotScale_lp
+                name: plotScale_link
                 optionName: plotScale
                 optionPart: link
                 enable: (!modelSelection_multinomial && !modelSelection_ordinal)
