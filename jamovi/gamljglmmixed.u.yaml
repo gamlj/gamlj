@@ -1,65 +1,10 @@
 name: gamljGlmMixed
-title: Generalized Mixed Models
+title: Generalized Mixed Model
 jus: '2.0'
 compilerMode: tame
 events:
   update: './mixed.events::update'
 children:
-  - type: LayoutBox
-    margin: large
-    style: inline
-    children:
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: Label
-            label: Categorical dependent variable
-            children:
-              - type: RadioButton
-                name: modelSelection_logistic
-                optionName: modelSelection
-                optionPart: logistic
-                events:
-                  change: './gamlj.events::onChange_model'
-              - type: RadioButton
-                name: modelSelection_probit
-                optionName: modelSelection
-                optionPart: probit
-                events:
-                  change: './gamlj.events::onChange_model'
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: Label
-            label: Frequencies
-            children:
-              - type: RadioButton
-                name: modelSelection_poisson
-                optionName: modelSelection
-                optionPart: poisson
-                events:
-                  change: './gamlj.events::onChange_model'
-              - type: RadioButton
-                name: modelSelection_nb
-                optionName: modelSelection
-                optionPart: nb
-                events:
-                  change: './gamlj.events::onChange_model'
-          - type: Label
-            label: Custom Model
-            children:
-              - type: RadioButton
-                name: modelSelection_custom
-                optionName: modelSelection
-                optionPart: custom
-                events:
-                  change: './gamlj.events::onChange_model'
-              - type: ComboBox
-                name: custom_family
-                enable: (modelSelection_custom)
-              - type: ComboBox
-                name: custom_link
-                enable: (modelSelection_custom)
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -104,21 +49,16 @@ children:
     style: inline
     children:
       - type: Label
-        label: Effect Size
-        margin: large
-        style: list
+        label: Estimation
+        style: list-inline
         children:
-          - name: effectSize_expb
-            type: CheckBox
-            optionPart: expb
-            optionName: effectSize
+          - type: CheckBox
+            name: reml
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list
+        style: list-inline
         children:
-          - name: showExpbCI
-            type: CheckBox
           - name: showParamsCI
             type: CheckBox
           - type: TextBox
@@ -126,7 +66,7 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI || showExpbCI)
+            enable: (showParamsCI)
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -232,6 +172,8 @@ children:
               - type: LayoutBox
                 margin: large
                 children:
+                  - type: CheckBox
+                    name: lrtRandomEffects
                   - name: ciRE
                     type: CheckBox
   - type: CollapseBox
@@ -332,6 +274,11 @@ children:
                     name: simpleScaleLabels_numbers_labels
                     optionName: simpleScaleLabels
                     optionPart: values_labels
+          - type: Label
+            label: Dependent variable
+            children:
+              - type: ComboBox
+                name: dep_scale
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -343,14 +290,14 @@ children:
         stretchFactor: 1
         format: term
         events:
-          change: './mixed.events::onChange_postHocSupplier'
-          update: './mixed.events::onUpdate_postHocSupplier'
+          change: './gamlj.events::onChange_postHocSupplier'
+          update: './gamlj.events::onUpdate_postHocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
             children:
               - type: ListBox
-                name: postHoc
+                name: posthoc
                 isTarget: true
                 template:
                   type: TermLabel
@@ -403,7 +350,6 @@ children:
               - type: VariablesListBox
                 name: plotSepPlots
                 isTarget: true
-                maxItemCount: 1
       - type: LayoutBox
         margin: large
         style: inline
@@ -435,14 +381,10 @@ children:
             children:
               - type: CheckBox
                 name: plotRaw
-                enable: (!plotLinearPred)
               - type: CheckBox
                 name: plotDvScale
-                enable: (!plotLinearPred)
               - type: CheckBox
                 name: plotRandomEffects
-              - type: CheckBox
-                name: plotLinearPred
           - type: Label
             label: Use
             children:
@@ -462,8 +404,8 @@ children:
         stretchFactor: 1
         persistentItems: false
         events:
-          change: './mixed.events::onChange_simpleSupplier'
-          update: './mixed.events::onUpdate_simpleSupplier'
+          change: './gamlj.events::onChange_simpleSupplier'
+          update: './gamlj.events::onUpdate_simpleSupplier'
         children:
           - type: TargetLayoutBox
             children:
@@ -474,40 +416,74 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleModerator
+                name: simpleModerators
                 isTarget: true
-                maxItemCount: 1
-          - type: TargetLayoutBox
-            children:
-              - type: VariablesListBox
-                name: simple3way
-                isTarget: true
-                maxItemCount: 1
+      - type: CheckBox
+        name: simpleInteractions
+        label: Simple interactions
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
     stretchFactor: 1
     children:
+      - type: Supplier
+        name: emmeansSupplier
+        persistentItems: false
+        stretchFactor: 1
+        format: term
+        events:
+          change: './gamlj.events::onChange_emmeansSupplier'
+          update: './gamlj.events::onUpdate_emmeansSupplier'
+        children:
+          - type: TargetLayoutBox
+            label: ''
+            children:
+              - type: ListBox
+                name: emmeans
+                isTarget: true
+                template:
+                  type: TermLabel
+  - type: CollapseBox
+    label: Assumption Checks
+    collapsed: true
+    stretchFactor: 1
+    style: inline
+    children:
       - type: Label
-        label: Display
+        label: Residuals
         children:
           - type: CheckBox
-            name: eDesc
+            name: normTest
+            label: Test normality of residuals
           - type: CheckBox
-            name: eCovs
-            enable: (eDesc)
+            name: homoTest
+          - type: CheckBox
+            name: qqplot
+            label: Q-Q plot of residuals
+          - type: CheckBox
+            name: normPlot
+            label: Residuals histogram
+          - type: CheckBox
+            name: residPlot
+            label: Residuals-Predicted plot
+      - type: Label
+        label: By clusters
+        children:
+          - type: CheckBox
+            name: clusterBoxplot
+            label: Residuals boxplot
+          - type: CheckBox
+            name: clusterResPred
+            label: Residuals-Predcted by cluster
+          - type: CheckBox
+            name: randHist
+            label: Random coefficients histogram
   - type: CollapseBox
     label: Options
     style: inline
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: Estimation
-        children:
-          - type: TextBox
-            name: nAGQ
-            format: number
       - type: Label
         label: CI Method
         children:
@@ -523,6 +499,17 @@ children:
             name: cimethod_boot
             optionName: cimethod
             optionPart: boot
+      - type: Label
+        label: DF Method
+        children:
+          - type: RadioButton
+            name: dfmethod_Satterthwaite
+            optionName: dfmethod
+            optionPart: Satterthwaite
+          - type: RadioButton
+            name: dfmethod_Kenward-Roger
+            optionName: dfmethod
+            optionPart: Kenward-Roger
       - type: Label
         label: Save
         children:

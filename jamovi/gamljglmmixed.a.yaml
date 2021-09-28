@@ -1,13 +1,13 @@
 ---
 name: gamljGlmMixed
-title: Generalized Mixed Models
+title: Generalized Mixed Model
 menuGroup: Linear Models
 version: '2.0.0'
 jas: '1.2'
-export: true
 completeWhenFilled: false
+export: true
 description:
-    main: Generalized Mixed Linear Model
+    main: Mixed Linear Model
     R:
         dontrun: false
         usage: |
@@ -46,11 +46,27 @@ options:
       type: Data
       description:
           R: the data as a data frame
+          
+          
+    - name: caller
+      type: String
+      default: "lmer"
+      hidden: true
+
+    - name: modelSelection
+      type: List
+      hidden: true
+      options:
+        - name: "lmer"
+      default: "lmer"
+          
 
     - name: dep
       title: Dependent Variable
       type: Variable
       default:
+      permitted:
+        - numeric
       description:
           R: >
             a string naming the dependent variable from `data`, variable
@@ -97,21 +113,12 @@ options:
 
 
     - name: showParamsCI
-      title: For estimates
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
-
-    - name: showExpbCI
-      title: For exp(B)
+      title: Confidence intervals
       type: Bool
       default: true
       description:
           R: >
-            `TRUE` (default) or `FALSE` , exp(B) CI in table
-
+            `TRUE` (default) or `FALSE` , parameters CI in table
 
 
     - name: paramCIWidth
@@ -174,8 +181,6 @@ options:
             `TRUE` or `FALSE` (default), provide contrast coefficients tables
 
 
-
-
     - name: plotHAxis
       title: Horizontal axis
       type: Variable
@@ -191,16 +196,20 @@ options:
       default:
       description:
           R: >
-            a string naming the variable represented as separate lines on the
+            a string naming the variable represented as separate lines in the
             plot
 
     - name: plotSepPlots
       title: Separate plots
-      type: Variable
+      type: Variables
       default:
+      
       description:
           R: >
-            the variable for whose levels multiple plots are computed
+            a list of string naming the variables defining the levels for multiple plots
+
+
+
 
     - name: plotRaw
       title: Observed scores
@@ -219,15 +228,6 @@ options:
              `TRUE` or `FALSE` (default), scale the plot Y-Axis to the max and the min
              of the dependent variable observed scores.
 
-
-    - name: plotOriginalScale
-      title: Original scale 
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), use original scale for covariates.
-
     - name: plotLinesTypes
       title: Varying line types 
       type: Bool
@@ -235,7 +235,6 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), use different linetypes per levels.
-
 
     - name: plotError
       title: Error Bar Definition
@@ -266,29 +265,20 @@ options:
             interval width
 
 
-    - name: postHoc
+    - name: posthoc
       title: Post Hoc Tests
       type: Terms
       default:
       description:
-          R: a list of terms to perform post-hoc tests on
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
 
 
-    - name: eDesc
+    - name: emmeans
       title: Estimated Marginal Means
-      type: Bool
-      default: false
+      type: Terms
+      default:
       description:
-          R: >
-            `TRUE` or `FALSE` (default), provide lsmeans statistics
-
-    - name: eCovs
-      title: Include covariates
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide lsmeans statistics
+          R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
 
 
     - name: simpleVariable
@@ -299,21 +289,14 @@ options:
           R: >
             The variable for which the simple effects (slopes) are computed
 
-    - name: simpleModerator
-      title: Moderator
-      type: Variable
+    - name: simpleModerators
+      title: Moderators
+      type: Variables
       default:
       description:
           R: >
             the variable that provides the levels at which the simple effects computed
 
-    - name: simple3way
-      title: Breaking variable
-      type: Variable
-      default:
-      description:
-          R: >
-            a moderator of the two-way interaction which is probed
 
 
     - name: simpleScale
@@ -364,6 +347,14 @@ options:
              `labels` indicates that only labels are used, such as `Mean` and 
              `Mean + 1 SD`. `values` uses the actual values as labels. `values_labels` uses both.
 
+    - name: simpleInteractions
+      title: Simple Interactions
+      type: Bool
+      default: false
+      description:
+          R: >
+            should simple Interactions be computed
+
 
 ############ generic with some specs ###########
 
@@ -399,17 +390,45 @@ options:
               - name: type
                 type: List
                 options:
-                  - centered
-                  - standardized
-                  - clusterbasedcentered
-                  - clusterbasedstandardized
-                  - none
-
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Centered clusterwise
+                      name:  clusterbasedcentered
+                    - title: z-scores clusterwise
+                      name:  clusterbasedstandardized
+                    - title: Log
+                      name: 'log'
+                    - title: None
+                      name: 'none'
                 default: centered 
       description:
           R: >
             a list of lists specifying the covariates scaling,
             one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: z-scores
+            name: standardized
+          - title: Centered clusterwise
+            name:  clusterbasedcentered
+          - title: z-scores clusterwise
+            name:  clusterbasedstandardized
+          - title: Log
+            name:  log
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
 
 
 ############ mixed model specifics ##############
@@ -453,6 +472,29 @@ options:
             lists of length > 1, the option is automatially set to `'block'`.
             The option is ignored if the model is passed using `formula`.
 
+    - name: reml
+      title: REML
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
+
+    - name: lrtRandomEffects
+      title: LRT for Random Effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), LRT for the random effects
+
+    - name: ciRE
+      title: Random Effect C.I. (slow)
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), confidence intervals for the random effects
 
 
     - name: plotRandomEffects
@@ -463,117 +505,16 @@ options:
           R: >
             `TRUE` or `FALSE` (default), add random effects predicted values in the
             plot
-    - name: plotLinearPred
-      title: Linear Predictor  
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), plot the predicted values in the linear predictor scale.
-            If set, `plotRaw` and `plotDvScale` are ignored.
-
-############# specs of generalized ##############
             
-
-    - name: nAGQ
-      title: Precision/Speed
-      type: Number
-      min: 0
-      max: 25
-      default: 1
-      description:
-          R: >
-            for the adaptive Gauss-Hermite log-likelihood approximation,
-            nAGQ argument controls the number of nodes in the quadrature formula. A positive integer
-
-    - name: lrtRandomEffects
-      title: LRT for Random Effects
-      type: Bool
-      default: false
-      hidden: true
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), LRT for the random effects
-
-
-    - name: ciRE
-      title: Random Effect C.I. (slow)
+    - name: plotOriginalScale
+      title: Covariate scale 
       type: Bool
       default: false
       description:
           R: >
-            `TRUE` or `FALSE` (default), confidence intervals for the random effects
+            `TRUE` or `FALSE` (default), use original scale for covariates.
 
-    - name: effectSize
-      title: Effect Size
-      type: NMXList
-      options:
-          - name: expb
-            title: Odd Ratios (expB)
-      default:
-          - expb
-          
-    - name: modelSelection
-      title: Model Selection
-      type: List
-      options:
-        - name: poisson
-          title: Poisson
-        - name: logistic
-          title: Logistic
-        - name: probit
-          title: Probit
-        - name : nb
-          title: Negative Binomial
-        - name: custom
-          title: Custom
-      default: logistic
-      description:
-          R: >
-            Select the generalized linear model: `linear`,`poisson`,`logistic`,`nb`, the latest being Negative Binomial
-
-
-    - name: custom_family
-      title: Distribution
-      type: List
-      options:
-          - title: Gaussian
-            name: 'gaussian'
-          - title: Binomial
-            name:  'binomial'
-          - title: Poisson
-            name:  'poisson'
-          - title: Inverse gaussian
-            name: 'inverse.gaussian'
-          - title: Gamma
-            name: 'Gamma'
-      default: "gaussian"
-      description:
-         R: >
-           Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
-
-    - name: custom_link
-      title: Link Function
-      type: List
-      options:
-          - title: Identity
-            name: 'identity'
-          - title: Logit
-            name:  'logit'
-          - title: Log
-            name:  'log'
-          - title: Inverse
-            name: 'inverse'
-          - title: Inverse squared
-            name: '1/mu^2'
-          - title: Square root
-            name: 'sqrt'
-      default: "identity"
-      description:
-         R: >
-           Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
-
-
+            
     - name: cimethod
       title: CI Method
       type: List
@@ -586,6 +527,82 @@ options:
         - name: boot
           title: Bootstrap (very slow)
 
+    - name: dfmethod
+      title: DF Method
+      type: List
+      default: Satterthwaite
+      options:
+        - name: Satterthwaite
+          title: Satterthwaite
+        - name:  Kenward-Roger
+          title: "Kenward-Roger"
+
+
+
+    - name: qqplot
+      title: Q-Q plot of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+
+    - name: homoTest
+      title: Residual Variances Homogeneity tests
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), perform homogeneity tests
+
+
+    - name: normTest
+      title: Normality of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a test for normality of residuals
+    - name: normPlot
+      title: Histogram of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+
+
+    - name: residPlot
+      title: Residuals-Predicted scatterplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+
+    - name: clusterBoxplot
+      title: Residuals by cluster boxplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a boxplot of random effects by the first defined clustering variable
+
+    - name: clusterResPred
+      title: Residuals vs Predcted by cluster 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), residuals vs predicted by the first defined clustering variable
+
+    - name: randHist
+      title: Histogram of random Coefficients
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide histogram of random Coefficients
 
     - name: predicted
       title: Predicted

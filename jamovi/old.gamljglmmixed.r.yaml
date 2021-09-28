@@ -1,13 +1,12 @@
 ---
-name:  gamljGLM
-title: Generalized Linear Model
+name:  gamljGlmMixed
+title: Generalized Mixed Model
 jrs: '1.0'
-
 
 items:
   - name: model
     type: Property
-    description: The underlying `glm` object
+    description: The underlying `glmer` object
 
   - name: info
     title: Model Info
@@ -31,8 +30,10 @@ items:
         - modelSelection
         - custom_family
         - custom_link
+        - nAGQ
     refs: gamlj
-    
+
+
 
   - name: main
     type: Group
@@ -42,14 +43,14 @@ items:
         - modelTerms
         - contrasts
         - scaling
+        - randomTerms
+        - correlatedEffects
         - fixedIntercept
-        - modelSelection
-        - custom_family
-        - custom_link
+        - nAGQ
 
     items:
            - name: anova
-             title: Loglikelihood ratio tests
+             title: Fixed Effect Omnibus tests
              type: Table
              description: a table of ANOVA results
              clearWith:
@@ -57,12 +58,9 @@ items:
                          - modelTerms
                          - contrasts
                          - scaling
+                         - randomTerms
+                         - correlatedEffects
                          - fixedIntercept
-                         - effectSize
-                         - modelSelection
-                         - custom_family
-                         - custom_link
-                 
              columns:
                     - name: name
                       title: ""
@@ -70,36 +68,30 @@ items:
                     - name: test
                       title: X²
                       type: number
-                    - name: df
+                    - name: df1
                       title: df
-                      type: integer
+                      type: number
                     - name: p
                       title: p
                       type: number
                       format: zto,pvalue
+
            - name: fixed
-             title: Parameter Estimates
+             title: Fixed Effects Parameter Estimates
              type: Table
              clearWith:
                     - dep
                     - modelTerms
                     - contrasts
                     - scaling
+                    - randomTerms
+                    - correlatedEffects
                     - fixedIntercept
-                    - effectSize
-                    - showParamsCI
-                    - showExpbCI
                     - paramCIWidth
-                    - modelSelection
-                    - custom_family
-                    - custom_link
- 
+                    - nAGQ
+                    - cimethod
+
              columns:
-                    - name: dep
-                      title: "Response Contrasts"
-                      type: text
-                      visible: (modelSelection:multinomial)
-                      combineBelow: true
                     - name: source
                       title: "Names"
                       type: text
@@ -133,7 +125,7 @@ items:
                       type: number
                       title: Upper
                       visible: (showExpbCI)
-
+                      
                     - name: z
                       title: "z"
                       type: number
@@ -141,41 +133,77 @@ items:
                       title: "p"
                       type: number
                       format: zto,pvalue
-           - name: relativerisk
-             title: Relative risk
+
+
+           - name: random
+             title: Random Components
              type: Table
-             visible: (effectSize:RR)
              clearWith:
                     - dep
                     - modelTerms
                     - contrasts
                     - scaling
+                    - randomTerms
+                    - correlatedEffects
                     - fixedIntercept
-                    - effectSize
-                    - ciWidth
+                    - randomTerms
+                    - nAGQ
 
              columns:
-                    - name: source
-                      title: "Names"
+                    - name: groups
+                      title: "Groups"
                       type: text
-                      visible: (showRealNames)
-                    - name: label
-                      title: "Effect"
+                      combineBelow: true
+                    - name: name
+                      title: "Name"
                       type: text
-                    - name: estimate
-                      title: "RR"
+                    - name: std
+                      title: "SD"
+                      type: number
+                    - name: var
+                      title: "Variance"
                       type: number
                     - name: cilow
                       type: number
                       title: Lower
-                      visible: (showExpbCI)
+                      visible: (ciRE)
                     - name: cihig
                       type: number
                       title: Upper
-                      visible: (showExpbCI)
+                      visible: (ciRE)
+                    - name: icc
+                      title: "ICC"
+                      type: number
 
+           - name: randomCov
+             title: Random Parameters correlations
+             type: Table
+             visible: false
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - randomTerms
+                    - correlatedEffects
+                    - fixedIntercept
+                    - randomTerms
+                    - nAGQ
 
-
+             columns:
+                   - name: groups
+                     title: "Groups"
+                     combineBelow: true
+                     type: text
+                   - name: name1
+                     title: "Param.1"
+                     type: text
+                   - name: name2
+                     title: "Param.2"
+                     type: text
+                   - name: cov
+                     title: "Corr."
+                     type: number
 
 
            - name: contrastCodeTables
@@ -185,7 +213,6 @@ items:
              visible: (showContrastCode)
              clearWith:
                     - contrasts
-
              template:
                    title:  $key
                    type: Table
@@ -209,21 +236,16 @@ items:
         - modelTerms
         - contrasts
         - scaling
+        - randomTerms
+        - correlatedEffects
         - postHocCorr
-        - modelSelection
-        - custom_family
-        - custom_link
-
+        - nAGQ
+        
     template:
         clearWith: []
         title:  ""
         type: Table
         columns:
-        - name: dep
-          title: "Response Groups"
-          type: text
-          visible: (modelSelection:multinomial)
-          combineBelow: true
         - name: contrast
           title: ""
           type: number
@@ -235,12 +257,11 @@ items:
           title: SE
           type: number
         - name: test
-          title: z
+          title: t
           type: number
         - name: df
           title: df
           type: number
-          visible: false
         - name: p
           title: p
           type: number
@@ -266,6 +287,8 @@ items:
                  - modelTerms
                  - contrasts
                  - scaling
+                 - randomTerms
+                 - correlatedEffects
                  - fixedIntercept
                  - simpleVariable
                  - simpleModerator
@@ -274,13 +297,12 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
-                 - modelSelection
-                 - custom_family
-                 - custom_link
+                 - nAGQ
+                 - cimethod
 
     items:
             - name: Anova
-              title: "ANOVA: Simple Effects for" 
+              title: Simple Effects ANOVA
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
@@ -295,9 +317,11 @@ items:
                  - name: chisq
                    title: X²
                    type: number
+                   visible: false
                  - name: df
                    title:  df
                    type: number
+                   visible: false                   
                  - name: p.value
                    title: p
                    type: number
@@ -308,11 +332,6 @@ items:
               type: Table
               visible: false
               columns:
-                     - name: dep
-                       title: "Response Contrasts"
-                       type: text
-                       visible: (modelSelection:multinomial)
-                       combineBelow: true
                      - name: threeway
                        title: " "
                        visible: (simple3way)
@@ -349,12 +368,6 @@ items:
                        type: number
                        title: Upper
                        visible: (showExpbCI)
-                     - name: df
-                       title: "df"
-                       type: number
-                     - name: t.ratio
-                       title: "t"
-                       type: number
                      - name: z.ratio
                        title: "z"
                        type: number
@@ -362,7 +375,6 @@ items:
                        title: "p"
                        type: number
                        format: zto,pvalue
-                       
 
 
 
@@ -376,12 +388,13 @@ items:
         - modelTerms
         - contrasts
         - scaling
-        - fixedIntercept
         - simpleScaleLabels
+        - randomTerms
+        - correlatedEffects
+        - fixedIntercept
         - ciWidth
-        - modelSelection
-        - custom_family
-        - custom_link
+        - nAGQ
+        - cimethod
 
     template:
         title:  $key
@@ -394,6 +407,9 @@ items:
         - name: SE
           title: SE
           type: number
+        - name: df
+          title: df
+          type: number
         - name: lower.CL
           title: Lower 
           type: number
@@ -403,7 +419,7 @@ items:
 
 
   - name: descPlot
-    title: Plots
+    title: Effects Plots
     visible: (plotHAxis)
     type: Image
     description: a descriptives plot
@@ -412,6 +428,7 @@ items:
     renderFun: .descPlot
     clearWith:
         - dep
+        - cluster
         - plotHAxis
         - plotSepLines
         - plotSepPlots
@@ -423,13 +440,13 @@ items:
         - fixedIntercept
         - simpleScale
         - simpleScaleLabels
+        - plotRandomEffects
+        - randomTerms
         - modelTerms
         - percvalue
         - cvalue
-        - modelSelection
-        - custom_family
-        - custom_link
-
+        - plotLinearPred
+        - cimethod
   - name: descPlots
     title: Results Plots
     type: Array
@@ -455,18 +472,20 @@ items:
            - simpleScale
            - simpleScaleLabels
            - plotDvScale
+           - plotRandomEffects
            - plotRaw
-           - modelTerms
+           - randomTerms
            - percvalue
            - cvalue
-           - modelSelection
-           - custom_family
-           - custom_link
+           - plotLinearPred
+  - name: plotnotes
+    type: Html
+    visible: false
 
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GzLM_PRED_${ dep }`'
+    varTitle: '`MzLM_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
         - dep
@@ -475,7 +494,7 @@ items:
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GzLM_RES_${ dep }`'
+    varTitle: '`MixzLM_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
         - dep

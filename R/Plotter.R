@@ -18,12 +18,15 @@ Plotter <- R6::R6Class(
       scatterModerators=NULL,
       scatterBars=FALSE,
       scatterRaw=FALSE,
+      scatterType=NULL,
       initialize=function(operator,results) {
             super$initialize(options=operator$options,vars=operator$vars)
             private$.results<-results
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
             self$scatterRaw<-self$options$plotRaw
+            self$scatterType<-self$options$plotScale
+            
       },
 
       initPlots=function() {
@@ -77,7 +80,8 @@ Plotter <- R6::R6Class(
         p <- ggplot2::ggplot()
         
         # give a scale to the Y axis
-        p <- p + ggplot2::scale_y_continuous(limits = self$scatterRange)
+        if (is.something(self$scatterRange))
+              p <- p + ggplot2::scale_y_continuous(limits = self$scatterRange)
         
 
         #### plot the actual data if required 
@@ -325,9 +329,16 @@ Plotter <- R6::R6Class(
             z<-self$options$plotSepLines
             moderators<-self$options$plotSepPlots
             
-            if (self$options$modelSelection=="multinomial" | self$options$modelSelection=="ordinal") {
+            if (self$options$modelSelection=="multinomial") {
                      moderators < c(z,moderators)
                      z   <- self$options$dep
+                     self$scatterType="response"
+            }
+            
+            if (self$options$modelSelection=="ordinal" & self$scatterType!="mean.class") {
+                     moderators < c(z,moderators)
+                     z   <- self$options$dep
+              
             }
             
             
@@ -375,8 +386,7 @@ Plotter <- R6::R6Class(
       
       moderators<-self$scatterModerators
 
-      
-      
+
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
 
@@ -424,8 +434,19 @@ Plotter <- R6::R6Class(
 
         ### give a range to the y-axis, if needed
         if (self$options$plotDvScale)
-          self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
+            self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
 
+      if (self$option("modelSelection","multinomial")) {
+        self$scatterRaw<-FALSE
+      }
+      
+      if (self$scatterType=="link") {
+        self$scatterRaw<-FALSE
+        self$scatterRange<-NULL
+      }
+      
+      
+      
       ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
       
         if (self$scatterY$type=="factor") {
@@ -434,11 +455,10 @@ Plotter <- R6::R6Class(
         }
         if (self$option("modelSelection","ordinal")) {
           rawData[[dep64]]<-rawData[[dep64]]+1
-          self$scatterRange<-c(1,self$scatterY$nlevels)
-          self$scatterRange<-c(0,1)
-          
+          if (self$option("plotScale","mean.class"))
+                    self$scatterRange<-c(1,self$scatterY$nlevels)
         }
-        
+
       
       if (is.something(dims))  {
         
@@ -610,30 +630,27 @@ Plotter <- R6::R6Class(
       }
       allterm64<-c(x64,term64)
 
-      type <- "response"
       mode <- NULL
+
       
-      if (self$option("plotLp")) {
-          type<-"link"
-          self$scatterRaw<-FALSE
-          self$scatterRange<-NULL
-      }
       if (self$option("modelSelection","ordinal")) {
-        mode<-"prob"
+            if (self$option("plotScale","mean.class"))
+                  mode<-"mean.class"
+            else  {
+                  mode<-"prob"
+                  self$scatterRaw<-FALSE
+            }
       }
-      
 
       ### now we get the estimated means #######
-      
       results<-try_hard(emmeans::emmeans(private$.operator$model,
                                          specs=allterm64,
                                          at=conditions,
-                                         type=type,
+                                         type=self$scatterType,
                                          mode=mode,
                                          nesting = NULL,
                                          options  = list(level = private$.operator$ciwidth)))
 
-      
       self$warnings<-list("topic"="plot",message=results$warning)
       self$errors<-list("topic"="plot",message=results$error)
       referenceGrid<-results$obj

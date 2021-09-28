@@ -13,6 +13,7 @@ Infomatic <- R6::R6Class(
     rcall=NULL,
     call=NULL,
     emmeans=NULL,
+    predict="response",
     fit=NULL,
     deptype=NULL,
     depnlevels=NULL,
@@ -32,13 +33,14 @@ Infomatic <- R6::R6Class(
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
       }
       
+      
 
       if (self$modeltype=="lm") {
         self$model        <-   c("Linear Model","OLS Model for continuous y")
         self$distribution <-  "gaussian"
         self$call         <-  "lm"
         self$rcall        <-   "stats::lm"
-        self$deptype      <-  "numeric"
+        self$deptype      <-  c("numeric","integer")
         
       }
       if (self$modeltype=="linear") {
@@ -98,8 +100,6 @@ Infomatic <- R6::R6Class(
         self$rcall         <-   FUNCS[[options$caller]]
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
-        
-        ### compute direction ###
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
         
@@ -113,6 +113,7 @@ Infomatic <- R6::R6Class(
         self$rcall         <-   FUNCS[[options$caller]]
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
+        self$deptype       <-   "integer"
         
         ### compute direction ###
         self$direction     <-   c("y","Dependent variable counts")
@@ -150,8 +151,8 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Ordinal GLM","Proportional odds logistic")
         self$distribution  <-    "logistic"
         self$call          <-    "ordinal"
-        self$rcall         <-    "ordinal::clm"
-        self$calloptions   <-    list(link="logit",model=TRUE)
+        self$rcall         <-    "MASS::polr"
+        self$calloptions   <-    list(model=TRUE, Hess=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "expected class"
         ### compute direction ###
@@ -173,6 +174,7 @@ Infomatic <- R6::R6Class(
         self$calloptions   <-    list(model=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "probabilities"
+        self$predict       <-   "probs"
         ### compute direction ###
         theory             <-   "P(Y=j)/P(Y=0)"
         actual             <-  paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")

@@ -6,13 +6,14 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
     inherit = jmvcore::Options,
     public = list(
         initialize = function(
+            caller = "lmer",
+            modelSelection = "lmer",
             dep = NULL,
             factors = NULL,
             covs = NULL,
             modelTerms = NULL,
             fixedIntercept = TRUE,
-            showParamsCI = FALSE,
-            showExpbCI = TRUE,
+            showParamsCI = TRUE,
             paramCIWidth = 95,
             contrasts = NULL,
             showRealNames = TRUE,
@@ -22,38 +23,41 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             plotSepPlots = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
-            plotOriginalScale = FALSE,
             plotLinesTypes = FALSE,
             plotError = "none",
             ciWidth = 95,
-            postHoc = NULL,
-            eDesc = FALSE,
-            eCovs = FALSE,
+            posthoc = NULL,
+            emmeans = NULL,
             simpleVariable = NULL,
-            simpleModerator = NULL,
-            simple3way = NULL,
+            simpleModerators = NULL,
             simpleScale = "mean_sd",
             cvalue = 1,
             percvalue = 25,
             simpleScaleLabels = "labels",
+            simpleInteractions = FALSE,
             postHocCorr = list(
                 "bonf"),
             scaling = NULL,
+            dep_scale = "none",
             cluster = NULL,
             randomTerms = list(
                 list()),
             correlatedEffects = "corr",
-            plotRandomEffects = FALSE,
-            plotLinearPred = FALSE,
-            nAGQ = 1,
+            reml = TRUE,
             lrtRandomEffects = FALSE,
             ciRE = FALSE,
-            effectSize = list(
-                "expb"),
-            modelSelection = "logistic",
-            custom_family = "gaussian",
-            custom_link = "identity",
-            cimethod = "wald", ...) {
+            plotRandomEffects = FALSE,
+            plotOriginalScale = FALSE,
+            cimethod = "wald",
+            dfmethod = "Satterthwaite",
+            qqplot = FALSE,
+            homoTest = FALSE,
+            normTest = FALSE,
+            normPlot = FALSE,
+            residPlot = FALSE,
+            clusterBoxplot = FALSE,
+            clusterResPred = FALSE,
+            randHist = FALSE, ...) {
 
             super$initialize(
                 package="gamlj",
@@ -61,10 +65,24 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 requiresData=TRUE,
                 ...)
 
+            private$..caller <- jmvcore::OptionString$new(
+                "caller",
+                caller,
+                default="lmer",
+                hidden=TRUE)
+            private$..modelSelection <- jmvcore::OptionList$new(
+                "modelSelection",
+                modelSelection,
+                hidden=TRUE,
+                options=list(
+                    "lmer"),
+                default="lmer")
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
-                default=NULL)
+                default=NULL,
+                permitted=list(
+                    "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
@@ -88,10 +106,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             private$..showParamsCI <- jmvcore::OptionBool$new(
                 "showParamsCI",
                 showParamsCI,
-                default=FALSE)
-            private$..showExpbCI <- jmvcore::OptionBool$new(
-                "showExpbCI",
-                showExpbCI,
                 default=TRUE)
             private$..paramCIWidth <- jmvcore::OptionNumber$new(
                 "paramCIWidth",
@@ -140,7 +154,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "plotSepLines",
                 plotSepLines,
                 default=NULL)
-            private$..plotSepPlots <- jmvcore::OptionVariable$new(
+            private$..plotSepPlots <- jmvcore::OptionVariables$new(
                 "plotSepPlots",
                 plotSepPlots,
                 default=NULL)
@@ -151,10 +165,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             private$..plotDvScale <- jmvcore::OptionBool$new(
                 "plotDvScale",
                 plotDvScale,
-                default=FALSE)
-            private$..plotOriginalScale <- jmvcore::OptionBool$new(
-                "plotOriginalScale",
-                plotOriginalScale,
                 default=FALSE)
             private$..plotLinesTypes <- jmvcore::OptionBool$new(
                 "plotLinesTypes",
@@ -174,29 +184,21 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 min=50,
                 max=99.9,
                 default=95)
-            private$..postHoc <- jmvcore::OptionTerms$new(
-                "postHoc",
-                postHoc,
+            private$..posthoc <- jmvcore::OptionTerms$new(
+                "posthoc",
+                posthoc,
                 default=NULL)
-            private$..eDesc <- jmvcore::OptionBool$new(
-                "eDesc",
-                eDesc,
-                default=FALSE)
-            private$..eCovs <- jmvcore::OptionBool$new(
-                "eCovs",
-                eCovs,
-                default=FALSE)
+            private$..emmeans <- jmvcore::OptionTerms$new(
+                "emmeans",
+                emmeans,
+                default=NULL)
             private$..simpleVariable <- jmvcore::OptionVariable$new(
                 "simpleVariable",
                 simpleVariable,
                 default=NULL)
-            private$..simpleModerator <- jmvcore::OptionVariable$new(
-                "simpleModerator",
-                simpleModerator,
-                default=NULL)
-            private$..simple3way <- jmvcore::OptionVariable$new(
-                "simple3way",
-                simple3way,
+            private$..simpleModerators <- jmvcore::OptionVariables$new(
+                "simpleModerators",
+                simpleModerators,
                 default=NULL)
             private$..simpleScale <- jmvcore::OptionList$new(
                 "simpleScale",
@@ -223,6 +225,10 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "values",
                     "values_labels"),
                 default="labels")
+            private$..simpleInteractions <- jmvcore::OptionBool$new(
+                "simpleInteractions",
+                simpleInteractions,
+                default=FALSE)
             private$..postHocCorr <- jmvcore::OptionNMXList$new(
                 "postHocCorr",
                 postHocCorr,
@@ -253,8 +259,20 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "standardized",
                                 "clusterbasedcentered",
                                 "clusterbasedstandardized",
+                                "log",
                                 "none"),
                             default="centered"))))
+            private$..dep_scale <- jmvcore::OptionList$new(
+                "dep_scale",
+                dep_scale,
+                options=list(
+                    "none",
+                    "centered",
+                    "standardized",
+                    "clusterbasedcentered",
+                    "clusterbasedstandardized",
+                    "log"),
+                default="none")
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
                 cluster,
@@ -277,67 +295,26 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "nocorr",
                     "block"),
                 default="corr")
-            private$..plotRandomEffects <- jmvcore::OptionBool$new(
-                "plotRandomEffects",
-                plotRandomEffects,
-                default=FALSE)
-            private$..plotLinearPred <- jmvcore::OptionBool$new(
-                "plotLinearPred",
-                plotLinearPred,
-                default=FALSE)
-            private$..nAGQ <- jmvcore::OptionNumber$new(
-                "nAGQ",
-                nAGQ,
-                min=0,
-                max=25,
-                default=1)
+            private$..reml <- jmvcore::OptionBool$new(
+                "reml",
+                reml,
+                default=TRUE)
             private$..lrtRandomEffects <- jmvcore::OptionBool$new(
                 "lrtRandomEffects",
                 lrtRandomEffects,
-                default=FALSE,
-                hidden=TRUE)
+                default=FALSE)
             private$..ciRE <- jmvcore::OptionBool$new(
                 "ciRE",
                 ciRE,
                 default=FALSE)
-            private$..effectSize <- jmvcore::OptionNMXList$new(
-                "effectSize",
-                effectSize,
-                options=list(
-                    "expb"),
-                default=list(
-                    "expb"))
-            private$..modelSelection <- jmvcore::OptionList$new(
-                "modelSelection",
-                modelSelection,
-                options=list(
-                    "poisson",
-                    "logistic",
-                    "probit",
-                    "nb",
-                    "custom"),
-                default="logistic")
-            private$..custom_family <- jmvcore::OptionList$new(
-                "custom_family",
-                custom_family,
-                options=list(
-                    "gaussian",
-                    "binomial",
-                    "poisson",
-                    "inverse.gaussian",
-                    "Gamma"),
-                default="gaussian")
-            private$..custom_link <- jmvcore::OptionList$new(
-                "custom_link",
-                custom_link,
-                options=list(
-                    "identity",
-                    "logit",
-                    "log",
-                    "inverse",
-                    "1/mu^2",
-                    "sqrt"),
-                default="identity")
+            private$..plotRandomEffects <- jmvcore::OptionBool$new(
+                "plotRandomEffects",
+                plotRandomEffects,
+                default=FALSE)
+            private$..plotOriginalScale <- jmvcore::OptionBool$new(
+                "plotOriginalScale",
+                plotOriginalScale,
+                default=FALSE)
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
                 cimethod,
@@ -346,18 +323,58 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "wald",
                     "profile",
                     "boot"))
+            private$..dfmethod <- jmvcore::OptionList$new(
+                "dfmethod",
+                dfmethod,
+                default="Satterthwaite",
+                options=list(
+                    "Satterthwaite",
+                    "Kenward-Roger"))
+            private$..qqplot <- jmvcore::OptionBool$new(
+                "qqplot",
+                qqplot,
+                default=FALSE)
+            private$..homoTest <- jmvcore::OptionBool$new(
+                "homoTest",
+                homoTest,
+                default=FALSE)
+            private$..normTest <- jmvcore::OptionBool$new(
+                "normTest",
+                normTest,
+                default=FALSE)
+            private$..normPlot <- jmvcore::OptionBool$new(
+                "normPlot",
+                normPlot,
+                default=FALSE)
+            private$..residPlot <- jmvcore::OptionBool$new(
+                "residPlot",
+                residPlot,
+                default=FALSE)
+            private$..clusterBoxplot <- jmvcore::OptionBool$new(
+                "clusterBoxplot",
+                clusterBoxplot,
+                default=FALSE)
+            private$..clusterResPred <- jmvcore::OptionBool$new(
+                "clusterResPred",
+                clusterResPred,
+                default=FALSE)
+            private$..randHist <- jmvcore::OptionBool$new(
+                "randHist",
+                randHist,
+                default=FALSE)
             private$..predicted <- jmvcore::OptionOutput$new(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
 
+            self$.addOption(private$..caller)
+            self$.addOption(private$..modelSelection)
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
-            self$.addOption(private$..showExpbCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
@@ -367,46 +384,51 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
-            self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..plotLinesTypes)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
-            self$.addOption(private$..postHoc)
-            self$.addOption(private$..eDesc)
-            self$.addOption(private$..eCovs)
+            self$.addOption(private$..posthoc)
+            self$.addOption(private$..emmeans)
             self$.addOption(private$..simpleVariable)
-            self$.addOption(private$..simpleModerator)
-            self$.addOption(private$..simple3way)
+            self$.addOption(private$..simpleModerators)
             self$.addOption(private$..simpleScale)
             self$.addOption(private$..cvalue)
             self$.addOption(private$..percvalue)
             self$.addOption(private$..simpleScaleLabels)
+            self$.addOption(private$..simpleInteractions)
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..scaling)
+            self$.addOption(private$..dep_scale)
             self$.addOption(private$..cluster)
             self$.addOption(private$..randomTerms)
             self$.addOption(private$..correlatedEffects)
-            self$.addOption(private$..plotRandomEffects)
-            self$.addOption(private$..plotLinearPred)
-            self$.addOption(private$..nAGQ)
+            self$.addOption(private$..reml)
             self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..ciRE)
-            self$.addOption(private$..effectSize)
-            self$.addOption(private$..modelSelection)
-            self$.addOption(private$..custom_family)
-            self$.addOption(private$..custom_link)
+            self$.addOption(private$..plotRandomEffects)
+            self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..cimethod)
+            self$.addOption(private$..dfmethod)
+            self$.addOption(private$..qqplot)
+            self$.addOption(private$..homoTest)
+            self$.addOption(private$..normTest)
+            self$.addOption(private$..normPlot)
+            self$.addOption(private$..residPlot)
+            self$.addOption(private$..clusterBoxplot)
+            self$.addOption(private$..clusterResPred)
+            self$.addOption(private$..randHist)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
         }),
     active = list(
+        caller = function() private$..caller$value,
+        modelSelection = function() private$..modelSelection$value,
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
-        showExpbCI = function() private$..showExpbCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
@@ -416,45 +438,50 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         plotSepPlots = function() private$..plotSepPlots$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
-        plotOriginalScale = function() private$..plotOriginalScale$value,
         plotLinesTypes = function() private$..plotLinesTypes$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
-        postHoc = function() private$..postHoc$value,
-        eDesc = function() private$..eDesc$value,
-        eCovs = function() private$..eCovs$value,
+        posthoc = function() private$..posthoc$value,
+        emmeans = function() private$..emmeans$value,
         simpleVariable = function() private$..simpleVariable$value,
-        simpleModerator = function() private$..simpleModerator$value,
-        simple3way = function() private$..simple3way$value,
+        simpleModerators = function() private$..simpleModerators$value,
         simpleScale = function() private$..simpleScale$value,
         cvalue = function() private$..cvalue$value,
         percvalue = function() private$..percvalue$value,
         simpleScaleLabels = function() private$..simpleScaleLabels$value,
+        simpleInteractions = function() private$..simpleInteractions$value,
         postHocCorr = function() private$..postHocCorr$value,
         scaling = function() private$..scaling$value,
+        dep_scale = function() private$..dep_scale$value,
         cluster = function() private$..cluster$value,
         randomTerms = function() private$..randomTerms$value,
         correlatedEffects = function() private$..correlatedEffects$value,
-        plotRandomEffects = function() private$..plotRandomEffects$value,
-        plotLinearPred = function() private$..plotLinearPred$value,
-        nAGQ = function() private$..nAGQ$value,
+        reml = function() private$..reml$value,
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
         ciRE = function() private$..ciRE$value,
-        effectSize = function() private$..effectSize$value,
-        modelSelection = function() private$..modelSelection$value,
-        custom_family = function() private$..custom_family$value,
-        custom_link = function() private$..custom_link$value,
+        plotRandomEffects = function() private$..plotRandomEffects$value,
+        plotOriginalScale = function() private$..plotOriginalScale$value,
         cimethod = function() private$..cimethod$value,
+        dfmethod = function() private$..dfmethod$value,
+        qqplot = function() private$..qqplot$value,
+        homoTest = function() private$..homoTest$value,
+        normTest = function() private$..normTest$value,
+        normPlot = function() private$..normPlot$value,
+        residPlot = function() private$..residPlot$value,
+        clusterBoxplot = function() private$..clusterBoxplot$value,
+        clusterResPred = function() private$..clusterResPred$value,
+        randHist = function() private$..randHist$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value),
     private = list(
+        ..caller = NA,
+        ..modelSelection = NA,
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
         ..modelTerms = NA,
         ..fixedIntercept = NA,
         ..showParamsCI = NA,
-        ..showExpbCI = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
@@ -464,35 +491,39 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..plotSepPlots = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
-        ..plotOriginalScale = NA,
         ..plotLinesTypes = NA,
         ..plotError = NA,
         ..ciWidth = NA,
-        ..postHoc = NA,
-        ..eDesc = NA,
-        ..eCovs = NA,
+        ..posthoc = NA,
+        ..emmeans = NA,
         ..simpleVariable = NA,
-        ..simpleModerator = NA,
-        ..simple3way = NA,
+        ..simpleModerators = NA,
         ..simpleScale = NA,
         ..cvalue = NA,
         ..percvalue = NA,
         ..simpleScaleLabels = NA,
+        ..simpleInteractions = NA,
         ..postHocCorr = NA,
         ..scaling = NA,
+        ..dep_scale = NA,
         ..cluster = NA,
         ..randomTerms = NA,
         ..correlatedEffects = NA,
-        ..plotRandomEffects = NA,
-        ..plotLinearPred = NA,
-        ..nAGQ = NA,
+        ..reml = NA,
         ..lrtRandomEffects = NA,
         ..ciRE = NA,
-        ..effectSize = NA,
-        ..modelSelection = NA,
-        ..custom_family = NA,
-        ..custom_link = NA,
+        ..plotRandomEffects = NA,
+        ..plotOriginalScale = NA,
         ..cimethod = NA,
+        ..dfmethod = NA,
+        ..qqplot = NA,
+        ..homoTest = NA,
+        ..normTest = NA,
+        ..normPlot = NA,
+        ..residPlot = NA,
+        ..clusterBoxplot = NA,
+        ..clusterResPred = NA,
+        ..randHist = NA,
         ..predicted = NA,
         ..residuals = NA)
 )
@@ -504,12 +535,13 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         model = function() private$..model,
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
-        postHocs = function() private$.items[["postHocs"]],
+        posthoc = function() private$.items[["posthoc"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
-        emeansTables = function() private$.items[["emeansTables"]],
-        descPlot = function() private$.items[["descPlot"]],
-        descPlots = function() private$.items[["descPlots"]],
+        simpleInteractions = function() private$.items[["simpleInteractions"]],
+        emmeans = function() private$.items[["emmeans"]],
+        mainPlots = function() private$.items[["mainPlots"]],
         plotnotes = function() private$.items[["plotnotes"]],
+        assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
     private = list(
@@ -533,29 +565,28 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     list(
                         `name`="value", 
                         `type`="text", 
-                        `title`="Value"),
+                        `title`=""),
                     list(
-                        `name`="comm", 
+                        `name`="specs", 
                         `type`="text", 
-                        `title`="Comment")),
+                        `title`="")),
                 clearWith=list(
                     "dep",
-                    "factors",
-                    "cov",
+                    "dep_scale",
+                    "randomTerms",
                     "modelTerms",
-                    "fixedIntercept",
-                    "modelSelection",
-                    "custom_family",
-                    "custom_link",
-                    "nAGQ"),
+                    "fixedIntercept"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
+                    r2 = function() private$.items[["r2"]],
+                    fit = function() private$.items[["fit"]],
                     anova = function() private$.items[["anova"]],
-                    fixed = function() private$.items[["fixed"]],
+                    coefficients = function() private$.items[["coefficients"]],
                     random = function() private$.items[["random"]],
                     randomCov = function() private$.items[["randomCov"]],
+                    randomTests = function() private$.items[["randomTests"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
                 public=list(
@@ -563,40 +594,37 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         super$initialize(
                             options=options,
                             name="main",
-                            title="Model Results",
-                            clearWith=list(
-                    "dep",
-                    "modelTerms",
-                    "contrasts",
-                    "scaling",
-                    "randomTerms",
-                    "correlatedEffects",
-                    "fixedIntercept",
-                    "nAGQ"))
+                            title="Model Results")
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="anova",
-                            title="Fixed Effect Omnibus tests",
+                            name="r2",
+                            title="Model Fit",
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
-                                "contrasts",
+                                "reml",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
-                                "fixedIntercept"),
+                                "fixedIntercept",
+                                "dfmethod"),
                             columns=list(
                                 list(
-                                    `name`="name", 
-                                    `title`="", 
+                                    `name`="type", 
+                                    `title`="Type", 
                                     `type`="text"),
                                 list(
-                                    `name`="test", 
-                                    `title`="X\u00B2", 
+                                    `name`="r2", 
+                                    `title`="R\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="df1", 
+                                    `name`="df", 
                                     `title`="df", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="test", 
+                                    `title`="LRT", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -605,19 +633,85 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `format`="zto,pvalue"))))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="fixed",
+                            name="fit",
+                            title="Additional indices",
+                            visible=TRUE,
+                            columns=list(
+                                list(
+                                    `name`="info", 
+                                    `type`="text", 
+                                    `title`="Info"),
+                                list(
+                                    `name`="value", 
+                                    `type`="text", 
+                                    `title`="Value"),
+                                list(
+                                    `name`="specs", 
+                                    `type`="text", 
+                                    `title`="Comment")),
+                            clearWith=list(
+                                "dep",
+                                "factors",
+                                "cov",
+                                "modelTerms",
+                                "fixedIntercept")))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="anova",
+                            title="Fixed Effect Omnibus tests",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "reml",
+                                "contrasts",
+                                "scaling",
+                                "dep_scale",
+                                "randomTerms",
+                                "correlatedEffects",
+                                "fixedIntercept",
+                                "dfmethod"),
+                            columns=list(
+                                list(
+                                    `name`="name", 
+                                    `title`="", 
+                                    `type`="text"),
+                                list(
+                                    `name`="f", 
+                                    `title`="F", 
+                                    `type`="number"),
+                                list(
+                                    `name`="chisq", 
+                                    `title`="X\u00B2", 
+                                    `type`="number", 
+                                    `visible`=FALSE),
+                                list(
+                                    `name`="df1", 
+                                    `title`="Num df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="df2", 
+                                    `title`="Den df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="coefficients",
                             title="Fixed Effects Parameter Estimates",
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
+                                "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
-                                "paramCIWidth",
-                                "nAGQ",
-                                "cimethod"),
+                                "paramCIWidth"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -637,33 +731,22 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="expb", 
-                                    `title`="exp(B)", 
-                                    `type`="number", 
-                                    `visible`="(effectSize:expb)"),
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number"),
                                 list(
-                                    `name`="ecilow", 
-                                    `type`="number", 
-                                    `title`="Lower", 
-                                    `visible`="(showExpbCI)"),
-                                list(
-                                    `name`="ecihig", 
-                                    `type`="number", 
-                                    `title`="Upper", 
-                                    `visible`="(showExpbCI)"),
-                                list(
-                                    `name`="z", 
-                                    `title`="z", 
+                                    `name`="t", 
+                                    `title`="t", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -677,13 +760,15 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
+                                "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
                                 "randomTerms",
-                                "nAGQ"),
+                                "ciRe"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -703,12 +788,12 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="Variance", 
                                     `type`="number"),
                                 list(
-                                    `name`="cilow", 
+                                    `name`="ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(ciRE)"),
                                 list(
-                                    `name`="cihig", 
+                                    `name`="ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(ciRE)"),
@@ -724,31 +809,90 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
+                                "reml",
                                 "contrasts",
                                 "scaling",
+                                "dep_scale",
                                 "randomTerms",
                                 "correlatedEffects",
                                 "fixedIntercept",
                                 "randomTerms",
-                                "nAGQ"),
+                                "ciRE"),
                             columns=list(
                                 list(
-                                    `name`="groups", 
+                                    `name`="grp", 
                                     `title`="Groups", 
                                     `combineBelow`=TRUE, 
                                     `type`="text"),
                                 list(
-                                    `name`="name1", 
+                                    `name`="var1", 
                                     `title`="Param.1", 
                                     `type`="text"),
                                 list(
-                                    `name`="name2", 
+                                    `name`="var2", 
                                     `title`="Param.2", 
                                     `type`="text"),
                                 list(
-                                    `name`="cov", 
+                                    `name`="vcov", 
+                                    `title`="Covar.", 
+                                    `type`="number"),
+                                list(
+                                    `name`="ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(ciRE)"),
+                                list(
+                                    `name`="ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(ciRE)"),
+                                list(
+                                    `name`="sdcor", 
                                     `title`="Corr.", 
                                     `type`="number"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="randomTests",
+                            title="Random Coefficients LRT",
+                            visible="(lrtRandomEffects)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "reml",
+                                "contrasts",
+                                "scaling",
+                                "dep_scale",
+                                "randomTerms",
+                                "correlatedEffects",
+                                "fixedIntercept",
+                                "randomTerms"),
+                            columns=list(
+                                list(
+                                    `name`="test", 
+                                    `title`="Test", 
+                                    `combineBelow`=TRUE, 
+                                    `type`="text"),
+                                list(
+                                    `name`="npar", 
+                                    `title`="N. par", 
+                                    `type`="number"),
+                                list(
+                                    `name`="AIC", 
+                                    `title`="AIC", 
+                                    `type`="number"),
+                                list(
+                                    `name`="LRT", 
+                                    `title`="LRT", 
+                                    `type`="number"),
+                                list(
+                                    `name`="Df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="Pr(>Chisq)", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",
@@ -771,28 +915,37 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                         `type`="text")))))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
-                name="postHocs",
+                name="posthoc",
                 title="Post Hoc Tests",
-                items="(postHoc)",
+                items="(posthoc)",
                 clearWith=list(
                     "dep",
                     "modelTerms",
+                    "reml",
                     "contrasts",
                     "scaling",
+                    "dep_scale",
                     "randomTerms",
                     "correlatedEffects",
-                    "postHocCorr",
-                    "nAGQ"),
+                    "fixedIntercept",
+                    "simpleVariable",
+                    "simpleModerators",
+                    "simpleScale",
+                    "cvalue",
+                    "percvalue",
+                    "simpleScaleLabels"),
                 template=jmvcore::Table$new(
                     options=options,
-                    clearWith=list(),
                     title="",
+                    clearWith=list(
+                        "posthoc"),
                     columns=list(
                         list(
-                            `name`="contrast", 
-                            `title`="", 
-                            `type`="number", 
-                            `visible`=FALSE),
+                            `name`="Response", 
+                            `title`="Response level", 
+                            `type`="text", 
+                            `visible`="(modelSelection:multinomial)", 
+                            `combineBelow`=TRUE),
                         list(
                             `name`="estimate", 
                             `title`="Difference", 
@@ -802,27 +955,43 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             `title`="SE", 
                             `type`="number"),
                         list(
-                            `name`="test", 
-                            `title`="t", 
-                            `type`="number"),
+                            `name`="ci.lower", 
+                            `type`="number", 
+                            `title`="Lower", 
+                            `visible`="(showParamsCI)"),
+                        list(
+                            `name`="ci.upper", 
+                            `type`="number", 
+                            `title`="Upper", 
+                            `visible`="(showParamsCI)"),
                         list(
                             `name`="df", 
                             `title`="df", 
                             `type`="number"),
                         list(
-                            `name`="p", 
+                            `name`="test", 
+                            `title`="t", 
+                            `type`="number"),
+                        list(
+                            `name`="none", 
                             `title`="p", 
                             `type`="number", 
                             `format`="zto,pvalue", 
                             `visible`="(postHocCorr:none)"),
                         list(
-                            `name`="pbonf", 
+                            `name`="bonf", 
                             `title`="p<sub>bonferroni</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
                             `visible`="(postHocCorr:bonf)"),
                         list(
-                            `name`="pholm", 
+                            `name`="tukey", 
+                            `title`="p<sub>tukey</sub>", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:tukey)"),
+                        list(
+                            `name`="holm", 
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
@@ -830,8 +999,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    Anova = function() private$.items[["Anova"]],
-                    Params = function() private$.items[["Params"]]),
+                    anova = function() private$.items[["anova"]],
+                    coefficients = function() private$.items[["coefficients"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -844,137 +1013,217 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "modelTerms",
                     "contrasts",
                     "scaling",
-                    "randomTerms",
-                    "correlatedEffects",
+                    "dep_scale",
                     "fixedIntercept",
                     "simpleVariable",
-                    "simpleModerator",
-                    "simple3way",
+                    "simpleModerators",
                     "simpleScale",
                     "cvalue",
                     "percvalue",
-                    "simpleScaleLabels",
-                    "nAGQ",
-                    "cimethod"))
+                    "simpleScaleLabels"))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="Anova",
+                            name="anova",
                             title="Simple Effects ANOVA",
                             visible=FALSE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "contrasts",
+                                "scaling",
+                                "fixedIntercept",
+                                "simpleVariable",
+                                "simpleModerators",
+                                "simpleScale",
+                                "cvalue",
+                                "percvalue",
+                                "simpleScaleLabels"),
                             columns=list(
                                 list(
-                                    `name`="threeway", 
-                                    `title`="", 
-                                    `visible`="(simple3way)", 
-                                    `combineBelow`=TRUE),
+                                    `name`="test", 
+                                    `title`="F", 
+                                    `type`="number"),
                                 list(
-                                    `name`="moderator", 
-                                    `title`="", 
-                                    `combineBelow`=TRUE),
-                                list(
-                                    `name`="chisq", 
-                                    `title`="X\u00B2", 
-                                    `type`="number", 
-                                    `visible`=FALSE),
-                                list(
-                                    `name`="df", 
+                                    `name`="df1", 
                                     `title`="df", 
-                                    `type`="number", 
-                                    `visible`=FALSE),
+                                    `type`="number"),
                                 list(
-                                    `name`="p.value", 
+                                    `name`="df2", 
+                                    `title`="dfe", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="Params",
+                            name="coefficients",
                             title="Parameter Estimates for simple effects",
                             visible=FALSE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "contrasts",
+                                "scaling",
+                                "dep_scale",
+                                "fixedIntercept",
+                                "simpleVariable",
+                                "simpleModerators",
+                                "simpleScale",
+                                "cvalue",
+                                "percvalue",
+                                "simpleScaleLabels"),
                             columns=list(
                                 list(
-                                    `name`="threeway", 
-                                    `title`=" ", 
-                                    `visible`="(simple3way)", 
-                                    `combineBelow`=TRUE),
-                                list(
-                                    `name`="moderator", 
-                                    `title`=" ", 
-                                    `combineBelow`=TRUE),
-                                list(
                                     `name`="contrast", 
-                                    `title`="contrast", 
+                                    `title`="Effect", 
                                     `type`="text"),
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 
                                     `type`="number"),
                                 list(
-                                    `name`="SE", 
+                                    `name`="se", 
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="lower.CL", 
+                                    `name`="ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
-                                    `visible`="(showParamsCI)"),
+                                    `visible`="(showParamsCI )"),
                                 list(
-                                    `name`="upper.CL", 
+                                    `name`="ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(showParamsCI)"),
+                                    `visible`="(showParamsCI )"),
                                 list(
-                                    `name`="expb", 
-                                    `title`="exp(B)", 
-                                    `type`="number", 
-                                    `visible`="(effectSize:expb)"),
-                                list(
-                                    `name`="lower.ECL", 
-                                    `type`="number", 
-                                    `title`="Lower", 
-                                    `visible`="(showExpbCI)"),
-                                list(
-                                    `name`="upper.ECL", 
-                                    `type`="number", 
-                                    `title`="Upper", 
-                                    `visible`="(showExpbCI)"),
-                                list(
-                                    `name`="z.ratio", 
-                                    `title`="z", 
+                                    `name`="df", 
+                                    `title`="df", 
                                     `type`="number"),
                                 list(
-                                    `name`="p.value", 
+                                    `name`="test", 
+                                    `title`="t", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
-                name="emeansTables",
-                title="Estimated Marginal Means",
-                visible="(eDesc)",
+                name="simpleInteractions",
+                title="Simple Interactions",
+                visible=FALSE,
                 clearWith=list(
                     "dep",
                     "modelTerms",
                     "contrasts",
                     "scaling",
-                    "simpleScaleLabels",
-                    "randomTerms",
-                    "correlatedEffects",
+                    "dep_scale",
                     "fixedIntercept",
+                    "simpleScaleLabels",
                     "ciWidth",
-                    "nAGQ",
-                    "cimethod"),
+                    "emmeans"),
+                template=R6::R6Class(
+                    inherit = jmvcore::Group,
+                    active = list(
+                        anova = function() private$.items[["anova"]],
+                        coefficients = function() private$.items[["coefficients"]]),
+                    private = list(),
+                    public=list(
+                        initialize=function(options) {
+                            super$initialize(
+                                options=options,
+                                name="undefined",
+                                title="Simple Interactions - $key",
+                                clearWith=list())
+                            self$add(jmvcore::Table$new(
+                                options=options,
+                                name="anova",
+                                title="ANOVA test -  $key",
+                                columns=list(
+                                    list(
+                                        `name`="effect", 
+                                        `title`="Effect", 
+                                        `type`="text"),
+                                    list(
+                                        `name`="f", 
+                                        `title`="F", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="df1", 
+                                        `title`="df", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="df2", 
+                                        `title`="df", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="p", 
+                                        `title`="p", 
+                                        `type`="number", 
+                                        `format`="zto,pvalue"))))
+                            self$add(jmvcore::Table$new(
+                                options=options,
+                                name="coefficients",
+                                title="Parameter Estimates for -  $key",
+                                columns=list(
+                                    list(
+                                        `name`="effect", 
+                                        `title`="Effect", 
+                                        `type`="text"),
+                                    list(
+                                        `name`="estimate", 
+                                        `title`="Estimate", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="se", 
+                                        `title`="SE", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="ci.lower", 
+                                        `title`="Lower", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="ci.upper", 
+                                        `title`="Upper", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="t", 
+                                        `title`="t", 
+                                        `type`="number"),
+                                    list(
+                                        `name`="p", 
+                                        `title`="p", 
+                                        `type`="number", 
+                                        `format`="zto,pvalue"))))}))$new(options=options)))
+            self$add(jmvcore::Array$new(
+                options=options,
+                name="emmeans",
+                title="Estimated Marginal Means",
+                visible=FALSE,
+                clearWith=list(
+                    "dep",
+                    "modelTerms",
+                    "contrasts",
+                    "scaling",
+                    "dep_scale",
+                    "fixedIntercept",
+                    "simpleScaleLabels",
+                    "ciWidth",
+                    "emmeans"),
                 template=jmvcore::Table$new(
                     options=options,
-                    title="$key",
+                    title="Estimate Marginal Means - $key",
                     clearWith=list(),
                     columns=list(
                         list(
-                            `name`="emmean", 
+                            `name`="estimate", 
                             `title`="Mean", 
                             `type`="number"),
                         list(
-                            `name`="SE", 
+                            `name`="se", 
                             `title`="SE", 
                             `type`="number"),
                         list(
@@ -982,53 +1231,23 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             `title`="df", 
                             `type`="number"),
                         list(
-                            `name`="lower.CL", 
+                            `name`="ci.lower", 
                             `title`="Lower", 
                             `type`="number"),
                         list(
-                            `name`="upper.CL", 
+                            `name`="ci.upper", 
                             `title`="Upper", 
                             `type`="number")))))
-            self$add(jmvcore::Image$new(
-                options=options,
-                name="descPlot",
-                title="Effects Plots",
-                visible="(plotHAxis)",
-                width=500,
-                height=300,
-                renderFun=".descPlot",
-                clearWith=list(
-                    "dep",
-                    "cluster",
-                    "plotHAxis",
-                    "plotSepLines",
-                    "plotSepPlots",
-                    "plotError",
-                    "ciWidth",
-                    "scaling",
-                    "plotRaw",
-                    "plotDvScale",
-                    "fixedIntercept",
-                    "simpleScale",
-                    "simpleScaleLabels",
-                    "plotRandomEffects",
-                    "randomTerms",
-                    "modelTerms",
-                    "percvalue",
-                    "cvalue",
-                    "plotLinearPred",
-                    "cimethod")))
             self$add(jmvcore::Array$new(
                 options=options,
-                name="descPlots",
+                name="mainPlots",
                 title="Results Plots",
-                visible="(plotSepPlots)",
                 template=jmvcore::Image$new(
                     options=options,
-                    title="$key",
-                    renderFun=".descPlot",
-                    width=500,
-                    height=300,
+                    title="",
+                    renderFun=".mainPlot",
+                    width=600,
+                    height=400,
                     clearWith=list(
                         "dep",
                         "plotHAxis",
@@ -1037,26 +1256,168 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         "plotError",
                         "ciWidth",
                         "scaling",
+                        "dep_scale",
                         "modelTerms",
                         "fixedIntercept",
                         "simpleScale",
                         "simpleScaleLabels",
                         "plotDvScale",
-                        "plotRandomEffects",
                         "plotRaw",
-                        "randomTerms",
                         "percvalue",
                         "cvalue",
-                        "plotLinearPred"))))
+                        "plotOriginalScale",
+                        "plotRandomEffects",
+                        "randomTerms",
+                        "modelTerms"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
                 visible=FALSE))
+            self$add(R6::R6Class(
+                inherit = jmvcore::Group,
+                active = list(
+                    homoTest = function() private$.items[["homoTest"]],
+                    normTest = function() private$.items[["normTest"]],
+                    qqplot = function() private$.items[["qqplot"]],
+                    normPlot = function() private$.items[["normPlot"]],
+                    residPlot = function() private$.items[["residPlot"]],
+                    clusterResPred = function() private$.items[["clusterResPred"]],
+                    clusterBoxplot = function() private$.items[["clusterBoxplot"]],
+                    randHist = function() private$.items[["randHist"]]),
+                private = list(),
+                public=list(
+                    initialize=function(options) {
+                        super$initialize(
+                            options=options,
+                            name="assumptions",
+                            title="Assumption Checks")
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="homoTest",
+                            title="Test for Homogeneity of Residual Variances (Levene's)",
+                            visible="(homoTest)",
+                            rows=1,
+                            columns=list(
+                                list(
+                                    `name`="test", 
+                                    `type`="number", 
+                                    `title`="F"),
+                                list(
+                                    `name`="df1", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="df2", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="normTest",
+                            title="Test for Normality of residuals",
+                            visible="(normTest)",
+                            columns=list(
+                                list(
+                                    `name`="name", 
+                                    `title`="Test", 
+                                    `type`="number"),
+                                list(
+                                    `name`="test", 
+                                    `title`="Statistics", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="qqplot",
+                            title="Q-Q Plot",
+                            visible="(qqplot)",
+                            width=450,
+                            height=400,
+                            renderFun=".qqPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms")))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="normPlot",
+                            title="Residual histogram",
+                            visible="(normPlot)",
+                            width=450,
+                            height=400,
+                            renderFun=".normPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "dep_scale")))
+                        self$add(jmvcore::Image$new(
+                            options=options,
+                            name="residPlot",
+                            title="Residual-Predicted Scatterplot",
+                            visible="(residPlot)",
+                            width=450,
+                            height=400,
+                            renderFun=".residPlot",
+                            requiresData=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms")))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterResPred",
+                            title="Residuals vs Predicted by cluster",
+                            visible="(clusterResPred)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterResPred",
+                                width=450,
+                                height=400)))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterBoxplot",
+                            title="Residuals by cluster boxplot",
+                            visible="(clusterBoxplot)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterBoxplot",
+                                width=450,
+                                height=400)))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="randHist",
+                            title="Random coefficients histogram",
+                            visible="(randHist)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".randHist",
+                                width=450,
+                                height=400)))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",
                 title="Predicted Vales",
-                varTitle="`MzLM_PRED_${ dep }`",
+                varTitle="`Mix_PRED_${ dep }`",
                 varDescription="Predicted values",
                 clearWith=list(
                     "dep",
@@ -1066,7 +1427,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 options=options,
                 name="residuals",
                 title="Residuals Vales",
-                varTitle="`MixzLM_RES_${ dep }`",
+                varTitle="`Mix_RES_${ dep }`",
                 varDescription="Residuals values",
                 clearWith=list(
                     "dep",
@@ -1094,9 +1455,9 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 requiresMissings = FALSE)
         }))
 
-#' Generalized Mixed Models
+#' Generalized Mixed Model
 #'
-#' Generalized Mixed Linear Model
+#' Mixed Linear Model
 #'
 #' @examples
 #' data(subjects_by_stimuli)
@@ -1114,6 +1475,8 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'        randomTerms=list(list(c("cond","subj"))))
 #'
 #' @param data the data as a data frame
+#' @param caller .
+#' @param modelSelection .
 #' @param dep a string naming the dependent variable from \code{data},
 #'   variable must be numeric
 #' @param factors a vector of strings naming the fixed factors from
@@ -1125,8 +1488,6 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   fixed intercept
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
-#' @param showExpbCI \code{TRUE} (default) or \code{FALSE} , exp(B) CI in
-#'   table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
 #' @param contrasts a list of lists specifying the factor and type of contrast
@@ -1139,15 +1500,13 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param plotHAxis a string naming the variable placed on the horizontal axis
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
-#'   lines on the plot
-#' @param plotSepPlots the variable for whose levels multiple plots are
-#'   computed
+#'   lines in the plot
+#' @param plotSepPlots a list of string naming the variables defining the
+#'   levels for multiple plots
 #' @param plotRaw \code{TRUE} or \code{FALSE} (default), provide descriptive
 #'   statistics
 #' @param plotDvScale \code{TRUE} or \code{FALSE} (default), scale the plot
 #'   Y-Axis to the max and the min of the dependent variable observed scores.
-#' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
-#'   original scale for covariates.
 #' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
 #'   linetypes per levels.
 #' @param plotError \code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
@@ -1155,16 +1514,14 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   plots, respectively
 #' @param ciWidth a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width
-#' @param postHoc a list of terms to perform post-hoc tests on
-#' @param eDesc \code{TRUE} or \code{FALSE} (default), provide lsmeans
-#'   statistics
-#' @param eCovs \code{TRUE} or \code{FALSE} (default), provide lsmeans
-#'   statistics
+#' @param posthoc a rhs formula with the terms specifying the table to apply
+#'   the comparisons (of the form \code{'~x+x:z'})
+#' @param emmeans a rhs formula with the terms specifying the marginal means
+#'   to estimate (of the form \code{'~x+x:z'})
 #' @param simpleVariable The variable for which the simple effects (slopes)
 #'   are computed
-#' @param simpleModerator the variable that provides the levels at which the
+#' @param simpleModerators the variable that provides the levels at which the
 #'   simple effects computed
-#' @param simple3way a moderator of the two-way interaction which is probed
 #' @param simpleScale \code{'mean_sd'} (default), \code{'custom'} , or
 #'   \code{'custom_percent'}. Use to condition the covariates (if any)
 #' @param cvalue offset value for conditioning
@@ -1173,12 +1530,14 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   and plots.  \code{labels} indicates that only labels are used, such as
 #'   \code{Mean} and  \code{Mean + 1 SD}. \code{values} uses the actual values
 #'   as labels. \code{values_labels} uses both.
+#' @param simpleInteractions should simple Interactions be computed
 #' @param postHocCorr one or more of \code{'none'},  \code{'bonf'}, or
 #'   \code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
 #'   respectively
 #' @param scaling a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
+#' @param dep_scale Re-scale the dependent variable.
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
 #' @param randomTerms a list of lists specifying the models random effects.
@@ -1188,44 +1547,62 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{'randomTerms'} is a list of  lists of length > 1, the option is
 #'   automatially set to \code{'block'}. The option is ignored if the model is
 #'   passed using \code{formula}.
-#' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
-#'   effects predicted values in the plot
-#' @param plotLinearPred \code{TRUE} or \code{FALSE} (default), plot the
-#'   predicted values in the linear predictor scale. If set, \code{plotRaw} and
-#'   \code{plotDvScale} are ignored.
-#' @param nAGQ for the adaptive Gauss-Hermite log-likelihood approximation,
-#'   nAGQ argument controls the number of nodes in the quadrature formula. A
-#'   positive integer
+#' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
+#'   be used rather than ML
 #' @param lrtRandomEffects \code{TRUE} or \code{FALSE} (default), LRT for the
 #'   random effects
 #' @param ciRE \code{TRUE} or \code{FALSE} (default), confidence intervals for
 #'   the random effects
-#' @param effectSize .
-#' @param modelSelection Select the generalized linear model:
-#'   \code{linear},\code{poisson},\code{logistic},\code{nb}, the latest being
-#'   Negative Binomial
-#' @param custom_family Distribution family for the custom model, accepts
-#'   gaussian, binomial, gamma and inverse_gaussian .
-#' @param custom_link Distribution family for the custom model, accepts
-#'   identity, log and inverse, onemu2 (for 1/mu^2).
+#' @param plotRandomEffects \code{TRUE} or \code{FALSE} (default), add random
+#'   effects predicted values in the plot
+#' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
+#'   original scale for covariates.
 #' @param cimethod .
+#' @param dfmethod .
+#' @param qqplot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+#'   residuals
+#' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#'   tests
+#' @param normTest \code{TRUE} or \code{FALSE} (default), provide a test for
+#'   normality of residuals
+#' @param normPlot \code{TRUE} or \code{FALSE} (default), provide a histogram
+#'   of residuals superimposed by a normal distribution
+#' @param residPlot \code{TRUE} or \code{FALSE} (default), provide a
+#'   scatterplot of the residuals against predicted
+#' @param clusterBoxplot \code{TRUE} or \code{FALSE} (default), provide a
+#'   boxplot of random effects by the first defined clustering variable
+#' @param clusterResPred \code{TRUE} or \code{FALSE} (default), residuals vs
+#'   predicted by the first defined clustering variable
+#' @param randHist \code{TRUE} or \code{FALSE} (default), provide histogram of
+#'   random Coefficients
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
-#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{glmer} object \cr
+#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
+#'   \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
-#'   \code{results$main$fixed} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$randomTests} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
-#'   \code{results$postHocs} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-#'   \code{results$simpleEffects$Anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
-#'   \code{results$simpleEffects$Params} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$emeansTables} \tab \tab \tab \tab \tab an array of predicted means tables \cr
-#'   \code{results$descPlot} \tab \tab \tab \tab \tab a descriptives plot \cr
-#'   \code{results$descPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+#'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+#'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
+#'   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$simpleInteractions} \tab \tab \tab \tab \tab an array of simple interactions tables \cr
+#'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
+#'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
+#'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
+#'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+#'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
+#'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
+#'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
+#'   \code{results$assumptions$clusterResPred} \tab \tab \tab \tab \tab Residuals vs Predicted by cluster \cr
+#'   \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
+#'   \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
 #'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
 #'   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
 #' }
@@ -1239,13 +1616,14 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @export
 gamljGlmMixed <- function(
     data,
+    caller = "lmer",
+    modelSelection = "lmer",
     dep = NULL,
     factors = NULL,
     covs = NULL,
     modelTerms = NULL,
     fixedIntercept = TRUE,
-    showParamsCI = FALSE,
-    showExpbCI = TRUE,
+    showParamsCI = TRUE,
     paramCIWidth = 95,
     contrasts = NULL,
     showRealNames = TRUE,
@@ -1255,38 +1633,41 @@ gamljGlmMixed <- function(
     plotSepPlots = NULL,
     plotRaw = FALSE,
     plotDvScale = FALSE,
-    plotOriginalScale = FALSE,
     plotLinesTypes = FALSE,
     plotError = "none",
     ciWidth = 95,
-    postHoc = NULL,
-    eDesc = FALSE,
-    eCovs = FALSE,
+    posthoc = NULL,
+    emmeans = NULL,
     simpleVariable = NULL,
-    simpleModerator = NULL,
-    simple3way = NULL,
+    simpleModerators = NULL,
     simpleScale = "mean_sd",
     cvalue = 1,
     percvalue = 25,
     simpleScaleLabels = "labels",
+    simpleInteractions = FALSE,
     postHocCorr = list(
                 "bonf"),
     scaling = NULL,
+    dep_scale = "none",
     cluster = NULL,
     randomTerms = list(
                 list()),
     correlatedEffects = "corr",
-    plotRandomEffects = FALSE,
-    plotLinearPred = FALSE,
-    nAGQ = 1,
+    reml = TRUE,
     lrtRandomEffects = FALSE,
     ciRE = FALSE,
-    effectSize = list(
-                "expb"),
-    modelSelection = "logistic",
-    custom_family = "gaussian",
-    custom_link = "identity",
+    plotRandomEffects = FALSE,
+    plotOriginalScale = FALSE,
     cimethod = "wald",
+    dfmethod = "Satterthwaite",
+    qqplot = FALSE,
+    homoTest = FALSE,
+    normTest = FALSE,
+    normPlot = FALSE,
+    residPlot = FALSE,
+    clusterBoxplot = FALSE,
+    clusterResPred = FALSE,
+    randHist = FALSE,
     formula) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
@@ -1332,8 +1713,7 @@ gamljGlmMixed <- function(
     if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
     if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
     if ( ! missing(simpleVariable)) simpleVariable <- jmvcore::resolveQuo(jmvcore::enquo(simpleVariable))
-    if ( ! missing(simpleModerator)) simpleModerator <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerator))
-    if ( ! missing(simple3way)) simple3way <- jmvcore::resolveQuo(jmvcore::enquo(simple3way))
+    if ( ! missing(simpleModerators)) simpleModerators <- jmvcore::resolveQuo(jmvcore::enquo(simpleModerators))
     if ( ! missing(cluster)) cluster <- jmvcore::resolveQuo(jmvcore::enquo(cluster))
     if (missing(data))
         data <- jmvcore::marshalData(
@@ -1345,22 +1725,23 @@ gamljGlmMixed <- function(
             `if`( ! missing(plotSepLines), plotSepLines, NULL),
             `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
             `if`( ! missing(simpleVariable), simpleVariable, NULL),
-            `if`( ! missing(simpleModerator), simpleModerator, NULL),
-            `if`( ! missing(simple3way), simple3way, NULL),
+            `if`( ! missing(simpleModerators), simpleModerators, NULL),
             `if`( ! missing(cluster), cluster, NULL))
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
     if (inherits(modelTerms, "formula")) modelTerms <- jmvcore::decomposeFormula(modelTerms)
-    if (inherits(postHoc, "formula")) postHoc <- jmvcore::decomposeFormula(postHoc)
+    if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
+    if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
 
     options <- gamljGlmMixedOptions$new(
+        caller = caller,
+        modelSelection = modelSelection,
         dep = dep,
         factors = factors,
         covs = covs,
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
-        showExpbCI = showExpbCI,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showRealNames = showRealNames,
@@ -1370,35 +1751,39 @@ gamljGlmMixed <- function(
         plotSepPlots = plotSepPlots,
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
-        plotOriginalScale = plotOriginalScale,
         plotLinesTypes = plotLinesTypes,
         plotError = plotError,
         ciWidth = ciWidth,
-        postHoc = postHoc,
-        eDesc = eDesc,
-        eCovs = eCovs,
+        posthoc = posthoc,
+        emmeans = emmeans,
         simpleVariable = simpleVariable,
-        simpleModerator = simpleModerator,
-        simple3way = simple3way,
+        simpleModerators = simpleModerators,
         simpleScale = simpleScale,
         cvalue = cvalue,
         percvalue = percvalue,
         simpleScaleLabels = simpleScaleLabels,
+        simpleInteractions = simpleInteractions,
         postHocCorr = postHocCorr,
         scaling = scaling,
+        dep_scale = dep_scale,
         cluster = cluster,
         randomTerms = randomTerms,
         correlatedEffects = correlatedEffects,
-        plotRandomEffects = plotRandomEffects,
-        plotLinearPred = plotLinearPred,
-        nAGQ = nAGQ,
+        reml = reml,
         lrtRandomEffects = lrtRandomEffects,
         ciRE = ciRE,
-        effectSize = effectSize,
-        modelSelection = modelSelection,
-        custom_family = custom_family,
-        custom_link = custom_link,
-        cimethod = cimethod)
+        plotRandomEffects = plotRandomEffects,
+        plotOriginalScale = plotOriginalScale,
+        cimethod = cimethod,
+        dfmethod = dfmethod,
+        qqplot = qqplot,
+        homoTest = homoTest,
+        normTest = normTest,
+        normPlot = normPlot,
+        residPlot = residPlot,
+        clusterBoxplot = clusterBoxplot,
+        clusterResPred = clusterResPred,
+        randHist = randHist)
 
     analysis <- gamljGlmMixedClass$new(
         options = options,

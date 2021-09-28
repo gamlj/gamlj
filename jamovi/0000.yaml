@@ -42,13 +42,13 @@ analyses:
     menuSubgroup: GAMLj
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
-  - title: Generalized Mixed Models
+  - title: Generalized Mixed Model
     name: gamljGlmMixed
     ns: gamlj
     menuGroup: Linear Models
     menuSubgroup: GAMLj
-    menuTitle: Generalized Mixed Models
-    description: Generalized Mixed Linear Model
+    menuTitle: Generalized Mixed Model
+    description: Mixed Linear Model
 datasets:
   - name: qsport
     path: qsport.csv

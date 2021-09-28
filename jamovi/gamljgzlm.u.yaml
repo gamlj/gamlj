@@ -386,19 +386,31 @@ children:
                 optionName: plotError
                 optionPart: se
           - type: Label
-            label: Plot
+            label: Plot type
+            children:
+              - type: RadioButton
+                name: plotScale_response
+                optionName: plotScale
+                optionPart: response
+              - type: RadioButton
+                name: plotScale_lp
+                optionName: plotScale
+                optionPart: link
+                enable: (!modelSelection_multinomial && !modelSelection_ordinal)
+              - type: RadioButton
+                name: plotScale_mean.class
+                optionName: plotScale
+                optionPart: mean.class
+                enable: (modelSelection_ordinal)
+          - type: Label
+            label: Plot options
             children:
               - type: CheckBox
                 name: plotRaw
-                enable: (!modelSelection_multinomial && !plotLp)
+                enable: (!modelSelection_multinomial && !plotScale_link)
               - type: CheckBox
                 name: plotDvScale
-                enable: (!modelSelection_multinomial && !plotLp)
-              - type: CheckBox
-                name: plotLp
-          - type: Label
-            label: Use
-            children:
+                enable: (plotScale_response)
               - type: CheckBox
                 name: plotOriginalScale
               - type: CheckBox

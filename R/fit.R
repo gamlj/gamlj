@@ -3,7 +3,7 @@
 fit.R2<- function(model,...) UseMethod(".R2") 
 
 .R2.default<-function(model,obj) {
-    results<-try_hard(performance::r2(model,tolerance =1e-09))
+    results<-try_hard(performance::r2(model,tolerance =0))
     
   if (!isFALSE(results$error))
         obj$errors<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
@@ -36,7 +36,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   return(list(alist))
 }
 
-.R2.clm<-function(model,obj) {
+.R2.polr<-function(model,obj) {
   
   alist       <-  list()
   results     <-  fit.compare_null_model(model)
@@ -48,10 +48,9 @@ fit.R2<- function(model,...) UseMethod(".R2")
   if (is.null(alist$r2))
     obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
   
-  results     <-  fit.compare_null_model(model)
   alist$test  <-  results$test
   alist$df    <-  results$df
-  alist$p     <-  results$`Pr(>Chisq)`
+  alist$p     <-  results$p
   return(list(alist))
   
 }
@@ -144,16 +143,15 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 }
 
 
-.compare_null_model.clm<-function(model) {
-  
+.compare_null_model.polr<-function(model) {
   form<- as.formula("~1")
   model0  <-  stats::update(model,form ,evaluate=T)
   .results <-  stats::anova(model0,model)
   results<-.results[2,]
-  results$deviance<--2*.results$logLik[2]
-  results$null.deviance<--2*.results$logLik[1]
-  results$test  <-  results$LR.stat
-  results$df    <-  results$df
+  results$deviance<--2*as.numeric(stats::logLik(model))
+  results$null.deviance<--2*as.numeric(stats::logLik(model0))
+  results$test  <-  results$`LR stat.`
+  results$df    <-  results$`   Df`
   results$p     <-  results$`Pr(Chi)`
   results
 }

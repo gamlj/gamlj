@@ -22,9 +22,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotSepPlots = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
-            plotLp = FALSE,
             plotOriginalScale = FALSE,
             plotLinesTypes = FALSE,
+            plotScale = "response",
             plotError = "none",
             ciWidth = 95,
             cimethod = "wald",
@@ -150,10 +150,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plotDvScale",
                 plotDvScale,
                 default=FALSE)
-            private$..plotLp <- jmvcore::OptionBool$new(
-                "plotLp",
-                plotLp,
-                default=FALSE)
             private$..plotOriginalScale <- jmvcore::OptionBool$new(
                 "plotOriginalScale",
                 plotOriginalScale,
@@ -162,6 +158,14 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plotLinesTypes",
                 plotLinesTypes,
                 default=FALSE)
+            private$..plotScale <- jmvcore::OptionList$new(
+                "plotScale",
+                plotScale,
+                options=list(
+                    "response",
+                    "link",
+                    "mean.class"),
+                default="response")
             private$..plotError <- jmvcore::OptionList$new(
                 "plotError",
                 plotError,
@@ -331,9 +335,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotSepPlots)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
-            self$.addOption(private$..plotLp)
             self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..plotLinesTypes)
+            self$.addOption(private$..plotScale)
             self$.addOption(private$..plotError)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..cimethod)
@@ -373,9 +377,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotSepPlots = function() private$..plotSepPlots$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
-        plotLp = function() private$..plotLp$value,
         plotOriginalScale = function() private$..plotOriginalScale$value,
         plotLinesTypes = function() private$..plotLinesTypes$value,
+        plotScale = function() private$..plotScale$value,
         plotError = function() private$..plotError$value,
         ciWidth = function() private$..ciWidth$value,
         cimethod = function() private$..cimethod$value,
@@ -414,9 +418,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotSepPlots = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
-        ..plotLp = NA,
         ..plotOriginalScale = NA,
         ..plotLinesTypes = NA,
+        ..plotScale = NA,
         ..plotError = NA,
         ..ciWidth = NA,
         ..cimethod = NA,
@@ -1069,8 +1073,9 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "plotRaw",
                         "percvalue",
                         "cvalue",
-                        "plotLp",
-                        "plotOriginalScale"))))
+                        "plotScale",
+                        "plotOriginalScale",
+                        "plotLinesTypes"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1164,12 +1169,13 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   the predicted values
 #' @param plotDvScale \code{TRUE} or \code{FALSE} (default), set the Y-axis
 #'   range equal to the range of the observed values.
-#' @param plotLp \code{TRUE} or \code{FALSE} (default), use linear predictor
-#'   rather than response scale.
 #' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
 #'   original scale for covariates.
 #' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
 #'   linetypes per levels.
+#' @param plotScale Scale the plot Y-axis:  \code{response} (default),
+#'   \code{lp} for linear predictor, or \code{mean.class} for expected class
+#'   (only for ordinal regression).
 #' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
@@ -1259,9 +1265,9 @@ gamljGzlm <- function(
     plotSepPlots = NULL,
     plotRaw = FALSE,
     plotDvScale = FALSE,
-    plotLp = FALSE,
     plotOriginalScale = FALSE,
     plotLinesTypes = FALSE,
+    plotScale = "response",
     plotError = "none",
     ciWidth = 95,
     cimethod = "wald",
@@ -1360,9 +1366,9 @@ gamljGzlm <- function(
         plotSepPlots = plotSepPlots,
         plotRaw = plotRaw,
         plotDvScale = plotDvScale,
-        plotLp = plotLp,
         plotOriginalScale = plotOriginalScale,
         plotLinesTypes = plotLinesTypes,
+        plotScale = plotScale,
         plotError = plotError,
         ciWidth = ciWidth,
         cimethod = cimethod,

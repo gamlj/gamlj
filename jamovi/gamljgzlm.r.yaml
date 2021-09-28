@@ -536,8 +536,9 @@ items:
            - plotRaw
            - percvalue
            - cvalue
-           - plotLp
+           - plotScale
            - plotOriginalScale
+           - plotLinesTypes
 
 
   - name: plotnotes

@@ -38,8 +38,7 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (self$options$predicted && results$predicted$isNotFilled()) {
                                 ginfo("Saving predicted")
-                                if ("multinom" %in% class(self$model))  type="probs" else type="response"
-                                p<-stats::predict(self$model,type=type)
+                                p<-stats::predict(self$model,type=self$infomatic$predict)
                               # we need the rownames in case there are missing in the datasheet
                                 pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(self$model)))
                                 results$predicted$setValues(p)
@@ -170,7 +169,7 @@ Estimate <- R6::R6Class("Estimate",
 
                                 ### other table ###
                                 
-                                 self$tab_anova<-mf.anova(self$model,self)
+                                self$tab_anova<-mf.anova(self$model,self)
                                 
                                 if (!self$isProper) 
                                   self$warnings<-list(topic="tab_anova",message=WARNS["glm.zeromodel"])
@@ -215,11 +214,10 @@ Estimate <- R6::R6Class("Estimate",
                                   names(params)<-c("groups","name","nothing","var","std")
                                   params$groups <- fromb64(params$groups,self$vars)
                                   params$name <- fromb64(params$name,self$vars)
-                                  params$icc<-params$var/(params$var+params$var[length(params$var)])
-                                  params$icc[length(params$icc)]<-NA
-                                  mark("icc")
-                                  mark(params$icc)
-                                  mark(performance::icc(self$model,))
+                                  params$icc<-NA
+                                  int<-which("(Intercept)" %in% params$name)
+                                  for (i in int)
+                                        params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
                                   ### confidence intervals
                                   ci_covariances<-NULL
                                   if (self$option("ciRE")) {
@@ -261,7 +259,7 @@ Estimate <- R6::R6Class("Estimate",
 
                                 #### LRT for random effects ####
                                 if (self$option("lrtRandomEffects")) {
-                                  ## this is required bu lmerTest::ranova() wich looks in the parent for data
+                                  ## this is required by lmerTest::ranova() which looks in the parent for "data"
                                   data<-self$model@frame
                                   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
                                   self$warnings<-list(topic="tab_randomTests",message=results$warning)

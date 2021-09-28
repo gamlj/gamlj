@@ -199,7 +199,7 @@ options:
             a list of string naming the variables defining the levels for multiple plots
 
     - name: plotRaw
-      title: Observed scores
+      title: Y observed scores
       type: Bool
       default: false
       description:
@@ -207,23 +207,15 @@ options:
             `TRUE` or `FALSE` (default), plot raw data along the predicted values
 
     - name: plotDvScale
-      title: Y-axis observed range 
+      title: Y-axis full range 
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
-    - name: plotLp
-      title: Linear predictor 
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), use linear predictor rather than response scale.
-
     - name: plotOriginalScale
-      title: Original scale 
+      title: X original scale 
       type: Bool
       default: false
       description:
@@ -237,6 +229,24 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), use different linetypes per levels.
+
+
+    - name: plotScale
+      title: type of plot 
+      type: List
+      options:
+        - name: response
+          title: Response
+        - name: link
+          title: Linear predictor
+        - name: mean.class
+          title: Explected class
+      default: response
+      description:
+          R: >
+            Scale the plot Y-axis:  `response` (default), `lp` for linear predictor, or `mean.class` for expected
+            class (only for ordinal regression).
+
 
     - name: plotError
       title: Error Bar Definition
