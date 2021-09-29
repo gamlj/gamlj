@@ -163,6 +163,7 @@ gamljMixedClass <- R6::R6Class(
       data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType="mixed")
       if (!is.data.frame(data))
         reject(data)
+      
       if (is.something(covs)) {
         names(data)<-jmvcore::fromB64(names(data))
         private$.cov_condition$storeValues(data)
@@ -431,6 +432,11 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       dataRaw <- self$data
+      
+      # we need to sort for cluster-based operations
+      dataRaw<-dataRaw[order(dataRaw[[clusters[1]]]),]
+      
+      
       data <- list()
       for (factor in factors) {
 

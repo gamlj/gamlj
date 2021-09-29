@@ -91,7 +91,6 @@ testthat::test_that("plot is there",{
 })
 
 
-
 mod<-gamlj::gamljGlmMixed(
   formula = pass ~ 1 +( 1 | school ),
   data = schoolexam,

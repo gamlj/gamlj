@@ -230,17 +230,12 @@ data("wicksell")
 data<-wicksell
 data$group<-factor(data$group)
 data$time<-factor(data$time)
+
 testthat::expect_warning(
   gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
-  contrasts = list(
-    list(
-      var="group",
-      type="simple"),
-    list(
-      var="time",
-      type="polynomial")),
+  contrasts = c("group"="simple","time"="polynomial"),
   simpleVariable = "time",
   simpleModerator = "group")
 )
