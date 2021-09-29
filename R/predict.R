@@ -119,10 +119,11 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
 }
 
 .simpleEstimates.default <- function(model, variable, moderator, threeway = NULL, cov_conditioning = conditioning$new(), interval = 95) {
-
+     
     ginfo(paste("simple effects estimation for generic model on", paste(class(model), collapse = " ")))
     data <- mf.getModelData(model)
     preds <- unlist(c(moderator, threeway))
+    
     lnames <- c("moderator", "threeway")[1:length(preds)]
 
     if (is.factor(data[[variable]])) {

@@ -345,7 +345,6 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
          jmvcore::reject(data)
   
      if (is.something(cluster)) {
-         data<-data[order(data[[jmvcore::toB64(cluster)]]),] 
          clusterdata<-data[[jmvcore::toB64(cluster)]]
      }
      

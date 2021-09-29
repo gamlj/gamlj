@@ -432,6 +432,11 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       dataRaw <- self$data
+      
+      # we need to sort for cluster-based operations
+      dataRaw<-dataRaw[order(dataRaw[[clusters[1]]]),]
+      
+      
       data <- list()
       for (factor in factors) {
 
