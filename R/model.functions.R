@@ -340,10 +340,15 @@ mf.give_family<-function(modelSelection,custom_family=NULL,custom_link=NULL) {
 }
 
 mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
-     
+
      if (!is.data.frame(data))
          jmvcore::reject(data)
   
+     if (is.something(cluster)) {
+         data<-data[order(data[[jmvcore::toB64(cluster)]]),] 
+         clusterdata<-data[[jmvcore::toB64(cluster)]]
+     }
+     
      dep=jmvcore::toB64(options$dep)
      ########## check the dependent variable ##########
      if (modelType %in% c("linear","mixed")) {
@@ -360,17 +365,14 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
                
      if  (modelType=="poisson" || modelType=="nb" || modelType=="poiover") {
          ### here I need the dv to be really numeric
-       data[[dep]] <- as.numeric(as.character(data[[dep]]))
-       if (any(data[[dep]]<0))
-             return("Poisson-like models require all positive numbers in the dependent variable")
+          data[[dep]] <- as.numeric(as.character(data[[dep]]))
+          if (any(data[[dep]]<0))
+               return("Poisson-like models require all positive numbers in the dependent variable")
      }
      ####### check the covariates usability and center them##########
      covs=options$covs
      scaling=options$scaling
      scalingVars<-sapply(scaling,function(a) a$var)
-     clusterdata<-NULL
-     if (is.something(cluster))
-           clusterdata<-factor(paste0("a",as.character(data[[jmvcore::toB64(cluster)]])))
      
      for (cov in covs) {
        cov64<-jmvcore::toB64(cov) 
