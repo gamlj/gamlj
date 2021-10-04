@@ -54,9 +54,10 @@ gamljGlmMixedClass <- R6::R6Class(
       
       if (getout) 
         return(FALSE)
-      data<-private$.cleandata()
-      data<-mf.checkData(self$options,data,modelType=modelType)
+      clusters<-self$options$cluster
       
+      data<-private$.cleandata()
+      data<-mf.checkData(self$options,data,cluster=clusters[[1]],modelType=modelType)
       if (!is.data.frame(data))
         jmvcore::reject(data)
       
