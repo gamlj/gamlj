@@ -1,5 +1,5 @@
 context("mixed")
-
+tol<-0.001
 data("subjects_by_stimuli")
 
 subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
@@ -143,9 +143,12 @@ model<-gamlj::gamljMixed(
   data = adddata, 
   scaling = c("x"="clusterbasedstandardized")
 )
-
-testthat::test_that("standardizing with more clusters",
+model
+testthat::test_that("standardizing with more clusters",{
                     testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
+                    testthat::expect_equal(model$main$fixed$asDF$estimate[1],19.60,tolerance = tol)
+}
+                    
 )
 
 
@@ -181,7 +184,7 @@ model<-gamlj::gamljMixed(
     type="clusterbasedstandardized")))
 
 testthat::test_that("cluster-based-standardizing", {
-  testthat::expect_equal(model$main$fixed$asDF[2,2],.6111,tolerance = .002)
+  testthat::expect_equal(model$main$fixed$asDF[2,2],.6111,tolerance = tol)
 })
 
 model<-gamlj::gamljMixed(

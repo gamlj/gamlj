@@ -52,6 +52,32 @@ testthat::test_that("vars table is fine",{
 
 })
 
+mod<-gamlj::gamljGlmMixed(
+  formula = pass ~ 1 + math*activity+( 1 | school ),
+  data = schoolexam,
+  plotHAxis = math,
+  correlatedEffects = "nocorr",
+  cimethod = "wald",
+  scaling=c(math="clusterbasedcentered")
+  )
+mod
+
+
+val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)
+val2<-round(as.numeric(as.character(mod$info$asDF$value[9])),digits = 3)
+val3<-as.numeric(as.character(mod$info$asDF$value[7]))
+val4<-as.numeric(as.character(mod$info$asDF$value[14]))
+
+testthat::test_that("info table is fine",{
+  testthat::expect_equal(val1,-2785.625)
+  testthat::expect_equal(val2, 0.039)
+  testthat::expect_equal(val3, 5571.25,tolerance = .001)
+  testthat::expect_equal(val4, 0.9564,tolerance = .001)
+  
+})
+
+
+
 testthat::expect_warning(
 mod<-gamlj::gamljGlmMixed(
   formula = pass ~ 1 + math+I(math^2)+( 1 | school ),
