@@ -136,9 +136,9 @@ mod2<-gamlj::gamljGlm(
 )
 
 se.params2<-mod2$simpleEffects$Params$asDF
-test_that("glm weird names", {
-  expect_equal(as.character(se.params2[2,1]),"female")
-  expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
+testthat::test_that("glm weird names", {
+  testthat::expect_equal(as.character(se.params2[2,1]),"female")
+  testthat::expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
 })
 
 mod3<-gamlj::gamljGlm(
@@ -157,7 +157,7 @@ testthat::test_that("glm order does not count", {
 })
 
 
-expect_warning(
+testthat::expect_warning(
   mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
@@ -167,16 +167,16 @@ expect_warning(
 )
 )
 res<-mod$emeansTables[[1]]$asDF
-test_that("glm EMM", {
-  expect_equal(round(res[1,2],2),52.07)
+testthat::test_that("glm EMM", {
+  testthat::expect_equal(round(res[1,2],2),52.07)
 })
 
 res1<-mod$assumptions$homoTest$asDF
 res2<-mod$assumptions$normTest$asDF
 
-test_that("glm assumptions", {
-  expect_equal(round(res1[1,4],2),0.13)
-  expect_equal(round(res2[1,3],2),0.86)
+testthat::test_that("glm assumptions", {
+  testthat::expect_equal(round(res1[1,4],2),0.13)
+  testthat::expect_equal(round(res2[1,3],2),0.86)
 })
 
 mod<-gamlj::gamljGlm(
@@ -188,7 +188,7 @@ mod<-gamlj::gamljGlm(
   qq=T
 )
 res<-mod$main$fixed$asDF
-
+res
 testthat::test_that("glm contrasts", {
   testthat::expect_equal(round(res[3,3],2),-0.11)
   testthat::expect_equal(round(res[1,3],2),51.96)
@@ -238,5 +238,6 @@ test_that("glm zero-intercept model", {
 })
 
 
-
-
+data<-data.frame(a=1,b=2)
+data<-data[0,]
+data$a<-factor(data$a)

@@ -52,6 +52,7 @@ testthat::test_that("vars table is fine",{
 
 })
 
+
 mod<-gamlj::gamljGlmMixed(
   formula = pass ~ 1 + math*activity+( 1 | school ),
   data = schoolexam,
@@ -76,6 +77,21 @@ testthat::test_that("info table is fine",{
   
 })
 
+schoolexam$school<-factor(schoolexam$school)
+mod0<-gamlj::gamljGlmMixed(
+  formula = pass ~ 1 + math*activity+( 1 | school ),
+  data = schoolexam,
+  plotHAxis = math,
+  correlatedEffects = "nocorr",
+  cimethod = "wald",
+  scaling=c(math="clusterbasedcentered")
+)
+
+testthat::test_that("info factoring clustes is equivalent",{
+  testthat::expect_equal(mod$main$fixed$asDF[3,3],mod0$main$fixed$asDF[3,3])
+  testthat::expect_equal(mod$main$fixed$asDF[4,2],mod0$main$fixed$asDF[4,2])
+  testthat::expect_equal(mod$main$anova$asDF[2,2],mod0$main$anova$asDF[2,2])
+})
 
 
 testthat::expect_warning(
