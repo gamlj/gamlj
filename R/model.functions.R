@@ -344,6 +344,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
      if (!is.data.frame(data))
          jmvcore::reject(data)
   
+     clusterdata<-NULL
      if (is.something(cluster)) {
          clusterdata<-data[[jmvcore::toB64(cluster)]]
      }
@@ -380,7 +381,8 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
           return(paste("Covariate",cov, "cannot be converted to a numeric variable"))
        w<-which(scalingVars==cov)
        type<-ifelse(is.something(w),scaling[[w]][['type']],"centered")
-       data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=clusterdata)  
+       if (length(data[[cov64]])>0)
+            data[[cov64]]<-lf.scaleContinuous(data[[cov64]],type,by=clusterdata)  
 
      }
      # check factors
@@ -394,6 +396,11 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        else if (length(lvls) == 0)
          return(paste("Factor ",jmvcore::fromB64(factorName),"contains no data"))
      }
+     ### this is a check for the clusterbase bug
+#     if (length(cluster)>0 & length(covs)> 0) {
+#         check<-round(tapply(data[[jmvcore::toB64(covs[[1]])]], data[[jmvcore::toB64(cluster)]], mean),digits=5)
+#         mark(check)
+#     }
      
      data
 }

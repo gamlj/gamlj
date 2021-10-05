@@ -432,12 +432,20 @@ gamljMixedClass <- R6::R6Class(
       covs <- self$options$covs
       clusters<-self$options$cluster
       dataRaw <- self$data
+      data <- list()
       
       # we need to sort for cluster-based operations
+      for (cluster in clusters) {
+        dataRaw[[cluster]] <- as.factor(dataRaw[[cluster]])
+      }
       dataRaw<-dataRaw[order(dataRaw[[clusters[1]]]),]
       
+      for (cluster in clusters) {
+        data[[jmvcore::toB64(cluster)]] <- dataRaw[[cluster]]
+        n64$addVar(cluster)
+      }
       
-      data <- list()
+      
       for (factor in factors) {
 
         ### we need this for Rinterface ####
