@@ -396,6 +396,8 @@ options:
                       name: standardized
                     - title: Centered clusterwise
                       name:  clusterbasedcentered
+                    - title: Clusters means
+                      name:  clustermeans
                     - title: z-scores clusterwise
                       name:  clusterbasedstandardized
                     - title: Log
@@ -495,7 +497,6 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), confidence intervals for the random effects
-
 
     - name: plotRandomEffects
       title: Random effects  

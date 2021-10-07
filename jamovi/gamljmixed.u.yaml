@@ -216,7 +216,7 @@ children:
           - name: var
             label: null
             selectable: false
-            stretchFactor: 1
+            stretchFactor: .5
             maxWidth: 300
             template:
               type: VariableLabel

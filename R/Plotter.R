@@ -25,7 +25,10 @@ Plotter <- R6::R6Class(
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
             self$scatterRaw<-self$options$plotRaw
-            self$scatterType<-self$options$plotScale
+            if ("plotScale" %in% names(self$options))
+                    self$scatterType<-self$options$plotScale
+            else 
+                    self$scatterType<-"response"
             
       },
 

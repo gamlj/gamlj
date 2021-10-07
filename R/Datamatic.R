@@ -103,6 +103,7 @@ Variable <- R6::R6Class(
         self$paramsnames64<-tob64(var)
         self$nlevels=3
       }
+      ### end covs ####
       
       if (self$option("cluster")) {
         if (self$name %in% self$options$cluster) {
@@ -111,7 +112,7 @@ Variable <- R6::R6Class(
             self$levels_labels<-levels(vardata)
             self$nlevels<-length(self$levels)
         } else {
-           self$hasCluster<-self$options$cluster[1]
+           self$hasCluster<-self$options$cluster
            self$nClusters<-length(self$options$cluster)
         }
       }
@@ -136,7 +137,6 @@ Variable <- R6::R6Class(
        
        
        if (self$type=="factor") {
-         
           if (!is.factor(vardata)) {
               self$errors<-list(topic="data",message=paste("Variable",self$name,"is not a factor"))
               return()
@@ -158,6 +158,8 @@ Variable <- R6::R6Class(
           if (!all(c(test1,test2)))
                self$isBetween<-TRUE
         }
+         
+         
         contrasts(vardata)<-self$contrast_values
         ### fix levels ####
         levels(vardata)<-paste0(LEVEL_SYMBOL,levels(vardata))
@@ -410,36 +412,67 @@ Variable <- R6::R6Class(
       if (is.factor(vardata)) 
            vardata<-jmvcore::toNumeric(vardata)
            
-      
+      ## we first update levels to same the old levels
       private$.update_levels(vardata)
       
       
       method<-self$scaling
       
     
-      if (is.something(self$hasCluster))
-            by<-factor(paste("a",as.character(data[[tob64(self$hasCluster)]])))
 
       if (method=="centered") 
         vardata<-scale(vardata,scale = F)  
-      if (method=="clusterbasedcentered") {    
-        vardata<-unlist(tapply(vardata,by,scale,scale=F))
-        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster))
-      }
+
       if (method=="standardized") 
         vardata<-scale(vardata,scale = T)  
-      if (method=="clusterbasedstandardized") {    
-        vardata<-unlist(tapply(vardata,by,scale,scale=T))
-        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster))
-        
-      }
-      
+
       if (method=="log") {
         vardata<-log(vardata)  
         if (any(is.nan(vardata)))
           self$errors<-list(topic="info",message=paste("Negative values found in variable",self$name,". Log transform not applicable."))
       }
-            
+      
+      
+      if (method=="clusterbasedcentered") {    
+        cluster64<-tob64(self$hasCluster[1])
+        sdata<-data[,c(cluster64,self$name64)]
+        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
+        names(mdata)<-c(cluster64,"mean")
+        sdata<-merge(sdata,mdata,by=cluster64)
+        sdata[[self$name64]]<-sdata[[self$name64]]-mdata[["mean"]]
+        vardata<-sdata[[self$name64]]
+        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
+      }
+      if (method=="clusterbasedstandardized") {    
+        cluster64<-tob64(self$hasCluster[1])
+        sdata<-data[,c(cluster64,self$name64)]
+        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
+        names(mdata)<-c(cluster64,"mean")
+        sdata<-merge(sdata,mdata,by=cluster64)
+        ddata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),sd)
+        names(ddata)<-c(cluster64,"sd")
+        if (any(ddata[["sd"]]<.0000001))
+            stop("Variable ",self$name," has zero variance in at least one cluster defined by",self$hasCluster[1])
+          
+        sdata<-merge(sdata,ddata,by=cluster64)
+        sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
+        vardata<-sdata[[self$name64]]
+        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
+        
+      }
+
+      if (method=="clustermeans") {    
+        cluster64<-tob64(self$hasCluster[1])
+        sdata<-data[,c(cluster64,self$name64)]
+        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
+        names(mdata)<-c(cluster64,"mean")
+        sdata<-merge(sdata,mdata,by=cluster64)
+        vardata<-sdata[["mean"]]
+        self$warnings<-list(topic="data",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
+        
+      }
+      
+      ## we then update levels to same the new levels (mean, sd etc)
       private$.update_levels(vardata)
       
       as.numeric(vardata)
@@ -543,6 +576,7 @@ Datamatic <- R6::R6Class(
       for (var in self$variables) {
                       data64[[var$name64]]   <-  var$get_values(data64)
       }
+        
       
       attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       data64 <- jmvcore::naOmit(data64)
@@ -598,9 +632,6 @@ Datamatic <- R6::R6Class(
        self$data_structure64<-self$cleandata(data)
        self$dep<-self$variables[[tob64(self$options$dep)]]
        }
-
-
-     
      
    ) #end of private
 )
