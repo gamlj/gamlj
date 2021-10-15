@@ -52,8 +52,10 @@ Plotter <- R6::R6Class(
       scatterPlot=function(image) {
         
         ## debug: return this to see what error is in the plotter code ### 
-#        pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
-#        return(pp)
+        if (!is.something(self$plotData)) {
+           pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
+           return(pp)
+        }
         
         ## collect the data 
         
@@ -651,6 +653,7 @@ Plotter <- R6::R6Class(
                                          at=conditions,
                                          type=self$scatterType,
                                          mode=mode,
+                                         lmer.df=ifelse(self$option("dfmethod"),self$options$dfmethod,NULL),
                                          nesting = NULL,
                                          options  = list(level = private$.operator$ciwidth)))
 

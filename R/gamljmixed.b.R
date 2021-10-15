@@ -19,6 +19,8 @@ gamljMixedClass <- R6::R6Class(
           self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
         return()
       }
+      ### enlarge the limit of emmeans 
+      emmeans::emm_options(lmerTest.limit = 25000)  
       
       ### set up the R6 workhorse class
       

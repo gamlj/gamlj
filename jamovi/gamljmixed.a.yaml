@@ -508,7 +508,7 @@ options:
             plot
             
     - name: plotOriginalScale
-      title: Covariate scale 
+      title: Original scales
       type: Bool
       default: false
       description:
