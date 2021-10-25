@@ -204,12 +204,12 @@ mf.anova<- function(x,...) UseMethod(".anova")
                etaSq=modeta[[1]],etaSqP=modeta[[1]],
                omegaSq=modomega[[1]],
                epsilonSq=modepsilon[[1]])
-    
-        etap<-effectsize::eta_squared(model,partial = T,verbose = F)
-        eta<-effectsize::eta_squared(model,partial = F,verbose = F)
-        eps<-effectsize::epsilon_squared(model,partial = T,verbose = F)
-        omega<-effectsize::omega_squared(model,partial = T,verbose = F)
-        epsilon<-effectsize::epsilon_squared(model,partial = T,verbose = F)
+        .anova<-car::Anova(model,type=3)
+        etap<-effectsize::eta_squared(.anova,partial = T,verbose = F)
+        eta<-effectsize::eta_squared(.anova,partial = F,verbose = F)
+        eps<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
+        omega<-effectsize::omega_squared(.anova,partial = T,verbose = F)
+        epsilon<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
         dss$etaSq<-eta[,2]
         dss$etaSqP<-etap[,2]
         dss$omegaSq<-omega[,2]

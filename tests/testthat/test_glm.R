@@ -16,6 +16,17 @@ test_that("glm estimates are correct", {
   expect_equal(round(as.numeric(as.character(mod$info$asDF[[2]][[3]])),3),0.059)
 })
 
+a<-mod$main$anova$asDF
+resid<-a$ss[a$name=="Residuals"]
+eff<-a$ss[a$name=="supp"]
+peta<-eff/(eff+resid)
+
+test_that("glm p eta2 are correct", {
+  expect_equal(a$etaSqP[a$name=="supp"],peta)
+})
+
+
+
 data("hsbdemo")
 
 mod<-gamlj::gamljGlm(
@@ -41,6 +52,8 @@ r.anova<-mod$main$anova$asDF
 test_that("glm anova is correct", {
   expect_equal(as.character(r.anova[3,1]),"schtyp")
   expect_equal(round(r.anova[4,4],3),0.276)
+  expect_equal(round(r.anova[3,6],5),0.00011)
+  
 })
 
 se.params<-mod$simpleEffects$Params$asDF
@@ -238,6 +251,3 @@ test_that("glm zero-intercept model", {
 })
 
 
-data<-data.frame(a=1,b=2)
-data<-data[0,]
-data$a<-factor(data$a)
