@@ -314,7 +314,7 @@ gamljMixedClass <- R6::R6Class(
   if (!private$.ready$ready) 
        return()
   
-  plot<-private$.plotter_machine$residPlot(ggtheme,theme)
+  plot<-private$.plotter_machine$residPlot(theme,ggtheme)
   
   return(plot)
 },

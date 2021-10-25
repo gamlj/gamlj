@@ -219,7 +219,7 @@ Plotter <- R6::R6Class(
         return(plot)
 
       },
-      residPlot=function(ggtheme,theme)  {
+      residPlot=function(theme,ggtheme)  {
         
         if (!self$option("residPlot"))
           return()
@@ -229,7 +229,6 @@ Plotter <- R6::R6Class(
         
             fill <- theme$fill[2]
             color <- theme$color[1]
-            data <- data.frame()
             data <- as.data.frame(stats::residuals(private$.operator$model))
             names(data) <- "res"
             data$pred <- stats::predict(private$.operator$model)

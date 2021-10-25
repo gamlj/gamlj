@@ -5,16 +5,6 @@ mf.addEffectSize<- function(x,...) UseMethod(".addEffectSize")
   return(atable)
 }
 
-.addEffectSize.summary_emm<-function(atable) {
-  
-  atable$etaSqP<-effectsize::eta_squared(atable)[,1]
-  atable$omegaSq<-effectsize::F_to_omega2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-  atable$epsilonSq<-effectsize::F_to_epsilon2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-  
-  
-  return(atable)
-}
-
 
 .addEffectSize.summary_emm<-function(atable) {
   
@@ -371,7 +361,7 @@ mf.getModelFactors<-function(model) {
 
 
 
-############# produces anova/deviance table in a somehow stadard format ##########
+############# produces anova/deviance table in a somehow standard format ##########
 mf.fixTable<- function(x,...) UseMethod(".fixtable")
 
 .fixtable.default<-function(atable) {
