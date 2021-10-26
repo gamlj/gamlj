@@ -439,7 +439,7 @@ Variable <- R6::R6Class(
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
-        sdata[[self$name64]]<-sdata[[self$name64]]-mdata[["mean"]]
+        sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         vardata<-sdata[[self$name64]]
         self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
       }

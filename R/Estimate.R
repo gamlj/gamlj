@@ -118,7 +118,8 @@ Estimate <- R6::R6Class("Estimate",
                               }
 
                           }
-                            
+                             te<-tapply(data[[tob64("x")]],list(data[[tob64("countryID")]]),mean)
+                             mark(te)
                              ### end of checks ###
                             
                               opts    <-  list(formula=self$formula64,data=data)
