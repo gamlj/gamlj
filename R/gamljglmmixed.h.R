@@ -223,7 +223,9 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 options=list(
                     "labels",
                     "values",
-                    "values_labels"),
+                    "values_labels",
+                    "uvalues",
+                    "uvalues_labels"),
                 default="labels")
             private$..simpleInteractions <- jmvcore::OptionBool$new(
                 "simpleInteractions",

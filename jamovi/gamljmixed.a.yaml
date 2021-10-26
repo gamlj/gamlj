@@ -340,6 +340,11 @@ options:
           title: Values
         - name: values_labels
           title: Values + Labels
+        - name:  uvalues
+          title: Unscaled Values
+        - name: uvalues_labels
+          title: Unscaled Values + Labels
+          
       default: labels
       description:
             R: >

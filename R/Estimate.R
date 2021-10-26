@@ -83,7 +83,6 @@ Estimate <- R6::R6Class("Estimate",
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
-                              
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
                                   stop(unlist(self$datamatic$errors))
