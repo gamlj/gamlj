@@ -164,13 +164,13 @@ Plotter <- R6::R6Class(
         else
           p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, linetype = self$scatterClabel)
         
-        if (self$scatterXscale) {
-             
-          o<-ggplot2::ggplot_build(p)
-          values<-o$layout$panel_params[[1]]$x$breaks
-          newlabs<-private$.rescale(self$scatterX,values)
-          p<-p+ggplot2::scale_x_continuous(labels= newlabs)
-        }
+        # if (self$scatterXscale) {
+        #      
+        #   o<-ggplot2::ggplot_build(p)
+        #   values<-o$layout$panel_params[[1]]$x$breaks
+        #   newlabs<-private$.rescale(self$scatterX,values)
+        #   p<-p+ggplot2::scale_x_continuous(labels= newlabs)
+        # }
            
         
         return(p)        
@@ -463,6 +463,17 @@ Plotter <- R6::R6Class(
                     self$scatterRange<-c(1,self$scatterY$nlevels)
         }
 
+      #### deal with rescaling
+      if (self$scatterXscale) {
+        data[[self$scatterX$name64]]<-private$.rescale(self$scatterX,data[[self$scatterX$name64]])
+        if (is.something(rawData))
+          rawData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,rawData[[self$scatterX$name64]])
+        if (is.something(randomData))
+          randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
+        
+      }
+      
+      
       
       if (is.something(dims))  {
         
@@ -690,20 +701,18 @@ Plotter <- R6::R6Class(
     },
     .rescale=function(varobj,values) {
       
-      
-      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
-      len <- max(min(len,na.rm = T),0)
+      if (varobj$scaling=="clusterbasedcentered")
+          self$warnings<-list(topic="plot",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` is the original scale is necessary.")
+        
+#      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
+#      len <- max(min(len,na.rm = T),0)
       if (varobj$scaling=="centered")
           values<-values+varobj$original_descriptive$mean
-      if (varobj$scaling=="standardized") 
-        values<-varobj$original_descriptive$sd*values+varobj$original_descriptive$mean
       if (varobj$scaling=="standardized") 
         values<-varobj$original_descriptive$sd*values+varobj$original_descriptive$mean
       if (varobj$scaling=="log") 
         values<-exp(values)
       
-      values<-round(values,digits = len)
-
       values
       
     }
