@@ -115,36 +115,6 @@ gamljGzlmClass <- R6::R6Class(
       
       
       
-      ### simple interactions ######
-      
-      if (is.something(estimate_machine$tab_simpleInteractionCoefficients)) {
-        
-        self$results$simpleInteractions$setVisible(TRUE)
-        ### moderators should be reverted in order so they make sense
-        terms<-c(self$options$simpleVariable,self$options$simpleModerators)
-        for (i in seq_along(estimate_machine$tab_simpleInteractionCoefficients)) {
-          aGroup <- self$results$simpleInteractions$addItem(key = i)
-          aTable<-aGroup$interactionCoefficients
-          term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
-          j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
-          title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
-          j.init_table(aTable,FALSE, ci=T,ciwidth=self$options$ciWidth,title=title)
-          
-          aTable<-aGroup$interactionAnova
-          j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")
-          title<-paste("ANOVA test for simple interaction",  jmvcore::stringifyTerm(term))
-          j.init_table(aTable,FALSE, ci=F,title=title)
-          
-          title<-paste("Simple interaction:",  jmvcore::stringifyTerm(term))
-          aGroup$setTitle(title)
-          
-        } 
-        
-        
-      }
-      
-      
-      
       
       ### posthoc ####
       

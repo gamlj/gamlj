@@ -647,15 +647,20 @@ Plotter <- R6::R6Class(
       }
 
       ### now we get the estimated means #######
-      results<-try_hard(emmeans::emmeans(private$.operator$model,
-                                         specs=allterm64,
-                                         at=conditions,
-                                         type=self$scatterType,
-                                         mode=mode,
-                                         lmer.df=ifelse(self$option("dfmethod"),self$options$dfmethod,NULL),
-                                         nesting = NULL,
-                                         options  = list(level = private$.operator$ciwidth)))
+      em_opts<-list(
+        private$.operator$model,
+        specs=allterm64,
+        at=conditions,
+        type=self$scatterType,
+        mode=mode,
+        nesting = NULL,
+        options  = list(level = private$.operator$ciwidth)
+      )
+      
+      if (self$option("dfmethod"))
+             em_opts[["lmer.df"]]<-self$options$dfmethod
 
+      results<-try_hard(do.call(emmeans::emmeans,em_opts))
       self$warnings<-list("topic"="plot",message=results$warning)
       self$errors<-list("topic"="plot",message=results$error)
       referenceGrid<-results$obj
