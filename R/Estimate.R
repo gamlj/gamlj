@@ -118,8 +118,6 @@ Estimate <- R6::R6Class("Estimate",
                               }
 
                           }
-                             te<-tapply(data[[tob64("x")]],list(data[[tob64("countryID")]]),mean)
-                             mark(te)
                              ### end of checks ###
                             
                               opts    <-  list(formula=self$formula64,data=data)
@@ -138,6 +136,9 @@ Estimate <- R6::R6Class("Estimate",
                               if (!isFALSE(results$error))
                                  stop(results$error)
                               
+                              if (mf.aliased(self$model))
+                                   self$warnings<-list(topic="info",message=WARNS["aliased"])
+                              mark(self$warnings)
                               self$model<-mf.fixModel(self$model,self)
 
 

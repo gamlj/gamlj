@@ -448,7 +448,7 @@ mf.converged<- function(x,...) UseMethod(".converged")
 
 
 
-########### to be removed and update with mi.xxx #########
+########### check if aliased #########
 
 mf.aliased<- function(x,...) UseMethod(".aliased")
 

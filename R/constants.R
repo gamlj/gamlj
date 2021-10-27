@@ -46,7 +46,7 @@ WARNS["se.largen"]<-"z-tests are computed because the number of observations exc
 
 #### anova #########
 
-WARNS["ano.aliased"]<-"WARNING: Some of the coefficients cannot be estimated because
+WARNS["aliased"]<-"WARNING: Some of the coefficients cannot be estimated because
 they are perfectly correlated with other coefficients in the model.
 This can be due to empty cells in the design or perfectly correlated covariates.
 The results may be uninterpretable."

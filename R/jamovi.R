@@ -198,10 +198,11 @@ j.add_warnings<-function(atable,adispatch,atopic,reset=FALSE) {
   
   if (inherits(atable,"Html"))
           atable$setContent(paste(adispatch$warnings[[atopic]],collapse = "; "))
-  else
+  else {
+      len<-length(atable$notes)
       for (i in seq_along(adispatch$warnings[[atopic]])) 
-               atable$setNote(i,adispatch$warnings[[atopic]][[i]])
-
+               atable$setNote(i+len,adispatch$warnings[[atopic]][[i]])
+}
   atable$setVisible(TRUE)
   
 }
