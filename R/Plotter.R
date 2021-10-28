@@ -425,6 +425,9 @@ Plotter <- R6::R6Class(
             d<-dim(contrasts(newdata[,v]))
             contrasts(newdata[,v])<-matrix(0,d[1],d[2])
           }
+        mark(head(data))
+        
+        mark(head(newdata))
         y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
         # end of zeroing 
         randomData<-as.data.frame(cbind(y,rawData))

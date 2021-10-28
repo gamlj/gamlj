@@ -803,6 +803,10 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="icc", 
                                     `title`="ICC", 
+                                    `type`="number"),
+                                list(
+                                    `name`="vpc", 
+                                    `title`="VPC", 
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,

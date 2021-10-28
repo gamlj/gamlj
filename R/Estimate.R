@@ -219,6 +219,11 @@ Estimate <- R6::R6Class("Estimate",
                                   int<-which("(Intercept)" %in% params$name)
                                   for (i in int)
                                         params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
+                                  ### Variance partitioning coefficients
+                                  vartot<-sum(params$var)
+                                  params$vpc<-params$var/vartot
+                                  
+                                  
                                   ### confidence intervals
                                   ci_covariances<-NULL
                                   if (self$option("ciRE")) {

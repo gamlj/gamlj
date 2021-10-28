@@ -222,6 +222,9 @@ items:
                     - name: icc
                       title: "ICC"
                       type: number
+                    - name: vpc
+                      title: "VPC"
+                      type: number
 
            - name: randomCov
              title: Random Parameters correlations
