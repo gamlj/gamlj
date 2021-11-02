@@ -1,6 +1,6 @@
 
-j_DEBUG=F
-j_INFO=F
+j_DEBUG=T
+j_INFO=T
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
 DUMMY_TAIL<-"_._._"
@@ -153,7 +153,9 @@ greek_vector <- c( # lowercase Greek letters
 
 letter_eta2<-paste(greek_vector["eta"],'\u00B2',sep="")
 letter_peta2<-paste(greek_vector["eta"],'\u00B2',"p",sep="")
+letter_omega2<-paste(greek_vector["omega"],'\u00B2',sep="")
 letter_pomega2<-paste(greek_vector["omega"],'\u00B2',"p",sep="")
+letter_epsilon2<-paste(greek_vector["epsilon"],'\u00B2',sep="")
 letter_pepsilon2<-paste(greek_vector["epsilon"],'\u00B2',"p",sep="")
 
 

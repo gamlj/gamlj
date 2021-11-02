@@ -474,20 +474,55 @@ gamljGlmClass <- R6::R6Class(
   
   if (!self$options$effectSizeInfo) 
     return()
-  ano<-car::Anova(model,type=3)
-      eta<-effectsize::eta_squared(ano,partial = F,ci=ciWidth,verbose=F)
-      peta<-effectsize::eta_squared(ano,partial = T,ci=ciWidth,verbose=F)
-      omega<-  effectsize::omega_squared(ano,partial = T,ci=ciWidth,verbose=F)
-      epsilon<-  effectsize::epsilon_squared(ano,partial = T,ci=ciWidth,verbose=F)
+  .anova<-car::Anova(model,test="F",type=3, singular.ok=T)
+  .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
+  anovatab<-.anova
+  colnames(anovatab)<-c("ss","df","f","p")
+  effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),"ss"]
+  errss<-anovatab$ss[rownames(anovatab)=="Residuals"]
+  sumr<-summary(model)
+  
+  ### whole model ###
+  f<-sumr$fstatistic[[1]]
+  edf<-sumr$fstatistic[[3]]
+  mdf<-sumr$fstatistic[[2]]
+  modss<-f*errss*mdf/edf
+
+  #####
+  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
+  ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
+  ## In unbalanced designs, the sum does not necessarely correspond to the model SS (plus residuals)
+  ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
+  ## and many properties of the non-partial indices are broken. 
+  ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
+  ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
+  #####
+  diff<-modss-sum(effss)
+  add<-data.frame(diff,1,1,0)
+  names(add)<-names(.anova)
+  .anova<-rbind(.anova,add)
+  last<-length(effss)[1]+1
+  
+  eta  <-    effectsize::eta_squared(.anova,partial = F,ci=ciWidth,verbose=F)
+  eta  <-    eta[-last,]
+  peta <-    effectsize::eta_squared(.anova,partial = T,ci=ciWidth,verbose=F)
+  omega <-   effectsize::omega_squared(.anova,partial = F,ci=ciWidth,verbose=F)
+  omegap<-   effectsize::omega_squared(.anova,partial = T,ci=ciWidth,verbose=F)
+  epsilon<-  effectsize::epsilon_squared(.anova,partial = F,ci=ciWidth,verbose=F)
+  epsilonp<- effectsize::epsilon_squared(.anova,partial = T,ci=ciWidth,verbose=F)
+
   aTable<-self$results$main$effectSizeTable
+      
   j<-1
   i<-1
   for (i in seq_along(eta$Parameter)) {
        aTable$setRow(rowNo=j,list(estimate=eta[[2]][i],lower.CL=eta$CI_low[i],upper.CL=eta$CI_high[i]))
        aTable$setRow(rowNo=j+1,list(estimate=peta[[2]][i],lower.CL=peta$CI_low[i],upper.CL=peta$CI_high[i]))
        aTable$setRow(rowNo=j+2,list(estimate=omega[[2]][i],lower.CL=omega$CI_low[i],upper.CL=omega$CI_high[i]))
-       aTable$setRow(rowNo=j+3,list(estimate=epsilon[[2]][i],lower.CL=epsilon$CI_low[i],upper.CL=epsilon$CI_high[i]))
-    j<-j+4
+       aTable$setRow(rowNo=j+3,list(estimate=omegap[[2]][i],lower.CL=omegap$CI_low[i],upper.CL=omegap$CI_high[i]))
+       aTable$setRow(rowNo=j+4,list(estimate=epsilon[[2]][i],lower.CL=epsilon$CI_low[i],upper.CL=epsilon$CI_high[i]))
+       aTable$setRow(rowNo=j+5,list(estimate=epsilonp[[2]][i],lower.CL=epsilonp$CI_low[i],upper.CL=epsilonp$CI_high[i]))
+    j<-j+6
   }
 
 
