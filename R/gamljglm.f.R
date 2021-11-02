@@ -75,9 +75,10 @@
 #'   \code{'centered'} to the mean, \code{'standardized'}, log-transformed \code{'log'} or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is. It can also be passed as a list of lists.
 #' @param effectSize a list of effect sizes to print out. They can be:
-#'   \code{'eta'} for eta-squared, \code{'partEta'} for partial eta-squared,
-#'   \code{'omega'} for partial omega-squared, \code{'epsilon'} for partial epsilon-squared, and \code{'beta'} for standardized
-#'   coefficients (betas). Default is \code{beta} and \code{partEta}.
+#'   \code{'eta'} for eta-squared, \code{'etap'} for partial eta-squared,
+#'   \code{'omega'} for omega-squared, \code{'omegap'} for partial omega-squared 
+#'   \code{'epsilon'} for epsilon-squared \code{'epsilonp'} for partial epsilon-squared, 
+#'    and \code{'beta'} for standardized coefficients (betas). Default is \code{beta} and \code{etap}.
 #' @param homoTest \code{TRUE} or \code{FALSE} (default), perform homogeneity
 #'   tests
 #' @param qq \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
@@ -158,7 +159,7 @@ gamljGlm <- function(
   scaling = NULL,
   effectSize = list(
     "beta",
-    "partEta"),
+    "etap"),
   homoTest = FALSE,
   qq = FALSE,
   normTest = FALSE,

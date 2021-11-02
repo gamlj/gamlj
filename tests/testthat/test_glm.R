@@ -45,6 +45,7 @@ mod<-gamlj::gamljGlm(
   simpleVariable = "math",
   simpleModerator = "schtyp",
   plotHAxis = "math",
+  effectSize = c("eta","etap","omega","omegap")
 )
 
 r.anova<-mod$main$anova$asDF
@@ -53,6 +54,8 @@ test_that("glm anova is correct", {
   expect_equal(as.character(r.anova[3,1]),"schtyp")
   expect_equal(round(r.anova[4,4],3),0.276)
   expect_equal(round(r.anova[3,6],5),0.00011)
+  expect_equal(round(r.anova[3,8],5),-0.00299)
+  expect_equal(round(r.anova[1,9],5),.38828)
   
 })
 
