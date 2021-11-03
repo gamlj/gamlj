@@ -400,16 +400,20 @@ options:
             title: β  
           - name: eta
             title: η²
-          - name: partEta
+          - name:  etap
             title: partial η²
           - name: omega
+            title: ω²
+          - name:  omegap
             title: partial ω²
           - name: epsilon
+            title: ε²
+          - name: epsilonp
             title: partial ε²
             
       default:
           - beta
-          - partEta
+          - etap
       description:
           R: >
              a list of effect sizes to print out. They can be:

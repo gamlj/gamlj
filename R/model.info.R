@@ -208,13 +208,14 @@ mi.initEffectSizeInfo<-function(options, results, terms, ciWidth) {
   for (term in terms) {
     aTable$addRow(rowKey=j,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_eta2))
     aTable$addRow(rowKey=j+1,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_peta2))
-    aTable$addRow(rowKey=j+2,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_pomega2))
-    aTable$addRow(rowKey=j+3,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_pepsilon2))
-
+    aTable$addRow(rowKey=j+2,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_omega2))
+    aTable$addRow(rowKey=j+3,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_pomega2))
+    aTable$addRow(rowKey=j+4,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_epsilon2))
+    aTable$addRow(rowKey=j+5,list(effect=lf.nicifyTerms(terms[[i]]),name=letter_pepsilon2))
     aTable$addFormat(col=1, rowNo=j, format=jmvcore::Cell.BEGIN_GROUP)
     aTable$addFormat(col=1, rowNo=j, format=jmvcore::Cell.BEGIN_END_GROUP)
     i<-i+1
-    j<-j+4
+    j<-j+6
   }
 }
 

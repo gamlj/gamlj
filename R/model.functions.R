@@ -185,36 +185,65 @@ mf.anova<- function(x,...) UseMethod(".anova")
   }
   
 .anova.lm<-function(model) {
-        ano<-car::Anova(model,test="F",type=3, singular.ok=T)
-        ano<-ano[rownames(ano)!="(Intercept)",]
-        colnames(ano)<-c("ss","df","f","p")
-        dss<-ano[!(rownames(ano) %in% c("Residuals","(Intercept)")),]
-        tots<-list(ss=sum(ano$ss),df=sum(ano$df))
-        reds<-list(ss=ano$ss[rownames(ano)=="Residuals"],df=ano$df[rownames(ano)=="Residuals"])
-        ss<-summary(model)
-        p<-stats::pf(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]],lower.tail = F)
-        modeta<-effectsize::F_to_eta2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-        modomega<-effectsize::F_to_omega2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-        modepsilon<-effectsize::F_to_epsilon2(ss$fstatistic[[1]],ss$fstatistic[[2]],ss$fstatistic[[3]])
-        
-        mods<-list(ss=sum(dss$ss),
-               df= ss$fstatistic[[2]],
-               f=ss$fstatistic[[1]],
+        .anova<-car::Anova(model,test="F",type=3, singular.ok=T)
+        .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
+        anovatab<-.anova
+        colnames(anovatab)<-c("ss","df","f","p")
+        effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),]
+        reds<-list(ss=anovatab$ss[rownames(anovatab)=="Residuals"],df=anovatab$df[rownames(anovatab)=="Residuals"])
+        sumr<-summary(model)
+
+        ### whole model ###
+        f<-sumr$fstatistic[[1]]
+        edf<-sumr$fstatistic[[3]]
+        mdf<-sumr$fstatistic[[2]]
+        p<-stats::pf(f,mdf,edf,lower.tail = F)
+        modeta<-effectsize::F_to_eta2(f,mdf,edf)
+        modomega<-effectsize::F_to_omega2(f,mdf,edf)
+        modepsilon<-effectsize::F_to_epsilon2(f,mdf,edf)
+        modss<-f*reds$ss*mdf/edf
+        mods<-list(ss=modss,
+               df= mdf,
+               f=f,
                p=p,
                etaSq=modeta[[1]],etaSqP=modeta[[1]],
                omegaSq=modomega[[1]],
-               epsilonSq=modepsilon[[1]])
-        .anova<-car::Anova(model,type=3)
+               omegaSqP=modomega[[1]],
+               epsilonSq=modepsilon[[1]],
+               epsilonSqP=modepsilon[[1]])
+
+        tots<-list(ss=mods$ss+reds$ss,df=mdf)
+
+        #####
+        # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
+        ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
+        ## In unbalanced designs, the sum does not necessarely correspond to the model SS (plus residuals)
+        ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
+        ## and many properties of the non-partial indices are broken. 
+        ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
+        ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
+        #####
+        diff<-mods$ss-sum(effss$ss)
+        add<-data.frame(diff,1,1,0)
+        names(add)<-names(.anova)
+        .anova<-rbind(.anova,add)
+        last<-dim(effss)[1]+1
         etap<-effectsize::eta_squared(.anova,partial = T,verbose = F)
         eta<-effectsize::eta_squared(.anova,partial = F,verbose = F)
         eps<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
-        omega<-effectsize::omega_squared(.anova,partial = T,verbose = F)
-        epsilon<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
-        dss$etaSq<-eta[,2]
-        dss$etaSqP<-etap[,2]
-        dss$omegaSq<-omega[,2]
-        dss$epsilonSq<-epsilon[,2]
-        reslist<-listify(dss)
+        omegap<-effectsize::omega_squared(.anova,partial = T,verbose = F)
+        omega<-effectsize::omega_squared(.anova,partial = F,verbose = F)
+        epsilonp<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
+        epsilon<-effectsize::epsilon_squared(.anova,partial = F,verbose = F)
+        
+        effss$etaSq<-eta[-last,2]
+        effss$etaSqP<-etap[-last,2]
+        effss$omegaSq<-omega[-last,2]
+        effss$omegaSqP<-omegap[-last,2]
+        effss$epsilonSq<-epsilon[-last,2]
+        effss$epsilonSqP<-epsilonp[-last,2]
+        
+        reslist<-listify(effss)
         reslist<-append_list(reslist,reds,"Residuals")
         reslist<-append_list(reslist,tots,"Totals")
         reslist<-prepend_list(reslist,mods,"Model")

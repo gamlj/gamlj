@@ -45,6 +45,7 @@ mod<-gamlj::gamljGlm(
   simpleVariable = "math",
   simpleModerator = "schtyp",
   plotHAxis = "math",
+  effectSize = c("eta","etap","omega","omegap")
 )
 
 r.anova<-mod$main$anova$asDF
@@ -52,7 +53,9 @@ r.anova<-mod$main$anova$asDF
 test_that("glm anova is correct", {
   expect_equal(as.character(r.anova[3,1]),"schtyp")
   expect_equal(round(r.anova[4,4],3),0.276)
-  expect_equal(round(r.anova[3,6],5),0.00011)
+  expect_equal(round(r.anova[3,6],5),7e-05)
+  expect_equal(round(r.anova[3,8],5),-0.00299)
+  expect_equal(round(r.anova[1,9],5),.38828)
   
 })
 
@@ -109,7 +112,6 @@ test_that("glm posthoc", {
 })
 
 
-
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
@@ -118,8 +120,8 @@ mod<-gamlj::gamljGlm(
 tab<-mod$main$effectSizeTable$asDF
 
 testthat::test_that("glm effectsize", {
-  testthat::expect_equal(tab[4,3],.2198,tol=.0001)
-  testthat::expect_equal(tab[10,5],.029999,tol=.00001)
+  testthat::expect_equal(tab[4,3],.216398,tol=.0001)
+  testthat::expect_equal(tab[10,5],.0,tol=.00001)
 })
 
 

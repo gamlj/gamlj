@@ -113,20 +113,33 @@ items:
                       title: η²
                       type: number
                       visible: (effectSize:eta)
+                      format: zto
+
                     - name: etaSqP
                       title: η²p
                       type: number
-                      visible: (effectSize:partEta)
+                      visible: (effectSize:etap)
                       format: zto
                     - name: omegaSq
-                      title: ω²p
+                      title: ω²
                       type: number
                       visible: (effectSize:omega)
                       format: zto
+                    - name: omegaSqP
+                      title: ω²p
+                      type: number
+                      visible: (effectSize:omegap)
+                      format: zto
+
                     - name: epsilonSq
-                      title: ε²p
+                      title: ε²
                       type: number
                       visible: (effectSize:epsilon)
+                      format: zto
+                    - name: epsilonSqP
+                      title: ε²p
+                      type: number
+                      visible: (effectSize:epsilonp)
                       format: zto
 
            - name: effectSizeTable
