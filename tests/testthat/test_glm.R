@@ -112,7 +112,6 @@ test_that("glm posthoc", {
 })
 
 
-
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
