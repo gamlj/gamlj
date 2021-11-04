@@ -52,7 +52,7 @@ testthat::test_that("standardizing", {
   testthat::expect_true(test)
 })
 
-upd<-update(obj,scaling=newopt,effectSize = c("beta", "partEta", "omega"))
+upd<-update(obj,scaling=newopt,effectSize = c("beta", "etap", "omega"))
 res1<-upd$main$fixed$asDF
 res2<-upd$main$anova$asDF
 testthat::test_that("updating", {
