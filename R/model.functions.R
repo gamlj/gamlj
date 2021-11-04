@@ -212,7 +212,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
                epsilonSq=modepsilon[[1]],
                epsilonSqP=modepsilon[[1]])
 
-        tots<-list(ss=mods$ss+reds$ss,df=mdf)
+        tots<-list(ss=mods$ss+reds$ss,df=mdf+edf)
 
         #####
         # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
