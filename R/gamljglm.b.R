@@ -500,22 +500,21 @@ gamljGlmClass <- R6::R6Class(
   diff<-modss-sum(effss)
   add<-data.frame(diff,1,1,0)
   names(add)<-names(.anova)
-  .anova<-rbind(.anova,add)
+  .canova<-rbind(.anova,add)
   last<-length(effss)[1]+1
   
-  eta  <-    effectsize::eta_squared(.anova,partial = F,ci=ciWidth,verbose=F)
-  eta  <-    eta[-last,]
+  eta  <-    effectsize::eta_squared(.canova,partial = F,ci=ciWidth,verbose=F)
   peta <-    effectsize::eta_squared(.anova,partial = T,ci=ciWidth,verbose=F)
-  omega <-   effectsize::omega_squared(.anova,partial = F,ci=ciWidth,verbose=F)
+  omega <-   effectsize::omega_squared(.canova,partial = F,ci=ciWidth,verbose=F)
   omegap<-   effectsize::omega_squared(.anova,partial = T,ci=ciWidth,verbose=F)
-  epsilon<-  effectsize::epsilon_squared(.anova,partial = F,ci=ciWidth,verbose=F)
+  epsilon<-  effectsize::epsilon_squared(.canova,partial = F,ci=ciWidth,verbose=F)
   epsilonp<- effectsize::epsilon_squared(.anova,partial = T,ci=ciWidth,verbose=F)
 
   aTable<-self$results$main$effectSizeTable
       
   j<-1
   i<-1
-  for (i in seq_along(eta$Parameter)) {
+  for (i in seq_along(peta$Parameter)) {
        aTable$setRow(rowNo=j,list(estimate=eta[[2]][i],lower.CL=eta$CI_low[i],upper.CL=eta$CI_high[i]))
        aTable$setRow(rowNo=j+1,list(estimate=peta[[2]][i],lower.CL=peta$CI_low[i],upper.CL=peta$CI_high[i]))
        aTable$setRow(rowNo=j+2,list(estimate=omega[[2]][i],lower.CL=omega$CI_low[i],upper.CL=omega$CI_high[i]))

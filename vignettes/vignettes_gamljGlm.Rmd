@@ -89,7 +89,7 @@ Additional effect size indexes can be asked with the option `effectSize`.
 ```{r }
 mod2<-gamljGlm(formula = yendu~xage+zexer, 
               data=data,
-              effectSize = c("beta", "eta","partEta","omega","epsilon"))
+              effectSize = c("beta", "eta","etap","omega","epsilon"))
 mod2$main$anova
 ```
 
@@ -97,7 +97,7 @@ The same analysis can be done by updating the model with the `update()` function
 
 
 ```{r }
-mod2_2<-update(mod1,effectSize = c("beta", "eta","partEta","omega","epsilon"))
+mod2_2<-update(mod1,effectSize = c("beta", "eta","etap","omega","epsilon"))
 mod2_2$main$anova
 ```
 
