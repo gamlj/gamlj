@@ -264,38 +264,71 @@ mf.anova<- function(x,...) UseMethod(".anova")
 
   if (!isFALSE(anoobj$error))
          return(NULL)
-      
-
-  ano<-anoobj$obj[row.names(anoobj$obj)!="(Intercept)",]
   
-  if (!obj$hasTerms) {
+  .anova<-anoobj$obj
+  .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
+  anovatab<-.anova
+  colnames(anovatab)<-c("ss","df","f","p")
+  effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),]
+  reds<-list(ss=anovatab$ss[rownames(anovatab)=="Residuals"],df=anovatab$df[rownames(anovatab)=="Residuals"])
+  sumr<-summary(model)
+  
+  ### whole model ###
+  f<-sumr$fstatistic[[1]]
+  edf<-sumr$fstatistic[[3]]
+  mdf<-sumr$fstatistic[[2]]
+  p<-stats::pf(f,mdf,edf,lower.tail = F)
+  modeta<-effectsize::F_to_eta2(f,mdf,edf)
+  modomega<-effectsize::F_to_omega2(f,mdf,edf)
+  modepsilon<-effectsize::F_to_epsilon2(f,mdf,edf)
+  modss<-f*reds$ss*mdf/edf
+  mods<-list(ss=modss,
+             df= mdf,
+             f=f,
+             p=p,
+             etaSq=modeta[[1]],etaSqP=modeta[[1]],
+             omegaSq=modomega[[1]],
+             omegaSqP=modomega[[1]],
+             epsilonSq=modepsilon[[1]],
+             epsilonSqP=modepsilon[[1]])
+  
+  tots<-list(ss=mods$ss+reds$ss,df=mdf)
+  
+  #####
+  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
+  ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
+  ## In unbalanced designs, the sum does not necessarely correspond to the model SS (plus residuals)
+  ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
+  ## and many properties of the non-partial indices are broken. 
+  ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
+  ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
+  #####
+  diff<-mods$ss-sum(effss$ss)
+  add<-data.frame(diff,1,1,0)
+  names(add)<-names(.anova)
+  .anova<-rbind(.anova,add)
+  last<-dim(effss)[1]+1
+  etap<-effectsize::eta_squared(.anova,partial = T,verbose = F)
+  eta<-effectsize::eta_squared(.anova,partial = F,verbose = F)
+  eps<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
+  omegap<-effectsize::omega_squared(.anova,partial = T,verbose = F)
+  omega<-effectsize::omega_squared(.anova,partial = F,verbose = F)
+  epsilonp<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
+  epsilon<-effectsize::epsilon_squared(.anova,partial = F,verbose = F)
+  
+  effss$etaSq<-eta[-last,2]
+  effss$etaSqP<-etap[-last,2]
+  effss$omegaSq<-omega[-last,2]
+  effss$omegaSqP<-omegap[-last,2]
+  effss$epsilonSq<-epsilon[-last,2]
+  effss$epsilonSqP<-epsilonp[-last,2]
+  reslist<-listify(effss)
+  reslist<-append_list(reslist,reds,"Residuals")
+  reslist<-append_list(reslist,tots,"Totals")
+  reslist    
 
-       results         <-  as.data.frame(rbind(ano,ano))
-       results$source  <-  c("Residuals","Total")
-       names(results)  <-  c("ss","df", "test", "p","source")
-       return(results)
-    
+
   }
-
-  suppressMessages({
-    
-  w                          <-  cbind(effectsize::eta_squared(anoobj$obj,partial=F)[1:2],
-                                       effectsize::eta_squared(anoobj$obj,partial = T)[2],
-                                       effectsize::omega_squared(anoobj$obj)[2],
-                                       effectsize::epsilon_squared(anoobj$obj)[2])
-
-  
-  })
-  params                     <-  parameters::model_parameters(ano)
-  results                    <-  merge(params,w,by="Parameter",all= T,sort = F)
-  names(results)             <-  c("source","ss","df", "ms", "test", "p",  "etaSq", "etaSqP", "omegaSq","epsilonSq")
-  tots                       <-  results[nrow(results),]
-  tots$source                <-  "Total"
-  tots$ss                    <-  sum(results$ss)
-  tots$df                    <-  sum(results$df)
-  results[nrow(results)+1,]  <-  tots
-  results
-}
 
 .anova.glmerMod<-function(model,df="Satterthwaite") {
   ginfo("using .anova.glmerMod")

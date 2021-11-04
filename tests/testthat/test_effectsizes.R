@@ -8,6 +8,8 @@ f<-sumr$fstatistic[[1]]
 edf<-sumr$fstatistic[[3]]
 mdf<-sumr$fstatistic[[2]]
 modss<-f*sigma(mod)^2*mdf/edf
+.anova<-car::Anova(mod,type=3)
+
 
 gmod<-gamlj::gamljGlm(formula = form,iris,effectSize = c("eta","etap","omega","omegap","epsilon","epsilonp"))
 gmod

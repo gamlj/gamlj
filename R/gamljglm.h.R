@@ -42,7 +42,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modelSelection = "lm",
             effectSize = list(
                 "beta",
-                "partEta"),
+                "etap"),
             homoTest = FALSE,
             qqplot = FALSE,
             normTest = FALSE,
@@ -285,12 +285,14 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=list(
                     "beta",
                     "eta",
-                    "partEta",
+                    "etap",
                     "omega",
-                    "epsilon"),
+                    "omegap",
+                    "epsilon",
+                    "epsilonp"),
                 default=list(
                     "beta",
-                    "partEta"))
+                    "etap"))
             private$..homoTest <- jmvcore::OptionBool$new(
                 "homoTest",
                 homoTest,
@@ -660,19 +662,31 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="etaSqP", 
                                     `title`="\u03B7\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:partEta)", 
+                                    `visible`="(effectSize:etap)", 
                                     `format`="zto"),
                                 list(
                                     `name`="omegaSq", 
-                                    `title`="\u03C9\u00B2p", 
+                                    `title`="\u03C9\u00B2", 
                                     `type`="number", 
                                     `visible`="(effectSize:omega)", 
                                     `format`="zto"),
                                 list(
+                                    `name`="omegaSqP", 
+                                    `title`="\u03C9\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:omegap)", 
+                                    `format`="zto"),
+                                list(
                                     `name`="epsilonSq", 
-                                    `title`="\u03B5\u00B2p", 
+                                    `title`="\u03B5\u00B2", 
                                     `type`="number", 
                                     `visible`="(effectSize:epsilon)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="epsilonSqP", 
+                                    `title`="\u03B5\u00B2p", 
+                                    `type`="number", 
+                                    `visible`="(effectSize:epsilonp)", 
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -1475,7 +1489,7 @@ gamljGlm <- function(
     modelSelection = "lm",
     effectSize = list(
                 "beta",
-                "partEta"),
+                "etap"),
     homoTest = FALSE,
     qqplot = FALSE,
     normTest = FALSE,

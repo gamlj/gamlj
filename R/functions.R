@@ -71,7 +71,25 @@ sourcifyList<-function(option,def) {
 
 
 
-            
+append_list <- function(alist, aelement, name = NULL) {
+    alist[[length(alist) + 1]] <- aelement
+    if (!is.null(name)) 
+        names(alist)[length(alist)] <- name
+    alist
+}
+prepend_list <- function(alist, aelement, name = NULL) {
+    alist <- c(0, alist)
+    alist[[1]] <- aelement
+    if (!is.null(name)) 
+        names(alist)[1] <- name
+    alist
+}
+
+listify <- function(adata) {
+    res <- lapply(1:dim(adata)[1], function(a) as.list(adata[a, ]))
+    names(res) <- rownames(adata)
+    res
+}            
 
 
 

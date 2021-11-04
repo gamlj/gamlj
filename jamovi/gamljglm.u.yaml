@@ -52,18 +52,27 @@ children:
             type: CheckBox
             optionPart: eta
             optionName: effectSize
-          - name: effectSize_partEta
+          - name: effectSize_etap
             type: CheckBox
-            optionPart: partEta
+            optionPart: etap
             optionName: effectSize
           - name: effectSize_omega
             type: CheckBox
             optionPart: omega
             optionName: effectSize
+          - name: effectSize_omegap
+            type: CheckBox
+            optionPart: omegap
+            optionName: effectSize
           - name: effectSize_epsilon
             type: CheckBox
             optionPart: epsilon
             optionName: effectSize
+          - name: effectSize_epsilonp
+            type: CheckBox
+            optionPart: epsilonp
+            optionName: effectSize
+
       - type: Label
         label: Confidence Intervals
         margin: large
