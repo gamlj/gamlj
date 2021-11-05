@@ -241,7 +241,8 @@ mf.anova<- function(x,...) UseMethod(".anova")
         effss$omegaSqP<-omegap[,2]
         effss$epsilonSq<-epsilon[-last,2]
         effss$epsilonSqP<-epsilonp[,2]
-        
+        ### negative estimates are not set to zero 
+        ### as per https://link.springer.com/article/10.3758/s13428-016-0760-y
         reslist<-listify(effss)
         reslist<-append_list(reslist,reds,"Residuals")
         reslist<-append_list(reslist,tots,"Totals")
