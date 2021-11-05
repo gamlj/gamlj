@@ -120,10 +120,9 @@ mod<-gamlj::gamljGlm(
 tab<-mod$main$effectSizeTable$asDF
 
 testthat::test_that("glm effectsize", {
-  testthat::expect_equal(tab[4,3],.216398,tol=.0001)
+  testthat::expect_equal(tab[4,3],.21724,tol=.0001)
   testthat::expect_equal(tab[10,5],.0,tol=.00001)
 })
-
 
 
 data<-hsbdemo

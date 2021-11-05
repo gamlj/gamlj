@@ -36,7 +36,7 @@ gamljGlm(
   simpleScaleLabels = "labels",
   postHocCorr = list("bonf"),
   scaling = NULL,
-  effectSize = list("beta", "partEta"),
+  effectSize = list("beta", "etap"),
   homoTest = FALSE,
   qq = FALSE,
   normTest = FALSE,
@@ -145,9 +145,10 @@ respectively.}
 \code{'none'} leaves the variable as it is. It can also be passed as a list of lists.}
 
 \item{effectSize}{a list of effect sizes to print out. They can be:
-\code{'eta'} for eta-squared, \code{'partEta'} for partial eta-squared,
-\code{'omega'} for partial omega-squared, \code{'epsilon'} for partial epsilon-squared, and \code{'beta'} for standardized
-coefficients (betas). Default is \code{beta} and \code{partEta}.}
+\code{'eta'} for eta-squared, \code{'etap'} for partial eta-squared,
+\code{'omega'} for omega-squared, \code{'omegap'} for partial omega-squared 
+\code{'epsilon'} for epsilon-squared \code{'epsilonp'} for partial epsilon-squared, 
+ and \code{'beta'} for standardized coefficients (betas). Default is \code{beta} and \code{etap}.}
 
 \item{homoTest}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
 tests}

@@ -178,26 +178,42 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
         ff[, name] <- as.character(ff[, name])
         params[, name] <- as.character(params[, name])
     }
-    if (.which.class(model) == "lm") {
-        ff$etaSqP <- ff$F.ratio * ff$df1/(ff$F.ratio * ff$df1 + ff$df2)
-        ff$omegaSq <- (ff$F.ratio - 1) * ff$df1/(ff$F.ratio * ff$df1 + ff$df2 + 1)
-        ff$omegaSq[ff$omegaSq < 0] <- 0
-        ff$epsilonSq <- (ff$F.ratio - 1) * ff$df1/(ff$F.ratio * ff$df1 + ff$df2)
-        ff$epsilonSq[ff$epsilonSq < 0] <- 0
 
-        ## eta squared
-        SS <- stats::anova(model)
-        SSerr <- stats::sigma(model)^2 * model$df.residual
-        SStot <- sum(SS$`Sum Sq`)
-        SSe <- (ff$etaSqP/(1 - ff$etaSqP)) * SSerr
-        ff$etaSq <- SSe/SStot
-
-        
-    }
 
     list(params, ff)
 }
 
+.simpleEstimates.lm <- function(model, variable, moderator, threeway = NULL, cov_conditioning = conditioning$new(), interval = 95) {
+ 
+    ginfo("simple effects estimation for lm model on")
+    results<-.simpleEstimates.default(model, variable, moderator, threeway , cov_conditioning, interval)
+
+    ### effect size indices ###
+    ff<-results[[2]]
+    dfres<-model$df.residual
+    sumr<-summary(model)
+    N<-dfres+sumr$fstatistic[[2]]+1
+    ssres<-sigma(model)^2*dfres
+    ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+    df<-ff$df1
+    SS<-df*ff$F.ratio*ssres/dfres
+    ff$etaSq  <- SS/(ssmod+ssres)
+    ff$etaSqP <- SS/(SS+ssres)
+    ff$omegaSq <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
+    ff$omegaSqP <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
+    ff$epsilonSq<-(SS-(ssres*df/dfres))/(ssmod+ssres)
+    ff$epsilonSqP<-(SS-(ssres*df/dfres))/(SS+ssres)
+    
+    ### beta in parameter estimates ###
+    xstd<-1
+    if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
+    y<-names(attr(model$terms,"dataClass"))[1]
+    ystd<-sd(model$model[,y])
+    params<-results[[1]]
+    params$beta<-params$estimate*(xstd/ystd)
+    list(params, ff)
+    
+}
 .simpleEstimates.multinom <- function(model, variable, moderator, threeway = NULL, cov_conditioning = conditioning$new(), interval = 95) {
 
     
