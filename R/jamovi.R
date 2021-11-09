@@ -136,9 +136,11 @@ j.init_table_append<-function(table,obj, indent=NULL) {
 
 j.fill_table<-function(table,obj, fixNA=TRUE,append=FALSE,spaceby=NULL,start=1) {
 
+
   if (!is.something(obj))
     return()
 
+ # mark(table$name,table$state)
 
   last<-start-1
   if (append)  last<-table$rowCount

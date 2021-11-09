@@ -149,8 +149,10 @@ Syntax <- R6::R6Class(
                   self$tab_anova<-lapply(self$options$modelTerms, function(x) list(name=.stringifyTerm(x)))
               
               if (self$options$modelSelection=="lm") {
-                    self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
-                    self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
+                if (self$hasTerms)
+                        self$tab_anova<-prepend_list(self$tab_anova,list(name="Model",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+                self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
+                self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
               }  
               ### we need at least a row otherwise we cannot add notes to the table
               if (is.null(self$tab_anova))

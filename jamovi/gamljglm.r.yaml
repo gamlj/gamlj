@@ -130,7 +130,7 @@ items:
                     - name: df
                       title: df
                       type: integer
-                    - name: test
+                    - name: f
                       title: F
                       type: number
                     - name: p

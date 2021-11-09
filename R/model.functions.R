@@ -271,8 +271,13 @@ mf.anova<- function(x,...) UseMethod(".anova")
   colnames(anovatab)<-c("ss","df","f","p")
   effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),]
   reds<-list(ss=anovatab$ss[rownames(anovatab)=="Residuals"],df=anovatab$df[rownames(anovatab)=="Residuals"])
+  ## returns if model has no terms
+  if (!obj$hasTerms) {
+    tots<-list(ss=reds$ss,df=reds$df)
+    return(list(reds,tots))
+  }
   sumr<-summary(model)
-  
+
   ### whole model ###
   f<-sumr$fstatistic[[1]]
   edf<-sumr$fstatistic[[3]]
@@ -286,13 +291,14 @@ mf.anova<- function(x,...) UseMethod(".anova")
              df= mdf,
              f=f,
              p=p,
-             etaSq=modeta[[1]],etaSqP=modeta[[1]],
+             etaSq=modeta[[1]],
+             etaSqP=modeta[[1]],
              omegaSq=modomega[[1]],
              omegaSqP=modomega[[1]],
              epsilonSq=modepsilon[[1]],
              epsilonSqP=modepsilon[[1]])
   
-  tots<-list(ss=mods$ss+reds$ss,df=mdf)
+  tots<-list(ss=mods$ss+reds$ss,df=mdf+edf)
   
   #####
   # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
@@ -306,25 +312,25 @@ mf.anova<- function(x,...) UseMethod(".anova")
   diff<-mods$ss-sum(effss$ss)
   add<-data.frame(diff,1,1,0)
   names(add)<-names(.anova)
-  .anova<-rbind(.anova,add)
+  .canova<-rbind(.anova,add)
   last<-dim(effss)[1]+1
   etap<-effectsize::eta_squared(.anova,partial = T,verbose = F)
-  eta<-effectsize::eta_squared(.anova,partial = F,verbose = F)
-  eps<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
+  eta<-effectsize::eta_squared(.canova,partial = F,verbose = F)
   omegap<-effectsize::omega_squared(.anova,partial = T,verbose = F)
-  omega<-effectsize::omega_squared(.anova,partial = F,verbose = F)
+  omega<-effectsize::omega_squared(.canova,partial = F,verbose = F)
   epsilonp<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
-  epsilon<-effectsize::epsilon_squared(.anova,partial = F,verbose = F)
+  epsilon<-effectsize::epsilon_squared(.canova,partial = F,verbose = F)
   
   effss$etaSq<-eta[-last,2]
-  effss$etaSqP<-etap[-last,2]
+  effss$etaSqP<-etap[,2]
   effss$omegaSq<-omega[-last,2]
-  effss$omegaSqP<-omegap[-last,2]
+  effss$omegaSqP<-omegap[,2]
   effss$epsilonSq<-epsilon[-last,2]
-  effss$epsilonSqP<-epsilonp[-last,2]
+  effss$epsilonSqP<-epsilonp[,2]
   reslist<-listify(effss)
   reslist<-append_list(reslist,reds,"Residuals")
-  reslist<-append_list(reslist,tots,"Totals")
+  reslist<-append_list(reslist,tots,"Total")
+  reslist<-prepend_list(reslist,mods,"Model")
   reslist    
 
 
