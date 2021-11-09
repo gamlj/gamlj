@@ -5,7 +5,7 @@ mod<-gamlj::gamljGlm(
   factors = "supp",
   modelTerms = ~ supp,
 )
-
+tob64(1)
 res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {

@@ -48,12 +48,12 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
-  
+
       .bootstrap           <-  obj$options$cimethod=="boot"
       .coefficients        <-  as.data.frame(parameters::parameters(
                                                                    model,
                                                                    ci=obj$ciwidth,
-                                                                   df_method=obj$optons$cimethod),stringAsFactors=FALSE)
+                                                                   ci_method=obj$options$cimethod),stringAsFactors=FALSE)
      .coefficients$CI     <-  NULL
       names(.coefficients)[1:8] <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
       if (.bootstrap) {
@@ -69,8 +69,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
               .coefficients  <-  cbind(.coefficients,ex)
       }
      if (obj$option("effectSize","beta")) {
-            
-       estim<-parameters::parameters(model,standardize="refit")
+        estim<-parameters::parameters(model,standardize="refit")
        .coefficients$beta  <-  estim$Coefficient
      }
       return(.coefficients)
@@ -492,8 +491,10 @@ mf.converged<- function(x,...) UseMethod(".converged")
 mf.aliased<- function(x,...) UseMethod(".aliased")
 
 .aliased.default<-function(model) {
-  aliased<-stats::alias(model)
-  (!is.null(aliased$Complete))
+  aliased<-try_hard(stats::alias(model))
+  if (is.something(aliased$error))
+      return(FALSE)
+  (!is.null(aliased$obj$Complete))
 }
 
 .aliased.glmerMod<-function(model) {

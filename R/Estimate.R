@@ -120,7 +120,9 @@ Estimate <- R6::R6Class("Estimate",
                           }
                              ### end of checks ###
                             
-                              opts    <-  list(formula=self$formula64,data=data)
+                              opts    <-  opts<-list(str2lang(self$infomatic$rcall))
+
+                              opts[["formula"]]<-self$formula64
                               
                               if (is.something(self$infomatic$family))
                                           opts[["family"]]<-self$infomatic$family    
@@ -128,17 +130,19 @@ Estimate <- R6::R6Class("Estimate",
                               for (opt in names(self$infomatic$calloptions))
                                         opts[[opt]]<-self$infomatic$calloptions[[opt]]    
                               
-                              FUNC<-eval(parse(text=self$infomatic$rcall))
-                              
-                              results<-try_hard(do.call(FUNC,opts))
+                              opts[["data"]]<-quote(data)
+                              acall<-as.call(opts)
+
+                              results<-try_hard(eval(acall))
                               self$model<-results$obj
+
                               self$warnings<-list(topic="info", message=results$warning)
                               if (!isFALSE(results$error))
                                  stop(results$error)
                               
                               if (mf.aliased(self$model))
                                    self$warnings<-list(topic="info",message=WARNS["aliased"])
-                              mark(self$warnings)
+                             
                               self$model<-mf.fixModel(self$model,self)
 
 
