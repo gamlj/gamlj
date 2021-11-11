@@ -425,11 +425,9 @@ Plotter <- R6::R6Class(
             d<-dim(contrasts(newdata[,v]))
             contrasts(newdata[,v])<-matrix(0,d[1],d[2])
           }
-        mark(head(data))
-        
-        mark(head(newdata))
+
         y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
-        # end of zeroing 
+          # end of zeroing 
         randomData<-as.data.frame(cbind(y,rawData))
         self$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
 
@@ -661,6 +659,7 @@ Plotter <- R6::R6Class(
       }
 
       ### now we get the estimated means #######
+
       em_opts<-list(
         private$.operator$model,
         specs=allterm64,
@@ -677,6 +676,7 @@ Plotter <- R6::R6Class(
       results<-try_hard(do.call(emmeans::emmeans,em_opts))
       self$warnings<-list("topic"="plot",message=results$warning)
       self$errors<-list("topic"="plot",message=results$error)
+      mark(results)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####

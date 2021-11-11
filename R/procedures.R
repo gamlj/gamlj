@@ -316,7 +316,14 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     .issues <- .all[test]
     if (is.something(.issues))
       obj$warnings<-list(topic="tab_simpleAnova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
-    
+
+    ## check issues with the variables ##
+    for (.term in term64) {
+      if (is.something(obj$datamatic$variables[[.term]]$warnings)) {
+            obj$absorbe_issues(obj$datamatic$variables[[.term]])
+      }
+    }
+    mark(obj$warnings)
 
   ginfo("End of Simple Effects")
   return(list(anova,params))

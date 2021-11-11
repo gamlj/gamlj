@@ -422,7 +422,7 @@ Variable <- R6::R6Class(
       if (method=="clusterbasedcentered") {    
         cluster64<-tob64(self$hasCluster[1])
         sdata<-data[,c(cluster64,self$name64)]
-        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
+        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
@@ -432,10 +432,10 @@ Variable <- R6::R6Class(
       if (method=="clusterbasedstandardized") {    
         cluster64<-tob64(self$hasCluster[1])
         sdata<-data[,c(cluster64,self$name64)]
-        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
+        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
-        ddata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),sd)
+        ddata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),sd,na.rm=TRUE)
         names(ddata)<-c(cluster64,"sd")
         if (any(ddata[["sd"]]<.0000001))
             stop("Variable ",self$name," has zero variance in at least one cluster defined by",self$hasCluster[1])
@@ -450,7 +450,7 @@ Variable <- R6::R6Class(
       if (method=="clustermeans") {    
         cluster64<-tob64(self$hasCluster[1])
         sdata<-data[,c(cluster64,self$name64)]
-        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean)
+        mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
         vardata<-sdata[["mean"]]
@@ -466,6 +466,7 @@ Variable <- R6::R6Class(
     },
     
     .update_levels=function(vardata) {
+      
       self$original_levels<-self$levels
       self$original_descriptive<-self$descriptive
       labels_type<-ifelse(is.null(self$options$simpleScaleLabels),"values",self$options$simpleScaleLabels)
@@ -497,7 +498,7 @@ Variable <- R6::R6Class(
         
         .labs<-c(paste0("50-", .lspan,"\u0025"), "50\u0025", paste0("50+", .lspan,"\u0025"))
         
-        self$levels<-round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span)), digits = 3) 
+        self$levels<-round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span),na.rm=TRUE), digits = 3) 
           
         self$method="percent"
       }
@@ -520,7 +521,8 @@ Variable <- R6::R6Class(
   
       if (all(!is.nan(self$levels)) &  all(!is.na(self$levels)))
             if(any(duplicated(self$levels))) {
-        stop(paste0("Problems in covariates conditioning for variable ",self$name,". Quantiles are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
+               self$levels<-unique(self$levels)
+               self$warnings<-list(topic="tab_simpleAnova",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
       }
       
     }
@@ -563,9 +565,8 @@ Datamatic <- R6::R6Class(
                       data64[[var$name64]]   <-  var$get_values(data64)
       }
         
-      
-      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       data64 <- jmvcore::naOmit(data64)
+      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
       self$absorbe_issues(self$variables)
       return(data64)
