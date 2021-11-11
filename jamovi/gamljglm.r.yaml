@@ -380,34 +380,48 @@ items:
                  - simpleScaleLabels
 
               columns:
-                 - name: test
-                   title: F
-                   type: number
-                 - name: df1
-                   title: Num df
-                   type: integer
-                 - name: df2
-                   title: Den df
-                   type: integer
-                 - name: p
-                   title: p
-                   type: number
-                   format: zto,pvalue
-                 - name: etaSqP
-                   title: η²p
-                   type: number
-                   visible: (effectSize:partEta)
-                   format: zto
-                 - name: omegaSq
-                   title: ω²p
-                   type: number
-                   visible: (effectSize:omega)
-                   format: zto
-                 - name: epsilonSq
-                   title: ε²p
-                   type: number
-                   visible: (effectSize:epsilon)
-                   format: zto
+                   - name: test
+                     title: F
+                     type: number
+                   - name: df1
+                     title: Num df
+                     type: integer
+                   - name: df2
+                     title: Den df
+                     type: integer
+                   - name: p
+                     title: p
+                     type: number
+                     format: zto,pvalue
+                   - name: etaSq
+                     title: η²
+                     type: number
+                     visible: (effectSize:eta)
+                   - name: etaSqP
+                     title: η²p
+                     type: number
+                     visible: (effectSize:etap)
+                     format: zto
+                   - name: omegaSq
+                     title: ω²
+                     type: number
+                     visible: (effectSize:omega)
+                     format: zto
+                   - name: omegaSqP
+                     title: ω²p
+                     type: number
+                     visible: (effectSize:omegap)
+                     format: zto
+                   - name: epsilonSq
+                     title: ε²
+                     type: number
+                     visible: (effectSize:epsilon)
+                     format: zto
+                   - name: epsilonSqP
+                     title: ε²p
+                     type: number
+                     visible: (effectSize:epsilonp)
+                     format: zto
 
             - name: coefficients
               title: Parameter Estimates for simple effects
@@ -445,6 +459,11 @@ items:
                        type: number
                        title: Upper
                        visible: (showParamsCI)
+                     - name: beta
+                       type: number
+                       title: β
+                       visible: (effectSize:beta)
+                       format: zto
                      - name: df
                        title: "df"
                        type: integer

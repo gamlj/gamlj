@@ -320,21 +320,8 @@ Estimate <- R6::R6Class("Estimate",
                             
                             ### anova effect sizes ####
 
-                            if (!is.something(self$tab_effectsizes))
-                              return()
-                            .anova<-car::Anova(self$model,type=3)
-                            eta<-effectsize::eta_squared(.anova,partial = F,ci=self$ciwidth,verbose=F)
-                            peta<-effectsize::eta_squared(.anova,partial = T,ci=self$ciwidth,verbose=F)
-                            omega<-  effectsize::omega_squared(.anova,partial = T,ci=self$ciwidth,verbose=F)
-                            epsilon<-  effectsize::epsilon_squared(.anova,partial = T,ci=self$ciwidth,verbose=F)
-                            alist<-list()
-                            for (i in seq_along(peta$Parameter)) {
-                              alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],ci.lower=eta[i,4],ci.upper=eta[i,5])
-                              alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=peta[i,2],ci.lower=peta[i,4],ci.upper=peta[i,5])
-                              alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=omega[i,2],ci.lower=omega[i,4],ci.upper=omega[i,5])
-                              alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=omega[i,2],ci.lower=epsilon[i,4],ci.upper=epsilon[i,5])
-                            }
-                            self$tab_effectsizes<-alist
+                            if (is.something(self$tab_effectsizes))
+                              self$tab_effectsizes<-es.glm_variances(self$model,self$ciwidth)
                           },
                           
                           

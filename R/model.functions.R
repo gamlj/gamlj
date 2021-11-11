@@ -406,17 +406,39 @@ mf.fixTable<- function(x,...) UseMethod(".fixtable")
   return(atable)
 }
 
-.fixtable.simple_lm<-function(atable) {
- 
-  atable$etaSqP<-as.numeric(effectsize::F_to_eta2(f = atable$test,df = atable$df1,df_error = atable$df2)[,1])
-  atable$omegaSq<-as.numeric(effectsize::F_to_omega2(f = atable$test,df = atable$df1,df_error = atable$df2)[,1])
-  atable$epsilonSq<-as.numeric(effectsize::F_to_omega2(f = atable$test,df = atable$df1,df_error = atable$df2)[,1])
+.fixtable.simple_anova_lm<-function(atable,model) {
+
+  mark(atable)
+  dfres<-model$df.residual
+  sumr<-summary(model)
+  N<-dfres+sumr$fstatistic[[2]]+1
+  ssres<-sigma(model)^2*dfres
+  ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+  df<-atable$df1
+  SS<-df*atable$test*ssres/dfres
+  atable$etaSq  <- SS/(ssmod+ssres)
+  atable$etaSqP <- SS/(SS+ssres)
+  atable$omegaSq <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
+  atable$omegaSqP <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
+  atable$epsilonSq<-(SS-(ssres*df/dfres))/(ssmod+ssres)
+  atable$epsilonSqP<-(SS-(ssres*df/dfres))/(SS+ssres)
   as.data.frame(atable)  
   
   
 }
 
 
+### beta in parameter estimates ###
+
+.fixtable.simple_params_lm<-function(atable,model,variable) {
+  
+      xstd<-1
+      if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
+      y<-names(attr(model$terms,"dataClass"))[1]
+      ystd<-sd(model$model[,y])
+      atable$beta<-atable$estimate*(xstd/ystd) 
+      atable
+}
 ############# some models are not built in standard way, here we fix them ##########
 mf.fixModel<- function(x,...) UseMethod(".fixModel")
 

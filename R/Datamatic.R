@@ -90,10 +90,7 @@ Variable <- R6::R6Class(
         self$type="numeric"
         scaling<-sapply(self$options$scaling,function(a) a$type)
         names(scaling)<-unlist(sapply(self$options$scaling,function(a) a$var))
-        if (var %in% names(scaling))
-             self$scaling<-scaling[[var]]
-        else
-             self$scaling<-"centered"
+        self$scaling<-ifelse(var %in% names(scaling),scaling[[var]],"centered")
         
         if (is.factor(vardata)) {
           self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to numeric"))
@@ -192,61 +189,50 @@ Variable <- R6::R6Class(
       if (is.null(type))
         type<-"simple"
       
+      switch(type,
+            "simple"={
+              dummy <- stats::contr.treatment(levels)
+              dimnames(dummy) <- NULL
+              coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
+              contrast <- (dummy - coding)
+            },
+            "deviation"={
+              contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
+              for (i in seq_len(nLevels-1)) {
+                    contrast[i+1, i] <- 1
+                    contrast[1, i] <- -1
+              }
+              },
+            'difference'={
+                  contrast <- stats::contr.helmert(levels)
+                  for (i in 1:ncol(contrast))
+                  contrast[,i] <- contrast[,i] / (i + 1)
+              },
+            'helmert'={
+                  contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
+        
+                  for (i in seq_len(nLevels-1)) {
+                        p <- (1 / (nLevels - i + 1))
+                        contrast[i,i] <- p * (nLevels - i)
+                        contrast[(i+1):nLevels,i] <- -p
+                    }
+                  },
+             'polynomial'={
+                  contrast <- stats::contr.poly(levels)
+              },
+            'repeated'={
+        
+                  contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
+                  for (i in seq_len(nLevels-1)) {
+                      contrast[1:i,i] <- (nLevels-i) / nLevels
+                      contrast[(i+1):nLevels,i] <- -i / nLevels
+                  }
+              },
+            'dummy'={
+                    contrast <- stats::contr.treatment(levels,base=1)
+      } 
+      ) # end of switch
       
-      if (type == 'simple') {
-        dummy <- stats::contr.treatment(levels)
-        dimnames(dummy) <- NULL
-        coding <- matrix(rep(1/nLevels, prod(dim(dummy))), ncol=nLevels-1)
-        contrast <- (dummy - coding)
-        
-      } else if (type == 'deviation') {
-        contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
-        for (i in seq_len(nLevels-1)) {
-          contrast[i+1, i] <- 1
-          contrast[1, i] <- -1
-        }
-        
-      } else if (type == 'difference') {
-        
-        contrast <- stats::contr.helmert(levels)
-        for (i in 1:ncol(contrast))
-          contrast[,i] <- contrast[,i] / (i + 1)
-        
-        dimnames(contrast) <- NULL
-        
-      } else if (type == 'helmert') {
-        
-        contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
-        
-        for (i in seq_len(nLevels-1)) {
-          p <- (1 / (nLevels - i + 1))
-          contrast[i,i] <- p * (nLevels - i)
-          contrast[(i+1):nLevels,i] <- -p
-        }
-        
-      } else if (type == 'polynomial') {
-        
-        contrast <- stats::contr.poly(levels)
-        dimnames(contrast) <- NULL
-        
-      } else if (type == 'repeated') {
-        
-        contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
-        for (i in seq_len(nLevels-1)) {
-          contrast[1:i,i] <- (nLevels-i) / nLevels
-          contrast[(i+1):nLevels,i] <- -i / nLevels
-        }
-        
-      } else if (type == 'dummy') {
-        contrast <- stats::contr.treatment(levels,base=1)
-        dimnames(contrast) <- NULL
-      } else {
-        contrast <- matrix(0, nrow=nLevels, ncol=nLevels-1)
-        for (i in seq_len(nLevels-1)) {
-          contrast[i+1, i] <- 1
-          contrast[1, i] <- -1
-        }
-      }
       dimnames(contrast)<-list(NULL,paste0(FACTOR_SYMBOL,1:(nLevels-1)))
       contrast
     },

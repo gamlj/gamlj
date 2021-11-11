@@ -291,7 +291,9 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     }
     
     res$contrast<-as.character(res$contrast)
-    
+    ### make fixes depending on the model and table
+    class(res)<-c(paste0("simple_params_",obj$options$modelSelection),class(res))
+    anova<-mf.fixTable(res,model,variable64)
     params<-res
 
     ### now we build the anova table ###à
@@ -306,8 +308,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     }
 
     ### make fix dependending of the type of model ###    
-    class(res)<-c(paste0("simple_",obj$options$modelSelection),class(res))
-    anova<-mf.fixTable(res)
+    class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
+    anova<-mf.fixTable(res,model)
     ### check some stuff 
     .all <- c(term64,variable64)
     test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
