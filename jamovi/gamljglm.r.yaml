@@ -213,6 +213,8 @@ items:
                     - dep_scale
                     - fixedIntercept
                     - paramCIWidth
+                    - cimethod
+                    - semethod
 
              columns:
                     - name: source

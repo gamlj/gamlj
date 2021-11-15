@@ -33,10 +33,10 @@ es.relativerisk<-function(obj) {
 es.glm_variances<-function(model,ciwidth) {
   
   .anova<-car::Anova(model,type=3)
-  anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
+  .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
   anovatab<-.anova
   colnames(anovatab)<-c("ss","df","f","p")
-  effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),"ss"]
+  effss<-anovatab$ss[!(rownames(anovatab) %in% c("Residuals"))]
   errss<-anovatab$ss[rownames(anovatab)=="Residuals"]
   sumr<-summary(model)
   
@@ -45,7 +45,6 @@ es.glm_variances<-function(model,ciwidth) {
   edf<-sumr$fstatistic[[3]]
   mdf<-sumr$fstatistic[[2]]
   modss<-f*errss*mdf/edf
-  
   #####
   # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
   ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
@@ -66,7 +65,6 @@ es.glm_variances<-function(model,ciwidth) {
   omegap<-  effectsize::omega_squared(.anova,partial = T,ci=ciwidth,verbose=F)
   epsilon<-  effectsize::epsilon_squared(.canova,partial = F,ci=ciwidth,verbose=F)
   epsilonp<-  effectsize::epsilon_squared(.anova,partial = T,ci=ciwidth,verbose=F)
-  
   alist<-list()
   for (i in seq_along(etap$Parameter)) {
     alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],ci.lower=eta[i,4],ci.upper=eta[i,5])

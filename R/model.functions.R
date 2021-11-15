@@ -49,28 +49,43 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
 
-      .bootstrap           <-  obj$options$cimethod=="boot"
+  mark(obj$options$cimethod)
+      .bootstrap           <-  obj$options$cimethod %in% c("boot","quantile","bci","bcai")
+      .iterations          <-  1000
+      .ci_method           <-  obj$options$cimethod
+      .ci_width            <-  obj$ciwidth
+      .se_method           <-  obj$options$semethod=="robust"
       .coefficients        <-  as.data.frame(parameters::parameters(
                                                                    model,
-                                                                   ci=obj$ciwidth,
-                                                                   ci_method=obj$options$cimethod),stringAsFactors=FALSE)
+                                                                   robust=.se_method,
+                                                                   bootstrap=.bootstrap,
+                                                                   iterations=.iterations,
+                                                                   ci=.ci_width,
+                                                                   ci_method=.ci_method),stringAsFactors=FALSE)
      .coefficients$CI     <-  NULL
       names(.coefficients)[1:8] <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
-      if (.bootstrap) {
-              bootci<-as.data.frame(parameters::parameters(model,ci=obj$ciwidth,bootstrap=TRUE),stringAsFactors=FALSE)
-              .coefficients$ci.lower  <-  bootci$CI_low
-              .coefficients$ci.upper  <-  bootci$CI_high
-              obj$warnings<-list(topic="tab_coefficients",message="Bootstrap confidence intervals")
-      }
+      
       if (obj$option("effectSize","expb")) {
-               ex            <-  as.data.frame(parameters::parameters(model,exponentiate=TRUE,bootstrap=.bootstrap))
-               ex            <-  ex[,c("Coefficient","CI_low" ,"CI_high")]
-               names(ex)     <-  c("expb","expb.ci.lower","expb.ci.upper")
-              .coefficients  <-  cbind(.coefficients,ex)
+               ex            <-  as.data.frame(parameters::parameters(model,
+                                                                      exponentiate=TRUE,
+                                                                      bootstrap=.bootstrap,
+                                                                      iterations=.iterations,
+                                                                      ci=.ci_width,
+                                                                      ci_method=.ci_method))
+               
+               .coefficients$exp  <-  estim$Coefficient
+               .coefficients$exp_ci.lower<-estim$CI_low
+               .coefficients$exp_ci.upper<-estim$CI_high
       }
      if (obj$option("effectSize","beta")) {
-        estim<-parameters::parameters(model,standardize="refit")
+        estim<-parameters::parameters(model,
+                                      standardize="refit",
+                                      bootstrap=.bootstrap,
+                                      ci_method=.ci_method,
+                                      iterations=.iterations)
        .coefficients$beta  <-  estim$Coefficient
+       .coefficients$beta_ci.lower<-estim$CI_low
+       .coefficients$beta_ci.upper<-estim$CI_high
      }
       return(.coefficients)
 }
@@ -408,7 +423,6 @@ mf.fixTable<- function(x,...) UseMethod(".fixtable")
 
 .fixtable.simple_anova_lm<-function(atable,model) {
 
-  mark(atable)
   dfres<-model$df.residual
   sumr<-summary(model)
   N<-dfres+sumr$fstatistic[[2]]+1

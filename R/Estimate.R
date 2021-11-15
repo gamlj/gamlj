@@ -148,6 +148,8 @@ Estimate <- R6::R6Class("Estimate",
 
                           },
                           .estimateTests=function() {
+                            
+                                ginfo("Estimating Info")
 
                                 ### update info table
                                 self$tab_info[["sample"]]$value<-self$datamatic$N
@@ -173,6 +175,7 @@ Estimate <- R6::R6Class("Estimate",
                                 
 
                                 ### other table ###
+                                ginfo("Estimating Anova")
                                 
                                 self$tab_anova<-mf.anova(self$model,self)
                                 

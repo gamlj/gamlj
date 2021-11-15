@@ -676,7 +676,6 @@ Plotter <- R6::R6Class(
       results<-try_hard(do.call(emmeans::emmeans,em_opts))
       self$warnings<-list("topic"="plot",message=results$warning)
       self$errors<-list("topic"="plot",message=results$error)
-      mark(results)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####

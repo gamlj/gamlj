@@ -10,7 +10,8 @@ procedure.beta<- function(x,...) UseMethod(".beta")
         data[[var]]<-as.numeric(scale(data[[var]]))
   }
   z<-update(model,data)
-  parameters::parameters(z)$Coefficient
+  confint(model)
+  parameters::parameters(model)$Coefficient
 }
 
 
@@ -293,8 +294,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     res$contrast<-as.character(res$contrast)
     ### make fixes depending on the model and table
     class(res)<-c(paste0("simple_params_",obj$options$modelSelection),class(res))
-    anova<-mf.fixTable(res,model,variable64)
-    params<-res
+    params<-mf.fixTable(res,model,variable64)
 
     ### now we build the anova table ###à
     res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
@@ -323,7 +323,6 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
             obj$absorbe_issues(obj$datamatic$variables[[.term]])
       }
     }
-    mark(obj$warnings)
 
   ginfo("End of Simple Effects")
   return(list(anova,params))

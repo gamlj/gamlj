@@ -72,7 +72,6 @@ children:
             type: CheckBox
             optionPart: epsilonp
             optionName: effectSize
-
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -115,8 +114,6 @@ children:
                   type: TermLabel
       - type: CheckBox
         name: fixedIntercept
-
-
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -343,8 +340,6 @@ children:
                 name: plotOriginalScale
               - type: CheckBox
                 name: plotLinesTypes
-
-
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -417,32 +412,63 @@ children:
         label: Residuals-Predicted plot
   - type: CollapseBox
     label: Options
-    style: inline
+    style: list
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: CI Method
+      - type: LayoutBox
+        margin: large
+        style: inline
         children:
-          - type: RadioButton
-            name: cimethod_standard
-            optionName: cimethod
-            optionPart: standard
-          - type: RadioButton
-            name: cimethod_boot
-            optionName: cimethod
-            optionPart: boot
-      - type: Label
-        label: Additional Info
+          - type: Label
+            label: CI Method
+            children:
+              - type: RadioButton
+                name: cimethod_standard
+                optionName: cimethod
+                optionPart: standard
+              - type: RadioButton
+                name: cimethod_quantile
+                optionName: cimethod
+                optionPart: quantile
+              - type: RadioButton
+                name: cimethod_bci
+                optionName: cimethod
+                optionPart: bci
+              - type: RadioButton
+                name: cimethod_bcai
+                optionName: cimethod
+                optionPart: bcai
+              - type: TextBox
+                name: bootR
+                format: number
+                enable: (cimethod_bcai || cimethod_bci || cimethod_quantile)
+          - type: Label
+            label: SE Method
+            children:
+              - type: RadioButton
+                name: semethod_standard
+                optionName: semethod
+                optionPart: standard
+              - type: RadioButton
+                name: semethod_robust
+                optionName: semethod
+                optionPart: robust
+      - type: LayoutBox
+        margin: large
+        style: inline
         children:
-          - type: CheckBox
-            name: interceptInfo
-          - type: CheckBox
-            name: effectSizeInfo
-      - type: Label
-        label: Save
-        children:
-          - type: Output
-            name: predicted
-          - type: Output
-            name: residuals
+          - type: Label
+            label: Additional Info
+            children:
+              - type: CheckBox
+                name: interceptInfo
+              - type: CheckBox
+                name: effectSizeInfo
+          - type: Label
+            label: Save
+            children:
+              - type: Output
+                name: predicted
+              - type: Output
+                name: residuals

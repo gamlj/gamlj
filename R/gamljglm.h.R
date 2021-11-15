@@ -15,6 +15,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             showParamsCI = TRUE,
             paramCIWidth = 95,
             cimethod = "standard",
+            bootR = 1000,
+            semethod = "standard",
             contrasts = NULL,
             showRealNames = TRUE,
             showContrastCode = FALSE,
@@ -113,7 +115,21 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default="standard",
                 options=list(
                     "standard",
-                    "boot"))
+                    "quantile",
+                    "bci",
+                    "bcai"))
+            private$..bootR <- jmvcore::OptionNumber$new(
+                "bootR",
+                bootR,
+                min=1,
+                default=1000)
+            private$..semethod <- jmvcore::OptionList$new(
+                "semethod",
+                semethod,
+                default="standard",
+                options=list(
+                    "standard",
+                    "robust"))
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -340,6 +356,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..showParamsCI)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..cimethod)
+            self$.addOption(private$..bootR)
+            self$.addOption(private$..semethod)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
             self$.addOption(private$..showContrastCode)
@@ -386,6 +404,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         showParamsCI = function() private$..showParamsCI$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         cimethod = function() private$..cimethod$value,
+        bootR = function() private$..bootR$value,
+        semethod = function() private$..semethod$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
         showContrastCode = function() private$..showContrastCode$value,
@@ -431,6 +451,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..showParamsCI = NA,
         ..paramCIWidth = NA,
         ..cimethod = NA,
+        ..bootR = NA,
+        ..semethod = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
         ..showContrastCode = NA,
@@ -735,7 +757,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "scaling",
                                 "dep_scale",
                                 "fixedIntercept",
-                                "paramCIWidth"),
+                                "paramCIWidth",
+                                "cimethod",
+                                "semethod"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1330,7 +1354,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 analysisId = analysisId,
                 revision = revision,
                 pause = NULL,
-                completeWhenFilled = FALSE,
+                completeWhenFilled = TRUE,
                 requiresMissings = FALSE)
         }))
 
@@ -1363,6 +1387,8 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
 #' @param cimethod .
+#' @param bootR a number bootstrap repetitions.
+#' @param semethod .
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
@@ -1485,6 +1511,8 @@ gamljGlm <- function(
     showParamsCI = TRUE,
     paramCIWidth = 95,
     cimethod = "standard",
+    bootR = 1000,
+    semethod = "standard",
     contrasts = NULL,
     showRealNames = TRUE,
     showContrastCode = FALSE,
@@ -1591,6 +1619,8 @@ gamljGlm <- function(
         showParamsCI = showParamsCI,
         paramCIWidth = paramCIWidth,
         cimethod = cimethod,
+        bootR = bootR,
+        semethod = semethod,
         contrasts = contrasts,
         showRealNames = showRealNames,
         showContrastCode = showContrastCode,

@@ -4,7 +4,7 @@ title: General Linear Model
 menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
-completeWhenFilled: false
+completeWhenFilled: true
 export: true
 description:
     main: |
@@ -129,8 +129,32 @@ options:
       options:
         - name:  standard
           title: Standard (fast)
-        - name: boot
-          title: Bootstrap (very slow)
+        - name: quantile
+          title: Bootstrap (Percent)
+        - name:  bci
+          title: Bootstrap (BC)
+        - name:  bcai
+          title: Bootstrap (BCA)
+          
+    - name: bootR
+      title: Bootstrap rep.
+      type: Number
+      min: 1
+      default: 1000
+      description:
+          R: >
+            a number bootstrap repetitions.
+
+
+    - name: semethod
+      title: SE Method
+      type: List
+      default: standard
+      options:
+        - name:  standard
+          title: Standard 
+        - name:  robust
+          title: Robust (HC)
 
 
     - name: contrasts

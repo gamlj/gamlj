@@ -96,7 +96,7 @@ Syntax <- R6::R6Class(
               self$hasIntercept<-self$options$fixedIntercept
               modelTerms<-self$options$modelTerms
               aOne<-which(unlist(self$options$modelTerms)=="1")
-              mark(modelTerms)
+
               if (is.something(aOne)) {
                 modelTerms[[aOne]]<-NULL
                 self$hasIntercept=TRUE
