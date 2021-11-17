@@ -12,7 +12,6 @@ Syntax <- R6::R6Class(
               hasTerms=FALSE,
               clusters=NULL,
               isProper=NULL,
-              tab_info=NULL,
               tab_anova=NULL,
               tab_coefficients=NULL,
               tab_intercept=NULL,
@@ -46,18 +45,120 @@ Syntax <- R6::R6Class(
                 
                 ### infomatic class takes care of all info about different models
                 self$infomatic<-Infomatic$new(options,datamatic)
-                
-                
-                ## prepare tables for init
-                private$.make_structure()
 
-
-
-
-
-                } # here initialize ends
+                }, # here initialize ends
+            #### init functions #####
+            
+              init_info=function() {
+                  tab                   <-   self$infomatic$info_table()
+                  tab[["call"]]$specs   <-    self$formula
               
+                  if (self$option("dep_scale"))
+                    tab[["dep"]]<-list(info="Y transform",value=self$options$dep_scale)
+                  
+                  try_hard(tab)
               
+              },
+             init_main_anova=function() {
+               
+               tab<-list()
+               if (self$hasTerms)
+                 tab<-lapply(self$options$modelTerms, function(x) list(name=.stringifyTerm(x)))
+               
+               if (self$options$modelSelection=="lm") {
+                  if (self$hasTerms)
+                    tab<-prepend_list(tab,list(name="Model",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+                 
+                  tab<-append_list(tab,list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+                  tab<-append_list(tab,list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+               }       
+                 ### we need at least a row otherwise we cannot add notes to the table
+               if (is.null(tab))
+                   tab[[1]]<-list(test="")
+                 
+               try_hard(tab)
+               },
+               
+               ### parameter estimates ####
+               init_main_coefficients=function() {
+                    .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
+                    .len<-length(.terms)
+                    if (self$options$modelSelection=="multinomial") 
+                            .len  <- .len * (self$datamatic$dep$nlevels-1)
+               
+                    if (self$options$modelSelection=="ordinal") 
+                            .len  <- .len + (self$datamatic$dep$nlevels-2)
+               
+               
+                    try_hard(lapply(1:.len, function(t) list(source="")))
+               },
+            init_main_contrastCodeTables=function() {
+
+                  try_hard({
+                    tab<-NULL
+            
+                    if (self$options$showContrastCode) {
+                      
+                          tab <-lapply(self$options$factors, function(factor) {
+                                        focal<-self$datamatic$variables[[tob64(factor)]]
+                                        values<-focal$contrast_values
+                                        values<-as.data.frame(t(values))
+                                        names(values)<-paste("Level",focal$levels,sep="=")
+                                        values$cname<-focal$paramsnames
+                                        values$clab<-unlist(focal$contrast_labels)
+                                        values
+                                  })
+                        }
+            
+                  })
+            },
+            init_main_effectsizes=function() {
+              try_hard({
+                        alist<-NULL  
+                        if (self$option("effectSizeInfo")) {
+                                alist<-list()
+                                for (term in self$options$modelTerms) {
+                                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
+                                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_peta2)
+                                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_omega2)
+                                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_pomega2)
+                                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_epsilon2)
+                                      alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_pepsilon2)
+                                }
+                        }
+                        alist
+              })
+            },
+            ### intercept more info ###
+            
+            init_main_intercept=function() {
+              try_hard(self$tab_intercept<-list(source="(Intercept)"))
+            },
+            
+            ### posthoc means ###
+            
+            init_posthoc=function() {
+                    
+                  try_hard({    
+                        lapply(self$options$posthoc, function(.term) {
+                              p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
+                              nrow<-p*(p-1)/2
+                              ncol<-(length(.term)*2)+1
+                              if (self$options$modelSelection=="multinomial") {
+                                  nrow<-nrow*(self$datamatic$dep$nlevels)
+                                }
+                              df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
+                             .names<-c(.term,"vs",.term)
+                              names(df)<-.names
+                              df$vs="-"
+                              df
+                              })
+                  })
+              
+            } 
+            
+            
+
           ),   # End public
           active=list(
            ### inherited warnings and errors are overriden to check specific message to change, and then passed to super 
@@ -79,10 +180,6 @@ Syntax <- R6::R6Class(
                return(private$.errors)
              if (is.null(obj))
                return()
-             
-##             check<-length(grep("infinite or missing",obj,fixed = T)>0) 
-##             if (check) 
-##               super$errors<-ERRS[["noluck"]]
              
              super$errors<-obj
            }
@@ -126,78 +223,29 @@ Syntax <- R6::R6Class(
   
             .make_structure=function() {
               
-              #### info table ####
-              self$tab_info                   <-  self$infomatic$info_table()
-              self$tab_info[["call"]]$specs   <-  self$formula
-              
-              if (self$option("dep_scale"))
-                    self$tab_info[["dep"]]<-list(info="Y transform",value=self$options$dep_scale)
-              
-              if (is.something(self$infomatic$r2)) {
-                
-                 self$tab_r2<-lapply(self$infomatic$r2, function(x) list(type=x))
-                 
-              }
-              
               ## some warnings ###
               if (self$option("cimethod","boot"))
                   self$warnings<-list(topic="tab_info",message="Bootstrap C.I. are being computed, this may take a while")
 
               ### anova table ###
               
-              if (self$hasTerms)
-                  self$tab_anova<-lapply(self$options$modelTerms, function(x) list(name=.stringifyTerm(x)))
-              
-              if (self$options$modelSelection=="lm") {
-                if (self$hasTerms)
-                        self$tab_anova<-prepend_list(self$tab_anova,list(name="Model",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
-                self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
-                self$tab_anova[[length(self$tab_anova)+1]]<-list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq="")
-              }  
-              ### we need at least a row otherwise we cannot add notes to the table
-              if (is.null(self$tab_anova))
-                    self$tab_anova[[1]]<-list(test="")
-
+    
               #### additional fit indeces ####
 
               if (is.something(self$infomatic$fit))
                   self$tab_fit<-self$infomatic$info_fit()
 
-              ### parameter estimates ####
-              .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
-              .len<-length(.terms)
-              if (self$options$modelSelection=="multinomial") {
-                .len  <- .len * (self$datamatic$dep$nlevels-1)
-              }
-              if (self$options$modelSelection=="ordinal") {
-                .len  <- .len + (self$datamatic$dep$nlevels-2)
-              }
-              
-              self$tab_coefficients<-lapply(1:.len, function(t) list(source=""))
 
               
             ### intercept info table ###
               
-              if (self$option("interceptInfo")) {
-               self$tab_intercept<-list(source="(Intercept)") 
+#              if (self$option("interceptInfo")) {
+#               self$tab_intercept<-list(source="(Intercept)") 
                 
-              }
+#              }
                 
             ### effect sizes table ###
 
-            if (self$option("effectSizeInfo")) {
-                alist<-list()
-                for (term in self$options$modelTerms) {
-                     alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
-                     alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_peta2)
-                     alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_omega2)
-                     alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_pomega2)
-                     alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_epsilon2)
-                     alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_pepsilon2)
-                 }
-                
-                self$tab_effectsizes<-alist
-            }
               
               
             ### estimated marginal means ###
@@ -218,26 +266,6 @@ Syntax <- R6::R6Class(
                    self$warnings<-list(topic="tab_emmeans",message=paste("Expected means are expressed as",emm))
             }
 
-              ### posthoc means ###
-              if (self$option("posthoc")) {
-                 
-                self$tab_posthoc<-lapply(self$options$posthoc, function(.term) {
-                  p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
-                  nrow<-p*(p-1)/2
-                  ncol<-(length(.term)*2)+1
-                  if (self$options$modelSelection=="multinomial") {
-                      nrow<-nrow*(self$datamatic$dep$nlevels)
-                  }
-                  df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
-                  .names<-c(.term,"vs",.term)
-                  names(df)<-.names
-                  df$vs="-"
-                  df
-                })
-                
-
-              } 
-              
             ### simple effects ########
 
               if (is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators)) {
@@ -286,18 +314,6 @@ Syntax <- R6::R6Class(
 
               ### Contrast coding explanation ####
               
-              if (self$options$showContrastCode) {
-                self$tab_contrastcodes<-lapply(self$options$factors, function(factor) {
-                    focal<-self$datamatic$variables[[tob64(factor)]]
-                    values<-focal$contrast_values
-                    values<-as.data.frame(t(values))
-                    names(values)<-paste("Level",focal$levels,sep="=")
-                    values$cname<-focal$paramsnames
-                    values$clab<-unlist(focal$contrast_labels)
-                    values
-                    })
-
-                }
                 
               ### here are specific calls ########
             

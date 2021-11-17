@@ -7,8 +7,9 @@ gamljGlmClass <- R6::R6Class(
     .estimate_machine=NULL,
     .plotter_machine=NULL,
     .ready=NULL,
+    .smartTabs=list(),
     .init=function() {
-      ginfo("init")
+      ginfo("### Module phase: init ###")
       
       class(private$.results) <- c('gamlj', class(private$.results))
       
@@ -26,24 +27,79 @@ gamljGlmClass <- R6::R6Class(
       plotter_machine<-Plotter$new(estimate_machine,self$results)
 
       ### info table ###
-      j.init_table(self$results$info,estimate_machine$tab_info) 
+      aSmartTab<-SmartTable$new(self$results$info,estimate_machine)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
 
       ### r2 table does not need initializing ###
 
+      ## R2 table ###
+      aSmartTab<-SmartTable$new(self$results$main$r2,estimate_machine)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
+
       ### anova table ###
-      j.init_table(self$results$main$anova,estimate_machine$tab_anova) 
+
+      aSmartTab<-SmartTable$new(self$results$main$anova,estimate_machine)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
 
       ### estimates table ###
-      j.init_table(self$results$main$coefficients,estimate_machine$tab_coefficients, ci=T,ciwidth=self$options$ciWidth)
+      aSmartTab<-SmartTable$new(self$results$main$coefficients,estimate_machine)
+      aSmartTab$ci(c("est"),self$options$ciWidth)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
+      ### constrast code tables
+      aSmartArray<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
+      aSmartArray$expandable<-TRUE
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
 
-      if (!is.something(self$options$factors))
-        self$results$main$coefficients$getColumn('label')$setVisible(FALSE)
+      ### intercept initialized in yalm ###
+
+      ### intercept more info table ###
+      
+      aSmartTab<-SmartTable$new(self$results$main$intercept,estimate_machine)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
+      ### effectsizes table ###
+
+      aSmartTab<-SmartTable$new(self$results$main$effectsizes,estimate_machine)
+      aSmartTab$ci(c("es"),self$options$ciWidth)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+
+      ## post hoc #####
+      
+      aSmartArray<-SmartArray$new(self$results$posthoc,estimate_machine)
+      aSmartArray$expandable<-TRUE
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
+      
+      # if (is.something(self$options$posthoc)) {
+      #   
+      #   for (i in seq_along(self$options$posthoc)) {
+      #     term<-self$options$posthoc[[i]]
+      #     aTable<-self$results$posthoc$get(key = term)
+      #     aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
+      #     j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
+      #     j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
+      #   } 
+      #   
+      # }
+      
+      
+            
+      ### init all ####
+
+ 
+      for (tab in private$.smartTabs)
+            tab$initTable()
+      
+
+
+#      if (!is.something(self$options$factors))
+#        self$results$main$coefficients$getColumn('label')$setVisible(FALSE)
       
       ### intercept initialized in yalm ###
 
-      ### effectsizes table ###
-      j.init_table(self$results$main$effectsizes,estimate_machine$tab_effectsizes,ci=T,ciwidth=self$options$ciWidth) 
-      
+
       
       ### estimate marginal means
       
@@ -104,31 +160,8 @@ gamljGlmClass <- R6::R6Class(
         
       ### posthoc ####
       
-      if (is.something(self$options$posthoc)) {
-        
-        for (i in seq_along(self$options$posthoc)) {
-            term<-self$options$posthoc[[i]]
-            aTable<-self$results$posthoc$get(key = term)
-            aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
-            j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
-            j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
-        } 
-        
-      }
 
-      if (is.something(estimate_machine$tab_contrastcodes)) {
 
-        for (i in seq_along(self$options$factors)) {
-          term<-self$options$factors[[i]]
-          aTable<-self$results$main$contrastCodeTables$get(key = term)
-          eTable<-estimate_machine$tab_contrastcodes[[i]]
-          levels_pos<-seq_len(length(names(eTable))-2)
-          j.expand_table(aTable,names(eTable)[levels_pos],append=T,type="number",names64=FALSE) 
-          names(eTable)[levels_pos]<-make.names(names(eTable)[levels_pos])
-          j.init_table(aTable,eTable)
-        }
-      }
-      
       #### normality assuption test ####
       if (is.something(estimate_machine$tab_normtest))
         j.init_table(self$results$assumptions$normTest,estimate_machine$tab_normtest)
@@ -143,7 +176,7 @@ gamljGlmClass <- R6::R6Class(
       private$.plotter_machine<-plotter_machine
     },
     .run=function() {
-      ginfo("run")
+      ginfo("### Module phase: run ###")
       
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
@@ -155,39 +188,12 @@ gamljGlmClass <- R6::R6Class(
       private$.estimate_machine$estimate(data)
       
       ### info table ###
-      j.fill_table(self$results$info,private$.estimate_machine$tab_info) 
-      
-      j.add_warnings(self$results$info,private$.data_machine,"data",reset=TRUE)
-      j.add_warnings(self$results$info,private$.estimate_machine,"info")
-      
-      ## R2 table ###
-      j.fill_table(self$results$main$r2,private$.estimate_machine$tab_r2)
-      j.add_warnings(self$results$main$r2,private$.estimate_machine,"tab_r2")
-      
-      ## Intercept table ###
-      j.fill_table(self$results$main$intercept,private$.estimate_machine$tab_intercept)
-      j.add_warnings(self$results$main$intercept,private$.estimate_machine,"tab_intercept")
-      
-      ## anova table ###
-      j.fill_table(self$results$main$anova,private$.estimate_machine$tab_anova)
-      j.add_warnings(self$results$main$anova,private$.estimate_machine,"tab_anova")
+      for (smarttab in private$.smartTabs)
+           smarttab$fillTable()
 
-      
-      ## effect sizes table ###
-      j.fill_table(self$results$main$effectsizes,private$.estimate_machine$tab_effectsizes)
-      j.add_warnings(self$results$main$effectsizes,private$.estimate_machine,"tab_effectsizes")
-      
-      ### parameter estimates
-      j.fill_table(self$results$main$coefficients,private$.estimate_machine$tab_coefficients)
-      j.add_warnings(self$results$main$coefficients,private$.estimate_machine,"tab_coefficients")
 
+    
       
-      ### simple effects
-      j.fill_table(self$results$simpleEffects$anova,private$.estimate_machine$tab_simpleAnova)
-      j.add_warnings(self$results$simpleEffects$anova,private$.estimate_machine,"tab_simpleAnova")
-      
-      j.fill_table(self$results$simpleEffects$coefficients,private$.estimate_machine$tab_simpleCoefficients)
-      j.add_warnings(self$results$simpleEffects$coefficients,private$.estimate_machine,"tab_simpleCoefficients")
       
       ### simple interactions
       if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
@@ -203,18 +209,7 @@ gamljGlmClass <- R6::R6Class(
       }
       
       
-      ### post hoc
-      
-      if (is.something(private$.estimate_machine$tab_posthoc)) {
-        
-        for (i in seq_along(self$options$posthoc)) {
-          term<-self$options$posthoc[[i]]
-          aTable<-self$results$posthoc$get(key = term)
-          j.fill_table(aTable,private$.estimate_machine$tab_posthoc[[i]])
-          j.add_warnings(aTable,private$.estimate_machine,"tab_posthoc")
-        } 
-      }
-      
+
     ###  emmeans 
       
       if (is.something(private$.estimate_machine$tab_emmeans)) {
@@ -250,7 +245,7 @@ gamljGlmClass <- R6::R6Class(
       private$.estimate_machine$savePredRes(self$results) 
       
 
-      mark("end")
+      ginfo("### Module phase: end ###")
       return()
           
         

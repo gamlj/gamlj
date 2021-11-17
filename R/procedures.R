@@ -74,18 +74,18 @@ procedure.posthoc <- function(Obj) {
     .cont <- gsub(" - ", "-", .cont, fixed = T)
     .cont <- gsub(" / ", "/", .cont, fixed = T)
 
-    
+
     .labs64 <- sapply(.cont, function(a) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
     })
     .labs <- fromb64(.labs64)
+    mark(.labs)
     labs <- do.call("rbind", .labs)
+
     cols <- make.names(c(rev(ph),rev(ph)),unique = T)
     colnames(labs) <- cols
     
     tableData <- cbind(labs, tableData)
-#    sortstring <- paste0("order(", paste0("tableData$", cols, collapse = ","), ")")
-#    tableData <- tableData[eval(parse(text = sortstring)), ]
     for (col in cols)
       tableData[,col]<-as.character(tableData[,col])
     

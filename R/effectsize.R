@@ -67,12 +67,12 @@ es.glm_variances<-function(model,ciwidth) {
   epsilonp<-  effectsize::epsilon_squared(.anova,partial = T,ci=ciwidth,verbose=F)
   alist<-list()
   for (i in seq_along(etap$Parameter)) {
-    alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],ci.lower=eta[i,4],ci.upper=eta[i,5])
-    alist[[length(alist)+1]]<-list(..space..=etap[i,1],estimate=etap[i,2],ci.lower=etap[i,4],ci.upper=etap[i,5])
-    alist[[length(alist)+1]]<-list(..space..=omega[i,1],estimate=omega[i,2],ci.lower=omega[i,4],ci.upper=omega[i,5])
-    alist[[length(alist)+1]]<-list(..space..=omegap[i,1],estimate=omegap[i,2],ci.lower=omegap[i,4],ci.upper=omegap[i,5])
-    alist[[length(alist)+1]]<-list(..space..=epsilon[i,1],estimate=epsilon[i,2],ci.lower=epsilon[i,4],ci.upper=epsilon[i,5])
-    alist[[length(alist)+1]]<-list(..space..=epsilonp[i,1],estimate=epsilonp[i,2],ci.lower=epsilonp[i,4],ci.upper=epsilonp[i,5])
+    alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],es.ci.lower=eta[i,4],es.ci.upper=eta[i,5])
+    alist[[length(alist)+1]]<-list(..space..=etap[i,1],estimate=etap[i,2],es.ci.lower=etap[i,4],es.ci.upper=etap[i,5])
+    alist[[length(alist)+1]]<-list(..space..=omega[i,1],estimate=omega[i,2],es.ci.lower=omega[i,4],es.ci.upper=omega[i,5])
+    alist[[length(alist)+1]]<-list(..space..=omegap[i,1],estimate=omegap[i,2],es.ci.lower=omegap[i,4],es.ci.upper=omegap[i,5])
+    alist[[length(alist)+1]]<-list(..space..=epsilon[i,1],estimate=epsilon[i,2],es.ci.lower=epsilon[i,4],es.ci.upper=epsilon[i,5])
+    alist[[length(alist)+1]]<-list(..space..=epsilonp[i,1],estimate=epsilonp[i,2],es.ci.lower=epsilonp[i,4],es.ci.upper=epsilonp[i,5])
     
   }
   

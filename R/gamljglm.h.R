@@ -627,19 +627,19 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="etaSqP", 
                                     `title`="\u03B7\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:partEta)", 
+                                    `visible`="(effectSize:etap)", 
                                     `format`="zto"),
                                 list(
-                                    `name`="omegaSq", 
+                                    `name`="omegaSqP", 
                                     `title`="\u03C9\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:omega)", 
+                                    `visible`="(effectSize:omegap)", 
                                     `format`="zto"),
                                 list(
-                                    `name`="epsilonSq", 
+                                    `name`="epsilonSqP", 
                                     `title`="\u03B5\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:epsilon)", 
+                                    `visible`="(effectSize:epsilonp)", 
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
@@ -738,11 +738,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Estimate", 
                                     `type`="number"),
                                 list(
-                                    `name`="ci.lower", 
+                                    `name`="es.ci.lower", 
                                     `title`="Lower", 
                                     `type`="number"),
                                 list(
-                                    `name`="ci.upper", 
+                                    `name`="es.ci.upper", 
                                     `title`="Higher", 
                                     `type`="number")),
                             refs="effectsize"))
@@ -779,12 +779,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="ci.lower", 
+                                    `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="ci.upper", 
+                                    `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
@@ -848,7 +848,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "postHocCorr"),
                 template=jmvcore::Table$new(
                     options=options,
-                    title="",
+                    title="Post Hoc comparison - $key",
                     clearWith=list(
                         "posthoc"),
                     columns=list(

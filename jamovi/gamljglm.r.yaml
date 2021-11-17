@@ -95,17 +95,17 @@ items:
                     - name: etaSqP
                       title: η²p
                       type: number
-                      visible: (effectSize:partEta)
+                      visible: (effectSize:etap)
                       format: zto
-                    - name: omegaSq
+                    - name: omegaSqP
                       title: ω²p
                       type: number
-                      visible: (effectSize:omega)
+                      visible: (effectSize:omegap)
                       format: zto
-                    - name: epsilonSq
+                    - name: epsilonSqP
                       title: ε²p
                       type: number
-                      visible: (effectSize:epsilon)
+                      visible: (effectSize:epsilonp)
                       format: zto
 
            - name: anova
@@ -194,10 +194,10 @@ items:
                     - name: estimate
                       title: Estimate
                       type: number
-                    - name: ci.lower
+                    - name: es.ci.lower
                       title: Lower
                       type: number
-                    - name: ci.upper
+                    - name: es.ci.upper
                       title: Higher
                       type: number
              refs: effectsize
@@ -230,11 +230,11 @@ items:
                     - name: se
                       title: "SE"
                       type: number
-                    - name: ci.lower
+                    - name: est.ci.lower
                       type: number
                       title: Lower
                       visible: (showParamsCI)
-                    - name: ci.upper
+                    - name: est.ci.upper
                       type: number
                       title: Upper
                       visible: (showParamsCI)
@@ -296,7 +296,7 @@ items:
         - posthoc
         - postHocCorr
     template:
-        title:  ""
+        title:  Post Hoc comparison - $key
         type: Table
         clearWith:
               - posthoc

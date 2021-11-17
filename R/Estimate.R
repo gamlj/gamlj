@@ -20,19 +20,81 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           estimate = function(data) {
                             private$.estimateModel(data)
-                            private$.estimateTests()
-                            private$.estimateFitIndices()
-                            private$.estimateRandom()
-                            private$.estimatePostHoc()
-                            private$.estimateEffectSizes()
-                            private$.estimateIntercept()
-                            private$.estimateSimpleEffects()
-                            private$.estimateSimpleInteractions()
-                            private$.estimateEmmeans()
-                            private$.estimateAssumptions()
-                            
                             ginfo("Estimation is done...")
                           }, # end of publich function estimate
+
+                          ##### fill the tables #####
+                          
+                          fill_info=function() {
+                               
+                                tab<-self$init_info()$obj
+                                tab[["sample"]]$value<-self$datamatic$N
+                            
+                          ## TODO: generalize if other models need an optimizer other than lmer
+                                if (isTRUE(self$infomatic$optimized))
+                                    tab[["optim"]]$value<-self$model@optinfo$optimizer
+                          
+                                tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
+                                try_hard(tab)
+                          },                    
+
+                          fill_main_anova=function() {
+                            
+                            if (!self$isProper) 
+                              self$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
+                            
+                            try_hard(mf.anova(self$model,self))
+                          },
+                          
+                          fill_main_r2=function() {
+                            
+                              res<-try_hard(fit.R2(self$model))
+                              res
+                          },
+                          
+                          fill_main_coefficients=function() {
+                            tab<-NULL
+                            if (self$isProper) {
+                              tab       <-  mf.parameters(self$model,self)
+                              tab       <-  private$.fix_names(tab)
+                              
+                            }
+                            try_hard(tab)
+                            
+                          },
+                          ### anova effect sizes ####
+                          
+                          fill_main_effectsizes=function()  {
+                            try_hard(es.glm_variances(self$model,self$ciwidth))
+                          },
+                          
+                          fill_main_intercept=function() {
+                            
+                            try_hard({
+                              ss<-summary(self$model)
+                              tt<-ss$coefficients[1,3]
+                              f<-tt^2
+                              df<-stats::df.residual(self$model)
+                              p<-ss$coefficients[1,4]
+                              etap<-effectsize::t_to_eta2(tt,df_error = df)
+                              omegap<-effectsize::t_to_omega2(tt,df_error = df)
+                              epsilonp<-effectsize::t_to_epsilon2(tt,df_error = df)
+                              tab<-list(list(source="(Intercept)",
+                                             df=df,
+                                             f=f,
+                                             etaSqP=etap[1,1],
+                                             omegaSqP=omegap[1,1],
+                                             epsilonSqP=epsilonp[1,1],
+                                             p=p))
+                              
+                            })
+                            
+                          },
+                          fill_posthoc=function() {
+                            
+                            try_hard(procedure.posthoc(self))
+                            
+                          },
                           
                           savePredRes=function(results) {
                             
@@ -166,24 +228,13 @@ Estimate <- R6::R6Class("Estimate",
                                 
                                 ### coefficients table ###
                                 
-                                if (self$isProper) {
-                                    coefficients       <-  mf.parameters(self$model,self)
-                                    coefficients       <-  private$.fix_names(coefficients)
-                                    self$tab_coefficients  <-  coefficients
-                                }
                                 
                                 
 
                                 ### other table ###
-                                ginfo("Estimating Anova")
+
                                 
-                                self$tab_anova<-mf.anova(self$model,self)
-                                
-                                if (!self$isProper) 
-                                  self$warnings<-list(topic="tab_anova",message=WARNS["glm.zeromodel"])
-                                
-                                self$tab_r2<-fit.R2(self$model,self)
-                                
+
                                 
                           },
                           .estimateFitIndices=function() {
@@ -288,30 +339,6 @@ Estimate <- R6::R6Class("Estimate",
 
                             },
 
-                          .estimateIntercept=function() {
-                            
-                             if (is.null(self$tab_intercept)) 
-                                return()
-                            
-                                ss<-summary(self$model)
-                                tt<-ss$coefficients[1,3]
-                                f<-tt^2
-                                df<-stats::df.residual(self$model)
-                                p<-ss$coefficients[1,4]
-                                peta<-effectsize::t_to_eta2(tt,df_error = df)
-                                omega<-effectsize::t_to_omega2(tt,df_error = df)
-                                epsilon<-effectsize::t_to_epsilon2(tt,df_error = df)
-                                self$tab_intercept<-list(list(source="(Intercept)",
-                                                              df=df,
-                                                              f=f,
-                                                              etaSqP=peta[1,1],
-                                                              omegaSq=omega[1,1],
-                                                              epsilonSq=epsilon[1,1],
-                                                              p=p))
-                            
-                                
-                            
-                          },
                           .estimateEffectSizes=function() {
 
                             ## relative risks
@@ -321,10 +348,6 @@ Estimate <- R6::R6Class("Estimate",
                                self$tab_relativerisk<-private$.fix_names(tab)
                             }
                             
-                            ### anova effect sizes ####
-
-                            if (is.something(self$tab_effectsizes))
-                              self$tab_effectsizes<-es.glm_variances(self$model,self$ciwidth)
                           },
                           
                           

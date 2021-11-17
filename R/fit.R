@@ -2,21 +2,14 @@
 
 fit.R2<- function(model,...) UseMethod(".R2") 
 
-.R2.default<-function(model,obj) {
-    results<-try_hard(performance::r2(model,tolerance =0))
-    
-  if (!isFALSE(results$error))
-        obj$errors<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
-  if (length(results$obj)==1 && is.na(results$obj)) {
-       obj$warnings<-list(topic="tab_r2",message=WARNS[["r2.nogood"]])
-       return(NULL)    
-  }
-  obj$warnings<-list(topic="tab_r2",message=results$warning)
-  results$obj
+.R2.default<-function(model) {
+   
+  performance::r2(model,tolerance =0)
 
 }
 
-.R2.glm<-function(model,obj) {
+.R2.glm<-function(model) {
+
   alist       <-  list()
   # mcFadden and adjusted
   alist$r2    <-  1-(model$deviance/model$null.deviance)
@@ -26,14 +19,14 @@ fit.R2<- function(model,...) UseMethod(".R2")
     alist$ar2 <- 0
   
   if (any(sapply(alist,is.null)))
-    obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
+    warning("R-squared cannot be computed")
   
   results     <-  fit.compare_null_model(model)
   alist$test  <-  results$test
   alist$df    <-  results$df
   alist$p     <-  results$p
+  list(alist)
   
-  return(list(alist))
 }
 
 .R2.polr<-function(model,obj) {
@@ -75,7 +68,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   return(list(alist))
 }
 
-.R2.lm<-function(model,obj) {
+.R2.lm<-function(model) {
   
   ss<-summary(model)
   results<-list()
@@ -87,7 +80,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
     results$f<-ss$fstatistic[["value"]]
     results$p<-stats::pf(results$f,results$df1,results$df2, lower.tail = FALSE)
   } else {
-    obj$warnings<-list(topic="tab_r2",message="R-squared tests cannot be computed")
+    warning("R-squared tests cannot be computed")
     
   }
   list(results)
@@ -95,18 +88,13 @@ fit.R2<- function(model,...) UseMethod(".R2")
 }
 
 
-.R2.lmerModLmerTest<-function(model,obj) {
+.R2.lmerModLmerTest<-function(model) {
   
   alist<-list()
   r2<-.R2.default(model,obj)
   if (is.null(r2))
       return(NULL)
-  results<-try_hard(fit.compare_null_model(model,type="m"))
-  
-  if (!isFALSE(results$error)) {
-      obj$errors<-list(topic="tab_r2",message="R-squared cannot be computed")
-      return()
-  }
+  results<-fit.compare_null_model(model,type="m")
   
   tests<-results$obj
   tests$r2<-r2$R2_marginal

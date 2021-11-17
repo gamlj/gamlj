@@ -49,7 +49,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
 
-  mark(obj$options$cimethod)
+      
       .bootstrap           <-  obj$options$cimethod %in% c("boot","quantile","bci","bcai")
       .iterations          <-  1000
       .ci_method           <-  obj$options$cimethod
@@ -63,7 +63,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                                                    ci=.ci_width,
                                                                    ci_method=.ci_method),stringAsFactors=FALSE)
      .coefficients$CI     <-  NULL
-      names(.coefficients)[1:8] <-  c("source","estimate","se","ci.lower","ci.upper","t","df","p")
+      names(.coefficients)[1:8] <-  c("source","estimate","se","est.ci.lower","est.ci.upper","t","df","p")
       
       if (obj$option("effectSize","expb")) {
                ex            <-  as.data.frame(parameters::parameters(model,
@@ -74,8 +74,8 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                                                       ci_method=.ci_method))
                
                .coefficients$exp  <-  estim$Coefficient
-               .coefficients$exp_ci.lower<-estim$CI_low
-               .coefficients$exp_ci.upper<-estim$CI_high
+               .coefficients$exp.ci.lower<-estim$CI_low
+               .coefficients$exp.ci.upper<-estim$CI_high
       }
      if (obj$option("effectSize","beta")) {
         estim<-parameters::parameters(model,
@@ -84,10 +84,11 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                       ci_method=.ci_method,
                                       iterations=.iterations)
        .coefficients$beta  <-  estim$Coefficient
-       .coefficients$beta_ci.lower<-estim$CI_low
-       .coefficients$beta_ci.upper<-estim$CI_high
+       .coefficients$beta.ci.lower<-estim$CI_low
+       .coefficients$beta.ci.upper<-estim$CI_high
      }
-      return(.coefficients)
+      .coefficients
+
 }
 
 .parameters.lmerModLmerTest<-function(model,obj) {
@@ -272,36 +273,29 @@ mf.anova<- function(x,...) UseMethod(".anova")
 
 .anova.lm<-function(model,obj) {
 
-  anoobj        <-  try_hard(car::Anova(model,test="F",type=3,singular.ok=T))
-  obj$errors    <-  list(topic="tab_anova",message=anoobj$error)
-  obj$warnings  <-  list(topic="tab_anova",message=anoobj$warning)
-
-  if (!isFALSE(anoobj$error))
-         return(NULL)
-  
-  .anova<-anoobj$obj
-  .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
-  anovatab<-.anova
-  colnames(anovatab)<-c("ss","df","f","p")
-  effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),]
-  reds<-list(ss=anovatab$ss[rownames(anovatab)=="Residuals"],df=anovatab$df[rownames(anovatab)=="Residuals"])
+      .anova        <-  car::Anova(model,test="F",type=3,singular.ok=T)
+      .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
+      anovatab<-.anova
+      colnames(anovatab)<-c("ss","df","f","p")
+      effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),]
+      reds<-list(ss=anovatab$ss[rownames(anovatab)=="Residuals"],df=anovatab$df[rownames(anovatab)=="Residuals"])
   ## returns if model has no terms
-  if (!obj$hasTerms) {
-    tots<-list(ss=reds$ss,df=reds$df)
-    return(list(reds,tots))
-  }
-  sumr<-summary(model)
+      if (!obj$hasTerms) {
+        tots<-list(ss=reds$ss,df=reds$df)
+      return(list(reds,tots))
+      }
+      sumr<-summary(model)
 
   ### whole model ###
-  f<-sumr$fstatistic[[1]]
-  edf<-sumr$fstatistic[[3]]
-  mdf<-sumr$fstatistic[[2]]
-  p<-stats::pf(f,mdf,edf,lower.tail = F)
-  modeta<-effectsize::F_to_eta2(f,mdf,edf)
-  modomega<-effectsize::F_to_omega2(f,mdf,edf)
-  modepsilon<-effectsize::F_to_epsilon2(f,mdf,edf)
-  modss<-f*reds$ss*mdf/edf
-  mods<-list(ss=modss,
+      f<-sumr$fstatistic[[1]]
+      edf<-sumr$fstatistic[[3]]
+      mdf<-sumr$fstatistic[[2]]
+      p<-stats::pf(f,mdf,edf,lower.tail = F)
+      modeta<-effectsize::F_to_eta2(f,mdf,edf)
+      modomega<-effectsize::F_to_omega2(f,mdf,edf)
+      modepsilon<-effectsize::F_to_epsilon2(f,mdf,edf)
+      modss<-f*reds$ss*mdf/edf
+      mods<-list(ss=modss,
              df= mdf,
              f=f,
              p=p,
@@ -312,7 +306,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
              epsilonSq=modepsilon[[1]],
              epsilonSqP=modepsilon[[1]])
   
-  tots<-list(ss=mods$ss+reds$ss,df=mdf+edf)
+      tots<-list(ss=mods$ss+reds$ss,df=mdf+edf)
   
   #####
   # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
@@ -323,31 +317,29 @@ mf.anova<- function(x,...) UseMethod(".anova")
   ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
   ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
   #####
-  diff<-mods$ss-sum(effss$ss)
-  add<-data.frame(diff,1,1,0)
-  names(add)<-names(.anova)
-  .canova<-rbind(.anova,add)
-  last<-dim(effss)[1]+1
-  etap<-effectsize::eta_squared(.anova,partial = T,verbose = F)
-  eta<-effectsize::eta_squared(.canova,partial = F,verbose = F)
-  omegap<-effectsize::omega_squared(.anova,partial = T,verbose = F)
-  omega<-effectsize::omega_squared(.canova,partial = F,verbose = F)
-  epsilonp<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
-  epsilon<-effectsize::epsilon_squared(.canova,partial = F,verbose = F)
+      diff<-mods$ss-sum(effss$ss)
+      add<-data.frame(diff,1,1,0)
+      names(add)<-names(.anova)
+      .canova<-rbind(.anova,add)
+      last<-dim(effss)[1]+1
+      etap<-effectsize::eta_squared(.anova,partial = T,verbose = F)
+      eta<-effectsize::eta_squared(.canova,partial = F,verbose = F)
+      omegap<-effectsize::omega_squared(.anova,partial = T,verbose = F)
+      omega<-effectsize::omega_squared(.canova,partial = F,verbose = F)
+      epsilonp<-effectsize::epsilon_squared(.anova,partial = T,verbose = F)
+      epsilon<-effectsize::epsilon_squared(.canova,partial = F,verbose = F)
   
-  effss$etaSq<-eta[-last,2]
-  effss$etaSqP<-etap[,2]
-  effss$omegaSq<-omega[-last,2]
-  effss$omegaSqP<-omegap[,2]
-  effss$epsilonSq<-epsilon[-last,2]
-  effss$epsilonSqP<-epsilonp[,2]
-  reslist<-listify(effss)
-  reslist<-append_list(reslist,reds,"Residuals")
-  reslist<-append_list(reslist,tots,"Total")
-  reslist<-prepend_list(reslist,mods,"Model")
-  reslist    
-
-
+      effss$etaSq<-eta[-last,2]
+      effss$etaSqP<-etap[,2]
+      effss$omegaSq<-omega[-last,2]
+      effss$omegaSqP<-omegap[,2]
+      effss$epsilonSq<-epsilon[-last,2]
+      effss$epsilonSqP<-epsilonp[,2]
+      reslist<-listify(effss)
+      reslist<-append_list(reslist,reds,"Residuals")
+      reslist<-append_list(reslist,tots,"Total")
+      reslist<-prepend_list(reslist,mods,"Model")
+      reslist    
   }
 
 .anova.glmerMod<-function(model,df="Satterthwaite") {
