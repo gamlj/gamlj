@@ -7,7 +7,8 @@ SmartTable <- R6::R6Class("SmartTable",
                         table=NULL,
                         nickname=NULL,
                         expandable=FALSE,
-                        expandaSuperTitle=NULL,
+                        expandSuperTitle=NULL,
+                        expandFromBegining=FALSE,
                         activated=NULL,
                         initialize=function(table,estimator=NULL) {
                             self$name       <-  table$name
@@ -18,6 +19,13 @@ SmartTable <- R6::R6Class("SmartTable",
                             private$.fill_function<-paste0("fill_",self$nickname)
                             ginfo("table",self$name,"initialized..")
                             self$activated<-self$table$visible
+                            test<-grep("___key___",table$title,fixed = TRUE)
+                            if (length(test)>0) {
+                               keys<-jmvcore::stringifyTerm(table$key)
+                               table$setTitle(gsub("___key___",keys,table$title))
+                            }
+                                
+                                
 
                         },
                         initTable=function() {
@@ -27,22 +35,29 @@ SmartTable <- R6::R6Class("SmartTable",
 
                           ginfo("table",self$name,"inited..")
                           
-                          output<-private$.estimator[[private$.init_function]]()
-                          
-                          results<-output$obj
-                          error<-output$error
-                          warning<-output$warning
-                          
-                          if (error!=FALSE) {
-                            self$table$setError(error)
-                            return()
+                          if (inherits(private$.init_function,"character") ) {
+                            
+                                 output<-private$.estimator[[private$.init_function]]()
+                                 
+                                 results<-output$obj
+                                 error<-output$error
+                                 warning<-output$warning
+                                 
+                                 if (error!=FALSE) {
+                                   self$table$setError(error)
+                                   return()
+                                 }
+                                 
+                                 if (warning!=FALSE) {
+                                   len<-length(self$table$notes)
+                                   self$table$setNote(len+1,warning)
+                                 }                          
+                                 
                           }
+                          else 
+                                 results<-private$.init_function
                           
-                          if (warning!=FALSE) {
-                            len<-length(self$table$notes)
-                            self$table$setNote(len+1,warning)
-                          }                          
-                          if (self$expandable) private$.expand(self$table,results)
+                          if (self$expandable) private$.expand(results)
                           private$.fill(self$table,results)
 
                         },
@@ -54,30 +69,41 @@ SmartTable <- R6::R6Class("SmartTable",
                           
                           ginfo("table",self$name,"filled..")
                           
-                          output<-private$.estimator[[private$.fill_function]]()
-                          results<-output$obj
-                          error<-output$error
-                          warning<-output$warning
-                          
-                          if (error!=FALSE) {
-                                self$table$setError(error)
-                                return()
-                          }
-
-                          if (warning!=FALSE) {
+                          if (inherits(private$.fill_function,"character") ) {
+                            
+                            output<-private$.estimator[[private$.fill_function]]()
+                            results<-output$obj
+                            error<-output$error
+                            warning<-output$warning
+                            
+                            if (error!=FALSE) {
+                              self$table$setError(error)
+                              return()
+                            }
+                            
+                            if (warning!=FALSE) {
                               len<-length(self$table$notes)
                               self$table$setNote(len+1,warning)
-                          }                          
+                            }                          
+                            
+                          }
+                          else 
+                            results<-private$.fill_function
                           
+
                           len<-length(self$table$notes)
                           for (i in seq_along(private$.estimator$warnings[[self$nickname]])) 
                                self$table$setNote(i+len,private$.estimator$warnings[[self$nickname]][[i]])
                           private$.fill(self$table,results)
                         },
                         
-                        fillFunction=function(obj) {
-                             private$.fill_function<-obj
+                        initFunction=function(aObject) {
+                             private$.init_function<-aObject
                           },
+                        fillFunction=function(aObject) {
+                          private$.fill_function<-aObject
+                        },
+                        
                         ci=function(alist,ciwidth=95,ciformat="{}% Confidence Intervals") {
                           if (is.null(names(alist))) {
                                .names<-alist
@@ -126,14 +152,14 @@ SmartTable <- R6::R6Class("SmartTable",
                                 .no<-FALSE
                                 if (is.null(private$.init_function)) 
                                   .no<-TRUE
-                                if (!(private$.init_function %in% names(private$.estimator)))
+                                if (is.character(private$.init_function) & !(private$.init_function %in% names(private$.estimator))  )
                                   .no<-TRUE
                                 .no
                               },
                               .fill=function(atable,aresult) {
                                 
+                                names(aresult)<-make.names(names(aresult),unique = TRUE)
                                 maxrow<-atable$rowCount
-                                
                                 .insert<-function(i,w) {
                                   if (i>maxrow)
                                       atable$addRow(rowKey=i,w)
@@ -153,24 +179,26 @@ SmartTable <- R6::R6Class("SmartTable",
                                   .insert(i,t)
                                 }
                               },
-                              .expand=function(table,result) {
+                              .expand=function(results) {
                                 
-                                if (inherits(result, "list"))
+                                if (inherits(results, "list"))
                                          result<-do.call(rbind,result)
-                                  .names<-names(result)
-                                  .types<-unlist(lapply(result,class))
+                                
+                                  .titles    <-  names(results)
+                                  .names    <-  make.names(.titles,unique = TRUE)
+                                  .types<-unlist(lapply(results,class))
                                   .types<-gsub("numeric","number",.types)
                                   .types<-gsub("integer","number",.types)
                                   .types<-gsub("factor","text",.types)
                                 
-                                
-                                .present<-names(table$columns)
-                                .names<-setdiff(.names,.present)
-                                superTitle<-NULL
-                                for (i in seq_along(.names)) {
-                                  table$addColumn(index=i,name = .names[[i]], title = .names[[i]], superTitle = superTitle, type=.types[i])
+                                  .present  <-  names(self$table$columns)
+                                  .names   <-  setdiff(.names,.present)
+
+                               last<-ifelse(self$expandFromBegining,0,(length(self$table$columns)-1))
+                               for (i in seq_along(.names)) {
+                                  self$table$addColumn(index=(i+last),name = .names[[i]], title = .titles[[i]], superTitle = self$expandSuperTitle, type=.types[i])
                                 }
-                                
+
                                 
                                 
                                 
@@ -213,21 +241,16 @@ SmartArray <- R6::R6Class("SmartArray",
                                 key     <-  self$itemKeys[[i]]
                                 aresult <-  results[[i]]
                                 atable  <-  self$table$get(key = key)
+                                aSmartTable<-SmartTable$new(atable,self)
+                                aSmartTable$expandable<-self$expandable
+                                aSmartTable$expandFromBegining<-self$expandFromBegining
+                                aSmartTable$expandSuperTitle<-self$expandSuperTitle
                                 
-                                if (self$expandable) private$.expand(atable,aresult)
-                                private$.fill(atable,aresult)
-                                
-                                if (error!=FALSE) {
-                                  atable$setError(error)
-                                  return()
+                                if (is.something(private$.ci)) {
+                                  aSmartTable$ci(private$.ci,private$.ciwidth,private$.ciformat)
                                 }
-                                
-                                if (warning!=FALSE) {
-                                  len<-length(atable$notes)
-                                  atable$setNote(len+1,warning)
-                                }           
-                                
-
+                                aSmartTable$initFunction(aresult)
+                                aSmartTable$initTable()
                               }
 
                             },
@@ -260,9 +283,23 @@ SmartArray <- R6::R6Class("SmartArray",
                                   atable$setNote(len+1,warning)
                                 }           
                               }
+                            },
+                            ci=function(alist,ciwidth=95,ciformat="{}% Confidence Intervals"){
+                              
+                              private$.ci<-alist
+                              private$.ciwidth<-ciwidth
+                              private$.ciformat<-ciformat
+                              
                             }
                             
                             
-      ) ## end of public
-      
+      ), ## end of public
+      private=list(
+        .ci=NULL,
+        .ciwidth=NULL,
+        .ciformat=NULL
+        
+        
+        
+      ) #end of private
 ) # end of class

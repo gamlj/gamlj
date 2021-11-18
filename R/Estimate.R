@@ -47,7 +47,7 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           fill_main_r2=function() {
-                            
+
                               res<-try_hard(fit.R2(self$model))
                               res
                           },

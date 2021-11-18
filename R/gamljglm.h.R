@@ -817,7 +817,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts"),
                             template=jmvcore::Table$new(
                                 options=options,
-                                title="$key",
+                                title="Factor: ___key___",
                                 columns=list(
                                     list(
                                         `name`="cname", 
@@ -848,7 +848,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "postHocCorr"),
                 template=jmvcore::Table$new(
                     options=options,
-                    title="Post Hoc comparison - $key",
+                    title="Post Hoc comparison:  ___key___",
                     clearWith=list(
                         "posthoc"),
                     columns=list(
@@ -861,12 +861,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="SE", 
                             `type`="number"),
                         list(
-                            `name`="ci.lower", 
+                            `name`="dif.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
                             `visible`="(showParamsCI)"),
                         list(
-                            `name`="ci.upper", 
+                            `name`="dif.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
                             `visible`="(showParamsCI)"),

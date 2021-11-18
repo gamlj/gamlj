@@ -10,7 +10,6 @@ procedure.beta<- function(x,...) UseMethod(".beta")
         data[[var]]<-as.numeric(scale(data[[var]]))
   }
   z<-update(model,data)
-  confint(model)
   parameters::parameters(model)$Coefficient
 }
 
@@ -49,6 +48,7 @@ procedure.posthoc <- function(Obj) {
     ## so the final table will look sorted in a more sensible way
     termB64 <- jmvcore::composeTerm(jmvcore::toB64(rev(ph)))
     suppressWarnings({
+      mark(Obj$options$postHocCorr)
       none <- .posthoc(model, termB64, "none",ci=TRUE, bootstrap=(Obj$options$cimethod=="boot"))
       bonferroni <- .posthoc(model, termB64, "bonferroni")
       holm <- .posthoc(model, termB64, "holm")
@@ -61,13 +61,13 @@ procedure.posthoc <- function(Obj) {
         tableData <- as.data.frame(none, stringAsFactors = FALSE)
         tableData$contrast <- as.character(tableData$contrast)
         if (length(names(tableData))==9)
-              colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
+              colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"dif.ci.lower","dif.ci.upper", "test", "none")
         else
-              colnames(tableData) <- c("contrast", "estimate", "se","df" ,"ci.lower","ci.upper", "test", "none")
+              colnames(tableData) <- c("contrast", "estimate", "se","df" ,"dif.ci.lower","dif.ci.upper", "test", "none")
         
         tableData$bonf <- bonferroni$p.value
         tableData$holm <- holm$p.value
-        tableData$tukey <- tukey$pvalue
+        tableData$tukey <- tukey$p.value
       }
     
     .cont <- as.character(tableData$contrast)
@@ -79,7 +79,6 @@ procedure.posthoc <- function(Obj) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
     })
     .labs <- fromb64(.labs64)
-    mark(.labs)
     labs <- do.call("rbind", .labs)
 
     cols <- make.names(c(rev(ph),rev(ph)),unique = T)
@@ -118,13 +117,13 @@ procedure.posthoc <- function(Obj) {
       newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(ci,TRUE))
+
       if (bootstrap & ci) {
-        
         model<-parameters::bootstrap_model(model)
         referenceGrid <- emmeans::emmeans(model, termf, type = "response", data = data)
         ci_results<-summary(graphics::pairs(referenceGrid))
-        results$lower.CL<-ci_results$lower.HPD
-        results$upper.CL<-ci_results$upper.HPD
+        results$dif.lower.CL<-ci_results$lower.HPD
+        results$dif.upper.CL<-ci_results$upper.HPD
         
       }
       

@@ -30,7 +30,6 @@ gamljGlmClass <- R6::R6Class(
       aSmartTab<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
 
-      ### r2 table does not need initializing ###
 
       ## R2 table ###
       aSmartTab<-SmartTable$new(self$results$main$r2,estimate_machine)
@@ -70,6 +69,9 @@ gamljGlmClass <- R6::R6Class(
       
       aSmartArray<-SmartArray$new(self$results$posthoc,estimate_machine)
       aSmartArray$expandable<-TRUE
+      aSmartArray$expandFromBegining<-TRUE
+      aSmartArray$expandSuperTitle<-"Comparison"
+      aSmartArray$ci(c("dif"))
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
       # if (is.something(self$options$posthoc)) {
