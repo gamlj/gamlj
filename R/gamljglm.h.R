@@ -259,7 +259,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "none",
                     "bonf",
                     "tukey",
-                    "holm"),
+                    "holm",
+                    "scheffe",
+                    "sidak"),
                 default=list(
                     "bonf"))
             private$..scaling <- jmvcore::OptionArray$new(
@@ -901,7 +903,19 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(postHocCorr:holm)")))))
+                            `visible`="(postHocCorr:holm)"),
+                        list(
+                            `name`="scheffe", 
+                            `title`="p<sub>scheffe</sub>", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:scheffe)"),
+                        list(
+                            `name`="sidak", 
+                            `title`="p<sub>sidak</sub>", 
+                            `type`="number", 
+                            `format`="zto,pvalue", 
+                            `visible`="(postHocCorr:scheffe)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(

@@ -48,11 +48,12 @@ procedure.posthoc <- function(Obj) {
     ## so the final table will look sorted in a more sensible way
     termB64 <- jmvcore::composeTerm(jmvcore::toB64(rev(ph)))
     suppressWarnings({
-      mark(Obj$options$postHocCorr)
       none <- .posthoc(model, termB64, "none",ci=TRUE, bootstrap=(Obj$options$cimethod=="boot"))
       bonferroni <- .posthoc(model, termB64, "bonferroni")
       holm <- .posthoc(model, termB64, "holm")
       tukey <- .posthoc(model, termB64, "tukey")
+      sidak <- .posthoc(model, termB64, "sidak")
+      scheffe <- .posthoc(model, termB64, "scheffe")
       
     })  # suppressWarnings
     if (is.character(none)) 
@@ -68,6 +69,9 @@ procedure.posthoc <- function(Obj) {
         tableData$bonf <- bonferroni$p.value
         tableData$holm <- holm$p.value
         tableData$tukey <- tukey$p.value
+        tableData$scheffe <- scheffe$p.value
+        tableData$sidak <- sidak$p.value
+        
       }
     
     .cont <- as.character(tableData$contrast)

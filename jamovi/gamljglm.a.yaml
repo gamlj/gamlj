@@ -398,13 +398,18 @@ options:
       type: NMXList
       options:
           - name: none
-            title: No correction
+            title: No correction (LSD)
           - name: bonf
             title: Bonferroni
           - name: tukey
             title: Tukey 
           - name: holm
             title: Holm
+          - name: scheffe
+            title: Scheffe
+          - name: sidak
+            title: Sidak
+
       default:
           - bonf
       description:

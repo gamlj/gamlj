@@ -342,6 +342,16 @@ items:
           type: number
           format: zto,pvalue
           visible: (postHocCorr:holm)
+        - name: scheffe
+          title: p<sub>scheffe</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:scheffe)
+        - name: sidak
+          title: p<sub>sidak</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:scheffe)
 
 
   - name: simpleEffects

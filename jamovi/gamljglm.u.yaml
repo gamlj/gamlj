@@ -269,6 +269,14 @@ children:
                 type: CheckBox
                 optionPart: holm
                 optionName: postHocCorr
+              - name: postHocCorr_scheffe
+                type: CheckBox
+                optionName: postHocCorr
+                optionPart: scheffe
+              - name: postHocCorr_sidak
+                type: CheckBox
+                optionName: postHocCorr
+                optionPart: sidak
   - type: CollapseBox
     label: Plots
     collapsed: true
