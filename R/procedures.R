@@ -62,9 +62,9 @@ procedure.posthoc <- function(Obj) {
         tableData <- as.data.frame(none, stringAsFactors = FALSE)
         tableData$contrast <- as.character(tableData$contrast)
         if (length(names(tableData))==9)
-              colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"dif.ci.lower","dif.ci.upper", "test", "none")
+              colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"est.ci.lower","est.ci.upper", "test", "none")
         else
-              colnames(tableData) <- c("contrast", "estimate", "se","df" ,"dif.ci.lower","dif.ci.upper", "test", "none")
+              colnames(tableData) <- c("contrast", "estimate", "se","df" ,"est.ci.lower","est.ci.upper", "test", "none")
         
         tableData$bonf <- bonferroni$p.value
         tableData$holm <- holm$p.value
@@ -126,8 +126,8 @@ procedure.posthoc <- function(Obj) {
         model<-parameters::bootstrap_model(model)
         referenceGrid <- emmeans::emmeans(model, termf, type = "response", data = data)
         ci_results<-summary(graphics::pairs(referenceGrid))
-        results$dif.lower.CL<-ci_results$lower.HPD
-        results$dif.upper.CL<-ci_results$upper.HPD
+        results$est.lower.CL<-ci_results$lower.HPD
+        results$est.upper.CL<-ci_results$upper.HPD
         
       }
       
@@ -200,7 +200,7 @@ procedure.emmeans<-function(obj) {
                                     lmer.df = df)
     tableData<-as.data.frame(referenceGrid)
     ### rename the columns ####
-    names(tableData)<-c(term64,"estimate","se","df","ci.lower","ci.upper")
+    names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
    
     ### fix the labels  ###
 
@@ -213,8 +213,8 @@ procedure.emmeans<-function(obj) {
     ## rename the dependent for multinomial ##
     if (obj$options$modelSelection=="multinomial")
          names(tableData)[1]<-"Response"
-    
-        
+
+    names(tableData)[1:length(term64)]<-rev(term)
     results[[length(results)+1]]<-tableData
   }
   
@@ -299,7 +299,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     class(res)<-c(paste0("simple_params_",obj$options$modelSelection),class(res))
     params<-mf.fixTable(res,model,variable64)
 
-    ### now we build the anova table ###à
+    ### now we build the anova table ###
     res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
     names(res)<-c(term64,"df1","df2","test","p")
 

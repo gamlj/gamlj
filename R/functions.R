@@ -7,19 +7,23 @@ ginfo <- function(...) {
     }
 }
 
-mark <- function(what = NULL, obj = NULL) {
-    if (j_DEBUG) {
-        if (!is.null(what)) 
-            print(what) else print("you got here")
-
-        if (!is.null(obj)) {
-            print(obj)
-            print("#### end ###")
-        }
-    }
+mark <- function(...) {
+    if (!j_DEBUG) 
+        return()
+    
+  if (missing(...))
+            cat("Mark here\n")
+  items<-list(...)
+  
+  if (length(items)>1)  cat("______begin________\n\n")
+  for (a in items)
+            if (is.character(a))
+                 cat(a,"\n")
+            else
+                 print(a)
+  if (length(items)>1)  cat("_____end_______\n\n")
+  
 }
-
-
 
 is.something <- function(x, ...) UseMethod(".is.something")
 
@@ -107,7 +111,7 @@ tob64<- function(x,...) UseMethod(".tob64")
             obj<-stringr::str_replace_all(obj,reg,jmvcore::toB64(r))
         }
     }
-    obj
+    paste0(B64_SYMBOL,obj)
 }
 
 .tob64.list<-function(obj,ref=NULL) {
@@ -127,6 +131,7 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     if (length(obj)>1)
         return(unlist(sapply(obj, bogusfromb64,ref=ref,USE.NAMES = F)))
     
+    obj<-gsub(B64_SYMBOL,"",obj,fixed=T)
     int<-strsplit(obj,INTERACTION_SYMBOL,fixed=T)[[1]]
     if (length(int)>1)
         return(paste0(unlist(sapply(int,bogusfromb64,ref=ref)),collapse = ":"))
@@ -154,3 +159,5 @@ fromb64<- function(x,...) UseMethod(".fromb64")
 
 bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
+
+is.b64<-function(a) ifelse(length(grep(B64_SYMBOL,a,fixed = TRUE))>0,TRUE,FALSE)

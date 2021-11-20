@@ -194,10 +194,10 @@ items:
                     - name: estimate
                       title: Estimate
                       type: number
-                    - name: es.ci.lower
+                    - name: est.ci.lower
                       title: Lower
                       type: number
-                    - name: es.ci.upper
+                    - name: est.ci.upper
                       title: Higher
                       type: number
              refs: effectsize
@@ -308,11 +308,11 @@ items:
         - name: se
           title: SE
           type: number
-        - name: dif.ci.lower
+        - name: est.ci.lower
           type: number
           title: Lower
           visible: (showParamsCI)
-        - name: dif.ci.upper
+        - name: est.ci.upper
           type: number
           title: Upper
           visible: (showParamsCI)
@@ -463,11 +463,11 @@ items:
                      - name: se
                        title: "SE"
                        type: number
-                     - name: ci.lower
+                     - name: est.ci.lower
                        type: number
                        title: Lower
                        visible: (showParamsCI)
-                     - name: ci.upper
+                     - name: est.ci.upper
                        type: number
                        title: Upper
                        visible: (showParamsCI)
@@ -546,10 +546,10 @@ items:
                    - name: df
                      title: df
                      type: integer
-                   - name: ci.lower
+                   - name: est.ci.lower
                      title: Lower 
                      type: number
-                   - name: ci.upper
+                   - name: est.ci.upper
                      title: Upper
                      type: number
                    - name: t
@@ -566,6 +566,7 @@ items:
     type: Array
     description: an array of predicted means tables
     visible: false
+    items: (emmeans)
     clearWith:
         - dep
         - modelTerms
@@ -578,7 +579,7 @@ items:
         - emmeans
 
     template:
-        title:  Estimate Marginal Means - $key
+        title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith: []
         columns:
@@ -591,10 +592,10 @@ items:
         - name: df
           title: df
           type: integer
-        - name: ci.lower
+        - name: est.ci.lower
           title: Lower 
           type: number
-        - name: ci.upper
+        - name: est.ci.upper
           title: Upper
           type: number
 

@@ -740,11 +740,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Estimate", 
                                     `type`="number"),
                                 list(
-                                    `name`="es.ci.lower", 
+                                    `name`="est.ci.lower", 
                                     `title`="Lower", 
                                     `type`="number"),
                                 list(
-                                    `name`="es.ci.upper", 
+                                    `name`="est.ci.upper", 
                                     `title`="Higher", 
                                     `type`="number")),
                             refs="effectsize"))
@@ -863,12 +863,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="SE", 
                             `type`="number"),
                         list(
-                            `name`="dif.ci.lower", 
+                            `name`="est.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
                             `visible`="(showParamsCI)"),
                         list(
-                            `name`="dif.ci.upper", 
+                            `name`="est.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
                             `visible`="(showParamsCI)"),
@@ -1044,12 +1044,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="ci.lower", 
+                                    `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showParamsCI)"),
                                 list(
-                                    `name`="ci.upper", 
+                                    `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(showParamsCI)"),
@@ -1148,11 +1148,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `title`="df", 
                                         `type`="integer"),
                                     list(
-                                        `name`="ci.lower", 
+                                        `name`="est.ci.lower", 
                                         `title`="Lower", 
                                         `type`="number"),
                                     list(
-                                        `name`="ci.upper", 
+                                        `name`="est.ci.upper", 
                                         `title`="Upper", 
                                         `type`="number"),
                                     list(
@@ -1169,6 +1169,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="emmeans",
                 title="Estimated Marginal Means",
                 visible=FALSE,
+                items="(emmeans)",
                 clearWith=list(
                     "dep",
                     "modelTerms",
@@ -1181,7 +1182,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "emmeans"),
                 template=jmvcore::Table$new(
                     options=options,
-                    title="Estimate Marginal Means - $key",
+                    title="Estimate Marginal Means - ___key___",
                     clearWith=list(),
                     columns=list(
                         list(
@@ -1197,11 +1198,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="df", 
                             `type`="integer"),
                         list(
-                            `name`="ci.lower", 
+                            `name`="est.ci.lower", 
                             `title`="Lower", 
                             `type`="number"),
                         list(
-                            `name`="ci.upper", 
+                            `name`="est.ci.upper", 
                             `title`="Upper", 
                             `type`="number")))))
             self$add(jmvcore::Array$new(

@@ -13,14 +13,19 @@ Estimate <- R6::R6Class("Estimate",
                           anova=NULL,
                           ciwidth=NULL,
                           subclass=NULL,
+                          tab_simpleAnova=NULL,
+                          tab_simpleCoefficients=NULL,
+                          
                           initialize=function(options,datamatic) {
                             super$initialize(options=options,datamatic=datamatic)
                             self$ciwidth <- options$ciWidth/100
                             self$subclass<-paste0("model_",options$modelSelection)
                           },
+                          
                           estimate = function(data) {
                             private$.estimateModel(data)
-                            ginfo("Estimation is done...")
+                            private$.estimateSimpleEffects()
+                            ginfo("Initial estimation is done...")
                           }, # end of publich function estimate
 
                           ##### fill the tables #####
@@ -53,13 +58,15 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           fill_main_coefficients=function() {
+                            try_hard({
                             tab<-NULL
                             if (self$isProper) {
                               tab       <-  mf.parameters(self$model,self)
                               tab       <-  private$.fix_names(tab)
                               
                             }
-                            try_hard(tab)
+                            tab
+                            })
                             
                           },
                           ### anova effect sizes ####
@@ -94,6 +101,18 @@ Estimate <- R6::R6Class("Estimate",
                             
                             try_hard(procedure.posthoc(self))
                             
+                          },
+                          fill_emmeans=function() {
+                            try_hard(procedure.emmeans(self))
+                          },
+                          
+                          fill_simpleEffects_anova=function() {
+                            try_hard(self$tab_simpleAnova)
+                          },
+                          
+                          fill_simpleEffects_coefficients=function() {
+                            mark(self$tab_simpleCoefficients)
+                            try_hard(self$tab_simpleCoefficients)
                           },
                           
                           savePredRes=function(results) {
@@ -349,32 +368,13 @@ Estimate <- R6::R6Class("Estimate",
                             }
                             
                           },
-                          
-                          
-                          .estimatePostHoc=function() {
-                            
-                            if (!is.something(self$tab_posthoc))
-                               return()
-                            
-                            self$tab_posthoc<-procedure.posthoc(self)
-
-                          },
-                          .estimateEmmeans=function() {
-                            
-                            if (!is.something(self$tab_emmeans))
-                              return()
-                            
-                            self$tab_emmeans<-procedure.emmeans(self)
-                            
-                            
-                          },
                           .estimateSimpleEffects=function() {
-                            
-                            if (!is.something(self$tab_simpleAnova))
-                              return()
                             results<-try_hard(procedure.simpleEffects(self$model,self))
-                            self$warnings  <- list(topic="tab_simpleAnova",message=results$warning)
-                            self$errors    <- list(topic="tab_simpleAnova",message=results$error)
+                            self$warnings  <- list(topic="init_simpleEffects_anova",message=results$warning)
+                            self$warnings  <- list(topic="init_simpleEffects_coefficients",message=results$warning)
+                            self$errors    <- list(topic="init_simpleEffects_anova",message=results$error)
+                            self$errors    <- list(topic="init_simpleEffects_coefficients",message=results$error)
+                            
                             self$tab_simpleAnova         <-  results$obj[[1]]
                             self$tab_simpleCoefficients  <-  results$obj[[2]]
                         },

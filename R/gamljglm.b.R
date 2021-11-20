@@ -37,22 +37,18 @@ gamljGlmClass <- R6::R6Class(
       
 
       ### anova table ###
-
       aSmartTab<-SmartTable$new(self$results$main$anova,estimate_machine)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       
-
       ### estimates table ###
       aSmartTab<-SmartTable$new(self$results$main$coefficients,estimate_machine)
       aSmartTab$ci(c("est"),self$options$ciWidth)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       
-      ### constrast code tables
+      ### contrasts code tables
       aSmartArray<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
       aSmartArray$expandable<-TRUE
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
-
-      ### intercept initialized in yalm ###
 
       ### intercept more info table ###
       
@@ -62,7 +58,7 @@ gamljGlmClass <- R6::R6Class(
       ### effectsizes table ###
 
       aSmartTab<-SmartTable$new(self$results$main$effectsizes,estimate_machine)
-      aSmartTab$ci(c("es"),self$options$ciWidth)
+      aSmartTab$ci(c("est"),self$options$ciWidth)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
 
       ## post hoc #####
@@ -71,23 +67,34 @@ gamljGlmClass <- R6::R6Class(
       aSmartArray$expandable<-TRUE
       aSmartArray$expandFromBegining<-TRUE
       aSmartArray$expandSuperTitle<-"Comparison"
-      aSmartArray$ci(c("dif"))
+      aSmartArray$ci(c("est"))
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
-      # if (is.something(self$options$posthoc)) {
-      #   
-      #   for (i in seq_along(self$options$posthoc)) {
-      #     term<-self$options$posthoc[[i]]
-      #     aTable<-self$results$posthoc$get(key = term)
-      #     aTable$setTitle(paste0("Post Hoc Comparisons - ", jmvcore::stringifyTerm(term)))
-      #     j.expand_table(aTable,names(estimate_machine$tab_posthoc[[i]]),superTitle="Comparison",names64=FALSE)
-      #     j.init_table(aTable,estimate_machine$tab_posthoc[[i]],ci=T,ciwidth = self$options$ciWidth)
-      #   } 
-      #   
-      # }
+
+      ### estimate marginal means
       
+      aSmartArray<-SmartArray$new(self$results$emmeans,estimate_machine)
+      aSmartArray$activated<-is.something(self$options$emmeans)
+      aSmartArray$expandable<-TRUE
+      aSmartArray$expandFromBegining<-TRUE
+      aSmartArray$ci(c("est"))
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
-            
+      ### simple effects
+      ##### anova
+      aSmartTab<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
+      aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartTab$expandable<-TRUE
+      aSmartArray$expandFromBegining<-TRUE
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      ##### coefficients
+      aSmartTab<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
+      aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartTab$expandable<-TRUE
+      aSmartTab$expandFromBegining<-TRUE
+      aSmartTab$ci(c("est"),self$options$ciWidth)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
       ### init all ####
 
  
@@ -103,35 +110,16 @@ gamljGlmClass <- R6::R6Class(
 
 
       
-      ### estimate marginal means
-      
-      if (is.something(self$options$emmeans)) {
-  
-              self$results$emmeans$setVisible(TRUE)
-              for (i in seq_along(self$options$emmeans)) {
-                    term<-self$options$emmeans[[i]]
-                    spaceby=NULL
-                    if (length(term)>1) spaceby<-1
-                    
-                    aTable <- self$results$emmeans$addItem(key = jmvcore::stringifyTerm(term))
-                    j.expand_table(aTable,term)
-                    j.init_table(aTable,estimate_machine$tab_emmeans[[i]], ci=T,ciwidth=self$options$ciWidth,spaceby = spaceby)
-              } 
-      
-      }
       
       ### simple effects ####
-      if (is.something(estimate_machine$tab_simpleAnova)) {
+         # j.expand_table(self$results$simpleEffects$anova,self$options$simpleModerators) 
+         # title<-paste("Omnibus test for variable",self$options$simpleVariable)
+         # j.init_table(self$results$simpleEffects$anova,estimate_machine$tab_simpleAnova,title=title)
+         # title<-paste("Parameter estimates for variable",self$options$simpleVariable)
+         # j.expand_table(self$results$simpleEffects$coefficients,self$options$simpleModerators,superTitle = "Moderators") 
+         # j.init_table(self$results$simpleEffects$coefficients,estimate_machine$tab_simpleCoefficients, ci=T,ciwidth=self$options$ciWidth,title=title)
+         # 
 
-         j.expand_table(self$results$simpleEffects$anova,self$options$simpleModerators) 
-         title<-paste("Omnibus test for variable",self$options$simpleVariable)
-         j.init_table(self$results$simpleEffects$anova,estimate_machine$tab_simpleAnova,title=title)
-         title<-paste("Parameter estimates for variable",self$options$simpleVariable)
-         j.expand_table(self$results$simpleEffects$coefficients,self$options$simpleModerators,superTitle = "Moderators") 
-         j.init_table(self$results$simpleEffects$coefficients,estimate_machine$tab_simpleCoefficients, ci=T,ciwidth=self$options$ciWidth,title=title)
-
-      }
-      
       ### simple interactions ######
       
       if (is.something(estimate_machine$tab_simpleInteractionCoefficients)) {

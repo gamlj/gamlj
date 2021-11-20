@@ -18,8 +18,6 @@ Syntax <- R6::R6Class(
               tab_emm=NULL,
               tab_effectsizes=NULL,
               tab_emmeans=NULL,
-              tab_simpleAnova=NULL,
-              tab_simpleCoefficients=NULL,
               tab_simpleInteractionCoefficients=NULL,
               tab_simpleInteractionAnova=NULL,
               tab_posthoc=NULL,
@@ -155,7 +153,76 @@ Syntax <- R6::R6Class(
                               })
                   })
               
-            } 
+            },
+            ### estimated marginal means ###
+            
+            init_emmeans=function() {
+
+              try_hard({
+              alist=NULL
+              
+              if (self$option("emmeans")) {
+                
+                .terms<-tob64(self$options$emmeans)
+                alist<-lapply(.terms, function(.term) {
+                  ncol<-length(.term)
+                  nrow<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
+                  if (self$options$modelSelection=="multinomial") {
+                    nrow<-nrow*(self$datamatic$dep$nlevels)
+                  }
+                  one<-data.frame(matrix("",ncol=ncol,nrow = nrow))
+                  names(one)<-fromb64(.term)
+                  one
+                })
+                
+                emm<-self$infomatic$emmeans
+                if (!is.null(emm))
+                  self$warnings<-list(topic="emmeans",message=paste("Expected means are expressed as",emm))
+              }
+              alist
+              
+              })
+              
+              
+              
+            },
+
+             init_simpleEffects_anova=function() {
+               
+               try_hard({
+                 
+               .term<-tob64(self$options$simpleVariable)
+               .terms<-tob64(self$options$simpleModerators)
+                nrow<-prod(unlist(lapply(.terms,function(t) self$datamatic$variables[[t]]$nlevels)))
+                ncol<-length(.term)
+                df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
+                names(df)<-paste0("mod_",self$options$simpleModerators)
+                mark(df)
+                df
+               })
+             },
+            
+            init_simpleEffects_coefficients=function() {
+
+              try_hard({
+                .term<-tob64(self$options$simpleVariable)
+                focal<-self$datamatic$variables[[.term]]
+                neffects<-ifelse(focal$type=="numeric",1,focal$nlevels-1)
+                .terms<-tob64(self$options$simpleModerators)
+               
+                nrow<-neffects*prod(unlist(lapply(.terms,function(t) self$datamatic$variables[[t]]$nlevels)))
+                ncol<-length(.term)
+                
+                if (self$options$modelSelection=="multinomial")
+                    nrow <- nrow * (self$datamatic$dep$nlevels-1)
+                
+                df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
+                names(df)<-tob64(self$options$simpleModerators)
+                df
+               })
+               
+            }
+            
             
             
 
@@ -248,44 +315,9 @@ Syntax <- R6::R6Class(
 
               
               
-            ### estimated marginal means ###
-            if (self$option("emmeans")) {
-              
-               .terms<-tob64(self$options$emmeans)
-               alist<-lapply(.terms, function(.term) {
-                     nrow<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
-                     if (self$options$modelSelection=="multinomial") {
-                        nrow<-nrow*(self$datamatic$dep$nlevels)
-                     }
-                     
-                     rep(list(emmeans=""),nrow)
-               })
-               self$tab_emmeans<-alist
-               emm<-self$infomatic$emmeans
-               if (!is.null(emm))
-                   self$warnings<-list(topic="tab_emmeans",message=paste("Expected means are expressed as",emm))
-            }
-
+           
             ### simple effects ########
 
-              if (is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators)) {
-
-                .term<-tob64(self$options$simpleVariable)
-                focal<-self$datamatic$variables[[.term]]
-                if (focal$type=="numeric")
-                    neffects<-1
-                else
-                    neffects<-focal$nlevels-1
-                .terms<-tob64(self$options$simpleModerators)
-                anovap<-prod(unlist(lapply(.terms,function(t) self$datamatic$variables[[t]]$nlevels)))
-                self$tab_simpleAnova<-data.frame(F.ratio=rep("",anovap))
-                coefsp<-anovap*neffects
-                if (self$options$modelSelection=="multinomial")
-                       coefsp <- coefsp * (self$datamatic$dep$nlevels-1)
-                
-                self$tab_simpleCoefficients<-data.frame(contrast=rep("",coefsp))
-
-              }
               
               ##### simple interactions ######
               
