@@ -85,7 +85,8 @@ gamljGlmClass <- R6::R6Class(
       aSmartTab<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
       aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
       aSmartTab$expandable<-TRUE
-      aSmartArray$expandFromBegining<-TRUE
+      aSmartTab$expandFromBegining<-TRUE
+      aSmartTab$key<-self$options$simpleVariable
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       ##### coefficients
       aSmartTab<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)

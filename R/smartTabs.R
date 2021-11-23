@@ -10,6 +10,7 @@ SmartTable <- R6::R6Class("SmartTable",
                         expandSuperTitle=NULL,
                         expandFromBegining=FALSE,
                         activated=NULL,
+                        key=NULL,
                         initialize=function(table,estimator=NULL) {
                             self$name       <-  table$name
                             self$table      <-  table
@@ -18,12 +19,10 @@ SmartTable <- R6::R6Class("SmartTable",
                             private$.init_function<-paste0("init_",self$nickname)
                             private$.fill_function<-paste0("fill_",self$nickname)
                             self$activated<-self$table$visible
-                            test<-grep("___key___",table$title,fixed = TRUE)
-                            if (length(test)>0) {
-                               keys<-jmvcore::stringifyTerm(table$key)
-                               table$setTitle(gsub("___key___",keys,table$title))
-                            }
-                                
+                            if ("keys" %in% names(table) )
+                                  if (is.something(table$keys))
+                                           self$key<-table$keys
+
                             ginfo("Table",self$nickname,"initialized..")
                             
 
@@ -53,7 +52,15 @@ SmartTable <- R6::R6Class("SmartTable",
                                  if (warning!=FALSE) {
                                    len<-length(self$table$notes)
                                    self$table$setNote(len+1,warning)
-                                 }                          
+                                 }
+                                 
+                                 test<-grep("___key___",self$table$title,fixed = TRUE)
+                                 mark("has __ke",length(test)>0,self$key)
+                                 if (length(test)>0 & is.something(self$key)) {
+                                   key<-jmvcore::stringifyTerm(self$key)
+                                   self$table$setTitle(gsub("___key___",key,self$table$title))
+                                 }
+                                 
                                  
                           }
                           else 
@@ -186,7 +193,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               },
                               .fill=function(atable,aresult) {
                                 
-                                names(aresult)<-make.names(names(aresult),unique = TRUE)
                                 maxrow<-atable$rowCount
                                 .insert<-function(i,w) {
                                   if (i>maxrow)
@@ -206,15 +212,16 @@ SmartTable <- R6::R6Class("SmartTable",
                                     t[which(is.na(t))]<-""
                                   .insert(i,t)
                                 }
+
                               },
                               .expand=function(results) {
                                 
                                 if (inherits(results, "list"))
                                          result<-do.call(rbind,result)
                                   
-                                  .titles   <-  names(results)
-                                  .titles   <- sapply(.titles,function(t) ifelse(is.b64(t),fromb64(t),t))
-                                  .names    <-  make.names(.titles,unique = TRUE)
+                                  .names   <-  names(results)
+                                  .titles  <- fromb64(.names)
+                                  .names   <- make.names(.names,unique = T)
                                   .types<-unlist(lapply(results,class))
                                   .types<-gsub("numeric","number",.types)
                                   .types<-gsub("integer","number",.types)

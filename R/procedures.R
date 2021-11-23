@@ -32,7 +32,7 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 procedure.posthoc <- function(Obj) {
   
   ginfo("Populate posthoc...")
-  terms <- Obj$options$posthoc
+  terms <- tob64(Obj$options$posthoc)
   dep <- Obj$options$dep
   model<-Obj$model
   if (length(terms) == 0) 
@@ -42,18 +42,17 @@ procedure.posthoc <- function(Obj) {
   
   for (ph in terms) {
     
-    
-    term <- jmvcore::composeTerm(ph)
+  
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
-    termB64 <- jmvcore::composeTerm(jmvcore::toB64(rev(ph)))
+    term <- jmvcore::composeTerm(rev(ph))
     suppressWarnings({
-      none <- .posthoc(model, termB64, "none",ci=TRUE, bootstrap=(Obj$options$cimethod=="boot"))
-      bonferroni <- .posthoc(model, termB64, "bonferroni")
-      holm <- .posthoc(model, termB64, "holm")
-      tukey <- .posthoc(model, termB64, "tukey")
-      sidak <- .posthoc(model, termB64, "sidak")
-      scheffe <- .posthoc(model, termB64, "scheffe")
+      none <- .posthoc(model, term, "none",ci=TRUE, bootstrap=(Obj$options$cimethod=="boot"))
+      bonferroni <- .posthoc(model, term, "bonferroni")
+      holm <- .posthoc(model, term, "holm")
+      tukey <- .posthoc(model, term, "tukey")
+      sidak <- .posthoc(model, term, "sidak")
+      scheffe <- .posthoc(model, term, "scheffe")
       
     })  # suppressWarnings
     if (is.character(none)) 
@@ -79,26 +78,27 @@ procedure.posthoc <- function(Obj) {
     .cont <- gsub(" / ", "/", .cont, fixed = T)
 
 
-    .labs64 <- sapply(.cont, function(a) {
+    .labs <- sapply(.cont, function(a) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
     })
-    .labs <- fromb64(.labs64)
+    .labs <- fromb64(.labs)
     labs <- do.call("rbind", .labs)
 
     cols <- make.names(c(rev(ph),rev(ph)),unique = T)
     colnames(labs) <- cols
-    
+
     tableData <- cbind(labs, tableData)
+    rownames(tableData)<-NULL
+    
     for (col in cols)
       tableData[,col]<-as.character(tableData[,col])
-    
+
     if ("Response" %in% names(tableData))
         tableData$Response<-as.character(tableData$Response)
-
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
   if (Obj$options$cimethod=="boot")
-       Obj$warnings<-list(topic="tab_posthoc",message="Bootstrap confidence intervals")
+       Obj$warnings<-list(topic="posthoc",message="Bootstrap confidence intervals")
     
   ginfo("Populate posthoc done")
 
@@ -118,7 +118,7 @@ procedure.posthoc <- function(Obj) {
       referenceGrid <- emmeans::emmeans(model, termf, type = "response", data = data)
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
-      newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
+      newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(ci,TRUE))
 
@@ -146,7 +146,7 @@ procedure.posthoc <- function(Obj) {
       referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
-      newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
+      newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid, by=dep, adjust = adjust),infer = c(ci,TRUE))
     })
@@ -281,10 +281,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
             res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
-            names(res)<-c("contrast",term64,"estimate","se","df","test","p","ci.lower","ci.upper")
+            names(res)<-c("contrast",term64,"estimate","se","df","test","p","est.ci.lower","est.ci.upper")
             
     } else {
-            names(res)<-c(term64,"estimate","se","df","ci.lower","ci.upper","test","p")
+            names(res)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper","test","p")
             res$contrast<-varobj$name
     }
     
@@ -309,8 +309,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
       res[[.name]]<-as.character(res[[.name]])
     }
+    #### fix names ####
+    
 
-    ### make fix dependending of the type of model ###    
+    ### make fix depending of the type of model ###    
     class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
     anova<-mf.fixTable(res,model)
     ### check some stuff 
@@ -318,7 +320,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
     .issues <- .all[test]
     if (is.something(.issues))
-      obj$warnings<-list(topic="tab_simpleAnova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
+      obj$warnings<-list(topic="simpleEffects_anova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
 
     ## check issues with the variables ##
     for (.term in term64) {

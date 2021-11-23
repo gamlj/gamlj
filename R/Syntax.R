@@ -79,6 +79,7 @@ Syntax <- R6::R6Class(
                
                ### parameter estimates ####
                init_main_coefficients=function() {
+                 
                     .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
                     .len<-length(.terms)
                     if (self$options$modelSelection=="multinomial") 
@@ -146,7 +147,8 @@ Syntax <- R6::R6Class(
                                   nrow<-nrow*(self$datamatic$dep$nlevels)
                                 }
                               df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
-                             .names<-c(.term,"vs",.term)
+                             .term64<- tob64(.term)
+                             .names<-c(.term64,"vs",.term64)
                               names(df)<-.names
                               df$vs="-"
                               df
@@ -191,13 +193,12 @@ Syntax <- R6::R6Class(
                
                try_hard({
                  
-               .term<-tob64(self$options$simpleVariable)
-               .terms<-tob64(self$options$simpleModerators)
-                nrow<-prod(unlist(lapply(.terms,function(t) self$datamatic$variables[[t]]$nlevels)))
-                ncol<-length(.term)
+               .var<-tob64(self$options$simpleVariable)
+               .mods<-tob64(self$options$simpleModerators)
+                nrow<-prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
+                ncol<-length(.mods)
                 df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
-                names(df)<-paste0("mod_",self$options$simpleModerators)
-                mark(df)
+                names(df)<-.mods
                 df
                })
              },
@@ -205,19 +206,19 @@ Syntax <- R6::R6Class(
             init_simpleEffects_coefficients=function() {
 
               try_hard({
-                .term<-tob64(self$options$simpleVariable)
-                focal<-self$datamatic$variables[[.term]]
+                .var<-tob64(self$options$simpleVariable)
+                focal<-self$datamatic$variables[[.var]]
                 neffects<-ifelse(focal$type=="numeric",1,focal$nlevels-1)
-                .terms<-tob64(self$options$simpleModerators)
+                .mods<-tob64(self$options$simpleModerators)
                
-                nrow<-neffects*prod(unlist(lapply(.terms,function(t) self$datamatic$variables[[t]]$nlevels)))
-                ncol<-length(.term)
+                nrow<-neffects*prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
+                ncol<-length(.mods)
                 
                 if (self$options$modelSelection=="multinomial")
                     nrow <- nrow * (self$datamatic$dep$nlevels-1)
                 
                 df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
-                names(df)<-tob64(self$options$simpleModerators)
+                names(df)<-.mods
                 df
                })
                

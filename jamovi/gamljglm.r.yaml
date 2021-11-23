@@ -355,7 +355,7 @@ items:
 
 
   - name: simpleEffects
-    title: Simple Effects
+    title: Simple Effects 
     type: Group
     clearWith:
                  - dep
@@ -373,7 +373,7 @@ items:
 
     items:
             - name: anova
-              title: Simple Effects ANOVA
+              title: Simple Effects ANOVA of __key__
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
@@ -436,7 +436,7 @@ items:
                      format: zto
 
             - name: coefficients
-              title: Parameter Estimates for simple effects
+              title: Parameter Estimates for simple effects of ___key___
               type: Table
               visible: false
               clearWith:

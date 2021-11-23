@@ -944,7 +944,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
-                            title="Simple Effects ANOVA",
+                            title="Simple Effects ANOVA of __key__",
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
@@ -1015,7 +1015,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
-                            title="Parameter Estimates for simple effects",
+                            title="Parameter Estimates for simple effects of ___key___",
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
