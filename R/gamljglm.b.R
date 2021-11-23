@@ -93,6 +93,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
       aSmartTab$expandable<-TRUE
       aSmartTab$expandFromBegining<-TRUE
+      aSmartTab$key<-self$options$simpleVariable
       aSmartTab$ci(c("est"),self$options$ciWidth)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       

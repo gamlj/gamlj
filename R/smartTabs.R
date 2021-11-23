@@ -19,12 +19,13 @@ SmartTable <- R6::R6Class("SmartTable",
                             private$.init_function<-paste0("init_",self$nickname)
                             private$.fill_function<-paste0("fill_",self$nickname)
                             self$activated<-self$table$visible
-                            if ("keys" %in% names(table) )
-                                  if (is.something(table$keys))
-                                           self$key<-table$keys
+
+                            if ("key" %in% names(table) )
+                                  if (is.something(table$key))
+                                           self$key<-table$key
 
                             ginfo("Table",self$nickname,"initialized..")
-                            
+                          
 
                         },
                         initTable=function() {
@@ -53,15 +54,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                    len<-length(self$table$notes)
                                    self$table$setNote(len+1,warning)
                                  }
-                                 
-                                 test<-grep("___key___",self$table$title,fixed = TRUE)
-                                 mark("has __ke",length(test)>0,self$key)
-                                 if (length(test)>0 & is.something(self$key)) {
-                                   key<-jmvcore::stringifyTerm(self$key)
-                                   self$table$setTitle(gsub("___key___",key,self$table$title))
-                                 }
-                                 
-                                 
+
                           }
                           else 
                                  results<-private$.init_function
@@ -69,6 +62,14 @@ SmartTable <- R6::R6Class("SmartTable",
                           if (self$expandable) private$.expand(results)
                           
                           private$.fill(self$table,results)
+                          
+                          ### handle titles ###
+                          test<-grep("___key___",self$table$title,fixed = TRUE)
+                          if (length(test)>0 & is.something(self$key)) {
+                            key<-jmvcore::stringifyTerm(self$key)
+                            self$table$setTitle(gsub("___key___",key,self$table$title))
+                          }
+                          
 
                           
                         },

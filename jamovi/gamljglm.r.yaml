@@ -373,7 +373,7 @@ items:
 
     items:
             - name: anova
-              title: Simple Effects ANOVA of __key__
+              title: Simple Effects ANOVA of ___key___
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
