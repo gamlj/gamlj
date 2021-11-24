@@ -222,6 +222,29 @@ Syntax <- R6::R6Class(
                 df
                })
                
+            },
+            init_simpleInteractions=function() {
+                 
+              try_hard({    
+              ### moderators should be reverted in order to match emmeans 
+                  .term<-rev(self$options$simpleModerators)
+                  n<-length(.term)
+                  j<-n
+                  params<-list()
+                  anovas<-list()
+                  while(j>1) {
+                       mods<-.term[j:n]
+                      .names<-setdiff(.term,mods)
+                      params[[length(params)+1]]<-.names
+                      j<-j-1
+                  }
+              ### and the results of the definitions should be revered as well
+                  list(rev(params),rev(params))
+                  self$tab_simpleInteractionCoefficients<-rev(params)
+                  self$tab_simpleInteractionAnova<-rev(params)
+                  
+              })
+
             }
             
             
@@ -324,7 +347,7 @@ Syntax <- R6::R6Class(
               
               if (self$options$simpleInteractions) {
                   if (is.something(self$options$simpleVariable) & length(self$options$simpleModerators)>1 ) {
-                      params<-list()
+                   params<-list()
                 ### moderators should be reverted in order to match emmeans 
                     .term<-rev(self$options$simpleModerators)
                     n<-length(.term)

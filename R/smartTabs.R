@@ -11,6 +11,9 @@ SmartTable <- R6::R6Class("SmartTable",
                         expandFromBegining=FALSE,
                         activated=NULL,
                         key=NULL,
+                        spaceBy=NULL,
+                        spaceAt=NULL,
+                        combineBelow=NULL,
                         initialize=function(table,estimator=NULL) {
                             self$name       <-  table$name
                             self$table      <-  table
@@ -70,7 +73,6 @@ SmartTable <- R6::R6Class("SmartTable",
                             self$table$setTitle(gsub("___key___",key,self$table$title))
                           }
                           
-
                           
                         },
 
@@ -107,6 +109,10 @@ SmartTable <- R6::R6Class("SmartTable",
                           for (i in seq_along(private$.estimator$warnings[[self$nickname]])) 
                                self$table$setNote(i+len,private$.estimator$warnings[[self$nickname]][[i]])
                           private$.fill(self$table,results)
+                          
+                          ## handle spacing 
+                          private$.spaceBy()
+                          
                         },
                         
                         initFunction=function(aObject) {
@@ -233,20 +239,38 @@ SmartTable <- R6::R6Class("SmartTable",
 
                                if (self$expandFromBegining) {
                                   for (i in seq_along(.names)) {
-                                    self$table$addColumn(index=i,name = .names[[i]], title = .titles[[i]], superTitle = self$expandSuperTitle, type=.types[i])
+                                    cb<-ifelse(i %in% self$combineBelow,TRUE,FALSE)
+                                    self$table$addColumn(index=i,
+                                                         name = .names[[i]], 
+                                                         title = .titles[[i]], 
+                                                         superTitle = self$expandSuperTitle, 
+                                                         type=.types[i],
+                                                         combineBelow=cb)
                                   }
                                } else {
                                  for (i in seq_along(.names)) {
                                    self$table$addColumn(name = .names[[i]], title = .titles[[i]], superTitle = self$expandSuperTitle, type=.types[i])
                                  }
-                                 
                                }
-                                  
-
+                              },
+                              
+                          .spaceBy=function() {
                                 
+                            
+                                for (sb in self$spaceBy) {
+                                  col<-self$table$asDF[[sb]]
+                                  rows<-unlist(lapply(unlist(unique(col)),function(x) min(which(col==x))))
+                                  for (j in rows)
+                                    self$table$addFormat(rowNo=j,col=1,jmvcore::Cell.BEGIN_GROUP)
+                                }
                                 
-                                
+                            for (j in self$spaceAt) {
+                                self$table$addFormat(rowNo=j,col=1,jmvcore::Cell.BEGIN_GROUP)
+                            }
+                            
                               }
+                              
+
                               
                               
                           ) #end of private
@@ -269,6 +293,7 @@ SmartArray <- R6::R6Class("SmartArray",
                               ginfo("Array",self$nickname,"initiazialased")
                               self$itemNames<-try_hard(tables$itemNames)$obj
                               self$itemKeys<-try_hard(tables$itemKeys)$obj
+                              mark(self$itemNames)
 
                             },
                             initTable=function() {
@@ -282,7 +307,7 @@ SmartArray <- R6::R6Class("SmartArray",
                               results<-output$obj
                               error<-output$error
                               warning<-output$warning
-                              
+
                               if (!isFALSE(error))
                                   self$table$setError(error)
 
@@ -295,6 +320,13 @@ SmartArray <- R6::R6Class("SmartArray",
                                 aSmartTable$expandable<-self$expandable
                                 aSmartTable$expandFromBegining<-self$expandFromBegining
                                 aSmartTable$expandSuperTitle<-self$expandSuperTitle
+                                
+                                if (is.something(self$combineBelow))
+                                        if (length(self$combineBelow)==1)
+                                              aSmartTable$combineBelow<-self$combineBelow
+                                        else
+                                              aSmartTable$combineBelow<-self$combineBelow[[i]]
+                                
                                 aSmartTable$activated<-self$activated
                                 if (is.something(private$.ci)) {
                                   aSmartTable$ci(private$.ci,private$.ciwidth,private$.ciformat)

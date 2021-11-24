@@ -111,7 +111,6 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           fill_simpleEffects_coefficients=function() {
-                            mark(self$tab_simpleCoefficients)
                             try_hard(self$tab_simpleCoefficients)
                           },
                           

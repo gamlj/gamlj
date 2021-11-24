@@ -38,6 +38,7 @@ gamljGlmClass <- R6::R6Class(
 
       ### anova table ###
       aSmartTab<-SmartTable$new(self$results$main$anova,estimate_machine)
+      aSmartTab$spaceAt<-1
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       
       ### estimates table ###
@@ -67,6 +68,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartArray$expandable<-TRUE
       aSmartArray$expandFromBegining<-TRUE
       aSmartArray$expandSuperTitle<-"Comparison"
+      aSmartArray$combineBelow<-1
       aSmartArray$ci(c("est"))
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
@@ -87,6 +89,9 @@ gamljGlmClass <- R6::R6Class(
       aSmartTab$expandable<-TRUE
       aSmartTab$expandFromBegining<-TRUE
       aSmartTab$key<-self$options$simpleVariable
+      aSmartTab$spaceBy<-length(self$options$simpleModerators)-1
+      aSmartTab$combineBelow<-1:(length(self$options$simpleModerators)-1)
+      
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       ##### coefficients
       aSmartTab<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
@@ -95,10 +100,17 @@ gamljGlmClass <- R6::R6Class(
       aSmartTab$expandFromBegining<-TRUE
       aSmartTab$key<-self$options$simpleVariable
       aSmartTab$ci(c("est"),self$options$ciWidth)
+      aSmartTab$spaceBy<-length(self$options$simpleModerators)-1
+      aSmartTab$combineBelow<-1:(length(self$options$simpleModerators)-1)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
+      ### simple interaction
+      aSmartArray<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
+      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
       ### init all ####
 
+      
  
       for (tab in private$.smartTabs)
             tab$initTable()
@@ -135,7 +147,7 @@ gamljGlmClass <- R6::R6Class(
           term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
           j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
           title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
-          j.init_table(aTable,FALSE, ci=T,ciwidth=self$options$ciWidth,title=title)
+          j.init_table(aTable,FALSE, ci=F,ciwidth=self$options$ciWidth,title=title)
 
           aTable<-aGroup$anova
           j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")

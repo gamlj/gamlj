@@ -1076,7 +1076,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="simpleInteractions",
                 title="Simple Interactions",
-                visible=FALSE,
+                visible="(simpleInteractions)",
                 clearWith=list(
                     "dep",
                     "modelTerms",

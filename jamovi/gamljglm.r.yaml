@@ -492,7 +492,7 @@ items:
     title: Simple Interactions 
     type: Array
     description: an array of simple interactions tables
-    visible: false
+    visible: (simpleInteractions)
     clearWith:
         - dep
         - modelTerms
