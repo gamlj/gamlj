@@ -46,12 +46,12 @@ es.glm_variances<-function(model,ciwidth) {
   mdf<-sumr$fstatistic[[2]]
   modss<-f*errss*mdf/edf
   #####
-  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
+  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indices
   ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
-  ## In unbalanced designs, the sum does not necessarely correspond to the model SS (plus residuals)
+  ## In unbalanced designs, the sum does not necessarily correspond to the model SS (plus residuals)
   ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
   ## and many properties of the non-partial indices are broken. 
-  ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
+  ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy between
   ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
   #####
   diff<-modss-sum(effss)
@@ -67,12 +67,12 @@ es.glm_variances<-function(model,ciwidth) {
   epsilonp<-  effectsize::epsilon_squared(.anova,partial = T,ci=ciwidth,verbose=F)
   alist<-list()
   for (i in seq_along(etap$Parameter)) {
-    alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],es.ci.lower=eta[i,4],es.ci.upper=eta[i,5])
-    alist[[length(alist)+1]]<-list(..space..=etap[i,1],estimate=etap[i,2],es.ci.lower=etap[i,4],es.ci.upper=etap[i,5])
-    alist[[length(alist)+1]]<-list(..space..=omega[i,1],estimate=omega[i,2],es.ci.lower=omega[i,4],es.ci.upper=omega[i,5])
-    alist[[length(alist)+1]]<-list(..space..=omegap[i,1],estimate=omegap[i,2],es.ci.lower=omegap[i,4],es.ci.upper=omegap[i,5])
-    alist[[length(alist)+1]]<-list(..space..=epsilon[i,1],estimate=epsilon[i,2],es.ci.lower=epsilon[i,4],es.ci.upper=epsilon[i,5])
-    alist[[length(alist)+1]]<-list(..space..=epsilonp[i,1],estimate=epsilonp[i,2],es.ci.lower=epsilonp[i,4],es.ci.upper=epsilonp[i,5])
+    alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],est.ci.lower=eta[i,4],es.ci.upper=eta[i,5])
+    alist[[length(alist)+1]]<-list(..space..=etap[i,1],estimate=etap[i,2],est.ci.lower=etap[i,4],es.ci.upper=etap[i,5])
+    alist[[length(alist)+1]]<-list(..space..=omega[i,1],estimate=omega[i,2],est.ci.lower=omega[i,4],es.ci.upper=omega[i,5])
+    alist[[length(alist)+1]]<-list(..space..=omegap[i,1],estimate=omegap[i,2],est.ci.lower=omegap[i,4],es.ci.upper=omegap[i,5])
+    alist[[length(alist)+1]]<-list(..space..=epsilon[i,1],estimate=epsilon[i,2],est.ci.lower=epsilon[i,4],es.ci.upper=epsilon[i,5])
+    alist[[length(alist)+1]]<-list(..space..=epsilonp[i,1],estimate=epsilonp[i,2],est.ci.lower=epsilonp[i,4],es.ci.upper=epsilonp[i,5])
     
   }
   

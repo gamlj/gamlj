@@ -26,6 +26,7 @@ gamljGlmClass <- R6::R6Class(
       estimate_machine<-Estimate$new(self$options,data_machine)
       plotter_machine<-Plotter$new(estimate_machine,self$results)
 
+
       ### info table ###
       aSmartTab<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
@@ -200,7 +201,10 @@ gamljGlmClass <- R6::R6Class(
       
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
-      
+      mark(self$results$model$state)
+      self$results$.setModel(private$.estimate_machine$model)
+      mark(length(self$results$model))
+
       ### info table ###
       for (smarttab in private$.smartTabs)
            smarttab$runTable()

@@ -5,8 +5,11 @@ jrs: '1.0'
 items:
   - name: model
     type: Property
-    description: The underlying `lm` object
-
+    description: The underlying model object
+    clearwith:
+        - dep
+        - modelTerms
+      
   - name: info
     title: Model Info
     type: Table
@@ -62,7 +65,7 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
-  
+                      
            - name: intercept
              title: Intercept Information
              type: Table

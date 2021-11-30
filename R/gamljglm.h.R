@@ -1494,7 +1494,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
-#'   \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lm} object \cr
+#'   \code{results$model} \tab \tab \tab \tab \tab The underlying model object \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
 #'   \code{results$main$intercept} \tab \tab \tab \tab \tab a table of information for the model intercept \cr

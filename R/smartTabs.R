@@ -65,7 +65,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             self$title
                             for (col in self$table$columns)
                               col$setTitle(fromb64(col$title))
-                            
+                            ginfo("SmartTable",self$nickname,"inited")
                         },
                         runTable=function() {
                           
@@ -77,6 +77,8 @@ SmartTable <- R6::R6Class("SmartTable",
                           rtable<-private$.getData()
                           private$.fill(self$table,rtable)
                           private$.spaceBy()
+                          ginfo("SmartTable",self$nickname,"run")
+                          
                         },
                         
                         ci=function(alist,ciwidth=95,ciformat="{}% Confidence Intervals"){
@@ -147,22 +149,29 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               .stop=function() {
                                 
-
                                 if (private$.phase=="init") {
                                   fun<-private$.init_function
                                   filled<-FALSE
                                 } else {
+                                  
                                   fun<-private$.run_function
                                   filled<-!self$table$isNotFilled()
+                                  if (filled & ("rowCount" %in% names(self$table))) 
+                                        filled<-self$table$rowCount>0
+                                  
+                                  
                                 }
+                                
                                 if (!self$activated)
                                    return(TRUE)
 
                                 if (is.null(fun)) 
                                   return(TRUE)
                                 
-                                if (is.character(fun) & !(fun %in% names(private$.estimator))  )
+                                if (is.character(fun) & !(fun %in% names(private$.estimator))  ) {
                                   return(TRUE)
+                                  
+                                }
                                 
                                 return(filled)
 
@@ -222,6 +231,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                   t[which(t==".")]<-NA
                                   .insert(i,t)
                                 }
+                                
+                              
 
                               },
                               .expand=function(rtable) {
