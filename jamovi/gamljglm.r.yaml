@@ -373,7 +373,7 @@ items:
 
     items:
             - name: anova
-              title: Simple Effects ANOVA of ___key___
+              title: ANOVA for Simple Effects  of ___key___
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
@@ -505,13 +505,13 @@ items:
         - emmeans
 
     template:
-        title:  Simple Interactions - $key 
+        title:  "Simple Interactions - Interaction: ___key___"
         type: Group
         clearWith: []
         items:
            - type: Table
              name: anova
-             title: ANOVA test -  $key
+             title: ANOVA 
              columns:
                    - name: effect
                      title: 'Effect'
@@ -532,7 +532,7 @@ items:
 
            - type: Table
              name: coefficients
-             title: Parameter Estimates for -  $key
+             title: Parameter Estimates 
              columns:
                    - name: effect
                      title: 'Effect'

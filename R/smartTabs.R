@@ -28,12 +28,8 @@ SmartTable <- R6::R6Class("SmartTable",
                             private$.run_function<-paste0("run_",self$nickname)
                             self$activated<-self$table$visible
 
-                            if ("key" %in% names(table) )
-                                  if (is.something(table$key))
-                                           self$key<-table$key
-                            
+                           
                             if (inherits(estimator,"SmartArray")) {
-                              self$key                    <- estimator$key
                               self$activated              <- estimator$activated
                               self$expandable             <- estimator$expandable
                               self$expandFromBegining     <- estimator$expandFromBegining
@@ -43,9 +39,12 @@ SmartTable <- R6::R6Class("SmartTable",
                               self$ciformat               <- estimator$ciformat
                               self$keys_sep               <- estimator$keys_sep
                               self$keys_raise             <- estimator$keys_raise
+                              self$combineBelow           <- estimator$combineBelow
                             }
                          
-                            
+                            if ("key" %in% names(table) )
+                              if (is.something(table$key))
+                                self$key<-table$key
 
                         },
                         initTable=function() {
@@ -266,6 +265,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 for (sb in self$spaceBy) {
                                   col<-self$table$asDF[[sb]]
                                   rows<-unlist(lapply(unlist(unique(col)),function(x) min(which(col==x))))
+                                  rows<-which(!col==c(col[-1],col[[length(col)]]))+1
                                   for (j in rows)
                                     self$table$addFormat(rowNo=j,col=1,jmvcore::Cell.BEGIN_GROUP)
                                 }
@@ -395,23 +395,24 @@ SmartArray <- R6::R6Class("SmartArray",
                                  return()
 
                               ginfo("Array",self$nickname,"inited with children",self$children)
+                              ginfo("and key",self$key)
                               
                               
                               self$table$setVisible(TRUE)
                               self$title
                               rtables<-private$.getData()
+                              .keys<-attr(rtables,"keys")
                               
                               if (!is.something(self$table$items)) {
                                 
                                
                                 for (i in seq_along(rtables)) {
                                   
-                                  .keys<-attr(rtables,"keys")
+                                 
                                   if (is.something(.keys))
                                      .key<-.keys[[i]]
                                   else 
                                      .key<-i
-                                  
                                   self$table$addItem(key = .key)
 
                                 }
@@ -428,6 +429,7 @@ SmartArray <- R6::R6Class("SmartArray",
                                   
                                   aSmartArray<-SmartArray$new(jtable,self)
                                   aSmartArray$initFunction(rtables[[i]])
+                                  aSmartArray$key<-.keys[[i]]
                                   aSmartArray$initTable()
                                  
                                 } else { 
@@ -435,13 +437,6 @@ SmartArray <- R6::R6Class("SmartArray",
                                 ### if we are here, children are tables
                                    rtable <- rtables[[i]]
                                    aSmartTable<-SmartTable$new(jtable,self)
-                                   
-                                   
-                                    if (is.something(self$combineBelow))
-                                           if (length(self$combineBelow)==1)
-                                                 aSmartTable$combineBelow<-self$combineBelow
-                                           else
-                                                  aSmartTable$combineBelow<-self$combineBelow[[i]]
                                    aSmartTable$initFunction(rtable)
                                    aSmartTable$initTable()
                                 }

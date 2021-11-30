@@ -229,15 +229,17 @@ Syntax <- R6::R6Class(
               try_hard({    
               ### moderators should be reverted in order to match emmeans 
                   .term<-rev(self$options$simpleModerators)
+                  .simple<-self$options$simpleVariable
                   n<-length(.term)
                   j<-n
                   resultsList<-list()
+                  inter_term<-list()
                   while(j>1) {
-                       mods<-.term[j:n]
-                       mark(mods)
-                      .params<-setdiff(.term,mods)
-                      mark(.params)
-                      ### the results of the definitions should be revered as well
+                      ## mods are the variable that we use as moderator of the interaction
+                      .mods<-.term[j:n]
+                      ## params are the variables in the interaction
+                      .params<-setdiff(.term,.mods)
+                      inter_term <- append_list(inter_term,c(.simple,setdiff(.term,.params)))
                       .names<-make.names(paste0("var_",.params))
                       df<-data.frame(matrix(".",ncol=length(.names),nrow=1))
                       names(df)<-.names
@@ -245,7 +247,10 @@ Syntax <- R6::R6Class(
                       resultsList[[length(resultsList)+1]]<-list(df,df)
                       j<-j-1
                   }
-                  mark(resultsList)
+                  ### the order should be reverted to fit the results
+                  inter_term<-rev(inter_term)
+                  resultsList<-rev(resultsList)
+                  attr(resultsList,"keys")<-inter_term
                   resultsList
               })
 

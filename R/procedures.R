@@ -496,7 +496,6 @@ procedure.simpleInteractions<-function(obj) {
             }
             names(res)[names(res)%in% mods]<-make.names(paste0("var_",fromb64(mods)))
             params<-res
-            mark(params)
             res<-emmeans::test(resgrid,by=mods,join=T)
             names(res)[(ncol(res)-3):ncol(res)]<-c("df1","df2","f","p")
             

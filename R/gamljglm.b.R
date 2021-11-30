@@ -68,7 +68,6 @@ gamljGlmClass <- R6::R6Class(
       aSmartArray$expandable<-TRUE
       aSmartArray$expandFromBegining<-TRUE
       aSmartArray$expandSuperTitle<-"Comparison"
-      aSmartArray$combineBelow<-1
       aSmartArray$ci(c("est"))
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
