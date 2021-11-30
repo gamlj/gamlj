@@ -82,12 +82,12 @@ items:
                     - name: source
                       title: ""
                       type: text
-                    - name:  df
-                      title: df
-                      type: integer
                     - name: f
                       title: F
                       type: number
+                    - name:  df
+                      title: df
+                      type: integer
                     - name: p
                       title: p
                       type: number
@@ -493,17 +493,6 @@ items:
     type: Array
     description: an array of simple interactions tables
     visible: (simpleInteractions)
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - fixedIntercept
-        - simpleScaleLabels
-        - ciWidth
-        - emmeans
-
     template:
         title:  "Simple Interactions - Interaction: ___key___"
         type: Group
@@ -512,6 +501,16 @@ items:
            - type: Table
              name: anova
              title: ANOVA 
+             clearWith:
+                - dep
+                - modelTerms
+                - contrasts
+                - scaling
+                - dep_scale
+                - fixedIntercept
+                - simpleScaleLabels
+                - ciWidth
+                - emmeans
              columns:
                    - name: effect
                      title: 'Effect'
@@ -533,6 +532,17 @@ items:
            - type: Table
              name: coefficients
              title: Parameter Estimates 
+             clearWith:
+                - dep
+                - modelTerms
+                - contrasts
+                - scaling
+                - dep_scale
+                - fixedIntercept
+                - simpleScaleLabels
+                - ciWidth
+                - emmeans
+             
              columns:
                    - name: effect
                      title: 'Effect'

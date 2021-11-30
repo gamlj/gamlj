@@ -613,13 +613,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="", 
                                     `type`="text"),
                                 list(
-                                    `name`="df", 
-                                    `title`="df", 
-                                    `type`="integer"),
-                                list(
                                     `name`="f", 
                                     `title`="F", 
                                     `type`="number"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="integer"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -1077,16 +1077,6 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="simpleInteractions",
                 title="Simple Interactions",
                 visible="(simpleInteractions)",
-                clearWith=list(
-                    "dep",
-                    "modelTerms",
-                    "contrasts",
-                    "scaling",
-                    "dep_scale",
-                    "fixedIntercept",
-                    "simpleScaleLabels",
-                    "ciWidth",
-                    "emmeans"),
                 template=R6::R6Class(
                     inherit = jmvcore::Group,
                     active = list(
@@ -1104,6 +1094,16 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 options=options,
                                 name="anova",
                                 title="ANOVA",
+                                clearWith=list(
+                                    "dep",
+                                    "modelTerms",
+                                    "contrasts",
+                                    "scaling",
+                                    "dep_scale",
+                                    "fixedIntercept",
+                                    "simpleScaleLabels",
+                                    "ciWidth",
+                                    "emmeans"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1130,6 +1130,16 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 options=options,
                                 name="coefficients",
                                 title="Parameter Estimates",
+                                clearWith=list(
+                                    "dep",
+                                    "modelTerms",
+                                    "contrasts",
+                                    "scaling",
+                                    "dep_scale",
+                                    "fixedIntercept",
+                                    "simpleScaleLabels",
+                                    "ciWidth",
+                                    "emmeans"),
                                 columns=list(
                                     list(
                                         `name`="effect", 

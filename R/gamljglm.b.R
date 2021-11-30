@@ -78,6 +78,8 @@ gamljGlmClass <- R6::R6Class(
       aSmartArray$activated<-is.something(self$options$emmeans)
       aSmartArray$expandable<-TRUE
       aSmartArray$expandFromBegining<-TRUE
+      aSmartArray$combineBelow="new"
+      aSmartArray$spaceBy="new"
       aSmartArray$ci(c("est"))
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
@@ -111,7 +113,9 @@ gamljGlmClass <- R6::R6Class(
       aSmartArray$expandable<-TRUE
       aSmartArray$expandSuperTitle<-"Moderator"
       aSmartArray$ci(c("est"),self$options$ciWidth)
-      aSmartArray$combineBelow<-1:max(1,length(self$options$simpleModerators)-1)
+      aSmartArray$combineBelow<-"new"
+      aSmartArray$spaceBy<-"new"
+      
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
       ### init all ####

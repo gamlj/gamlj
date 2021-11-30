@@ -14,6 +14,7 @@ Variable <- R6::R6Class(
     original_descriptive=NULL,
     descriptive=NULL,
     nlevels=NULL,
+    neffects=NULL,
     contrast_values=NULL,
     contrast_labels=NULL,
     levels_labels=NULL,
@@ -49,8 +50,9 @@ Variable <- R6::R6Class(
         self$levels<-levels(vardata)
         self$levels_labels<-levels(vardata)
         self$nlevels<-length(self$levels)
-        self$paramsnames<-paste0(var,1:(self$nlevels-1))
-        self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$nlevels-1))
+        self$neffects<-self$nlevels-1
+        self$paramsnames<-paste0(var,1:(self$neffects))
+        self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$neffects))
 
         self$descriptive=list(min=0,max=1)
         
@@ -70,6 +72,7 @@ Variable <- R6::R6Class(
                  self$levels<-levels(vardata)
                  self$levels_labels<-levels(vardata)
                  self$nlevels<-length(self$levels)
+                 self$neffects<-self$nlevels-1
                  self$contrast_values<-private$.contrast_values(self$levels, "dummy")
                  self$contrast_labels<-private$.contrast_labels(self$levels,  "dummy")
                  self$method="dummy"
@@ -99,6 +102,8 @@ Variable <- R6::R6Class(
         self$paramsnames<-var
         self$paramsnames64<-tob64(var)
         self$nlevels=3
+        self$neffects=1
+        
       }
       ### end covs ####
       
@@ -108,6 +113,7 @@ Variable <- R6::R6Class(
             self$levels<-levels(vardata)
             self$levels_labels<-levels(vardata)
             self$nlevels<-length(self$levels)
+            self$neffects<-self$nlevels-1
         } else {
            self$hasCluster<-self$options$cluster
            self$nClusters<-length(self$options$cluster)

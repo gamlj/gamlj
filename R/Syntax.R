@@ -147,10 +147,10 @@ Syntax <- R6::R6Class(
                                 }
                               df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
                              .cols<-make.names(.term)
-                             .names<-c(paste0(.cols,"1"),"vs",paste0(.cols,"2"))
+                             .names<-c(paste0(.cols,"1"),".vs.",paste0(.cols,"2"))
                              .titles<-c(.term,"vs",.term)
                               names(df)<-.names
-                              df$vs="-"
+                              df$.vs.="-"
                               attr(df,"titles")<-.titles
                               df
                               })
@@ -209,7 +209,7 @@ Syntax <- R6::R6Class(
               try_hard({
                 .var<-tob64(self$options$simpleVariable)
                 focal<-self$datamatic$variables[[.var]]
-                neffects<-ifelse(focal$type=="numeric",1,focal$nlevels-1)
+                neffects<-focal$neffects
                 .mods<-tob64(self$options$simpleModerators)
                
                 nrow<-neffects*prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
@@ -237,14 +237,27 @@ Syntax <- R6::R6Class(
                   while(j>1) {
                       ## mods are the variable that we use as moderator of the interaction
                       .mods<-.term[j:n]
-                      ## params are the variables in the interaction
+                      ## params are selected moderators
                       .params<-setdiff(.term,.mods)
-                      inter_term <- append_list(inter_term,c(.simple,setdiff(.term,.params)))
+                      ## inters are the variables in the interaction
+                      .inters<-c(.simple,setdiff(.term,.params))
+                      inter_term <- append_list(inter_term,.inters)
                       .names<-make.names(paste0("var_",.params))
-                      df<-data.frame(matrix(".",ncol=length(.names),nrow=1))
-                      names(df)<-.names
-                      attr(df,"titles")<-.params
-                      resultsList[[length(resultsList)+1]]<-list(df,df)
+                      
+                      .params64<-tob64(.params)
+                      ntests<-prod(unlist(lapply(.params64,function(m) self$datamatic$variables[[m]]$nlevels)))
+                      df1<-data.frame(matrix(".",ncol=length(.names),nrow=ntests))
+                      names(df1)<-.names
+                      attr(df1,"titles")<-.params
+
+                      ## for coefficients
+                      .inters64<-tob64(.inters)
+                      neffects<-ntests*prod(unlist(lapply(.inters64,function(m) self$datamatic$variables[[m]]$neffects)))
+                      
+                      df2<-data.frame(matrix(".",ncol=length(.names),nrow=neffects))
+                      names(df2)<-.names
+                      attr(df2,"titles")<-.params
+                      resultsList[[length(resultsList)+1]]<-list(df1,df2)
                       j<-j-1
                   }
                   ### the order should be reverted to fit the results
