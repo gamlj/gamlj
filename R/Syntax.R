@@ -52,8 +52,7 @@ Syntax <- R6::R6Class(
                   tab[["call"]]$specs   <-    self$formula
               
                   if (self$option("dep_scale"))
-                    tab[["dep"]]<-list(info="Y transform",value=self$options$dep_scale)
-                  
+                    tab[["dep"]]<-list(info="Y transform",value=self$options$dep_scale,specs="")
                   try_hard(tab)
               
               },
@@ -147,10 +146,12 @@ Syntax <- R6::R6Class(
                                   nrow<-nrow*(self$datamatic$dep$nlevels)
                                 }
                               df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
-                             .term64<- tob64(.term)
-                             .names<-c(.term64,"vs",.term64)
+                             .cols<-make.names(.term)
+                             .names<-c(paste0(.cols,"1"),"vs",paste0(.cols,"2"))
+                             .titles<-c(.term,"vs",.term)
                               names(df)<-.names
                               df$vs="-"
+                              attr(df,"titles")<-.titles
                               df
                               })
                   })
@@ -198,7 +199,7 @@ Syntax <- R6::R6Class(
                 nrow<-prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
                 ncol<-length(.mods)
                 df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
-                names(df)<-.mods
+                names(df)<-rev(.mods)
                 df
                })
              },
@@ -218,7 +219,7 @@ Syntax <- R6::R6Class(
                     nrow <- nrow * (self$datamatic$dep$nlevels-1)
                 
                 df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
-                names(df)<-.mods
+                names(df)<-rev(.mods)
                 df
                })
                
@@ -230,19 +231,22 @@ Syntax <- R6::R6Class(
                   .term<-rev(self$options$simpleModerators)
                   n<-length(.term)
                   j<-n
-                  params<-list()
-                  anovas<-list()
+                  resultsList<-list()
                   while(j>1) {
                        mods<-.term[j:n]
-                      .names<-setdiff(.term,mods)
-                      params[[length(params)+1]]<-.names
+                       mark(mods)
+                      .params<-setdiff(.term,mods)
+                      mark(.params)
+                      ### the results of the definitions should be revered as well
+                      .names<-make.names(paste0("var_",.params))
+                      df<-data.frame(matrix(".",ncol=length(.names),nrow=1))
+                      names(df)<-.names
+                      attr(df,"titles")<-.params
+                      resultsList[[length(resultsList)+1]]<-list(df,df)
                       j<-j-1
                   }
-              ### and the results of the definitions should be revered as well
-                  list(rev(params),rev(params))
-                  self$tab_simpleInteractionCoefficients<-rev(params)
-                  self$tab_simpleInteractionAnova<-rev(params)
-                  
+                  mark(resultsList)
+                  resultsList
               })
 
             }

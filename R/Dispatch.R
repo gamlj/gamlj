@@ -103,7 +103,7 @@ Dispatch <- R6::R6Class(
      .warnings=list(),
      .errors=list(),
      .translate=function(msg) {
-         
+      
        for (w in TRANSWARNS) {
          if (length(grep(w$original,msg,fixed = T))>0)
              return(w$new)

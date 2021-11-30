@@ -88,24 +88,31 @@ gamljGlmClass <- R6::R6Class(
       aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
       aSmartTab$expandable<-TRUE
       aSmartTab$expandFromBegining<-TRUE
+      aSmartTab$expandSuperTitle<-"Moderator"
       aSmartTab$key<-self$options$simpleVariable
-      aSmartTab$spaceBy<-length(self$options$simpleModerators)-1
       aSmartTab$combineBelow<-1:(length(self$options$simpleModerators)-1)
+      aSmartTab$spaceBy<-(length(self$options$simpleModerators)-1)
       
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      
       ##### coefficients
       aSmartTab<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
       aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
       aSmartTab$expandable<-TRUE
       aSmartTab$expandFromBegining<-TRUE
+      aSmartTab$expandSuperTitle<-"Moderator"
       aSmartTab$key<-self$options$simpleVariable
       aSmartTab$ci(c("est"),self$options$ciWidth)
-      aSmartTab$spaceBy<-length(self$options$simpleModerators)-1
       aSmartTab$combineBelow<-1:(length(self$options$simpleModerators)-1)
+      aSmartTab$spaceBy<-(length(self$options$simpleModerators)-1)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
       
       ### simple interaction
       aSmartArray<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
+      aSmartArray$expandable<-TRUE
+      aSmartArray$expandSuperTitle<-"Moderator"
+      aSmartArray$ci(c("est"),self$options$ciWidth)
+      aSmartArray$combineBelow<-1:max(1,length(self$options$simpleModerators)-1)
       private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
       
       ### init all ####
@@ -135,42 +142,42 @@ gamljGlmClass <- R6::R6Class(
          # 
 
       ### simple interactions ######
-      
-      if (is.something(estimate_machine$tab_simpleInteractionCoefficients)) {
-  
-        self$results$simpleInteractions$setVisible(TRUE)
-        ### moderators should be reverted in order so they make sense
-        terms<-c(self$options$simpleVariable,self$options$simpleModerators)
-        for (i in seq_along(estimate_machine$tab_simpleInteractionCoefficients)) {
-          aGroup <- self$results$simpleInteractions$addItem(key = i)
-          aTable<-aGroup$coefficients
-          term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
-          j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
-          title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
-          j.init_table(aTable,FALSE, ci=F,ciwidth=self$options$ciWidth,title=title)
-
-          aTable<-aGroup$anova
-          j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")
-          title<-paste("ANOVA test for simple interaction",  jmvcore::stringifyTerm(term))
-          j.init_table(aTable,FALSE, ci=F,title=title)
-          
-          title<-paste("Simple interaction:",  jmvcore::stringifyTerm(term))
-          aGroup$setTitle(title)
-          
-        } 
-        
-        
-      }
-        
-      ### posthoc ####
-      
-
-
-      #### normality assuption test ####
-      if (is.something(estimate_machine$tab_normtest))
-        j.init_table(self$results$assumptions$normTest,estimate_machine$tab_normtest)
-      
-      
+      # 
+      # if (is.something(estimate_machine$tab_simpleInteractionCoefficients)) {
+      # 
+      #   self$results$simpleInteractions$setVisible(TRUE)
+      #   ### moderators should be reverted in order so they make sense
+      #   terms<-c(self$options$simpleVariable,self$options$simpleModerators)
+      #   for (i in seq_along(estimate_machine$tab_simpleInteractionCoefficients)) {
+      #     aGroup <- self$results$simpleInteractions$addItem(key = i)
+      #     aTable<-aGroup$coefficients
+      #     term<-setdiff(terms,estimate_machine$tab_simpleInteractionCoefficients[[i]])
+      #     j.expand_table(aTable,estimate_machine$tab_simpleInteractionCoefficients[[i]],superTitle="Moderator")
+      #     title<-paste("Parameter Estimates for simple interaction",  jmvcore::stringifyTerm(term))
+      #     j.init_table(aTable,FALSE, ci=F,ciwidth=self$options$ciWidth,title=title)
+      # 
+      #     aTable<-aGroup$anova
+      #     j.expand_table(aTable,estimate_machine$tab_simpleInteractionAnova[[i]],superTitle="Moderator")
+      #     title<-paste("ANOVA test for simple interaction",  jmvcore::stringifyTerm(term))
+      #     j.init_table(aTable,FALSE, ci=F,title=title)
+      #     
+      #     title<-paste("Simple interaction:",  jmvcore::stringifyTerm(term))
+      #     aGroup$setTitle(title)
+      #     
+      #   } 
+      #   
+      #   
+      # }
+      #   
+      # ### posthoc ####
+      # 
+      # 
+      # 
+      # #### normality assuption test ####
+      # if (is.something(estimate_machine$tab_normtest))
+      #   j.init_table(self$results$assumptions$normTest,estimate_machine$tab_normtest)
+      # 
+      # 
       
       
       plotter_machine$initPlots()
@@ -193,61 +200,61 @@ gamljGlmClass <- R6::R6Class(
       
       ### info table ###
       for (smarttab in private$.smartTabs)
-           smarttab$fillTable()
+           smarttab$runTable()
 
 
     
       
       
-      ### simple interactions
-      if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
-        
-        for (i in seq_along(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
-          aGroup <- self$results$simpleInteractions$get(key = i)
-          aTable<-aGroup$coefficients
-          j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionCoefficients[[i]],append = T)
-          aTable<-aGroup$anova
-          j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionAnova[[i]],append = T)
-
-        } 
-      }
-      
+      # ### simple interactions
+      # if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
+      #   
+      #   for (i in seq_along(private$.estimate_machine$tab_simpleInteractionCoefficients)) {
+      #     aGroup <- self$results$simpleInteractions$get(key = i)
+      #     aTable<-aGroup$coefficients
+      #     j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionCoefficients[[i]],append = T)
+      #     aTable<-aGroup$anova
+      #     j.fill_table(aTable,private$.estimate_machine$tab_simpleInteractionAnova[[i]],append = T)
+      # 
+      #   } 
+      # }
+      # 
       
 
     ###  emmeans 
       
-      if (is.something(private$.estimate_machine$tab_emmeans)) {
-        
-        for (i in seq_along(self$options$emmeans)) {
-          term<-self$options$emmeans[[i]]
-          aTable<-self$results$emmeans$get(key = jmvcore::stringifyTerm(term))
-          j.fill_table(aTable,private$.estimate_machine$tab_emmeans[[i]])
-        } 
-      }
-      
-      ###### levene's test #######
-      if (self$options$homoTest) {
-        j.fill_table(self$results$assumptions$homoTest,private$.estimate_machine$tab_levene)
-        j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_levene")
-        
-      }
-      
-      ###### normality test #######
-      
-      if (self$options$normTest) {
-        j.fill_table(self$results$assumptions$normTest,private$.estimate_machine$tab_normtest)
-        j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_normtest")
-        
-      }
-      
-      
-      
-      private$.plotter_machine$preparePlots()
-      j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
-      
-      #save model preds and resids            
-      private$.estimate_machine$savePredRes(self$results) 
-      
+      # if (is.something(private$.estimate_machine$tab_emmeans)) {
+      #   
+      #   for (i in seq_along(self$options$emmeans)) {
+      #     term<-self$options$emmeans[[i]]
+      #     aTable<-self$results$emmeans$get(key = jmvcore::stringifyTerm(term))
+      #     j.fill_table(aTable,private$.estimate_machine$tab_emmeans[[i]])
+      #   } 
+      # }
+      # 
+      # ###### levene's test #######
+      # if (self$options$homoTest) {
+      #   j.fill_table(self$results$assumptions$homoTest,private$.estimate_machine$tab_levene)
+      #   j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_levene")
+      #   
+      # }
+      # 
+      # ###### normality test #######
+      # 
+      # if (self$options$normTest) {
+      #   j.fill_table(self$results$assumptions$normTest,private$.estimate_machine$tab_normtest)
+      #   j.add_warnings(self$results$assumptions$homoTest,private$.estimate_machine,"tab_normtest")
+      #   
+      # }
+      # 
+      # 
+      # 
+      # private$.plotter_machine$preparePlots()
+      # j.add_warnings(self$results$plotnotes,private$.plotter_machine,"plot")
+      # 
+      # #save model preds and resids            
+      # private$.estimate_machine$savePredRes(self$results) 
+      # 
 
       ginfo("### Module phase: end ###")
       return()

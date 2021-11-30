@@ -31,7 +31,6 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 
 procedure.posthoc <- function(Obj) {
   
-  ginfo("Populate posthoc...")
   terms <- tob64(Obj$options$posthoc)
   dep <- Obj$options$dep
   model<-Obj$model
@@ -92,6 +91,9 @@ procedure.posthoc <- function(Obj) {
     
     for (col in cols)
       tableData[,col]<-as.character(tableData[,col])
+    
+    .names<-make.names(fromb64(rev(ph)))
+    names(tableData)[1:length(cols)]<-c(paste0(.names,"1"),paste0(.names,"2"))
 
     if ("Response" %in% names(tableData))
         tableData$Response<-as.character(tableData$Response)
@@ -100,7 +102,6 @@ procedure.posthoc <- function(Obj) {
   if (Obj$options$cimethod=="boot")
        Obj$warnings<-list(topic="posthoc",message="Bootstrap confidence intervals")
     
-  ginfo("Populate posthoc done")
 
     postHocTables
   
@@ -233,7 +234,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   variable64<-tob64(variable)
   term<-obj$options$simpleModerators
   ### we need to reverse the term because emmeans order levels in a strange way
-  term64<-tob64(rev(term))
+  term64<-tob64(term)
   varobj<-obj$datamatic$variables[[variable64]]
   results<-list()
   vars<-c("contrast",term64)
@@ -276,7 +277,6 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     }
     ##
     res<-as.data.frame(estimates)
-    
     if (varobj$type=="factor") {
       
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
@@ -442,8 +442,7 @@ procedure.simpleInteractions<-function(obj) {
       if (obj$option("dfmethod"))
         df<-tolower(obj$options$dfmethod)
       
-      params<-list()
-      anovas<-list()
+      resultsList<-list()
       while(j>1) {
             mods<-term64[j:n]
             conditions<-lapply(seq_along(term64),function(i) {
@@ -476,12 +475,11 @@ procedure.simpleInteractions<-function(obj) {
             results<-try_hard(do.call(emmeans::contrast,opts))
             obj$warnings<-list(topic="simpleInteractions",message=results$warning)
             obj$errors<-list(topic="simpleInteractions",message=results$error)
-            resgrid<-results$obj 
-
+            resgrid<-results$obj
             ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
             res<-as.data.frame(resgrid)
             res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
-            names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","t","p","ci.lower","ci.upper")
+            names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","t","p","est.ci.lower","est.ci.upper")
             names(res)[1:length(.names)]<-.names
             
             if (varobj$type=="numeric") {
@@ -496,8 +494,9 @@ procedure.simpleInteractions<-function(obj) {
                levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
                res[[.name]]<-as.character(res[[.name]])
             }
-            
-            params[[length(params)+1]]<-res
+            names(res)[names(res)%in% mods]<-make.names(paste0("var_",fromb64(mods)))
+            params<-res
+            mark(params)
             res<-emmeans::test(resgrid,by=mods,join=T)
             names(res)[(ncol(res)-3):ncol(res)]<-c("df1","df2","f","p")
             
@@ -513,15 +512,16 @@ procedure.simpleInteractions<-function(obj) {
               levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
               res[[.name]]<-as.character(res[[.name]])
             }
-            
-            anovas[[length(anovas)+1]]<-res
+            names(res)[1:length(mods)]<-make.names(paste0("var_",fromb64(mods)))
+            anova<-res
+            resultsList[[length(resultsList)+1]]<-list(anova,params)
             j<-j-1
         }
       
 
       ginfo("simple Interactions ended")
-      
-      return(list(params,anovas))
+ 
+      return(resultsList)
 }
 
   

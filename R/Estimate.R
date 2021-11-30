@@ -24,13 +24,12 @@ Estimate <- R6::R6Class("Estimate",
                           
                           estimate = function(data) {
                             private$.estimateModel(data)
-                            private$.estimateSimpleEffects()
                             ginfo("Initial estimation is done...")
                           }, # end of publich function estimate
 
                           ##### fill the tables #####
                           
-                          fill_info=function() {
+                          run_info=function() {
                                
                                 tab<-self$init_info()$obj
                                 tab[["sample"]]$value<-self$datamatic$N
@@ -43,7 +42,7 @@ Estimate <- R6::R6Class("Estimate",
                                 try_hard(tab)
                           },                    
 
-                          fill_main_anova=function() {
+                          run_main_anova=function() {
                             
                             if (!self$isProper) 
                               self$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
@@ -51,13 +50,13 @@ Estimate <- R6::R6Class("Estimate",
                             try_hard(mf.anova(self$model,self))
                           },
                           
-                          fill_main_r2=function() {
+                          run_main_r2=function() {
 
                               res<-try_hard(fit.R2(self$model))
                               res
                           },
                           
-                          fill_main_coefficients=function() {
+                          run_main_coefficients=function() {
                             try_hard({
                             tab<-NULL
                             if (self$isProper) {
@@ -71,11 +70,11 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           ### anova effect sizes ####
                           
-                          fill_main_effectsizes=function()  {
+                          run_main_effectsizes=function()  {
                             try_hard(es.glm_variances(self$model,self$ciwidth))
                           },
                           
-                          fill_main_intercept=function() {
+                          run_main_intercept=function() {
                             
                             try_hard({
                               ss<-summary(self$model)
@@ -97,22 +96,29 @@ Estimate <- R6::R6Class("Estimate",
                             })
                             
                           },
-                          fill_posthoc=function() {
+                          run_posthoc=function() {
                             
                             try_hard(procedure.posthoc(self))
                             
                           },
-                          fill_emmeans=function() {
+                          run_emmeans=function() {
                             try_hard(procedure.emmeans(self))
                           },
                           
-                          fill_simpleEffects_anova=function() {
+                          run_simpleEffects_anova=function() {
+                            private$.estimateSimpleEffects()
                             try_hard(self$tab_simpleAnova)
                           },
                           
-                          fill_simpleEffects_coefficients=function() {
+                          run_simpleEffects_coefficients=function() {
                             try_hard(self$tab_simpleCoefficients)
                           },
+                          run_simpleInteractions=function() {
+                            try_hard(procedure.simpleInteractions(self))
+                          },
+                          
+                          
+                          
                           
                           savePredRes=function(results) {
                             
@@ -378,17 +384,7 @@ Estimate <- R6::R6Class("Estimate",
                             self$tab_simpleCoefficients  <-  results$obj[[2]]
                         },
                           
-                          .estimateSimpleInteractions=function() {
-                            
-                            if (!is.something(self$tab_simpleInteractionAnova))
-                              return()
-                            
-                            tables<-procedure.simpleInteractions(self)
-                            self$tab_simpleInteractionCoefficients<-tables[[1]]
-                            self$tab_simpleInteractionAnova<-tables[[2]]
-           
-                            
-                          },
+                          
                         
                          .estimateAssumptions=function() {
                            

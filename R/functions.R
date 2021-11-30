@@ -138,7 +138,8 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     int<-strsplit(obj,INTERACTION_SYMBOL,fixed=T)[[1]]
     if (length(int)>1)
         return(paste0(unlist(sapply(int,bogusfromb64,ref=ref)),collapse = ":"))
-    
+
+
     if (is.null(ref)) {
         fac<-strsplit(obj,FACTOR_SYMBOL,fixed=T)[[1]]
         obj<-fac[[1]]  
@@ -164,3 +165,13 @@ bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
 
 is.b64<-function(a) ifelse(length(grep(B64_SYMBOL,a,fixed = TRUE))>0,TRUE,FALSE)
+
+is.listOfList<-function(obj) {
+
+    if (inherits(obj,"list")) {
+       child<-obj[[1]]
+       return(inherits(obj,"list"))
+    }
+  return(FALSE)
+}
+  
