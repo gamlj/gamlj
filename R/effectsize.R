@@ -67,12 +67,12 @@ es.glm_variances<-function(model,ciwidth) {
   epsilonp<-  effectsize::epsilon_squared(.anova,partial = T,ci=ciwidth,verbose=F)
   alist<-list()
   for (i in seq_along(etap$Parameter)) {
-    alist[[length(alist)+1]]<-list(..space..=eta[i,1],estimate=eta[i,2],est.ci.lower=eta[i,4],es.ci.upper=eta[i,5])
-    alist[[length(alist)+1]]<-list(..space..=etap[i,1],estimate=etap[i,2],est.ci.lower=etap[i,4],es.ci.upper=etap[i,5])
-    alist[[length(alist)+1]]<-list(..space..=omega[i,1],estimate=omega[i,2],est.ci.lower=omega[i,4],es.ci.upper=omega[i,5])
-    alist[[length(alist)+1]]<-list(..space..=omegap[i,1],estimate=omegap[i,2],est.ci.lower=omegap[i,4],es.ci.upper=omegap[i,5])
-    alist[[length(alist)+1]]<-list(..space..=epsilon[i,1],estimate=epsilon[i,2],est.ci.lower=epsilon[i,4],es.ci.upper=epsilon[i,5])
-    alist[[length(alist)+1]]<-list(..space..=epsilonp[i,1],estimate=epsilonp[i,2],est.ci.lower=epsilonp[i,4],es.ci.upper=epsilonp[i,5])
+    alist[[length(alist)+1]]<-list(estimate=eta[i,2],est.ci.lower=eta[i,4],est.ci.upper=eta[i,5])
+    alist[[length(alist)+1]]<-list(estimate=etap[i,2],est.ci.lower=etap[i,4],est.ci.upper=etap[i,5])
+    alist[[length(alist)+1]]<-list(estimate=omega[i,2],est.ci.lower=omega[i,4],est.ci.upper=omega[i,5])
+    alist[[length(alist)+1]]<-list(estimate=omegap[i,2],est.ci.lower=omegap[i,4],est.ci.upper=omegap[i,5])
+    alist[[length(alist)+1]]<-list(estimate=epsilon[i,2],est.ci.lower=epsilon[i,4],est.ci.upper=epsilon[i,5])
+    alist[[length(alist)+1]]<-list(epsilonp[i,1],estimate=epsilonp[i,2],est.ci.lower=epsilonp[i,4],est.ci.upper=epsilonp[i,5])
     
   }
   
@@ -80,5 +80,43 @@ es.glm_variances<-function(model,ciwidth) {
 }
   
   
+mf.fixTable<- function(x,...) UseMethod(".fixtable")
+
+.fixtable.default<-function(atable) {
+  return(atable)
+}
+
+
+
+### beta in parameter estimates ###
+add_effect_size<- function(x,...) UseMethod(".add_es")
+
+.add_es.simple_params_lm<-function(atable,model,variable) {
+  
+  xstd<-1
+  if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
+  y<-names(attr(model$terms,"dataClass"))[1]
+  ystd<-sd(model$model[,y])
+  atable$beta<-atable$estimate*(xstd/ystd) 
+  atable
+}
+
+.add_es.simple_anova_lm<-function(atable,model) {
+  
+  dfres<-model$df.residual
+  sumr<-summary(model)
+  N<-dfres+sumr$fstatistic[[2]]+1
+  ssres<-sigma(model)^2*dfres
+  ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+  df<-atable$df1
+  SS<-df*atable$test*ssres/dfres
+  atable$etaSq  <- SS/(ssmod+ssres)
+  atable$etaSqP <- SS/(SS+ssres)
+  atable$omegaSq <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
+  atable$omegaSqP <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
+  atable$epsilonSq<-(SS-(ssres*df/dfres))/(ssmod+ssres)
+  atable$epsilonSqP<-(SS-(ssres*df/dfres))/(SS+ssres)
+  as.data.frame(atable)  
+}
 
 

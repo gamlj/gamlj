@@ -2,15 +2,14 @@ gamljGlmClass <- R6::R6Class(
   "gamljGlmClass",
   inherit = gamljGlmBase,
   private=list(
-    .model=NA,
+    .dispatcher=NULL,
     .data_machine=NULL,
     .estimate_machine=NULL,
     .plotter_machine=NULL,
     .ready=NULL,
-    .smartTabs=list(),
+    .smartObjs=list(),
     .init=function() {
       ginfo("### Module phase: init ###")
-      
       class(private$.results) <- c('gamlj', class(private$.results))
       
       private$.ready<-readiness(self$options)
@@ -21,109 +20,108 @@ gamljGlmClass <- R6::R6Class(
       }
       
       ### set up the R6 workhorse class
-      
-      data_machine<-Datamatic$new(self$options,self$data)
-      estimate_machine<-Estimate$new(self$options,data_machine)
-      plotter_machine<-Plotter$new(estimate_machine,self$results)
-
+      dispatcher<-Dispatch$new(self$options)
+      data_machine<-Datamatic$new(self$data,dispatcher)
+      estimate_machine<-Estimate$new(data_machine,dispatcher)
+      plotter_machine<-Plotter$new(estimate_machine,self$results,dispatcher)
 
       ### info table ###
-      aSmartTab<-SmartTable$new(self$results$info,estimate_machine)
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
 
       ## R2 table ###
-      aSmartTab<-SmartTable$new(self$results$main$r2,estimate_machine)
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
 
       ### anova table ###
-      aSmartTab<-SmartTable$new(self$results$main$anova,estimate_machine)
-      aSmartTab$spaceAt<-1
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
+      aSmartObj$spaceAt<-1
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### estimates table ###
-      aSmartTab<-SmartTable$new(self$results$main$coefficients,estimate_machine)
-      aSmartTab$ci(c("est"),self$options$ciWidth)
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
+      aSmartObj$ci(c("est"),self$options$ciWidth)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### contrasts code tables
-      aSmartArray<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
-      aSmartArray$expandable<-TRUE
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
+      aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
       ### intercept more info table ###
       
-      aSmartTab<-SmartTable$new(self$results$main$intercept,estimate_machine)
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$main$intercept,estimate_machine)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### effectsizes table ###
 
-      aSmartTab<-SmartTable$new(self$results$main$effectsizes,estimate_machine)
-      aSmartTab$ci(c("est"),self$options$ciWidth)
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$main$effectsizes,estimate_machine)
+      aSmartObj$ci(c("est"),self$options$ciWidth)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
       ## post hoc #####
       
-      aSmartArray<-SmartArray$new(self$results$posthoc,estimate_machine)
-      aSmartArray$expandable<-TRUE
-      aSmartArray$expandFromBegining<-TRUE
-      aSmartArray$expandSuperTitle<-"Comparison"
-      aSmartArray$ci(c("est"))
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
+      aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFromBegining<-TRUE
+      aSmartObj$expandSuperTitle<-"Comparison"
+      aSmartObj$ci(c("est"),self$options$ciWidth)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
 
       ### estimate marginal means
       
-      aSmartArray<-SmartArray$new(self$results$emmeans,estimate_machine)
-      aSmartArray$activated<-is.something(self$options$emmeans)
-      aSmartArray$expandable<-TRUE
-      aSmartArray$expandFromBegining<-TRUE
-      aSmartArray$combineBelow="new"
-      aSmartArray$spaceBy="new"
-      aSmartArray$ci(c("est"))
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
+      aSmartObj<-SmartArray$new(self$results$emmeans,estimate_machine)
+      aSmartObj$activated<-is.something(self$options$emmeans)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFromBegining<-TRUE
+      aSmartObj$combineBelow="new"
+      aSmartObj$spaceBy="new"
+      aSmartObj$ci(c("est"),self$options$ciWidth)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### simple effects
       ##### anova
-      aSmartTab<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
-      aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
-      aSmartTab$expandable<-TRUE
-      aSmartTab$expandFromBegining<-TRUE
-      aSmartTab$expandSuperTitle<-"Moderator"
-      aSmartTab$key<-self$options$simpleVariable
-      aSmartTab$combineBelow<-1:(length(self$options$simpleModerators)-1)
-      aSmartTab$spaceBy<-(length(self$options$simpleModerators)-1)
+      aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
+      aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFromBegining<-TRUE
+      aSmartObj$expandSuperTitle<-"Moderator"
+      aSmartObj$key<-self$options$simpleVariable
+      aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
+      aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
       
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ##### coefficients
-      aSmartTab<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
-      aSmartTab$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
-      aSmartTab$expandable<-TRUE
-      aSmartTab$expandFromBegining<-TRUE
-      aSmartTab$expandSuperTitle<-"Moderator"
-      aSmartTab$key<-self$options$simpleVariable
-      aSmartTab$ci(c("est"),self$options$ciWidth)
-      aSmartTab$combineBelow<-1:(length(self$options$simpleModerators)-1)
-      aSmartTab$spaceBy<-(length(self$options$simpleModerators)-1)
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartTab)
+      aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
+      aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFromBegining<-TRUE
+      aSmartObj$expandSuperTitle<-"Moderator"
+      aSmartObj$key<-self$options$simpleVariable
+      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
+      aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### simple interaction
-      aSmartArray<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
-      aSmartArray$expandable<-TRUE
-      aSmartArray$expandSuperTitle<-"Moderator"
-      aSmartArray$ci(c("est"),self$options$ciWidth)
-      aSmartArray$combineBelow<-"new"
-      aSmartArray$spaceBy<-"new"
+      aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandSuperTitle<-"Moderator"
+      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$combineBelow<-"new"
+      aSmartObj$spaceBy<-"new"
       
-      private$.smartTabs<-append_list(private$.smartTabs,aSmartArray)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### init all ####
 
       
  
-      for (tab in private$.smartTabs)
+      for (tab in private$.smartObjs)
             tab$initTable()
       
 
@@ -201,12 +199,9 @@ gamljGlmClass <- R6::R6Class(
       
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
-      mark(self$results$model$state)
-      self$results$.setModel(private$.estimate_machine$model)
-      mark(length(self$results$model))
 
       ### info table ###
-      for (smarttab in private$.smartTabs)
+      for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
 

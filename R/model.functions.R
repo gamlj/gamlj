@@ -55,6 +55,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       .ci_method           <-  obj$options$cimethod
       .ci_width            <-  obj$ciwidth
       .se_method           <-  obj$options$semethod=="robust"
+      
       .coefficients        <-  as.data.frame(parameters::parameters(
                                                                    model,
                                                                    robust=.se_method,
@@ -330,7 +331,10 @@ mf.anova<- function(x,...) UseMethod(".anova")
       epsilon<-effectsize::epsilon_squared(.canova,partial = F,verbose = F)
   
       effss$etaSq<-eta[-last,2]
+      mark(effss$etaSq)
       effss$etaSqP<-etap[,2]
+      mark(effss$etaSqP)
+      
       effss$omegaSq<-omega[-last,2]
       effss$omegaSqP<-omegap[,2]
       effss$epsilonSq<-epsilon[-last,2]
@@ -339,6 +343,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
       reslist<-append_list(reslist,reds,"Residuals")
       reslist<-append_list(reslist,tots,"Total")
       reslist<-prepend_list(reslist,mods,"Model")
+
       reslist    
   }
 
@@ -406,45 +411,6 @@ mf.getModelFactors<-function(model) {
 
 
 
-############# produces anova/deviance table in a somehow standard format ##########
-mf.fixTable<- function(x,...) UseMethod(".fixtable")
-
-.fixtable.default<-function(atable) {
-  return(atable)
-}
-
-.fixtable.simple_anova_lm<-function(atable,model) {
-
-  dfres<-model$df.residual
-  sumr<-summary(model)
-  N<-dfres+sumr$fstatistic[[2]]+1
-  ssres<-sigma(model)^2*dfres
-  ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
-  df<-atable$df1
-  SS<-df*atable$test*ssres/dfres
-  atable$etaSq  <- SS/(ssmod+ssres)
-  atable$etaSqP <- SS/(SS+ssres)
-  atable$omegaSq <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
-  atable$omegaSqP <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
-  atable$epsilonSq<-(SS-(ssres*df/dfres))/(ssmod+ssres)
-  atable$epsilonSqP<-(SS-(ssres*df/dfres))/(SS+ssres)
-  as.data.frame(atable)  
-  
-  
-}
-
-
-### beta in parameter estimates ###
-
-.fixtable.simple_params_lm<-function(atable,model,variable) {
-  
-      xstd<-1
-      if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
-      y<-names(attr(model$terms,"dataClass"))[1]
-      ystd<-sd(model$model[,y])
-      atable$beta<-atable$estimate*(xstd/ystd) 
-      atable
-}
 ############# some models are not built in standard way, here we fix them ##########
 mf.fixModel<- function(x,...) UseMethod(".fixModel")
 

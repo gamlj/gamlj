@@ -3,13 +3,19 @@ name:  gamljGlm
 title: General Linear Model
 jrs: '1.0'
 items:
-  - name: model
-    type: Property
-    description: The underlying model object
-    clearwith:
-        - dep
+
+  - name: storage
+    title: Storage
+    type: Table
+    visible: false
+    clearWith: 
         - modelTerms
-      
+        
+    columns:
+       - name: info
+         type: text
+         title: "Info"
+
   - name: info
     title: Model Info
     type: Table
@@ -185,6 +191,7 @@ items:
                          - fixedIntercept
                          - effectSize
                          - dep_scale
+                         - ciWidth
                          
              columns:
                     - name: effect
@@ -215,7 +222,7 @@ items:
                     - scaling
                     - dep_scale
                     - fixedIntercept
-                    - paramCIWidth
+                    - ciWidth
                     - cimethod
                     - semethod
 
@@ -290,20 +297,14 @@ items:
     type: Array
     description: an array of post-hoc tables
     items: (posthoc)
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - posthoc
-        - postHocCorr
     template:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
               - posthoc
-  
+              - semethod
+              - ciWidth
+
         columns:
         - name: estimate
           title: Difference
@@ -360,20 +361,6 @@ items:
   - name: simpleEffects
     title: Simple Effects 
     type: Group
-    clearWith:
-                 - dep
-                 - modelTerms
-                 - contrasts
-                 - scaling
-                 - dep_scale
-                 - fixedIntercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
-
     items:
             - name: anova
               title: ANOVA for Simple Effects  of ___key___
@@ -393,7 +380,7 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
-
+ 
               columns:
                    - name: test
                      title: F
@@ -455,7 +442,8 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
-
+                 - semethod
+                 - ciWidth
               columns:
                      - name: contrast
                        title: "Effect"
@@ -518,7 +506,7 @@ items:
                    - name: effect
                      title: 'Effect'
                      type: text
-                   - name: f
+                   - name: test
                      title: F
                      type: number
                    - name: df1
@@ -531,6 +519,36 @@ items:
                      title: p
                      type: number
                      format: zto,pvalue
+                   - name: etaSq
+                     title: η²
+                     type: number
+                     visible: (effectSize:eta)
+                   - name: etaSqP
+                     title: η²p
+                     type: number
+                     visible: (effectSize:etap)
+                     format: zto
+                   - name: omegaSq
+                     title: ω²
+                     type: number
+                     visible: (effectSize:omega)
+                     format: zto
+                   - name: omegaSqP
+                     title: ω²p
+                     type: number
+                     visible: (effectSize:omegap)
+                     format: zto
+                   - name: epsilonSq
+                     title: ε²
+                     type: number
+                     visible: (effectSize:epsilon)
+                     format: zto
+                   - name: epsilonSqP
+                     title: ε²p
+                     type: number
+                     visible: (effectSize:epsilonp)
+                     format: zto
+
 
            - type: Table
              name: coefficients
@@ -580,21 +598,13 @@ items:
     description: an array of predicted means tables
     visible: false
     items: (emmeans)
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - fixedIntercept
-        - simpleScaleLabels
-        - ciWidth
-        - emmeans
-
     template:
         title:  Estimate Marginal Means - ___key___
         type: Table
-        clearWith: []
+        clearWith:
+            - ciWidth
+            - emmeans
+
         columns:
         - name: estimate
           title: 'Mean'

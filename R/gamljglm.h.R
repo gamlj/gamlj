@@ -13,7 +13,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modelTerms = NULL,
             fixedIntercept = TRUE,
             showParamsCI = TRUE,
-            paramCIWidth = 95,
             cimethod = "standard",
             bootR = 1000,
             semethod = "standard",
@@ -103,12 +102,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "showParamsCI",
                 showParamsCI,
                 default=TRUE)
-            private$..paramCIWidth <- jmvcore::OptionNumber$new(
-                "paramCIWidth",
-                paramCIWidth,
-                min=50,
-                max=99.9,
-                default=95)
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
                 cimethod,
@@ -356,7 +349,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
-            self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..cimethod)
             self$.addOption(private$..bootR)
             self$.addOption(private$..semethod)
@@ -404,7 +396,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
-        paramCIWidth = function() private$..paramCIWidth$value,
         cimethod = function() private$..cimethod$value,
         bootR = function() private$..bootR$value,
         semethod = function() private$..semethod$value,
@@ -451,7 +442,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..modelTerms = NA,
         ..fixedIntercept = NA,
         ..showParamsCI = NA,
-        ..paramCIWidth = NA,
         ..cimethod = NA,
         ..bootR = NA,
         ..semethod = NA,
@@ -496,7 +486,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "gamljGlmResults",
     inherit = jmvcore::Group,
     active = list(
-        model = function() private$..model,
+        storage = function() private$.items[["storage"]],
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
@@ -508,15 +498,25 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotnotes = function() private$.items[["plotnotes"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
-    private = list(
-        ..model = NA),
+    private = list(),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="General Linear Model")
-            private$..model <- NULL
+            self$add(jmvcore::Table$new(
+                options=options,
+                name="storage",
+                title="Storage",
+                visible=FALSE,
+                clearWith=list(
+                    "modelTerms"),
+                columns=list(
+                    list(
+                        `name`="info", 
+                        `type`="text", 
+                        `title`="Info"))))
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -724,7 +724,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "scaling",
                                 "fixedIntercept",
                                 "effectSize",
-                                "dep_scale"),
+                                "dep_scale",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="effect", 
@@ -759,7 +760,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "scaling",
                                 "dep_scale",
                                 "fixedIntercept",
-                                "paramCIWidth",
+                                "ciWidth",
                                 "cimethod",
                                 "semethod"),
                             columns=list(
@@ -840,19 +841,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="posthoc",
                 title="Post Hoc Tests",
                 items="(posthoc)",
-                clearWith=list(
-                    "dep",
-                    "modelTerms",
-                    "contrasts",
-                    "scaling",
-                    "dep_scale",
-                    "posthoc",
-                    "postHocCorr"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
-                        "posthoc"),
+                        "posthoc",
+                        "semethod",
+                        "ciWidth"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -927,20 +922,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="simpleEffects",
-                            title="Simple Effects",
-                            clearWith=list(
-                    "dep",
-                    "modelTerms",
-                    "contrasts",
-                    "scaling",
-                    "dep_scale",
-                    "fixedIntercept",
-                    "simpleVariable",
-                    "simpleModerators",
-                    "simpleScale",
-                    "cvalue",
-                    "percvalue",
-                    "simpleScaleLabels"))
+                            title="Simple Effects")
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -1029,7 +1011,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "simpleScale",
                                 "cvalue",
                                 "percvalue",
-                                "simpleScaleLabels"),
+                                "simpleScaleLabels",
+                                "semethod",
+                                "ciWidth"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1110,7 +1094,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `title`="Effect", 
                                         `type`="text"),
                                     list(
-                                        `name`="f", 
+                                        `name`="test", 
                                         `title`="F", 
                                         `type`="number"),
                                     list(
@@ -1125,7 +1109,42 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="p", 
                                         `title`="p", 
                                         `type`="number", 
-                                        `format`="zto,pvalue"))))
+                                        `format`="zto,pvalue"),
+                                    list(
+                                        `name`="etaSq", 
+                                        `title`="\u03B7\u00B2", 
+                                        `type`="number", 
+                                        `visible`="(effectSize:eta)"),
+                                    list(
+                                        `name`="etaSqP", 
+                                        `title`="\u03B7\u00B2p", 
+                                        `type`="number", 
+                                        `visible`="(effectSize:etap)", 
+                                        `format`="zto"),
+                                    list(
+                                        `name`="omegaSq", 
+                                        `title`="\u03C9\u00B2", 
+                                        `type`="number", 
+                                        `visible`="(effectSize:omega)", 
+                                        `format`="zto"),
+                                    list(
+                                        `name`="omegaSqP", 
+                                        `title`="\u03C9\u00B2p", 
+                                        `type`="number", 
+                                        `visible`="(effectSize:omegap)", 
+                                        `format`="zto"),
+                                    list(
+                                        `name`="epsilonSq", 
+                                        `title`="\u03B5\u00B2", 
+                                        `type`="number", 
+                                        `visible`="(effectSize:epsilon)", 
+                                        `format`="zto"),
+                                    list(
+                                        `name`="epsilonSqP", 
+                                        `title`="\u03B5\u00B2p", 
+                                        `type`="number", 
+                                        `visible`="(effectSize:epsilonp)", 
+                                        `format`="zto"))))
                             self$add(jmvcore::Table$new(
                                 options=options,
                                 name="coefficients",
@@ -1180,20 +1199,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 title="Estimated Marginal Means",
                 visible=FALSE,
                 items="(emmeans)",
-                clearWith=list(
-                    "dep",
-                    "modelTerms",
-                    "contrasts",
-                    "scaling",
-                    "dep_scale",
-                    "fixedIntercept",
-                    "simpleScaleLabels",
-                    "ciWidth",
-                    "emmeans"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="Estimate Marginal Means - ___key___",
-                    clearWith=list(),
+                    clearWith=list(
+                        "ciWidth",
+                        "emmeans"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1360,8 +1371,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "dep",
                     "factors",
-                    "covs")))},
-        .setModel=function(x) private$..model <- x))
+                    "covs")))}))
 
 gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "gamljGlmBase",
@@ -1409,8 +1419,6 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
-#' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
-#'   the confidence interval width for the parameter estimates
 #' @param cimethod .
 #' @param bootR a number bootstrap repetitions.
 #' @param semethod .
@@ -1494,7 +1502,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
-#'   \code{results$model} \tab \tab \tab \tab \tab The underlying model object \cr
+#'   \code{results$storage} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
 #'   \code{results$main$intercept} \tab \tab \tab \tab \tab a table of information for the model intercept \cr
@@ -1520,9 +1528,9 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
 #'
-#' \code{results$info$asDF}
+#' \code{results$storage$asDF}
 #'
-#' \code{as.data.frame(results$info)}
+#' \code{as.data.frame(results$storage)}
 #'
 #' @export
 gamljGlm <- function(
@@ -1534,7 +1542,6 @@ gamljGlm <- function(
     modelTerms = NULL,
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
-    paramCIWidth = 95,
     cimethod = "standard",
     bootR = 1000,
     semethod = "standard",
@@ -1642,7 +1649,6 @@ gamljGlm <- function(
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
-        paramCIWidth = paramCIWidth,
         cimethod = cimethod,
         bootR = bootR,
         semethod = semethod,

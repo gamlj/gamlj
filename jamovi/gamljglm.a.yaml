@@ -111,17 +111,6 @@ options:
             `TRUE` (default) or `FALSE` , parameters CI in table
 
 
-    - name: paramCIWidth
-      title: Confidence level
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
-      description:
-          R: >
-            a number between 50 and 99.9 (default: 95) specifying the confidence
-            interval width for the parameter estimates
-
     - name: cimethod
       title: CI Method
       type: List

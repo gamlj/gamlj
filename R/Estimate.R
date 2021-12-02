@@ -6,13 +6,11 @@
 Estimate <- R6::R6Class("Estimate",
                         inherit = Syntax,
                         cloneable=FALSE,
-                        class=FALSE,
+                        class=TRUE,
                         public=list(
-                          model=NULL,
-                          summary=NULL,
-                          anova=NULL,
-                          ciwidth=NULL,
                           subclass=NULL,
+                          ciwidth=NULL,
+                          model=NULL,
                           tab_simpleAnova=NULL,
                           tab_simpleCoefficients=NULL,
                           
@@ -21,10 +19,17 @@ Estimate <- R6::R6Class("Estimate",
                             self$ciwidth <- options$ciWidth/100
                             self$subclass<-paste0("model_",options$modelSelection)
                           },
-                          
+                          setStorage=function(atable) {
+                            
+                            private$.storageTable<-atable
+                            if (is.something(atable$state))
+                               private$.hasStorage<-TRUE
+                          },
                           estimate = function(data) {
-                            private$.estimateModel(data)
+                            
+                            self$model<-private$.estimateModel(data)
                             ginfo("Initial estimation is done...")
+                            
                           }, # end of publich function estimate
 
                           ##### fill the tables #####
@@ -106,11 +111,17 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_simpleEffects_anova=function() {
-                            private$.estimateSimpleEffects()
+                            
+                            if (is.null(self$tab_simpleAnova))
+                                private$.estimateSimpleEffects()
                             try_hard(self$tab_simpleAnova)
                           },
                           
                           run_simpleEffects_coefficients=function() {
+                            
+                            if (is.null(self$tab_simpleCoefficients))
+                              private$.estimateSimpleEffects()
+                            
                             try_hard(self$tab_simpleCoefficients)
                           },
                           run_simpleInteractions=function() {
@@ -165,9 +176,33 @@ Estimate <- R6::R6Class("Estimate",
                           
                           
                           ),# end of public
+                        active=list(
+                          
+                          
+                          storage=function(anobj) {
+                            
+                            if (missing(anobj)) {
+                              ginfo("retreiving the model")
+                              return(private$.storageTable$state)
+                            }
+                            else {
+                              ginfo("setting the model")
+                              
+                              private$.storageTable$setState(anobj)
+                              private$.hasStorage<-TRUE
+                              ginfo("done")
+                            }
+                            
+                            
+                            
+                          }
+
+                        ), #end of active
                         privat=list(
                           .data64=NULL,
                           .contr_index=0,
+                          .storageTable=NULL,
+                          .hasStorage=FALSE,
                           .estimateModel=function(data) {
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
@@ -220,8 +255,7 @@ Estimate <- R6::R6Class("Estimate",
                               acall<-as.call(opts)
 
                               results<-try_hard(eval(acall))
-                              self$model<-results$obj
-
+                              
                               self$warnings<-list(topic="info", message=results$warning)
                               if (!isFALSE(results$error))
                                  stop(results$error)
@@ -229,7 +263,9 @@ Estimate <- R6::R6Class("Estimate",
                               if (mf.aliased(self$model))
                                    self$warnings<-list(topic="info",message=WARNS["aliased"])
                              
-                              self$model<-mf.fixModel(self$model,self)
+                              .model<-mf.fixModel(results$obj,self)
+                              
+                              return(.model)
 
 
                           },
@@ -375,11 +411,10 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           .estimateSimpleEffects=function() {
                             results<-try_hard(procedure.simpleEffects(self$model,self))
-                            self$warnings  <- list(topic="init_simpleEffects_anova",message=results$warning)
-                            self$warnings  <- list(topic="init_simpleEffects_coefficients",message=results$warning)
-                            self$errors    <- list(topic="init_simpleEffects_anova",message=results$error)
-                            self$errors    <- list(topic="init_simpleEffects_coefficients",message=results$error)
-                            
+                            self$warnings  <- list(topic="simpleEffects_anova",message=results$warning)
+                            self$warnings  <- list(topic="simpleEffects_coefficients",message=results$warning)
+                            self$errors    <- list(topic="simpleEffects_anova",message=results$error)
+                            self$errors    <- list(topic="simpleEffects_coefficients",message=results$error)
                             self$tab_simpleAnova         <-  results$obj[[1]]
                             self$tab_simpleCoefficients  <-  results$obj[[2]]
                         },

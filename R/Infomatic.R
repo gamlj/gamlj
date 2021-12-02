@@ -224,7 +224,7 @@ Infomatic <- R6::R6Class(
       if (is.something(self$df))
         alist[["df"]]<-list(info="DF method",value=self$df,specs="") 
       
-      alist[["sample"]]   <-  list(info="Sample size",value="",specs="")
+      alist[["sample"]]   <-  list(info="Sample size",value=".",specs="")
       alist[["conv"]]   <-  list(info="Converged",value="no yet", specs="")
       
       return(alist)

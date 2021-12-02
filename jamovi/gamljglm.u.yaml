@@ -75,16 +75,17 @@ children:
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: showParamsCI
             type: CheckBox
           - type: TextBox
-            name: paramCIWidth
+            name: ciWidth
             label: Interval
             suffix: '%'
             format: number
             enable: (showParamsCI)
+            
   - type: CollapseBox
     label: Model
     collapsed: true
@@ -323,13 +324,6 @@ children:
                 name: errBarDef_ci
                 optionName: plotError
                 optionPart: ci
-                children:
-                  - type: TextBox
-                    name: ciWidth
-                    label: Interval
-                    suffix: '%'
-                    format: number
-                    enable: (errBarDef_ci)
               - name: plotError_se
                 type: RadioButton
                 optionName: plotError
