@@ -1,10 +1,10 @@
 SmartTable <- R6::R6Class("SmartTable",
-                          inherit = Scaffold,
                           cloneable=FALSE,
                           class=FALSE,
                           public=list(
                             name=NULL,
                             table=NULL,
+                            dispatcher=NULL,
                             nickname=NULL,
                             expandable=FALSE,
                             expandSuperTitle=NULL,
@@ -20,7 +20,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             ciroot=NULL,
                             ciwidth=NULL,
                             ciformat="{}% Confidence Intervals",
-                            initialize=function(table,estimator=NULL,dispatcher=NULL) {
+                            initialize=function(table,estimator=NULL) {
                               self$name       <-  table$name
                               self$table      <-  table
                               self$nickname   <-  make.names(gsub('"','',gsub("/","_",table$path,fixed = TRUE),fixed=TRUE))
@@ -78,10 +78,11 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.fill(self$table,rtable)
                               private$.spaceBy()
                               
-                              for (w in private$.estimator$warnings[[self$nickname]]) {
-                                n<-length(self$table$notes)
-                                self$table$setNote(as.character(n+1),w)
-                              }
+                              if (is.something(self$dispatcher))
+                                 for (w in self$dispatcher$warnings[[self$nickname]]) {
+                                      n<-length(self$table$notes)
+                                    self$table$setNote(as.character(n+1),w)
+                                 }
                               
                               tinfo("SmartTable",self$nickname,"run")
                               
@@ -462,6 +463,7 @@ SmartArray <- R6::R6Class("SmartArray",
                                 jtable  <-  self$table$items[[i]]
                                 if (inherits(jtable,"Group")) {
                                   aSmartArray<-SmartArray$new(jtable,self)
+                                  aSmartArray$dispatcher<-self$dispatcher
                                   aSmartArray$initFunction(rtables[[i]])
                                   aSmartArray$key<-.keys[[i]]
                                   self$childrenObjs<-append_list(self$childrenObjs,aSmartArray)
@@ -470,6 +472,7 @@ SmartArray <- R6::R6Class("SmartArray",
                                   
                                   ### if we are here, children are tables
                                   aSmartTable<-SmartTable$new(jtable,self)
+                                  aSmartTable$dispatcher<-self$dispatcher
                                   aSmartTable$initFunction(rtables[[i]])
                                   self$childrenObjs<-append_list(self$childrenObjs,aSmartTable)
                                   

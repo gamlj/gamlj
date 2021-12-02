@@ -128,7 +128,7 @@ items:
                          - scaling
                          - dep_scale
                          - fixedIntercept
-                         - effectSize
+ 
              columns:
                     - name: name
                       title: ""

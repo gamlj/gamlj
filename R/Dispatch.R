@@ -1,57 +1,14 @@
 
 Dispatch <- R6::R6Class(
   "Dispatch",
-  class=FALSE, ## this and the next 
+  class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   public=list(
-    vars=NULL,
-    options=NULL,
-    initialize=function(options,vars) {
-      self$vars<-vars
-      self$options<-options
-    },
-    ####### eval option that may not exist ####
-    
-    option=function(val,spec=NULL) {
-      
-        res<-hasName(self$options,val)
-        if (res) {
-          if (is.logical(self$options[[val]]))
-              res<-self$options[[val]]
-          else
-              res<-is.something(self$options[[val]])
-
-          if (!is.null(spec))
-              res<-(spec %in% self$options[[val]])
-        }
-        res      
-      
-    },
-    
-    ### this requires that sooner or later something is a Dispatch object ###
-    absorbe_issues=function(obj) {
-
-      if (!is.something(obj))
-         return()
-      if (inherits(obj,"Dispatch")) {
-              wars<-obj$warnings
-              errs<-obj$errors
-              for (topicname in names(wars)) {
-                      topic<-wars[[topicname]]
-                      for (t in topic) 
-                              self$warnings<-list(topic=topicname,message=t)
-              }
-              for (topicname in names(errs)) {
-                topic<-errs[[topicname]]
-                for (t in topic) 
-                  self$errors<-list(topic=topicname,message=t)
-              }
-
-       } else
-            for (aobj in obj) 
-                 self$absorbe_issues(aobj)
+    initialize=function() {
     }
-    
+
+
+
   ),
   active=list(
         warnings=function(obj) {

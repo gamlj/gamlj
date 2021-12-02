@@ -10,15 +10,10 @@ es.relativerisk<-function(obj) {
       
       data[,depobj$name64]  <-  as.numeric(data[[depobj$name64]]==levs[2])
 
-      results<-try_hard(geepack::geeglm(as.formula(obj$formula64),
+      results<-geepack::geeglm(as.formula(obj$formula64),
                                         family = poisson(link = "log"),
                                         id = id_id_id, 
                                         corstr = "exchangeable", data = data)
-      )
-      obj$warnings   <-  list(topic="tab_relativerisk",message=results$warning)
-      obj$errors     <-  list(topic="tab_relativerisk",message=results$error)
-      if (!isFALSE(results$error))
-         return()
       
       params<-as.data.frame(parameters::parameters(results$obj,exponentiate=TRUE))
       names(params)<-c("source","estimate","se","nothing", "ci.lower","ci.upper","test","df","p")

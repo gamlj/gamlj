@@ -653,8 +653,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "scaling",
                                 "dep_scale",
-                                "fixedIntercept",
-                                "effectSize"),
+                                "fixedIntercept"),
                             columns=list(
                                 list(
                                     `name`="name", 

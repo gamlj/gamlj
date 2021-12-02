@@ -4,8 +4,9 @@ Syntax <- R6::R6Class(
   "Syntax",
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
-  inherit = Dispatch,
+  inherit = Scaffold,
   public=list(
+    vars=NULL,
     formula=NULL,
     formula64=NULL,
     hasIntercept=TRUE,
@@ -33,9 +34,9 @@ Syntax <- R6::R6Class(
     
     datamatic=NULL,
     infomatic=NULL,
-    initialize=function(options,datamatic) {
+    initialize=function(options,dispatcher,datamatic) {
       
-      super$initialize(options=options,vars=datamatic$vars)
+      super$initialize(options,dispatcher)
       self$datamatic<-datamatic
       
       #### we prepare the model syntax
@@ -44,7 +45,6 @@ Syntax <- R6::R6Class(
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(options,datamatic)
       
-
     }, # here initialize ends
     #### init functions #####
     
@@ -84,6 +84,8 @@ Syntax <- R6::R6Class(
     
     ### parameter estimates ####
     init_main_coefficients=function() {
+      
+      mark(self$datamatic$data_structure64)
       
       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
       .len<-length(.terms)
@@ -332,6 +334,7 @@ Syntax <- R6::R6Class(
       
       sep<-"+"
       if (!self$hasTerms) sep=""
+      self$vars<-c(self$options$dep,unique(unlist(modelTerms)))
       
       fixed<-jmvcore::composeFormula(NULL,tob64(modelTerms))
       fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed)

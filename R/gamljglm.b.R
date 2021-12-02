@@ -20,10 +20,10 @@ gamljGlmClass <- R6::R6Class(
       }
       
       ### set up the R6 workhorse class
-      dispatcher<-Dispatch$new(self$options)
-      data_machine<-Datamatic$new(self$data,dispatcher)
-      estimate_machine<-Estimate$new(data_machine,dispatcher)
-      plotter_machine<-Plotter$new(estimate_machine,self$results,dispatcher)
+      dispatcher<-Dispatch$new()
+      data_machine<-Datamatic$new(self$options,dispatcher,self$data)
+      estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
+#      plotter_machine<-Plotter$new(estimate_machine,self$results)
 
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
@@ -182,11 +182,11 @@ gamljGlmClass <- R6::R6Class(
       # 
       
       
-      plotter_machine$initPlots()
+      #plotter_machine$initPlots()
       
       private$.data_machine<-data_machine
       private$.estimate_machine<-estimate_machine
-      private$.plotter_machine<-plotter_machine
+      #private$.plotter_machine<-plotter_machine
     },
     .run=function() {
       ginfo("### Module phase: run ###")
@@ -195,7 +195,6 @@ gamljGlmClass <- R6::R6Class(
       if (!private$.ready$ready) {
         return()
       }
-      
       
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
@@ -267,7 +266,7 @@ gamljGlmClass <- R6::R6Class(
 
 .mainPlot=function(image, ggtheme, theme, ...) {
   
-  plot<-private$.plotter_machine$scatterPlot(image)
+#  plot<-private$.plotter_machine$scatterPlot(image)
   plot<-plot + ggtheme
   
   return(plot)

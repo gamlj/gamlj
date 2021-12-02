@@ -1,10 +1,100 @@
+Datamatic <- R6::R6Class(
+  "Datamatic",
+  cloneable=FALSE,
+  class=TRUE,
+  inherit = Scaffold,
+  public=list(
+    vars=NULL,
+    variables=NULL,
+    data_structure64=NULL,
+    dep=NULL,
+    labels=NULL,
+    N=NULL,
+    initialize=function(options,dispatcher,data) {
+      
+      super$initialize(options,dispatcher)
+      
+      self$vars<-unlist(c(options$dep,options$factors,options$covs))
+      if (hasName(options,"cluster"))
+        self$vars<-c(options$cluster,self$vars)
+      
+      private$.inspect_data(data)
+      
+    },
+    
+    cleandata=function(data) {
+      
+      data64          <-   data
+      names(data64)   <-   tob64(names(data))
+      mark(head(data))
+      for (var in self$variables) {
+        data64[[var$name64]]   <-  var$get_values(data64)
+      }
+      
+      data64 <- jmvcore::naOmit(data64)
+      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
+      self$N<-dim(data64)[1]
+      return(data64)
+      
+    },
+    get_params_labels=function(terms) {
+      
+      ### here we want to gather the labels of the effects. If the variable is continuous, its name is passed on
+      ### if the variable is categorical (a contrast is required), it is passed. 
+      ### however, we need to change the formatting depending on the type of label
+      
+      labs<-lapply(terms, function(term) {
+        for (i in seq_along(term)) {
+          alabel<-self$labels[[ term[[i]] ]]
+          if (is.something(alabel)) {
+            ## if it is a contrast and its part of an interaction, we put paranthesis around
+            if (length(term)>1 & length(grep(FACTOR_SYMBOL,term[[i]],fixed = T))>0) {
+              alabel<-paste0("(",alabel,")")
+              ### we want to avoid that an interaction (1-0)*(1-0) becomes (1-0)^2, so we trick 
+              ### jmvcore::stringifyTerm by adding a different string to each label
+              term[[i]]<-paste0(alabel,paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
+            } else
+              term[[i]]<-alabel
+          }
+        }
+        term<-gsub(IMPROBABLE_SEQ,"",jmvcore::stringifyTerm(term,raise = T),fixed = T)
+        
+        return(term)
+      })
+      return(unlist(fromb64(labs,self$vars)))
+      
+      
+    }
+    
+  ), ### end of public
+  private=list(
+    .inspect_data=function(data) {
+      
+      self$variables<-lapply(self$vars,function(var) Variable$new(var,self)$checkVariable(data))
+      names(self$variables)<-unlist(lapply(self$variables,function(var) var$name64))
+      
+      labels<-list()
+      for (var in self$variables) 
+        for (i in seq_along(var$paramsnames64)) {
+          par64<-var$paramsnames64[[i]]
+          lab<-var$contrast_labels[[i]]
+          labels[[par64]]<-lab
+        }
+      self$labels<-labels
+      self$data_structure64<-self$cleandata(data)
+      self$dep<-self$variables[[tob64(self$options$dep)]]
+    }
+    
+  ) #end of private
+)
+
 Variable <- R6::R6Class(
   "Variable",
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
-  inherit = Dispatch,
   public=list(
     name=NULL,
+    datamatic=NULL,
     paramsnames=NULL,
     name64=NULL,
     paramsnames64=NULL,
@@ -23,16 +113,13 @@ Variable <- R6::R6Class(
     hasCluster=NULL,
     nClusters=0,
     isBetween=FALSE,
-    initialize=function(var,options) {
+    initialize=function(var,datamatic) {
       self$name<-var
-      self$options<-options
-      self$vars=var
+      self$datamatic<-datamatic
       self$name64<-tob64(var)
-      
 
     },
     checkVariable=function(data) { 
-
       var<-self$name
       
       if (inherits(data,"data.frame"))
@@ -41,11 +128,11 @@ Variable <- R6::R6Class(
         vardata<-data
            
       if (is.null(vardata)) {
-          self$errors<-paste("Variable",var,"not in the data")
+          self$datamatic$dispatcher$errors<-list(topic="info",message=paste("Variable",var,"not in the data"))
           return(self)
       }
 
-      if (var %in% self$options$factors) {
+      if (var %in% self$datamatic$options$factors) {
         self$type="factor"
         self$levels<-levels(vardata)
         self$levels_labels<-levels(vardata)
@@ -56,8 +143,8 @@ Variable <- R6::R6Class(
 
         self$descriptive=list(min=0,max=1)
         
-        cont<-lapply(self$options$contrasts,function(a) a$type)
-        names(cont)<-sapply(self$options$contrasts,function(a) a$var)
+        cont<-lapply(self$datamatic$options$contrasts,function(a) a$type)
+        names(cont)<-sapply(self$datamatic$options$contrasts,function(a) a$var)
         ctype<-ifelse(var %in% names(cont),cont[[var]],"simple") 
         self$contrast_values<-private$.contrast_values(self$levels, ctype)
         self$contrast_labels<-private$.contrast_labels(self$levels, ctype)
@@ -65,7 +152,7 @@ Variable <- R6::R6Class(
       }
 
       ### check dependent variables ###
-      if (var %in% self$options$dep) {
+      if (var %in% self$datamatic$options$dep) {
            self$type=class(vardata)
            if (self$type=="factor") {
                  self$descriptive=list(min=0,max=1)
@@ -79,8 +166,8 @@ Variable <- R6::R6Class(
                  
            } else {
              
-             if (self$option("dep_scale")) 
-                 self$scaling<-self$options$dep_scale
+             if (self$datamatic$option("dep_scale")) 
+                 self$scaling<-self$datamatic$options$dep_scale
                  self$contrast_labels<-self$name
 
            }
@@ -89,14 +176,14 @@ Variable <- R6::R6Class(
       }
         
             
-      if (var %in% self$options$covs) {
+      if (var %in% self$datamatic$options$covs) {
         self$type="numeric"
-        scaling<-sapply(self$options$scaling,function(a) a$type)
-        names(scaling)<-unlist(sapply(self$options$scaling,function(a) a$var))
+        scaling<-sapply(self$datamatic$options$scaling,function(a) a$type)
+        names(scaling)<-unlist(sapply(self$datamatic$options$scaling,function(a) a$var))
         self$scaling<-ifelse(var %in% names(scaling),scaling[[var]],"centered")
         
         if (is.factor(vardata)) {
-          self$warnings<-list(topic="data",message=paste("Variable",var,"has been coerced to numeric"))
+          self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",var,"has been coerced to numeric"))
         }
         self$contrast_labels<-self$name
         self$paramsnames<-var
@@ -107,16 +194,16 @@ Variable <- R6::R6Class(
       }
       ### end covs ####
       
-      if (self$option("cluster")) {
-        if (self$name %in% self$options$cluster) {
+      if (self$datamatic$option("cluster")) {
+        if (self$name %in% self$datamatic$options$cluster) {
             self$type="cluster"
             self$levels<-levels(vardata)
             self$levels_labels<-levels(vardata)
             self$nlevels<-length(self$levels)
             self$neffects<-self$nlevels-1
         } else {
-           self$hasCluster<-self$options$cluster
-           self$nClusters<-length(self$options$cluster)
+           self$hasCluster<-self$datamatic$options$cluster
+           self$nClusters<-length(self$datamatic$options$cluster)
         }
       }
         
@@ -131,7 +218,7 @@ Variable <- R6::R6Class(
        if (self$type=="cluster") {
          if (!is.factor(vardata)) {
            vardata<-factor(vardata)
-           self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been coerced to factor"))
+           self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been coerced to factor"))
          }
          return(vardata)
          
@@ -141,7 +228,7 @@ Variable <- R6::R6Class(
        
        if (self$type=="factor") {
           if (!is.factor(vardata)) {
-              self$errors<-list(topic="data",message=paste("Variable",self$name,"is not a factor"))
+            self$datamatic$dispatcher$errors<-list(topic="info",message=paste("Variable",self$name,"is not a factor"))
               return()
           }
        
@@ -421,7 +508,7 @@ Variable <- R6::R6Class(
       if (method=="log") {
         vardata<-log(vardata)  
         if (any(is.nan(vardata)))
-          self$errors<-list(topic="info",message=paste("Negative values found in variable",self$name,". Log transform not applicable."))
+          self$datamatic$dispatcher$errors<-list(topic="info",message=paste("Negative values found in variable",self$name,". Log transform not applicable."))
       }
       
       
@@ -433,7 +520,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         vardata<-sdata[[self$name64]]
-        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
+        self$datamatic$dispatcher$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
       }
       if (method=="clusterbasedstandardized") {    
         cluster64<-tob64(self$hasCluster[1])
@@ -449,7 +536,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,ddata,by=cluster64)
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
         vardata<-sdata[[self$name64]]
-        self$warnings<-list(topic="data",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
+        self$datamatic$dispatcher$warnings<-list(topic="data",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
         
       }
 
@@ -460,7 +547,7 @@ Variable <- R6::R6Class(
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
         vardata<-sdata[["mean"]]
-        self$warnings<-list(topic="data",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
+        self$datamatic$dispatcher$warnings<-list(topic="data",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
         
       }
       
@@ -475,7 +562,7 @@ Variable <- R6::R6Class(
       
       self$original_levels<-self$levels
       self$original_descriptive<-self$descriptive
-      labels_type<-ifelse(is.null(self$options$simpleScaleLabels),"values",self$options$simpleScaleLabels)
+      labels_type<-ifelse(is.null(self$datamatic$options$simpleScaleLabels),"values",self$datamatic$options$simpleScaleLabels)
       ### when called by init, force labels because we cannot compute the values
       ### if not, we can compute the descriptive
       if (length(vardata)==0)
@@ -487,9 +574,9 @@ Variable <- R6::R6Class(
                               sd=sd(vardata,na.rm = TRUE))
       
       
-      if (self$options$simpleScale=="mean_sd")  {
+      if (self$datamatic$options$simpleScale=="mean_sd")  {
         
-        .span<-ifelse(is.null(self$options$cvalue),1,self$options$cvalue)
+        .span<-ifelse(is.null(self$datamatic$options$cvalue),1,self$datamatic$options$cvalue)
         .labs<-c(paste0("Mean-", .span, "\u00B7", "SD"), "Mean", paste0("Mean+", .span, "\u00B7","SD"))
         .mean <- mean(vardata)
         .sd <- sd(vardata)
@@ -497,9 +584,9 @@ Variable <- R6::R6Class(
         self$method="mean_sd"
 
       }
-      if (self$options$simpleScale=="percent") {
+      if (self$datamatic$options$simpleScale=="percent") {
         
-        .lspan<-ifelse(is.null(self$options$percvalue),25,self$options$percvalue)
+        .lspan<-ifelse(is.null(self$datamatic$options$percvalue),25,self$datamatic$options$percvalue)
         .span<-.lspan/100
         
         .labs<-c(paste0("50-", .lspan,"\u0025"), "50\u0025", paste0("50+", .lspan,"\u0025"))
@@ -528,8 +615,8 @@ Variable <- R6::R6Class(
       if (all(!is.nan(self$levels)) &  all(!is.na(self$levels)))
             if(any(duplicated(self$levels))) {
                self$levels<-unique(self$levels)
-               self$warnings<-list(topic="simpleEffects_anova",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
-               self$warnings<-list(topic="simpleEffects_coefficients",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
+               self$datamatic$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
+               self$datamatic$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
                
       }
       
@@ -542,91 +629,3 @@ Variable <- R6::R6Class(
 
 
 
-Datamatic <- R6::R6Class(
-  "Datamatic",
-  cloneable=FALSE,
-  class=TRUE,
-  inherit = Dispatch,
-  public=list(
-    variables=NULL,
-    data_structure64=NULL,
-    dep=NULL,
-    labels=NULL,
-    N=NULL,
-    initialize=function(options,data) {
-      vars<-unlist(c(options$dep,options$factors,options$covs))
-      
-      if (hasName(options,"cluster"))
-               vars<-c(options$cluster,vars)
-      
-      super$initialize(options=options,vars=vars)
-      private$.inspect_data(data)
-
-    },
-
-     cleandata=function(data) {
-      
-      data64          <-   data
-      names(data64)   <-   tob64(names(data))
-
-      for (var in self$variables) {
-                      data64[[var$name64]]   <-  var$get_values(data64)
-      }
-        
-      data64 <- jmvcore::naOmit(data64)
-      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
-      self$N<-dim(data64)[1]
-      self$absorbe_issues(self$variables)
-      return(data64)
-
-    },
-    get_params_labels=function(terms) {
-      
-      ### here we want to gather the labels of the effects. If the variable is continuous, its name is passed on
-      ### if the variable is categorical (a contrast is required), it is passed. 
-      ### however, we need to change the formatting depending on the type of label
-      
-      labs<-lapply(terms, function(term) {
-        for (i in seq_along(term)) {
-          alabel<-self$labels[[ term[[i]] ]]
-          if (is.something(alabel)) {
-            ## if it is a contrast and its part of an interaction, we put paranthesis around
-            if (length(term)>1 & length(grep(FACTOR_SYMBOL,term[[i]],fixed = T))>0) {
-                 alabel<-paste0("(",alabel,")")
-                 ### we want to avoid that an interaction (1-0)*(1-0) becomes (1-0)^2, so we trick 
-                 ### jmvcore::stringifyTerm by adding a different string to each label
-                 term[[i]]<-paste0(alabel,paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
-            } else
-                 term[[i]]<-alabel
-          }
-        }
-        term<-gsub(IMPROBABLE_SEQ,"",jmvcore::stringifyTerm(term,raise = T),fixed = T)
-
-        return(term)
-      })
-      return(unlist(fromb64(labs,self$vars)))
-      
-      
-    }
-    
-    ), ### end of public
-   private=list(
-     .inspect_data=function(data) {
-       
-       self$variables<-lapply(self$vars,function(var) Variable$new(var,self$options)$checkVariable(data))
-       names(self$variables)<-unlist(lapply(self$variables,function(var) var$name64))
-       
-       labels<-list()
-       for (var in self$variables) 
-           for (i in seq_along(var$paramsnames64)) {
-             par64<-var$paramsnames64[[i]]
-             lab<-var$contrast_labels[[i]]
-             labels[[par64]]<-lab
-           }
-       self$labels<-labels
-       self$data_structure64<-self$cleandata(data)
-       self$dep<-self$variables[[tob64(self$options$dep)]]
-       }
-     
-   ) #end of private
-)

@@ -14,19 +14,12 @@ Estimate <- R6::R6Class("Estimate",
                           tab_simpleAnova=NULL,
                           tab_simpleCoefficients=NULL,
                           
-                          initialize=function(options,datamatic) {
-                            super$initialize(options=options,datamatic=datamatic)
+                          initialize=function(options,dispatcher,datamatic) {
+                            super$initialize(options,dispatcher,datamatic)
                             self$ciwidth <- options$ciWidth/100
                             self$subclass<-paste0("model_",options$modelSelection)
                           },
-                          setStorage=function(atable) {
-                            
-                            private$.storageTable<-atable
-                            if (is.something(atable$state))
-                               private$.hasStorage<-TRUE
-                          },
                           estimate = function(data) {
-                            
                             self$model<-private$.estimateModel(data)
                             ginfo("Initial estimation is done...")
                             
@@ -50,7 +43,7 @@ Estimate <- R6::R6Class("Estimate",
                           run_main_anova=function() {
                             
                             if (!self$isProper) 
-                              self$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
+                              self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
                             
                             try_hard(mf.anova(self$model,self))
                           },
@@ -235,7 +228,7 @@ Estimate <- R6::R6Class("Estimate",
                               terms<-setdiff(unlist(unlist(self$options$randomTerms)),unlist(c("Intercept",self$options$cluster)))
                               for (t in terms) {
                                  if(self$datamatic$variables[[tob64(t)]]$isBetween)
-                                     self$warnings<-list(topic="info",message=paste("Variable",t,"does not seem to vary across clusters but its effects are set random."))
+                                     self$dispatcher$warnings<-list(topic="info",message=paste("Variable",t,"does not seem to vary across clusters but its effects are set random."))
                               }
 
                           }
@@ -256,12 +249,12 @@ Estimate <- R6::R6Class("Estimate",
 
                               results<-try_hard(eval(acall))
                               
-                              self$warnings<-list(topic="info", message=results$warning)
+                              self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               if (!isFALSE(results$error))
                                  stop(results$error)
                               
                               if (mf.aliased(self$model))
-                                   self$warnings<-list(topic="info",message=WARNS["aliased"])
+                                   self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
                              
                               .model<-mf.fixModel(results$obj,self)
                               
@@ -284,7 +277,7 @@ Estimate <- R6::R6Class("Estimate",
                                 
                                 ########## fill basic tables #########
                                 if (!self$hasIntercept & is.something(self$options$factors)) 
-                                  self$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
+                                  self$dispatcher$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
                                 
                                 ### coefficients table ###
                                 
@@ -349,7 +342,7 @@ Estimate <- R6::R6Class("Estimate",
                                       method     <-  ifelse(self$options$cimethod=="wald","Wald",self$options$cimethod)
                                       results    <-  try_hard(stats::profile(self$model,which="theta_",optimizer=self$model@optinfo$optimizer,prof.scale=c("varcov")))
 
-                                      self$warnings<-list(topic="tab_random",message=results$warning)
+                                      self$dispatcher$warnings<-list(topic="tab_random",message=results$warning)
 
                                       ci         <-  as.data.frame(confint(results$obj,parm = "theta_",level = self$ciwidth, method=method))
                                       names(ci)  <-  c("ci.lower","ci.upper")
@@ -357,14 +350,14 @@ Estimate <- R6::R6Class("Estimate",
                                       ci_variances <- ci[ci_var_pos,]
                                       ci_covariances <- ci[!ci_var_pos,]
                                       params<-cbind(params,ci_variances)
-                                      self$warnings<-list(topic="tab_random",message="C.I. are computed with the profile method")
+                                      self$dispatcher$warnings<-list(topic="tab_random",message="C.I. are computed with the profile method")
                                   }
 
                                   self$tab_random<-params
                                   ngrp<-vapply(self$model@flist,nlevels,1)
                                   .names<-fromb64(names(ngrp))
                                   info<-paste("Number of Obs:", self$model@devcomp$dims[[1]],", groups:",paste(.names),ngrp,collapse = ", ")
-                                  self$warnings<-list(topic="tab_random",message=info)
+                                  self$dispatcher$warnings<-list(topic="tab_random",message=info)
 
 
                                 if (is.something(covariances)) {
@@ -386,7 +379,7 @@ Estimate <- R6::R6Class("Estimate",
                                   ## this is required by lmerTest::ranova() which looks in the parent for "data"
                                   data<-self$model@frame
                                   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
-                                  self$warnings<-list(topic="tab_randomTests",message=results$warning)
+                                  self$dispatcher$warnings<-list(topic="tab_randomTests",message=results$warning)
                                   if (!isFALSE(results$error))
                                      self$errors<-list(topic="tab_randomTests",message=paste("LR tests cannot be computed",results$error))
                                   else {
@@ -411,8 +404,8 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           .estimateSimpleEffects=function() {
                             results<-try_hard(procedure.simpleEffects(self$model,self))
-                            self$warnings  <- list(topic="simpleEffects_anova",message=results$warning)
-                            self$warnings  <- list(topic="simpleEffects_coefficients",message=results$warning)
+                            self$dispatcher$warnings  <- list(topic="simpleEffects_anova",message=results$warning)
+                            self$dispatcher$warnings  <- list(topic="simpleEffects_coefficients",message=results$warning)
                             self$errors    <- list(topic="simpleEffects_anova",message=results$error)
                             self$errors    <- list(topic="simpleEffects_coefficients",message=results$error)
                             self$tab_simpleAnova         <-  results$obj[[1]]
@@ -441,7 +434,7 @@ Estimate <- R6::R6Class("Estimate",
                                        p=result[1,'Pr(>F)']))
                              } else {
                                
-                               self$warnings<-list(topic="tab_levene",message="Levene's test requires at least one factor in the model")
+                               self$dispatcher$warnings<-list(topic="tab_levene",message="Levene's test requires at least one factor in the model")
                                
                              }
                              
@@ -459,7 +452,7 @@ Estimate <- R6::R6Class("Estimate",
                                test<-try_hard(stats::shapiro.test(resids))
                                
                                if (!isFALSE(test$error))
-                                   self$warnings<-list(topic="tab_normtest",message="Shapiro-Wilk not available due to the very large number of cases")
+                                   self$dispatcher$warnings<-list(topic="tab_normtest",message="Shapiro-Wilk not available due to the very large number of cases")
                                else
                                    self$tab_normtest[[2]]<-list(test=test$obj$statistic,p=test$obj$p.value)
                                
