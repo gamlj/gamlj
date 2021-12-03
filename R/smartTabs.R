@@ -65,7 +65,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               self$title
                               for (col in self$table$columns)
                                 col$setTitle(fromb64(col$title))
-                              tinfo("SmartTable",self$nickname,"inited")
+                              tinfo("TABLES: table",self$nickname,"inited")
                             },
                             runTable=function() {
                               
@@ -84,7 +84,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                     self$table$setNote(as.character(n+1),w)
                                  }
                               
-                              tinfo("SmartTable",self$nickname,"run")
+                              tinfo("TABLES: array",self$nickname,"run")
                               
                             },
                             
@@ -202,7 +202,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 warning<-output$warning
                                 
                                 if (error!=FALSE) {
-                                  tinfo("Error in ",fun,error)
+                                  tinfo("TABLES: Error in ",fun,error)
                                   self$table$setError(error)
                                   return()
                                 }
@@ -432,7 +432,7 @@ SmartArray <- R6::R6Class("SmartArray",
                               if (private$.stop())
                                 return()
                               
-                              tinfo("Array",self$nickname,"inited")
+                              tinfo("TABLES: array",self$nickname,"inited")
                               
                               self$table$setVisible(TRUE)
                               self$title
@@ -489,7 +489,7 @@ SmartArray <- R6::R6Class("SmartArray",
                               if (private$.stop())
                                 return()
                               
-                              tinfo("Array",self$nickname,"run")
+                              tinfo("TABLES: array",self$nickname,"run")
                               
                               rtables<-private$.getData()
                               

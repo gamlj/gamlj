@@ -7,11 +7,12 @@ gamljGlmClass <- R6::R6Class(
     .estimate_machine=NULL,
     .plotter_machine=NULL,
     .ready=NULL,
+    .time=NULL,
     .smartObjs=list(),
     .init=function() {
-      ginfo("### Module phase: init ###")
+      ginfo("MODULE:  #### phase init ####")
       class(private$.results) <- c('gamlj', class(private$.results))
-      
+      private$.time<-Sys.time()
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         if(private$.ready$report)
@@ -189,7 +190,7 @@ gamljGlmClass <- R6::R6Class(
       #private$.plotter_machine<-plotter_machine
     },
     .run=function() {
-      ginfo("### Module phase: run ###")
+      ginfo("MODULE:  #### phase run ####")
       
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
@@ -203,8 +204,11 @@ gamljGlmClass <- R6::R6Class(
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
-
-    
+      
+      for (e in private$.estimate_machine$dispatcher$errors)
+              print(e)
+      for (e in private$.estimate_machine$dispatcher$warnings)
+        print(e)
       
       
       # ### simple interactions
@@ -257,7 +261,10 @@ gamljGlmClass <- R6::R6Class(
       # private$.estimate_machine$savePredRes(self$results) 
       # 
 
-      ginfo("### Module phase: end ###")
+      ginfo("MODULE:  #### phase end ####")
+      now<-Sys.time()
+      ginfo("TIME:",now-private$.time," secs")
+      
       return()
           
         

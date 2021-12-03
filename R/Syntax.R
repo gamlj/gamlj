@@ -85,8 +85,7 @@ Syntax <- R6::R6Class(
     ### parameter estimates ####
     init_main_coefficients=function() {
       
-      mark(self$datamatic$data_structure64)
-      
+
       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
       .len<-length(.terms)
       if (self$options$modelSelection=="multinomial") 

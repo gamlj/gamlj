@@ -1,5 +1,5 @@
 
-j_DEBUG=T
+j_DEBUG=F
 j_INFO=T
 t_INFO=T
 

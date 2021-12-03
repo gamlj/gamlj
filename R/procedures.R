@@ -51,7 +51,7 @@ procedure.posthoc <- function(obj) {
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
     term <- jmvcore::composeTerm(rev(ph))
-    suppressWarnings({
+    test<-try_hard({
       none <- .posthoc(model, term, "none",ci=TRUE, vfun=vfun,bootstrap=(obj$options$cimethod=="boot"))
       bonferroni <- .posthoc(model, term, "bonferroni",vfun=vfun)
       holm <- .posthoc(model, term, "holm",vfun=vfun)
@@ -60,14 +60,18 @@ procedure.posthoc <- function(obj) {
       scheffe <- .posthoc(model, term, "scheffe",vfun=vfun)
       
     })  # suppressWarnings
-    if (is.character(none)) 
-      obj$warnings<-list(topic="posthoc", message=WARNS["ph.nojoy"]) 
-    else {
-        tableData <- as.data.frame(none, stringAsFactors = FALSE)
-        tableData$contrast <- as.character(tableData$contrast)
-        if (length(names(tableData))==9)
+    if (!isFALSE(test$error)) {
+       obj$dispatecher$error<-list(topic="posthoc", message=WARNS["ph.nojoy"]) 
+       return()
+    }
+    if (!isFALSE(test$warning)) 
+      obj$dispatecher$warnings<-list(topic="posthoc", message=test$warning) 
+    
+      tableData <- as.data.frame(none, stringAsFactors = FALSE)
+      tableData$contrast <- as.character(tableData$contrast)
+      if (length(names(tableData))==9)
               colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"est.ci.lower","est.ci.upper", "test", "none")
-        else
+      else
               colnames(tableData) <- c("contrast", "estimate", "se","df" ,"est.ci.lower","est.ci.upper", "test", "none")
         
         tableData$bonf <- bonferroni$p.value
@@ -76,7 +80,7 @@ procedure.posthoc <- function(obj) {
         tableData$scheffe <- scheffe$p.value
         tableData$sidak <- sidak$p.value
         
-      }
+      
     
     .cont <- as.character(tableData$contrast)
     .cont <- gsub(" - ", "-", .cont, fixed = T)
@@ -106,7 +110,7 @@ procedure.posthoc <- function(obj) {
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
   if (obj$options$cimethod=="boot")
-       obj$warnings<-list(topic="posthoc",message="Bootstrap confidence intervals")
+       obj$dispatcher$warnings<-list(topic="posthoc",message="Bootstrap confidence intervals")
     
 
     postHocTables
@@ -174,11 +178,8 @@ procedure.posthoc <- function(obj) {
 
 procedure.emmeans<-function(obj) {
   
-  ginfo("Estimated Marginal Means")
+  gstart("PROCEDURE: Estimated Marginal Means")
   terms<-obj$options$emmeans
-  mode<-NULL
-  if (obj$option("modelSelection","ordinal"))
-    mode<-"mean.class"
   
   type<-"response"
   results<-list()
@@ -199,19 +200,27 @@ procedure.emmeans<-function(obj) {
         conditions[[.term]]<-var$levels 
       }
     }
-    df<-NULL
+  
+    ### prepare the options ###
+    opts_list<-list(obj$model,
+                    specs=term64,
+                    at=conditions,
+                    type=type,
+                    mode=mode,
+                    nesting = NULL,
+                    options = c(level=obj$ciwidth)
+    )
     if (obj$option("dfmethod"))
-        df<-tolower(obj$options$dfmethod)
+       opts_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
+    
+    if (obj$option("semethod","robust")) 
+      opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+
+    if (obj$option("modelSelection","ordinal"))
+      opts_list[["mode"]]<-"mean.class"
     
     ### now we get the estimated means #######
-    referenceGrid<-emmeans::emmeans(obj$model,
-                                    specs=term64,
-                                    at=conditions,
-                                    type=type,
-                                    mode=mode,
-                                    nesting = NULL,
-                                    lmer.df = df,
-                                    options = c(level=obj$ciwidth))
+    referenceGrid<-do.call(emmeans::emmeans,opts_list)
     tableData<-as.data.frame(referenceGrid)
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
@@ -231,8 +240,7 @@ procedure.emmeans<-function(obj) {
     names(tableData)[1:length(term64)]<-rev(term)
     results[[length(results)+1]]<-tableData
   }
-  
-  ginfo("End of Estimated Marginal Means")
+  gend()
   results
 }  
   
@@ -241,6 +249,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
 
 .simpleEffects.default<-function(model,obj) {
+
+   gstart("PROCEDURE: Simple Effects estimated")
   
   variable<-obj$options$simpleVariable
   variable64<-tob64(variable)
@@ -339,16 +349,9 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
     .issues <- .all[test]
     if (is.something(.issues))
-      obj$warnings<-list(topic="simpleEffects_anova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
+      obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
 
-    ## check issues with the variables ##
-    for (.term in term64) {
-      if (is.something(obj$datamatic$variables[[.term]]$warnings)) {
-            obj$absorbe_issues(obj$datamatic$variables[[.term]])
-      }
-    }
-  ginfo("PROCEDURES: Simple Effects estimated")
-    
+  gend()    
   return(list(anova,params))
 
 }  
@@ -446,7 +449,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 ## we want the simple interactions nested in the highest interaction required
 procedure.simpleInteractions<-function(obj) {
   
-     ginfo("simple Interactions started")
+     gstart("PROCEDURE: simmple Interactions")
   
       variable<-obj$options$simpleVariable
       variable64<-tob64(variable)
@@ -499,7 +502,7 @@ procedure.simpleInteractions<-function(obj) {
                   .names<-c(variable64,.names)
             }
             
-            obj$warnings<-list(topic="simpleInteractions",message=results$warning)
+            obj$dispatcher$warnings<-list(topic="simpleInteractions",message=results$warning)
             obj$errors<-list(topic="simpleInteractions",message=results$error)
             emgrid<-results$obj 
             ### we need the interaction contrast to be in obj because it should count the times
@@ -509,7 +512,7 @@ procedure.simpleInteractions<-function(obj) {
             opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
             results<-try_hard(do.call(emmeans::contrast,opts_list))
             
-            obj$warnings<-list(topic="simpleInteractions",message=results$warning)
+            obj$dispatcher$warnings<-list(topic="simpleInteractions",message=results$warning)
             obj$errors<-list(topic="simpleInteractions",message=results$error)
             resgrid<-results$obj
             ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
@@ -556,7 +559,7 @@ procedure.simpleInteractions<-function(obj) {
         }
       
 
-      ginfo("simple Interactions ended")
+      gend()
  
       return(resultsList)
 }

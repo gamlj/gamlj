@@ -844,7 +844,6 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
-                        "posthoc",
                         "semethod",
                         "ciWidth"),
                     columns=list(
@@ -1203,7 +1202,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
                         "ciWidth",
-                        "emmeans"),
+                        "emmeans",
+                        "semethod"),
                     columns=list(
                         list(
                             `name`="estimate", 

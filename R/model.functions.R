@@ -331,10 +331,8 @@ mf.anova<- function(x,...) UseMethod(".anova")
       epsilon<-effectsize::epsilon_squared(.canova,partial = F,verbose = F)
   
       effss$etaSq<-eta[-last,2]
-      mark(effss$etaSq)
       effss$etaSqP<-etap[,2]
-      mark(effss$etaSqP)
-      
+
       effss$omegaSq<-omega[-last,2]
       effss$omegaSqP<-omegap[,2]
       effss$epsilonSq<-epsilon[-last,2]

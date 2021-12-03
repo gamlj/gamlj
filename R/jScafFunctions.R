@@ -14,6 +14,18 @@ ginfo <- function(...) {
   }
 }
 
+gstart <- function(...) {
+  if (j_INFO) {
+    cat(paste(paste(list(...)),"..."))
+  }
+}
+gend <- function() {
+  if (j_INFO) {
+    cat(".......................................done\n")
+  }
+}
+
+
 mark <- function(...) {
   if (!j_DEBUG) 
     return()

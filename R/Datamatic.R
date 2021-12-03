@@ -26,7 +26,6 @@ Datamatic <- R6::R6Class(
       
       data64          <-   data
       names(data64)   <-   tob64(names(data))
-      mark(head(data))
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }

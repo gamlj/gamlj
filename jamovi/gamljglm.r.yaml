@@ -301,7 +301,6 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-              - posthoc
               - semethod
               - ciWidth
 
@@ -604,6 +603,7 @@ items:
         clearWith:
             - ciWidth
             - emmeans
+            - semethod
 
         columns:
         - name: estimate
