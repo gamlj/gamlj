@@ -201,16 +201,13 @@ gamljGlmClass <- R6::R6Class(
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
 
-      ### info table ###
+      ### run tables ###
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
       for (smarttab in private$.smartObjs)
         smarttab$setNotes(private$.estimate_machine$dispatcher)
       
-      ### info table ###
-      mark(private$.estimate_machine$dispatcher$warnings)
-          
 
 
       

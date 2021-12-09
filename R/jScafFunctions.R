@@ -112,15 +112,8 @@ listify <- function(adata) {
 }            
 
 smartTableName<-function(root,alist,end=NULL) {
-  if (length(alist)==1)
-     middle=make.names(alist)
-  else
-     middle<-paste0(".",paste(make.names(alist),collapse ="."),".")
-  
-  if (is.null(end))
-    paste(root,middle,sep="_")
-  else
-    paste(root,middle,end,sep="_")
-  
+    res<-paste(root,make.names(paste(alist,collapse = ".")),end,sep="_")
+  mark(res)
+  res
 }
 

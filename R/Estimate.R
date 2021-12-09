@@ -29,7 +29,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_info=function() {
                                
-                                tab<-self$init_info()$obj
+                                tab<-self$init_info()
                                 tab[["sample"]]$value<-self$datamatic$N
                             
                           ## TODO: generalize if other models need an optimizer other than lmer
@@ -43,8 +43,8 @@ Estimate <- R6::R6Class("Estimate",
                           run_main_anova=function() {
                             
                             if (!self$isProper) 
-                              self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
-                              mf.anova(self$model,self)
+                                self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
+                            mf.anova(self$model,self)
                               
                           },
                           
@@ -119,8 +119,6 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_simpleInteractions=function() {
-                            
-                            self$dispatcher$warnings<-list(topic="simpleInteractions_coefficients",message="indirect simple coefs")
                             
                             procedure.simpleInteractions(self)
                           },

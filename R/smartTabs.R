@@ -92,6 +92,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             runTable=function() {
                             
                               tinfo("TABLES: table",self$nickname,"checked for run")
+                              mark(self$table$state)
                               self$retrieveNotes()
                               private$.phase<-"run"
 
@@ -200,8 +201,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                 filled<-!self$table$isNotFilled()
                                 if (filled & ("rowCount" %in% names(self$table))) 
                                   filled<-self$table$rowCount>0
-                                
-                                
                               }
                               
                               if (!self$activated)
@@ -522,9 +521,8 @@ SmartArray <- R6::R6Class("SmartArray",
                             runTable=function() {
                               
                               private$.phase<-"run"
-                              
-                              for (child in self$childrenObjs)
-                                   child$retrieveNotes()
+                              tinfo("TABLES: array",self$nickname,"checked for run")
+                              self$retrieveNotes()
                                 
 
                               if (private$.stop())
@@ -542,6 +540,13 @@ SmartArray <- R6::R6Class("SmartArray",
                               }
                               
                             },
+                            retrieveNotes=function() {
+
+                              for (child in self$childrenObjs)
+                                child$retrieveNotes()
+                              
+                            },
+                              
                             setNotes=function(dispatcher=NULL) {
                                for (child in self$childrenObjs)
                                     child$setNotes(dispatcher)
