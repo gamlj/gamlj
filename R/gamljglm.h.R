@@ -494,8 +494,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         simpleInteractions = function() private$.items[["simpleInteractions"]],
         emmeans = function() private$.items[["emmeans"]],
         mainPlots = function() private$.items[["mainPlots"]],
-        assumptions = function() private$.items[["assumptions"]],
         plotnotes = function() private$.items[["plotnotes"]],
+        assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
     private = list(),
@@ -1251,6 +1251,10 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "cvalue",
                         "plotOriginalScale",
                         "plotLinesTypes"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="plotnotes",
+                visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1344,10 +1348,6 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "dep",
                                 "modelTerms",
                                 "dep_scale")))}))$new(options=options))
-            self$add(jmvcore::Html$new(
-                options=options,
-                name="plotnotes",
-                visible=FALSE))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",
@@ -1512,12 +1512,12 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$simpleInteractions} \tab \tab \tab \tab \tab an array of simple interactions tables \cr
 #'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
+#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
 #'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
 #'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
-#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
 #'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
 #'   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
 #' }

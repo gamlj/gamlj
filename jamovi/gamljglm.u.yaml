@@ -396,22 +396,29 @@ children:
     label: Assumption Checks
     collapsed: true
     stretchFactor: 1
+    style: inline
     children:
-      - type: CheckBox
-        name: homoTest
-        label: Homogeneity tests
-      - type: CheckBox
-        name: normTest
-        label: Test normality of residuals
-      - type: CheckBox
-        name: qqplot
-        label: Q-Q plot of residuals
-      - type: CheckBox
-        name: normPlot
-        label: Residuals histogram
-      - type: CheckBox
-        name: residPlot
-        label: Residuals-Predicted plot
+      - type: Label
+        label: Tests
+        children:
+          - type: CheckBox
+            name: homoTest
+            label: Homogeneity tests
+          - type: CheckBox
+            name: normTest
+            label: Test normality of residuals
+      - type: Label
+        label: Plots
+        children:
+            - type: CheckBox
+              name: qqplot
+              label: Q-Q plot of residuals
+            - type: CheckBox
+              name: normPlot
+              label: Residuals histogram
+            - type: CheckBox
+              name: residPlot
+              label: Residuals-Predicted plot
   - type: CollapseBox
     label: Options
     style: list

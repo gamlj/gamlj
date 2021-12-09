@@ -5,6 +5,7 @@ Plotter <- R6::R6Class(
   inherit = Scaffold,
   public=list(
       options=NULL,
+      dispatcher=NULL,
       plotData=list(),
       rawData=list(),
       randomData=list(),
@@ -30,7 +31,7 @@ Plotter <- R6::R6Class(
                     self$scatterType<-self$options$plotScale
             else 
                     self$scatterType<-"response"
-            
+            self$dispatcher<-Dispatch$new()
       },
 
       initPlots=function() {
@@ -388,6 +389,8 @@ Plotter <- R6::R6Class(
 
       ginfo("PLOTTER: prepare main plot")
       resultsgroup<-private$.results$get("mainPlots")
+
+      ### stop is filled from previous run ###
       test<-any(unlist(sapply(resultsgroup$items, function(i) !i$isNotFilled())))
       if (test)
            return()
@@ -434,7 +437,7 @@ Plotter <- R6::R6Class(
         y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
           # end of zeroing 
         randomData<-as.data.frame(cbind(y,rawData))
-#        self$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
+        self$dispatcher$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
 
       }
       ### end of random ###
@@ -646,8 +649,10 @@ Plotter <- R6::R6Class(
       
       if (xobj$type=="numeric") {
            conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
-           if (self$option("plotOriginalScale"))
+           if (self$option("plotOriginalScale")) {
                  self$scatterXscale<-TRUE
+                 self$dispatcher$warnings<-list(topic="plot",message="Note: The X-axis is in the X-variable original scale")
+           }
       }
       allterm64<-c(x64,term64)
 
@@ -679,8 +684,8 @@ Plotter <- R6::R6Class(
              em_opts[["lmer.df"]]<-self$options$dfmethod
 
       results<-try_hard(do.call(emmeans::emmeans,em_opts))
-#      self$warnings<-list("topic"="plot",message=results$warning)
-#      self$errors<-list("topic"="plot",message=results$error)
+      self$dispatcher$warnings<-list("topic"="plot",message=results$warning)
+      self$dispatcher$errors<-list("topic"="plot",message=results$error)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####
@@ -709,7 +714,7 @@ Plotter <- R6::R6Class(
     .rescale=function(varobj,values) {
       
       if (varobj$scaling=="clusterbasedcentered")
-          self$warnings<-list(topic="plot",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` is the original scale is necessary.")
+          self$dispatcher$warnings<-list(topic="plot",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` is the original scale is necessary.")
         
 #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
 #      len <- max(min(len,na.rm = T),0)

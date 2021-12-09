@@ -652,6 +652,10 @@ items:
            - plotOriginalScale
            - plotLinesTypes
 
+  - name: plotnotes
+    type: Html
+    visible: false
+
   - name: assumptions
     title: Assumption Checks
     type: Group
@@ -734,9 +738,6 @@ items:
             - modelTerms
             - dep_scale
 
-  - name: plotnotes
-    type: Html
-    visible: false
 
 
 

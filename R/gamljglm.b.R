@@ -164,6 +164,10 @@ gamljGlmClass <- R6::R6Class(
       # 
       private$.plotter_machine$preparePlots()
       
+      if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
+          self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
+          self$results$plotnotes$setVisible(TRUE)
+      }  
       ginfo("MODULE:  #### phase end ####")
       now<-Sys.time()
       ginfo("TIME:",now-private$.time," secs")
