@@ -92,7 +92,6 @@ SmartTable <- R6::R6Class("SmartTable",
                             runTable=function() {
                             
                               tinfo("TABLES: table",self$nickname,"checked for run")
-                              mark(self$table$state)
                               self$retrieveNotes()
                               private$.phase<-"run"
 

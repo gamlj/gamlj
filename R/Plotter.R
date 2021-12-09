@@ -2,8 +2,9 @@ Plotter <- R6::R6Class(
   "Plotter",
   cloneable=FALSE,
   class=FALSE,
-  inherit = Dispatch,
+  inherit = Scaffold,
   public=list(
+      options=NULL,
       plotData=list(),
       rawData=list(),
       randomData=list(),
@@ -19,8 +20,8 @@ Plotter <- R6::R6Class(
       scatterBars=FALSE,
       scatterRaw=FALSE,
       scatterType=NULL,
-      initialize=function(operator,results) {
-            super$initialize(options=operator$options,vars=operator$vars)
+      initialize=function(options,operator,results) {
+            self$options<-options
             private$.results<-results
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
@@ -33,7 +34,7 @@ Plotter <- R6::R6Class(
       },
 
       initPlots=function() {
-        
+           ginfo("PLOTTER: init main plot")
            private$.initMainPlot()
 
       },
@@ -58,7 +59,6 @@ Plotter <- R6::R6Class(
         }
         
         ## collect the data 
-        
         data<-self$plotData[[image$key]]
         
         ### prepare aestetics for one or two way scatterplot
@@ -381,12 +381,17 @@ Plotter <- R6::R6Class(
     },
     .prepareMainPlot=function() {
       
+      
 
       if (!is.something(self$options$plotHAxis)) 
         return()
 
-
+      ginfo("PLOTTER: prepare main plot")
       resultsgroup<-private$.results$get("mainPlots")
+      test<-any(unlist(sapply(resultsgroup$items, function(i) !i$isNotFilled())))
+      if (test)
+           return()
+      
       
       moderators<-self$scatterModerators
 
@@ -429,7 +434,7 @@ Plotter <- R6::R6Class(
         y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
           # end of zeroing 
         randomData<-as.data.frame(cbind(y,rawData))
-        self$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
+#        self$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
 
       }
       ### end of random ###
@@ -674,8 +679,8 @@ Plotter <- R6::R6Class(
              em_opts[["lmer.df"]]<-self$options$dfmethod
 
       results<-try_hard(do.call(emmeans::emmeans,em_opts))
-      self$warnings<-list("topic"="plot",message=results$warning)
-      self$errors<-list("topic"="plot",message=results$error)
+#      self$warnings<-list("topic"="plot",message=results$warning)
+#      self$errors<-list("topic"="plot",message=results$error)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####

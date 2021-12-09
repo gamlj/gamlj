@@ -1,7 +1,7 @@
 
 j_DEBUG=T
 j_INFO=T
-t_INFO=T
+t_INFO=F
 
 IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
 
