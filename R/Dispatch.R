@@ -4,11 +4,7 @@ Dispatch <- R6::R6Class(
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   public=list(
-    initialize=function() {
-    }
-
-
-
+    initialize=function() { }
   ),
   active=list(
         warnings=function(obj) {
@@ -19,7 +15,7 @@ Dispatch <- R6::R6Class(
                            return()
               if (obj$message==FALSE)
                            return()
-              obj<-fromb64(obj,self$vars)
+              obj<-fromb64(obj)
               topic<-private$.warnings[[obj$topic]]
               msg<-private$.translate(obj$message)
               topic[[length(topic)+1]]<-msg
@@ -52,7 +48,10 @@ Dispatch <- R6::R6Class(
           topic<-unique(topic)
           private$.errors[[obj$topic]]<-topic
 
-        }
+        },
+        warnings_topics=function() {return(names(private$.warnings))},
+        errors_topics=function() {return(names(private$.errors))}
+        
         
   ),
   

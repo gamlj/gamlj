@@ -37,25 +37,24 @@ Estimate <- R6::R6Class("Estimate",
                                     tab[["optim"]]$value<-self$model@optinfo$optimizer
                           
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
-                                try_hard(tab)
+                                tab
                           },                    
 
                           run_main_anova=function() {
                             
                             if (!self$isProper) 
                               self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
-                            
-                            try_hard(mf.anova(self$model,self))
+                              mf.anova(self$model,self)
+                              
                           },
                           
                           run_main_r2=function() {
 
-                              res<-try_hard(fit.R2(self$model))
-                              res
+                              fit.R2(self$model)
                           },
                           
                           run_main_coefficients=function() {
-                            try_hard({
+                            
                             tab<-NULL
                             if (self$isProper) {
                               tab       <-  mf.parameters(self$model,self)
@@ -63,18 +62,18 @@ Estimate <- R6::R6Class("Estimate",
                               
                             }
                             tab
-                            })
                             
                           },
                           ### anova effect sizes ####
                           
                           run_main_effectsizes=function()  {
-                            try_hard(es.glm_variances(self$model,self$ciwidth))
+                            
+                            es.glm_variances(self$model,self$ciwidth)
+                            
                           },
                           
                           run_main_intercept=function() {
                             
-                            try_hard({
                               ss<-summary(self$model)
                               tt<-ss$coefficients[1,3]
                               f<-tt^2
@@ -90,24 +89,23 @@ Estimate <- R6::R6Class("Estimate",
                                              omegaSqP=omegap[1,1],
                                              epsilonSqP=epsilonp[1,1],
                                              p=p))
-                              
-                            })
-                            
+                               tab
                           },
                           run_posthoc=function() {
-                            
-                            try_hard(procedure.posthoc(self))
-                            
+                              
+                            procedure.posthoc(self)
+                              
                           },
                           run_emmeans=function() {
-                            try_hard(procedure.emmeans(self))
+                              procedure.emmeans(self)
                           },
                           
                           run_simpleEffects_anova=function() {
                             
                             if (is.null(self$tab_simpleAnova))
                                 private$.estimateSimpleEffects()
-                            try_hard(self$tab_simpleAnova)
+                            warnings("this is direct to simple anova")
+                            self$tab_simpleAnova
                           },
                           
                           run_simpleEffects_coefficients=function() {
@@ -115,10 +113,16 @@ Estimate <- R6::R6Class("Estimate",
                             if (is.null(self$tab_simpleCoefficients))
                               private$.estimateSimpleEffects()
                             
-                            try_hard(self$tab_simpleCoefficients)
+                            self$dispatcher$warnings<-list(topic="simpleEffects_anova",message="indirect simple")
+                            
+                            self$tab_simpleCoefficients
                           },
+                          
                           run_simpleInteractions=function() {
-                            try_hard(procedure.simpleInteractions(self))
+                            
+                            self$dispatcher$warnings<-list(topic="simpleInteractions_coefficients",message="indirect simple coefs")
+                            
+                            procedure.simpleInteractions(self)
                           },
                           
                           
@@ -258,6 +262,7 @@ Estimate <- R6::R6Class("Estimate",
                              
                               .model<-mf.fixModel(results$obj,self)
                               
+                              self$dispatcher$warnings<-list(topic="info",message="indirect info")
                               return(.model)
 
 
@@ -403,13 +408,16 @@ Estimate <- R6::R6Class("Estimate",
                             
                           },
                           .estimateSimpleEffects=function() {
+                            
                             results<-try_hard(procedure.simpleEffects(self$model,self))
-                            self$dispatcher$warnings  <- list(topic="simpleEffects_anova",message=results$warning)
-                            self$dispatcher$warnings  <- list(topic="simpleEffects_coefficients",message=results$warning)
-                            self$errors    <- list(topic="simpleEffects_anova",message=results$error)
-                            self$errors    <- list(topic="simpleEffects_coefficients",message=results$error)
-                            self$tab_simpleAnova         <-  results$obj[[1]]
-                            self$tab_simpleCoefficients  <-  results$obj[[2]]
+                            
+                            if (!isFALSE(results$error)) {
+                               stop(results$error)
+                            }  else {
+                                  self$tab_simpleAnova         <-  results$obj[[1]]
+                                  self$tab_simpleCoefficients  <-  results$obj[[2]]
+                            }
+                            
                         },
                           
                           

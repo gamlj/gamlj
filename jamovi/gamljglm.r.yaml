@@ -187,10 +187,7 @@ items:
                          - dep
                          - modelTerms
                          - contrasts
-                         - scaling
                          - fixedIntercept
-                         - effectSize
-                         - dep_scale
                          - ciWidth
                          
              columns:

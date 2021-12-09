@@ -122,8 +122,9 @@ gamljGlmClass <- R6::R6Class(
 
       
  
-      for (tab in private$.smartObjs)
+      for (tab in private$.smartObjs) {
             tab$initTable()
+      }
       
 
 
@@ -204,12 +205,14 @@ gamljGlmClass <- R6::R6Class(
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
+      for (smarttab in private$.smartObjs)
+        smarttab$setNotes(private$.estimate_machine$dispatcher)
       
-      for (e in private$.estimate_machine$dispatcher$errors)
-              print(e)
-      for (e in private$.estimate_machine$dispatcher$warnings)
-        print(e)
-      
+      ### info table ###
+      mark(private$.estimate_machine$dispatcher$warnings)
+          
+
+
       
       # ### simple interactions
       # if (is.something(private$.estimate_machine$tab_simpleInteractionCoefficients)) {

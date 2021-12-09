@@ -720,10 +720,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "dep",
                                 "modelTerms",
                                 "contrasts",
-                                "scaling",
                                 "fixedIntercept",
-                                "effectSize",
-                                "dep_scale",
                                 "ciWidth"),
                             columns=list(
                                 list(

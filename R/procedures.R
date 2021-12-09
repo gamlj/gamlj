@@ -40,6 +40,7 @@ procedure.posthoc <- function(obj) {
        vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
   }
   
+  
   if (length(terms) == 0) 
     return()
   
@@ -59,14 +60,21 @@ procedure.posthoc <- function(obj) {
       sidak <- .posthoc(model, term, "sidak",vfun=vfun)
       scheffe <- .posthoc(model, term, "scheffe",vfun=vfun)
       
-    })  # suppressWarnings
+    })  
+
+#    obj$dispatcher$warnings<-list(topic=smartTableName("posthoc",fromb64(rev(ph))), message="specific to posthoc") 
+
     if (!isFALSE(test$error)) {
-       obj$dispatecher$error<-list(topic="posthoc", message=WARNS["ph.nojoy"]) 
+       obj$dispatcher$errors<-list(topic="posthoc", message=WARNS["ph.nojoy"]) 
        return()
     }
+
     if (!isFALSE(test$warning)) 
-      obj$dispatecher$warnings<-list(topic="posthoc", message=test$warning) 
+      obj$dispatcher$warnings<-list(topic="posthoc", message=test$warning) 
     
+    obj$dispatcher$warnings<-list(topic="posthoc", message="indirect to posthoc") 
+    
+
       tableData <- as.data.frame(none, stringAsFactors = FALSE)
       tableData$contrast <- as.character(tableData$contrast)
       if (length(names(tableData))==9)
@@ -251,7 +259,6 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 .simpleEffects.default<-function(model,obj) {
 
    gstart("PROCEDURE: Simple Effects estimated")
-  
   variable<-obj$options$simpleVariable
   variable64<-tob64(variable)
   term<-obj$options$simpleModerators
@@ -449,7 +456,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 ## we want the simple interactions nested in the highest interaction required
 procedure.simpleInteractions<-function(obj) {
   
-     gstart("PROCEDURE: simmple Interactions")
+     gstart("PROCEDURE: simple Interactions")
   
       variable<-obj$options$simpleVariable
       variable64<-tob64(variable)
@@ -460,15 +467,18 @@ procedure.simpleInteractions<-function(obj) {
       n<-length(term64)
       j<-n
       
-      df<-NULL
-      if (obj$option("dfmethod"))
-        df<-tolower(obj$options$dfmethod)
-      
+
       resultsList<-list()
       while(j>1) {
+        
+        results=try_hard({
+            if (j==3) warning("a problem in coefficients 3")
+            ### mods are the variables that form the interaction with simple (variable)
             mods<-term64[j:n]
             conditions<-lapply(seq_along(term64),function(i) {
                               .obj<-obj$datamatic$variables[[term64[i]]]
+                              ## if numeric are part of the interactions (i<j)
+                              ## they are conditioned to 0 1 to create a proper interaction
                               if (.obj$type=="numeric") {
                                     if (i<j) c(0,1) else .obj$levels
                               }  else
@@ -477,7 +487,11 @@ procedure.simpleInteractions<-function(obj) {
             
             names(conditions)<-term64
             conditions<-conditions[sapply(conditions, function(x) is.something(x))]
+            ## these are the selected moderators
             .names<-setdiff(term64,mods)
+            ## this is the table key, if needed
+            .key<-c(variable,rev(term[1:(j-1)]))
+            
             opts_list<-list(object=obj$model,
                             at = conditions
                             )
@@ -492,29 +506,22 @@ procedure.simpleInteractions<-function(obj) {
               
               opts_list[["specs"]]<-term64
               opts_list[["var"]]<-variable64
-              results<-try_hard(do.call(emmeans::emtrends,opts_list))
+              emgrid<-do.call(emmeans::emtrends,opts_list)
               
             }
             else  { 
               
                   opts_list[["specs"]]<-c(variable64,term64)
-                  results<-try_hard(do.call(emmeans::emmeans,opts_list))
+                  emgrid<-do.call(emmeans::emmeans,opts_list)
                   .names<-c(variable64,.names)
             }
             
-            obj$dispatcher$warnings<-list(topic="simpleInteractions",message=results$warning)
-            obj$errors<-list(topic="simpleInteractions",message=results$error)
-            emgrid<-results$obj 
             ### we need the interaction contrast to be in obj because it should count the times
             ## it is called to know which variable should be contrasted
             .datamatic<-rev(sapply(.names, function(.name) obj$datamatic$variables[[.name]]))
             
             opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
-            results<-try_hard(do.call(emmeans::contrast,opts_list))
-            
-            obj$dispatcher$warnings<-list(topic="simpleInteractions",message=results$warning)
-            obj$errors<-list(topic="simpleInteractions",message=results$error)
-            resgrid<-results$obj
+            resgrid<-do.call(emmeans::contrast,opts_list)
             ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
             res<-as.data.frame(resgrid)
             res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
@@ -534,31 +541,60 @@ procedure.simpleInteractions<-function(obj) {
                res[[.name]]<-as.character(res[[.name]])
             }
             names(res)[names(res)%in% mods]<-make.names(paste0("var_",fromb64(mods)))
-            params<-res
-            res<-emmeans::test(resgrid,by=mods,join=T)
-            names(res)[(ncol(res)-3):ncol(res)]<-c("df1","df2","test","p")
+            res
+      })
+        
+      key<-smartTableName("simpleInteractions",.key,"coefficients")
+        
+      if (!isFALSE(results$error)) 
+          obj$dispatcher$error<-list(topic=key,message=results$error)
+      if (!isFALSE(results$warning)) 
+          obj$dispatcher$warnings<-list(topic=key,message=results$warning)
             
-            if (varobj$type=="numeric") 
-               res$effect<-jmvcore::stringifyTerm(c(variable,fromb64(.names)))
-            else
-               res$effect<-jmvcore::stringifyTerm(c(fromb64(.names)))
+      params<-results$obj            
+
+      
+      results<-try_hard({ 
+              if (j==2) warning("a problem in anova 2")
+        
+              res<-emmeans::test(resgrid,by=mods,join=T)
+              names(res)[(ncol(res)-3):ncol(res)]<-c("df1","df2","test","p")
+        
+              if (varobj$type=="numeric") 
+                  res$effect<-jmvcore::stringifyTerm(c(variable,fromb64(.names)))
+              else
+                  res$effect<-jmvcore::stringifyTerm(c(fromb64(.names)))
+        
+              for (.name in mods) {
+                  res[[.name]]<-factor(res[[.name]])
+                  levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+                  res[[.name]]<-as.character(res[[.name]])
+              }
+              names(res)[1:length(mods)]<-make.names(paste0("var_",fromb64(mods)))
+              class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
+              res<-add_effect_size(res,obj$model)
+              res
+        })
+      
+      key<-smartTableName("simpleInteractions",.key,"anova")
+      
             
-            
-            
-            for (.name in mods) {
-              res[[.name]]<-factor(res[[.name]])
-              levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
-              res[[.name]]<-as.character(res[[.name]])
-            }
-            names(res)[1:length(mods)]<-make.names(paste0("var_",fromb64(mods)))
-            class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
-            anova<-add_effect_size(res,obj$model)
-            
-            resultsList[[length(resultsList)+1]]<-list(anova,params)
-            j<-j-1
+      if (!isFALSE(results$error)) 
+              obj$dispatcher$error<-list(topic=key,message=results$error)
+      if (!isFALSE(results$warning)) 
+              obj$dispatcher$warnings<-list(topic=key,message=results$warning)
+      anova<-results$obj      
+                          
+      resultsList[[length(resultsList)+1]]<-list(anova,params)
+      j<-j-1
         }
       
+      key<-"simpleInteractions_.._anova"
+      
+      obj$dispatcher$warnings<-list(topic=key,message="this goes to all simple int anova")
 
+      obj$dispatcher$warnings<-list(topic="simpleInteractions",message="this gos to all simple int ")
+      
       gend()
  
       return(resultsList)

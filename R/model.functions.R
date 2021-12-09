@@ -341,7 +341,6 @@ mf.anova<- function(x,...) UseMethod(".anova")
       reslist<-append_list(reslist,reds,"Residuals")
       reslist<-append_list(reslist,tots,"Total")
       reslist<-prepend_list(reslist,mods,"Model")
-
       reslist    
   }
 

@@ -56,10 +56,8 @@ Syntax <- R6::R6Class(
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
     
       if (self$option("semethod","robust"))
-            self$warnings  <- list(topic="info",message="All SE are heteroskedasticity-consistent robust SE")
-      
-      
-      try_hard(tab)
+            warning("All SE are heteroskedasticity-consistent robust SE")
+     tab
       
     },
     init_main_anova=function() {
@@ -79,7 +77,7 @@ Syntax <- R6::R6Class(
       if (is.null(tab))
         tab[[1]]<-list(test="")
       
-      try_hard(tab)
+      tab
     },
     
     ### parameter estimates ####
@@ -94,12 +92,11 @@ Syntax <- R6::R6Class(
       if (self$options$modelSelection=="ordinal") 
         .len  <- .len + (self$datamatic$dep$nlevels-2)
       
+      lapply(1:.len, function(t) list(source=""))
       
-      try_hard(lapply(1:.len, function(t) list(source="")))
     },
     init_main_contrastCodeTables=function() {
       
-      try_hard({
         tab<-NULL
         
         if (self$options$showContrastCode) {
@@ -114,11 +111,9 @@ Syntax <- R6::R6Class(
             values
           })
         }
-        
-      })
     },
     init_main_effectsizes=function() {
-      try_hard({
+
         alist<-NULL  
         if (self$option("effectSizeInfo")) {
           alist<-list()
@@ -132,19 +127,19 @@ Syntax <- R6::R6Class(
           }
         }
         alist
-      })
     },
     ### intercept more info ###
     
     init_main_intercept=function() {
-      try_hard(self$tab_intercept<-list(source="(Intercept)"))
+      
+      self$tab_intercept<-list(source="(Intercept)")
+      
     },
     
     ### posthoc means ###
     
     init_posthoc=function() {
       
-      try_hard({    
         lapply(self$options$posthoc, function(.term) {
           p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
           nrow<-p*(p-1)/2
@@ -161,14 +156,12 @@ Syntax <- R6::R6Class(
           attr(df,"titles")<-.titles
           df
         })
-      })
-      
+
     },
     ### estimated marginal means ###
     
     init_emmeans=function() {
       
-      try_hard({
         alist=NULL
         
         if (self$option("emmeans")) {
@@ -190,17 +183,11 @@ Syntax <- R6::R6Class(
             self$warnings<-list(topic="emmeans",message=paste("Expected means are expressed as",emm))
         }
         alist
-        
-      })
-      
-      
-      
     },
     
     init_simpleEffects_anova=function() {
       
-      try_hard({
-        
+
         .var<-tob64(self$options$simpleVariable)
         .mods<-tob64(self$options$simpleModerators)
         nrow<-prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
@@ -208,12 +195,11 @@ Syntax <- R6::R6Class(
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
         names(df)<-rev(.mods)
         df
-      })
+        
     },
     
     init_simpleEffects_coefficients=function() {
       
-      try_hard({
         .var<-tob64(self$options$simpleVariable)
         focal<-self$datamatic$variables[[.var]]
         neffects<-focal$neffects
@@ -228,12 +214,11 @@ Syntax <- R6::R6Class(
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
         names(df)<-rev(.mods)
         df
-      })
-      
+
     },
     init_simpleInteractions=function() {
       
-      try_hard({    
+    
         ### moderators should be reverted in order to match emmeans 
         .term<-rev(self$options$simpleModerators)
         .simple<-self$options$simpleVariable
@@ -242,12 +227,13 @@ Syntax <- R6::R6Class(
         resultsList<-list()
         inter_term<-list()
         while(j>1) {
-          ## mods are the variable that we use as moderator of the interaction
+          ## mods are the variables that go in the interaction with simple
           .mods<-.term[j:n]
+          ## inters are the variables in the interaction
+          .inters<-c(.simple,.mods)
           ## params are selected moderators
           .params<-setdiff(.term,.mods)
-          ## inters are the variables in the interaction
-          .inters<-c(.simple,setdiff(.term,.params))
+
           inter_term <- append_list(inter_term,.inters)
           .names<-make.names(paste0("var_",.params))
           
@@ -272,7 +258,6 @@ Syntax <- R6::R6Class(
         resultsList<-rev(resultsList)
         attr(resultsList,"keys")<-inter_term
         resultsList
-      })
       
     }
     
@@ -280,31 +265,7 @@ Syntax <- R6::R6Class(
     
     
   ),   # End public
-  active=list(
-    ### inherited warnings and errors are overriden to check specific message to change, and then passed to super 
-    warnings=function(obj) {
-      if (missing(obj))
-        return(private$.warnings)
-      if (is.null(obj))
-        return()
-      if (is.null(obj$message))
-        return()
-      
-      ### custom checks here ###
-      
-      super$warnings<-obj
-    },
-    errors=function(obj) {
-      
-      if (missing(obj))
-        return(private$.errors)
-      if (is.null(obj))
-        return()
-      
-      super$errors<-obj
-    }
-    
-  ),
+  
   private=list(
     
     .constructFormula=function() {
