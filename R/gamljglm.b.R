@@ -116,6 +116,11 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$combineBelow<-"new"
       aSmartObj$spaceBy<-"new"
       
+      ### assumptions hometest
+      aSmartObj<-SmartTable$new(self$results$assumptions$homotest,estimate_machine)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ### assumptions nromtest
+      aSmartObj<-SmartTable$new(self$results$assumptions$normtest,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### init all ####

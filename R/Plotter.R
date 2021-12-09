@@ -35,7 +35,6 @@ Plotter <- R6::R6Class(
       },
 
       initPlots=function() {
-           ginfo("PLOTTER: init main plot")
            private$.initMainPlot()
 
       },
@@ -327,7 +326,8 @@ Plotter <- R6::R6Class(
             if (!is.something(self$options$plotHAxis)) 
                    return()
             
-
+            ginfo("PLOTTER: init main plot")
+      
             resultsgroup<-private$.results$get("mainPlots")
             y<-self$options$dep
             x<-self$options$plotHAxis

@@ -1258,8 +1258,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
-                    homoTest = function() private$.items[["homoTest"]],
-                    normTest = function() private$.items[["normTest"]],
+                    homotest = function() private$.items[["homotest"]],
+                    normtest = function() private$.items[["normtest"]],
                     qqplot = function() private$.items[["qqplot"]],
                     normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]]),
@@ -1272,15 +1272,19 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Assumption Checks")
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="homoTest",
+                            name="homotest",
                             title="Test for Homogeneity of Residual Variances (Levene's)",
                             visible="(homoTest)",
-                            rows=1,
+                            rows=2,
                             columns=list(
+                                list(
+                                    `name`="name", 
+                                    `type`="text", 
+                                    `title`="Test"),
                                 list(
                                     `name`="test", 
                                     `type`="number", 
-                                    `title`="F"),
+                                    `title`="Statistic"),
                                 list(
                                     `name`="df1", 
                                     `type`="integer"),
@@ -1293,7 +1297,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `format`="zto,pvalue"))))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="normTest",
+                            name="normtest",
                             title="Test for Normality of residuals",
                             visible="(normTest)",
                             columns=list(
@@ -1513,8 +1517,8 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
-#'   \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-#'   \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+#'   \code{results$assumptions$homotest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
+#'   \code{results$assumptions$normtest} \tab \tab \tab \tab \tab a table of normality tests \cr
 #'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr

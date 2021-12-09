@@ -123,8 +123,48 @@ Estimate <- R6::R6Class("Estimate",
                             procedure.simpleInteractions(self)
                           },
                           
-                          
-                          
+                          run_assumptions_homotest=function() {
+
+                                data<-self$model$model
+                                data$res<-residuals(self$model)
+                                factors <-   names(attr(stats::model.matrix(self$model),"contrasts"))
+                                if (is.null(factors))
+                                  return()
+                                rhs <- paste0('`', factors, '`', collapse=':')
+                                formula <- as.formula(paste0('`res`~', rhs))
+                                result <- car::leveneTest(formula, data, center="mean")
+                                table<-data.frame(name=c("Levene's Test","Breusch-Pagan Test"))
+                                table$test[1]=result[1,'F value']
+                                table$df1[1]=result[1,'Df']
+                                table$df2[1]=result[2,'Df']
+                                table$p[1]=result[1,'Pr(>F)']
+                                ## Breusch-Pagan ##
+                                test<-lmtest::bptest(self$model)
+                                table$test[2]<-test$statistic
+                                table$df1[2]<-test$parameter
+                                table$df2[2]<-""
+                                table$p[2]<-test$p.value
+                               table
+                          },
+                          run_assumptions_normtest=function() {
+                           
+                            table<-data.frame(name=c("Kolmogorov-Smirnov","Shapiro-Wilk"),test=c(NaN,NaN),p=c(NaN,NaN))
+                            rr<-residuals(self$model)
+                            ks<-ks.test(rr,"pnorm",mean(rr),sd(rr))
+                            table$test[1]=ks$statistic
+                            table$p[1]=ks$p.value
+                            
+                            st<-try_hard(shapiro.test(rr))
+                            if (!isFALSE(st$error)) {
+                              warning("Shapiro-Wilk not available due to too large number of cases")
+                            }
+                            else {
+                              table$test[2]=st$obj$statistic
+                              table$p[2]=st$obj$p.value 
+                            }
+                            mark(table)
+                            table
+                          },
                           
                           savePredRes=function(results) {
                             

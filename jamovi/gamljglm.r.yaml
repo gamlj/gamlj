@@ -660,27 +660,28 @@ items:
     title: Assumption Checks
     type: Group
     items:
-        - name: homoTest
+        - name: homotest
           title: Test for Homogeneity of Residual Variances (Levene's)
           type: Table
           description: a table of homogeneity tests
           visible: (homoTest)
-          rows: 1
+          rows: 2
           columns:
+            - name: name
+              type: text
+              title: Test
             - name: test
               type: number
-              title: F
-
+              title: Statistic
             - name: df1
               type: integer
-
             - name: df2
               type: integer
 
             - name: p
               type: number
               format: zto,pvalue
-        - name: normTest
+        - name: normtest
           title: Test for Normality of residuals
           type: Table
           description: a table of normality tests

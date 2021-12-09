@@ -201,7 +201,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                 if (filled & ("rowCount" %in% names(self$table))) 
                                   filled<-self$table$rowCount>0
                               }
-                              
                               if (!self$activated)
                                 return(TRUE)
                               
