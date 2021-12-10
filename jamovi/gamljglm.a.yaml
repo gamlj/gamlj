@@ -103,12 +103,20 @@ options:
 
 
     - name: showParamsCI
-      title: Confidence intervals
+      title: Parameters Estimates
       type: Bool
       default: true
       description:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
+
+    - name: showBetaCI
+      title: Betas
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , standardized parameters CI in table
 
 
     - name: cimethod

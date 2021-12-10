@@ -79,6 +79,8 @@ children:
         children:
           - name: showParamsCI
             type: CheckBox
+          - name: showBetaCI
+            type: CheckBox
           - type: TextBox
             name: ciWidth
             label: Interval

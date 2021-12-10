@@ -250,6 +250,14 @@ items:
                       title: β
                       visible: (effectSize:beta)
                       format: zto
+                    - name: beta.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (showParamsCI & showBetaCI)
+                    - name: beta.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (showParamsCI & showBetaCI)
                     - name: df
                       title: "df"
                       type: number
@@ -322,7 +330,7 @@ items:
         - name: df
           title: df
           type: integer
-        - name: none
+        - name: p
           title: p
           type: number
           format: zto,pvalue
@@ -661,7 +669,7 @@ items:
     type: Group
     items:
         - name: homotest
-          title: Test for Homogeneity of Residual Variances (Levene's)
+          title: Test for Homogeneity of Residual Variance
           type: Table
           description: a table of homogeneity tests
           visible: (homoTest)

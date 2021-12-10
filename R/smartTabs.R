@@ -17,10 +17,8 @@ SmartTable <- R6::R6Class("SmartTable",
                             spaceAt=NULL,
                             spaceMethod="cb",
                             combineBelow=0,
-                            ciroot=NULL,
-                            ciwidth=NULL,
-                            ciformat="{}% Confidence Intervals",
-                            
+                            ci_info=list(),
+
                             initialize=function(table,estimator=NULL) {
                               
                               self$name       <-  table$name
@@ -35,14 +33,13 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.run_function<-paste0("run_",self$nickname)
                               self$activated<-self$table$visible
                               
+
                               if (inherits(private$.estimator,"SmartArray")) {
                                 self$activated              <- private$.estimator$activated
                                 self$expandable             <- private$.estimator$expandable
                                 self$expandFromBegining     <- private$.estimator$expandFromBegining
                                 self$expandSuperTitle       <- private$.estimator$expandSuperTitle
-                                self$ciroot                 <- private$.estimator$ciroot
-                                self$ciwidth                <- private$.estimator$ciwidth
-                                self$ciformat               <- private$.estimator$ciformat
+                                self$ci_info                <- private$.estimator$ci_info
                                 self$keys_sep               <- private$.estimator$keys_sep
                                 self$keys_raise             <- private$.estimator$keys_raise
                                 self$combineBelow           <- private$.estimator$combineBelow
@@ -107,12 +104,12 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                             },
                             
-                            ci=function(alist,ciwidth=95,ciformat="{}% Confidence Intervals"){
+                            ci=function(aroot,width=95,label=NULL,format="{}% Confidence Intervals"){
                               
-                              self$ciroot<-alist
-                              self$ciwidth<-ciwidth
-                              self$ciformat<-ciformat
-                              
+                              if (is.null(label)) label="" 
+                              alist<-list(root=aroot,label=label,width=width,format=format)
+                              self$ci_info<-append_list(self$ci_info,alist)
+
                             },
                             
                             initFunction=function(aObject) {
@@ -133,8 +130,10 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                                 if (is.something(dispatcher)) {
                                     topics<-intersect(dispatcher$warnings_topics,self$topics)
-                                    for (t in topics)
-                                       private$.setNote(dispatcher$warnings[[t]])
+                                    for (t in topics) {
+                                      for (m in dispatcher$warnings[[t]])
+                                             private$.setNote(m)
+                                    }
 
                                 }
                             }        
@@ -344,31 +343,19 @@ SmartTable <- R6::R6Class("SmartTable",
                             },
                             .ci=function() {
                               
-                              if (is.null(self$ciroot))
+                              if (!is.something(self$ci_info))
                                 return()
                               
-                              alist<-self$ciroot
-                              ciwidth<-self$ciwidth
-                              ciformat<-self$ciformat
-                              if (is.null(names(alist))) {
-                                .names<-alist
-                                .labels<-rep("",length(alist))
-                              } else {
-                                .names<-names(alist)
-                                .labels<-alist
+                              for (info in self$ci_info) {
                                 
-                              }
-                              
-                              for (i in seq_along(alist)) {
-                                
-                                .label <-paste(.labels[[i]],ciformat)
-                                .name  <-.names[[i]]
+                                .label <-paste(info$label,info$format)
+                                .name  <-info$root
                                 l<-paste0(.name,".ci.lower")
                                 u<-paste0(.name,".ci.upper")
                                 if (l %in% names(self$table$columns))
-                                  self$table$getColumn(l)$setSuperTitle(jmvcore::format(.label, ciwidth))
+                                  self$table$getColumn(l)$setSuperTitle(jmvcore::format(.label, info$width))
                                 if (u %in% names(self$table$columns))
-                                  self$table$getColumn(u)$setSuperTitle(jmvcore::format(.label, ciwidth))
+                                  self$table$getColumn(u)$setSuperTitle(jmvcore::format(.label, info$width))
                                 
                               }
                             }, 

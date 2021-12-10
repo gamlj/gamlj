@@ -43,7 +43,8 @@ gamljGlmClass <- R6::R6Class(
       
       ### estimates table ###
       aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
-      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ciWidth)
+      aSmartObj$ci("beta",self$options$ciWidth,label=greek_vector[["beta"]])
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### contrasts code tables
@@ -59,7 +60,7 @@ gamljGlmClass <- R6::R6Class(
       ### effectsizes table ###
 
       aSmartObj<-SmartTable$new(self$results$main$effectsizes,estimate_machine)
-      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ciWidth)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
       ## post hoc #####
@@ -68,7 +69,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$expandable<-TRUE
       aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
-      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ciWidth)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
 
@@ -80,7 +81,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$expandFromBegining<-TRUE
       aSmartObj$combineBelow="new"
       aSmartObj$spaceBy="new"
-      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ciWidth)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### simple effects
@@ -103,7 +104,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$key<-self$options$simpleVariable
-      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ciWidth)
       aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
       aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
@@ -112,9 +113,10 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$ci(c("est"),self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ciWidth)
       aSmartObj$combineBelow<-"new"
       aSmartObj$spaceBy<-"new"
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### assumptions hometest
       aSmartObj<-SmartTable$new(self$results$assumptions$homotest,estimate_machine)

@@ -13,6 +13,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modelTerms = NULL,
             fixedIntercept = TRUE,
             showParamsCI = TRUE,
+            showBetaCI = TRUE,
             cimethod = "standard",
             bootR = 1000,
             semethod = "standard",
@@ -101,6 +102,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..showParamsCI <- jmvcore::OptionBool$new(
                 "showParamsCI",
                 showParamsCI,
+                default=TRUE)
+            private$..showBetaCI <- jmvcore::OptionBool$new(
+                "showBetaCI",
+                showBetaCI,
                 default=TRUE)
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
@@ -349,6 +354,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
+            self$.addOption(private$..showBetaCI)
             self$.addOption(private$..cimethod)
             self$.addOption(private$..bootR)
             self$.addOption(private$..semethod)
@@ -396,6 +402,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
+        showBetaCI = function() private$..showBetaCI$value,
         cimethod = function() private$..cimethod$value,
         bootR = function() private$..bootR$value,
         semethod = function() private$..semethod$value,
@@ -442,6 +449,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..modelTerms = NA,
         ..fixedIntercept = NA,
         ..showParamsCI = NA,
+        ..showBetaCI = NA,
         ..cimethod = NA,
         ..bootR = NA,
         ..semethod = NA,
@@ -794,6 +802,16 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `visible`="(effectSize:beta)", 
                                     `format`="zto"),
                                 list(
+                                    `name`="beta.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(showParamsCI & showBetaCI)"),
+                                list(
+                                    `name`="beta.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(showParamsCI & showBetaCI)"),
+                                list(
                                     `name`="df", 
                                     `title`="df", 
                                     `type`="number"),
@@ -871,7 +889,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="df", 
                             `type`="integer"),
                         list(
-                            `name`="none", 
+                            `name`="p", 
                             `title`="p", 
                             `type`="number", 
                             `format`="zto,pvalue", 
@@ -1273,7 +1291,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="homotest",
-                            title="Test for Homogeneity of Residual Variances (Levene's)",
+                            title="Test for Homogeneity of Residual Variance",
                             visible="(homoTest)",
                             rows=2,
                             columns=list(
@@ -1419,6 +1437,8 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
+#' @param showBetaCI \code{TRUE} (default) or \code{FALSE} , standardized
+#'   parameters CI in table
 #' @param cimethod .
 #' @param bootR a number bootstrap repetitions.
 #' @param semethod .
@@ -1542,6 +1562,7 @@ gamljGlm <- function(
     modelTerms = NULL,
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
+    showBetaCI = TRUE,
     cimethod = "standard",
     bootR = 1000,
     semethod = "standard",
@@ -1649,6 +1670,7 @@ gamljGlm <- function(
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
+        showBetaCI = showBetaCI,
         cimethod = cimethod,
         bootR = bootR,
         semethod = semethod,

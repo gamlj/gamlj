@@ -33,8 +33,15 @@ procedure.posthoc <- function(obj) {
   
   terms <- tob64(obj$options$posthoc)
   dep <- obj$options$dep
-  model<-obj$model
   
+  ### we set the model, if we need bootstrap ci, we give the bootstraped model
+   model<-obj$model
+   
+  .model<-model
+   if (!obj$option("cimethod","standard")) 
+       .model<-obj$boot_model
+  
+  ### check if we need robust standard error  
   vfun<-NULL
   if (obj$option("semethod","robust")) {
        vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
@@ -52,44 +59,28 @@ procedure.posthoc <- function(obj) {
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
     term <- jmvcore::composeTerm(rev(ph))
-    test<-try_hard({
-      none <- .posthoc(model, term, "none",ci=TRUE, vfun=vfun,bootstrap=(obj$options$cimethod=="boot"))
+    
+      none <- .posthoc(model, term, "none", vfun=vfun)
       bonferroni <- .posthoc(model, term, "bonferroni",vfun=vfun)
       holm <- .posthoc(model, term, "holm",vfun=vfun)
       tukey <- .posthoc(model, term, "tukey",vfun=vfun)
       sidak <- .posthoc(model, term, "sidak",vfun=vfun)
       scheffe <- .posthoc(model, term, "scheffe",vfun=vfun)
       
-    })  
+      cidata <- .posthoc_ci(.model,term,obj$ciwidth,obj$options$cimethod,vfun=vfun)
 
-#    obj$dispatcher$warnings<-list(topic=smartTableName("posthoc",fromb64(rev(ph))), message="specific to posthoc") 
-
-    if (!isFALSE(test$error)) {
-       obj$dispatcher$errors<-list(topic="posthoc", message=WARNS["ph.nojoy"]) 
-       return()
-    }
-
-    if (!isFALSE(test$warning)) 
-      obj$dispatcher$warnings<-list(topic="posthoc", message=test$warning) 
-    
-    obj$dispatcher$warnings<-list(topic="posthoc", message="indirect to posthoc") 
-    
 
       tableData <- as.data.frame(none, stringAsFactors = FALSE)
       tableData$contrast <- as.character(tableData$contrast)
-      if (length(names(tableData))==9)
-              colnames(tableData) <- c("contrast", "Response", "estimate", "se","df" ,"est.ci.lower","est.ci.upper", "test", "none")
-      else
-              colnames(tableData) <- c("contrast", "estimate", "se","df" ,"est.ci.lower","est.ci.upper", "test", "none")
-        
-        tableData$bonf <- bonferroni$p.value
-        tableData$holm <- holm$p.value
-        tableData$tukey <- tukey$p.value
-        tableData$scheffe <- scheffe$p.value
-        tableData$sidak <- sidak$p.value
-        
+     
+      tableData$bonf <- bonferroni$p
+      tableData$holm <- holm$p
+      tableData$tukey <- tukey$p
+      tableData$scheffe <- scheffe$p
+      tableData$sidak <- sidak$p
+      tableData$est.ci.lower<-cidata$est.ci.lower       
+      tableData$est.ci.upper<-cidata$est.ci.upper       
       
-    
     .cont <- as.character(tableData$contrast)
     .cont <- gsub(" - ", "-", .cont, fixed = T)
     .cont <- gsub(" / ", "/", .cont, fixed = T)
@@ -110,16 +101,13 @@ procedure.posthoc <- function(obj) {
     for (col in cols)
       tableData[,col]<-as.character(tableData[,col])
     
-    .names<-make.names(fromb64(rev(ph)))
+   .names<-make.names(fromb64(rev(ph)))
     names(tableData)[1:length(cols)]<-c(paste0(.names,"1"),paste0(.names,"2"))
 
     if ("Response" %in% names(tableData))
         tableData$Response<-as.character(tableData$Response)
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
-  if (obj$options$cimethod=="boot")
-       obj$dispatcher$warnings<-list(topic="posthoc",message="Bootstrap confidence intervals")
-    
 
     postHocTables
   
@@ -129,34 +117,25 @@ procedure.posthoc <- function(obj) {
 ###### post hoc ##########
 .posthoc <- function(x, ...) UseMethod(".posthoc")
 
-.posthoc.default <- function(model, term, adjust,ci=FALSE, bootstrap=FALSE,vfun=NULL) {
+.posthoc.default <- function(model, term, adjust,vfun=NULL) {
 
     termf <- stats::as.formula(paste("~", term))
+    
     data <- mf.getModelData(model)
-
     opts_list<-list(object=model,specs=termf, type = "response", data = data)
 
     if (is.something(vfun))
          opts_list[["vcov."]]<-vfun    
-    
-    suppressMessages({
+
       referenceGrid <- do.call(emmeans::emmeans,opts_list)
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
       newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
-      results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(ci,TRUE))
-
-      if (bootstrap & ci) {
-        model<-parameters::bootstrap_model(model)
-        referenceGrid <- emmeans::emmeans(model, termf, type = "response", data = data)
-        ci_results<-summary(graphics::pairs(referenceGrid))
-        results$est.lower.CL<-ci_results$lower.HPD
-        results$est.upper.CL<-ci_results$upper.HPD
-        
-      }
+      results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(FALSE,TRUE))
+      names(results)<-c("contrast","estimate","se","df","test","p")
       
-    })
+      
   results
 }
 
@@ -178,6 +157,25 @@ procedure.posthoc <- function(obj) {
   })
   
   return(results)
+}
+
+
+.posthoc_ci <- function(x, ...) UseMethod(".posthoc_ci")
+
+.posthoc_ci.default=function(model,term,width,method,vfun=NULL) {
+  
+  termf <- stats::as.formula(paste("pairwise ~", term))
+
+  opts_list<-list(object=model,specs=termf, type = "response")
+  if (is.something(vfun))
+    opts_list[["vcov."]]<-vfun    
+  referenceGrid <- do.call(emmeans::emmeans,opts_list)
+  results<-as.data.frame(parameters::model_parameters(referenceGrid,ci=width,ci_method=method))
+  results<-results[results$Component=="contrasts",]
+  results<-as.data.frame(cbind(results$CI_low,results$CI_high))
+  names(results)<-c("est.ci.lower","est.ci.upper")
+  results
+  
 }
 
 ######## end post hoc #############
@@ -292,7 +290,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     if (obj$option("semethod","robust"))
       opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
 
-    
+
     if (varobj$type=="factor") {
       ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
       opts_list[["specs"]]=c(variable64,term64)
@@ -323,7 +321,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
             names(res)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper","test","p")
             res$contrast<-varobj$name
     }
-    
+
     for (.name in term64) {
             res[[.name]]<-factor(res[[.name]])
             levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
@@ -334,11 +332,13 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     ### add effect sizes depending on the model and table
     class(res)<-c(paste0("simple_params_",obj$options$modelSelection),class(res))
     params<-add_effect_size(res,model,variable64)
-
+    
+    
     ### now we build the anova table ###
     res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
     names(res)<-c(term64,"df1","df2","test","p")
-
+   
+    
     ### fix labels and make sure they are not factors or stuff    
     for (.name in term64) {
       res[[.name]]<-factor(res[[.name]])
@@ -347,7 +347,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     }
     #### fix names ####
     
-
+    
     ### make fix depending of the type of model ###    
     class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
     anova<-add_effect_size(res,model)
@@ -355,8 +355,9 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     .all <- c(term64,variable64)
     test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
     .issues <- .all[test]
+
     if (is.something(.issues))
-      obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variables",paste(.issues,collapse = ","),"are included in the simple effects analysis but they do not appear in any interaction"))
+      obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
 
   gend()    
   return(list(anova,params))

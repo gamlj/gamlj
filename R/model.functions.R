@@ -51,21 +51,50 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
       
       .bootstrap           <-  obj$options$cimethod %in% c("boot","quantile","bci","bcai")
-      .iterations          <-  1000
+      .iterations          <-  obj$options$bootR
       .ci_method           <-  obj$options$cimethod
       .ci_width            <-  obj$ciwidth
       .se_method           <-  obj$options$semethod=="robust"
       
+      if (.bootstrap) .model<-obj$boot_model else .model<-model
+        
+      
+      
       .coefficients        <-  as.data.frame(parameters::parameters(
                                                                    model,
                                                                    robust=.se_method,
-                                                                   bootstrap=.bootstrap,
-                                                                   iterations=.iterations,
-                                                                   ci=.ci_width,
-                                                                   ci_method=.ci_method),stringAsFactors=FALSE)
-     .coefficients$CI     <-  NULL
-      names(.coefficients)[1:8] <-  c("source","estimate","se","est.ci.lower","est.ci.upper","t","df","p")
-      
+                                                                   ci=NULL,
+                                                                    ),stringAsFactors=FALSE)
+      names(.coefficients) <-  c("source","estimate","se","t","df","p")
+
+      if (obj$option("showParamsCI")) {
+
+        cidata            <-  as.data.frame(parameters::ci(.model,
+                                                               ci=.ci_width,
+                                                               ci_method=.ci_method))
+        
+        .coefficients$est.ci.lower<-cidata$CI_low
+        .coefficients$est.ci.upper<-cidata$CI_high
+        
+      }
+
+      if (obj$option("effectSize","beta")) {
+        
+        ## if not CI are required, we do not bootstrap again 
+        if (obj$option("showBetaCI")) ..bootstrap<-.bootstrap else ..bootstrap<-FALSE
+        if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
+        
+        estim<-parameters::parameters(model,
+                                      standardize="refit",
+                                      bootstrap=..bootstrap,
+                                      ci_method=.ci_method,
+                                      iterations=.iterations)
+        .coefficients$beta  <-  estim$Coefficient
+        .coefficients$beta.ci.lower<-estim$CI_low
+        .coefficients$beta.ci.upper<-estim$CI_high
+
+      }
+
       if (obj$option("effectSize","expb")) {
                ex            <-  as.data.frame(parameters::parameters(model,
                                                                       exponentiate=TRUE,
@@ -78,16 +107,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                .coefficients$exp.ci.lower<-estim$CI_low
                .coefficients$exp.ci.upper<-estim$CI_high
       }
-     if (obj$option("effectSize","beta")) {
-        estim<-parameters::parameters(model,
-                                      standardize="refit",
-                                      bootstrap=.bootstrap,
-                                      ci_method=.ci_method,
-                                      iterations=.iterations)
-       .coefficients$beta  <-  estim$Coefficient
-       .coefficients$beta.ci.lower<-estim$CI_low
-       .coefficients$beta.ci.upper<-estim$CI_high
-     }
       .coefficients
 
 }

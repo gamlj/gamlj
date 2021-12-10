@@ -11,6 +11,7 @@ Estimate <- R6::R6Class("Estimate",
                           subclass=NULL,
                           ciwidth=NULL,
                           model=NULL,
+                          boot_model=NULL,
                           tab_simpleAnova=NULL,
                           tab_simpleCoefficients=NULL,
                           
@@ -20,10 +21,12 @@ Estimate <- R6::R6Class("Estimate",
                             self$subclass<-paste0("model_",options$modelSelection)
                           },
                           estimate = function(data) {
-                            self$model<-private$.estimateModel(data)
-                            ginfo("Initial estimation is done...")
                             
-                          }, # end of publich function estimate
+                            self$model<-private$.estimateModel(data)
+                            ginfo("ESTIMATE: initial estimation done")
+                            
+                            
+                          }, # end of public function estimate
 
                           ##### fill the tables #####
                           
@@ -55,11 +58,18 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_coefficients=function() {
                             
+                            if (!self$option("cimethod","standard")) {
+                              gstart("ESTIMATE: estimating bootstrap model")
+                              self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method"))
+                              self$boot_model<-parameters::bootstrap_model(self$model)
+                              gend()
+                            }                              
+                            
+                            
                             tab<-NULL
                             if (self$isProper) {
                               tab       <-  mf.parameters(self$model,self)
                               tab       <-  private$.fix_names(tab)
-                              
                             }
                             tab
                             
@@ -111,7 +121,7 @@ Estimate <- R6::R6Class("Estimate",
                           run_simpleEffects_coefficients=function() {
                             
                             if (is.null(self$tab_simpleCoefficients))
-                              private$.estimateSimpleEffects()
+                               private$.estimateSimpleEffects()
                             
                             self$dispatcher$warnings<-list(topic="simpleEffects_anova",message="indirect simple")
                             
@@ -162,7 +172,6 @@ Estimate <- R6::R6Class("Estimate",
                               table$test[2]=st$obj$statistic
                               table$p[2]=st$obj$p.value 
                             }
-                            mark(table)
                             table
                           },
                           
@@ -300,7 +309,6 @@ Estimate <- R6::R6Class("Estimate",
                              
                               .model<-mf.fixModel(results$obj,self)
                               
-                              self$dispatcher$warnings<-list(topic="info",message="indirect info")
                               return(.model)
 
 
