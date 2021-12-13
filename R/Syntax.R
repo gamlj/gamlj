@@ -158,6 +158,10 @@ Syntax <- R6::R6Class(
         })
 
     },
+    init_posthocEffsize=function() {
+      self$init_posthoc()
+    },
+    
     ### estimated marginal means ###
     
     init_emmeans=function() {

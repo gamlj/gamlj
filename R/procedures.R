@@ -80,7 +80,7 @@ procedure.posthoc <- function(obj) {
       tableData$sidak <- sidak$p
       tableData$est.ci.lower<-cidata$est.ci.lower       
       tableData$est.ci.upper<-cidata$est.ci.upper       
-      
+
     .cont <- as.character(tableData$contrast)
     .cont <- gsub(" - ", "-", .cont, fixed = T)
     .cont <- gsub(" / ", "/", .cont, fixed = T)
@@ -112,6 +112,37 @@ procedure.posthoc <- function(obj) {
     postHocTables
   
 }
+
+procedure.posthoc_effsize <- function(obj) {
+
+tables<-obj$tab_posthoc
+for (i in seq_along(tables)) {
+  
+  d<-effectsize::t_to_d(tables[[i]]$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
+  tables[[i]]$ds<-d$d
+  tables[[i]]$ds.ci.lower<-d$CI_low
+  tables[[i]]$ds.ci.upper<-d$CI_high
+
+  df<-tables[[i]]$df
+  J <- exp(lgamma(df / 2) - log(sqrt(df / 2)) - lgamma((df - 1) / 2)) # see effectsize package
+  tables[[i]]$g<-d$d * J
+  tables[[i]]$g.ci.lower<-d$CI_low * J
+  tables[[i]]$g.ci.upper<-d$CI_high * J
+
+  ## here we use the model sigma as the denominator. This is the approach used in
+  ## emmeans::eff_size default. 
+  
+  t<-sqrt(df)*tables[[i]]$estimate/(2*sigma(obj$model))
+  d<-effectsize::t_to_d(t,df_error = df,ci = obj$ciwidth)
+  tables[[i]]$dp<-d$d
+  tables[[i]]$dp.ci.lower<-d$CI_low
+  tables[[i]]$dp.ci.upper<-d$CI_high
+  
+  
+}
+tables
+}
+
 
 
 ###### post hoc ##########

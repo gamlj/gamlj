@@ -40,6 +40,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             simpleScaleLabels = "labels",
             postHocCorr = list(
                 "bonf"),
+            posthocEffsize = NULL,
             scaling = NULL,
             modelSelection = "lm",
             effectSize = list(
@@ -262,6 +263,13 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "sidak"),
                 default=list(
                     "bonf"))
+            private$..posthocEffsize <- jmvcore::OptionNMXList$new(
+                "posthocEffsize",
+                posthocEffsize,
+                options=list(
+                    "dp",
+                    "ds",
+                    "g"))
             private$..scaling <- jmvcore::OptionArray$new(
                 "scaling",
                 scaling,
@@ -380,6 +388,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..percvalue)
             self$.addOption(private$..simpleScaleLabels)
             self$.addOption(private$..postHocCorr)
+            self$.addOption(private$..posthocEffsize)
             self$.addOption(private$..scaling)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
@@ -428,6 +437,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         percvalue = function() private$..percvalue$value,
         simpleScaleLabels = function() private$..simpleScaleLabels$value,
         postHocCorr = function() private$..postHocCorr$value,
+        posthocEffsize = function() private$..posthocEffsize$value,
         scaling = function() private$..scaling$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
@@ -475,6 +485,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..percvalue = NA,
         ..simpleScaleLabels = NA,
         ..postHocCorr = NA,
+        ..posthocEffsize = NA,
         ..scaling = NA,
         ..predicted = NA,
         ..residuals = NA,
@@ -498,6 +509,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
+        posthocEffsize = function() private$.items[["posthocEffsize"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
         simpleInteractions = function() private$.items[["simpleInteractions"]],
         emmeans = function() private$.items[["emmeans"]],
@@ -924,6 +936,76 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `type`="number", 
                             `format`="zto,pvalue", 
                             `visible`="(postHocCorr:scheffe)")))))
+            self$add(jmvcore::Array$new(
+                options=options,
+                name="posthocEffsize",
+                title="Comparisons effect size",
+                items="(posthoc)",
+                template=jmvcore::Table$new(
+                    options=options,
+                    title="Comparisons:  ___key___",
+                    clearWith=list(
+                        "semethod",
+                        "ciWidth",
+                        "posthoc_effsize"),
+                    columns=list(
+                        list(
+                            `name`="estimate", 
+                            `title`="Difference", 
+                            `type`="number"),
+                        list(
+                            `name`="se", 
+                            `title`="SE", 
+                            `type`="number"),
+                        list(
+                            `name`="dp", 
+                            `title`="d<sub>pop</sub>", 
+                            `type`="number"),
+                        list(
+                            `name`="dp", 
+                            `title`="d<sub>pop</sub>", 
+                            `type`="number", 
+                            `visible`="(posthocEffsize:dp)"),
+                        list(
+                            `name`="dp.ci.lower", 
+                            `type`="number", 
+                            `title`="Lower", 
+                            `visible`="(posthocEffsize:dp)"),
+                        list(
+                            `name`="dp.ci.upper", 
+                            `type`="number", 
+                            `title`="Upper", 
+                            `visible`="(posthocEffsize:dp)"),
+                        list(
+                            `name`="ds", 
+                            `title`="d<sub>sample</sub>", 
+                            `type`="number", 
+                            `visible`="(posthocEffsize:ds)"),
+                        list(
+                            `name`="ds.ci.lower", 
+                            `type`="number", 
+                            `title`="Lower", 
+                            `visible`="(posthocEffsize:ds)"),
+                        list(
+                            `name`="ds.ci.upper", 
+                            `type`="number", 
+                            `title`="Upper", 
+                            `visible`="(posthocEffsize:ds)"),
+                        list(
+                            `name`="g", 
+                            `title`="g<sub>sample</sub>", 
+                            `type`="number", 
+                            `visible`="(posthocEffsize:g)"),
+                        list(
+                            `name`="g.ci.lower", 
+                            `type`="number", 
+                            `title`="Lower", 
+                            `visible`="(posthocEffsize:g)"),
+                        list(
+                            `name`="g.ci.upper", 
+                            `type`="number", 
+                            `title`="Upper", 
+                            `visible`="(posthocEffsize:g)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1494,6 +1576,9 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param postHocCorr one or more of \code{'none'},
 #'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
 #'   and Holm Post Hoc corrections respectively.
+#' @param posthocEffsize one or more of \code{'none'},
+#'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
+#'   and Holm Post Hoc corrections respectively.
 #' @param scaling a named vector of the form \code{c(var1='type',
 #'   var2='type2')} specifying the transformation to apply to covariates, one of
 #'   \code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
@@ -1531,6 +1616,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
+#'   \code{results$posthocEffsize} \tab \tab \tab \tab \tab an array of post-hoc effect size \cr
 #'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
 #'   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$simpleInteractions} \tab \tab \tab \tab \tab an array of simple interactions tables \cr
@@ -1589,6 +1675,7 @@ gamljGlm <- function(
     simpleScaleLabels = "labels",
     postHocCorr = list(
                 "bonf"),
+    posthocEffsize,
     scaling = NULL,
     modelSelection = "lm",
     effectSize = list(
@@ -1696,6 +1783,7 @@ gamljGlm <- function(
         percvalue = percvalue,
         simpleScaleLabels = simpleScaleLabels,
         postHocCorr = postHocCorr,
+        posthocEffsize = posthocEffsize,
         scaling = scaling,
         modelSelection = modelSelection,
         effectSize = effectSize,

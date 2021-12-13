@@ -60,8 +60,14 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (!self$option("cimethod","standard")) {
                               gstart("ESTIMATE: estimating bootstrap model")
-                              self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method"))
-                              self$boot_model<-parameters::bootstrap_model(self$model)
+                              bmodel<-try_hard(parameters::bootstrap_model(self$model))
+                              if (!isFALSE(bmodel$error)) {
+                                 self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
+                              }  else {
+                                self$boot_model<-bmodel$obj
+                                self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method"))
+                              }
+                              
                               gend()
                             }                              
                             
@@ -103,9 +109,15 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_posthoc=function() {
                               
-                            procedure.posthoc(self)
-                              
+                            self$tab_posthoc<-procedure.posthoc(self)
+                            self$tab_posthoc  
                           },
+                          run_posthocEffsize=function() {
+                            if (!self$option("cimethod","standard"))
+                               warning("Bootstrap confidence intervals not available. They are computed based on t-distribution")
+                            procedure.posthoc_effsize(self)
+                          },
+                          
                           run_emmeans=function() {
                               procedure.emmeans(self)
                           },
@@ -304,7 +316,7 @@ Estimate <- R6::R6Class("Estimate",
                               if (!isFALSE(results$error))
                                  stop(results$error)
                               
-                              if (mf.aliased(self$model))
+                              if (mf.aliased(results$obj))
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
                              
                               .model<-mf.fixModel(results$obj,self)

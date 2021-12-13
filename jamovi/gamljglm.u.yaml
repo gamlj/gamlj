@@ -252,6 +252,7 @@ children:
                   type: TermLabel
       - type: LayoutBox
         margin: large
+        style: inline
         children:
           - type: Label
             label: Correction
@@ -280,6 +281,22 @@ children:
                 type: CheckBox
                 optionName: postHocCorr
                 optionPart: sidak
+          - type: Label
+            label: Effect size
+            children:
+              - name: posthocEffsize_dp
+                type: CheckBox
+                optionPart: dp
+                optionName: posthocEffsize
+              - name: postHocEffsize_ds
+                type: CheckBox
+                optionPart: ds
+                optionName: posthocEffsize
+              - name: postHocEffsize_g
+                type: CheckBox
+                optionPart: g
+                optionName: posthocEffsize
+
   - type: CollapseBox
     label: Plots
     collapsed: true

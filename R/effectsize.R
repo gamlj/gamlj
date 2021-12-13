@@ -27,48 +27,41 @@ es.relativerisk<-function(obj) {
 
 es.glm_variances<-function(model,ciwidth) {
   
-  .anova<-car::Anova(model,type=3)
-  .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
-  anovatab<-.anova
-  colnames(anovatab)<-c("ss","df","f","p")
-  effss<-anovatab$ss[!(rownames(anovatab) %in% c("Residuals"))]
-  errss<-anovatab$ss[rownames(anovatab)=="Residuals"]
+  .anova<-car::Anova(model,type="III")
+  atable<-as.data.frame(.anova[c(-1,-dim(.anova)[1]),])
+  names(atable)<-c("SS","df","test","p")
+  df<-atable$df
+  dfres<-model$df.residual
   sumr<-summary(model)
-  
-  ### whole model ###
-  f<-sumr$fstatistic[[1]]
-  edf<-sumr$fstatistic[[3]]
-  mdf<-sumr$fstatistic[[2]]
-  modss<-f*errss*mdf/edf
-  #####
-  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indices
-  ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
-  ## In unbalanced designs, the sum does not necessarily correspond to the model SS (plus residuals)
-  ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
-  ## and many properties of the non-partial indices are broken. 
-  ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy between
-  ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
-  #####
-  diff<-modss-sum(effss)
-  add<-data.frame(diff,1,1,0)
-  names(add)<-names(.anova)
-  .canova<-rbind(.anova,add)
-  last<-length(effss)[1]+1
-  eta<-effectsize::eta_squared(.canova,partial = F,ci=ciwidth,verbose=F)
-  etap<-effectsize::eta_squared(.anova,partial = T,ci=ciwidth,verbose=F)
-  omega<-  effectsize::omega_squared(.canova,partial = F,ci=ciwidth,verbose=F)
-  omegap<-  effectsize::omega_squared(.anova,partial = T,ci=ciwidth,verbose=F)
-  epsilon<-  effectsize::epsilon_squared(.canova,partial = F,ci=ciwidth,verbose=F)
-  epsilonp<-  effectsize::epsilon_squared(.anova,partial = T,ci=ciwidth,verbose=F)
+  N<-dfres+sumr$fstatistic[[2]]+1
+  ssres<-sigma(model)^2*dfres
+  ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+  SS<-df*atable$test*ssres/dfres
+  N<-dfres+sumr$fstatistic[[2]]+1
+  ssres<-sigma(model)^2*dfres
+  ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+  SS<-df*atable$test*ssres/dfres
+  es  <- SS/(ssmod+ssres)
+  etaSq<-ci_effectsize(es,df,dfres)
+  es <- SS/(SS+ssres)
+  etaSqP<-ci_effectsize(es,df,dfres)
+  es <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
+  omegaSq <- ci_effectsize(es,df,dfres)
+  es <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
+  omegaSqP<-ci_effectsize(es,df,dfres)
+  es<-(SS-(ssres*df/dfres))/(ssmod+ssres)
+  epsilonSq<-ci_effectsize(es,df,dfres)
+  es<-(SS-(ssres*df/dfres))/(SS+ssres)
+  epsilonSqP<-ci_effectsize(es,df,dfres)
+
   alist<-list()
-  for (i in seq_along(etap$Parameter)) {
-    alist[[length(alist)+1]]<-list(estimate=eta[i,2],est.ci.lower=eta[i,4],est.ci.upper=eta[i,5])
-    alist[[length(alist)+1]]<-list(estimate=etap[i,2],est.ci.lower=etap[i,4],est.ci.upper=etap[i,5])
-    alist[[length(alist)+1]]<-list(estimate=omega[i,2],est.ci.lower=omega[i,4],est.ci.upper=omega[i,5])
-    alist[[length(alist)+1]]<-list(estimate=omegap[i,2],est.ci.lower=omegap[i,4],est.ci.upper=omegap[i,5])
-    alist[[length(alist)+1]]<-list(estimate=epsilon[i,2],est.ci.lower=epsilon[i,4],est.ci.upper=epsilon[i,5])
-    alist[[length(alist)+1]]<-list(epsilonp[i,1],estimate=epsilonp[i,2],est.ci.lower=epsilonp[i,4],est.ci.upper=epsilonp[i,5])
-    
+  for (i in seq_along(etaSq$es)) {
+    alist[[length(alist)+1]]<-list(estimate=etaSq[i,1],     est.ci.lower=etaSq[i,2],      est.ci.upper=etaSq[i,3])
+    alist[[length(alist)+1]]<-list(estimate=etaSqP[i,1],    est.ci.lower=etaSqP[i,2],     est.ci.upper=etaSqP[i,3])
+    alist[[length(alist)+1]]<-list(estimate=omegaSq[i,1],   est.ci.lower=omegaSq[i,2],    est.ci.upper=omegaSq[i,3])
+    alist[[length(alist)+1]]<-list(estimate=omegaSqP[i,1],  est.ci.lower=omegaSqP[i,2],   est.ci.upper=omegaSqP[i,3])
+    alist[[length(alist)+1]]<-list(estimate=epsilonSq[i,1], est.ci.lower=epsilonSq[i,2],  est.ci.upper=epsilonSq[i,3])
+    alist[[length(alist)+1]]<-list(estimate=epsilonSqP[i,1],est.ci.lower=epsilonSqP[i,2], est.ci.upper=epsilonSqP[i,3])
   }
   
   return(alist)
@@ -114,4 +107,22 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
   as.data.frame(atable)  
 }
 
+
+ci_effectsize<-function(es,df,dfres) {
+  
+  fs<-.v_to_F(es,df,dfres)
+  cilist<-lapply(seq_along(fs),function(i) {
+    res<- effectsize:::.get_ncp_F(fs[i],df[i],dfres)
+    res[is.na(res)]<-0
+    c(es[i],.F_to_v(res,df = df[i],dfres))
+  })
+  res<-as.data.frame(do.call(rbind,cilist))
+  names(res)<-c("es","es.ci.lower","es.ci.upper")
+  res
+}
+
+
+.F_to_v<-function(f,df,dfe)  {(f*df) / (f*df + dfe)}
+
+.v_to_F<-function(e,df,dfe) pmax(0, (e/df) / ((1-e)/dfe))
 

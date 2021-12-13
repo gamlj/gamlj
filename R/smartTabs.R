@@ -99,7 +99,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               rtable<-private$.getData()
                               private$.fill(self$table,rtable)
                               private$.spaceBy()
-
                               tinfo("TABLES: table",self$nickname,"run")
                               
                             },
@@ -316,13 +315,15 @@ SmartTable <- R6::R6Class("SmartTable",
                             
                             .spaceBy=function() {
                               
+                              if (is.null(self$spaceBy))
+                                 return()
                               try_hard({
                                 
                                 if (self$spaceBy=="new")
                                   .spaceBy=private$.new_columns
                                 else 
                                   .spaceBy=self$spaceBy
-                                
+
                                 for (sb in .spaceBy) {
                                   
                                   col<-self$table$asDF[[sb]]
@@ -445,10 +446,13 @@ SmartArray <- R6::R6Class("SmartArray",
                             initialize=function(tables,estimator=NULL) {
                               
                               super$initialize(tables,estimator)
-                              itemNames<-try_hard(tables$itemNames)$obj
-                              itemKeys<-try_hard(tables$itemKeys)$obj
-                              if (is.something(itemKeys)) self$children<-itemKeys else self$children<-itemNames
-                              
+                              if (hasName(tables,"itemKeys"))
+                                    self$children<-tables$itemKeys 
+                              else 
+                                if (hasName(tables,"itemNames"))
+                                  self$children<-tables$itemNames 
+                                
+
                               
                             },
                             initTable=function() {

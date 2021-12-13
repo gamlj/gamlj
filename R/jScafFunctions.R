@@ -62,22 +62,33 @@ is.something <- function(x, ...) UseMethod(".is.something")
 #### something like try_hard({a<-3^2}) and not a<-try_hard(3^2)
 
 try_hard<-function(exp) {
-  results<-list(error=FALSE,warning=FALSE,message=FALSE,obj=FALSE)
+
+  .results<-list(error=FALSE,warning=FALSE,message=FALSE,obj=FALSE)
   
-  results$obj <- withCallingHandlers(
+  .results$obj <- withCallingHandlers(
     tryCatch(exp, error=function(e) {
-      results$error<<-conditionMessage(e)
+       mark("SOURCE:")
+       mark(conditionCall(e))
+      .results$error<<-conditionMessage(e)
       NULL
     }), warning=function(w) {
-      results$warning<<-conditionMessage(w)
+      .results$warning<<-conditionMessage(w)
       invokeRestart("muffleWarning")
     }, message = function(m) {
-      results$message<<-conditionMessage(m)
+      .results$message<<-conditionMessage(m)
       invokeRestart("muffleMessage")
     })
+
+  
+  if (!isFALSE(.results$error)) {
+               mark("CALLER:")
+               mark(rlang::enquo(exp))
+               mark("ERROR:")
+               mark(.results$error)
+  }
   
 
-  return(results)
+  return(.results)
 }
 
 
@@ -112,8 +123,6 @@ listify <- function(adata) {
 }            
 
 smartTableName<-function(root,alist,end=NULL) {
-    res<-paste(root,make.names(paste(alist,collapse = ".")),end,sep="_")
-  mark(res)
-  res
+    paste(root,make.names(paste(alist,collapse = ".")),end,sep="_")
 }
 

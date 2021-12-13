@@ -361,6 +361,66 @@ items:
           format: zto,pvalue
           visible: (postHocCorr:scheffe)
 
+  - name: posthocEffsize
+    title: Comparisons effect size
+    type: Array
+    description: an array of post-hoc effect size
+    items: (posthoc)
+    template:
+        title:  "Comparisons:  ___key___"
+        type: Table
+        clearWith:
+              - semethod
+              - ciWidth
+              - posthoc_effsize
+        columns:
+        - name: estimate
+          title: Difference
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: dp
+          title: d<sub>pop</sub>
+          type: number
+
+        - name: dp
+          title: d<sub>pop</sub>
+          type: number
+          visible: (posthocEffsize:dp)
+        - name: dp.ci.lower
+          type: number
+          title: Lower
+          visible: (posthocEffsize:dp)
+        - name: dp.ci.upper
+          type: number
+          title: Upper
+          visible: (posthocEffsize:dp)
+        - name: ds
+          title: d<sub>sample</sub>
+          type: number
+          visible: (posthocEffsize:ds)
+        - name: ds.ci.lower
+          type: number
+          title: Lower
+          visible: (posthocEffsize:ds)
+        - name: ds.ci.upper
+          type: number
+          title: Upper
+          visible: (posthocEffsize:ds)
+        - name: g
+          title: g<sub>sample</sub> 
+          type: number
+          visible: (posthocEffsize:g)
+        - name: g.ci.lower
+          type: number
+          title: Lower
+          visible: (posthocEffsize:g)
+        - name: g.ci.upper
+          type: number
+          title: Upper
+          visible: (posthocEffsize:g)
+
 
   - name: simpleEffects
     title: Simple Effects 

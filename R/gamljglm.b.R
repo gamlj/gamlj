@@ -61,6 +61,7 @@ gamljGlmClass <- R6::R6Class(
 
       aSmartObj<-SmartTable$new(self$results$main$effectsizes,estimate_machine)
       aSmartObj$ci("est",self$options$ciWidth)
+      aSmartObj$spaceBy="effect"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
       ## post hoc #####
@@ -72,7 +73,15 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$ci("est",self$options$ciWidth)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
-
+      aSmartObj<-SmartArray$new(self$results$posthocEffsize,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFromBegining<-TRUE
+      aSmartObj$expandSuperTitle<-"Comparison"
+      aSmartObj$ci("dp",self$options$ciWidth)
+      aSmartObj$ci("ds",self$options$ciWidth)
+      aSmartObj$ci("g",self$options$ciWidth)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      
       ### estimate marginal means
       
       aSmartObj<-SmartArray$new(self$results$emmeans,estimate_machine)
@@ -111,6 +120,7 @@ gamljGlmClass <- R6::R6Class(
       
       ### simple interaction
       aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
+      aSmartObj$activated<-(self$options$simpleInteractions & is.something(self$options$simpleVariable) & length(self$options$simpleModerators)>1)
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$ci("est",self$options$ciWidth)

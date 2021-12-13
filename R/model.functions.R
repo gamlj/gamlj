@@ -56,10 +56,9 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       .ci_width            <-  obj$ciwidth
       .se_method           <-  obj$options$semethod=="robust"
       
-      if (.bootstrap) .model<-obj$boot_model else .model<-model
+      if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
         
-      
-      
+
       .coefficients        <-  as.data.frame(parameters::parameters(
                                                                    model,
                                                                    robust=.se_method,
@@ -78,10 +77,10 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
         
       }
 
-      if (obj$option("effectSize","beta")) {
+      if (obj$option("effectSize","beta") & obj$hasTerms) {
         
         ## if not CI are required, we do not bootstrap again 
-        if (obj$option("showBetaCI")) ..bootstrap<-.bootstrap else ..bootstrap<-FALSE
+        if (obj$option("showBetaCI") | !is.null(obj$boot_model)) ..bootstrap<-.bootstrap else ..bootstrap<-FALSE
         if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
         
         estim<-parameters::parameters(model,
