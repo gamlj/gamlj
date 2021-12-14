@@ -20,7 +20,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             ci_info=list(),
 
                             initialize=function(table,estimator=NULL) {
-                              
+
                               self$name       <-  table$name
                               self$table      <-  table
                               self$nickname   <-  gsub('"','',gsub("/","_",table$path,fixed = TRUE),fixed=TRUE)
@@ -75,9 +75,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.ci()
                               private$.fill(self$table,rtable)
                               self$title
-                              for (col in self$table$columns)
-                                col$setTitle(fromb64(col$title))
-
                               state<-as.list(self$table$state)
                               state$notes<-list()
                               self$table$setState(state)
@@ -231,7 +228,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 warning<-output$warning
                                 
                                 if (error!=FALSE) {
-                                  tinfo("TABLES: Error in ",fun,error)
+                                  ginfo("TABLES: Error in ",fun,error)
                                   self$table$setError(error)
                                   return()
                                 }
@@ -249,7 +246,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               rtable
                             },
                             .fill=function(jtable,rtable) {
-                              
                               maxrow<-jtable$rowCount
                               
                               .insert<-function(i,w) {
@@ -278,13 +274,16 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.something(attr(rtable,"titles")))
                                 .titles<-attr(rtable,"titles")
                               else
-                                .titles<-.names
+                                .titles<-fromb64(.names)
+                              
                               .types<-unlist(lapply(rtable,class))
                               .types<-gsub("numeric","number",.types)
                               .types<-gsub("integer","number",.types)
                               .types<-gsub("factor","text",.types)
                               .present<-names(self$table$columns)
                               .names<-setdiff(.names,.present)
+                              
+                              
                               
                               if (self$expandFromBegining) {
                                 for (i in seq_along(.names)) {

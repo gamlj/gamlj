@@ -87,7 +87,6 @@ children:
             suffix: '%'
             format: number
             enable: (showParamsCI)
-            
   - type: CollapseBox
     label: Model
     collapsed: true
@@ -284,9 +283,9 @@ children:
           - type: Label
             label: Effect size
             children:
-              - name: posthocEffsize_dp
+              - name: posthocEffsize_dm
                 type: CheckBox
-                optionPart: dp
+                optionPart: dm
                 optionName: posthocEffsize
               - name: postHocEffsize_ds
                 type: CheckBox
@@ -296,7 +295,11 @@ children:
                 type: CheckBox
                 optionPart: g
                 optionName: posthocEffsize
-
+              - type: CheckBox
+                name: dci
+                label: Confidence Intervals
+                enable: (postHocEffsize_g || postHocEffsize_dm || postHocEffsize_ds)
+                
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -429,15 +432,15 @@ children:
       - type: Label
         label: Plots
         children:
-            - type: CheckBox
-              name: qqplot
-              label: Q-Q plot of residuals
-            - type: CheckBox
-              name: normPlot
-              label: Residuals histogram
-            - type: CheckBox
-              name: residPlot
-              label: Residuals-Predicted plot
+          - type: CheckBox
+            name: qqplot
+            label: Q-Q plot of residuals
+          - type: CheckBox
+            name: normPlot
+            label: Residuals histogram
+          - type: CheckBox
+            name: residPlot
+            label: Residuals-Predicted plot
   - type: CollapseBox
     label: Options
     style: list
@@ -470,7 +473,7 @@ children:
               - type: TextBox
                 name: bootR
                 format: number
-                enable: (cimethod_bcai || cimethod_bci || cimethod_quantile)
+                
           - type: Label
             label: SE Method
             children:

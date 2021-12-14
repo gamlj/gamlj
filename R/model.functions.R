@@ -80,7 +80,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       if (obj$option("effectSize","beta") & obj$hasTerms) {
         
         ## if not CI are required, we do not bootstrap again 
-        if (obj$option("showBetaCI") | !is.null(obj$boot_model)) ..bootstrap<-.bootstrap else ..bootstrap<-FALSE
+        if (!obj$option("showBetaCI")) ..bootstrap<-FALSE else ..bootstrap<-.bootstrap
         if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
         
         estim<-parameters::parameters(model,

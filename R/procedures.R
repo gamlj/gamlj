@@ -115,32 +115,85 @@ procedure.posthoc <- function(obj) {
 
 procedure.posthoc_effsize <- function(obj) {
 
-tables<-obj$tab_posthoc
-for (i in seq_along(tables)) {
-  
-  d<-effectsize::t_to_d(tables[[i]]$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
-  tables[[i]]$ds<-d$d
-  tables[[i]]$ds.ci.lower<-d$CI_low
-  tables[[i]]$ds.ci.upper<-d$CI_high
 
-  df<-tables[[i]]$df
-  J <- exp(lgamma(df / 2) - log(sqrt(df / 2)) - lgamma((df - 1) / 2)) # see effectsize package
-  tables[[i]]$g<-d$d * J
-  tables[[i]]$g.ci.lower<-d$CI_low * J
-  tables[[i]]$g.ci.upper<-d$CI_high * J
+  terms <- tob64(obj$options$posthoc)
+  dep <- obj$options$dep
+  
+  ### at the moment (version 3.0.0), no bootstrap for d indeces
+  model<-obj$model
+  
+  ### check if we need robust standard error  
+  vfun<-NULL
+  if (obj$option("semethod","robust")) {
+    vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+  }
+  
+  
+  if (length(terms) == 0) 
+    return()
+  
+  dTables <- list()
+  
+  for (ph in terms) {
+    
+    
+    ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
+    ## so the final table will look sorted in a more sensible way
+    term <- jmvcore::composeTerm(rev(ph))
+    
+    base <- .posthoc(model, term, "none", vfun=vfun)
 
-  ## here we use the model sigma as the denominator. This is the approach used in
-  ## emmeans::eff_size default. 
+    tableData <- as.data.frame(base, stringAsFactors = FALSE)
+    tableData$contrast <- as.character(tableData$contrast)
+    
+    .cont <- as.character(tableData$contrast)
+    .cont <- gsub(" - ", "-", .cont, fixed = T)
+    .cont <- gsub(" / ", "/", .cont, fixed = T)
+    
+    .labs <- sapply(.cont, function(a) {
+      sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
+    })
+    .labs <- fromb64(.labs)
+    labs <- do.call("rbind", .labs)
+    
+    cols <- make.names(c(rev(ph),rev(ph)),unique = T)
+    colnames(labs) <- cols
+    
+    tableData <- cbind(labs, tableData)
+    rownames(tableData)<-NULL
+    
+    for (col in cols)
+      tableData[,col]<-as.character(tableData[,col])
+    
+    .names<-make.names(fromb64(rev(ph)))
+    names(tableData)[1:length(cols)]<-c(paste0(.names,"1"),paste0(.names,"2"))
+   
+    
+    d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
+    tableData$ds<-d$d
+    tableData$ds.ci.lower<-d$CI_low
+    tableData$ds.ci.upper<-d$CI_high
+    
+    df<-tableData$df
+    J <- exp(lgamma(df / 2) - log(sqrt(df / 2)) - lgamma((df - 1) / 2)) # see effectsize package
+    tableData$g<-d$d * J
+    tableData$g.ci.lower<-d$CI_low * J
+    tableData$g.ci.upper<-d$CI_high * J
+    
+    ## here we use the model sigma as the denominator. This is the approach used in
+    ## emmeans::eff_size default. 
+    
+    t<-sqrt(df)*tableData$estimate/(2*sigma(model))
+    d<-effectsize::t_to_d(t,df_error = df,ci = obj$ciwidth)
+    tableData$dm<-d$d
+    tableData$dm.ci.lower<-d$CI_low
+    tableData$dm.ci.upper<-d$CI_high
   
-  t<-sqrt(df)*tables[[i]]$estimate/(2*sigma(obj$model))
-  d<-effectsize::t_to_d(t,df_error = df,ci = obj$ciwidth)
-  tables[[i]]$dp<-d$d
-  tables[[i]]$dp.ci.lower<-d$CI_low
-  tables[[i]]$dp.ci.upper<-d$CI_high
+    dTables[[length(dTables)+1]]<-tableData
+  }
   
-  
-}
-tables
+  dTables
+
 }
 
 
@@ -288,6 +341,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 .simpleEffects.default<-function(model,obj) {
 
    gstart("PROCEDURE: Simple Effects estimated")
+  
+  if (!obj$option("cimethod","standard"))
+      model<-obj$boot_model
+  
   variable<-obj$options$simpleVariable
   variable64<-tob64(variable)
   term<-obj$options$simpleModerators
@@ -340,8 +397,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       
       estimates <- do.call(emmeans::emtrends, opts_list)
     }
+    mark(estimates)
     ##
     res<-as.data.frame(estimates)
+
     if (varobj$type=="factor") {
       
             ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))

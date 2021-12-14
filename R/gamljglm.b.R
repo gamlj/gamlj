@@ -38,7 +38,7 @@ gamljGlmClass <- R6::R6Class(
 
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
-      aSmartObj$spaceAt<-1
+      #aSmartObj$spaceAt<-1
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### estimates table ###
@@ -74,12 +74,14 @@ gamljGlmClass <- R6::R6Class(
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       aSmartObj<-SmartArray$new(self$results$posthocEffsize,estimate_machine)
+      aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthocEffsize))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
-      aSmartObj$ci("dp",self$options$ciWidth)
+      aSmartObj$ci("dm",self$options$ciWidth)
       aSmartObj$ci("ds",self$options$ciWidth)
       aSmartObj$ci("g",self$options$ciWidth)
+#      aSmartObj$restNotes(self$options$dci==FALSE)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### estimate marginal means

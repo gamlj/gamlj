@@ -36,6 +36,9 @@ items:
         - cov
         - modelTerms
         - fixedIntercept
+        - cimethod
+        - semethod
+        - dci
     refs: gamlj
      
   - name: main
@@ -205,7 +208,7 @@ items:
                       title: Lower
                       type: number
                     - name: est.ci.upper
-                      title: Higher
+                      title: Upper
                       type: number
              refs: effectsize
 
@@ -235,7 +238,7 @@ items:
                       title: "Estimate"
                       type: number
                     - name: se
-                      title: "SE"
+                      title: SE
                       type: number
                     - name: est.ci.lower
                       type: number
@@ -260,7 +263,7 @@ items:
                       visible: (showParamsCI & showBetaCI)
                     - name: df
                       title: "df"
-                      type: number
+                      type: integer
                     - name: t
                       title: "t"
                       type: number
@@ -307,6 +310,7 @@ items:
         type: Table
         clearWith:
               - semethod
+              - cimethod
               - ciWidth
 
         columns:
@@ -365,14 +369,17 @@ items:
     title: Comparisons effect size
     type: Array
     description: an array of post-hoc effect size
+    visible: false
     items: (posthoc)
     template:
         title:  "Comparisons:  ___key___"
         type: Table
         clearWith:
               - semethod
+              - cimethod
               - ciWidth
-              - posthoc_effsize
+              - posthocEffsize
+              - dci
         columns:
         - name: estimate
           title: Difference
@@ -380,22 +387,18 @@ items:
         - name: se
           title: SE
           type: number
-        - name: dp
-          title: d<sub>pop</sub>
+        - name: dm
+          title: d<sub>mod</sub>
           type: number
-
-        - name: dp
-          title: d<sub>pop</sub>
-          type: number
-          visible: (posthocEffsize:dp)
-        - name: dp.ci.lower
+          visible: (posthocEffsize:dm)
+        - name: dm.ci.lower
           type: number
           title: Lower
-          visible: (posthocEffsize:dp)
-        - name: dp.ci.upper
+          visible: (posthocEffsize:dm && dci)
+        - name: dm.ci.upper
           type: number
           title: Upper
-          visible: (posthocEffsize:dp)
+          visible: (posthocEffsize:dm && dci)
         - name: ds
           title: d<sub>sample</sub>
           type: number
@@ -403,11 +406,11 @@ items:
         - name: ds.ci.lower
           type: number
           title: Lower
-          visible: (posthocEffsize:ds)
+          visible: (posthocEffsize:ds && dci)
         - name: ds.ci.upper
           type: number
           title: Upper
-          visible: (posthocEffsize:ds)
+          visible: (posthocEffsize:ds && dci)
         - name: g
           title: g<sub>sample</sub> 
           type: number
@@ -415,11 +418,11 @@ items:
         - name: g.ci.lower
           type: number
           title: Lower
-          visible: (posthocEffsize:g)
+          visible: (posthocEffsize:g && dci)
         - name: g.ci.upper
           type: number
           title: Upper
-          visible: (posthocEffsize:g)
+          visible: (posthocEffsize:g && dci)
 
 
   - name: simpleEffects
@@ -516,7 +519,7 @@ items:
                        title: "Estimate"
                        type: number
                      - name: se
-                       title: "SE"
+                       title: SE
                        type: number
                      - name: est.ci.lower
                        type: number
@@ -533,7 +536,7 @@ items:
                        format: zto
                      - name: df
                        title: "df"
-                       type: integer
+                       type: number
                      - name: test
                        title: "t"
                        type: number

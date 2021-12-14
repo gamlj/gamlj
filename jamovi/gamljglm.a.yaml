@@ -419,19 +419,25 @@ options:
       title: Effect size 
       type: NMXList
       options:
-          - name: dp
+          - name: dm
             title: Cohen's d (model SD)
           - name: ds
             title: Cohen's d (sample SD)
           - name: g
             title: Hedge's g (sample SD)
-
       description:
           R: >
-            one or more of `'none'`,  `'bonf'`,`'tukey'` 
-            `'holm'`; provide no,  Bonferroni, Tukey and
-            Holm Post Hoc corrections respectively.
+            one or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD ) 
+            or Hedge's g
+  
 
+    - name: dci
+      title: Confidence intervals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), d confidence intervals
 
 
     - name: scaling

@@ -40,11 +40,18 @@ Estimate <- R6::R6Class("Estimate",
                                     tab[["optim"]]$value<-self$model@optinfo$optimizer
                           
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
+                                
+                                ### issue some notes ###
+                                if (!self$option("cimethod","standard") & self$option("posthoc") & self$option("posthocEffsize") & self$option("dci")) 
+                                  self$dispatcher$warnings<-list(topic="posthocEffsize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
+
+                                
+                                
                                 tab
                           },                    
 
                           run_main_anova=function() {
-                            
+
                             if (!self$isProper) 
                                 self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
                             mf.anova(self$model,self)
@@ -62,7 +69,7 @@ Estimate <- R6::R6Class("Estimate",
                               gstart("ESTIMATE: estimating bootstrap model")
                               bmodel<-try_hard(parameters::bootstrap_model(self$model))
                               if (!isFALSE(bmodel$error)) {
-                                 self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
+                                 self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model (if not otherwise specified"))
                               }  else {
                                 self$boot_model<-bmodel$obj
                                 self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method"))
@@ -113,8 +120,6 @@ Estimate <- R6::R6Class("Estimate",
                             self$tab_posthoc  
                           },
                           run_posthocEffsize=function() {
-                            if (!self$option("cimethod","standard"))
-                               warning("Bootstrap confidence intervals not available. They are computed based on t-distribution")
                             procedure.posthoc_effsize(self)
                           },
                           

@@ -41,6 +41,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             postHocCorr = list(
                 "bonf"),
             posthocEffsize = NULL,
+            dci = FALSE,
             scaling = NULL,
             modelSelection = "lm",
             effectSize = list(
@@ -267,9 +268,13 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "posthocEffsize",
                 posthocEffsize,
                 options=list(
-                    "dp",
+                    "dm",
                     "ds",
                     "g"))
+            private$..dci <- jmvcore::OptionBool$new(
+                "dci",
+                dci,
+                default=FALSE)
             private$..scaling <- jmvcore::OptionArray$new(
                 "scaling",
                 scaling,
@@ -389,6 +394,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..simpleScaleLabels)
             self$.addOption(private$..postHocCorr)
             self$.addOption(private$..posthocEffsize)
+            self$.addOption(private$..dci)
             self$.addOption(private$..scaling)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
@@ -438,6 +444,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         simpleScaleLabels = function() private$..simpleScaleLabels$value,
         postHocCorr = function() private$..postHocCorr$value,
         posthocEffsize = function() private$..posthocEffsize$value,
+        dci = function() private$..dci$value,
         scaling = function() private$..scaling$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
@@ -486,6 +493,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..simpleScaleLabels = NA,
         ..postHocCorr = NA,
         ..posthocEffsize = NA,
+        ..dci = NA,
         ..scaling = NA,
         ..predicted = NA,
         ..residuals = NA,
@@ -559,7 +567,10 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "factors",
                     "cov",
                     "modelTerms",
-                    "fixedIntercept"),
+                    "fixedIntercept",
+                    "cimethod",
+                    "semethod",
+                    "dci"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -762,7 +773,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number"),
                                 list(
                                     `name`="est.ci.upper", 
-                                    `title`="Higher", 
+                                    `title`="Upper", 
                                     `type`="number")),
                             refs="effectsize"))
                         self$add(jmvcore::Table$new(
@@ -826,7 +837,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df", 
-                                    `type`="number"),
+                                    `type`="integer"),
                                 list(
                                     `name`="t", 
                                     `title`="t", 
@@ -872,6 +883,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
                         "semethod",
+                        "cimethod",
                         "ciWidth"),
                     columns=list(
                         list(
@@ -940,14 +952,17 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="posthocEffsize",
                 title="Comparisons effect size",
+                visible=FALSE,
                 items="(posthoc)",
                 template=jmvcore::Table$new(
                     options=options,
                     title="Comparisons:  ___key___",
                     clearWith=list(
                         "semethod",
+                        "cimethod",
                         "ciWidth",
-                        "posthoc_effsize"),
+                        "posthocEffsize",
+                        "dci"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -958,24 +973,20 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="SE", 
                             `type`="number"),
                         list(
-                            `name`="dp", 
-                            `title`="d<sub>pop</sub>", 
-                            `type`="number"),
-                        list(
-                            `name`="dp", 
-                            `title`="d<sub>pop</sub>", 
+                            `name`="dm", 
+                            `title`="d<sub>mod</sub>", 
                             `type`="number", 
-                            `visible`="(posthocEffsize:dp)"),
+                            `visible`="(posthocEffsize:dm)"),
                         list(
-                            `name`="dp.ci.lower", 
+                            `name`="dm.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthocEffsize:dp)"),
+                            `visible`="(posthocEffsize:dm && dci)"),
                         list(
-                            `name`="dp.ci.upper", 
+                            `name`="dm.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthocEffsize:dp)"),
+                            `visible`="(posthocEffsize:dm && dci)"),
                         list(
                             `name`="ds", 
                             `title`="d<sub>sample</sub>", 
@@ -985,12 +996,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="ds.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthocEffsize:ds)"),
+                            `visible`="(posthocEffsize:ds && dci)"),
                         list(
                             `name`="ds.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthocEffsize:ds)"),
+                            `visible`="(posthocEffsize:ds && dci)"),
                         list(
                             `name`="g", 
                             `title`="g<sub>sample</sub>", 
@@ -1000,12 +1011,12 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="g.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthocEffsize:g)"),
+                            `visible`="(posthocEffsize:g && dci)"),
                         list(
                             `name`="g.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthocEffsize:g)")))))
+                            `visible`="(posthocEffsize:g && dci)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1141,7 +1152,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="test", 
                                     `title`="t", 
@@ -1576,9 +1587,9 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param postHocCorr one or more of \code{'none'},
 #'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
 #'   and Holm Post Hoc corrections respectively.
-#' @param posthocEffsize one or more of \code{'none'},
-#'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
-#'   and Holm Post Hoc corrections respectively.
+#' @param posthocEffsize one or more of \code{'dm'},  \code{'ds'},\code{'g'}
+#'   for Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g
+#' @param dci \code{TRUE} or \code{FALSE} (default), d confidence intervals
 #' @param scaling a named vector of the form \code{c(var1='type',
 #'   var2='type2')} specifying the transformation to apply to covariates, one of
 #'   \code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
@@ -1676,6 +1687,7 @@ gamljGlm <- function(
     postHocCorr = list(
                 "bonf"),
     posthocEffsize,
+    dci = FALSE,
     scaling = NULL,
     modelSelection = "lm",
     effectSize = list(
@@ -1784,6 +1796,7 @@ gamljGlm <- function(
         simpleScaleLabels = simpleScaleLabels,
         postHocCorr = postHocCorr,
         posthocEffsize = posthocEffsize,
+        dci = dci,
         scaling = scaling,
         modelSelection = modelSelection,
         effectSize = effectSize,
