@@ -42,11 +42,8 @@ Estimate <- R6::R6Class("Estimate",
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
                                 
                                 ### issue some notes ###
-                                if (!self$option("cimethod","standard") & self$option("posthoc") & self$option("posthocEffsize") & self$option("dci")) 
+                                if ((!self$option("cimethod","wald")) & self$option("posthoc") & self$option("posthocEffsize") & self$option("dci")) 
                                   self$dispatcher$warnings<-list(topic="posthocEffsize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
-
-                                
-                                
                                 tab
                           },                    
 
@@ -65,20 +62,9 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_coefficients=function() {
                             
-                            if (!self$option("cimethod","standard")) {
-                              gstart("ESTIMATE: estimating bootstrap model")
-                              bmodel<-try_hard(parameters::bootstrap_model(self$model))
-                              if (!isFALSE(bmodel$error)) {
-                                 self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model (if not otherwise specified"))
-                              }  else {
-                                self$boot_model<-bmodel$obj
-                                self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method"))
-                              }
-                              
-                              gend()
-                            }                              
-                            
-                            
+                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                              private$.bootstrap_model()
+
                             tab<-NULL
                             if (self$isProper) {
                               tab       <-  mf.parameters(self$model,self)
@@ -115,7 +101,10 @@ Estimate <- R6::R6Class("Estimate",
                                tab
                           },
                           run_posthoc=function() {
-                              
+                            
+                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                              private$.bootstrap_model()
+                            
                             self$tab_posthoc<-procedure.posthoc(self)
                             self$tab_posthoc  
                           },
@@ -124,10 +113,17 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_emmeans=function() {
-                              procedure.emmeans(self)
+                            
+                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                              private$.bootstrap_model()
+                            
+                            procedure.emmeans(self)
                           },
                           
                           run_simpleEffects_anova=function() {
+                            
+                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                              private$.bootstrap_model()
                             
                             if (is.null(self$tab_simpleAnova))
                                 private$.estimateSimpleEffects()
@@ -136,6 +132,9 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_simpleEffects_coefficients=function() {
+                            
+                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                              private$.bootstrap_model()
                             
                             if (is.null(self$tab_simpleCoefficients))
                                private$.estimateSimpleEffects()
@@ -146,6 +145,10 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_simpleInteractions=function() {
+                            
+                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                              private$.bootstrap_model()
+                            
                             
                             procedure.simpleInteractions(self)
                           },
@@ -329,6 +332,17 @@ Estimate <- R6::R6Class("Estimate",
                               return(.model)
 
 
+                          },
+                          .bootstrap_model=function() {
+                            
+                                gstart("ESTIMATE: estimating bootstrap model")
+                                bmodel<-try_hard(parameters::bootstrap_model(self$model,iterations=self$options$bootR))
+                                if (!isFALSE(bmodel$error)) {
+                                  self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
+                                }  else {
+                                  self$boot_model<-bmodel$obj
+                                  self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method (",self$options$cimethod,"), with",self$options$bootR,"iterations."))
+                                }
                           },
                           .estimateTests=function() {
                             

@@ -126,3 +126,10 @@ smartTableName<-function(root,alist,end=NULL) {
     paste(root,make.names(paste(alist,collapse = ".")),end,sep="_")
 }
 
+
+transnames<-function(original,ref) {
+  unlist(lapply(original,function(x) {
+    i<-names(ref)[sapply(ref,function(y) any(y %in% x))]
+    ifelse(length(i)>0,i,x)
+  }))
+}

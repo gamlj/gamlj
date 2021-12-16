@@ -14,7 +14,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             fixedIntercept = TRUE,
             showParamsCI = TRUE,
             showBetaCI = TRUE,
-            cimethod = "standard",
+            cimethod = "wald",
             bootR = 1000,
             semethod = "standard",
             contrasts = NULL,
@@ -112,11 +112,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
                 cimethod,
-                default="standard",
+                default="wald",
                 options=list(
-                    "standard",
+                    "wald",
                     "quantile",
-                    "bci",
                     "bcai"))
             private$..bootR <- jmvcore::OptionNumber$new(
                 "bootR",
@@ -570,7 +569,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "fixedIntercept",
                     "cimethod",
                     "semethod",
-                    "dci"),
+                    "dci",
+                    "bootR"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -752,7 +752,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "modelTerms",
                                 "contrasts",
                                 "fixedIntercept",
-                                "ciWidth"),
+                                "ciWidth",
+                                "cimethod",
+                                "bootR"),
                             columns=list(
                                 list(
                                     `name`="effect", 
@@ -789,6 +791,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixedIntercept",
                                 "ciWidth",
                                 "cimethod",
+                                "bootR",
                                 "semethod"),
                             columns=list(
                                 list(
@@ -884,7 +887,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "semethod",
                         "cimethod",
-                        "ciWidth"),
+                        "ciWidth",
+                        "bootR"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -961,6 +965,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "semethod",
                         "cimethod",
                         "ciWidth",
+                        "bootR",
                         "posthocEffsize",
                         "dci"),
                     columns=list(
@@ -1119,7 +1124,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "percvalue",
                                 "simpleScaleLabels",
                                 "semethod",
-                                "ciWidth"),
+                                "cimethod",
+                                "ciWidth",
+                                "bootR"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1191,9 +1198,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "scaling",
                                     "dep_scale",
                                     "fixedIntercept",
-                                    "simpleScaleLabels",
-                                    "ciWidth",
-                                    "emmeans"),
+                                    "simpleScaleLabels"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1264,7 +1269,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "fixedIntercept",
                                     "simpleScaleLabels",
                                     "ciWidth",
-                                    "emmeans"),
+                                    "emmeans",
+                                    "ciWidth",
+                                    "cimethod",
+                                    "bootR",
+                                    "semethod"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1311,7 +1320,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "ciWidth",
                         "emmeans",
-                        "semethod"),
+                        "semethod",
+                        "bootR"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1395,7 +1405,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="test", 
                                     `type`="number", 
-                                    `title`="Statistic"),
+                                    `title`="Statistics"),
                                 list(
                                     `name`="df1", 
                                     `type`="integer"),
@@ -1660,7 +1670,7 @@ gamljGlm <- function(
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
     showBetaCI = TRUE,
-    cimethod = "standard",
+    cimethod = "wald",
     bootR = 1000,
     semethod = "standard",
     contrasts = NULL,

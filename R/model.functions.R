@@ -50,7 +50,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 .parameters.default<-function(model,obj) {
 
       
-      .bootstrap           <-  obj$options$cimethod %in% c("boot","quantile","bci","bcai")
+      .bootstrap           <-  obj$options$cimethod %in% c("quantile","bcai")
       .iterations          <-  obj$options$bootR
       .ci_method           <-  obj$options$cimethod
       .ci_width            <-  obj$ciwidth
@@ -77,21 +77,30 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
         
       }
 
-      if (obj$option("effectSize","beta") & obj$hasTerms) {
+      if (obj$option("effectSize","beta")) {
+        
+          if (obj$hasTerms) {
         
         ## if not CI are required, we do not bootstrap again 
         if (!obj$option("showBetaCI")) ..bootstrap<-FALSE else ..bootstrap<-.bootstrap
         if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
-        
         estim<-parameters::parameters(model,
                                       standardize="refit",
                                       bootstrap=..bootstrap,
                                       ci_method=.ci_method,
+                                      ci=.ci_width,
                                       iterations=.iterations)
         .coefficients$beta  <-  estim$Coefficient
         .coefficients$beta.ci.lower<-estim$CI_low
         .coefficients$beta.ci.upper<-estim$CI_high
-
+         gend()
+        
+          } else {
+            .coefficients$beta  <-  0
+            .coefficients$beta.ci.lower<-0
+            .coefficients$beta.ci.upper<-0
+            
+          }
       }
 
       if (obj$option("effectSize","expb")) {

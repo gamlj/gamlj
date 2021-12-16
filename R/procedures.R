@@ -34,13 +34,13 @@ procedure.posthoc <- function(obj) {
   terms <- tob64(obj$options$posthoc)
   dep <- obj$options$dep
   
-  ### we set the model, if we need bootstrap ci, we give the bootstraped model
+  ### we set the model, if we need bootstrap ci, we give the bootstrapped model
    model<-obj$model
    
   .model<-model
-   if (!obj$option("cimethod","standard")) 
+   if (!obj$option("cimethod","wald")) 
        .model<-obj$boot_model
-  
+
   ### check if we need robust standard error  
   vfun<-NULL
   if (obj$option("semethod","robust")) {
@@ -251,11 +251,12 @@ procedure.posthoc_effsize <- function(obj) {
   termf <- stats::as.formula(paste("pairwise ~", term))
 
   opts_list<-list(object=model,specs=termf, type = "response")
+  
   if (is.something(vfun))
     opts_list[["vcov."]]<-vfun    
+  
   referenceGrid <- do.call(emmeans::emmeans,opts_list)
-  results<-as.data.frame(parameters::model_parameters(referenceGrid,ci=width,ci_method=method))
-  results<-results[results$Component=="contrasts",]
+  results<-as.data.frame(parameters::parameters(referenceGrid$contrasts,ci=width,ci_method=method))
   results<-as.data.frame(cbind(results$CI_low,results$CI_high))
   names(results)<-c("est.ci.lower","est.ci.upper")
   results
@@ -340,11 +341,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
 .simpleEffects.default<-function(model,obj) {
 
-   gstart("PROCEDURE: Simple Effects estimated")
-  
-  if (!obj$option("cimethod","standard"))
-      model<-obj$boot_model
-  
+  gstart("PROCEDURE: Simple Effects estimated")
   variable<-obj$options$simpleVariable
   variable64<-tob64(variable)
   term<-obj$options$simpleModerators
@@ -366,81 +363,100 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
         labels[[.term]]<-var$levels_labels 
       }
     }
+    .get_se<-function(alist) {
     ### now we get the estimated means #######
-    opts_list<-list(model,
+    ### to handle bootstrap, we need to estimate the effects without CI
+    ### and then add the CI with a specific method declared in options$cimethod
+
+
+    if (varobj$type=="factor") {
+      alist[["specs"]]=c(variable64,term64)
+      ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
+      referenceGrid<-do.call(emmeans::emmeans,alist)
+      grid<-emmeans::contrast(referenceGrid,
+                                   by=term64,
+                                   method =.local.emmc,
+                                   datamatic=varobj
+                                   )
+    } else {
+      alist[["specs"]]<-term64
+      alist[["var"]]<-variable64
+      grid <- do.call(emmeans::emtrends, alist)
+    }
+    grid
+    }
+    ##
+    
+    opts_list<-list(object=model,
                     at=conditions,
-                    nesting = NULL
-                    )
+                    nesting = NULL,
+                    infer=c(TRUE,TRUE),
+                    estName="estimate"
+    )
     
     if (obj$option("dfmethod"))
       opts_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
     
     if (obj$option("semethod","robust"))
       opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+    
+    
+    
+    grid<-.get_se(opts_list)
+    estimates<-as.data.frame(grid)
 
-
-    if (varobj$type=="factor") {
-      ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
-      opts_list[["specs"]]=c(variable64,term64)
-      referenceGrid<-do.call(emmeans::emmeans,opts_list)
-      estimates<-emmeans::contrast(referenceGrid,
-                                   by=term64,
-                                   method =.local.emmc,
-                                   datamatic=varobj)
-
-    }
-    else {
+    ## deal with  CI
+    if (!obj$option("cimethod","wald")) {
       
-      opts_list[["specs"]]<-term64
-      opts_list[["var"]]<-variable64
-      opts_list[["infer"]]<-c(T,T)
+      opts_list$object<-obj$boot_model
+      cidata<-.get_se(opts_list)
+      cidata<-as.data.frame(parameters::parameters(cidata,ci_method=obj$options$cimethod))
+      estimates$est.ci.lower<-cidata$CI_low
+      estimates$est.ci.upper<-cidata$CI_high
       
-      estimates <- do.call(emmeans::emtrends, opts_list)
-    }
-    mark(estimates)
-    ##
-    res<-as.data.frame(estimates)
-
-    if (varobj$type=="factor") {
-      
-            ci<-as.data.frame(stats::confint(estimates,level=obj$ciwidth))
-            res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
-            names(res)<-c("contrast",term64,"estimate","se","df","test","p","est.ci.lower","est.ci.upper")
-            
     } else {
-            names(res)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper","test","p")
-            res$contrast<-varobj$name
+      
+      cidata<-stats::confint(grid,level = obj$ciwidth)    
+      estimates$est.ci.lower<-cidata$lower.CL
+      estimates$est.ci.upper<-cidata$upper.CL
     }
 
+    .transnames<-list(test="t.ratio",p="p.value",se="SE")
+    names(estimates)<-transnames(names(estimates),.transnames)    
+
+    if (!("contrast" %in% names(estimates)))
+          estimates$contrast<-variable
+
+    
     for (.name in term64) {
-            res[[.name]]<-factor(res[[.name]])
-            levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
-            res[[.name]]<-as.character(res[[.name]])
+            estimates[[.name]]<-factor(estimates[[.name]])
+            levels(estimates[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+            estimates[[.name]]<-as.character(estimates[[.name]])
     }
     
-    res$contrast<-as.character(res$contrast)
+    estimates$contrast<-as.character(estimates$contrast)
     ### add effect sizes depending on the model and table
-    class(res)<-c(paste0("simple_params_",obj$options$modelSelection),class(res))
-    params<-add_effect_size(res,model,variable64)
+    class(estimates)<-c(paste0("simple_params_",obj$options$modelSelection),class(estimates))
+    .params<-add_effect_size(estimates,model,variable64)
     
     
     ### now we build the anova table ###
-    res<-as.data.frame(emmeans::test(estimates, join=TRUE, by = term64))
-    names(res)<-c(term64,"df1","df2","test","p")
+    .anova<-as.data.frame(emmeans::test(grid, join=TRUE, by = term64))
+    names(.anova)<-c(term64,"df1","df2","test","p")
    
     
     ### fix labels and make sure they are not factors or stuff    
     for (.name in term64) {
-      res[[.name]]<-factor(res[[.name]])
-      levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
-      res[[.name]]<-as.character(res[[.name]])
+      .anova[[.name]]<-factor(.anova[[.name]])
+      levels(.anova[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+      .anova[[.name]]<-as.character(.anova[[.name]])
     }
     #### fix names ####
     
     
     ### make fix depending of the type of model ###    
-    class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
-    anova<-add_effect_size(res,model)
+    class(.anova)<-c(paste0("simple_anova_",obj$options$modelSelection),class(.anova))
+    .anova<-add_effect_size(.anova,model)
     ### check some stuff 
     .all <- c(term64,variable64)
     test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
@@ -450,12 +466,12 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
 
   gend()    
-  return(list(anova,params))
+  return(list(.anova,.params))
 
 }  
 
 .local.emmc<-function(levs, datamatic=NULL) {
-  #  print(datamatic)
+
   # get the contrast weights
   codes <- datamatic$contrast_values
   if (datamatic$method=="dummy")
@@ -563,7 +579,6 @@ procedure.simpleInteractions<-function(obj) {
       while(j>1) {
         
         results=try_hard({
-            if (j==3) warning("a problem in coefficients 3")
             ### mods are the variables that form the interaction with simple (variable)
             mods<-term64[j:n]
             conditions<-lapply(seq_along(term64),function(i) {
@@ -582,28 +597,34 @@ procedure.simpleInteractions<-function(obj) {
             .names<-setdiff(term64,mods)
             ## this is the table key, if needed
             .key<-c(variable,rev(term[1:(j-1)]))
+            test<-any(jmvcore::composeTerm(sort(.key)) %in% jmvcore::composeTerms(lapply(obj$options$modelTerms,sort)))
+            if (!test) {
+              msg<-paste("Interaction",jmvcore::composeTerm(.key),"is not in the model, results may be misleading.")
+              obj$dispatcher$warnings<-list(topic="simpleInteractions_anova",message=msg)
+              obj$dispatcher$warnings<-list(topic="simpleInteractions_coefficients",message=msg)
+              
+            }
             
-            opts_list<-list(object=obj$model,
-                            at = conditions
+            grid_list<-list(object=obj$model,
+                            at = conditions,
+                            estName="estimate"
                             )
             
             if (obj$option("dfmethod"))
-              opts_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
+              grid_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
             
             if (obj$option("semethod","robust"))
-              opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+              grid_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
             
             if (varobj$type=="numeric") {
-              
-              opts_list[["specs"]]<-term64
-              opts_list[["var"]]<-variable64
-              emgrid<-do.call(emmeans::emtrends,opts_list)
+                grid_list[["specs"]]<-term64
+                grid_list[["var"]]<-variable64
+                emgrid<-do.call(emmeans::emtrends,grid_list)
               
             }
             else  { 
-              
-                  opts_list[["specs"]]<-c(variable64,term64)
-                  emgrid<-do.call(emmeans::emmeans,opts_list)
+                  grid_list[["specs"]]<-c(variable64,term64)
+                  emgrid<-do.call(emmeans::emmeans,grid_list)
                   .names<-c(variable64,.names)
             }
             
@@ -613,9 +634,36 @@ procedure.simpleInteractions<-function(obj) {
             
             opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
             resgrid<-do.call(emmeans::contrast,opts_list)
-            ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
             res<-as.data.frame(resgrid)
-            res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
+            
+            ### deal with confidence intervals ###
+
+            
+            if (!obj$option("cimethod","wald")) {
+              
+              grid_list$object<-obj$boot_model
+              
+              if (varobj$type=="numeric") 
+                emgrid<-do.call(emmeans::emtrends,grid_list)
+              else  
+                emgrid<-do.call(emmeans::emmeans,grid_list)
+              
+              opts_list[["object"]]<-emgrid
+              resgrid<-do.call(emmeans::contrast,opts_list)
+              cidata<-as.data.frame(parameters::model_parameters(resgrid,ci_method=obj$options$cimethod))
+              res$est.ci.lower<-cidata$CI_low
+              res$est.ci.upper<-cidata$CI_high
+              
+            } else {
+              
+              ci<-as.data.frame(stats::confint(resgrid,level=obj$ciwidth))
+              res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
+              
+            }
+            
+            
+            ##
+            
             names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","t","p","est.ci.lower","est.ci.upper")
             names(res)[1:length(.names)]<-.names
             
@@ -624,6 +672,7 @@ procedure.simpleInteractions<-function(obj) {
                     labnames<-c("focal",.names)
             } else
                     labnames<-.names
+            
             res$effect<-apply(res[,labnames],1,jmvcore::stringifyTerm)
             
             for (.name in mods) {
@@ -644,10 +693,8 @@ procedure.simpleInteractions<-function(obj) {
             
       params<-results$obj            
 
-      
+###### now we build the anova table ##########      
       results<-try_hard({ 
-              if (j==2) warning("a problem in anova 2")
-        
               res<-emmeans::test(resgrid,by=mods,join=T)
               names(res)[(ncol(res)-3):ncol(res)]<-c("df1","df2","test","p")
         
@@ -680,12 +727,10 @@ procedure.simpleInteractions<-function(obj) {
       j<-j-1
         }
       
-      key<-"simpleInteractions_.._anova"
+#      key<-"simpleInteractions_.._anova"
       
-      obj$dispatcher$warnings<-list(topic=key,message="this goes to all simple int anova")
 
-      obj$dispatcher$warnings<-list(topic="simpleInteractions",message="this gos to all simple int ")
-      
+
       gend()
  
       return(resultsList)

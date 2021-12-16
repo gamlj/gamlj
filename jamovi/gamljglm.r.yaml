@@ -39,6 +39,7 @@ items:
         - cimethod
         - semethod
         - dci
+        - bootR
     refs: gamlj
      
   - name: main
@@ -192,7 +193,9 @@ items:
                          - contrasts
                          - fixedIntercept
                          - ciWidth
-                         
+                         - cimethod
+                         - bootR
+
              columns:
                     - name: effect
                       title: Effect
@@ -224,6 +227,7 @@ items:
                     - fixedIntercept
                     - ciWidth
                     - cimethod
+                    - bootR
                     - semethod
 
              columns:
@@ -312,6 +316,7 @@ items:
               - semethod
               - cimethod
               - ciWidth
+              - bootR
 
         columns:
         - name: estimate
@@ -378,6 +383,7 @@ items:
               - semethod
               - cimethod
               - ciWidth
+              - bootR
               - posthocEffsize
               - dci
         columns:
@@ -510,7 +516,10 @@ items:
                  - percvalue
                  - simpleScaleLabels
                  - semethod
+                 - cimethod
                  - ciWidth
+                 - bootR
+                 
               columns:
                      - name: contrast
                        title: "Effect"
@@ -567,8 +576,6 @@ items:
                 - dep_scale
                 - fixedIntercept
                 - simpleScaleLabels
-                - ciWidth
-                - emmeans
              columns:
                    - name: effect
                      title: 'Effect'
@@ -630,7 +637,11 @@ items:
                 - simpleScaleLabels
                 - ciWidth
                 - emmeans
-             
+                - ciWidth
+                - cimethod
+                - bootR
+                - semethod
+
              columns:
                    - name: effect
                      title: 'Effect'
@@ -672,6 +683,7 @@ items:
             - ciWidth
             - emmeans
             - semethod
+            - bootR
 
         columns:
         - name: estimate
@@ -743,7 +755,7 @@ items:
               title: Test
             - name: test
               type: number
-              title: Statistic
+              title: Statistics
             - name: df1
               type: integer
             - name: df2

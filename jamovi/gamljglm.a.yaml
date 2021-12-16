@@ -122,16 +122,14 @@ options:
     - name: cimethod
       title: CI Method
       type: List
-      default: standard
+      default: wald
       options:
-        - name:  standard
+        - name:  wald
           title: Standard (fast)
         - name: quantile
           title: Bootstrap (Percent)
-        - name:  bci
-          title: Bootstrap (BC)
         - name:  bcai
-          title: Bootstrap (BCA)
+          title: Bootstrap (BCa)
           
     - name: bootR
       title: Bootstrap rep.

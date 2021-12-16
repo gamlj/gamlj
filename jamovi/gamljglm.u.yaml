@@ -287,19 +287,18 @@ children:
                 type: CheckBox
                 optionPart: dm
                 optionName: posthocEffsize
-              - name: postHocEffsize_ds
+              - name: posthocEffsize_ds
                 type: CheckBox
                 optionPart: ds
                 optionName: posthocEffsize
-              - name: postHocEffsize_g
+              - name: posthocEffsize_g
                 type: CheckBox
                 optionPart: g
                 optionName: posthocEffsize
               - type: CheckBox
                 name: dci
                 label: Confidence Intervals
-                enable: (postHocEffsize_g || postHocEffsize_dm || postHocEffsize_ds)
-                
+                enable: (posthocEffsize_g || posthocEffsize_dm || posthocEffsize_ds)
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -455,17 +454,14 @@ children:
             label: CI Method
             children:
               - type: RadioButton
-                name: cimethod_standard
+                name: cimethod_wald
                 optionName: cimethod
-                optionPart: standard
+                optionPart: wald
+
               - type: RadioButton
                 name: cimethod_quantile
                 optionName: cimethod
                 optionPart: quantile
-              - type: RadioButton
-                name: cimethod_bci
-                optionName: cimethod
-                optionPart: bci
               - type: RadioButton
                 name: cimethod_bcai
                 optionName: cimethod
@@ -473,7 +469,6 @@ children:
               - type: TextBox
                 name: bootR
                 format: number
-                
           - type: Label
             label: SE Method
             children:

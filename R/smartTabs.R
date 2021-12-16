@@ -1,10 +1,19 @@
+### for warnings and error, tables responds to:
+###  tablename formed as "groupname_tablename"
+###  groupname (if any)
+###  arrayname_key
+###  arrayname_key_tablename (if any)
+###  arrayname_tablename (if any)
+
+
+
 SmartTable <- R6::R6Class("SmartTable",
                           cloneable=FALSE,
                           class=FALSE,
                           public=list(
                             name=NULL,
                             table=NULL,
-                            topics=list(),
+                            topics=NULL,
                             nickname=NULL,
                             expandable=FALSE,
                             expandSuperTitle=NULL,
@@ -26,12 +35,13 @@ SmartTable <- R6::R6Class("SmartTable",
                               self$nickname   <-  gsub('"','',gsub("/","_",table$path,fixed = TRUE),fixed=TRUE)
                               self$nickname   <-  stringr::str_replace_all(self$nickname,'[\\]"\\[]',"")
                               self$nickname   <-  make.names(self$nickname)
-                              
-                              self$topics     <-  self$nickname
                               private$.estimator  <-   estimator
                               private$.init_function<-paste0("init_",self$nickname)
                               private$.run_function<-paste0("run_",self$nickname)
                               self$activated<-self$table$visible
+                              
+                              if ("key" %in% names(table) ) 
+                                self$key<-table$key
                               
 
                               if (inherits(private$.estimator,"SmartArray")) {
@@ -46,19 +56,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                 self$spaceMethod            <- private$.estimator$spaceMethod
                                 self$spaceAt                <- private$.estimator$spaceAt
                                 self$spaceBy                <- private$.estimator$spaceBy
-                                
                               }
 
-                              if ("key" %in% names(table) )
-                                if (is.something(table$key)) {
-                                    .key<-paste(make.names(table$key),collapse = ".")
-                                     topic<-gsub(.key,"",self$nickname,fixed=TRUE)
-                                     topic<-stringr::str_replace_all(topic,"__","_")
-                                     topic<-stringr::str_replace(topic,"_$","")
-                                     self$topics<-append_list(self$topics,topic)
-                                     self$key<-table$key
-                                     
-                                }
                               
                               
                             },
@@ -69,6 +68,11 @@ SmartTable <- R6::R6Class("SmartTable",
                                 return()
                               }
                               
+                              ### init warnings topics ####
+                                private$.set_topics()
+
+                              ### ###
+
                               self$table$setVisible(TRUE)
                               rtable<-private$.getData()
                               if (self$expandable) private$.expand(rtable)
@@ -125,6 +129,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             setNotes=function(dispatcher=NULL) {
                               
                                 if (is.something(dispatcher)) {
+                                    mark(self$topics)
                                     topics<-intersect(dispatcher$warnings_topics,self$topics)
                                     for (t in topics) {
                                       for (m in dispatcher$warnings[[t]])
@@ -296,6 +301,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                                        type=.types[i],
                                                        combineBelow=cb)
                                 }
+                                
                                 private$.new_columns<-seq_along(.names)
                                 
                               } else {
@@ -315,14 +321,18 @@ SmartTable <- R6::R6Class("SmartTable",
                             .spaceBy=function() {
                               
                               if (is.null(self$spaceBy))
-                                 return()
+                                   return()
+                              
+                              if (self$spaceBy==0)
+                                return()
+                              
                               try_hard({
                                 
                                 if (self$spaceBy=="new")
                                   .spaceBy=private$.new_columns
                                 else 
                                   .spaceBy=self$spaceBy
-
+                                
                                 for (sb in .spaceBy) {
                                   
                                   col<-self$table$asDF[[sb]]
@@ -370,10 +380,10 @@ SmartTable <- R6::R6Class("SmartTable",
                             .listify = function(adata) {
                               
                               if (is.null(adata)) {
-                                if ("notes" %in% names(self$table)) {
-                                  .len<-length(self$table$notes)
-                                  private$.setNote("No result found")
-                                }
+                                # if ("notes" %in% names(self$table)) {
+                                #   .len<-length(self$table$notes)
+                                #   private$.setNote("No result found")
+                                # }
                                 return()
                               }
                               
@@ -426,6 +436,47 @@ SmartTable <- R6::R6Class("SmartTable",
                               attr(obj,"keys")<-attrs[["keys"]]
                               attr(obj,"titles")<-attrs[["titles"]]
                               obj
+                            },
+                            .nice_name=function(aname) {
+                              a<-stringr::str_replace_all(aname,'[\\]"\\[]',"")
+                              a<-strsplit(a,".",fixed = T)
+                              a<-make.names(a)
+                              paste(a,collapse = ".")
+                            },
+                            .set_topics=function() {
+                              
+                              test<-TRUE
+                              who<-self$table
+                              .topics<-list(private$.nice_name(who$name))
+                              while(test) {
+                                if (inherits(who$parent,c("Group","Array"))) {
+                                  .topics<-append_list(.topics,private$.nice_name(who$parent$name))
+                                  who<-who$parent
+                                  test<-TRUE
+                                } else
+                                  test<-FALSE
+                              }
+                              
+                              .topics<-.topics[-length(.topics)]
+                              l<-length(.topics)
+                              i<-1
+                              while(i<l) {
+                                self$topics<-append_list(self$topics,paste(.topics[l:i],collapse = "_"))
+                                i<-i+1
+                              }
+                              
+                              if (is.null(self$key))
+                                 return()
+                              .key<-paste(self$key,collapse = ".")
+                              test<-which(.topics %in% .key)
+                              .topics<-.topics[-test]
+                              l<-length(.topics)
+                              i<-1
+                              while(i<l) {
+                                self$topics<-append_list(self$topics,paste(.topics[l:i],collapse = "_"))
+                                i<-i+1
+                              }
+                              
                             }
                             
                             
@@ -466,7 +517,6 @@ SmartArray <- R6::R6Class("SmartArray",
                               .keys<-attr(rtables,"keys")
 
                               if (!is.something(self$table$items)) {
-                                
                                 
                                 for (i in seq_along(rtables)) {
                                   
