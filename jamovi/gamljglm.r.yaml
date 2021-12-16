@@ -681,6 +681,7 @@ items:
         type: Table
         clearWith:
             - ciWidth
+            - cimethod
             - emmeans
             - semethod
             - bootR

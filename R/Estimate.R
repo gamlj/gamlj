@@ -116,7 +116,8 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
                               private$.bootstrap_model()
-                            
+                            if (is.something(self$infomatic$emmeans))
+                               self$dispatcher$warnings<-list(topic="emmeans",message=paste("Estimated marginal means are",self$infomatic$emmeans))
                             procedure.emmeans(self)
                           },
                           
@@ -127,7 +128,7 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (is.null(self$tab_simpleAnova))
                                 private$.estimateSimpleEffects()
-                            warnings("this is direct to simple anova")
+                            
                             self$tab_simpleAnova
                           },
                           

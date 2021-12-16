@@ -469,6 +469,7 @@ children:
               - type: TextBox
                 name: bootR
                 format: number
+                enable: (cimethod_quantile | cimethod_bcai)
           - type: Label
             label: SE Method
             children:

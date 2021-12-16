@@ -1319,6 +1319,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
                         "ciWidth",
+                        "cimethod",
                         "emmeans",
                         "semethod",
                         "bootR"),

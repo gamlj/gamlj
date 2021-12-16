@@ -293,7 +293,7 @@ procedure.emmeans<-function(obj) {
     }
   
     ### prepare the options ###
-    opts_list<-list(obj$model,
+    opts_list<-list(object=obj$model,
                     specs=term64,
                     at=conditions,
                     type=type,
@@ -315,6 +315,15 @@ procedure.emmeans<-function(obj) {
     tableData<-as.data.frame(referenceGrid)
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
+    
+    if (!obj$option("cimethod","wald")) {
+      
+      opts_list$object<-obj$boot_model
+      referenceGrid<-do.call(emmeans::emmeans,opts_list)
+      cidata<-as.data.frame(parameters::parameters(referenceGrid,ci_method=obj$options$cimethod,ci=obj$ciwidth))
+      tableData$est.ci.lower<-cidata$CI_low
+      tableData$est.ci.upper<-cidata$CI_high
+    }
    
     ### fix the labels  ###
 
@@ -600,9 +609,7 @@ procedure.simpleInteractions<-function(obj) {
             test<-any(jmvcore::composeTerm(sort(.key)) %in% jmvcore::composeTerms(lapply(obj$options$modelTerms,sort)))
             if (!test) {
               msg<-paste("Interaction",jmvcore::composeTerm(.key),"is not in the model, results may be misleading.")
-              obj$dispatcher$warnings<-list(topic="simpleInteractions_anova",message=msg)
-              obj$dispatcher$warnings<-list(topic="simpleInteractions_coefficients",message=msg)
-              
+              obj$dispatcher$warnings<-list(topic="simpleInteractions",message=msg)
             }
             
             grid_list<-list(object=obj$model,

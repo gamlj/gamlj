@@ -1,9 +1,12 @@
 ### for warnings and error, tables responds to:
-###  tablename formed as "groupname_tablename"
-###  groupname (if any)
+###  tablename
+###  groupname 
+###  groupname_tablename
+###  arrayname
 ###  arrayname_key
-###  arrayname_key_tablename (if any)
-###  arrayname_tablename (if any)
+###  arrayname_key_tablename
+###  arrayname_tablename
+
 
 
 
@@ -129,7 +132,6 @@ SmartTable <- R6::R6Class("SmartTable",
                             setNotes=function(dispatcher=NULL) {
                               
                                 if (is.something(dispatcher)) {
-                                    mark(self$topics)
                                     topics<-intersect(dispatcher$warnings_topics,self$topics)
                                     for (t in topics) {
                                       for (m in dispatcher$warnings[[t]])
@@ -460,7 +462,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               .topics<-.topics[-length(.topics)]
                               l<-length(.topics)
                               i<-1
-                              while(i<l) {
+                              while(i<=l) {
                                 self$topics<-append_list(self$topics,paste(.topics[l:i],collapse = "_"))
                                 i<-i+1
                               }
