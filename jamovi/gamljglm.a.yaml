@@ -5,7 +5,7 @@ menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
 completeWhenFilled: true
-export: true
+export: false
 description:
     main: |
            General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 

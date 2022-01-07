@@ -15,4 +15,11 @@
         `year`=2020, 
         `title`="Compute and interpret indices of effect size", 
         `publisher`="CRAN", 
-        `url`="https://github.com/easystats/effectsize"))
+        `url`="https://github.com/easystats/effectsize"), 
+    `parameters`=list(
+        `type`="software", 
+        `author`="L\u00FCdecke, Ben-Shachar, Patil &  Makowski", 
+        `year`=2020, 
+        `title`="Extracting, Computing and Exploring the Parameters of Statistical Models using R", 
+        `publisher`="CRAN", 
+        `url`="https://github.com/easystats/parameters"))

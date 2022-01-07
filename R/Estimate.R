@@ -14,6 +14,7 @@ Estimate <- R6::R6Class("Estimate",
                           boot_model=NULL,
                           tab_simpleAnova=NULL,
                           tab_simpleCoefficients=NULL,
+                          boot_variances=NULL,
                           
                           initialize=function(options,dispatcher,datamatic) {
                             super$initialize(options,dispatcher,datamatic)
@@ -77,7 +78,15 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_effectsizes=function()  {
                             
-                            es.glm_variances(self$model,self$ciwidth)
+                            if (!self$option("cimethod","wald")) {
+                              gstart("ESTIMATE: bootstrapping variances")
+                              self$boot_variances<-boot::boot(self$model$model,
+                                                              statistic = es.var_boot_fun,
+                                                              R = self$options$bootR,
+                                                              model=self$model)
+                              gend()
+                            }
+                            es.glm_variances(self$model,self)
                             
                           },
                           
@@ -139,8 +148,6 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (is.null(self$tab_simpleCoefficients))
                                private$.estimateSimpleEffects()
-                            
-                            self$dispatcher$warnings<-list(topic="simpleEffects_anova",message="indirect simple")
                             
                             self$tab_simpleCoefficients
                           },

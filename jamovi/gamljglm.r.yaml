@@ -186,7 +186,8 @@ items:
              type: Table
              visible: (effectSizeInfo)
              description: a table of effect size indeces
-            
+             refs: effectsize
+
              clearWith:
                          - dep
                          - modelTerms
@@ -213,7 +214,6 @@ items:
                     - name: est.ci.upper
                       title: Upper
                       type: number
-             refs: effectsize
 
            - name: coefficients
              title:  Parameter Estimates (Coefficients)
@@ -276,7 +276,7 @@ items:
                       type: number
                       format: zto,pvalue
 
-
+             refs: parameters
 
 
            - name: contrastCodeTables
@@ -750,6 +750,9 @@ items:
           description: a table of homogeneity tests
           visible: (homoTest)
           rows: 2
+          clearWith:
+              - modelTerms
+              - dep
           columns:
             - name: name
               type: text
@@ -770,6 +773,9 @@ items:
           type: Table
           description: a table of normality tests
           visible: (normTest)
+          clearWith:
+              - modelTerms
+              - dep
           columns:
             - name: name
               title: Test

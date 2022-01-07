@@ -92,8 +92,9 @@ try_hard<-function(exp) {
 }
 
 
-sourcifyList<-function(option,def) {
+sourcifyList<-function(option,def=NULL) {
   alist<-option$value
+  mark(option)
   test<-all(sapply(alist,function(a) a$type)==def)
   if (test)
     return("")

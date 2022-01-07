@@ -25,7 +25,7 @@ es.relativerisk<-function(obj) {
 
 }      
 
-es.glm_variances<-function(model,ciwidth) {
+es.glm_variances<-function(model,obj) {
   
   .anova<-car::Anova(model,type="III")
   atable<-as.data.frame(.anova[c(-1,-dim(.anova)[1]),])
@@ -42,17 +42,17 @@ es.glm_variances<-function(model,ciwidth) {
   ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
   SS<-df*atable$test*ssres/dfres
   es  <- SS/(ssmod+ssres)
-  etaSq<-ci_effectsize(es,df,dfres)
+  etaSq<-ci_effectsize(es,df,dfres,obj,"eta")
   es <- SS/(SS+ssres)
-  etaSqP<-ci_effectsize(es,df,dfres)
+  etaSqP<-ci_effectsize(es,df,dfres,obj,"etap")
   es <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
-  omegaSq <- ci_effectsize(es,df,dfres)
+  omegaSq <- ci_effectsize(es,df,dfres,obj,"omega")
   es <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
-  omegaSqP<-ci_effectsize(es,df,dfres)
+  omegaSqP<-ci_effectsize(es,df,dfres,obj,"omegap")
   es<-(SS-(ssres*df/dfres))/(ssmod+ssres)
-  epsilonSq<-ci_effectsize(es,df,dfres)
+  epsilonSq<-ci_effectsize(es,df,dfres,obj,"epsilon")
   es<-(SS-(ssres*df/dfres))/(SS+ssres)
-  epsilonSqP<-ci_effectsize(es,df,dfres)
+  epsilonSqP<-ci_effectsize(es,df,dfres,obj,"epsilonp")
 
   alist<-list()
   for (i in seq_along(etaSq$es)) {
@@ -108,21 +108,88 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
 }
 
 
-ci_effectsize<-function(es,df,dfres) {
+ci_effectsize<-function(es,df,dfres,obj,what="any") {
   
-  fs<-.v_to_F(es,df,dfres)
-  cilist<-lapply(seq_along(fs),function(i) {
-    res<- effectsize:::.get_ncp_F(fs[i],df[i],dfres)
-    res[is.na(res)]<-0
-    c(es[i],.F_to_v(res,df = df[i],dfres))
-  })
-  res<-as.data.frame(do.call(rbind,cilist))
-  names(res)<-c("es","es.ci.lower","es.ci.upper")
-  res
+  if (is.null(obj$boot_variances)) {
+  
+        fs<-.v_to_F(es,df,dfres)
+        cilist<-lapply(seq_along(fs),function(i) {
+                  res<- effectsize:::.get_ncp_F(fs[i],df[i],dfres,conf.level = obj$ciwidth)
+                  res[is.na(res)]<-0
+                  c(es[i],.F_to_v(res,df = df[i],dfres))
+              })
+        res<-as.data.frame(do.call(rbind,cilist))
+        names(res)<-c("es","es.ci.lower","es.ci.upper")
+        res
+  } else {
+    terms<-seq_along(es)  
+    get_boot_ci(what,terms,obj$boot_variances,type=obj$options$cimethod,width=obj$ciwidth,df = df,dfres=dfres,N=N)
+    
+    }
+}
+.F_to_v<-function(f,df,dfres)  {(f*df) / (f*df + dfres)}
+
+.v_to_F<-function(e,df,dfres) pmax(0, (e/df) / ((1-e)/dfres))
+
+
+
+### bootstrap ####
+
+es.var_boot_fun<-function(data,indices,model=NULL) {
+  .data<-data[indices,]
+  .model<-stats::update(model,data=.data)
+  .anova<-car::Anova(.model,type="III",singular.ok=T)
+   atable<-as.data.frame(.anova[!(rownames(.anova) %in% c("(Intercept)","Residuals")),])
+   names(atable)<-c("ss","df","test","p")
+   dfres<-model$df.residual
+   sumr<-summary(model)
+   ssres<-sigma(model)^2*dfres
+   ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+   ss<-atable$ss
+   unlist(c(ss,ssmod,ssres))
 }
 
+## computes bootstrap conf int for variances effect size indices 
+get_boot_ci<-function(effsize,terms,bootresults,type,width,df,dfres,N) {
 
-.F_to_v<-function(f,df,dfe)  {(f*df) / (f*df + dfe)}
-
-.v_to_F<-function(e,df,dfe) pmax(0, (e/df) / ((1-e)/dfe))
+  type<-switch(type,
+               quantile="perc",
+               bcai="bca")  
+  fun<-switch(effsize,
+              eta=function(ss,ssmod,ssres,df,dfres,N) ss/(ssmod+ssres),
+              etap=function(ss,ssmod,ssres,df,dfres,N) ss/(ss+ssres),
+              omega=function(ss,ssmod,ssres,df,dfres,N) (ss-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres)),
+              omegap=function(ss,ssmod,ssres,df,dfres,N) (ss-(ssres*df/dfres))/(ss+(ssres*(N-df)/dfres)),
+              epsilon=function(ss,ssmod,ssres,df,dfres,N) (ss-(ssres*df/dfres))/(ssmod+ssres),
+              epsilonp=function(ss,ssmod,ssres,df,dfres,N) (ss-(ssres*df/dfres))/(ss+ssres),
+  )
+  
+  sterms<-seq_along(terms)
+  l<-length(bootresults$t0)
+  ss<-bootresults$t0[sterms]
+  ssmod<-bootresults$t0[l-1]
+  ssres<-bootresults$t0[l]
+  N<-dim(bootresults$data)[1]
+  es  <- fun(ss,ssmod,ssres,df,dfres,N)
+  bootresults$t0[sterms]<-es
+  
+  for (i in 1:nrow(bootresults$t)) {
+    
+    ss<-bootresults$t[i,sterms]
+    ssmod<-bootresults$t[i,l-1]
+    ssres<-bootresults$t[i,l]
+    es  <- fun(ss,ssmod,ssres,df,dfres,N)
+    bootresults$t[i,sterms]<-es
+    
+  }
+  alist<-lapply(sterms, function(i) {
+    r<-boot::boot.ci(bootresults,type=type,conf = width,index=i)
+    c(r$t0,r[[length(r)]][c(4:5)])
+  })
+  res<-as.data.frame(do.call(rbind,alist))
+  names(res)<-c("es","est.ci.lower","est.ci.upper")
+  res$type<-effsize
+  res$effect<-terms
+  res
+}
 

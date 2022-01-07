@@ -146,9 +146,6 @@ gamljGlmClass <- R6::R6Class(
       }
       
 
-
-
-      
       private$.data_machine<-data_machine
       private$.estimate_machine<-estimate_machine
       
@@ -265,6 +262,13 @@ gamljGlmClass <- R6::R6Class(
   if (name == 'postHoc') {
     if (length(value) == 0)
       return('')
+  }
+  if (name=="simpleModerators") {
+    vec<-""
+    mark(option$value)
+    mark(option$vars)
+    mark(option$valueAsSource)
+    
   }
   
   super$.sourcifyOption(option)

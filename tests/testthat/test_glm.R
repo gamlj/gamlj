@@ -4,8 +4,9 @@ mod<-gamlj::gamljGlm(
   dep = "len",
   factors = "supp",
   modelTerms = ~ supp,
-)
-tob64(1)
+  posthocEffsize = "dm")
+mod
+
 res<-mod$main$fixed$asDF
 params<-res$estimate
 test_that("glm estimates are correct", {
