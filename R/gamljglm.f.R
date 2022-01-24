@@ -255,9 +255,6 @@ gamljGlm <- function(
   if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
   if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
   
-  ## here are fixes for R ###
-  if (is.null(posthocEffsize))
-     mark("no effect")
 
   options <- gamljGlmOptions$new(
     caller = caller,

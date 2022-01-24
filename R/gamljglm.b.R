@@ -263,14 +263,7 @@ gamljGlmClass <- R6::R6Class(
     if (length(value) == 0)
       return('')
   }
-  if (name=="simpleModerators") {
-    vec<-""
-    mark(option$value)
-    mark(option$vars)
-    mark(option$valueAsSource)
-    
-  }
-  
+
   super$.sourcifyOption(option)
 }
 )
