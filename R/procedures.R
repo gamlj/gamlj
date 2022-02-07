@@ -31,7 +31,7 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 
 procedure.posthoc <- function(obj) {
   
-  terms <- tob64(obj$options$posthoc)
+  terms <- obj$options$posthoc
   dep <- obj$options$dep
   
   ### we set the model, if we need bootstrap ci, we give the bootstrapped model
@@ -53,34 +53,32 @@ procedure.posthoc <- function(obj) {
   
   postHocTables <- list()
   
-  for (ph in terms) {
+  for (.vars in terms) {
     
-  
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
-    term <- jmvcore::composeTerm(rev(ph))
-    
-      none <- .posthoc(model, term, "none", vfun=vfun)
-      bonferroni <- .posthoc(model, term, "bonferroni",vfun=vfun)
-      holm <- .posthoc(model, term, "holm",vfun=vfun)
-      tukey <- .posthoc(model, term, "tukey",vfun=vfun)
-      sidak <- .posthoc(model, term, "sidak",vfun=vfun)
-      scheffe <- .posthoc(model, term, "scheffe",vfun=vfun)
+    .revvars<-rev(.vars)
+    .term64<-jmvcore::composeTerm(tob64(.revvars))
+     none <- .posthoc(model, .term64, "none", vfun=vfun)
+     bonferroni <- .posthoc(model, .term64, "bonferroni",vfun=vfun)
+     holm <- .posthoc(model, .term64, "holm",vfun=vfun)
+     tukey <- .posthoc(model, .term64, "tukey",vfun=vfun)
+     sidak <- .posthoc(model, .term64, "sidak",vfun=vfun)
+     scheffe <- .posthoc(model, .term64, "scheffe",vfun=vfun)
       
-      cidata <- .posthoc_ci(.model,term,obj$ciwidth,obj$options$cimethod,vfun=vfun)
+     cidata <- .posthoc_ci(.model,.term64,obj$ciwidth,obj$options$cimethod,vfun=vfun)
 
 
-      tableData <- as.data.frame(none, stringAsFactors = FALSE)
-      tableData$contrast <- as.character(tableData$contrast)
+     tableData <- as.data.frame(none, stringAsFactors = FALSE)
+     tableData$contrast <- as.character(tableData$contrast)
      
-      tableData$bonf <- bonferroni$p
-      tableData$holm <- holm$p
-      tableData$tukey <- tukey$p
-      tableData$scheffe <- scheffe$p
-      tableData$sidak <- sidak$p
-      tableData$est.ci.lower<-cidata$est.ci.lower       
-      tableData$est.ci.upper<-cidata$est.ci.upper       
-
+     tableData$bonf <- bonferroni$p
+     tableData$holm <- holm$p
+     tableData$tukey <- tukey$p
+     tableData$scheffe <- scheffe$p
+     tableData$sidak <- sidak$p
+     tableData$est.ci.lower<-cidata$est.ci.lower       
+     tableData$est.ci.upper<-cidata$est.ci.upper       
     .cont <- as.character(tableData$contrast)
     .cont <- gsub(" - ", "-", .cont, fixed = T)
     .cont <- gsub(" / ", "/", .cont, fixed = T)
@@ -92,17 +90,15 @@ procedure.posthoc <- function(obj) {
     .labs <- fromb64(.labs)
     labs <- do.call("rbind", .labs)
 
-    cols <- make.names(c(rev(ph),rev(ph)),unique = T)
-    colnames(labs) <- cols
-
-    tableData <- cbind(labs, tableData)
-    rownames(tableData)<-NULL
+    .vars  <-make.names(.revvars,unique = T)
+    .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
+     colnames(labs) <- .names
+     tableData <- cbind(labs, tableData)
+     rownames(tableData)<-NULL
     
-    for (col in cols)
-      tableData[,col]<-as.character(tableData[,col])
+    for (.name in .names)
+      tableData[,.name]<-as.character(tableData[,.name])
     
-   .names<-make.names(fromb64(rev(ph)))
-    names(tableData)[1:length(cols)]<-c(paste0(.names,"1"),paste0(.names,"2"))
 
     if ("Response" %in% names(tableData))
         tableData$Response<-as.character(tableData$Response)
@@ -116,9 +112,8 @@ procedure.posthoc <- function(obj) {
 procedure.posthoc_effsize <- function(obj) {
 
 
-  terms <- tob64(obj$options$posthoc)
+  terms <- obj$options$posthoc
   dep <- obj$options$dep
-  
   ### at the moment (version 3.0.0), no bootstrap for d indeces
   model<-obj$model
   
@@ -134,15 +129,14 @@ procedure.posthoc_effsize <- function(obj) {
   
   dTables <- list()
   
-  for (ph in terms) {
+  for (.vars in terms) {
     
-    
+   .revvars<-rev(.vars)
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
-    term <- jmvcore::composeTerm(rev(ph))
+   .term64 <- jmvcore::composeTerm(tob64(.revvars))
     
-    base <- .posthoc(model, term, "none", vfun=vfun)
-
+    base <- .posthoc(model, .term64, "none", vfun=vfun)
     tableData <- as.data.frame(base, stringAsFactors = FALSE)
     tableData$contrast <- as.character(tableData$contrast)
     
@@ -154,31 +148,29 @@ procedure.posthoc_effsize <- function(obj) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
     })
     .labs <- fromb64(.labs)
-    labs <- do.call("rbind", .labs)
+     labs <- do.call("rbind", .labs)
+
+     .vars  <- make.names(.revvars,unique = T)
+     .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
+      colnames(labs) <- .names
     
-    cols <- make.names(c(rev(ph),rev(ph)),unique = T)
-    colnames(labs) <- cols
+      tableData <- cbind(labs, tableData)
+      rownames(tableData)<-NULL
     
-    tableData <- cbind(labs, tableData)
-    rownames(tableData)<-NULL
+      for (.name in .names)
+         tableData[,.name]<-as.character(tableData[,.name])
     
-    for (col in cols)
-      tableData[,col]<-as.character(tableData[,col])
     
-    .names<-make.names(fromb64(rev(ph)))
-    names(tableData)[1:length(cols)]<-c(paste0(.names,"1"),paste0(.names,"2"))
-   
+      d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
+      tableData$ds<-d$d
+      tableData$ds.ci.lower<-d$CI_low
+      tableData$ds.ci.upper<-d$CI_high
     
-    d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
-    tableData$ds<-d$d
-    tableData$ds.ci.lower<-d$CI_low
-    tableData$ds.ci.upper<-d$CI_high
-    
-    df<-tableData$df
-    J <- exp(lgamma(df / 2) - log(sqrt(df / 2)) - lgamma((df - 1) / 2)) # see effectsize package
-    tableData$g<-d$d * J
-    tableData$g.ci.lower<-d$CI_low * J
-    tableData$g.ci.upper<-d$CI_high * J
+      df<-tableData$df
+      J <- exp(lgamma(df / 2) - log(sqrt(df / 2)) - lgamma((df - 1) / 2)) # see effectsize package
+      tableData$g<-d$d * J
+      tableData$g.ci.lower<-d$CI_low * J
+      tableData$g.ci.upper<-d$CI_high * J
     
     ## here we use the model sigma as the denominator. This is the approach used in
     ## emmeans::eff_size default. 
@@ -218,8 +210,6 @@ procedure.posthoc_effsize <- function(obj) {
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(FALSE,TRUE))
       names(results)<-c("contrast","estimate","se","df","test","p")
-      
-      
   results
 }
 
@@ -435,7 +425,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
     if (!("contrast" %in% names(estimates)))
           estimates$contrast<-variable
-
+    
     
     for (.name in term64) {
             estimates[[.name]]<-factor(estimates[[.name]])
@@ -446,9 +436,9 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     estimates$contrast<-as.character(estimates$contrast)
     ### add effect sizes depending on the model and table
     class(estimates)<-c(paste0("simple_params_",obj$options$modelSelection),class(estimates))
+    ## fix the names of the columns
     .params<-add_effect_size(estimates,model,variable64)
-    
-    
+    names(.params)[names(.params) %in% term64]<-paste0("mod_",make.names(fromb64(term64),unique = T))
     ### now we build the anova table ###
     .anova<-as.data.frame(emmeans::test(grid, join=TRUE, by = term64))
     names(.anova)<-c(term64,"df1","df2","test","p")
@@ -461,7 +451,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       .anova[[.name]]<-as.character(.anova[[.name]])
     }
     #### fix names ####
-    
+    .names<-paste0("mod_",make.names(term,unique = T))
+    names(.anova)[1:length(.names)]<-.names
     
     ### make fix depending of the type of model ###    
     class(.anova)<-c(paste0("simple_anova_",obj$options$modelSelection),class(.anova))
@@ -687,7 +678,7 @@ procedure.simpleInteractions<-function(obj) {
                levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
                res[[.name]]<-as.character(res[[.name]])
             }
-            names(res)[names(res)%in% mods]<-make.names(paste0("var_",fromb64(mods)))
+            names(res)[names(res)%in% mods]<-make.names(paste0("mod_",fromb64(mods)))
             res
       })
         
@@ -715,7 +706,7 @@ procedure.simpleInteractions<-function(obj) {
                   levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
                   res[[.name]]<-as.character(res[[.name]])
               }
-              names(res)[1:length(mods)]<-make.names(paste0("var_",fromb64(mods)))
+              names(res)[1:length(mods)]<-make.names(paste0("mod_",fromb64(mods)))
               class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
               res<-add_effect_size(res,obj$model)
               res

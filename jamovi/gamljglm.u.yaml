@@ -233,13 +233,13 @@ children:
     stretchFactor: 1
     children:
       - type: Supplier
-        name: postHocSupplier
+        name: posthocSupplier
         persistentItems: false
         stretchFactor: 1
         format: term
         events:
-          change: './gamlj.events::onChange_postHocSupplier'
-          update: './gamlj.events::onUpdate_postHocSupplier'
+          change: './gamlj.events::onChange_posthocSupplier'
+          update: './gamlj.events::onUpdate_posthocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
@@ -256,29 +256,29 @@ children:
           - type: Label
             label: Correction
             children:
-              - name: postHocCorr_none
+              - name: posthocCorr_none
                 type: CheckBox
                 optionPart: none
-                optionName: postHocCorr
-              - name: postHocCorr_bonf
+                optionName: posthocCorr
+              - name: posthocCorr_bonf
                 type: CheckBox
                 optionPart: bonf
-                optionName: postHocCorr
-              - name: postHocCorr_tukey
+                optionName: posthocCorr
+              - name: posthocCorr_tukey
                 type: CheckBox
                 optionPart: tukey
-                optionName: postHocCorr
-              - name: postHocCorr_holm
+                optionName: posthocCorr
+              - name: posthocCorr_holm
                 type: CheckBox
                 optionPart: holm
-                optionName: postHocCorr
-              - name: postHocCorr_scheffe
+                optionName: posthocCorr
+              - name: posthocCorr_scheffe
                 type: CheckBox
-                optionName: postHocCorr
+                optionName: posthocCorr
                 optionPart: scheffe
-              - name: postHocCorr_sidak
+              - name: posthocCorr_sidak
                 type: CheckBox
-                optionName: postHocCorr
+                optionName: posthocCorr
                 optionPart: sidak
           - type: Label
             label: Effect size

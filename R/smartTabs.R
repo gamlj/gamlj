@@ -209,10 +209,9 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.null(fun)) 
                                 return(TRUE)
                               
-                              if (is.character(fun) & !(fun %in% names(private$.estimator))  ) {
-                                return(TRUE)
-                                
-                              }
+                              if (is.character(fun))
+                                   if (!(fun %in% names(private$.estimator))) 
+                                        return(TRUE)
                               
                               return(filled)
                               
@@ -270,18 +269,16 @@ SmartTable <- R6::R6Class("SmartTable",
                                 .insert(i,t)
                               }
                               
-                              
-                              
+
                             },
                             .expand=function(rtable) {
                               
                               rtable<-private$.framefy(rtable)
                               .names    <-  names(rtable)
-                              
                               if (is.something(attr(rtable,"titles")))
                                 .titles<-attr(rtable,"titles")
                               else
-                                .titles<-fromb64(.names)
+                                .titles<-fromb64(names(rtable))
                               
                               .types<-unlist(lapply(rtable,class))
                               .types<-gsub("numeric","number",.types)
@@ -294,8 +291,12 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               if (self$expandFromBegining) {
                                 for (i in seq_along(.names)) {
-                                  cb<-ifelse(i %in% self$combineBelow,TRUE,FALSE)
-                                  if (self$combineBelow=="new") cb<-TRUE
+                                  cb<-FALSE
+                                  if (inherits(self$combineBelow,"integer"))
+                                         if(i %in% self$combineBelow) cb<-TRUE
+                                  else
+                                         if (self$combineBelow=="new") cb<-TRUE
+                                        
                                   self$table$addColumn(index=i,
                                                        name = .names[[i]], 
                                                        title = .titles[[i]], 

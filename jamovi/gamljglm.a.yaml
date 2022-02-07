@@ -113,7 +113,7 @@ options:
     - name: showBetaCI
       title: Betas
       type: Bool
-      default: true
+      default: false
       description:
           R: >
             `TRUE` (default) or `FALSE` , standardized parameters CI in table
@@ -301,7 +301,9 @@ options:
       type: Terms
       default:
       description:
-          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
+             The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
+             also as a list of the form '`list("x","z",c("x","z")`'
 
 
     - name: simpleVariable
@@ -388,7 +390,7 @@ options:
 
 ############ generic with some specs ###########
 
-    - name: postHocCorr
+    - name: posthocCorr
       title: Correction
       type: NMXList
       options:
@@ -404,7 +406,6 @@ options:
             title: Scheffe
           - name: sidak
             title: Sidak
-
       default:
           - bonf
       description:

@@ -255,8 +255,19 @@ gamljGlm <- function(
   if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
   if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
   
-
-  options <- gamljGlmOptions$new(
+  ### fix options for  R interface ##
+  
+  if (is.something(names(scaling))) 
+    scaling<-lapply(names(scaling), function(a) list(var=a,type=scaling[[a]]))
+  
+  if (is.something(names(contrasts))) 
+    contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
+  
+  if (is.something(posthoc)) 
+     mark(posthoc)
+        
+  
+    options <- gamljGlmOptions$new(
     caller = caller,
     dep = dep,
     factors = factors,

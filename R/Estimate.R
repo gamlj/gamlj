@@ -117,6 +117,7 @@ Estimate <- R6::R6Class("Estimate",
                             self$tab_posthoc<-procedure.posthoc(self)
                             self$tab_posthoc  
                           },
+                          
                           run_posthocEffsize=function() {
                             procedure.posthoc_effsize(self)
                           },
@@ -137,7 +138,6 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (is.null(self$tab_simpleAnova))
                                 private$.estimateSimpleEffects()
-                            
                             self$tab_simpleAnova
                           },
                           

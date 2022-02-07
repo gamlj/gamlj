@@ -13,7 +13,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modelTerms = NULL,
             fixedIntercept = TRUE,
             showParamsCI = TRUE,
-            showBetaCI = TRUE,
+            showBetaCI = FALSE,
             cimethod = "wald",
             bootR = 1000,
             semethod = "standard",
@@ -38,7 +38,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             cvalue = 1,
             percvalue = 25,
             simpleScaleLabels = "labels",
-            postHocCorr = list(
+            posthocCorr = list(
                 "bonf"),
             posthocEffsize = NULL,
             dci = FALSE,
@@ -108,7 +108,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..showBetaCI <- jmvcore::OptionBool$new(
                 "showBetaCI",
                 showBetaCI,
-                default=TRUE)
+                default=FALSE)
             private$..cimethod <- jmvcore::OptionList$new(
                 "cimethod",
                 cimethod,
@@ -251,9 +251,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "uvalues",
                     "uvalues_labels"),
                 default="labels")
-            private$..postHocCorr <- jmvcore::OptionNMXList$new(
-                "postHocCorr",
-                postHocCorr,
+            private$..posthocCorr <- jmvcore::OptionNMXList$new(
+                "posthocCorr",
+                posthocCorr,
                 options=list(
                     "none",
                     "bonf",
@@ -391,7 +391,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..cvalue)
             self$.addOption(private$..percvalue)
             self$.addOption(private$..simpleScaleLabels)
-            self$.addOption(private$..postHocCorr)
+            self$.addOption(private$..posthocCorr)
             self$.addOption(private$..posthocEffsize)
             self$.addOption(private$..dci)
             self$.addOption(private$..scaling)
@@ -441,7 +441,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         cvalue = function() private$..cvalue$value,
         percvalue = function() private$..percvalue$value,
         simpleScaleLabels = function() private$..simpleScaleLabels$value,
-        postHocCorr = function() private$..postHocCorr$value,
+        posthocCorr = function() private$..posthocCorr$value,
         posthocEffsize = function() private$..posthocEffsize$value,
         dci = function() private$..dci$value,
         scaling = function() private$..scaling$value,
@@ -490,7 +490,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..cvalue = NA,
         ..percvalue = NA,
         ..simpleScaleLabels = NA,
-        ..postHocCorr = NA,
+        ..posthocCorr = NA,
         ..posthocEffsize = NA,
         ..dci = NA,
         ..scaling = NA,
@@ -952,7 +952,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="p<sub>sidak</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(postHocCorr:scheffe)")))))
+                            `visible`="(postHocCorr:sidak)")))))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="posthocEffsize",

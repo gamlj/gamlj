@@ -368,7 +368,7 @@ items:
           title: p<sub>sidak</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:scheffe)
+          visible: (postHocCorr:sidak)
 
   - name: posthocEffsize
     title: Comparisons effect size

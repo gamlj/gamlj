@@ -148,8 +148,8 @@ Syntax <- R6::R6Class(
             nrow<-nrow*(self$datamatic$dep$nlevels)
           }
           df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
-          .cols<-make.names(.term)
-          .names<-c(paste0(.cols,"1"),".vs.",paste0(.cols,"2"))
+          .vars<-make.names(.term,unique = T)
+          .names <- c(paste0(.vars,"_lev1"),".vs.",paste0(.vars,"_lev2"))
           .titles<-c(.term,"vs",.term)
           names(df)<-.names
           df$.vs.="-"
@@ -190,33 +190,35 @@ Syntax <- R6::R6Class(
     },
     
     init_simpleEffects_anova=function() {
-      
-
-        .var<-tob64(self$options$simpleVariable)
-        .mods<-tob64(self$options$simpleModerators)
-        nrow<-prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
-        ncol<-length(.mods)
+        .var64<-tob64(self$options$simpleVariable)
+        .mods<-self$options$simpleModerators
+        .mods64<-tob64(.mods)
+        nrow<-prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
+        ncol<-length(.mods64)
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
-        names(df)<-rev(.mods)
+        names(df)<-paste0("mod_",make.names(.mods,unique = T))
+        attr(df,"titles")<-.mods
         df
         
     },
     
     init_simpleEffects_coefficients=function() {
       
-        .var<-tob64(self$options$simpleVariable)
-        focal<-self$datamatic$variables[[.var]]
+        .var64<-tob64(self$options$simpleVariable)
+        focal<-self$datamatic$variables[[.var64]]
         neffects<-focal$neffects
-        .mods<-tob64(self$options$simpleModerators)
+        .mods<-self$options$simpleModerators
+        .mods64<-tob64(.mods)
         
-        nrow<-neffects*prod(unlist(lapply(.mods,function(m) self$datamatic$variables[[m]]$nlevels)))
-        ncol<-length(.mods)
+        nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
+        ncol<-length(.mods64)
         
         if (self$options$modelSelection=="multinomial")
           nrow <- nrow * (self$datamatic$dep$nlevels-1)
         
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
-        names(df)<-rev(.mods)
+        names(df)<-paste0("mod_",make.names(.mods,unique = T))
+        attr(df,"titles")<-.mods
         df
 
     },
@@ -239,7 +241,7 @@ Syntax <- R6::R6Class(
           .params<-setdiff(.term,.mods)
 
           inter_term <- append_list(inter_term,.inters)
-          .names<-make.names(paste0("var_",.params))
+          .names<-make.names(paste0("mod_",.params))
           
           .params64<-tob64(.params)
           ntests<-prod(unlist(lapply(.params64,function(m) self$datamatic$variables[[m]]$nlevels)))

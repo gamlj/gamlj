@@ -68,12 +68,12 @@ const events = {
         ui.dep.setValue(null);
       },
 
-    onChange_postHocSupplier: function(ui) {
-        let values = this.itemsToValues(ui.postHocSupplier.value());
-//        this.checkValue(ui.postHoc, true, values, FormatDef.term);
+    onChange_posthocSupplier: function(ui) {
+        let values = this.itemsToValues(ui.posthocSupplier.value());
+        this.checkValue(ui.posthoc, true, values, FormatDef.term);
     },
 
-    onUpdate_postHocSupplier: function(ui) {
+    onUpdate_posthocSupplier: function(ui) {
         updatePostHocSupplier(ui, this);
     },
 
@@ -200,7 +200,7 @@ var updatePostHocSupplier = function(ui, context) {
         if (containsCovariate(term, covariatesList) === false)
             list.push(term);
     }
-    ui.postHocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
+    ui.posthocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
 };
 
 var updateEmmeansSupplier = function(ui, context) {
