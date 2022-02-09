@@ -213,10 +213,23 @@ gamlj_simpleEffects <- function(object, variable = NULL, moderator = NULL, three
 #' @export
 
 gamlj_data <- function(object) {
+    
     if (isS4(object$model)) 
-        data <- object$model@frame else data <- object$model$model
-    names(data) <- jmvcore::fromB64(names(data))
-    data
+        .data <- object$model@frame 
+    else 
+        .data <- object$model$model
+    
+    .names<-names(.data)
+    good<-grep("I(",.names,fixed=T,invert = T)
+    .data<-.data[,good]
+    .names<-fromb64(.names[good])
+    names(.data)<-.names
+    .factors<-.names[sapply(.data,is.factor)]
+    for (f in .factors) {
+        levels(.data[[f]])<-gsub(LEVEL_SYMBOL,"",levels(.data[[f]]))
+        colnames(contrasts(.data[[f]]))<-gsub(FACTOR_SYMBOL,"",colnames(contrasts(.data[[f]])))
+    }
+    .data
 }
 
 #' Predicted values from GAMLj models 
@@ -393,15 +406,22 @@ residuals.gamljGlmMixedResults <- function(object, type = "deviance", ...) {
 
 gamlj_model <- function(object) {
 
-    rf <- attr(object$model, "refit")
-    command <- rf$command
-    if (!is.null(rf$lib)) 
-        command <- paste0(rf$lib, "::", rf$command)
-    rf$eoptions[["data"]] <- gamlj_data(object)
-    fun <- getfun(command)
-    model <- do.call(fun, rf$eoptions)
-    model <- mf.setModelCall(model, rf)
+    model<-object$model
+    
+    .call<-model$call
+    .command<-.call[[1]]
+    .formula<-as.formula(.call[[2]])
+    dep<-.formula[[2]]
+    flist<-jmvcore::decomposeFormula(.formula)
+    flist[[1]]<-as.numeric(flist[[1]])
+    newformula<-jmvcore::composeFormula(rht = fromb64(flist),lht = fromb64(dep))
+    .data<-gamlj_data(object)
+    model<-do.call(eval(.command),list(formula=newformula,data=.data))
+    .call<-as.call(list(.command,formula=newformula,data=.data))
+    model$call<-.call
     model
+
+    
 }
 
 
@@ -439,12 +459,13 @@ posthoc <- function(object, ...) UseMethod("posthoc")
 posthoc.gamlj <- function(object, formula = NULL, ...) {
 
     if (is.something(formula)) 
-        object <- stats::update(object, postHoc = formula, ...) else if (is.something(list(...))) 
-        object <- stats::update(object, ...)
-    if (length(object$postHocs) == 0) 
+        object <- stats::update(object, posthoc = formula, ...) 
+    else if (is.something(list(...))) 
+           object <- stats::update(object, ...)
+    if (length(object$posthoc) == 0) 
         return(FALSE)
 
-    object$postHocs
+    object$posthoc
 }
 
 

@@ -3,19 +3,9 @@ name:  gamljGlm
 title: General Linear Model
 jrs: '1.0'
 items:
-
-  - name: storage
-    title: Storage
-    type: Table
-    visible: false
-    clearWith: 
-        - modelTerms
-        
-    columns:
-       - name: info
-         type: text
-         title: "Info"
-
+  - name: model
+    type: Property
+ 
   - name: info
     title: Model Info
     type: Table
@@ -841,6 +831,7 @@ items:
         - dep
         - factors
         - covs
+        - modelTerms
   - name: residuals
     title: Residuals Vales
     type: Output            
@@ -850,3 +841,4 @@ items:
         - dep
         - factors
         - covs
+        - modelTerms

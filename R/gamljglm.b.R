@@ -173,7 +173,7 @@ gamljGlmClass <- R6::R6Class(
         smarttab$setNotes(private$.estimate_machine$dispatcher)
       
 
-
+      private$.checkpoint()
       
       # #save model preds and resids            
       # private$.estimate_machine$savePredRes(self$results) 
@@ -184,13 +184,18 @@ gamljGlmClass <- R6::R6Class(
           self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
           self$results$plotnotes$setVisible(TRUE)
       }  
+      private$.checkpoint()
+      
+      ### save the model if we are in R ###
+      if (self$options$.interface=="r")
+              self$results$.setModel(private$.estimate_machine$model)
+      
       ginfo("MODULE:  #### phase end ####")
       now<-Sys.time()
       ginfo("TIME:",now-private$.time," secs")
       
       return()
           
-        
     },
 
 
@@ -242,29 +247,13 @@ gamljGlmClass <- R6::R6Class(
 
 .sourcifyOption = function(option) {
 
-  name <- option$name
-  value <- option$value
-
-  if (!is.something(value))
-    return('')
-
-  if (option$name %in% c('factors', 'dep', 'covs', 'modelTerms'))
-    return('')
+  skip<-c("modelTerms","factors","covs","dep")
+  defaults<-c(scaling="centered",contrasts="simple")
   
-  if (name =='scaling') {
-    vec<-sourcifyList(option,"centered")
-    return(vec)
-  }
-  if (name =='contrasts') {
-    vec<-sourcifyList(option,"simple")
-    return(vec)
-  }
-  if (name == 'postHoc') {
-    if (length(value) == 0)
-      return('')
-  }
+  if (option$name %in% skip)
+     return('')
+ sourcifyOption(option,defaults)
 
-  super$.sourcifyOption(option)
 }
 )
 )

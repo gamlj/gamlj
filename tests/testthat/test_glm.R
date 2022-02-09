@@ -255,23 +255,24 @@ testthat::test_that("weird posthoc", {
 })
 
 
-testthat::expect_warning(
-  mod<-gamlj::gamljGlm(
+
+mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp, 
-  emmeans = ~schtyp
-  )
+  emmeans = ~schtyp,
+  homoTest = T,
+  normTest = T
 )
-res<-mod$emeansTables[[1]]$asDF
+res<-mod$emmeans[[1]]$asDF
 testthat::test_that("glm EMM", {
   testthat::expect_equal(round(res[1,2],2),52.07)
 })
 
-res1<-mod$assumptions$homoTest$asDF
-res2<-mod$assumptions$normTest$asDF
+res1<-mod$assumptions$homotest$asDF
+res2<-mod$assumptions$normtest$asDF
 
 testthat::test_that("glm assumptions", {
-  testthat::expect_equal(round(res1[1,4],2),0.13)
+  testthat::expect_equal(round(res1[1,5],2),0.13)
   testthat::expect_equal(round(res2[1,3],2),0.86)
 })
 

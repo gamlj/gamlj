@@ -24,12 +24,12 @@ Infomatic <- R6::R6Class(
     
     initialize=function(options,datamatic) {
       self$modeltype<-options$modelSelection
-      self$caller<-options$caller
+      self$caller<-options$.caller
       dep<-options$dep
       dlevs<-datamatic$variables[[tob64(dep)]]$levels_labels
       
       
-      if (options$caller=="glm") {
+      if (self$caller=="glm") {
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
       }
       
@@ -46,8 +46,8 @@ Infomatic <- R6::R6Class(
       if (self$modeltype=="linear") {
         self$model        <-   c("Linear Model","ML Model for continuous y")
         self$distribution <-  "gaussian"
-        self$call          <-   CALLS[[options$caller]]
-        self$rcall         <-   FUNCS[[options$caller]]
+        self$call          <-   CALLS[[self$caller]]
+        self$rcall         <-   FUNCS[[self$caller]]
         self$link         <-  "identity"
         self$direction    <-   c("y","Dependent variable scores")
         self$deptype      <-   c("numeric","integer")
@@ -59,8 +59,8 @@ Infomatic <- R6::R6Class(
         self$model        <-   c("Logistis Model","Model for binary y")
         self$distribution  <-  "binomial"
         self$family        <-   stats::binomial()
-        self$call          <-   CALLS[[options$caller]]
-        self$rcall         <-   FUNCS[[options$caller]]
+        self$call          <-   CALLS[[self$caller]]
+        self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "logit"
         self$emmeans       <-    "probabilities"
         self$deptype       <-    "factor"
@@ -78,8 +78,8 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Probit Model","Model for binary y")
         self$distribution  <-  "binomial"
         self$family        <-   stats::binomial(link="probit")
-        self$call          <-   CALLS[[options$caller]]
-        self$rcall         <-   FUNCS[[options$caller]]
+        self$call          <-   CALLS[[self$caller]]
+        self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "probit"
         self$emmeans       <-   "probabilities"
         self$deptype       <-    "factor"
@@ -96,8 +96,8 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Poisson Model","Model for count y")
         self$distribution  <-   "poisson"
         self$family        <-   stats::poisson()
-        self$call          <-   CALLS[[options$caller]]
-        self$rcall         <-   FUNCS[[options$caller]]
+        self$call          <-   CALLS[[self$caller]]
+        self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
         self$direction     <-   c("y","Dependent variable counts")
@@ -109,8 +109,8 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Poisson Model","Model for overdispersed count y")
         self$distribution  <-   "quasi-poisson"
         self$family        <-   stats::quasipoisson()
-        self$call          <-   CALLS[[options$caller]]
-        self$rcall         <-   FUNCS[[options$caller]]
+        self$call          <-   CALLS[[self$caller]]
+        self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
         self$deptype       <-   "integer"
@@ -137,8 +137,8 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("User Model","Generalized model")
         self$family        <-    do.call(options$custom_family,list(options$custom_link))
         self$distribution  <-    options$custom_family
-        self$call          <-    CALLS[[options$caller]]
-        self$rcall         <-    FUNCS[[options$caller]]
+        self$call          <-    CALLS[[self$caller]]
+        self$rcall         <-    FUNCS[[self$caller]]
         self$link          <-    options$custom_link
         self$emmeans       <-   "the response metric"
         self$direction     <-   c("y","Dependent variable counts")

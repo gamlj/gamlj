@@ -25,8 +25,6 @@ Estimate <- R6::R6Class("Estimate",
                             
                             self$model<-private$.estimateModel(data)
                             ginfo("ESTIMATE: initial estimation done")
-                            
-                            
                           }, # end of public function estimate
 
                           ##### fill the tables #####

@@ -91,17 +91,68 @@ try_hard<-function(exp) {
   return(.results)
 }
 
+sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
 
-sourcifyList<-function(option,def=NULL) {
+.sourcifyOption.default=function(option,def=NULL) {
+  
+  if (option$name == 'data')
+    return('data = data')
+  
+  if (startsWith(option$name, 'results/'))
+    return('')
+  
+  value <- option$value
+  def <- option$default
+  
+  if ( ! ((is.numeric(value) && isTRUE(all.equal(value, def))) || base::identical(value, def))) {
+    valueAsSource <- option$valueAsSource
+    if ( ! identical(valueAsSource, ''))
+      return(paste0(option$name, ' = ', valueAsSource))
+  }
+  ''
+}
+.sourcifyOption.OptionVariables<-function(option,def=NULL) {
+  
+  if (is.null(option$value))
+     return('')
+  
+  values<-sourcifyName(option$value)
+  
+  if (length(values)==1)
+     return(paste0(option$name,"=",values))
+  else
+    return(paste0(option$name,"=c(",paste0(values,collapse = ","),")"))
+}
+  
+.sourcifyOption.OptionTerms<-function(option,def=NULL)
+     .sourcifyOption.default(option,def)
+  
+.sourcifyOption.OptionArray<-function(option,def=NULL) {
   alist<-option$value
-  test<-all(sapply(alist,function(a) a$type)==def)
-  if (test)
+  if (length(alist)==0)
+      return('')
+  if (is.something(def) & option$name %in% names(def)) {
+    test<-all(sapply(alist,function(a) a$type)==def[[option$name]])
+    if (test)
     return("")
-  paste0(option$name,"=c(",paste(sapply(alist,function(a) paste0(a$var,' = \"',a$type,'\"')),collapse=", "),")")
+  }
+  paste0(option$name,"=c(",paste(sapply(alist,function(a) paste0(sourcifyName(a$var),' = \"',a$type,'\"')),collapse=", "),")")
 }
 
 
+sourcifyName<-function(name) {
+  
+  what<-which(make.names(name)!=name)
+  for (i in what)
+    name[[i]]<-paste0('"',name[[i]],'"')
+  name
+}
 
+sourcifyVars<-function(value) {
+  
+  paste0(sourcifyName(value),collapse = ",")
+  
+}
 append_list <- function(alist, aelement, name = NULL) {
   alist[[length(alist) + 1]] <- aelement
   if (!is.null(name)) 

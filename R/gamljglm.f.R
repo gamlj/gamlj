@@ -9,9 +9,9 @@
 #' @examples
 #' data('ToothGrowth')
 #' gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
-#'
+
+#' @param formula (optional) the formula to use, see the examples
 #' @param data the data as a data frame
-#' @param caller .
 #' @param dep a string naming the dependent variable from \code{data}; the
 #'   variable must be numeric. Not needed if \code{formula} is used.
 #' @param factors a vector of strings naming the fixed factors from
@@ -78,7 +78,7 @@
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
 #'   to the variable orginal levels, before scaling.
-#' @param postHocCorr one or more of \code{'none'},
+#' @param posthocCorr one or more of \code{'none'},
 #'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
 #'   and Holm Post Hoc corrections respectively.
 #' @param posthocEffsize one or more of \code{'dm'},  \code{'ds'},\code{'g'}
@@ -109,7 +109,8 @@
 #' @param effectSizeInfo \code{TRUE} or \code{FALSE} (default), provide
 #'   ìnformation about the effect size indexes
 #' @param dep_scale Re-scale the dependent variable.
-#' @param formula (optional) the formula to use, see the examples
+#' @param .caller Internal options, please ignore it
+#' @param .interface Internal options, please ignore it
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$storage} \tab \tab \tab \tab \tab a table \cr
@@ -145,8 +146,8 @@
 #'
 #' @export
 gamljGlm <- function(
+  formula,
   data,
-  caller = "lm",
   dep = NULL,
   factors = NULL,
   covs = NULL,
@@ -178,7 +179,7 @@ gamljGlm <- function(
   cvalue = 1,
   percvalue = 25,
   simpleScaleLabels = "labels",
-  postHocCorr = list(
+  posthocCorr = list(
     "bonf"),
   posthocEffsize=list(),
   dci = FALSE,
@@ -195,7 +196,9 @@ gamljGlm <- function(
   interceptInfo = FALSE,
   effectSizeInfo = FALSE,
   dep_scale = "none",
-  formula) {
+  .caller = "lm",
+  .interface="r"  
+  ) {
   
   if ( ! requireNamespace("jmvcore", quietly=TRUE))
     stop("gamljGlm requires jmvcore to be installed (restart may be required)")
@@ -263,12 +266,9 @@ gamljGlm <- function(
   if (is.something(names(contrasts))) 
     contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
   
-  if (is.something(posthoc)) 
-     mark(posthoc)
-        
-  
     options <- gamljGlmOptions$new(
-    caller = caller,
+    .caller = .caller,
+    .interface=.interface,
     dep = dep,
     factors = factors,
     covs = covs,
@@ -300,7 +300,7 @@ gamljGlm <- function(
     cvalue = cvalue,
     percvalue = percvalue,
     simpleScaleLabels = simpleScaleLabels,
-    postHocCorr = postHocCorr,
+    posthocCorr = posthocCorr,
     posthocEffsize = posthocEffsize,
     dci = dci,
     scaling = scaling,

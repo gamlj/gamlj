@@ -6,7 +6,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Options,
     public = list(
         initialize = function(
-            caller = "lm",
+            .caller = "lm",
+            .interface = "jamovi",
             dep = NULL,
             factors = NULL,
             covs = NULL,
@@ -20,6 +21,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             contrasts = NULL,
             showRealNames = TRUE,
             showContrastCode = FALSE,
+            scaling = NULL,
             plotHAxis = NULL,
             plotSepLines = NULL,
             plotSepPlots = NULL,
@@ -42,7 +44,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "bonf"),
             posthocEffsize = NULL,
             dci = FALSE,
-            scaling = NULL,
             modelSelection = "lm",
             effectSize = list(
                 "beta",
@@ -62,10 +63,15 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 requiresData=TRUE,
                 ...)
 
-            private$..caller <- jmvcore::OptionString$new(
-                "caller",
-                caller,
+            private$...caller <- jmvcore::OptionString$new(
+                ".caller",
+                .caller,
                 default="lm",
+                hidden=TRUE)
+            private$...interface <- jmvcore::OptionString$new(
+                ".interface",
+                .interface,
+                default="jamovi",
                 hidden=TRUE)
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
@@ -162,6 +168,28 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "showContrastCode",
                 showContrastCode,
                 default=FALSE)
+            private$..scaling <- jmvcore::OptionArray$new(
+                "scaling",
+                scaling,
+                items="(covs)",
+                default=NULL,
+                template=jmvcore::OptionGroup$new(
+                    "scaling",
+                    NULL,
+                    elements=list(
+                        jmvcore::OptionVariable$new(
+                            "var",
+                            NULL,
+                            content="$key"),
+                        jmvcore::OptionList$new(
+                            "type",
+                            NULL,
+                            options=list(
+                                "centered",
+                                "standardized",
+                                "log",
+                                "none"),
+                            default="centered"))))
             private$..plotHAxis <- jmvcore::OptionVariable$new(
                 "plotHAxis",
                 plotHAxis,
@@ -274,28 +302,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "dci",
                 dci,
                 default=FALSE)
-            private$..scaling <- jmvcore::OptionArray$new(
-                "scaling",
-                scaling,
-                items="(covs)",
-                default=NULL,
-                template=jmvcore::OptionGroup$new(
-                    "scaling",
-                    NULL,
-                    elements=list(
-                        jmvcore::OptionVariable$new(
-                            "var",
-                            NULL,
-                            content="$key"),
-                        jmvcore::OptionList$new(
-                            "type",
-                            NULL,
-                            options=list(
-                                "centered",
-                                "standardized",
-                                "log",
-                                "none"),
-                            default="centered"))))
             private$..predicted <- jmvcore::OptionOutput$new(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
@@ -359,7 +365,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "log"),
                 default="none")
 
-            self$.addOption(private$..caller)
+            self$.addOption(private$...caller)
+            self$.addOption(private$...interface)
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
@@ -373,6 +380,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
             self$.addOption(private$..showContrastCode)
+            self$.addOption(private$..scaling)
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
             self$.addOption(private$..plotSepPlots)
@@ -394,7 +402,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..posthocCorr)
             self$.addOption(private$..posthocEffsize)
             self$.addOption(private$..dci)
-            self$.addOption(private$..scaling)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
             self$.addOption(private$..modelSelection)
@@ -409,7 +416,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..dep_scale)
         }),
     active = list(
-        caller = function() private$..caller$value,
+        .caller = function() private$...caller$value,
+        .interface = function() private$...interface$value,
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
@@ -423,6 +431,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
         showContrastCode = function() private$..showContrastCode$value,
+        scaling = function() private$..scaling$value,
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
         plotSepPlots = function() private$..plotSepPlots$value,
@@ -444,7 +453,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         posthocCorr = function() private$..posthocCorr$value,
         posthocEffsize = function() private$..posthocEffsize$value,
         dci = function() private$..dci$value,
-        scaling = function() private$..scaling$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
         modelSelection = function() private$..modelSelection$value,
@@ -458,7 +466,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         effectSizeInfo = function() private$..effectSizeInfo$value,
         dep_scale = function() private$..dep_scale$value),
     private = list(
-        ..caller = NA,
+        ...caller = NA,
+        ...interface = NA,
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
@@ -472,6 +481,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..contrasts = NA,
         ..showRealNames = NA,
         ..showContrastCode = NA,
+        ..scaling = NA,
         ..plotHAxis = NA,
         ..plotSepLines = NA,
         ..plotSepPlots = NA,
@@ -493,7 +503,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..posthocCorr = NA,
         ..posthocEffsize = NA,
         ..dci = NA,
-        ..scaling = NA,
         ..predicted = NA,
         ..residuals = NA,
         ..modelSelection = NA,
@@ -512,7 +521,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "gamljGlmResults",
     inherit = jmvcore::Group,
     active = list(
-        storage = function() private$.items[["storage"]],
+        model = function() private$..model,
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
@@ -525,25 +534,15 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
-    private = list(),
+    private = list(
+        ..model = NA),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
                 title="General Linear Model")
-            self$add(jmvcore::Table$new(
-                options=options,
-                name="storage",
-                title="Storage",
-                visible=FALSE,
-                clearWith=list(
-                    "modelTerms"),
-                columns=list(
-                    list(
-                        `name`="info", 
-                        `type`="text", 
-                        `title`="Info"))))
+            private$..model <- NULL
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -1490,7 +1489,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "dep",
                     "factors",
-                    "covs")))
+                    "covs",
+                    "modelTerms")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1500,7 +1500,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "dep",
                     "factors",
-                    "covs")))}))
+                    "covs",
+                    "modelTerms")))},
+        .setModel=function(x) private$..model <- x))
 
 gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "gamljGlmBase",

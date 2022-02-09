@@ -39,11 +39,15 @@ options:
       description:
           R: the data as a data frame
 
-    - name: caller
+    - name: .caller
       type: String
       default: "lm"
       hidden: true
 
+    - name: .interface
+      type: String
+      default: "jamovi"
+      hidden: true
 
     - name: dep
       title: Dependent Variable
@@ -173,6 +177,7 @@ options:
                   - helmert
                   - repeated
                   - polynomial
+
                 default: simple
       description:
           R: >
@@ -197,6 +202,35 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), shows contrast coefficients tables
+
+    - name: scaling
+      title: Covariates Scaling
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Log
+                      name: 'log'
+                    - title: None
+                      name: 'none'
+
+                default: centered 
+      description:
+          R: >
+             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
+             one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
 
 
@@ -438,35 +472,6 @@ options:
           R: >
             `TRUE` or `FALSE` (default), d confidence intervals
 
-
-    - name: scaling
-      title: Covariates Scaling
-      type: Array
-      items: (covs)
-      default:
-      template:
-          type: Group
-          elements:
-              - name: var
-                type: Variable
-                content: $key
-              - name: type
-                type: List
-                options:
-                    - title: Centered
-                      name:  centered
-                    - title: z-scores
-                      name: standardized
-                    - title: Log
-                      name: 'log'
-                    - title: None
-                      name: 'none'
-
-                default: centered 
-      description:
-          R: >
-             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
-             one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
 
     - name: predicted

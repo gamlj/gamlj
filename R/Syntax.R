@@ -305,7 +305,10 @@ Syntax <- R6::R6Class(
       fixed<-jmvcore::composeFormula(NULL,tob64(modelTerms))
       fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed)
       self$formula64<-trimws(paste(fixed,rands,sep =  ""))
-      self$formula<-fromb64(self$formula64,self$vars)
+
+      fixed<-jmvcore::composeFormula(NULL,modelTerms)
+      fixed<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),fixed)
+      self$formula<-trimws(paste(fixed,rands,sep =  ""))
       
     },
     

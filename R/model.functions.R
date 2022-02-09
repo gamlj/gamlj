@@ -531,25 +531,33 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
 }
 
 
-########### set the model call for R in a reasonable way #########
+### sourcify syntax for all models ####
 
-mf.setModelCall<- function(x,...) UseMethod(".setModelCall")
+mf.sourcify<-function(option) {
 
-.setModelCall.default<-function(model,info) {
-  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
-  call<-paste0(info$command,"(",coptions,", data=data)")
-  model$call<-call
-  model
+  results<-list(type="transformed",option=option)
+  .ignore<-c('factors', 'dep', 'covs', 'modelTerms','.interface','.caller')
+  .transform<-c("simpleVariable","simpleModerators","plotHAxis","plotSepLines","plotSepPlots")
+
+  if (!is.something(option$value))
+      results$type="empty"
+  
+  if (option$name %in% .ignore)
+    results$type="empty"
+  
+  if (option$name =='scaling') {
+    results$option$value<-sourcifyList(option,"centered")
+    results$type="complete"
+  }
+  if (option$name =='contrasts') {
+    results$option$value<-sourcifyList(option,"simple")
+    results$type="complete"
+  }
+  
+  if (option$name %in% .transform) {
+    results$option$value<-sourcifyVars(option$value)
+  }
+  results
 }
-
-.setModelCall.lmerMod<-function(model,info) {
-  coptions<-paste(names(info$coptions),info$coptions,sep="=",collapse = ",")
-  call<-paste0(info$command,"(",coptions,", data=data)")
-  model@call<-as.call(str2lang(call))
-  model
-}
-.setModelCall.glmerMod<-function(model,info) 
-        .setModelCall.lmerMod(model,info)
-
 
 
