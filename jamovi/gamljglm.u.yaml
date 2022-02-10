@@ -196,37 +196,21 @@ children:
                         suffix: '%'
                         format: number
                         enable: (simpleScale_percent)
-          - type: Label
-            label: Covariates labeling
+          - type: LayoutBox
+            margin: large
+            style: list
             children:
-              - type: LayoutBox
-                margin: large
-                children:
-                  - type: RadioButton
-                    name: simpleScaleLabels_labels
-                    optionName: simpleScaleLabels
-                    optionPart: labels
-                  - type: RadioButton
-                    name: simpleScaleLabels_numbers
-                    optionName: simpleScaleLabels
-                    optionPart: values
-                  - type: RadioButton
-                    name: simpleScaleLabels_numbers_labels
-                    optionName: simpleScaleLabels
-                    optionPart: values_labels
-                  - name: simpleScaleLabels_uvalues
-                    type: RadioButton
-                    optionName: simpleScaleLabels
-                    optionPart: uvalues
-                  - name: simpleScaleLabels_uvalues_labels
-                    type: RadioButton
-                    optionName: simpleScaleLabels
-                    optionPart: uvalues_labels
-          - type: Label
-            label: Dependent variable
-            children:
-              - type: ComboBox
-                name: dep_scale
+                    - type: Label
+                      label: Covariates labeling
+                      children:
+                             - type: ComboBox
+                               name: simpleScaleLabels
+                    - type: Label
+                      label: Dependent variable
+                      children:
+                             - type: ComboBox
+                               name: dep_scale
+
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true

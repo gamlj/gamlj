@@ -1,12 +1,12 @@
 
 es.relativerisk<-function(obj) {
-
       model          <-  obj$model
-      data           <-  model$data
-      data$id_id_id  <- seq_len(dim(data)[1])
-      depobj         <- obj$datamatic$variables[[tob64(obj$options$dep)]]
-      levs           <- depobj$levels
-      ciWidth        <- obj$ciwidth
+      data           <-  insight::get_data(model)
+      data$id_id_id  <-  seq_len(dim(data)[1])
+      depobj         <-  obj$datamatic$variables[[tob64(obj$options$dep)]]
+      levs           <-  levels(data[[depobj$name64]])
+      ciWidth        <-  obj$ciwidth
+      
       
       data[,depobj$name64]  <-  as.numeric(data[[depobj$name64]]==levs[2])
 
@@ -14,8 +14,8 @@ es.relativerisk<-function(obj) {
                                         family = poisson(link = "log"),
                                         id = id_id_id, 
                                         corstr = "exchangeable", data = data)
-      
-      params<-as.data.frame(parameters::parameters(results$obj,exponentiate=TRUE))
+      params<-as.data.frame(parameters::parameters(results,exponentiate=TRUE))
+
       names(params)<-c("source","estimate","se","nothing", "ci.lower","ci.upper","test","df","p")
       
       if (params$source[1]=="(Intercept)")
@@ -76,8 +76,11 @@ mf.fixTable<- function(x,...) UseMethod(".fixtable")
 
 
 
-### beta in parameter estimates ###
+### ES estimates ###
 add_effect_size<- function(x,...) UseMethod(".add_es")
+
+.add_es.default<-function(atable,model,variable)
+      return(atable)
 
 .add_es.simple_params_lm<-function(atable,model,variable) {
   
@@ -88,6 +91,14 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
   atable$beta<-atable$estimate*(xstd/ystd) 
   atable
 }
+
+.add_es.simple_params_glm<-function(atable,model,variable=NULL) {
+  atable$expb<-exp(atable$estimate)
+  atable$expb.ci.lower<-exp(atable$est.ci.lower)
+  atable$expb.ci.upper<-exp(atable$est.ci.upper)
+  atable
+}
+
 
 .add_es.simple_anova_lm<-function(atable,model) {
   

@@ -209,7 +209,14 @@ procedure.posthoc_effsize <- function(obj) {
       newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(FALSE,TRUE))
-      names(results)<-c("contrast","estimate","se","df","test","p")
+
+      .transnames<-list(estimate=c("odds.ratio"),
+                        test=c("z.ratio","t.ratio"),
+                        p="p.value",
+                        se="SE"
+                        )
+      names(results)<-transnames(names(results),.transnames)    
+
   results
 }
 
@@ -403,26 +410,26 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     
     grid<-.get_se(opts_list)
     estimates<-as.data.frame(grid)
-
     ## deal with  CI
+    .transnames<-list("ci.lower"=c("asymp.LCL","CI_low","lower.CL"),
+                     "ci.upper"=c("asymp.UCL","CI_high","upper.CL"))
+    
     if (!obj$option("cimethod","wald")) {
       
       opts_list$object<-obj$boot_model
       cidata<-.get_se(opts_list)
       cidata<-as.data.frame(parameters::parameters(cidata,ci_method=obj$options$cimethod))
-      estimates$est.ci.lower<-cidata$CI_low
-      estimates$est.ci.upper<-cidata$CI_high
       
     } else {
-      
+    
       cidata<-stats::confint(grid,level = obj$ciwidth)    
-      estimates$est.ci.lower<-cidata$lower.CL
-      estimates$est.ci.upper<-cidata$upper.CL
     }
+    names(cidata)<-transnames(names(cidata),.transnames)
+    estimates$est.ci.lower<-cidata$ci.lower
+    estimates$est.ci.upper<-cidata$ci.upper
 
-    .transnames<-list(test="t.ratio",p="p.value",se="SE")
+    .transnames<-list(test=c("z.ratio", "t.ratio"),p="p.value",se="SE")
     names(estimates)<-transnames(names(estimates),.transnames)    
-
     if (!("contrast" %in% names(estimates)))
           estimates$contrast<-variable
     
@@ -434,23 +441,28 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     }
     
     estimates$contrast<-as.character(estimates$contrast)
-    ### add effect sizes depending on the model and table
-    class(estimates)<-c(paste0("simple_params_",obj$options$modelSelection),class(estimates))
-    ## fix the names of the columns
+    ## fix the names of the moderators columns
     .params<-add_effect_size(estimates,model,variable64)
     names(.params)[names(.params) %in% term64]<-paste0("mod_",make.names(fromb64(term64),unique = T))
+
+    ## add effect sizes
+    class(.params)<-c(paste0("simple_params_",obj$options$.caller),class(.params))
+    .params<-add_effect_size(.params,model,variable64)
+    
+    
+    
     ### now we build the anova table ###
     .anova<-as.data.frame(emmeans::test(grid, join=TRUE, by = term64))
-    names(.anova)<-c(term64,"df1","df2","test","p")
-   
-    
+    .transnames<-list(test=c("F.ratio"),p="p.value")
+    names(.anova)<-transnames(names(.anova),.transnames)    
+
     ### fix labels and make sure they are not factors or stuff    
     for (.name in term64) {
       .anova[[.name]]<-factor(.anova[[.name]])
       levels(.anova[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
       .anova[[.name]]<-as.character(.anova[[.name]])
     }
-    #### fix names ####
+    #### fix names of moderators columns ####
     .names<-paste0("mod_",make.names(term,unique = T))
     names(.anova)[1:length(.names)]<-.names
     
@@ -548,7 +560,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          levels(parameters$contrast)<-unlist(varobj$contrast_labels)
          parameters$contrast<-as.character(parameters$contrast)
          
-         names(anovas)[1:3]<-c("test","df1","p")
+         .transname<-list(test="F.ratio")
+         names(anovas)<-transnames(names(anovas),.transname)
          
          for (.name in .names) {
            anovas[[.name]]<-factor(anovas[[.name]])
@@ -661,7 +674,6 @@ procedure.simpleInteractions<-function(obj) {
             
             
             ##
-            
             names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","t","p","est.ci.lower","est.ci.upper")
             names(res)[1:length(.names)]<-.names
             

@@ -45,7 +45,29 @@ Estimate <- R6::R6Class("Estimate",
                                   self$dispatcher$warnings<-list(topic="posthocEffsize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
                                 tab
                           },                    
-
+                          run_main_fit=function() {
+                            
+                            tab<-self$init_main_fit()
+                            for (name in names(tab)) {
+                              
+                              if (name=="lik")
+                                tab[["lik"]]$value<-as.numeric(stats::logLik(self$model))
+                              if (name=="aic")
+                                tab[["aic"]]$value<-stats::AIC(self$model)
+                              if (name=="bic")
+                                tab[["bic"]]$value<-stats::BIC(self$model)
+                              if (name=="dev")
+                                tab[["dev"]]$value<-stats::deviance(self$model)
+                              if (name=="dfr")
+                                tab[["dfr"]]$value<-stats::df.residual(self$model)
+                              if (name=="over") {
+                                value <- sum(stats::residuals(self$model, type = "pearson")^2)
+                                result <- value/stats::df.residual(self$model)
+                                tab[["over"]]$value<-result
+                              }
+                            }
+                            tab
+                          },
                           run_main_anova=function() {
 
                             if (!self$isProper) 
@@ -107,6 +129,16 @@ Estimate <- R6::R6Class("Estimate",
                                              p=p))
                                tab
                           },
+                          run_main_relativerisk=function() {
+                            tab<-NULL
+                            if (self$isProper) {
+                              tab       <-  es.relativerisk(self)
+                              tab       <-  private$.fix_names(tab)
+                            }
+                            tab
+                            
+                            
+                          },
                           run_posthoc=function() {
                             
                             if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
@@ -124,8 +156,7 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
                               private$.bootstrap_model()
-                            if (is.something(self$infomatic$emmeans))
-                               self$dispatcher$warnings<-list(topic="emmeans",message=paste("Estimated marginal means are",self$infomatic$emmeans))
+                            
                             procedure.emmeans(self)
                           },
                           
@@ -562,6 +593,7 @@ Estimate <- R6::R6Class("Estimate",
                             .rownames        <-  unlist(lapply(fromb64(.terms,self$vars),jmvcore::stringifyTerm,raise=T))
                             atable$source    <-  .rownames
                             atable$label     <-  self$datamatic$get_params_labels(.terms)
+                            
                             if ("Response" %in% names(atable)) {
                                    atable$Response          <-  factor(atable$Response)
                                    levels(atable$Response)  <-  unlist(self$datamatic$dep$contrast_labels)

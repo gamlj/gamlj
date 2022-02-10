@@ -399,7 +399,6 @@ options:
 
 
     - name: simpleScaleLabels
-      title: Moderators labeling
       type: List
       options:
         - name: labels

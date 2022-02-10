@@ -675,7 +675,7 @@ items:
             - emmeans
             - semethod
             - bootR
-
+            - modelTerms
         columns:
         - name: estimate
           title: 'Mean'

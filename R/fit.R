@@ -29,10 +29,11 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
 }
 
-.R2.polr<-function(model,obj) {
-  
+.R2.polr<-function(model) {
+
   alist       <-  list()
   results     <-  fit.compare_null_model(model)
+
   # mcFadden 
 
   alist$r2    <-  1-(results$deviance/results$null.deviance)
@@ -48,7 +49,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
 }
   
-.R2.multinom<-function(model,obj) {
+.R2.multinom<-function(model) {
 
   
   llfull<-stats::logLik(model)  ### model loglikelihood
@@ -132,8 +133,10 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
 
 .compare_null_model.polr<-function(model) {
+
   form<- as.formula("~1")
-  model0  <-  stats::update(model,form ,evaluate=T)
+  data<-mf.getModelData(model)
+  model0  <-  stats::update(model,form ,data=data,evaluate=T)
   .results <-  stats::anova(model0,model)
   results<-.results[2,]
   results$deviance<--2*as.numeric(stats::logLik(model))

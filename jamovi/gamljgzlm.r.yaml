@@ -27,6 +27,11 @@ items:
         - cov
         - modelTerms
         - fixedIntercept
+        - cimethod
+        - semethod
+        - dci
+        - bootR
+
     refs: gamlj
      
   - name: main
@@ -93,6 +98,7 @@ items:
                          - dep_scale
                          - fixedIntercept
                          - effectSize
+                         - chisqType
              columns:
                     - name: name
                       title: ""
@@ -120,6 +126,7 @@ items:
                     - dep_scale
                     - fixedIntercept
                     - paramCIWidth
+                    - cimethod
 
              columns:
                     - name: Response
@@ -140,11 +147,11 @@ items:
                     - name: se
                       title: "SE"
                       type: number
-                    - name: ci.lower
+                    - name: est.ci.lower
                       type: number
                       title: Lower
                       visible: (showParamsCI)
-                    - name: ci.upper
+                    - name: est.ci.upper
                       type: number
                       title: Upper
                       visible: (showParamsCI)
@@ -168,6 +175,32 @@ items:
                       title: "p"
                       type: number
                       format: zto,pvalue
+
+
+
+           - name: contrastCodeTables
+             title: Contrast Coefficients 
+             type: Array
+             description: an array of contrast coefficients tables
+             visible: (showContrastCode)
+             items: (factors)
+             clearWith:
+                    - contrasts
+             template:
+                   title:  $key
+                   type: Table
+                   columns:
+                         - name: cname
+                           title: 'Name'
+                           type: text
+                           visible: (showRealNames)
+                         - name: clab
+                           title: 'Contrast'
+                           type: text
+                         - name: bogus
+                           title: 'bogus'
+                           type: text
+                           visible: false
 
            - name: relativerisk
              title: Relative risk
@@ -212,33 +245,6 @@ items:
                       format: zto,pvalue
 
 
-
-
-           - name: contrastCodeTables
-             title: Contrast Coefficients 
-             type: Array
-             description: an array of contrast coefficients tables
-             visible: (showContrastCode)
-             items: (factors)
-             clearWith:
-                    - contrasts
-             template:
-                   title:  $key
-                   type: Table
-                   columns:
-                         - name: cname
-                           title: 'Name'
-                           type: text
-                           visible: (showRealNames)
-                         - name: clab
-                           title: 'Contrast'
-                           type: text
-                         - name: bogus
-                           title: 'bogus'
-                           type: text
-                           visible: false
-
-
   - name: posthoc
     title: Post Hoc Tests
     type: Array
@@ -251,12 +257,16 @@ items:
         - scaling
         - dep_scale
         - posthoc
-        - postHocCorr
+        - posthocCorr
+        - cimethod
+        - bootR
+        
     template:
         title:  ""
         type: Table
         clearWith:
               - posthoc
+              - cimethod
   
         columns:
         - name: Response
@@ -270,11 +280,11 @@ items:
         - name: se
           title: SE
           type: number
-        - name: ci.lower
+        - name: est.ci.lower
           type: number
           title: Lower
           visible: (showParamsCI)
-        - name: ci.upper
+        - name: est.ci.upper
           type: number
           title: Upper
           visible: (showParamsCI)
@@ -285,22 +295,22 @@ items:
           title: p
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:none)
+          visible: (posthocCorr:none)
         - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:bonf)
+          visible: (posthocCorr:bonf)
         - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:tukey)
+          visible: (posthocCorr:tukey)
         - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:holm)
+          visible: (posthocCorr:holm)
 
 
   - name: simpleEffects
@@ -319,10 +329,12 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+                 - cimethod
+                 - bootR
 
     items:
             - name: anova
-              title: Simple Effects ANOVA
+              title: ANOVA for Simple Effects  of ___key___
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
@@ -352,7 +364,7 @@ items:
                    format: zto,pvalue
 
             - name: coefficients
-              title: Parameter Estimates for simple effects
+              title: Parameter Estimates for simple effects of ___key___
               type: Table
               visible: false
               clearWith:
@@ -368,7 +380,9 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
-
+                 - cimethod
+                 - bootR
+ 
               columns:
                      - name: Response
                        title: Response contrast
@@ -384,11 +398,11 @@ items:
                      - name: se
                        title: "SE"
                        type: number
-                     - name: ci.lower
+                     - name: est.ci.lower
                        type: number
                        title: Lower
                        visible: (showParamsCI || showExpbCI)
-                     - name: ci.upper
+                     - name: est.ci.upper
                        type: number
                        title: Upper
                        visible: (showParamsCI || showExpbCI)
@@ -429,7 +443,7 @@ items:
                    - name: effect
                      title: 'Effect'
                      type: text
-                   - name: f
+                   - name: test
                      title: X²
                      type: number
                    - name: df1
@@ -453,10 +467,10 @@ items:
                    - name: se
                      title: SE
                      type: number
-                   - name: ci.lower
+                   - name: est.ci.lower
                      title: Lower 
                      type: number
-                   - name: ci.upper
+                   - name: est.ci.upper
                      title: Upper
                      type: number
                    - name: t
@@ -473,36 +487,32 @@ items:
     type: Array
     description: an array of predicted means tables
     visible: false
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - fixedIntercept
-        - simpleScaleLabels
-        - ciWidth
-        - emmeans
-
+    items: (emmeans)
     template:
-        title:  Estimate Marginal Means - $key
+        title:  Estimate Marginal Means - ___key___
         type: Table
-        clearWith: []
+        clearWith:
+            - ciWidth
+            - cimethod
+            - emmeans
+            - modelTerms
+            - modelSelection
+            - cimethod
+
         columns:
-        - name: Response
-          title: Response level
-          type: text
-          visible: (modelSelection:multinomial)
         - name: estimate
           title: 'Mean'
           type: number
         - name: se
           title: SE
           type: number
-        - name: ci.lower
+        - name: df
+          title: df
+          type: integer
+        - name: est.ci.lower
           title: Lower 
           type: number
-        - name: ci.upper
+        - name: est.ci.upper
           title: Upper
           type: number
 

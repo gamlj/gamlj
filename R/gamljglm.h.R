@@ -1322,7 +1322,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "cimethod",
                         "emmeans",
                         "semethod",
-                        "bootR"),
+                        "bootR",
+                        "modelTerms"),
                     columns=list(
                         list(
                             `name`="estimate", 

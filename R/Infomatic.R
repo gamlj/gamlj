@@ -21,7 +21,7 @@ Infomatic <- R6::R6Class(
     r2=NULL,
     optimized=FALSE,
     df=NULL,
-    
+    comparison="Difference",
     initialize=function(options,datamatic) {
       self$modeltype<-options$modelSelection
       self$caller<-options$.caller
@@ -56,13 +56,14 @@ Infomatic <- R6::R6Class(
       
       if (self$modeltype=="logistic") {
         
-        self$model        <-   c("Logistis Model","Model for binary y")
+        self$model        <-   c("Logistic Model","Model for binary y")
         self$distribution  <-  "binomial"
-        self$family        <-   stats::binomial()
+        self$family        <-   "binomial"
         self$call          <-   CALLS[[self$caller]]
         self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "logit"
         self$emmeans       <-    "probabilities"
+        self$comparison    <-  "OR"
         self$deptype       <-    "factor"
         self$depnlevels    <-    2
         
@@ -142,8 +143,7 @@ Infomatic <- R6::R6Class(
         self$link          <-    options$custom_link
         self$emmeans       <-   "the response metric"
         self$direction     <-   c("y","Dependent variable counts")
-        self$deptype       <-   "integer"
-        
+        self$deptype       <-   c("numeric","integer","factor")
       }
 
       if (self$modeltype=="ordinal") {

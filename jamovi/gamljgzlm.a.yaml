@@ -2,7 +2,7 @@
 name: gamljGzlm
 title: Generalized Linear Models
 menuGroup: Linear Models
-version: '1.5.2'
+version: '2.0.3'
 jas: '1.2'
 export: true
 description:
@@ -36,12 +36,15 @@ formula:
         type: terms
 options:
 
-    - name: caller
+    - name: .caller
       type: String
       default: "glm"
       hidden: true
-      
-      
+
+    - name: .interface
+      type: String
+      default: "jamovi"
+      hidden: true
       
     - name: data
       type: Data
@@ -281,12 +284,22 @@ options:
       type: List
       default: wald
       options:
-        - name: wald
-          title: Wald (fast)
-        - name:  profile
-          title: Profile (slow)
-        - name: boot
-          title: Bootstrap (very slow)
+        - name:  wald
+          title: Standard (fast)
+        - name: quantile
+          title: Bootstrap (Percent)
+        - name:  bcai
+          title: Bootstrap (BCa)
+
+
+    - name: bootR
+      title: Bootstrap rep.
+      type: Number
+      min: 1
+      default: 1000
+      description:
+          R: >
+            a number bootstrap repetitions.
 
     - name: emmeans
       title: Estimated Marginal Means
@@ -363,7 +376,6 @@ options:
 
 
     - name: simpleScaleLabels
-      title: Moderators labeling
       type: List
       options:
         - name: labels
@@ -385,9 +397,11 @@ options:
             variable orginal levels, before scaling.
 
 
+
+
 ############ generic with some specs ###########
 
-    - name: postHocCorr
+    - name: posthocCorr
       title: Correction
       type: NMXList
       options:
@@ -540,6 +554,20 @@ options:
          R: >
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
            
+
+    - name: chisqType
+      title: Omnibus chi2
+      type: List
+      options:
+        - name: lrt
+          title: LRT
+        - name: wald
+          title: Wald
+      default: lrt
+      description:
+          R: >
+            Chi-squared computation method. `'lrt'` (default) gives LogLikelihood ration test, 
+            `'wald'` gives the Wald Chi-squared.
 
 
 ...

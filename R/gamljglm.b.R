@@ -38,7 +38,6 @@ gamljGlmClass <- R6::R6Class(
 
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
-      #aSmartObj$spaceAt<-1
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### estimates table ###

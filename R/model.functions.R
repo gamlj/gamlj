@@ -54,7 +54,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       .iterations          <-  obj$options$bootR
       .ci_method           <-  obj$options$cimethod
       .ci_width            <-  obj$ciwidth
-      .se_method           <-  obj$options$semethod=="robust"
+      .se_method           <-  obj$option("semethod","robust")
       
       if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
         
@@ -64,6 +64,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                                                    robust=.se_method,
                                                                    ci=NULL,
                                                                     ),stringAsFactors=FALSE)
+    
       names(.coefficients) <-  c("source","estimate","se","t","df","p")
 
       if (obj$option("showParamsCI")) {
@@ -79,7 +80,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
       if (obj$option("effectSize","beta")) {
         
-          if (obj$hasTerms) {
+        if (obj$hasTerms) {
         
         ## if not CI are required, we do not bootstrap again 
         if (!obj$option("showBetaCI")) ..bootstrap<-FALSE else ..bootstrap<-.bootstrap
@@ -93,7 +94,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
         .coefficients$beta  <-  estim$Coefficient
         .coefficients$beta.ci.lower<-estim$CI_low
         .coefficients$beta.ci.upper<-estim$CI_high
-         gend()
+  
         
           } else {
             .coefficients$beta  <-  0
@@ -104,16 +105,16 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       }
 
       if (obj$option("effectSize","expb")) {
-               ex            <-  as.data.frame(parameters::parameters(model,
+               estim            <-  as.data.frame(parameters::parameters(model,
                                                                       exponentiate=TRUE,
                                                                       bootstrap=.bootstrap,
                                                                       iterations=.iterations,
                                                                       ci=.ci_width,
                                                                       ci_method=.ci_method))
                
-               .coefficients$exp  <-  estim$Coefficient
-               .coefficients$exp.ci.lower<-estim$CI_low
-               .coefficients$exp.ci.upper<-estim$CI_high
+               .coefficients$expb          <-  estim$Coefficient
+               .coefficients$expb.ci.lower <-  estim$CI_low
+               .coefficients$expb.ci.upper <-  estim$CI_high
       }
       .coefficients
 
@@ -275,21 +276,30 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.glm<-function(model,obj) {
 
         if (!obj$hasTerms) {
-          obj$warnings  <-  list(topic="tab_anova",message="Omnibus tests cannot be computed")
+          obj$dispatcher$warnings  <-  list(topic="tab_anova",message="Omnibus tests cannot be computed")
           return(NULL)
         }
 
-        anoobj        <-  try_hard(car::Anova(model,test="LR",type=3,singular.ok=T))
-        obj$errors    <-  list(topic="tab_anova",message=anoobj$error)
-        obj$warnings  <-  list(topic="tab_anova",message=anoobj$warning)
+        test<-switch (obj$options$chisqType,
+                lrt = "LR",
+                wald= "Wald")
+
+        anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))
+        obj$dispatcher$errors    <-  list(topic="main_anova",message=anoobj$error)
+        obj$dispatcher$warnings  <-  list(topic="main_anova",message=anoobj$warning)
         
 
         if (!isFALSE(anoobj$error))
             return(NULL)
         
-        ano           <-  anoobj$obj
-        colnames(ano) <-  c("test","df","p")
-        as.data.frame(ano, stringsAsFactors = F)
+        .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
+        
+        .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
+        names(.anova)<-transnames(names(.anova),.transnames)
+        
+        .anova<-.anova[rownames(.anova)!="(Intercept)",]   
+        .anova
+        
 }
 
 .anova.multinom<-function(model,obj)
@@ -442,6 +452,8 @@ mf.fixModel<- function(x,...) UseMethod(".fixModel")
   return(model)
 }
 
+
+
 .fixModel.lmerModLmerTest<-function(model,obj=NULL) {
   
   if (lme4::isSingular(model))
@@ -530,6 +542,11 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   
 }
 
+.aliased.polr<-function(model) {
+  ### to do 
+  FALSE
+  
+}
 
 ### sourcify syntax for all models ####
 

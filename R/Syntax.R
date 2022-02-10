@@ -60,6 +60,14 @@ Syntax <- R6::R6Class(
      tab
       
     },
+    init_main_fit=function() {
+      
+            tab<-self$infomatic$info_fit()
+            if (is.null(tab))
+              tab[[1]]<-list(info="")
+            tab
+            
+    },
     init_main_anova=function() {
       
       tab<-list()
@@ -74,7 +82,7 @@ Syntax <- R6::R6Class(
         tab<-append_list(tab,list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
       }       
       ### we need at least a row otherwise we cannot add notes to the table
-      if (is.null(tab))
+      if (!is.something(tab))
         tab[[1]]<-list(test="")
       
       tab
@@ -136,6 +144,16 @@ Syntax <- R6::R6Class(
       
     },
     
+    init_main_relativerisk=function() {
+      
+      alist<-NULL
+      if (self$option("effectSize","RR")) {
+        alist  <-  self$init_main_coefficients()
+        if (self$hasIntercept)
+          alist  <-  alist[-1]
+      }
+      alist
+    },
     ### posthoc means ###
     
     init_posthoc=function() {
@@ -184,14 +202,14 @@ Syntax <- R6::R6Class(
           
           emm<-self$infomatic$emmeans
           if (!is.null(emm))
-            self$warnings<-list(topic="emmeans",message=paste("Expected means are expressed as",emm))
+            self$dispatcher$warnings<-list(topic="emmeans",message=paste("Expected means are expressed as",emm))
         }
         alist
     },
     
     init_simpleEffects_anova=function() {
         .var64<-tob64(self$options$simpleVariable)
-        .mods<-self$options$simpleModerators
+        .mods<-rev(self$options$simpleModerators)
         .mods64<-tob64(.mods)
         nrow<-prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
@@ -207,7 +225,7 @@ Syntax <- R6::R6Class(
         .var64<-tob64(self$options$simpleVariable)
         focal<-self$datamatic$variables[[.var64]]
         neffects<-focal$neffects
-        .mods<-self$options$simpleModerators
+        .mods<-rev(self$options$simpleModerators)
         .mods64<-tob64(.mods)
         
         nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
@@ -308,7 +326,7 @@ Syntax <- R6::R6Class(
 
       fixed<-jmvcore::composeFormula(NULL,modelTerms)
       fixed<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),fixed)
-      self$formula<-trimws(paste(fixed,rands,sep =  ""))
+        self$formula<-trimws(paste(fixed,rands,sep =  ""))
       
     },
     

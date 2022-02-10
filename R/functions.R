@@ -61,7 +61,6 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     obj<-gsub(LEVEL_SYMBOL,"",obj,fixed = T)
     obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
     obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
-    
     obj
 }
 
@@ -69,10 +68,17 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     lapply(obj,bogusfromb64,ref=ref)
 }
 
+
 bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
 
-is.b64<-function(a) ifelse(length(grep(B64_SYMBOL,a,fixed = TRUE))>0,TRUE,FALSE)
+is.b64<-function(a) { 
+    test1<-length(grep(B64_SYMBOL,a,fixed = TRUE))>0
+    test2<-length(grep(LEVEL_SYMBOL,a,fixed = TRUE))>0
+    test3<-length(grep(FACTOR_SYMBOL,a,fixed = TRUE))>0
+    test4<-length(grep(INTERACTION_SYMBOL,a,fixed = TRUE))>0
+    any(test1,test2,test3,test4)
+}
 
 is.listOfList<-function(obj) {
 

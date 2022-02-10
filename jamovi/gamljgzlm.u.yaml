@@ -64,7 +64,6 @@ children:
                 type: RadioButton
                 optionName: modelSelection
                 optionPart: ordinal
-
               - type: RadioButton
                 name: modelSelection_multinomial
                 optionName: modelSelection
@@ -148,7 +147,7 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI)
+            enable: (showParamsCI || showExpbCI)
   - type: CollapseBox
     label: Model
     collapsed: true
@@ -264,39 +263,21 @@ children:
               - type: LayoutBox
                 margin: large
                 children:
-                  - type: RadioButton
-                    name: simpleScaleLabels_labels
-                    optionName: simpleScaleLabels
-                    optionPart: labels
-                  - type: RadioButton
-                    name: simpleScaleLabels_numbers
-                    optionName: simpleScaleLabels
-                    optionPart: values
-                  - type: RadioButton
-                    name: simpleScaleLabels_numbers_labels
-                    optionName: simpleScaleLabels
-                    optionPart: values_labels
-                  - name: simpleScaleLabels_uvalues
-                    type: RadioButton
-                    optionName: simpleScaleLabels
-                    optionPart: uvalues
-                  - name: simpleScaleLabels_uvalues_labels
-                    type: RadioButton
-                    optionName: simpleScaleLabels
-                    optionPart: uvalues_labels
+                  - type: ComboBox
+                    name: simpleScaleLabels
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
     stretchFactor: 1
     children:
       - type: Supplier
-        name: postHocSupplier
+        name: posthocSupplier
         persistentItems: false
         stretchFactor: 1
         format: term
         events:
-          change: './gamlj.events::onChange_postHocSupplier'
-          update: './gamlj.events::onUpdate_postHocSupplier'
+          change: './gamlj.events::onChange_posthocSupplier'
+          update: './gamlj.events::onUpdate_posthocSupplier'
         children:
           - type: TargetLayoutBox
             label: ''
@@ -312,22 +293,22 @@ children:
           - type: Label
             label: Correction
             children:
-              - name: postHocCorr_none
+              - name: posthocCorr_none
                 type: CheckBox
                 optionPart: none
-                optionName: postHocCorr
-              - name: postHocCorr_bonf
+                optionName: posthocCorr
+              - name: posthocCorr_bonf
                 type: CheckBox
                 optionPart: bonf
-                optionName: postHocCorr
-              - name: postHocCorr_tukey
+                optionName: posthocCorr
+              - name: posthocCorr_tukey
                 type: CheckBox
                 optionPart: tukey
-                optionName: postHocCorr
-              - name: postHocCorr_holm
+                optionName: posthocCorr
+              - name: posthocCorr_holm
                 type: CheckBox
                 optionPart: holm
-                optionName: postHocCorr
+                optionName: posthocCorr
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -468,29 +449,51 @@ children:
                   type: TermLabel
   - type: CollapseBox
     label: Options
-    style: inline
+    style: list
     collapsed: true
     stretchFactor: 1
     children:
-      - type: Label
-        label: CI Method
+      - type: LayoutBox
+        margin: large
+        style: inline
         children:
-          - type: RadioButton
-            name: cimethod_wald
-            optionName: cimethod
-            optionPart: wald
-          - type: RadioButton
-            name: cimethod_profile
-            optionName: cimethod
-            optionPart: profile
-          - type: RadioButton
-            name: cimethod_boot
-            optionName: cimethod
-            optionPart: boot
-      - type: Label
-        label: Save
-        children:
-          - type: Output
-            name: predicted
-          - type: Output
-            name: residuals
+          - type: Label
+            label: CI Method
+            children:
+              - type: RadioButton
+                name: cimethod_wald
+                optionName: cimethod
+                optionPart: wald
+              - name: cimethod_quantile
+                type: RadioButton
+                optionName: cimethod
+                optionPart: quantile
+              - name: cimethod_bcai
+                type: RadioButton
+                optionName: cimethod
+                optionPart: bcai
+              - type: TextBox
+                name: bootR
+                format: number
+                enable: (cimethod_quantile || cimethod_bcai)
+                
+          - type: Label
+            label: Omnibus Chi²
+            children:
+              - type: RadioButton
+                name: chisqType_lrt
+                optionName: chisqType
+                optionPart: lrt
+              - type: RadioButton
+                name: chisqType_wald
+                optionName: chisqType
+                optionPart: wald
+                
+          - type: Label
+            label: Save
+            children:
+              - type: Output
+                name: predicted
+              - type: Output
+                name: residuals
+                

@@ -121,7 +121,7 @@ hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~c1*c2,
-  postHocCorr = "bonf",
+  posthocCorr = "bonf",
   posthoc =  list("c1",c("c1","c2"))
 )
 
