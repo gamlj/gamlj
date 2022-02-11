@@ -38,7 +38,8 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     
     if (length(obj)>1)
         return(unlist(sapply(obj, bogusfromb64,ref=ref,USE.NAMES = F)))
-    
+  
+    obj<-gsub(LEVEL_SYMBOL,"",obj,fixed = T)
     if (!is.b64(obj))
           return(obj)
     
@@ -58,7 +59,6 @@ fromb64<- function(x,...) UseMethod(".fromb64")
             obj<-stringr::str_replace_all(obj,paste0("\\b",jmvcore::toB64(r),"\\b"),r)
         
     }
-    obj<-gsub(LEVEL_SYMBOL,"",obj,fixed = T)
     obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
     obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
     obj

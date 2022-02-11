@@ -520,10 +520,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   
         .names       <-  names(rows)
          parameters  <-  data.frame()
-         anovas  <-  data.frame()
+         anovas      <-  data.frame()
          
          data64      <-  mf.getModelData(model)
          
+         ## here we do the actual simple model ####
          for (i in 1:nrow(rows)) {
                 .data1<-data64
                  for (.name in .names) {
@@ -535,15 +536,22 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
                  .model  <-  update(model,data=.data1)
                  params  <-  as.data.frame(parameters::parameters(.model))
                  params  <-  params[params$Parameter %in% varobj$paramsnames64,]
-                 params[,.names]  <-  rows[i,]         
+                 params[,.names]  <-  rows[i,]      
                  parameters  <-  rbind(parameters,params)
-                 oneanova <- car::Anova(.model,test="LR",type=3,singular.ok=T)
+                 oneanova <- car::Anova(.model,test="Wald",type=3,singular.ok=T)
                  oneanova <- oneanova[rownames(oneanova) %in% varobj$name64,]
                  oneanova[,.names]  <-  rows[i,]         
                  anovas   <- rbind(anovas,oneanova)
     
          }
-         names(parameters)[1:8]<-c("contrast","estimate","se","nothing","ci.lower","ci.upper","test","df","p")
+         names(parameters)[1:9]<-c("contrast","estimate","se","nothing","est.ci.lower","est.ci.upper","test","df","p")
+         
+         ## add exp b
+         
+         parameters$expb<-exp(parameters$estimate)
+         parameters$expb.ci.lower<-exp(parameters$est.ci.lower)
+         parameters$expb.ci.upper<-exp(parameters$est.ci.upper)
+
          
          for (.name in .names) {
            parameters[[.name]]<-factor(parameters[[.name]])
@@ -551,25 +559,28 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
            parameters[[.name]]<-as.character(parameters[[.name]])
          }
          ### fix labels for  the response contrasts
-         parameters$Response<-factor(parameters$Response)
-         levels(parameters$Response)<-unlist(obj$datamatic$dep$contrast_labels)
-         parameters$Response<-as.character(parameters$Response)
+         parameters$response<-factor(parameters$Response)
+         levels(parameters$response)<-unlist(obj$datamatic$dep$contrast_labels)
+         parameters$response<-as.character(parameters$response)
          
          ### fix labels for the contrast column ###
          parameters$contrast<-factor(parameters$contrast)
          levels(parameters$contrast)<-unlist(varobj$contrast_labels)
          parameters$contrast<-as.character(parameters$contrast)
-         
-         .transname<-list(test="F.ratio")
+
+         ## fix names for moderators and tests
+         names(parameters)[names(parameters) %in% .names]<-paste0("mod_",make.names(fromb64(.names),unique = T))
+         .transname<-list(test=c("F.ratio","LR Chisq"),df1=c("Df"),p=c("Pr(>Chisq)"))
          names(anovas)<-transnames(names(anovas),.transname)
          
+         ### fix anovas
          for (.name in .names) {
            anovas[[.name]]<-factor(anovas[[.name]])
            levels(anovas[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
            anovas[[.name]]<-as.character(anovas[[.name]])
          }
+         names(anovas)[names(anovas) %in% .names]<-paste0("mod_",make.names(fromb64(.names),unique = T))
          
-
          return(list(anovas,parameters))
 }
 ## this is humbly supercool ###

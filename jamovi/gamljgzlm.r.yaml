@@ -129,8 +129,8 @@ items:
                     - cimethod
 
              columns:
-                    - name: Response
-                      title: Response contrast
+                    - name: response
+                      title: Response 
                       type: text
                       visible: (modelSelection:multinomial)
                       combineBelow: true
@@ -269,8 +269,8 @@ items:
               - cimethod
   
         columns:
-        - name: Response
-          title: Response level
+        - name: response
+          title: Response 
           type: text
           visible: (modelSelection:multinomial)
           combineBelow: true
@@ -384,14 +384,14 @@ items:
                  - bootR
  
               columns:
-                     - name: Response
-                       title: Response contrast
-                       type: text
-                       visible: (modelSelection:multinomial)
-
                      - name: contrast
                        title: "Effect"
                        type: text
+                     - name: response
+                       title: Response 
+                       type: text
+                       visible: (modelSelection:multinomial)
+
                      - name: estimate
                        title: "Estimate"
                        type: number
@@ -401,11 +401,24 @@ items:
                      - name: est.ci.lower
                        type: number
                        title: Lower
-                       visible: (showParamsCI || showExpbCI)
+                       visible: (showParamsCI)
                      - name: est.ci.upper
                        type: number
                        title: Upper
-                       visible: (showParamsCI || showExpbCI)
+                       visible: (showParamsCI)
+                     - name: expb
+                       type: number
+                       title: Exp(B)
+                       visible: (effectSize:expb)
+                     - name: expb.ci.lower
+                       type: number
+                       title: Lower
+                       visible: (showExpbCI)
+                     - name: expb.ci.upper
+                       type: number
+                       title: Upper
+                       visible: (showExpbCI)
+
                      - name: test
                        title: "z"
                        type: number
@@ -458,9 +471,15 @@ items:
              name: coefficients
              title: Parameter Estimates for -  $key
              columns:
+             
                    - name: effect
                      title: 'Effect'
                      type: text
+                   - name: response
+                     title: Response 
+                     type: text
+                     visible: (modelSelection:multinomial)
+                     
                    - name: estimate
                      title: Estimate
                      type: number

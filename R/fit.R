@@ -53,8 +53,9 @@ fit.R2<- function(model,...) UseMethod(".R2")
 
   
   llfull<-stats::logLik(model)  ### model loglikelihood
-  nullmodel <- stats::update(model, ~ 1,  evaluate = FALSE)
-  nullmodel <- eval.parent(nullmodel)
+  data<-mf.getModelData(model)
+  nullmodel <- stats::update(model, ~ 1, data=data,  evaluate = T)
+#  nullmodel <- eval.parent(nullmodel)
   llnull<-stats::logLik(nullmodel)
   r2<-as.numeric(1-(llfull/llnull))  
   compare<-anova(nullmodel,model)

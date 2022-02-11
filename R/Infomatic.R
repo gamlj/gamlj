@@ -78,7 +78,7 @@ Infomatic <- R6::R6Class(
         
         self$model         <-   c("Probit Model","Model for binary y")
         self$distribution  <-  "binomial"
-        self$family        <-   stats::binomial(link="probit")
+        self$family        <-   "binomial(link='probit')"
         self$call          <-   CALLS[[self$caller]]
         self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "probit"
@@ -96,7 +96,7 @@ Infomatic <- R6::R6Class(
         
         self$model         <-   c("Poisson Model","Model for count y")
         self$distribution  <-   "poisson"
-        self$family        <-   stats::poisson()
+        self$family        <-   "stats::poisson()"
         self$call          <-   CALLS[[self$caller]]
         self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "log"
@@ -109,7 +109,7 @@ Infomatic <- R6::R6Class(
         
         self$model         <-   c("Poisson Model","Model for overdispersed count y")
         self$distribution  <-   "quasi-poisson"
-        self$family        <-   stats::quasipoisson()
+        self$family        <-   "stats::quasipoisson()"
         self$call          <-   CALLS[[self$caller]]
         self$rcall         <-   FUNCS[[self$caller]]
         self$link          <-   "log"
@@ -136,7 +136,7 @@ Infomatic <- R6::R6Class(
       if (self$modeltype=="custom") {
         
         self$model         <-   c("User Model","Generalized model")
-        self$family        <-    do.call(options$custom_family,list(options$custom_link))
+        self$family        <-    "do.call(options$custom_family,list(options$custom_link))"
         self$distribution  <-    options$custom_family
         self$call          <-    CALLS[[self$caller]]
         self$rcall         <-    FUNCS[[self$caller]]

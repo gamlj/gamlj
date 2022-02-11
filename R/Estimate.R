@@ -347,7 +347,7 @@ Estimate <- R6::R6Class("Estimate",
                               opts[["formula"]]<-self$formula64
                               
                               if (is.something(self$infomatic$family))
-                                          opts[["family"]]<-self$infomatic$family    
+                                          opts[["family"]]<-str2lang(self$infomatic$family)    
                               
                               for (opt in names(self$infomatic$calloptions))
                                         opts[[opt]]<-self$infomatic$calloptions[[opt]]    
@@ -594,10 +594,10 @@ Estimate <- R6::R6Class("Estimate",
                             atable$source    <-  .rownames
                             atable$label     <-  self$datamatic$get_params_labels(.terms)
                             
-                            if ("Response" %in% names(atable)) {
-                                   atable$Response          <-  factor(atable$Response)
-                                   levels(atable$Response)  <-  unlist(self$datamatic$dep$contrast_labels)
-                                   atable$Response          <-  as.character(atable$Response)
+                            if ("response" %in% names(atable)) {
+                                   atable$response          <-  factor(atable$response)
+                                   levels(atable$response)  <-  unlist(self$datamatic$dep$contrast_labels)
+                                   atable$response          <-  as.character(atable$response)
                             }
                             if ("Component" %in% names(atable))
                                                atable$source[atable$Component=="alpha"]<-"Threshold"

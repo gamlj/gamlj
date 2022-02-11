@@ -49,7 +49,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
 
-      
       .bootstrap           <-  obj$options$cimethod %in% c("quantile","bcai")
       .iterations          <-  obj$options$bootR
       .ci_method           <-  obj$options$cimethod
@@ -58,7 +57,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       
       if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
         
-
       .coefficients        <-  as.data.frame(parameters::parameters(
                                                                    model,
                                                                    robust=.se_method,
@@ -66,7 +64,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                                                     ),stringAsFactors=FALSE)
     
       names(.coefficients) <-  c("source","estimate","se","t","df","p")
-
+      
       if (obj$option("showParamsCI")) {
 
         cidata            <-  as.data.frame(parameters::ci(.model,
@@ -104,21 +102,70 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
           }
       }
 
-      if (obj$option("effectSize","expb")) {
-               estim            <-  as.data.frame(parameters::parameters(model,
-                                                                      exponentiate=TRUE,
-                                                                      bootstrap=.bootstrap,
-                                                                      iterations=.iterations,
-                                                                      ci=.ci_width,
-                                                                      ci_method=.ci_method))
-               
-               .coefficients$expb          <-  estim$Coefficient
-               .coefficients$expb.ci.lower <-  estim$CI_low
-               .coefficients$expb.ci.upper <-  estim$CI_high
-      }
       .coefficients
 
 }
+
+
+.parameters.glm<-function(model,obj) {
+  
+  .bootstrap           <-  obj$options$cimethod %in% c("quantile","bcai")
+  .iterations          <-  obj$options$bootR
+  .ci_method           <-  obj$options$cimethod
+  .ci_width            <-  obj$ciwidth
+
+  if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
+  
+    .coefficients        <-  as.data.frame(parameters::parameters(
+      model,
+      ci=NULL,
+    ),stringAsFactors=FALSE)
+    
+    if ("Response" %in% names(.coefficients)) {
+        goodnames<-c("source","estimate","se","t","df","p","response")
+    }
+    else
+      goodnames<-c("source","estimate","se","t","df","p")
+
+    names(.coefficients)<-goodnames
+    
+    
+    if (obj$option("effectSize","expb")) {
+      estim            <-  as.data.frame(parameters::parameters(model,
+                                                                exponentiate=TRUE,
+                                                                bootstrap=.bootstrap,
+                                                                iterations=.iterations,
+                                                                ci=.ci_width,
+                                                                ci_method=.ci_method))
+      
+      .coefficients$expb          <-  estim$Coefficient
+      .coefficients$expb.ci.lower <-  estim$CI_low
+      .coefficients$expb.ci.upper <-  estim$CI_high
+    }
+    
+    
+  
+  if (obj$option("showParamsCI")) {
+    
+    cidata            <-  as.data.frame(parameters::ci(.model,
+                                                       ci=.ci_width,
+                                                       ci_method=.ci_method))
+    
+    .coefficients$est.ci.lower<-cidata$CI_low
+    .coefficients$est.ci.upper<-cidata$CI_high
+    
+  }
+  
+
+  .coefficients
+  
+}
+
+.parameters.multinom<-function(model,obj) 
+        .parameters.glm(model,obj)
+    
+.parameters.polr<-function(model,obj) 
+  .parameters.glm(model,obj)
 
 .parameters.lmerModLmerTest<-function(model,obj) {
   

@@ -56,6 +56,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
       aSmartObj$ci("est",self$options$ciWidth)
       aSmartObj$ci("expb",self$options$ciWidth)
+      aSmartObj$spaceBy<-"response"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### contrasts code tables
@@ -112,6 +113,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$key<-self$options$simpleVariable
       aSmartObj$ci("est",self$options$ciWidth)
+      aSmartObj$ci("expb",self$options$ciWidth)
       aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
       aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
