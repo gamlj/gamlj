@@ -140,8 +140,21 @@ Estimate <- R6::R6Class("Estimate",
                           run_main_paralleltest=function() {
                             tab<-NULL
                             if (self$isProper) {
-                              mod<-ordinal::clm(self$formula64,data=self$model$model)
-                              tab<-as.data.frame(ordinal::nominal_test(mod))
+                              obj<-try_hard({
+                                form<-formula(paste(self$formula64,collapse = ""))
+                                mod<-do.call(ordinal::clm,list(formula=form,data=self$model$model))
+                                ordinal::nominal_test(mod)
+                                
+                                })
+                              if (!isFALSE(obj$error))
+                                    warnings(obj$error)
+                              
+                              if (!isFALSE(obj$warning)) {
+                                  if (length(grep("deprecated",obj$warning,fixed=T ))==0)
+                                        warnings(obj$warning)
+                              }
+                              
+                              tab<-as.data.frame(obj$obj)
                               tab<-tab[rownames(tab)!="<none>",]
                               names(tab)<-c("df","loglik","aic", "test","p")
                               
