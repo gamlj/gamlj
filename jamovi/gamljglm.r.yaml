@@ -124,7 +124,7 @@ items:
                          - fixedIntercept
  
              columns:
-                    - name: name
+                    - name: source
                       title: ""
                       type: text
                     - name: ss

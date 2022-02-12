@@ -48,7 +48,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modelSelection = "linear",
             custom_family = "gaussian",
             custom_link = "identity",
-            chisqType = "lrt", ...) {
+            chisqType = "lrt",
+            propodds = FALSE, ...) {
 
             super$initialize(
                 package="gamlj",
@@ -338,6 +339,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "lrt",
                     "wald"),
                 default="lrt")
+            private$..propodds <- jmvcore::OptionBool$new(
+                "propodds",
+                propodds,
+                default=FALSE)
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
@@ -382,6 +387,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
             self$.addOption(private$..chisqType)
+            self$.addOption(private$..propodds)
         }),
     active = list(
         .caller = function() private$...caller$value,
@@ -426,7 +432,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         modelSelection = function() private$..modelSelection$value,
         custom_family = function() private$..custom_family$value,
         custom_link = function() private$..custom_link$value,
-        chisqType = function() private$..chisqType$value),
+        chisqType = function() private$..chisqType$value,
+        propodds = function() private$..propodds$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
@@ -470,7 +477,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..modelSelection = NA,
         ..custom_family = NA,
         ..custom_link = NA,
-        ..chisqType = NA)
+        ..chisqType = NA,
+        ..propodds = NA)
 )
 
 gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -533,7 +541,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
-                    relativerisk = function() private$.items[["relativerisk"]]),
+                    relativerisk = function() private$.items[["relativerisk"]],
+                    paralleltest = function() private$.items[["paralleltest"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -611,7 +620,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "chisqType"),
                             columns=list(
                                 list(
-                                    `name`="name", 
+                                    `name`="source", 
                                     `title`="", 
                                     `type`="text"),
                                 list(
@@ -769,6 +778,47 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="test", 
                                     `title`="X\u00B2", 
                                     `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="paralleltest",
+                            title="Parallel lines test",
+                            visible="(propodds & modelSelection:ordinal)",
+                            clearWith=list(
+                                "dep",
+                                "modelTerms",
+                                "contrasts",
+                                "scaling",
+                                "fixedIntercept",
+                                "effectSize",
+                                "ciWidth",
+                                "propodds"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="", 
+                                    `type`="text", 
+                                    `visible`="(showRealNames)"),
+                                list(
+                                    `name`="loglik", 
+                                    `title`="Log-Lik.", 
+                                    `type`="number"),
+                                list(
+                                    `name`="aic", 
+                                    `title`="AIC", 
+                                    `type`="number"),
+                                list(
+                                    `name`="test", 
+                                    `title`="X\u00B2", 
+                                    `type`="number"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="integer"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -1280,6 +1330,8 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   identity, log and inverse, onemu2 (for 1/mu^2).
 #' @param chisqType Chi-squared computation method. \code{'lrt'} (default)
 #'   gives LogLikelihood ration test,  \code{'wald'} gives the Wald Chi-squared.
+#' @param propodds Test parallel lines assumptions in cumulative link model
+#'   (ordinal regression)
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1291,6 +1343,7 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$paralleltest} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
 #'   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
@@ -1354,6 +1407,7 @@ gamljGzlm <- function(
     custom_family = "gaussian",
     custom_link = "identity",
     chisqType = "lrt",
+    propodds = FALSE,
     formula) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
@@ -1455,7 +1509,8 @@ gamljGzlm <- function(
         modelSelection = modelSelection,
         custom_family = custom_family,
         custom_link = custom_link,
-        chisqType = chisqType)
+        chisqType = chisqType,
+        propodds = propodds)
 
     analysis <- gamljGzlmClass$new(
         options = options,

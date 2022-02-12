@@ -570,5 +570,13 @@ options:
             `'wald'` gives the Wald Chi-squared.
 
 
+    - name: propodds
+      title: Parallel lines
+      type: Bool
+      default: false
+      description:
+          R: >
+             Test parallel lines assumptions in cumulative link model (ordinal regression)
+
 ...
 

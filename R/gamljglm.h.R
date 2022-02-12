@@ -686,7 +686,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixedIntercept"),
                             columns=list(
                                 list(
-                                    `name`="name", 
+                                    `name`="source", 
                                     `title`="", 
                                     `type`="text"),
                                 list(

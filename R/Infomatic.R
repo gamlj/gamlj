@@ -151,7 +151,8 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Ordinal GLM","Proportional odds logistic")
         self$distribution  <-    "logistic"
         self$call          <-    "ordinal"
-        self$rcall         <-    "MASS::polr"
+        #self$rcall         <-    "ordinal::clm"  
+        self$rcall        <-    "MASS::polr"
         self$calloptions   <-    list(model=TRUE, Hess=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "expected class"

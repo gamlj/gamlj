@@ -121,7 +121,8 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
 .compare_null_model.default<-function(model) {
   
-  data    <-  mf.getModelData(model)
+  data    <-  insight::get_data(model)
+  head(data)
   int<-attr(terms(model),"intercept")
   form<- as.formula(paste("~",int))
   model0  <-  stats::update(model,form ,data=data,evaluate=T)

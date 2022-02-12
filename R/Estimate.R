@@ -136,9 +136,19 @@ Estimate <- R6::R6Class("Estimate",
                               tab       <-  private$.fix_names(tab)
                             }
                             tab
-                            
-                            
                           },
+                          run_main_paralleltest=function() {
+                            tab<-NULL
+                            if (self$isProper) {
+                              mod<-ordinal::clm(self$formula64,data=self$model$model)
+                              tab<-as.data.frame(ordinal::nominal_test(mod))
+                              tab<-tab[rownames(tab)!="<none>",]
+                              names(tab)<-c("df","loglik","aic", "test","p")
+                              
+                            }
+                            tab
+                          },
+                          
                           run_posthoc=function() {
                             
                             if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
@@ -363,7 +373,7 @@ Estimate <- R6::R6Class("Estimate",
                               
                               if (mf.aliased(results$obj))
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
-                             
+                              
                               .model<-mf.fixModel(results$obj,self)
                               
                               return(.model)

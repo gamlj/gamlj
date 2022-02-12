@@ -100,7 +100,7 @@ items:
                          - effectSize
                          - chisqType
              columns:
-                    - name: name
+                    - name: source
                       title: ""
                       type: text
                     - name: test
@@ -244,6 +244,40 @@ items:
                       type: number
                       format: zto,pvalue
 
+           - name: paralleltest
+             title: Parallel lines test
+             type: Table
+             visible: (propodds & modelSelection:ordinal)
+             clearWith:
+                    - dep
+                    - modelTerms
+                    - contrasts
+                    - scaling
+                    - fixedIntercept
+                    - effectSize
+                    - ciWidth
+                    - propodds
+             columns:
+                    - name: source
+                      title: ""
+                      type: text
+                      visible: (showRealNames)
+                    - name: loglik
+                      title: "Log-Lik."
+                      type: number
+                    - name: aic
+                      title: "AIC"
+                      type: number
+                    - name: test
+                      title:  X²
+                      type: number
+                    - name: df
+                      title: "df"
+                      type: integer
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
   - name: posthoc
     title: Post Hoc Tests

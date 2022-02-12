@@ -200,17 +200,16 @@ children:
             margin: large
             style: list
             children:
-                    - type: Label
-                      label: Covariates labeling
-                      children:
-                             - type: ComboBox
-                               name: simpleScaleLabels
-                    - type: Label
-                      label: Dependent variable
-                      children:
-                             - type: ComboBox
-                               name: dep_scale
-
+              - type: Label
+                label: Covariates labeling
+                children:
+                  - type: ComboBox
+                    name: simpleScaleLabels
+              - type: Label
+                label: Dependent variable
+                children:
+                  - type: ComboBox
+                    name: dep_scale
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -441,7 +440,6 @@ children:
                 name: cimethod_wald
                 optionName: cimethod
                 optionPart: wald
-
               - type: RadioButton
                 name: cimethod_quantile
                 optionName: cimethod

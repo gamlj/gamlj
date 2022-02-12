@@ -72,7 +72,7 @@ Syntax <- R6::R6Class(
       
       tab<-list()
       if (self$hasTerms)
-        tab<-lapply(self$options$modelTerms, function(x) list(name=.stringifyTerm(x)))
+        tab<-lapply(self$options$modelTerms, function(x) list(source=.stringifyTerm(x)))
       
       if (self$options$modelSelection=="lm") {
         if (self$hasTerms)
@@ -153,6 +153,10 @@ Syntax <- R6::R6Class(
           alist  <-  alist[-1]
       }
       alist
+    },
+    init_main_paralleltest=function() {
+      
+      self$init_main_anova()
     },
     ### posthoc means ###
     

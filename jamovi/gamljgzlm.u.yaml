@@ -476,7 +476,6 @@ children:
                 name: bootR
                 format: number
                 enable: (cimethod_quantile || cimethod_bcai)
-                
           - type: Label
             label: Omnibus Chi²
             children:
@@ -488,7 +487,6 @@ children:
                 name: chisqType_wald
                 optionName: chisqType
                 optionPart: wald
-                
           - type: Label
             label: Save
             children:
@@ -496,4 +494,9 @@ children:
                 name: predicted
               - type: Output
                 name: residuals
-                
+          - type: Label
+            name: propLabel
+            label: Test
+            children:
+              - type: CheckBox
+                name: propodds

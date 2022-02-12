@@ -97,7 +97,7 @@ procedure.posthoc <- function(obj) {
      rownames(tableData)<-NULL
     
     for (.name in .names)
-      tableData[,.name]<-as.character(tableData[,.name])
+      tableData[,.name]<-fromb64(as.character(tableData[,.name]))
     
 
     if ("Response" %in% names(tableData))

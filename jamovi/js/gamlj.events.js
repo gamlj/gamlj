@@ -7,7 +7,6 @@ const events = {
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updatePlotsSupplier(ui, this);
-        
 
     },
 
@@ -27,6 +26,7 @@ const events = {
         updateSimpleSupplier(ui, this);
         updateEmmeansSupplier(ui, this);
         updatePlotsSupplier(ui, this);
+
 
 
     },
@@ -63,6 +63,13 @@ const events = {
                ui.effectSize_expb.setValue(true);
                ui.showParamsCI.setValue(false);
                ui.showExpbCI.setValue(true);
+        }
+        
+        if (ui.modelSelection.getValue()==="ordinal") {
+          ui.propLabel.$el.show();
+        } else {
+          ui.propLabel.$el.hide();
+
         }
   
         ui.dep.setValue(null);
@@ -289,6 +296,8 @@ var updateScaling = function(ui, variableList, context) {
     }
     ui.scaling.setValue(list3);
 };
+
+
 
 var containsCovariate = function(value, covariates) {
     for (var i = 0; i < covariates.length; i++) {
