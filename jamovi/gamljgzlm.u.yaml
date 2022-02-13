@@ -148,6 +148,14 @@ children:
             suffix: '%'
             format: number
             enable: (showParamsCI || showExpbCI)
+      - type: Label
+        label: Estimation
+        margin: large
+        style: list
+        children:
+          - name: donotrun
+            type: CheckBox
+
   - type: CollapseBox
     label: Model
     collapsed: true

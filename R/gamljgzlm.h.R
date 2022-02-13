@@ -14,6 +14,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modelTerms = NULL,
             fixedIntercept = TRUE,
             showParamsCI = TRUE,
+            donotrun = FALSE,
             paramCIWidth = 95,
             contrasts = NULL,
             showRealNames = TRUE,
@@ -100,6 +101,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "showParamsCI",
                 showParamsCI,
                 default=TRUE)
+            private$..donotrun <- jmvcore::OptionBool$new(
+                "donotrun",
+                donotrun,
+                default=FALSE)
             private$..paramCIWidth <- jmvcore::OptionNumber$new(
                 "paramCIWidth",
                 paramCIWidth,
@@ -352,6 +357,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..modelTerms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..showParamsCI)
+            self$.addOption(private$..donotrun)
             self$.addOption(private$..paramCIWidth)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..showRealNames)
@@ -398,6 +404,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         modelTerms = function() private$..modelTerms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         showParamsCI = function() private$..showParamsCI$value,
+        donotrun = function() private$..donotrun$value,
         paramCIWidth = function() private$..paramCIWidth$value,
         contrasts = function() private$..contrasts$value,
         showRealNames = function() private$..showRealNames$value,
@@ -443,6 +450,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..modelTerms = NA,
         ..fixedIntercept = NA,
         ..showParamsCI = NA,
+        ..donotrun = NA,
         ..paramCIWidth = NA,
         ..contrasts = NA,
         ..showRealNames = NA,
@@ -791,11 +799,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "modelTerms",
-                                "contrasts",
-                                "scaling",
                                 "fixedIntercept",
-                                "effectSize",
-                                "ciWidth",
                                 "propodds"),
                             columns=list(
                                 list(
@@ -1143,10 +1147,6 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="SE", 
                             `type`="number"),
                         list(
-                            `name`="df", 
-                            `title`="df", 
-                            `type`="integer"),
-                        list(
                             `name`="est.ci.lower", 
                             `title`="Lower", 
                             `type`="number"),
@@ -1256,6 +1256,8 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param showParamsCI \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
+#' @param donotrun \code{TRUE} (default) or \code{FALSE} , parameters CI in
+#'   table
 #' @param paramCIWidth a number between 50 and 99.9 (default: 95) specifying
 #'   the confidence interval width for the parameter estimates
 #' @param contrasts a named vector of the form \code{c(var1="type",
@@ -1372,6 +1374,7 @@ gamljGzlm <- function(
     modelTerms = NULL,
     fixedIntercept = TRUE,
     showParamsCI = TRUE,
+    donotrun = FALSE,
     paramCIWidth = 95,
     contrasts = NULL,
     showRealNames = TRUE,
@@ -1477,6 +1480,7 @@ gamljGzlm <- function(
         modelTerms = modelTerms,
         fixedIntercept = fixedIntercept,
         showParamsCI = showParamsCI,
+        donotrun = donotrun,
         paramCIWidth = paramCIWidth,
         contrasts = contrasts,
         showRealNames = showRealNames,

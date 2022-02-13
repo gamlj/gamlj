@@ -65,20 +65,26 @@ procedure.posthoc <- function(obj) {
      tukey <- .posthoc(model, .term64, "tukey",vfun=vfun)
      sidak <- .posthoc(model, .term64, "sidak",vfun=vfun)
      scheffe <- .posthoc(model, .term64, "scheffe",vfun=vfun)
-      
-     cidata <- .posthoc_ci(.model,.term64,obj$ciwidth,obj$options$cimethod,vfun=vfun)
-
-
+     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$cimethod,vfun=vfun)
      tableData <- as.data.frame(none, stringAsFactors = FALSE)
+     .transnames<-list(estimate=c("odds.ratio","ratio"),
+                       test=c("z.ratio","t.ratio"),
+                       p="p.value",
+                       se="SE",
+                       response=tob64(dep)
+     )
+     names(tableData)<-transnames(names(tableData),.transnames)    
      tableData$contrast <- as.character(tableData$contrast)
+     tableData$bonf <- bonferroni$p.value
+     tableData$holm <- holm$p.value
+     tableData$tukey <- tukey$p.value
+     tableData$scheffe <- scheffe$p.value
+     tableData$sidak <- sidak$p.value
      
-     tableData$bonf <- bonferroni$p
-     tableData$holm <- holm$p
-     tableData$tukey <- tukey$p
-     tableData$scheffe <- scheffe$p
-     tableData$sidak <- sidak$p
      tableData$est.ci.lower<-cidata$est.ci.lower       
      tableData$est.ci.upper<-cidata$est.ci.upper       
+     
+
     .cont <- as.character(tableData$contrast)
     .cont <- gsub(" - ", "-", .cont, fixed = T)
     .cont <- gsub(" / ", "/", .cont, fixed = T)
@@ -100,8 +106,8 @@ procedure.posthoc <- function(obj) {
       tableData[,.name]<-fromb64(as.character(tableData[,.name]))
     
 
-    if ("Response" %in% names(tableData))
-        tableData$Response<-as.character(tableData$Response)
+    if ("response" %in% names(tableData))
+        tableData$response<-fromb64(as.character(tableData$response))
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
 
@@ -138,6 +144,14 @@ procedure.posthoc_effsize <- function(obj) {
     
     base <- .posthoc(model, .term64, "none", vfun=vfun)
     tableData <- as.data.frame(base, stringAsFactors = FALSE)
+
+    .transnames<-list(estimate=c("odds.ratio","ratio"),
+                      test=c("z.ratio","t.ratio"),
+                      p="p.value",
+                      se="SE"
+    )
+    names(tableData)<-transnames(names(tableData),.transnames)    
+    
     tableData$contrast <- as.character(tableData$contrast)
     
     .cont <- as.character(tableData$contrast)
@@ -210,23 +224,21 @@ procedure.posthoc_effsize <- function(obj) {
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(FALSE,TRUE))
 
-      .transnames<-list(estimate=c("odds.ratio"),
-                        test=c("z.ratio","t.ratio"),
-                        p="p.value",
-                        se="SE"
-                        )
-      names(results)<-transnames(names(results),.transnames)    
-
+ 
   results
 }
 
-.posthoc.multinom <- function(model, term, adjust,ci=FALSE) {
-  
+.posthoc.multinom <- function(model, term, adjust,ci=FALSE,vfun=NULL) {
+
+  if (inherits(model,"bootstrap_model") )
+       model<-attr(model,"original_model")
+      
   results <- try({
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)
     tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
-    data <- mf.getModelData(model)
+    data <- insight::get_data(model)
+    
     suppressMessages({
       referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
       terms <- jmvcore::decomposeTerm(term)
@@ -236,7 +248,6 @@ procedure.posthoc_effsize <- function(obj) {
       results <- summary(graphics::pairs(referenceGrid, by=dep, adjust = adjust),infer = c(ci,TRUE))
     })
   })
-  
   return(results)
 }
 
@@ -250,13 +261,39 @@ procedure.posthoc_effsize <- function(obj) {
   opts_list<-list(object=model,specs=termf, type = "response")
   
   if (is.something(vfun))
-    opts_list[["vcov."]]<-vfun    
+    opts_list[["vcov."]]<-vfun   
   
   referenceGrid <- do.call(emmeans::emmeans,opts_list)
   results<-as.data.frame(parameters::parameters(referenceGrid$contrasts,ci=width,ci_method=method))
   results<-as.data.frame(cbind(results$CI_low,results$CI_high))
   names(results)<-c("est.ci.lower","est.ci.upper")
   results
+  
+}
+.posthoc_ci.multinom=function(model,term,width,method,vfun=NULL) {
+
+  if (inherits(model,"bootstrap_model") )
+    model<-attr(model,"original_model")
+  
+  results <- try({
+    dep <- names(attr(stats::terms(model), "dataClass"))[1]
+    dep <- jmvcore::composeTerm(dep)
+    tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
+    data <- insight::get_data(model)
+    
+    suppressMessages({
+      referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
+      terms <- jmvcore::decomposeTerm(term)
+      labs <- referenceGrid@grid[terms]
+      newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
+      referenceGrid@grid[terms] <- newlabs
+      results <- as.data.frame(summary(graphics::pairs(referenceGrid, by=dep),infer = c(TRUE,FALSE)))
+      results<-as.data.frame(cbind(results$lower.CL,results$upper.CL))
+      names(results)<-c("est.ci.lower","est.ci.upper")
+      results
+    })
+  })
+  return(results)
   
 }
 

@@ -10,7 +10,7 @@ gamljGzlmClass <- R6::R6Class(
     .smartObjs=list(),
     .init=function() {
       
-      ginfo("MODULE:  #### phase init ####")
+      ginfo(paste("MODULE:",self$options$.caller,self$options$modelSelection,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
       private$.ready<-readiness(self$options)
@@ -145,6 +145,8 @@ gamljGzlmClass <- R6::R6Class(
       
       ginfo("MODULE:  #### phase run ####")
       
+      if (self$options$donotrun) return()
+        
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()

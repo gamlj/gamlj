@@ -85,7 +85,7 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "probabilities"
         self$deptype       <-    "factor"
         self$depnlevels    <-    2
-        
+        self$comparison    <-    "OR"
         ### compute direction ###
         dlevs              <-   datamatic$variables[[tob64(options$dep)]]$levels
         theory             <-   "P(y=1)"
@@ -103,6 +103,7 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "expected counts"
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
+        self$comparison    <-    "Ratio"
         
       }
       if (self$modeltype=="poiover") {
@@ -115,6 +116,7 @@ Infomatic <- R6::R6Class(
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
         self$deptype       <-   "integer"
+        self$comparison    <-    "Ratio"
         
         ### compute direction ###
         self$direction     <-   c("y","Dependent variable counts")
@@ -130,7 +132,7 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "expected counts"
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
-        
+        self$comparison    <-    "Ratio"
       }
       
       if (self$modeltype=="custom") {
@@ -156,6 +158,8 @@ Infomatic <- R6::R6Class(
         self$calloptions   <-    list(model=TRUE, Hess=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "expected class"
+        self$comparison    <-    "Ratio"
+        
         ### compute direction ###
         theory             <-     paste('P(Y',greek_vector['leq'],'j)/P(Y', greek_vector['gt'],' j)')
         actual             <-     paste("j=",paste(dlevs,collapse = " | "))

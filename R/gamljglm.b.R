@@ -10,7 +10,7 @@ gamljGlmClass <- R6::R6Class(
     .time=NULL,
     .smartObjs=list(),
     .init=function() {
-      ginfo("MODULE:  #### phase init ####")
+      ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
       private$.ready<-readiness(self$options)

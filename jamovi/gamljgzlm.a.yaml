@@ -111,6 +111,13 @@ options:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
 
+    - name: donotrun
+      title: Do not run
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , parameters CI in table
 
     - name: paramCIWidth
       title: Confidence level
