@@ -17,9 +17,9 @@ Dispatch <- R6::R6Class(
                            return()
               obj<-fromb64(obj)
               topic<-private$.warnings[[obj$topic]]
+              id<-tob64(ifelse(hasName(obj,"id"),obj$id,as.character(length(topic)+1)))
               msg<-private$.translate(obj$message)
-              topic[[length(topic)+1]]<-msg
-              topic<-unique(topic)
+              topic[[id]]<-msg
               private$.warnings[[obj$topic]]<-topic
           },
         errors=function(obj) {

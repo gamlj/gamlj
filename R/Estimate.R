@@ -181,7 +181,7 @@ Estimate <- R6::R6Class("Estimate",
                               private$.bootstrap_model()
                             if (self$option("modelSelection","ordinal")) {
                                  msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                 self$dispatcher$warnings<-list(topic="emmeans",message=paste("Classes are:",msg))
+                                 self$dispatcher$warnings<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
                             }
                             procedure.emmeans(self)
                           },

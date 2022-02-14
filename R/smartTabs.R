@@ -127,8 +127,8 @@ SmartTable <- R6::R6Class("SmartTable",
                             retrieveNotes=function(dispatcher=NULL) {
                               
                                 if (is.something(self$table$state$notes))
-                                    for (n in self$table$state$notes)
-                                        private$.setNote(n)
+                                    for (i in seq_along(self$table$state$notes))
+                                        private$.setNote(self$table$state$notes[i])
                             },
                             
                             setNotes=function(dispatcher=NULL) {
@@ -136,8 +136,11 @@ SmartTable <- R6::R6Class("SmartTable",
                                 if (is.something(dispatcher)) {
                                     topics<-intersect(dispatcher$warnings_topics,self$topics)
                                     for (t in topics) {
-                                      for (m in dispatcher$warnings[[t]]) 
-                                             private$.setNote(m)
+                                      for (i in seq_along(dispatcher$warnings[[t]])) {
+                                        m<-dispatcher$warnings[[t]][i]
+                                        private$.setNote(m)
+
+                                      } 
                                     }
 
                                 }
@@ -248,7 +251,9 @@ SmartTable <- R6::R6Class("SmartTable",
                                 
                                 if (warning!=FALSE) {
                                   if ("notes" %in% names(self$table)) {
-                                      private$.setNote(warning)
+                                      n<-list()
+                                      n[[tob64(warning)]]<-warning
+                                      private$.setNote(n)
                                   } 
                                 }
                                 
@@ -387,10 +392,11 @@ SmartTable <- R6::R6Class("SmartTable",
                               }
                             }, 
                             .setNote=function(note) {
+                              id<-names(note)
                               note<-as.character(note)
-                              self$table$setNote(make.names(note),note)
+                              self$table$setNote(id,note)
                               state<-self$table$state
-                              state$notes[[make.names(note)]]<-note
+                              state$notes[[id]]<-note
                               self$table$setState(state)
                             },
 
