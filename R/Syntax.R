@@ -73,7 +73,7 @@ Syntax <- R6::R6Class(
       tab<-list()
       if (self$hasTerms)
         tab<-lapply(self$options$modelTerms, function(x) list(source=.stringifyTerm(x)))
-      
+
       if (self$options$modelSelection=="lm") {
         if (self$hasTerms)
           tab<-prepend_list(tab,list(name="Model",f="."))

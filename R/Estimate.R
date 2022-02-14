@@ -73,7 +73,7 @@ Estimate <- R6::R6Class("Estimate",
                             if (!self$isProper) 
                                 self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
                             mf.anova(self$model,self)
-                              
+                            
                           },
                           
                           run_main_r2=function() {
@@ -334,8 +334,7 @@ Estimate <- R6::R6Class("Estimate",
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
                                   stop(unlist(self$datamatic$errors))
-                            
-                              if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
+                                if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
                                     t2  <-  paste(self$infomatic$deptype,collapse = " or ")
                                     t1  <-  self$datamatic$dep$type
                                     m   <-   self$infomatic$model[1]
@@ -381,6 +380,7 @@ Estimate <- R6::R6Class("Estimate",
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
 
+
                               results<-try_hard(eval(acall))
                               
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
@@ -389,7 +389,7 @@ Estimate <- R6::R6Class("Estimate",
                               
                               if (mf.aliased(results$obj))
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
-                              
+
                               .model<-mf.fixModel(results$obj,self)
                               
                               return(.model)

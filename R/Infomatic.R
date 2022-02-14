@@ -138,13 +138,13 @@ Infomatic <- R6::R6Class(
       if (self$modeltype=="custom") {
         
         self$model         <-   c("User Model","Generalized model")
-        self$family        <-    "do.call(options$custom_family,list(options$custom_link))"
+        self$family        <-    paste(options$custom_family,"(",options$custom_link,")")
         self$distribution  <-    options$custom_family
         self$call          <-    CALLS[[self$caller]]
         self$rcall         <-    FUNCS[[self$caller]]
         self$link          <-    options$custom_link
         self$emmeans       <-   "the response metric"
-        self$direction     <-   c("y","Dependent variable counts")
+        self$direction     <-   c("y","Dependent variable scores")
         self$deptype       <-   c("numeric","integer","factor")
       }
 

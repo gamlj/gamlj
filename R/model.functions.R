@@ -340,11 +340,11 @@ mf.anova<- function(x,...) UseMethod(".anova")
             return(NULL)
         
         .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
-        
         .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
         names(.anova)<-transnames(names(.anova),.transnames)
         
         .anova<-.anova[rownames(.anova)!="(Intercept)",]   
+        .anova$source<-rownames(.anova)
         .anova
         
 }
