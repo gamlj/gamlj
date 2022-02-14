@@ -331,7 +331,6 @@ procedure.emmeans<-function(obj) {
                     specs=term64,
                     at=conditions,
                     type=type,
-                    mode=mode,
                     nesting = NULL,
                     options = c(level=obj$ciwidth)
     )
@@ -343,7 +342,8 @@ procedure.emmeans<-function(obj) {
 
     if (obj$option("modelSelection","ordinal"))
       opts_list[["mode"]]<-"mean.class"
-    
+
+
     ### now we get the estimated means #######
     referenceGrid<-do.call(emmeans::emmeans,opts_list)
     tableData<-as.data.frame(referenceGrid)
@@ -369,9 +369,9 @@ procedure.emmeans<-function(obj) {
 
     ## rename the dependent for multinomial ##
     if (obj$options$modelSelection=="multinomial")
-         names(tableData)[1]<-"Response"
+         names(tableData)[1]<-"response"
 
-    names(tableData)[1:length(term64)]<-rev(term)
+    names(tableData)<-fromb64(names(tableData))
     results[[length(results)+1]]<-tableData
   }
   gend()

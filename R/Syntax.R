@@ -212,6 +212,7 @@ Syntax <- R6::R6Class(
     },
     
     init_simpleEffects_anova=function() {
+      
         .var64<-tob64(self$options$simpleVariable)
         .mods<-rev(self$options$simpleModerators)
         .mods64<-tob64(.mods)

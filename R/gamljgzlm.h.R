@@ -1139,6 +1139,11 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "cimethod"),
                     columns=list(
                         list(
+                            `name`="response", 
+                            `title`="Response", 
+                            `type`="text", 
+                            `visible`="(modelSelection:multinomial)"),
+                        list(
                             `name`="estimate", 
                             `title`="Mean", 
                             `type`="number"),

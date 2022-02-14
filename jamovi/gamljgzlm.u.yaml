@@ -508,3 +508,4 @@ children:
             children:
               - type: CheckBox
                 name: propodds
+                enable: (modelSelection_ordinal)

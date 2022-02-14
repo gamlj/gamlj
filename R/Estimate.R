@@ -179,7 +179,10 @@ Estimate <- R6::R6Class("Estimate",
                             
                             if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
                               private$.bootstrap_model()
-                            
+                            if (self$option("modelSelection","ordinal")) {
+                                 msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
+                                 self$dispatcher$warnings<-list(topic="emmeans",message=paste("Classes are:",msg))
+                            }
                             procedure.emmeans(self)
                           },
                           

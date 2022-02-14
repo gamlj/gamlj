@@ -549,6 +549,10 @@ items:
             - cimethod
 
         columns:
+        - name: response
+          title: Response 
+          type: text
+          visible: (modelSelection:multinomial)
         - name: estimate
           title: 'Mean'
           type: number
