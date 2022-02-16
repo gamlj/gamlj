@@ -652,7 +652,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="",
                     columns=list(
                         list(
-                            `name`="dep", 
+                            `name`="response", 
                             `title`="Response Groups", 
                             `type`="text", 
                             `visible`="(modelSelection:multinomial)", 

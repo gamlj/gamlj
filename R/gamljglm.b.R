@@ -465,8 +465,12 @@ gamljGlmClass <- R6::R6Class(
   peta<-effectsize::t_to_eta2(tt,df_error = df)
   omega<-effectsize::t_to_omega2(tt,df_error = df)
   epsilon<-effectsize::t_to_epsilon2(tt,df_error = df)
-  tableRow<-list(df=df,f=f,etaSqP=peta$Eta_Sq_partial,omegaSq=omega$Omega_Sq_partial,epsilonSq=epsilon$Epsilon2_partial,p=p)
+  mark(peta)
+  mark(omega)
+  mark(epsilon)
+  tableRow<-list(df=df,f=f,etap=peta$Eta2_partial,omegap=omega$Omega2_partial,epsilonp=epsilon$Epsilon2_partial,p=p)
   aTable<-self$results$main$interceptTable
+  mark(tableRow)
   aTable$setRow(rowNo=1,tableRow)
 },
 
@@ -503,12 +507,12 @@ gamljGlmClass <- R6::R6Class(
   .canova<-rbind(.anova,add)
   last<-length(effss)[1]+1
   
-  eta  <-    effectsize::eta_squared(.canova,partial = F,ci=ciWidth,verbose=F)
-  peta <-    effectsize::eta_squared(.anova,partial = T,ci=ciWidth,verbose=F)
-  omega <-   effectsize::omega_squared(.canova,partial = F,ci=ciWidth,verbose=F)
-  omegap<-   effectsize::omega_squared(.anova,partial = T,ci=ciWidth,verbose=F)
-  epsilon<-  effectsize::epsilon_squared(.canova,partial = F,ci=ciWidth,verbose=F)
-  epsilonp<- effectsize::epsilon_squared(.anova,partial = T,ci=ciWidth,verbose=F)
+  eta  <-    effectsize::eta_squared(.canova,partial = F,ci=ciWidth,verbose=F,alternative = "two.sided")
+  peta <-    effectsize::eta_squared(.anova,partial = T,ci=ciWidth,verbose=F,alternative = "two.sided")
+  omega <-   effectsize::omega_squared(.canova,partial = F,ci=ciWidth,verbose=F,alternative = "two.sided")
+  omegap<-   effectsize::omega_squared(.anova,partial = T,ci=ciWidth,verbose=F,alternative = "two.sided")
+  epsilon<-  effectsize::epsilon_squared(.canova,partial = F,ci=ciWidth,verbose=F,alternative = "two.sided")
+  epsilonp<- effectsize::epsilon_squared(.anova,partial = T,ci=ciWidth,verbose=F,alternative = "two.sided")
 
   aTable<-self$results$main$effectSizeTable
       

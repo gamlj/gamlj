@@ -523,22 +523,22 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number", 
                                     `format`="zto,pvalue"),
                                 list(
-                                    `name`="etaSqP", 
+                                    `name`="etap", 
                                     `title`="\u03B7\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:partEta)", 
+                                    `visible`="(effectSize:etap)", 
                                     `format`="zto"),
                                 list(
-                                    `name`="omegaSq", 
+                                    `name`="omegap", 
                                     `title`="\u03C9\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:omega)", 
+                                    `visible`="(effectSize:omegap)", 
                                     `format`="zto"),
                                 list(
-                                    `name`="epsilonSq", 
+                                    `name`="epsilonp", 
                                     `title`="\u03B5\u00B2p", 
                                     `type`="number", 
-                                    `visible`="(effectSize:epsilon)", 
+                                    `visible`="(effectSize:epsilonp)", 
                                     `format`="zto"))))
                         self$add(jmvcore::Table$new(
                             options=options,
