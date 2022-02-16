@@ -10,6 +10,8 @@
 build/
 build*/
 
+alt/
+
 temp/
 *.jmo
 newversion.R
