@@ -64,20 +64,20 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
-                    - name: etaSqP
+                    - name: etap
                       title: η²p
                       type: number
-                      visible: (effectSize:partEta)
+                      visible: (effectSize:etap)
                       format: zto
-                    - name: omegaSq
+                    - name: omegap
                       title: ω²p
                       type: number
-                      visible: (effectSize:omega)
+                      visible: (effectSize:omegap)
                       format: zto
-                    - name: epsilonSq
+                    - name: epsilonp
                       title: ε²p
                       type: number
-                      visible: (effectSize:epsilon)
+                      visible: (effectSize:epsilonp)
                       format: zto
 
            - name: anova
@@ -114,7 +114,6 @@ items:
                       type: number
                       visible: (effectSize:eta)
                       format: zto
-
                     - name: etaSqP
                       title: η²p
                       type: number
@@ -136,6 +135,7 @@ items:
                       type: number
                       visible: (effectSize:epsilon)
                       format: zto
+
                     - name: epsilonSqP
                       title: ε²p
                       type: number

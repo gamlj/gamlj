@@ -124,12 +124,12 @@ testthat::test_that("Multinomial works", {
 })
 
 ph<-mod$postHocs[[1]]$asDF
-ph
+
 testthat::test_that("Multinomial posthoc works", {
   testthat::expect_equal(as.character(ph[11,1]),"academic")
-  testthat::expect_equal(ph[42,9],0.9402,tol=.0001)
+  testthat::expect_equal(ph[42,9],-1.114,tol=.0001)
   testthat::expect_equal(as.character(ph[42,1]),"vocation")
-  testthat::expect_equal(as.character(ph[42,2]),"middle")
+  testthat::expect_equal(as.character(ph[42,2]),"low")
   
 })
 
@@ -175,3 +175,4 @@ res<-mod$main$fixed$asDF$expb[1]
 testthat::test_that("Custom model works", {
   testthat::expect_equal(round(res,2),2.15)
 })
+

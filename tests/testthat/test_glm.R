@@ -118,14 +118,24 @@ mod<-gamlj::gamljGlm(
   formula=science~math+schtyp+math:schtyp,
   effectSizeInfo = T
 )
+mod
 tab<-mod$main$effectSizeTable$asDF
-
+tab
 testthat::test_that("glm effectsize", {
   testthat::expect_equal(tab[4,3],.21724,tol=.0001)
   testthat::expect_equal(tab[10,5],.0,tol=.00001)
 })
 
-
+data = hsbdemo
+contrasts(data$schtyp)<-contr.sum(2)/2
+data$math<-data$math-mean(data$math)
+formula=science~math+schtyp+math:schtyp
+rmod<-lm(formula,data) 
+.anova<-car::Anova(rmod,type=3)
+effectsize::eta_squared(.anova,partial = T,ci=.95,verbose=F,alternative = "two.sided")
+a<-effectsize::t_to_eta2(1,df_error = 12,ci = .95,alternative = "two.sided")
+a$Eta2_partial
+effectsize::
 data<-hsbdemo
 names(data)[3]<-c("Gender (test ?)")
 mod<-gamlj::gamljGlm(
