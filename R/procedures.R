@@ -368,8 +368,10 @@ procedure.emmeans<-function(obj) {
     }
 
     ## rename the dependent for multinomial ##
-    if (obj$options$modelSelection=="multinomial")
+    if (obj$options$modelSelection=="multinomial"){
          names(tableData)[1]<-"response"
+         tableData<-tableData[order(tableData$response),]
+    }
 
     names(tableData)<-fromb64(names(tableData))
     results[[length(results)+1]]<-tableData
@@ -486,8 +488,6 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     class(.params)<-c(paste0("simple_params_",obj$options$.caller),class(.params))
     .params<-add_effect_size(.params,model,variable64)
     
-    
-    
     ### now we build the anova table ###
     .anova<-as.data.frame(emmeans::test(grid, join=TRUE, by = term64))
     .transnames<-list(test=c("F.ratio"),p="p.value")
@@ -599,6 +599,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          parameters$response<-factor(parameters$Response)
          levels(parameters$response)<-unlist(obj$datamatic$dep$contrast_labels)
          parameters$response<-as.character(parameters$response)
+         parameters<-parameters[order(parameters$response),]
          
          ### fix labels for the contrast column ###
          parameters$contrast<-factor(parameters$contrast)

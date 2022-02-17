@@ -982,14 +982,15 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "bootR"),
                             columns=list(
                                 list(
-                                    `name`="contrast", 
-                                    `title`="Effect", 
-                                    `type`="text"),
-                                list(
                                     `name`="response", 
                                     `title`="Response", 
                                     `type`="text", 
+                                    `combineBelow`=TRUE, 
                                     `visible`="(modelSelection:multinomial)"),
+                                list(
+                                    `name`="contrast", 
+                                    `title`="Effect", 
+                                    `type`="text"),
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 
@@ -1142,7 +1143,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="response", 
                             `title`="Response", 
                             `type`="text", 
-                            `visible`="(modelSelection:multinomial)"),
+                            `visible`="(modelSelection:multinomial)", 
+                            `combineBelow`=TRUE),
                         list(
                             `name`="estimate", 
                             `title`="Mean", 

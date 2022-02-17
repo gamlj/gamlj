@@ -414,14 +414,14 @@ items:
                  - bootR
  
               columns:
-                     - name: contrast
-                       title: "Effect"
-                       type: text
                      - name: response
                        title: Response 
                        type: text
+                       combineBelow: true
                        visible: (modelSelection:multinomial)
-
+                     - name: contrast
+                       title: "Effect"
+                       type: text
                      - name: estimate
                        title: "Estimate"
                        type: number
@@ -553,6 +553,8 @@ items:
           title: Response 
           type: text
           visible: (modelSelection:multinomial)
+          combineBelow: true
+
         - name: estimate
           title: 'Mean'
           type: number

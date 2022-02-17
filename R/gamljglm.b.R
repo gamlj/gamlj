@@ -67,7 +67,6 @@ gamljGlmClass <- R6::R6Class(
       
       aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
       aSmartObj$expandable<-TRUE
-      aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("est",self$options$ciWidth)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
@@ -75,7 +74,6 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartArray$new(self$results$posthocEffsize,estimate_machine)
       aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthocEffsize))
       aSmartObj$expandable<-TRUE
-      aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("dm",self$options$ciWidth)
       aSmartObj$ci("ds",self$options$ciWidth)
@@ -88,9 +86,8 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartArray$new(self$results$emmeans,estimate_machine)
       aSmartObj$activated<-is.something(self$options$emmeans)
       aSmartObj$expandable<-TRUE
-      aSmartObj$expandFromBegining<-TRUE
-      aSmartObj$combineBelow="new"
-      aSmartObj$spaceBy="new"
+      aSmartObj$combineBelow="new!"
+      aSmartObj$spaceBy="new!"
       aSmartObj$ci("est",self$options$ciWidth)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
@@ -99,7 +96,6 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
       aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
       aSmartObj$expandable<-TRUE
-      aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$key<-self$options$simpleVariable
       aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
@@ -111,7 +107,6 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
       aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
       aSmartObj$expandable<-TRUE
-      aSmartObj$expandFromBegining<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$key<-self$options$simpleVariable
       aSmartObj$ci("est",self$options$ciWidth)
@@ -125,8 +120,8 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$ci("est",self$options$ciWidth)
-      aSmartObj$combineBelow<-"new"
-      aSmartObj$spaceBy<-"new"
+      aSmartObj$combineBelow<-"new!"
+      aSmartObj$spaceBy<-"new!"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### assumptions hometest

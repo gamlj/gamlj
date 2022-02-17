@@ -20,7 +20,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             nickname=NULL,
                             expandable=FALSE,
                             expandSuperTitle=NULL,
-                            expandFromBegining=TRUE,
+                            expandFrom=1,
                             activated=NULL,
                             key=NULL,
                             keys_sep=NULL,
@@ -51,7 +51,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (inherits(private$.estimator,"SmartArray")) {
                                 self$activated              <- private$.estimator$activated
                                 self$expandable             <- private$.estimator$expandable
-                                self$expandFromBegining     <- private$.estimator$expandFromBegining
+                                self$expandFrom             <- private$.estimator$expandFrom
                                 self$expandSuperTitle       <- private$.estimator$expandSuperTitle
                                 self$ci_info                <- private$.estimator$ci_info
                                 self$keys_sep               <- private$.estimator$keys_sep
@@ -63,7 +63,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                 self$columnTitles          <-  private$.estimator$columnTitles
                               }
 
-                              
                             },
                             initTable=function() {
                               private$.phase<-"init"
@@ -299,17 +298,16 @@ SmartTable <- R6::R6Class("SmartTable",
                               .present<-names(self$table$columns)
                               .names<-setdiff(.names,.present)
                               
-                              
-                              
-                              if (self$expandFromBegining) {
+                                k<-self$expandFrom-1
                                 for (i in seq_along(.names)) {
+                                  j<-i+k
                                   cb<-FALSE
-                                  if (inherits(self$combineBelow,"integer"))
+                                  if (inherits(self$combineBelow,"integer")) {
                                          if(i %in% self$combineBelow) cb<-TRUE
-                                  else
-                                         if (self$combineBelow=="new") cb<-TRUE
-                                        
-                                  self$table$addColumn(index=i,
+                                  } else
+                                         if (.names[i] %in% c("new!",self$combineBelow)) cb<-TRUE
+                                         
+                                  self$table$addColumn(index=j,
                                                        name = .names[[i]], 
                                                        title = .titles[[i]], 
                                                        superTitle = self$expandSuperTitle, 
@@ -317,20 +315,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                                        combineBelow=cb)
                                 }
                                 
-                                private$.new_columns<-seq_along(.names)
+                                private$.new_columns<-.names
                                 
-                              } else {
-                                last<-length(self$table$columns)
-                                for (i in seq_along(.names)) {
-                                  cb<-ifelse(i %in% self$combineBelow,TRUE,FALSE)
-                                  self$table$addColumn(name = .names[[i]], 
-                                                       title = .titles[[i]], 
-                                                       superTitle = self$expandSuperTitle, 
-                                                       type=.types[i],
-                                                       combineBelow=cb)
-                                }
-                                private$.new_columns<-seq_along(.names)+last
-                              }
                             },
                             .setColumnTitle=function() {
                               what<-names(self$table$columns)
@@ -350,20 +336,22 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               try_hard({
                                 
-                                if (self$spaceBy=="new")
+                                if (self$spaceBy=="new!")
                                   .spaceBy=private$.new_columns
                                 else 
                                   .spaceBy=self$spaceBy
-                                
+                                jnames<-names(self$table$columns)
                                 for (sb in .spaceBy) {
-                                  
                                   col<-self$table$asDF[[sb]]
+                                  k<-which(sb==jnames)
                                   rows<-unlist(lapply(unlist(unique(col)),function(x) min(which(col==x))))
                                   rows<-which(!col==c(col[-1],col[[length(col)]]))+1
+                                  
                                   if (self$spaceMethod=="cb" & length(rows)==length(col)-1)
                                     rows<-NULL
+                                
                                   for (j in rows)
-                                    self$table$addFormat(rowNo=j,col=1,jmvcore::Cell.BEGIN_GROUP)
+                                    self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.BEGIN_GROUP)
                                   
                                 }
                                 
