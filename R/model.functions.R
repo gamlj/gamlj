@@ -387,6 +387,7 @@ mf.checkData<-function(options,data,cluster=NULL,modelType="linear") {
        if ("dep_scale" %in% names(options)) 
            data[[dep]]<-lf.scaleContinuous(data[[dep]],options$dep_scale,by=clusterdata)
      }
+
        if ( any(is.na(data[[dep]])) ) {
           nice=paste0(toupper(substring(modelType,1,1)),substring(modelType,2,nchar(modelType)))
           return(paste(nice,"model requires a numeric dependent variable"))

@@ -1,3 +1,4 @@
+# testing
 context("glm")
 mod<-gamlj::gamljGlm(
   data = ToothGrowth,
@@ -117,13 +118,13 @@ mod<-gamlj::gamljGlm(
   formula=science~math+schtyp+math:schtyp,
   effectSizeInfo = T
 )
+
 tab<-mod$main$effectSizeTable$asDF
 
 testthat::test_that("glm effectsize", {
   testthat::expect_equal(tab[4,3],.21724,tol=.0001)
   testthat::expect_equal(tab[10,5],.0,tol=.00001)
 })
-
 
 data<-hsbdemo
 names(data)[3]<-c("Gender (test ?)")

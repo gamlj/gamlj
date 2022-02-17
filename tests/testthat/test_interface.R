@@ -120,7 +120,7 @@ testthat::test_that("glmixed predict", {
 
 rmod0<-gamlj_model(mod)
 
-rmod1<-lme4::glmer(formula = pass ~ 1 + math + (1 | school), family = binomial(logit), 
+rmod1<-lme4::glmer(formula = pass ~ 1 + math + (1 | school), family = binomial(), 
              data = schoolexam)
 
 

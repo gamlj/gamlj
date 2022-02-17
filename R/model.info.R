@@ -197,8 +197,10 @@ mi.initInterceptInfo<-function(options, results) {
 }
 
 mi.initEffectSizeInfo<-function(options, results, terms, ciWidth) {
+
   if (!options$effectSizeInfo) 
-    return()
+     return()
+  
   aTable<-results$main$effectSizeTable
   aTable$getColumn('lower.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))
   aTable$getColumn('upper.CL')$setSuperTitle(jmvcore::format('{}% Confidence Interval', ciWidth))

@@ -219,7 +219,7 @@ items:
         title:  ""
         type: Table
         columns:
-        - name: dep
+        - name: response
           title: "Response Groups"
           type: text
           visible: (modelSelection:multinomial)

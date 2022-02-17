@@ -102,7 +102,7 @@ gposthoc.populate <- function(model, options, tables) {
             table$setState("there is work done")
             tableData <- as.data.frame(none)
             tableData$contrast <- as.character(tableData$contrast)
-            colnames(tableData) <- c("contrast", "estimate", "se", "df", "test", "p")
+            colnames(tableData)[1:6] <- c("contrast", "estimate", "se", "df", "test", "p")
             tableData$pbonf <- bonferroni[, 6]
             tableData$pholm <- holm[, 6]
             tableData$ptukey <- tukey[, 6]
@@ -128,10 +128,14 @@ gposthoc.populate <- function(model, options, tables) {
                 table$getColumn("df")$setVisible(FALSE)
             }
         tableData <- cbind(labs, tableData)
+        if ("response" %in% names(tableData))
+             cols<-c("response",cols)
+
         sortstring <- paste0("order(", paste0("tableData$", cols, collapse = ","), ")")
         tableData <- tableData[eval(parse(text = sortstring)), ]
         for (col in cols)
             tableData[,col]<-as.character(tableData[,col])
+        rownames(tableData)<-NULL
 
         for (i in 1:nrow(tableData)) {
             arow <- tableData[i, ]
@@ -179,7 +183,8 @@ gposthoc.populate <- function(model, options, tables) {
 
         })
         res <- as.data.frame(res)
-        res[, dep] <- NULL
+        res$response<-res[, dep] 
+        res[,dep]<-NULL
         res
     })
 
