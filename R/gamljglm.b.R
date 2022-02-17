@@ -64,8 +64,8 @@ gamljGlmClass <- R6::R6Class(
                   lab<-jmvcore::stringifyTerm(aterms[[i]],raise=T)
                   aTable$addRow(rowKey=i+1, list(name=lab))
           }
-         aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
-         aTable$addRow(rowKey=i+3, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",epsilonSq=""))
+         aTable$addRow(rowKey=i+2, list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSqP="",epsilonSq=""))
+         aTable$addRow(rowKey=i+3, list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSqP="",epsilonSq=""))
          
          aTable$addFormat(col=1, rowNo=i+2, format=jmvcore::Cell.BEGIN_END_GROUP)
          aTable$addFormat(col=1, rowNo=2, format=jmvcore::Cell.BEGIN_GROUP)
