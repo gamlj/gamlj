@@ -9,7 +9,7 @@
 # jamovi
 build/
 build*/
-
+extdata/
 alt/
 
 temp/
