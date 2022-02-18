@@ -40,7 +40,7 @@ mod<-gamlj::gamljGzlm(
 r.anova<-mod$main$anova$asDF
 r.show<-as.character(mod$main$contrastCodeTables[[1]]$asDF[1,1])
 testthat::test_that("gzlm anova is correct", {
-  testthat::expect_equal(as.character(r.anova[3,1]),"honors:write")
+  testthat::expect_equal(as.character(r.anova[3,1]),"write:honors")
   testthat::expect_equal(round(r.anova[1,4],3),0.809)
 })
 testthat::test_that("contrasts are correct", {
@@ -121,8 +121,10 @@ testthat::test_that("Multinomial posthoc works", {
   testthat::expect_equal(mod$posthoc[[1]]$asDF$response[[1]],"academic")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[8],.2101,tol)
   testthat::expect_equal(mod$posthoc[[1]]$asDF$response[[42]],"vocation")
-  testthat::expect_equal(mod$posthoc[[1]]$asDF[42,2],"female")
-  testthat::expect_equal(mod$posthoc[[1]]$asDF[42,1],"low")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF[42,1],"vocation")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF[42,2],"low")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF[42,3],"female")
+  
 })
 
 
@@ -135,14 +137,7 @@ mod2<-gamlj::gamljGzlm(
 
 res<-mod$main$anova$asDF
 res2<-mod2$main$anova$asDF
-res
-res2
-mod2
-rmod<-nnet::multinom(prog~ses*female+math,data=hsbdemo)
-car::Anova(rmod,type=3)
 
-rmod<-nnet::multinom(prog~math+ses*female,data=hsbdemo)
-car::Anova(rmod,type=3)
 
 testthat::test_that("glm order does not count", {
   testthat::expect_equal(res[1,2],res2[3,2])
@@ -163,7 +158,7 @@ mod<-gamlj::gamljGzlm(
   posthoc = ~age,
   emmeans =  ~agg_test)
 
-
+mod
 testthat::test_that("Poisson works", {
 
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1],.1064,tol)
@@ -179,61 +174,91 @@ testthat::test_that("Poisson works", {
 })
 
 data$q<-data$acts+1
+#contrasts(data$age)<-contr.sum(3)
+#data$x<-data$agg_test-mean(data$agg_test)
+#rmod<-glm(formula=q~x*age,data=data,family = Gamma())
 mod<-gamlj::gamljGzlm(
-  formula=q~agg_test,
+  formula=q~agg_test*age,
   data=data,
   modelSelection = "custom",
   custom_family = "Gamma",
   custom_link = "inverse",
-  emmeans = ~agg_test)
+  simpleVariable = agg_test,
+  simpleModerators = age,
+  posthoc = ~age,
+  emmeans =  ~agg_test
+)
 
-res<-mod$main$coefficients$asDF$expb[1]
 testthat::test_that("Custom model works", {
-  testthat::expect_equal(round(res,2),2.15)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1],2.151,tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1],168.42,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1],.695,tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2,.870,tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4],2.538,tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2],1.448,tol)
+  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2],75.937,tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1],.001,tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1],"agg_test")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2],.010,tol)
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$age_lev1[2],"1")
+  
 })
 
-testthat::test_that("Custom model works", {
-  testthat::expect_equal(mod$main$fit$asDF$value[3],46.523,tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[1],-17.393,tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[2],40.787,tol)
-})
 
 ### negative binomial
-
 data$q<-as.integer(data$q)
+testthat::expect_warning({
+  
 mod<-gamlj::gamljGzlm(
-  formula=q~agg_test,
+  formula=q~agg_test*age,
   data=data,
   modelSelection = "nb",
-  
-  emmeans = ~agg_test)
-
-res<-mod$main$coefficients$asDF$expb[1]
-testthat::test_that("Custom negative binomial works", {
-  testthat::expect_equal(round(res,2),1.47)
+  simpleVariable = agg_test,
+  simpleModerators = age,
+  posthoc = ~age,
+  emmeans =  ~agg_test
+  )
 })
 
-testthat::test_that("Custom model works", {
-  testthat::expect_equal(mod$main$fit$asDF$value[3],138.76,tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[1],-63.510,tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[2],133.02,tol)
+testthat::test_that("negative binomial model works", {
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1],1.425,tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1],22.6,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1],-.0845,tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2,.777,tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4],8.89,tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2],2.08,tol)
+  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2],5.91,tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1],.010,tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1],"agg_test")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2],1.056,tol)
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$age_lev1[2],"1")
+  
 })
 
 
 ### quasi poisson
 data$q<-as.integer(data$q)
 mod<-gamlj::gamljGzlm(
-  formula=q~agg_test,
+  formula=q~agg_test*age,
   data=data,
   modelSelection = "poiover",
-  emmeans = ~agg_test)
+  simpleVariable = agg_test,
+  simpleModerators = age,
+  posthoc = ~age,
+  emmeans =  ~agg_test
+)
 
 testthat::test_that("quasi poisson binomial works", {
-  testthat::expect_equal(mod$main$coefficients$asDF$expb[1],1.47,tol)
-  testthat::expect_equal(mod$main$anova$asDF$test[1],132.66,tol)
-  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1],.2652,tol)
-  testthat::expect_equal(mod$main$r2$asDF$r2,.742,tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[4],10.28,tol)
-  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2],1.651,tol)
-})
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1],1.425,tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1],105.641,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1],.167,tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2,.777,tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4],8.893,tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2],1.698,tol)
+  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2],27.64,tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1],.00475,tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1],"agg_test")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2],1.056,tol)
+  
+  })
 

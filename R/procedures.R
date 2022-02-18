@@ -34,6 +34,7 @@ procedure.posthoc <- function(obj) {
   terms <- obj$options$posthoc
   dep <- obj$options$dep
   
+
   ### we set the model, if we need bootstrap ci, we give the bootstrapped model
    model<-obj$model
    
@@ -389,10 +390,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   gstart("PROCEDURE: Simple Effects estimated")
   variable<-obj$options$simpleVariable
   variable64<-tob64(variable)
-  term<-obj$options$simpleModerators
-  ### we need to reverse the term because emmeans order levels in a strange way
-  term64<-tob64(term)
   varobj<-obj$datamatic$variables[[variable64]]
+  
+  term<-obj$options$simpleModerators
+
+  term64<-tob64(term)
   results<-list()
   vars<-c("contrast",term64)
   
@@ -561,7 +563,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          
          data64      <-  mf.getModelData(model)
          
-         ## here we do the actual simple model ####
+         ## here we do the actual simple model for each combination of moderator levels ####
          for (i in 1:nrow(rows)) {
                 .data1<-data64
                  for (.name in .names) {
@@ -618,6 +620,14 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
            anovas[[.name]]<-as.character(anovas[[.name]])
          }
          names(anovas)[names(anovas) %in% .names]<-paste0("mod_",make.names(fromb64(.names),unique = T))
+         
+         ### check some stuff 
+         .all <- c(.names,variable64)
+         test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
+         .issues <- .all[test]
+         
+         if (is.something(.issues))
+           obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
          
          return(list(anovas,parameters))
 }

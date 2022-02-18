@@ -551,7 +551,7 @@ items:
     description: an array of simple interactions tables
     visible: (simpleInteractions)
     template:
-        title:  "Simple Interactions - Interaction: ___key___"
+        title:  "Interaction: ___key___"
         type: Group
         clearWith: []
         items:

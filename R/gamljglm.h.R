@@ -1185,7 +1185,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             super$initialize(
                                 options=options,
                                 name="undefined",
-                                title="Simple Interactions - Interaction: ___key___",
+                                title="Interaction: ___key___",
                                 clearWith=list())
                             self$add(jmvcore::Table$new(
                                 options=options,

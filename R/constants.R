@@ -1,6 +1,6 @@
 
-j_DEBUG=T
-j_INFO=T
+j_DEBUG=F
+j_INFO=F
 t_INFO=F
 
 IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"
@@ -8,7 +8,7 @@ IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"
 
 FACTOR_SYMBOL= "..f_f_f.."
 LEVEL_SYMBOL = "..l_l_l.."
-INTERACTION_SYMBOL="..x_x_x.."
+INTERACTION_SYMBOL=":"
 B64_SYMBOL="..b_b_b.."
 
 

@@ -19,12 +19,12 @@ testthat::test_that("glm estimates are correct", {
 })
 
 a<-mod$main$anova$asDF
-resid<-a$ss[a$name=="Residuals"]
-eff<-a$ss[a$name=="supp"]
+resid<-a$ss[a$source=="Residuals"]
+eff<-a$ss[a$source=="supp"]
 peta<-eff/(eff+resid)
 
 test_that("glm p eta2 are correct", {
-  expect_equal(a$etaSqP[a$name=="supp"],peta)
+  expect_equal(a$etaSqP[a$source=="supp"],peta)
 })
 
 
@@ -214,7 +214,7 @@ res3<-mod3$main$anova$asDF
 
 testthat::test_that("glm order does not count", {
   testthat::expect_equal(res[2,4],res3[2,4])
-  testthat::expect_equal(as.character(res[4,1]),as.character(res3[3,1]))
+  testthat::expect_equal(as.character(res[4,1]),as.character(res3[4,1]))
 })
 
 
@@ -306,7 +306,7 @@ mod<-gamlj::gamljGlm(
 res<-mod$main$anova$asDF
 
 testthat::test_that("glm contrasts", {
-  testthat::expect_equal(as.character(res$name[3]),"math²")
+  testthat::expect_equal(as.character(res$source[3]),"math²")
   testthat::expect_equal(round(res[1,4],2),65.07)
 })
 
@@ -316,7 +316,7 @@ mod<-gamlj::gamljGlm(
 )
 res<-mod$main$anova$asDF
 testthat::test_that("glm intercept only model", {
-  testthat::expect_equal(as.character(res$name[1]),"Residuals")
+  testthat::expect_equal(as.character(res$source[1]),"Residuals")
   testthat::expect_equal(round(res[2,2],2),20919.42)
 })
 
@@ -329,7 +329,7 @@ mod<-gamlj::gamljGlm(
 
 res<-mod$main$anova$asDF
 testthat::test_that("glm zero-intercept model", {
-  testthat::expect_equal(as.character(res$name[1]),"Residuals")
+  testthat::expect_equal(as.character(res$source[1]),"Residuals")
   testthat::expect_equal(round(res[2,2],2),566514)
 })
 

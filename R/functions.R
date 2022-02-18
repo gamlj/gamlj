@@ -43,12 +43,12 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     if (!is.b64(obj))
           return(obj)
     
-    obj<-gsub(B64_SYMBOL,"",obj,fixed=T)
     int<-strsplit(obj,INTERACTION_SYMBOL,fixed=T)[[1]]
     if (length(int)>1)
         return(paste0(unlist(sapply(int,bogusfromb64,ref=ref)),collapse = ":"))
 
-
+    obj<-gsub(B64_SYMBOL,"",obj,fixed=T)
+    
     if (is.null(ref)) {
         fac<-strsplit(obj,FACTOR_SYMBOL,fixed=T)[[1]]
         obj<-fac[[1]]  
@@ -60,7 +60,7 @@ fromb64<- function(x,...) UseMethod(".fromb64")
         
     }
     obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
-    obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
+#    obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
     obj
 }
 

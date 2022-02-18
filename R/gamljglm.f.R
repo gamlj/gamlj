@@ -254,9 +254,13 @@ gamljGlm <- function(
       `if`( ! missing(simpleModerators), simpleModerators, NULL))
   
   for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
+
   if (inherits(modelTerms, "formula")) modelTerms <- jmvcore::decomposeFormula(modelTerms)
   if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
   if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
+  
+  
+  
   
   ### fix options for  R interface ##
   

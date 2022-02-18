@@ -332,6 +332,12 @@ mf.anova<- function(x,...) UseMethod(".anova")
                 wald= "Wald")
 
         anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))
+        
+        ### LR is less lenient than Wald
+        if (test=="LR" & !isFALSE(anoobj$error)) {
+           anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))
+           obj$dispatcher$warnings  <-  list(topic="main_anova",message="Wald test was used because LR failed")
+        }
         obj$dispatcher$errors    <-  list(topic="main_anova",message=anoobj$error)
         obj$dispatcher$warnings  <-  list(topic="main_anova",message=anoobj$warning)
         
@@ -342,12 +348,14 @@ mf.anova<- function(x,...) UseMethod(".anova")
         .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
         .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
         names(.anova)<-transnames(names(.anova),.transnames)
-        
+
         .anova<-.anova[rownames(.anova)!="(Intercept)",]   
-        .anova$source<-rownames(.anova)
+        
         .anova
         
 }
+
+
 
 .anova.multinom<-function(model,obj)
                       .anova.glm(model,obj)

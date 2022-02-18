@@ -337,13 +337,15 @@ SmartTable <- R6::R6Class("SmartTable",
                               try_hard({
                                 
                                 if (self$spaceBy=="new!")
-                                  .spaceBy=private$.new_columns
+                                     .spaceBy=private$.new_columns
                                 else 
-                                  .spaceBy=self$spaceBy
+                                     .spaceBy=self$spaceBy
+                                
                                 jnames<-names(self$table$columns)
+                                k<-names(self$table$asDF)[1]
+
                                 for (sb in .spaceBy) {
                                   col<-self$table$asDF[[sb]]
-                                  k<-which(sb==jnames)
                                   rows<-unlist(lapply(unlist(unique(col)),function(x) min(which(col==x))))
                                   rows<-which(!col==c(col[-1],col[[length(col)]]))+1
                                   
@@ -367,7 +369,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 return()
                               
                               for (info in self$ci_info) {
-                                
+
                                 .label <-paste(info$label,info$format)
                                 .name  <-info$root
                                 l<-paste0(.name,".ci.lower")

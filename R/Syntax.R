@@ -71,15 +71,24 @@ Syntax <- R6::R6Class(
     init_main_anova=function() {
       
       tab<-list()
-      if (self$hasTerms)
-        tab<-lapply(self$options$modelTerms, function(x) list(source=.stringifyTerm(x)))
-
+      if (self$hasTerms) {
+        .formulalist<-self$options$modelTerms
+        ## we want to be sure that the order of terms is the same used by the estimator
+        ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
+        ## lm() (or other estimator) in different order
+        .formula<-jmvcore::composeFormula(NULL,.formulalist)
+#        .formula<-terms(as.formula(.formula))
+        .formula<-attr(terms(as.formula(.formula)),"term.labels")
+        .formulalist<-jmvcore::decomposeTerms(.formula)
+        tab<-lapply(.formulalist, function(x) list(source=.stringifyTerm(x)))
+      }
+      
       if (self$options$modelSelection=="lm") {
         if (self$hasTerms)
-          tab<-prepend_list(tab,list(name="Model",f="."))
+          tab<-prepend_list(tab,list(source="Model",f="."))
         
-        tab<-append_list(tab,list(name="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
-        tab<-append_list(tab,list(name="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
+        tab<-append_list(tab,list(source="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
+        tab<-append_list(tab,list(source="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
       }       
       ### we need at least a row otherwise we cannot add notes to the table
       if (!is.something(tab))
@@ -161,6 +170,8 @@ Syntax <- R6::R6Class(
     ### posthoc means ###
     
     init_posthoc=function() {
+      
+
       
         lapply(self$options$posthoc, function(.term) {
           p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
@@ -317,13 +328,16 @@ Syntax <- R6::R6Class(
       self$hasTerms <-(length(modelTerms)>0)
       self$isProper <-(self$hasIntercept | self$hasTerms)
       
-      rands<-NULL
-      if (self$option("randomTerms")) 
-        rands<-private$.buildreffects()
+      rands   <-NULL
+      cluster <-NULL
+      if (self$option("randomTerms")) {
+         rands<-private$.buildreffects()
+         cluster<-self$options$cluster
+      }
       
       sep<-"+"
       if (!self$hasTerms) sep=""
-      self$vars<-c(self$options$dep,unique(unlist(modelTerms)))
+      self$vars<-c(self$options$dep,unique(unlist(modelTerms)),cluster)
       
       fixed<-jmvcore::composeFormula(NULL,tob64(modelTerms))
       fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed)
@@ -331,7 +345,7 @@ Syntax <- R6::R6Class(
 
       fixed<-jmvcore::composeFormula(NULL,modelTerms)
       fixed<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),fixed)
-        self$formula<-trimws(paste(fixed,rands,sep =  ""))
+      self$formula<-trimws(paste(fixed,rands,sep =  ""))
       
     },
     

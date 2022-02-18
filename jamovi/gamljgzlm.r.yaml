@@ -475,7 +475,7 @@ items:
         - emmeans
 
     template:
-        title:  Simple Interactions - $key 
+        title:  "Interaction: ___key___"
         type: Group
         clearWith: []
         items:

@@ -382,10 +382,13 @@ Estimate <- R6::R6Class("Estimate",
 
 
                               results<-try_hard(eval(acall))
-                              
+                             
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
+                              
                               if (!isFALSE(results$error))
                                  stop(results$error)
+                              if (!isFALSE(results$warning))
+                                warning(results$warning)
                               
                               if (mf.aliased(results$obj))
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
