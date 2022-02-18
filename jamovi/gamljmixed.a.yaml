@@ -112,6 +112,10 @@ options:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
 
+    - name: donotrun
+      title: Do not run
+      type: Bool
+      default: false
 
 
     - name: ci_method

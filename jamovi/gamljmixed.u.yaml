@@ -49,10 +49,13 @@ children:
     children:
       - type: Label
         label: Estimation
-        style: list-inline
+        style: list
         children:
           - type: CheckBox
             name: reml
+          - name: donotrun
+            type: CheckBox
+            
       - type: Label
         label: Confidence Intervals
         margin: large

@@ -131,11 +131,11 @@ items:
                     - name: est.ci.lower
                       type: number
                       title: Lower
-                      visible: (showParamsCI)
+                      visible: (estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
-                      visible: (showParamsCI)
+                      visible: (estimates_ci)
                     - name: df
                       title: "df"
                       type: integer
@@ -165,7 +165,7 @@ items:
                          - name: cname
                            title: 'Name'
                            type: text
-                           visible: (show_contrastname)
+                           visible: (show_contrastnames)
                          - name: clab
                            title: 'Contrast'
                            type: text
@@ -199,11 +199,11 @@ items:
         - name: est.ci.lower
           type: number
           title: Lower
-          visible: (showParamsCI)
+          visible: (estimates_ci)
         - name: est.ci.upper
           type: number
           title: Upper
-          visible: (showParamsCI)
+          visible: (estimates_ci)
         - name: test
           title: t
           type: number
@@ -375,11 +375,11 @@ items:
                      - name: est.ci.lower
                        type: number
                        title: Lower
-                       visible: (showParamsCI)
+                       visible: (estimates_ci)
                      - name: est.ci.upper
                        type: number
                        title: Upper
-                       visible: (showParamsCI)
+                       visible: (estimates_ci)
                      - name: df
                        title: "df"
                        type: number

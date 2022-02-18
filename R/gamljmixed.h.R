@@ -14,6 +14,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             model_terms = NULL,
             fixedIntercept = TRUE,
             estimates_ci = TRUE,
+            donotrun = FALSE,
             ci_method = "wald",
             bootR = 1000,
             contrasts = NULL,
@@ -113,6 +114,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "estimates_ci",
                 estimates_ci,
                 default=TRUE)
+            private$..donotrun <- jmvcore::OptionBool$new(
+                "donotrun",
+                donotrun,
+                default=FALSE)
             private$..ci_method <- jmvcore::OptionList$new(
                 "ci_method",
                 ci_method,
@@ -392,6 +397,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..model_terms)
             self$.addOption(private$..fixedIntercept)
             self$.addOption(private$..estimates_ci)
+            self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..bootR)
             self$.addOption(private$..contrasts)
@@ -446,6 +452,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         model_terms = function() private$..model_terms$value,
         fixedIntercept = function() private$..fixedIntercept$value,
         estimates_ci = function() private$..estimates_ci$value,
+        donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
         bootR = function() private$..bootR$value,
         contrasts = function() private$..contrasts$value,
@@ -499,6 +506,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..model_terms = NA,
         ..fixedIntercept = NA,
         ..estimates_ci = NA,
+        ..donotrun = NA,
         ..ci_method = NA,
         ..bootR = NA,
         ..contrasts = NA,
@@ -719,12 +727,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
-                                    `visible`="(showParamsCI)"),
+                                    `visible`="(estimates_ci)"),
                                 list(
                                     `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(showParamsCI)"),
+                                    `visible`="(estimates_ci)"),
                                 list(
                                     `name`="df", 
                                     `title`="df", 
@@ -791,12 +799,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="est.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(showParamsCI)"),
+                            `visible`="(estimates_ci)"),
                         list(
                             `name`="est.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(showParamsCI)"),
+                            `visible`="(estimates_ci)"),
                         list(
                             `name`="test", 
                             `title`="t", 
@@ -998,12 +1006,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
-                                    `visible`="(showParamsCI)"),
+                                    `visible`="(estimates_ci)"),
                                 list(
                                     `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(showParamsCI)"),
+                                    `visible`="(estimates_ci)"),
                                 list(
                                     `name`="df", 
                                     `title`="df", 
@@ -1335,6 +1343,7 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
+#' @param donotrun .
 #' @param ci_method .
 #' @param bootR a number bootstrap repetitions.
 #' @param contrasts a named vector of the form \code{c(var1="type",
@@ -1468,6 +1477,7 @@ gamljMixed <- function(
     model_terms = NULL,
     fixedIntercept = TRUE,
     estimates_ci = TRUE,
+    donotrun = FALSE,
     ci_method = "wald",
     bootR = 1000,
     contrasts = NULL,
@@ -1586,6 +1596,7 @@ gamljMixed <- function(
         model_terms = model_terms,
         fixedIntercept = fixedIntercept,
         estimates_ci = estimates_ci,
+        donotrun = donotrun,
         ci_method = ci_method,
         bootR = bootR,
         contrasts = contrasts,
