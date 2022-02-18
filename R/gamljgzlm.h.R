@@ -668,7 +668,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="source", 
                                     `title`="Name", 
                                     `type`="text", 
-                                    `visible`="(showRealNames)"),
+                                    `visible`="(show_contrastnames)"),
                                 list(
                                     `name`="label", 
                                     `title`="Effect", 
@@ -719,7 +719,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=options,
                             name="contrastCodeTables",
                             title="Contrast Coefficients",
-                            visible="(showContrastCode)",
+                            visible="(show_contrastcodes)",
                             items="(factors)",
                             clearWith=list(
                                 "contrasts"),

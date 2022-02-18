@@ -33,9 +33,9 @@ const events = {
 //        console.log("change in random supplier");
         var changes = this.findChanges("randomSupplier",supplierList,rtermFormat);
         if (changes.removed.length>0) {
-          var randomTerms = this.cloneArray(ui.randomTerms.value(),[]);
-          var  light = removeFromMultiList(changes.removed,randomTerms,this,1);
-          ui.randomTerms.setValue(light);
+          var re = this.cloneArray(ui.re.value(),[]);
+          var  light = removeFromMultiList(changes.removed,re,this,1);
+          ui.re.setValue(light);
         }
         return;
     },
@@ -58,15 +58,15 @@ const events = {
     
     onChange_simpleSupplier: function(ui) {
         let values = this.itemsToValues(ui.simpleSupplier.value());
-        this.checkValue(ui.simpleVariable, false, values, FormatDef.variable);
-        this.checkValue(ui.simpleModerator, false, values, FormatDef.variable);
+        this.checkValue(ui.simple_effects, false, values, FormatDef.variable);
+        this.checkValue(ui.simple_moderators, false, values, FormatDef.variable);
         this.checkValue(ui.simple3way, false, values, FormatDef.variable);
     },
 
  
     onChange_postHocSupplier: function(ui) {
         let values = this.itemsToValues(ui.postHocSupplier.value());
-        this.checkValue(ui.postHoc, true, values, FormatDef.term);
+        this.checkValue(ui.posthoc, true, values, FormatDef.term);
     },
     onUpdate_postHocSupplier: function(ui) {
         updatePostHocSupplier(ui, this);
@@ -95,13 +95,13 @@ const events = {
     onEvent_addRandomTerm: function(ui) {
 //        console.log("addRandomTerm does nothing");
     },
-    onEvent_randomTerms_preprocess: function(ui, data) {
+    onEvent_re_preprocess: function(ui, data) {
  //       for(var j = 0; j < data.items.length; j++) {
 //          data.items[j].value.raw=data.items[j].value.toString();
 //      }
     },
     onEvent_corr: function(ui, data) {
-      //    console.log("Correlation structure changed");
+          console.log("Correlation structure changed");
           fixRandomEffects(ui,this);
 
     },    
@@ -115,19 +115,19 @@ const events = {
 };
 
 var fixRandomEffects = function(ui, context) {
-            var option=ui.correlatedEffects.value();
-            var oldOption = context.workspace.correlatedEffects;
-            context.workspace.correlatedEffects=option;
+            var option=ui.re_corr.value();
+            var oldOption = context.workspace.re_corr;
+            context.workspace.re_corr=option;
           
 
-            if (ui.correlatedEffects.value()=="block") {
+            if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
-                        ui.randomTerms.setValue(Array([]));
+                        ui.re.setValue(Array([]));
                   // make sure the add button is visible                      
-                  var button= ui.randomTerms.$addButton;
+                  var button= ui.re.$addButton;
                   button[0].style.visibility="visible";
-                  // get the randomTerms field to manipulate the children
-                  var target= ui.randomTerms;
+                  // get the re field to manipulate the children
+                  var target= ui.re;
                   target.$el[0].lastElementChild.style.borderColor=null;
                   target.controls[0].$el[0].childNodes[0].style.visibility="visible";
                   // remove possibility to kill the first row
@@ -135,11 +135,11 @@ var fixRandomEffects = function(ui, context) {
                   
 
              } else {
-                 var data = context.cloneArray(ui.randomTerms.value(),[]);
+                 var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
-                 var button= ui.randomTerms.$addButton;
+                 var button= ui.re.$addButton;
                  button[0].style.visibility="hidden";
-                 var target= ui.randomTerms;
+                 var target= ui.re;
                  target.setValue(Array(one));
                  var one = target.controls[0];
                  target.$el[0].lastElementChild.style.borderColor="transparent";
@@ -163,7 +163,7 @@ var calcModelTerms = function(ui, context) {
     var combinedDiff = context.findChanges("combinedList", combinedList, true, FormatDef.variable);
 
 
-    var termsList = context.cloneArray(ui.modelTerms.value(), []);
+    var termsList = context.cloneArray(ui.model_terms.value(), []);
     var termsChanged = false;
 
     for (var i = 0; i < combinedDiff.removed.length; i++) {
@@ -207,14 +207,14 @@ var calcModelTerms = function(ui, context) {
     }
 
     if (termsChanged)
-        ui.modelTerms.setValue(termsList);
+        ui.model_terms.setValue(termsList);
 
     updateContrasts(ui, variableList, context);
     updateScaling(ui, covariatesList, context);
 };
 
 var updateSimpleSupplier = function(ui, context) {
-        var termsList = context.cloneArray(ui.modelTerms.value(), []);
+        var termsList = context.cloneArray(ui.model_terms.value(), []);
         var varList=[];
         for (var j = 0; j < termsList.length; j++) {
             var newTerm=context.clone(termsList[j]);
@@ -229,7 +229,7 @@ var updateSimpleSupplier = function(ui, context) {
 
 
 var updatePostHocSupplier = function(ui, context) {
-    var termsList = context.cloneArray(ui.modelTerms.value(), []);
+    var termsList = context.cloneArray(ui.model_terms.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
     var list = [];
     for (var j = 0; j < termsList.length; j++) {
@@ -237,11 +237,11 @@ var updatePostHocSupplier = function(ui, context) {
         if (containsCovariate(term, covariatesList) === false)
             list.push(term);
     }
-    ui.postHocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
+    ui.posthocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
 };
 
 var filterModelTerms = function(ui, context) {
-    var termsList = context.cloneArray(ui.modelTerms.value(), []);
+    var termsList = context.cloneArray(ui.model_terms.value(), []);
     var diff = context.findChanges("termsList", termsList, true, FormatDef.term);
 
     var changed = false;
@@ -266,7 +266,7 @@ var filterModelTerms = function(ui, context) {
         changed = true;
 
     if (changed)
-        ui.modelTerms.setValue(termsList);
+        ui.model_terms.setValue(termsList);
 };
 
 var updateContrasts = function(ui, variableList, context) {
@@ -325,10 +325,10 @@ var updateRandomSupplier = function(ui, context) {
     var factorList = context.cloneArray(ui.factors.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
     var variableList = factorList.concat(covariatesList);
-    var modelTerms = context.cloneArray(ui.modelTerms.value(), []); 
+    var model_terms = context.cloneArray(ui.model_terms.value(), []); 
     var termsList=[];
     termsList = context.getCombinations(variableList);
-    termsList=unique(termsList.concat(modelTerms));
+    termsList=unique(termsList.concat(model_terms));
     context.sortArraysByLength(termsList);
 //    ui.randomSupplier.setValue(context.valuesToItems(termsList, FormatDef.term));
     var clusterList = context.cloneArray(ui.cluster.value(), []);
@@ -347,7 +347,7 @@ var updateRandomSupplier = function(ui, context) {
     context.sortArraysByLength(alist);
 //    console.log("random supplierList");
       var formatted=context.valuesToItems(alist, rtermFormat);
-//    var busyList = context.cloneArray(ui.randomTerms.value(), []);
+//    var busyList = context.cloneArray(ui.re.value(), []);
 //    var busyForm = context.valuesToItems(busyList, rtermFormat);
 //    var xunique = formatted.filter(function(val) {
 //         return busyForm.indexOf(val) == -1;
@@ -359,17 +359,17 @@ var updateRandomSupplier = function(ui, context) {
 
 var filterRandomTerms = function(ui, context) {
 //    console.log("filter random effects");  
-    var termsList = context.cloneArray(ui.randomTerms.value(), []);
+    var termsList = context.cloneArray(ui.re.value(), []);
     var unique = termsList.filter((v, i, a) => a.indexOf(v) === i); 
     if (unique.length!=termsList.length)
-      ui.randomTerms.setValue(unique);
+      ui.re.setValue(unique);
   
 };
 
 
 var updatePlotsSupplier = function(ui, context) {
 
-        var termsList = context.cloneArray(ui.modelTerms.value(), []);
+        var termsList = context.cloneArray(ui.model_terms.value(), []);
         var varList=[];
         for (var j = 0; j < termsList.length; j++) {
             var newTerm=context.clone(termsList[j]);

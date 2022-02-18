@@ -137,7 +137,7 @@ items:
                     - name: source
                       title: "Name"
                       type: text
-                      visible: (showRealNames)
+                      visible: (show_contrastnames)
                     - name: label
                       title: "Effect"
                       type: text
@@ -182,7 +182,7 @@ items:
              title: Contrast Coefficients 
              type: Array
              description: an array of contrast coefficients tables
-             visible: (showContrastCode)
+             visible: (show_contrastcodes)
              items: (factors)
              clearWith:
                     - contrasts

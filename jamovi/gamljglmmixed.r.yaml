@@ -151,7 +151,7 @@ items:
                     - name: source
                       title: "Names"
                       type: text
-                      visible: (showRealNames)
+                      visible: (show_contrastnames)
                     - name: label
                       title: "Effect"
                       type: text

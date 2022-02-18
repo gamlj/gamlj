@@ -719,7 +719,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `name`="source", 
                                     `title`="Names", 
                                     `type`="text", 
-                                    `visible`="(showRealNames)"),
+                                    `visible`="(show_contrastnames)"),
                                 list(
                                     `name`="label", 
                                     `title`="Effect", 

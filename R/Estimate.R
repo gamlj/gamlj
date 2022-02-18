@@ -18,7 +18,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           initialize=function(options,dispatcher,datamatic) {
                             super$initialize(options,dispatcher,datamatic)
-                            self$ciwidth <- options$ciWidth/100
+                            self$ciwidth <- options$ci_width/100
                             self$subclass<-paste0("model_",options$modelSelection)
                           },
                           estimate = function(data) {
