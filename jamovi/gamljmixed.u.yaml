@@ -146,6 +146,13 @@ children:
         style: inline
         children:
           - type: Label
+            label: List components
+            children:
+                  - type: ComboBox
+                    name: re_listing
+                    events:
+                      change: './mixed.events::onEvent_re_list'
+          - type: Label
             label: Effects correlation
             children:
               - type: LayoutBox

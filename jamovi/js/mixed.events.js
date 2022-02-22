@@ -3,6 +3,7 @@ var rtermFormat = require('./rtermFormat');
 const events = {
     update: function(ui) {
         this.setCustomVariable("Intercept", "none", "");
+        console.log(ui.re_listing.value());
         calcModelTerms(ui, this);
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
@@ -87,11 +88,13 @@ const events = {
     },
 
     onUpdate_randomSupplier: function(ui) {
-        updateRandomSupplier(ui,this);
+        //
 
     },
 
-
+    onEvent_re_list: function(ui) {
+      updateRandomSupplier(ui,this);
+    },
     onEvent_addRandomTerm: function(ui) {
 //        console.log("addRandomTerm does nothing");
     },
@@ -322,20 +325,38 @@ var containsCovariate = function(value, covariates) {
 
 
 var updateRandomSupplier = function(ui, context) {
-    var factorList = context.cloneArray(ui.factors.value(), []);
-    var covariatesList = context.cloneArray(ui.covs.value(), []);
-    var variableList = factorList.concat(covariatesList);
-    var modelTerms = context.cloneArray(ui.modelTerms.value(), []); 
-    var termsList=[];
-    termsList = context.getCombinations(variableList);
-    termsList=unique(termsList.concat(modelTerms));
-    context.sortArraysByLength(termsList);
-//    ui.randomSupplier.setValue(context.valuesToItems(termsList, FormatDef.term));
+
+    console.log("random update")
+// first we check if the update is needed    
     var clusterList = context.cloneArray(ui.cluster.value(), []);
     if (clusterList.length<1) {
-                ui.randomSupplier.setValue(context.valuesToItems([], rtermFormat));                  return;
+                ui.randomSupplier.setValue(context.valuesToItems([], rtermFormat));                                return;
+    }
+    var termsList=[];
+// then we check how to prepare the list
+
+    var option = ui.re_listing.value();
+    var order = 0
+
+    if ( option === "model") {
+         termsList = context.cloneArray(ui.modelTerms.value(), []); 
+    }
+    if ( option != "model" ) {
+       console.log("extra coefficients");
+       var factorList = context.cloneArray(ui.factors.value(), []);
+       var covariatesList = context.cloneArray(ui.covs.value(), []);
+       var variablesList = factorList.concat(covariatesList);
+
+        if ( option === "main") order = 1;
+        if ( option === "way2") order = 2;
+        if ( option === "way3") order = 3;
+        if ( option === "all")  order = variablesList.length
+        
+        termsList = interactions(variablesList, order);
+        
     }
     termsList.unshift(["Intercept"]);
+
     var alist=[];
     for (var i=0; i < clusterList.length; i++) {
      for (var j = 0; j < termsList.length; j++) {
@@ -344,16 +365,11 @@ var updateRandomSupplier = function(ui, context) {
        alist.push(item);
      }
     }
-    context.sortArraysByLength(alist);
-//    console.log("random supplierList");
-      var formatted=context.valuesToItems(alist, rtermFormat);
-//    var busyList = context.cloneArray(ui.randomTerms.value(), []);
-//    var busyForm = context.valuesToItems(busyList, rtermFormat);
-//    var xunique = formatted.filter(function(val) {
-//         return busyForm.indexOf(val) == -1;
-//            });    
+    var formatted=context.valuesToItems(alist, rtermFormat);
+
     ui.randomSupplier.setValue(formatted);
-    
+  
+  
 };
 
 
@@ -500,6 +516,47 @@ var dim = function(aList) {
   
     return(value);
 };
+
+function k_combinations(set, k) {
+	var i, j, combs, head, tailcombs;
+	
+	if (k > set.length || k <= 0) {
+		return [];
+	}
+	
+	// K-sized set has only one K-sized subset.
+	if (k == set.length) {
+		return [set];
+	}
+	
+	// There is N 1-sized subsets in a N-sized set.
+	if (k == 1) {
+		combs = [];
+		for (i = 0; i < set.length; i++) {
+			combs.push([set[i]]);
+		}
+		return combs;
+	}
+	
+	combs = [];
+	for (i = 0; i < set.length - k + 1; i++) {
+		head = set.slice(i, i + 1);
+		tailcombs = k_combinations(set.slice(i + 1), k - 1);
+		for (j = 0; j < tailcombs.length; j++) {
+			combs.push(head.concat(tailcombs[j]));
+		}
+	}
+	return combs;
+}
+
+function interactions(set,order) {
+
+var inter=[], j
+for (j = 0; j < order; j++) {
+   inter=inter.concat(k_combinations(set,j+1))
+}
+return inter;
+}
 
 
 
