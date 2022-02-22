@@ -41,6 +41,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             randomTerms = list(
                 list()),
             correlatedEffects = "corr",
+            re_modelterms = TRUE,
+            re_listing = "none",
             plotRandomEffects = FALSE,
             plotLinearPred = FALSE,
             nAGQ = 1,
@@ -267,6 +269,20 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "nocorr",
                     "block"),
                 default="corr")
+            private$..re_modelterms <- jmvcore::OptionBool$new(
+                "re_modelterms",
+                re_modelterms,
+                default=TRUE)
+            private$..re_listing <- jmvcore::OptionList$new(
+                "re_listing",
+                re_listing,
+                options=list(
+                    "none",
+                    "main",
+                    "way2",
+                    "way3",
+                    "all"),
+                default="none")
             private$..plotRandomEffects <- jmvcore::OptionBool$new(
                 "plotRandomEffects",
                 plotRandomEffects,
@@ -374,6 +390,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..cluster)
             self$.addOption(private$..randomTerms)
             self$.addOption(private$..correlatedEffects)
+            self$.addOption(private$..re_modelterms)
+            self$.addOption(private$..re_listing)
             self$.addOption(private$..plotRandomEffects)
             self$.addOption(private$..plotLinearPred)
             self$.addOption(private$..nAGQ)
@@ -421,6 +439,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         cluster = function() private$..cluster$value,
         randomTerms = function() private$..randomTerms$value,
         correlatedEffects = function() private$..correlatedEffects$value,
+        re_modelterms = function() private$..re_modelterms$value,
+        re_listing = function() private$..re_listing$value,
         plotRandomEffects = function() private$..plotRandomEffects$value,
         plotLinearPred = function() private$..plotLinearPred$value,
         nAGQ = function() private$..nAGQ$value,
@@ -467,6 +487,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..cluster = NA,
         ..randomTerms = NA,
         ..correlatedEffects = NA,
+        ..re_modelterms = NA,
+        ..re_listing = NA,
         ..plotRandomEffects = NA,
         ..plotLinearPred = NA,
         ..nAGQ = NA,

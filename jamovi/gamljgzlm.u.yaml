@@ -105,7 +105,6 @@ children:
                  children:
                           - type: VariablesListBox
                             name: covs
-                            height: small
                             isTarget: true
                             events:
                                  change: './gamlj.events::onChange_covariates'

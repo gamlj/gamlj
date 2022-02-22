@@ -32,7 +32,6 @@ children:
         children:
           - type: VariablesListBox
             name: covs
-            height: small
             isTarget: true
             events:
               change: './mixed.events::onChange_covariates'

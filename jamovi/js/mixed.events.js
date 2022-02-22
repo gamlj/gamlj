@@ -16,13 +16,11 @@ const events = {
 
     onChange_factors: function(ui) {
         calcModelTerms(ui, this);
-        updateRandomSupplier(ui,this);
  
     },
 
     onChange_covariates: function(ui) {
         calcModelTerms(ui, this);
-        updateRandomSupplier(ui,this);
 
     },
     onChange_cluster: function(ui) {
@@ -87,6 +85,8 @@ const events = {
             let covariatesList = this.cloneArray(ui.covs.value(), []);
             var variablesList = factorsList.concat(covariatesList);
             ui.modelSupplier.setValue(this.valuesToItems(variablesList, FormatDef.variable));
+            updateRandomSupplier(ui,this);
+
     },
 
     onUpdate_randomSupplier: function(ui) {
@@ -342,6 +342,7 @@ var updateRandomSupplier = function(ui, context) {
          termsList = context.cloneArray(ui.modelTerms.value(), []); 
     }
     var option = ui.re_listing.value();
+
     if (  option != "none" ) {
        var factorList = context.cloneArray(ui.factors.value(), []);
        var covariatesList = context.cloneArray(ui.covs.value(), []);
