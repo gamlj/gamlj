@@ -458,12 +458,20 @@ options:
             The option is ignored if the model is passed using `formula`.
 
 
+    - name: re_modelterms
+      title: Model terms
+      type: Bool
+      default: true
+      description:
+          R: >
+            Not in R interface
+
     - name: re_listing
       type: List
-      title: " "
+      title: "Add"
       options:
-        - name:  model
-          title: Model terms
+        - name:  none
+          title: None
         - name:  main
           title: Main effects
         - name:  way2
@@ -472,7 +480,7 @@ options:
           title: Up to 3-way
         - name:  all
           title: All possible
-      default: model
+      default: none
       description:
           R: >
              Not in R interface

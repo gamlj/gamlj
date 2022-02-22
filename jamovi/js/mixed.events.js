@@ -1,9 +1,10 @@
 var rtermFormat = require('./rtermFormat');
+var DEBUG=true;
 
 const events = {
     update: function(ui) {
+        mark("updating module");
         this.setCustomVariable("Intercept", "none", "");
-        console.log(ui.re_listing.value());
         calcModelTerms(ui, this);
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
@@ -30,8 +31,8 @@ const events = {
     },
 
     onChange_randomSupplier: function(ui){
+        mark("OnChange random supplier: local check");
         let supplierList = this.itemsToValues(ui.randomSupplier.value());
-//        console.log("change in random supplier");
         var changes = this.findChanges("randomSupplier",supplierList,rtermFormat);
         if (changes.removed.length>0) {
           var randomTerms = this.cloneArray(ui.randomTerms.value(),[]);
@@ -42,6 +43,7 @@ const events = {
     },
 
     onChange_modelTerms: function(ui) {
+        mark("OnChange model terms")
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
@@ -88,7 +90,7 @@ const events = {
     },
 
     onUpdate_randomSupplier: function(ui) {
-        //
+        updateRandomSupplier(ui,this);
 
     },
 
@@ -96,7 +98,6 @@ const events = {
       updateRandomSupplier(ui,this);
     },
     onEvent_addRandomTerm: function(ui) {
-//        console.log("addRandomTerm does nothing");
     },
     onEvent_randomTerms_preprocess: function(ui, data) {
  //       for(var j = 0; j < data.items.length; j++) {
@@ -104,7 +105,6 @@ const events = {
 //      }
     },
     onEvent_corr: function(ui, data) {
-      //    console.log("Correlation structure changed");
           fixRandomEffects(ui,this);
 
     },    
@@ -154,6 +154,7 @@ var fixRandomEffects = function(ui, context) {
 };
 
 var calcModelTerms = function(ui, context) {
+    mark("Calculating model terms");
     var variableList = context.cloneArray(ui.factors.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
     var combinedList = variableList.concat(covariatesList);
@@ -326,7 +327,7 @@ var containsCovariate = function(value, covariates) {
 
 var updateRandomSupplier = function(ui, context) {
 
-    console.log("random update")
+   mark("updating random supplier");
 // first we check if the update is needed    
     var clusterList = context.cloneArray(ui.cluster.value(), []);
     if (clusterList.length<1) {
@@ -335,14 +336,13 @@ var updateRandomSupplier = function(ui, context) {
     var termsList=[];
 // then we check how to prepare the list
 
-    var option = ui.re_listing.value();
     var order = 0
 
-    if ( option === "model") {
+    if ( ui.re_modelterms.value() === true) {
          termsList = context.cloneArray(ui.modelTerms.value(), []); 
     }
-    if ( option != "model" ) {
-       console.log("extra coefficients");
+    var option = ui.re_listing.value();
+    if (  option != "none" ) {
        var factorList = context.cloneArray(ui.factors.value(), []);
        var covariatesList = context.cloneArray(ui.covs.value(), []);
        var variablesList = factorList.concat(covariatesList);
@@ -352,7 +352,7 @@ var updateRandomSupplier = function(ui, context) {
         if ( option === "way3") order = 3;
         if ( option === "all")  order = variablesList.length
         
-        termsList = interactions(variablesList, order);
+        termsList = unique(termsList.concat(interactions(variablesList, order)));
         
     }
     termsList.unshift(["Intercept"]);
@@ -558,7 +558,12 @@ for (j = 0; j < order; j++) {
 return inter;
 }
 
-
+function mark(value) {
+  
+  if (DEBUG)
+   console.log(value);
+  
+}
 
 module.exports = events;
 

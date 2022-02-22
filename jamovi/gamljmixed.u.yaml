@@ -148,6 +148,11 @@ children:
           - type: Label
             label: List components
             children:
+                  - type: CheckBox
+                    name: re_modelterms
+                    events:
+                      change: './mixed.events::onEvent_re_list'
+
                   - type: ComboBox
                     name: re_listing
                     events:
