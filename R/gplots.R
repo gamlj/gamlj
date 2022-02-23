@@ -331,7 +331,7 @@ gplots.twoWaysPlot <- function(image, theme, depName, groupName, linesName, erro
             names(data) <- c("cluster", "group", "y")
 
             p <- p + ggplot2::geom_smooth(data = data, aes_string(x = "group", y = "y", group = "cluster"),
-                                          se=FALSE,alpha = 0.5, size = 0.2, color = "cadetblue3", 
+                                          se=FALSE,alpha = 0.5, size = 0.2, color = "gray64", 
                 show.legend = F)
         }
         if (errorType != "") 
@@ -393,7 +393,7 @@ gplots.oneWayPlot <- function(image, theme, depName, groupName, errorType = "non
             names(data) <- c("cluster", "group", "y")
             ginfo("Random effects plotting")
             p <- p + ggplot2::geom_smooth(data = data, aes_string(x = "group", y = "y", group = "cluster"),
-                                          se=FALSE, alpha = 0.5, size = 0.2, color="gray", show.legend = F)
+                                          se=FALSE, alpha = 0.5, size = 0.2, color="gray64", show.legend = F)
         }
 
         if (errorType != "") 
