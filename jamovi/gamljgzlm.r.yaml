@@ -216,7 +216,7 @@ items:
                     - ci_width
              columns:
                     - name: source
-                      title: "Names"
+                      title: "Name"
                       type: text
                       visible: (show_contrastnames)
                     - name: label

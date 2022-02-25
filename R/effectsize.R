@@ -18,8 +18,8 @@ es.relativerisk<-function(obj) {
 
       names(params)<-c("source","estimate","se","nothing", "ci.lower","ci.upper","test","df","p")
       
-      if (params$source[1]=="(Intercept)")
-             params <- params[-1,] 
+##      if (params$source[1]=="(Intercept)")
+##             params <- params[-1,] 
       
     return(params)
 

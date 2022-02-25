@@ -156,10 +156,10 @@ Syntax <- R6::R6Class(
     init_main_relativerisk=function() {
       
       alist<-NULL
-      if (self$option("es","RR")) {
+      if (self$option("es","RR") ) {
         alist  <-  self$init_main_coefficients()
-        if (self$hasIntercept)
-          alist  <-  alist[-1]
+#        if (self$hasIntercept)
+#          alist  <-  alist[-1]
       }
       alist
     },

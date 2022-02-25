@@ -131,11 +131,13 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_main_relativerisk=function() {
                             tab<-NULL
-                            if (self$hasTerms) {
+                            if (self$isProper) {
                               tab       <-  es.relativerisk(self)
                               tab       <-  private$.fix_names(tab)
                             }
-                            mark(tab)
+                            if (self$hasIntercept)
+                                 tab$label[tab$source=="(Intercept)"]<-"Probability"
+                            
                             tab
                           },
                           run_main_paralleltest=function() {
