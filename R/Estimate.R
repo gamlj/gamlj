@@ -19,7 +19,7 @@ Estimate <- R6::R6Class("Estimate",
                           initialize=function(options,dispatcher,datamatic) {
                             super$initialize(options,dispatcher,datamatic)
                             self$ciwidth <- options$ci_width/100
-                            self$subclass<-paste0("model_",options$model_type)
+                            self$subclass<-paste0("model_",options$modeltype)
                           },
                           estimate = function(data) {
                             
@@ -131,10 +131,11 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_main_relativerisk=function() {
                             tab<-NULL
-                            if (self$isProper) {
+                            if (self$hasTerms) {
                               tab       <-  es.relativerisk(self)
                               tab       <-  private$.fix_names(tab)
                             }
+                            mark(tab)
                             tab
                           },
                           run_main_paralleltest=function() {

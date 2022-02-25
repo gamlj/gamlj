@@ -83,7 +83,7 @@ Syntax <- R6::R6Class(
         tab<-lapply(.formulalist, function(x) list(source=.stringifyTerm(x)))
       }
       
-      if (self$options$model_type=="lm") {
+      if (self$options$modeltype=="lm") {
         if (self$hasTerms)
           tab<-prepend_list(tab,list(source="Model",f="."))
         
@@ -103,10 +103,10 @@ Syntax <- R6::R6Class(
 
       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
       .len<-length(.terms)
-      if (self$options$model_type=="multinomial") 
+      if (self$options$modeltype=="multinomial") 
         .len  <- .len * (self$datamatic$dep$nlevels-1)
       
-      if (self$options$model_type=="ordinal") 
+      if (self$options$modeltype=="ordinal") 
         .len  <- .len + (self$datamatic$dep$nlevels-2)
       
       lapply(1:.len, function(t) list(source=""))
@@ -174,7 +174,7 @@ Syntax <- R6::R6Class(
           p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
           nrow<-p*(p-1)/2
           ncol<-(length(.term)*2)+1
-          if (self$options$model_type=="multinomial") {
+          if (self$options$modeltype=="multinomial") {
             nrow<-nrow*(self$datamatic$dep$nlevels)
           }
           df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
@@ -204,7 +204,7 @@ Syntax <- R6::R6Class(
           alist<-lapply(.terms, function(.term) {
             ncol<-length(.term)
             nrow<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
-            if (self$options$model_type=="multinomial") {
+            if (self$options$modeltype=="multinomial") {
               nrow<-nrow*(self$datamatic$dep$nlevels)
             }
             one<-data.frame(matrix("",ncol=ncol,nrow = nrow))
@@ -244,7 +244,7 @@ Syntax <- R6::R6Class(
         nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
         
-        if (self$options$model_type=="multinomial")
+        if (self$options$modeltype=="multinomial")
           nrow <- nrow * (self$datamatic$dep$nlevels-1)
         
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
@@ -316,7 +316,7 @@ Syntax <- R6::R6Class(
         modelTerms[[aOne]]<-NULL
         self$hasIntercept=TRUE
       }
-      if (self$options$model_type=="ordinal") {
+      if (self$options$modeltype=="ordinal") {
         self$hasIntercept=TRUE
         if (self$options$fixed_intercept==FALSE)
           self$warnings<-list(topic="tab_info",message="Ordinal regression requires the intercept. It has been added to the model")

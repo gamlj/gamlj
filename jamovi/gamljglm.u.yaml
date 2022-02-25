@@ -192,6 +192,8 @@ children:
                       - type: TextBox
                         name: ccm_value
                         format: number
+                        enable: (covs_conditioning_mean_sd)
+
                   - name: covs_conditioning_percent
                     type: RadioButton
                     optionName: covs_conditioning

@@ -314,7 +314,7 @@ procedure.emmeans<-function(obj) {
     term64<-tob64(rev(term))
     
     ## include the dependent for multinomial ##
-    if (obj$options$model_type=="multinomial")
+    if (obj$options$modeltype=="multinomial")
         term64<-c(obj$datamatic$dep$name64,term64)
     
     ## first we get the levels of covs at which to condition the estimation ##
@@ -369,7 +369,7 @@ procedure.emmeans<-function(obj) {
     }
 
     ## rename the dependent for multinomial ##
-    if (obj$options$model_type=="multinomial"){
+    if (obj$options$modeltype=="multinomial"){
          names(tableData)[1]<-"response"
          tableData<-tableData[order(tableData$response),]
     }
@@ -506,7 +506,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     names(.anova)[1:length(.names)]<-.names
     
     ### make fix depending of the type of model ###    
-    class(.anova)<-c(paste0("simple_anova_",obj$options$model_type),class(.anova))
+    class(.anova)<-c(paste0("simple_anova_",obj$options$modeltype),class(.anova))
     .anova<-add_effect_size(.anova,model)
     ### check some stuff 
     .all <- c(term64,variable64)
@@ -778,7 +778,7 @@ procedure.simpleInteractions<-function(obj) {
                   res[[.name]]<-as.character(res[[.name]])
               }
               names(res)[1:length(mods)]<-make.names(paste0("mod_",fromb64(mods)))
-              class(res)<-c(paste0("simple_anova_",obj$options$model_type),class(res))
+              class(res)<-c(paste0("simple_anova_",obj$options$modeltype),class(res))
               res<-add_effect_size(res,obj$model)
               res
         })

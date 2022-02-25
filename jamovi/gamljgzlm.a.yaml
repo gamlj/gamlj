@@ -108,7 +108,7 @@ options:
       default: false
       description:
           R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
+            `TRUE` (default) or `FALSE` , coefficients CI in tables
 
     - name: donotrun
       title: Do not run
@@ -318,7 +318,7 @@ options:
           R: >
             should simple Interactions be computed
 
-    - name: covs_scale
+    - name: covs_conditioning
       title: Covariates conditioning
       type: List
       options:
@@ -333,7 +333,7 @@ options:
             covariates (if any)
 
 
-    - name: csm_value
+    - name: ccm_value
       type: Number
       default: 1
       description:
@@ -341,7 +341,7 @@ options:
             how many st.deviations around the means used to condition simple effects and plots.
             Used if `simpleScale`=`'mean_sd'`
 
-    - name: csp_value
+    - name: ccp_value
       type: Number
       default: 25
       min: 5
@@ -417,7 +417,7 @@ options:
 ############ generic with some specs ###########
 
 
-    - name: scaling
+    - name: covs_scale
       title: Covariates Scaling
       type: Array
       items: (covs)
@@ -469,7 +469,7 @@ options:
       default:
           - expb
           
-    - name: model_type
+    - name: modeltype
       title: Model Selection
       type: List
       options:

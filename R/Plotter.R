@@ -334,13 +334,13 @@ Plotter <- R6::R6Class(
             z<-self$options$plotSepLines
             moderators<-self$options$plotSepPlots
             
-            if (self$options$modelSelection=="multinomial") {
+            if (self$options$modeltype=="multinomial") {
                      moderators < c(z,moderators)
                      z   <- self$options$dep
                      self$scatterType="response"
             }
             
-            if (self$options$modelSelection=="ordinal" & self$scatterType!="mean.class") {
+            if (self$options$modeltype=="ordinal" & self$scatterType!="mean.class") {
                      moderators < c(z,moderators)
                      z   <- self$options$dep
               

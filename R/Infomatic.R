@@ -23,7 +23,7 @@ Infomatic <- R6::R6Class(
     df=NULL,
     comparison="Difference",
     initialize=function(options,datamatic) {
-      self$modeltype<-options$model_type
+      self$modeltype<-options$modeltype
       self$caller<-options$.caller
       dep<-options$dep
       dlevs<-datamatic$variables[[tob64(dep)]]$levels_labels
@@ -320,14 +320,14 @@ FIT[["over"]]  <-  list(info="Chi-squared/DF", specs="Overdispersion indicator")
   
   dlevs<-self$datamatic$variables[[tob64(self$options$dep)]]$levels
   dep<-self$options$dep
-  if (self$options$model_type %in% c("logistic")) {
+  if (self$options$modeltype %in% c("logistic")) {
     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
     
   }
-  if (self$options$model_type %in% c("probit")) {
+  if (self$options$modeltype %in% c("probit")) {
     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],")")
   }
-  if (self$options$model_type %in% c("multinomial")) {
+  if (self$options$modeltype %in% c("multinomial")) {
     self$tab_info[["dir"]]$value<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
   }
   

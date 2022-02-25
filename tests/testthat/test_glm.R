@@ -4,9 +4,7 @@ tol<-.001
 mod<-gamlj::gamljGlm(
   data = ToothGrowth,
   dep = "len",
-  factors = "supp",
-  modelTerms = ~ supp,
-  posthocEffsize = "dm")
+  factors = "supp")
 
 res<-mod$main$coefficients$asDF
 params<-res$estimate

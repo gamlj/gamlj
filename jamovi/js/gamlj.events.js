@@ -10,7 +10,7 @@ const events = {
         
         if (typeof ui.propLabel !== 'undefined' ) {
           
-            if (ui.model_type.getValue()==="ordinal") {
+            if (ui.modeltype.getValue()==="ordinal") {
               ui.propLabel.$el.show();
             } else {
               ui.propLabel.$el.hide();
@@ -66,7 +66,7 @@ const events = {
         if (typeof ui.es_RR !== 'undefined' ) {
               ui.es_RR.setValue(false);
         }
-        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear") {
+        if (ui.modeltype.getValue()==="custom" ||  ui.modeltype.getValue()==="linear") {
                ui.es_expb.setValue(false);
                ui.estimates_ci.setValue(true);
                ui.expb_ci.setValue(false);
@@ -76,7 +76,7 @@ const events = {
                ui.expb_ci.setValue(true);
         }
         
-        if (ui.model_type.getValue()==="ordinal") {
+        if (ui.modeltype.getValue()==="ordinal") {
           ui.propLabel.$el.show();
         } else {
           ui.propLabel.$el.hide();

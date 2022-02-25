@@ -10,7 +10,7 @@ gamljGzlmClass <- R6::R6Class(
     .smartObjs=list(),
     .init=function() {
       
-      ginfo(paste("MODULE:",self$options$.caller,self$options$modelSelection,"  #### phase init  ####"))
+      ginfo(paste("MODULE:",self$options$.caller,self$options$modeltype,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
       private$.ready<-readiness(self$options)
@@ -40,7 +40,7 @@ gamljGzlmClass <- R6::R6Class(
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### some models do not have adjusted r2 ###
-      if (self$options$modelSelection %in% c("multinomial","ordinal", "custom"))
+      if (self$options$modeltype %in% c("multinomial","ordinal", "custom"))
              self$results$main$r2$getColumn("ar2")$setVisible(FALSE)
       
       
@@ -54,8 +54,8 @@ gamljGzlmClass <- R6::R6Class(
       
       ### estimates table ###
       aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
-      aSmartObj$ci("est",self$options$ciWidth)
-      aSmartObj$ci("expb",width=self$options$ciWidth,label="Exp(B)")
+      aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
       aSmartObj$spaceBy<-"response"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
@@ -78,7 +78,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
-      aSmartObj$ci("est",self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-"response"
       aSmartObj$expandFrom<-2
       aSmartObj$setColumnTitle("estimate",estimate_machine$infomatic$comparison)
@@ -93,40 +93,40 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$expandFrom<-2
       aSmartObj$combineBelow="new!"
       aSmartObj$spaceBy="new!"
-      aSmartObj$ci("est",self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ci_width)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### simple effects
       ##### anova
       aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$key<-self$options$simpleVariable
-      aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
-      aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
+      aSmartObj$key<-self$options$simple_effects
+      aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
+      aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
       
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ##### coefficients
       aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandFrom<-2
       aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$key<-self$options$simpleVariable
-      aSmartObj$ci("est",self$options$ciWidth)
-      aSmartObj$ci("expb",width=self$options$ciWidth,format="Exp(B) {}% Confidence Intervals")
-      aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
-      aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
+      aSmartObj$key<-self$options$simple_effects
+      aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$ci("expb",width=self$options$ci_width,format="Exp(B) {}% Confidence Intervals")
+      aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
+      aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### simple interaction
       aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
-      aSmartObj$activated<-(self$options$simpleInteractions & is.something(self$options$simpleVariable) & length(self$options$simpleModerators)>1)
+      aSmartObj$activated<-(self$options$simple_interactions & is.something(self$options$simple_effects) & length(self$options$simple_moderators)>1)
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$ci("est",self$options$ciWidth)
+      aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-"new!"
       aSmartObj$spaceBy<-"new!"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)

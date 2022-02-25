@@ -24,7 +24,7 @@ items:
     clearWith:
         - dep
         - factors
-        - cov
+        - covs
         - model_terms
         - fixed_intercept
         - ci_method
@@ -94,7 +94,7 @@ items:
                          - dep
                          - model_terms
                          - contrasts
-                         - scaling
+                         - covs_conditioning
                          - dep_scale
                          - fixed_intercept
                          - es
@@ -122,7 +122,7 @@ items:
                     - dep
                     - model_terms
                     - contrasts
-                    - scaling
+                    - covs_conditioning
                     - dep_scale
                     - fixed_intercept
                     - ci_width
@@ -132,7 +132,7 @@ items:
                     - name: response
                       title: Response 
                       type: text
-#                      visible: (model_type:multinomial)
+                      visible: (modeltype:multinomial)
                       combineBelow: true
                     - name: source
                       title: "Name"
@@ -210,7 +210,7 @@ items:
                     - dep
                     - model_terms
                     - contrasts
-                    - scaling
+                    - covs_conditioning
                     - fixed_intercept
                     - es
                     - ci_width
@@ -247,7 +247,7 @@ items:
            - name: paralleltest
              title: Parallel lines test
              type: Table
-#             visible: (propodds_test & model_type:ordinal)
+             visible: (propodds_test & modeltype:ordinal)
              clearWith:
                     - dep
                     - model_terms
@@ -284,7 +284,7 @@ items:
         - dep
         - model_terms
         - contrasts
-        - scaling
+        - covs_conditioning
         - dep_scale
         - posthoc
         - posthoc_adjust
@@ -302,7 +302,7 @@ items:
         - name: response
           title: Response 
           type: text
-#          visible: (model_type:multinomial)
+          visible: (modeltype:multinomial)
           combineBelow: true
         - name: estimate
           title: Difference
@@ -350,14 +350,14 @@ items:
                  - dep
                  - model_terms
                  - contrasts
-                 - scaling
+                 - covs_conditioning
                  - dep_scale
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
                  - covs_scale
-                 - csm_value
-                 - csp_value
+                 - ccm_value
+                 - ccp_value
                  - covs_scale_labels
                  - ci_method
                  - boot_r
@@ -372,13 +372,13 @@ items:
                  - dep
                  - model_terms
                  - contrasts
-                 - scaling
+                 - covs_conditioning
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
                  - covs_scale
-                 - csm_value
-                 - csp_value
+                 - ccm_value
+                 - ccp_value
                  - covs_scale_labels
 
               columns:
@@ -401,14 +401,14 @@ items:
                  - dep
                  - model_terms
                  - contrasts
-                 - scaling
+                 - covs_conditioning
                  - dep_scale
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
                  - covs_scale
-                 - csm_value
-                 - csp_value
+                 - ccm_value
+                 - ccp_value
                  - covs_scale_labels
                  - ci_method
                  - boot_r
@@ -418,7 +418,7 @@ items:
                        title: Response 
                        type: text
                        combineBelow: true
-#                       visible: (model_type:multinomial)
+                       visible: (modeltype:multinomial)
                      - name: contrast
                        title: "Effect"
                        type: text
@@ -467,7 +467,7 @@ items:
         - dep
         - model_terms
         - contrasts
-        - scaling
+        - covs_conditioning
         - dep_scale
         - fixed_intercept
         - covs_scale_labels
@@ -508,7 +508,7 @@ items:
                    - name: response
                      title: Response 
                      type: text
-#                     visible: (model_type:multinomial)
+                     visible: (modeltype:multinomial)
                      
                    - name: estimate
                      title: Estimate
@@ -545,14 +545,14 @@ items:
             - ci_method
             - emmeans
             - model_terms
-            - model_type
+            - modeltype
             - ci_method
 
         columns:
         - name: response
           title: Response 
           type: text
-#          visible: (model_type:multinomial)
+          visible: (modeltype:multinomial)
           combineBelow: true
 
         - name: estimate
@@ -588,7 +588,7 @@ items:
            - plotSepPlots
            - plotError
            - ci_width
-           - scaling
+           - covs_conditioning
            - dep_scale
            - model_terms
            - fixed_intercept
@@ -596,8 +596,8 @@ items:
            - covs_scale_labels
            - plotDvScale
            - plotRaw
-           - csp_value
-           - csm_value
+           - ccp_value
+           - ccm_value
            - plotScale
            - plotOriginalScale
            - plotLinesTypes

@@ -23,7 +23,7 @@ items:
     clearWith:
         - dep
         - factors
-        - cov
+        - covs
         - model_terms
         - fixed_intercept
         - ci_method
@@ -249,11 +249,11 @@ items:
                     - name: beta.ci.lower
                       type: number
                       title: Lower
-                      visible: (estimates_ci & betas_ci)
+                      visible: (betas_ci)
                     - name: beta.ci.upper
                       type: number
                       title: Upper
-                      visible: (estimates_ci & betas_ci)
+                      visible: (betas_ci)
                     - name: df
                       title: "df"
                       type: integer
@@ -434,10 +434,10 @@ items:
                  - dep
                  - model_terms
                  - contrasts
+                 - covs_scale
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
-                 - covs_scale
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
@@ -497,8 +497,7 @@ items:
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simpleVariable
-                 - simpleModerators
+                 - simple_moderators
                  - covs_conditioning
                  - ccm_value
                  - ccp_value
@@ -559,10 +558,13 @@ items:
              clearWith:
                 - dep
                 - model_terms
-                - contrasts
-                - covs_scale
                 - fixed_intercept
+                - contrasts
+                - covs_conditioning
+                - covs_scale
                 - covs_scale_labels
+                - simple_effects
+                - simple_moderators
              columns:
                    - name: effect
                      title: 'Effect'
@@ -619,11 +621,12 @@ items:
                 - model_terms
                 - contrasts
                 - covs_scale
+                - simple_effects
+                - simple_moderators
+                - covs_conditioning
                 - dep_scale
                 - fixed_intercept
                 - covs_scale_labels
-                - ci_width
-                - emmeans
                 - ci_width
                 - ci_method
                 - boot_r
@@ -755,6 +758,7 @@ items:
             - name: p
               type: number
               format: zto,pvalue
+              
         - name: normtest
           title: Test for Normality of residuals
           type: Table
@@ -835,3 +839,4 @@ items:
     clearWith:
         - dep
         - model_terms
+        

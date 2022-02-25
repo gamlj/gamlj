@@ -17,7 +17,7 @@ gamljGlmMixedClass <- R6::R6Class(
 #       factors<-self$options$factors
 #       covs<-self$options$covs
 #       fixedIntercept<-self$options$fixedIntercept
-#       modelType<-self$options$modelSelection
+#       modelType<-self$options$modeltype
 #       afamily<-mf.give_family(modelType,self$options$custom_family,self$options$custom_link)
 #       ciWidth<-self$options$paramCIWidth
 #       
@@ -158,7 +158,7 @@ gamljGlmMixedClass <- R6::R6Class(
       # ginfo("run")
       # # collect some option
       # dep <- self$options$dep
-      # modelType<-self$options$modelSelection
+      # modelType<-self$options$modeltype
       # if (is.null(dep))
       #   return()
       # 

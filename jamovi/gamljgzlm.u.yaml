@@ -16,8 +16,8 @@ children:
             label: Continuous dependent variable
             children:
               - type: RadioButton
-                name: model_type_linear
-                optionName: model_type
+                name: modeltype_linear
+                optionName: modeltype
                 optionPart: linear
                 events:
                   change: './gamlj.events::onChange_model'
@@ -25,20 +25,20 @@ children:
             label: Frequencies
             children:
               - type: RadioButton
-                name: model_type_poisson
-                optionName: model_type
+                name: modeltype_poisson
+                optionName: modeltype
                 optionPart: poisson
                 events:
                   change: './gamlj.events::onChange_model'
-              - name: model_type_poiover
+              - name: modeltype_poiover
                 type: RadioButton
-                optionName: model_type
+                optionName: modeltype
                 optionPart: poiover
                 events:
                   change: './gamlj.events::onChange_model'
               - type: RadioButton
-                name: model_type_nb
-                optionName: model_type
+                name: modeltype_nb
+                optionName: modeltype
                 optionPart: nb
                 events:
                   change: './gamlj.events::onChange_model'
@@ -49,24 +49,27 @@ children:
             label: Categorical dependent variable
             children:
               - type: RadioButton
-                name: model_type_logistic
-                optionName: model_type
+                name: modeltype_logistic
+                optionName: modeltype
                 optionPart: logistic
                 events:
                   change: './gamlj.events::onChange_model'
               - type: RadioButton
-                name: model_type_probit
-                optionName: model_type
+                name: modeltype_probit
+                optionName: modeltype
                 optionPart: probit
                 events:
                   change: './gamlj.events::onChange_model'
-              - name: model_type_ordinal
+              - name: modeltype_ordinal
                 type: RadioButton
-                optionName: model_type
+                optionName: modeltype
                 optionPart: ordinal
+                events:
+                  change: './gamlj.events::onChange_model'
+
               - type: RadioButton
-                name: model_type_multinomial
-                optionName: model_type
+                name: modeltype_multinomial
+                optionName: modeltype
                 optionPart: multinomial
                 events:
                   change: './gamlj.events::onChange_model'
@@ -74,17 +77,20 @@ children:
             label: Custom Model
             children:
               - type: RadioButton
-                name: model_type_custom
-                optionName: model_type
+                name: modeltype_custom
+                optionName: modeltype
                 optionPart: custom
                 events:
                   change: './gamlj.events::onChange_model'
               - type: ComboBox
                 name: custom_family
-                enable: (model_type_custom)
+                enable: (modeltype_custom)
               - type: ComboBox
                 name: custom_link
-                enable: (model_type_custom)
+                enable: (modeltype_custom)
+                events:
+                  change: './gamlj.events::onChange_model'
+
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -132,7 +138,7 @@ children:
             type: CheckBox
             optionPart: RR
             optionName: es
-            enable: (model_type:logistic)
+            enable: (modeltype:logistic)
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -185,6 +191,10 @@ children:
                   type: TermLabel
       - type: CheckBox
         name: fixed_intercept
+        
+        
+###### factor coding #####
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -212,13 +222,18 @@ children:
         name: show_contrastnames
       - type: CheckBox
         name: show_contrastcodes
+
+
+
+######## covariates scale 
+
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
     stretchFactor: 1
     children:
       - type: ListBox
-        name: scaling
+        name: covs_scale
         stretchFactor: 1
         showColumnHeaders: false
         columns:
@@ -247,32 +262,34 @@ children:
                 style: list
                 children:
                   - type: RadioButton
-                    name: covs_scale_mean_sd
-                    optionName: covs_scale
+                    name: covs_conditioning_mean_sd
+                    optionName: covs_conditioning
                     optionPart: mean_sd
                     children:
                       - type: TextBox
-                        name: csm_value
+                        name: ccm_value
                         format: number
-                  - name: covs_scale_percent
+                  - name: covs_conditioning_percent
                     type: RadioButton
-                    optionName: covs_scale
+                    optionName: covs_conditioning
                     optionPart: percent
                     children:
                       - type: TextBox
-                        name: csp_value
+                        name: ccp_value
                         label: null
                         suffix: '%'
                         format: number
-                        enable: (covs_scale_percent)
-          - type: Label
-            label: Covariates labeling
+                        enable: (covs_conditioning_percent)
+          - type: LayoutBox
+            margin: large
+            style: list
             children:
-              - type: LayoutBox
-                margin: large
-                children:
-                  - type: ComboBox
-                    name: covs_scale_labels
+              - type: Label
+                label: Covariates labeling
+                children: 
+                      - type: ComboBox
+                        name: covs_scale_labels
+
 
 ##### post hoc #########
 
@@ -401,18 +418,18 @@ children:
                 name: plot_scale_link
                 optionName: plot_scale
                 optionPart: link
-                enable: (!model_type_multinomial && !model_type_ordinal)
+                enable: (!modeltype_multinomial && !modeltype_ordinal)
               - type: RadioButton
                 name: plotcale_mean.class
                 optionName: plot_scale
                 optionPart: mean.class
-                enable: (model_type_ordinal)
+                enable: (modeltype_ordinal)
           - type: Label
             label: Plot options
             children:
               - type: CheckBox
                 name: plotRaw
-                enable: (!model_type_multinomial && !plot_scale_link)
+                enable: (!modeltype_multinomial && !plot_scale_link)
               - type: CheckBox
                 name: plotDvScale
                 enable: (plot_scale_response)
@@ -450,7 +467,7 @@ children:
       - type: CheckBox
         name: simple_interactions
         label: Simple interactions
-        enable: (!model_type_multinomial)
+        enable: (!modeltype_multinomial)
 
 
   - type: CollapseBox
@@ -531,4 +548,4 @@ children:
             children:
               - type: CheckBox
                 name: propodds_test
-                enable: (model_type_ordinal)
+                enable: (modeltype_ordinal)

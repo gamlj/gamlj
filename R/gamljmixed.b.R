@@ -84,29 +84,29 @@ gamljMixedClass <- R6::R6Class(
       ### simple effects
       ##### anova
       aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$key<-self$options$simpleVariable
-      aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
-      aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
+      aSmartObj$key<-self$options$simple_effects
+      aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
+      aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
       
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ##### coefficients
       aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$simpleVariable) & is.something(self$options$simpleModerators))
+      aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$key<-self$options$simpleVariable
+      aSmartObj$key<-self$options$simple_effects
       aSmartObj$ci("est",self$options$ci_width)
-      aSmartObj$combineBelow<-1:(length(self$options$simpleModerators)-1)
-      aSmartObj$spaceBy<-(length(self$options$simpleModerators)-1)
+      aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
+      aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### simple interaction
       aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
-      aSmartObj$activated<-(self$options$simpleInteractions & is.something(self$options$simpleVariable) & length(self$options$simpleModerators)>1)
+      aSmartObj$activated<-(self$options$simple_interactions & is.something(self$options$simple_effects) & length(self$options$simple_moderators)>1)
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$ci("est",self$options$ci_width)

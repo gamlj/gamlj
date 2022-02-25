@@ -5,7 +5,7 @@ menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
 completeWhenFilled: true
-export: false
+export: true
 description:
     main: |
            General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
@@ -471,7 +471,8 @@ options:
           R: >
             one or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD ) 
             or Hedge's g
-  
+      default:
+          - dm
 
     - name: d_ci
       title: Confidence intervals
@@ -589,7 +590,7 @@ options:
           - title: Log
             name: 'log'
 
-      default: "none"
+      default: 'none'
       description:
          R: >
            Re-scale the dependent variable.
