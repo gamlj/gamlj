@@ -752,7 +752,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             columns=list(
                                 list(
                                     `name`="source", 
-                                    `title`="Names", 
+                                    `title`="Name", 
                                     `type`="text", 
                                     `visible`="(show_contrastnames)"),
                                 list(

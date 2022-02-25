@@ -70,10 +70,17 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_main_anova=function() {
 
-                            if (!self$isProper) 
-                                self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["glm.zeromodel"])
+                            if (!self$isProper) {
+                                mark("is not proper")
+                                if (self$infomatic$caller=="lm") {
+                                    self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
+                                    return(mf.anova(self$model,self))
+                                }   else { 
+                                    self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["error.zeromodel"])
+                                    return(NULL)
+                                }
+                            }
                             mf.anova(self$model,self)
-                            
                           },
                           
                           run_main_r2=function() {
