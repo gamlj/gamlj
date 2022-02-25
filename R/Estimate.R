@@ -19,7 +19,7 @@ Estimate <- R6::R6Class("Estimate",
                           initialize=function(options,dispatcher,datamatic) {
                             super$initialize(options,dispatcher,datamatic)
                             self$ciwidth <- options$ci_width/100
-                            self$subclass<-paste0("model_",options$modelSelection)
+                            self$subclass<-paste0("model_",options$model_type)
                           },
                           estimate = function(data) {
                             
@@ -41,8 +41,8 @@ Estimate <- R6::R6Class("Estimate",
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
                                 
                                 ### issue some notes ###
-                                if ((!self$option("cimethod","wald")) & self$option("posthoc") & self$option("posthocEffsize") & self$option("dci")) 
-                                  self$dispatcher$warnings<-list(topic="posthocEffsize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
+                                if ((!self$option("ci_method","wald")) & self$option("posthoc") & self$option("posthoc_es") & self$option("d_ci")) 
+                                  self$dispatcher$warnings<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
                                 tab
                           },                    
                           run_main_fit=function() {
@@ -83,7 +83,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_coefficients=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
 
                             tab<-NULL
@@ -98,11 +98,11 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_effectsizes=function()  {
                             
-                            if (!self$option("cimethod","wald")) {
+                            if (!self$option("ci_method","wald")) {
                               gstart("ESTIMATE: bootstrapping variances")
                               self$boot_variances<-boot::boot(self$model$model,
                                                               statistic = es.var_boot_fun,
-                                                              R = self$options$bootR,
+                                                              R = self$options$boot_r,
                                                               model=self$model)
                               gend()
                             }
@@ -164,22 +164,22 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_posthoc=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
                             self$tab_posthoc<-procedure.posthoc(self)
                             self$tab_posthoc  
                           },
                           
-                          run_posthocEffsize=function() {
+                          run_posthocEffectSize=function() {
                             procedure.posthoc_effsize(self)
                           },
                           
                           run_emmeans=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
-                            if (self$option("modelSelection","ordinal")) {
+                            if (self$option("model_type","ordinal")) {
                                  msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
                                  self$dispatcher$warnings<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
                             }
@@ -188,7 +188,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_simpleEffects_anova=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
                             if (is.null(self$tab_simpleAnova))
@@ -198,7 +198,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_simpleEffects_coefficients=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
                             if (is.null(self$tab_simpleCoefficients))
@@ -209,7 +209,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_simpleInteractions=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("cimethod","wald")) 
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
                             
@@ -358,7 +358,7 @@ Estimate <- R6::R6Class("Estimate",
                             ## check random effects for mixed
                             
                             if (self$infomatic$caller=="lmer") {
-                              terms<-setdiff(unlist(unlist(self$options$randomTerms)),unlist(c("Intercept",self$options$cluster)))
+                              terms<-setdiff(unlist(unlist(self$options$re)),unlist(c("Intercept",self$options$cluster)))
                               for (t in terms) {
                                  if(self$datamatic$variables[[tob64(t)]]$isBetween)
                                      self$dispatcher$warnings<-list(topic="info",message=paste("Variable",t,"does not seem to vary across clusters but its effects are set random."))
@@ -402,12 +402,12 @@ Estimate <- R6::R6Class("Estimate",
                           .bootstrap_model=function() {
                             
                                 gstart("ESTIMATE: estimating bootstrap model")
-                                bmodel<-try_hard(parameters::bootstrap_model(self$model,iterations=self$options$bootR))
+                                bmodel<-try_hard(parameters::bootstrap_model(self$model,iterations=self$options$boot_r))
                                 if (!isFALSE(bmodel$error)) {
                                   self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
                                 }  else {
                                   self$boot_model<-bmodel$obj
-                                  self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method (",self$options$cimethod,"), with",self$options$bootR,"iterations."))
+                                  self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method (",self$options$ci_method,"), with",self$options$boot_r,"iterations."))
                                 }
                           },
                           .estimateTests=function() {
@@ -485,9 +485,9 @@ Estimate <- R6::R6Class("Estimate",
                                   
                                   ### confidence intervals
                                   ci_covariances<-NULL
-                                  if (self$option("ciRE")) {
+                                  if (self$option("re_ci")) {
                                     
-                                      method     <-  ifelse(self$options$cimethod=="wald","Wald",self$options$cimethod)
+                                      method     <-  ifelse(self$options$ci_method=="wald","Wald",self$options$ci_method)
                                       results    <-  try_hard(stats::profile(self$model,which="theta_",optimizer=self$model@optinfo$optimizer,prof.scale=c("varcov")))
 
                                       self$dispatcher$warnings<-list(topic="tab_random",message=results$warning)
@@ -523,7 +523,7 @@ Estimate <- R6::R6Class("Estimate",
                           
 
                                 #### LRT for random effects ####
-                                if (self$option("lrtRandomEffects")) {
+                                if (self$option("re_lrt")) {
                                   ## this is required by lmerTest::ranova() which looks in the parent for "data"
                                   data<-self$model@frame
                                   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
@@ -567,9 +567,9 @@ Estimate <- R6::R6Class("Estimate",
                         
                          .estimateAssumptions=function() {
                            
-                           if (self$option("homoTest")) {
+                           if (self$option("homo_test")) {
                              
-                             factors<-intersect(unique(unlist(self$options$modelTerms)),self$options$factors)
+                             factors<-intersect(unique(unlist(self$options$model_terms)),self$options$factors)
                              
                              if (length(factors)>0) {
                                factors64<-tob64(factors)

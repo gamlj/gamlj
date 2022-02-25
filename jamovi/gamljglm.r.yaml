@@ -24,12 +24,12 @@ items:
         - dep
         - factors
         - cov
-        - modelTerms
-        - fixedIntercept
-        - cimethod
-        - semethod
-        - dci
-        - bootR
+        - model_terms
+        - fixed_intercept
+        - ci_method
+        - se_method
+        - d_ci
+        - boot_r
     refs: gamlj
      
   - name: main
@@ -42,8 +42,8 @@ items:
              description: a table of R
              clearWith:
                          - dep
-                         - modelTerms
-                         - fixedIntercept
+                         - model_terms
+                         - fixed_intercept
              rows: 1
              columns:
                     - name: r1
@@ -69,17 +69,17 @@ items:
            - name: intercept
              title: Intercept Information
              type: Table
-             visible: (interceptInfo)
+             visible: (intercept_info)
              description: a table of information for the model intercept
              clearWith:
                          - dep
-                         - modelTerms
+                         - model_terms
                          - contrasts
-                         - scaling
+                         - covs_scale
                          - dep_scale
-                         - fixedIntercept
-                         - effectSize
-                         - interceptInfo
+                         - fixed_intercept
+                         - es
+                         - intercept_info
              rows: 1             
              columns:
                     - name: source
@@ -98,17 +98,17 @@ items:
                     - name: etaSqP
                       title: η²p
                       type: number
-                      visible: (effectSize:etap)
+                      visible: (es:etap)
                       format: zto
                     - name: omegaSqP
                       title: ω²p
                       type: number
-                      visible: (effectSize:omegap)
+                      visible: (es:omegap)
                       format: zto
                     - name: epsilonSqP
                       title: ε²p
                       type: number
-                      visible: (effectSize:epsilonp)
+                      visible: (es:epsilonp)
                       format: zto
 
            - name: anova
@@ -117,11 +117,10 @@ items:
              description: a table of ANOVA results
              clearWith:
                          - dep
-                         - modelTerms
+                         - model_terms
                          - contrasts
-                         - scaling
-                         - dep_scale
-                         - fixedIntercept
+                         - covs_scale
+                         - fixed_intercept
  
              columns:
                     - name: source
@@ -143,49 +142,49 @@ items:
                     - name: etaSq
                       title: η²
                       type: number
-                      visible: (effectSize:eta)
+                      visible: (es:eta)
                     - name: etaSqP
                       title: η²p
                       type: number
-                      visible: (effectSize:etap)
+                      visible: (es:etap)
                       format: zto
                     - name: omegaSq
                       title: ω²
                       type: number
-                      visible: (effectSize:omega)
+                      visible: (es:omega)
                       format: zto
                     - name: omegaSqP
                       title: ω²p
                       type: number
-                      visible: (effectSize:omegap)
+                      visible: (es:omegap)
                       format: zto
 
                     - name: epsilonSq
                       title: ε²
                       type: number
-                      visible: (effectSize:epsilon)
+                      visible: (es:epsilon)
                       format: zto
                     - name: epsilonSqP
                       title: ε²p
                       type: number
-                      visible: (effectSize:epsilonp)
+                      visible: (es:epsilonp)
                       format: zto
 
            - name: effectsizes
              title: Effect Size Indices
              type: Table
-             visible: (effectSizeInfo)
+             visible: (es_info)
              description: a table of effect size indeces
-             refs: effectsize
+             refs: es
 
              clearWith:
                          - dep
-                         - modelTerms
+                         - model_terms
                          - contrasts
-                         - fixedIntercept
-                         - ciWidth
-                         - cimethod
-                         - bootR
+                         - fixed_intercept
+                         - ci_width
+                         - ci_method
+                         - boot_r
 
              columns:
                     - name: effect
@@ -210,21 +209,21 @@ items:
              type: Table
              clearWith:
                     - dep
-                    - modelTerms
+                    - model_terms
                     - contrasts
-                    - scaling
+                    - covs_scale
                     - dep_scale
-                    - fixedIntercept
-                    - ciWidth
-                    - cimethod
-                    - bootR
-                    - semethod
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - se_method
 
              columns:
                     - name: source
                       title: "Names"
                       type: text
-                      visible: (showRealNames)
+                      visible: (show_contrastnames)
                     - name: label
                       title: "Effect"
                       type: text
@@ -237,24 +236,24 @@ items:
                     - name: est.ci.lower
                       type: number
                       title: Lower
-                      visible: (showParamsCI)
+                      visible: (estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
-                      visible: (showParamsCI)
+                      visible: (estimates_ci)
                     - name: beta
                       type: number
                       title: β
-                      visible: (effectSize:beta)
+                      visible: (es:beta)
                       format: zto
                     - name: beta.ci.lower
                       type: number
                       title: Lower
-                      visible: (showParamsCI & showBetaCI)
+                      visible: (estimates_ci & betas_ci)
                     - name: beta.ci.upper
                       type: number
                       title: Upper
-                      visible: (showParamsCI & showBetaCI)
+                      visible: (estimates_ci & betas_ci)
                     - name: df
                       title: "df"
                       type: integer
@@ -273,7 +272,7 @@ items:
              title: Contrast Coefficients 
              type: Array
              description: an array of contrast coefficients tables
-             visible: (showContrastCode)
+             visible: (show_contrastcodes)
              items: (factors)
              clearWith:
                     - contrasts
@@ -284,7 +283,7 @@ items:
                          - name: cname
                            title: 'Name'
                            type: text
-                           visible: (showRealNames)
+                           visible: (show_contrastnames)
                          - name: clab
                            title: 'Contrast'
                            type: text
@@ -303,10 +302,11 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-              - semethod
-              - cimethod
-              - ciWidth
-              - bootR
+              - se_method
+              - ci_method
+              - ci_width
+              - boot_r
+              - posthoc_adjust
 
         columns:
         - name: estimate
@@ -318,11 +318,11 @@ items:
         - name: est.ci.lower
           type: number
           title: Lower
-          visible: (showParamsCI)
+          visible: (estimates_ci)
         - name: est.ci.upper
           type: number
           title: Upper
-          visible: (showParamsCI)
+          visible: (estimates_ci)
         - name: test
           title: t
           type: number
@@ -333,34 +333,34 @@ items:
           title: p
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:none)
+#          visible: (posthoc_adjust:none)
         - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:bonf)
+#          visible: (posthoc_adjust:bonf)
         - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:tukey)
+#          visible: (posthoc_adjust:tukey)
         - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:holm)
+#          visible: (posthoc_adjust:holm)
         - name: scheffe
           title: p<sub>scheffe</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:scheffe)
+#          visible: (posthoc_adjust:scheffe)
         - name: sidak
           title: p<sub>sidak</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:sidak)
+#          visible: (posthoc_adjust:sidak)
 
-  - name: posthocEffsize
+  - name: posthocEffectSize
     title: Comparisons effect size
     type: Array
     description: an array of post-hoc effect size
@@ -370,12 +370,12 @@ items:
         title:  "Comparisons:  ___key___"
         type: Table
         clearWith:
-              - semethod
-              - cimethod
-              - ciWidth
-              - bootR
-              - posthocEffsize
-              - dci
+              - se_method
+              - ci_method
+              - ci_width
+              - boot_r
+              - posthoc_es
+              - d_ci
         columns:
         - name: estimate
           title: Difference
@@ -386,39 +386,39 @@ items:
         - name: dm
           title: d<sub>mod</sub>
           type: number
-          visible: (posthocEffsize:dm)
+          visible: (posthoc_es:dm)
         - name: dm.ci.lower
           type: number
           title: Lower
-          visible: (posthocEffsize:dm && dci)
+          visible: (posthoc_es:dm && d_ci)
         - name: dm.ci.upper
           type: number
           title: Upper
-          visible: (posthocEffsize:dm && dci)
+          visible: (posthoc_es:dm && d_ci)
         - name: ds
           title: d<sub>sample</sub>
           type: number
-          visible: (posthocEffsize:ds)
+          visible: (posthoc_es:ds)
         - name: ds.ci.lower
           type: number
           title: Lower
-          visible: (posthocEffsize:ds && dci)
+          visible: (posthoc_es:ds && d_ci)
         - name: ds.ci.upper
           type: number
           title: Upper
-          visible: (posthocEffsize:ds && dci)
+          visible: (posthoc_es:ds && d_ci)
         - name: g
           title: g<sub>sample</sub> 
           type: number
-          visible: (posthocEffsize:g)
+          visible: (posthoc_es:g)
         - name: g.ci.lower
           type: number
           title: Lower
-          visible: (posthocEffsize:g && dci)
+          visible: (posthoc_es:g && d_ci)
         - name: g.ci.upper
           type: number
           title: Upper
-          visible: (posthocEffsize:g && dci)
+          visible: (posthoc_es:g && d_ci)
 
 
   - name: simpleEffects
@@ -432,17 +432,15 @@ items:
               visible: false
               clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
-                 - scaling
-                 - dep_scale
-                 - fixedIntercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - covs_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
  
               columns:
                    - name: test
@@ -461,31 +459,31 @@ items:
                    - name: etaSq
                      title: η²
                      type: number
-                     visible: (effectSize:eta)
+                     visible: (es:eta)
                    - name: etaSqP
                      title: η²p
                      type: number
-                     visible: (effectSize:etap)
+                     visible: (es:etap)
                      format: zto
                    - name: omegaSq
                      title: ω²
                      type: number
-                     visible: (effectSize:omega)
+                     visible: (es:omega)
                      format: zto
                    - name: omegaSqP
                      title: ω²p
                      type: number
-                     visible: (effectSize:omegap)
+                     visible: (es:omegap)
                      format: zto
                    - name: epsilonSq
                      title: ε²
                      type: number
-                     visible: (effectSize:epsilon)
+                     visible: (es:epsilon)
                      format: zto
                    - name: epsilonSqP
                      title: ε²p
                      type: number
-                     visible: (effectSize:epsilonp)
+                     visible: (es:epsilonp)
                      format: zto
 
             - name: coefficients
@@ -494,21 +492,21 @@ items:
               visible: false
               clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
-                 - scaling
+                 - covs_scale
                  - dep_scale
-                 - fixedIntercept
+                 - fixed_intercept
                  - simpleVariable
                  - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
-                 - semethod
-                 - cimethod
-                 - ciWidth
-                 - bootR
+                 - covs_conditioning
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - se_method
+                 - ci_method
+                 - ci_width
+                 - boot_r
                  
               columns:
                      - name: contrast
@@ -523,15 +521,15 @@ items:
                      - name: est.ci.lower
                        type: number
                        title: Lower
-                       visible: (showParamsCI)
+                       visible: (estimates_ci)
                      - name: est.ci.upper
                        type: number
                        title: Upper
-                       visible: (showParamsCI)
+                       visible: (estimates_ci)
                      - name: beta
                        type: number
                        title: β
-                       visible: (effectSize:beta)
+                       visible: (es:beta)
                        format: zto
                      - name: df
                        title: "df"
@@ -549,7 +547,7 @@ items:
     title: Simple Interactions 
     type: Array
     description: an array of simple interactions tables
-    visible: (simpleInteractions)
+    visible: (simple_interactions)
     template:
         title:  "Interaction: ___key___"
         type: Group
@@ -560,12 +558,11 @@ items:
              title: ANOVA 
              clearWith:
                 - dep
-                - modelTerms
+                - model_terms
                 - contrasts
-                - scaling
-                - dep_scale
-                - fixedIntercept
-                - simpleScaleLabels
+                - covs_scale
+                - fixed_intercept
+                - covs_scale_labels
              columns:
                    - name: effect
                      title: 'Effect'
@@ -586,31 +583,31 @@ items:
                    - name: etaSq
                      title: η²
                      type: number
-                     visible: (effectSize:eta)
+                     visible: (es:eta)
                    - name: etaSqP
                      title: η²p
                      type: number
-                     visible: (effectSize:etap)
+                     visible: (es:etap)
                      format: zto
                    - name: omegaSq
                      title: ω²
                      type: number
-                     visible: (effectSize:omega)
+                     visible: (es:omega)
                      format: zto
                    - name: omegaSqP
                      title: ω²p
                      type: number
-                     visible: (effectSize:omegap)
+                     visible: (es:omegap)
                      format: zto
                    - name: epsilonSq
                      title: ε²
                      type: number
-                     visible: (effectSize:epsilon)
+                     visible: (es:epsilon)
                      format: zto
                    - name: epsilonSqP
                      title: ε²p
                      type: number
-                     visible: (effectSize:epsilonp)
+                     visible: (es:epsilonp)
                      format: zto
 
 
@@ -619,18 +616,18 @@ items:
              title: Parameter Estimates 
              clearWith:
                 - dep
-                - modelTerms
+                - model_terms
                 - contrasts
-                - scaling
+                - covs_scale
                 - dep_scale
-                - fixedIntercept
-                - simpleScaleLabels
-                - ciWidth
+                - fixed_intercept
+                - covs_scale_labels
+                - ci_width
                 - emmeans
-                - ciWidth
-                - cimethod
-                - bootR
-                - semethod
+                - ci_width
+                - ci_method
+                - boot_r
+                - se_method
 
              columns:
                    - name: effect
@@ -670,12 +667,12 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - ciWidth
-            - cimethod
+            - ci_width
+            - ci_method
             - emmeans
-            - semethod
-            - bootR
-            - modelTerms
+            - se_method
+            - boot_r
+            - model_terms
         columns:
         - name: estimate
           title: 'Mean'
@@ -712,17 +709,17 @@ items:
            - plotSepLines
            - plotSepPlots
            - plotError
-           - ciWidth
-           - scaling
+           - ci_width
+           - covs_scale
            - dep_scale
-           - modelTerms
-           - fixedIntercept
-           - simpleScale
-           - simpleScaleLabels
+           - model_terms
+           - fixed_intercept
+           - covs_conditioning
+           - covs_scale_labels
            - plotDvScale
            - plotRaw
-           - percvalue
-           - cvalue
+           - ccp_value
+           - ccm_value
            - plotOriginalScale
            - plotLinesTypes
 
@@ -738,10 +735,10 @@ items:
           title: Test for Homogeneity of Residual Variance
           type: Table
           description: a table of homogeneity tests
-          visible: (homoTest)
+          visible: (homo_test)
           rows: 2
           clearWith:
-              - modelTerms
+              - model_terms
               - dep
           columns:
             - name: name
@@ -762,9 +759,9 @@ items:
           title: Test for Normality of residuals
           type: Table
           description: a table of normality tests
-          visible: (normTest)
+          visible: (norm_test)
           clearWith:
-              - modelTerms
+              - model_terms
               - dep
           columns:
             - name: name
@@ -780,7 +777,7 @@ items:
 
         - name: qqplot
           title: Q-Q Plot
-          visible: (qqplot)
+          visible: (qq_plot)
           type: Image
           description: a q-q plot
           width: 450
@@ -789,12 +786,11 @@ items:
           requiresData: true
           clearWith:
             - dep
-            - modelTerms
-            - dep_scale
+            - model_terms
 
         - name: normPlot
           title: Residual histogram
-          visible: (normPlot)
+          visible: (norm_plot)
           type: Image
           description: Residual histogram
           width: 450
@@ -804,10 +800,10 @@ items:
           clearWith:
             - dep
             - dep_scale
-            - modelTerms
+            - model_terms
         - name: residPlot
           title: Residual-Predicted Scatterplot
-          visible: (residPlot)
+          visible: (resid_plot)
           type: Image
           description: Residual Predicted plot
           width: 450
@@ -816,7 +812,7 @@ items:
           requiresData: true
           clearWith:
             - dep
-            - modelTerms
+            - model_terms
             - dep_scale
 
 
@@ -829,9 +825,8 @@ items:
     varDescription: Predicted values
     clearWith:
         - dep
-        - factors
-        - covs
-        - modelTerms
+        - model_terms
+        
   - name: residuals
     title: Residuals Vales
     type: Output            
@@ -839,6 +834,4 @@ items:
     varDescription: Residuals values
     clearWith:
         - dep
-        - factors
-        - covs
-        - modelTerms
+        - model_terms

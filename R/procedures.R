@@ -39,12 +39,12 @@ procedure.posthoc <- function(obj) {
    model<-obj$model
    
   .model<-model
-   if (!obj$option("cimethod","wald")) 
+   if (!obj$option("ci_method","wald")) 
        .model<-obj$boot_model
 
   ### check if we need robust standard error  
   vfun<-NULL
-  if (obj$option("semethod","robust")) {
+  if (obj$option("se_method","robust")) {
        vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
   }
   
@@ -66,7 +66,7 @@ procedure.posthoc <- function(obj) {
      tukey <- .posthoc(model, .term64, "tukey",vfun=vfun)
      sidak <- .posthoc(model, .term64, "sidak",vfun=vfun)
      scheffe <- .posthoc(model, .term64, "scheffe",vfun=vfun)
-     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$cimethod,vfun=vfun)
+     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
      tableData <- as.data.frame(none, stringAsFactors = FALSE)
      .transnames<-list(estimate=c("odds.ratio","ratio"),
                        test=c("z.ratio","t.ratio"),
@@ -126,7 +126,7 @@ procedure.posthoc_effsize <- function(obj) {
   
   ### check if we need robust standard error  
   vfun<-NULL
-  if (obj$option("semethod","robust")) {
+  if (obj$option("se_method","robust")) {
     vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
   }
   
@@ -314,7 +314,7 @@ procedure.emmeans<-function(obj) {
     term64<-tob64(rev(term))
     
     ## include the dependent for multinomial ##
-    if (obj$options$modelSelection=="multinomial")
+    if (obj$options$model_type=="multinomial")
         term64<-c(obj$datamatic$dep$name64,term64)
     
     ## first we get the levels of covs at which to condition the estimation ##
@@ -335,13 +335,13 @@ procedure.emmeans<-function(obj) {
                     nesting = NULL,
                     options = c(level=obj$ciwidth)
     )
-    if (obj$option("dfmethod"))
-       opts_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
+    if (obj$option("df_method"))
+       opts_list[["lmer.df"]]<-tolower(obj$options$df_method)
     
-    if (obj$option("semethod","robust")) 
+    if (obj$option("se_method","robust")) 
       opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
 
-    if (obj$option("modelSelection","ordinal"))
+    if (obj$option("model_type","ordinal"))
       opts_list[["mode"]]<-"mean.class"
 
 
@@ -351,11 +351,11 @@ procedure.emmeans<-function(obj) {
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
     
-    if (!obj$option("cimethod","wald")) {
+    if (!obj$option("ci_method","wald")) {
       
       opts_list$object<-obj$boot_model
       referenceGrid<-do.call(emmeans::emmeans,opts_list)
-      cidata<-as.data.frame(parameters::parameters(referenceGrid,ci_method=obj$options$cimethod,ci=obj$ciwidth))
+      cidata<-as.data.frame(parameters::parameters(referenceGrid,ci_method=obj$options$ci_method,ci=obj$ciwidth))
       tableData$est.ci.lower<-cidata$CI_low
       tableData$est.ci.upper<-cidata$CI_high
     }
@@ -369,7 +369,7 @@ procedure.emmeans<-function(obj) {
     }
 
     ## rename the dependent for multinomial ##
-    if (obj$options$modelSelection=="multinomial"){
+    if (obj$options$model_type=="multinomial"){
          names(tableData)[1]<-"response"
          tableData<-tableData[order(tableData$response),]
     }
@@ -388,11 +388,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 .simpleEffects.default<-function(model,obj) {
 
   gstart("PROCEDURE: Simple Effects estimated")
-  variable<-obj$options$simpleVariable
+  variable<-obj$options$simple_effects
   variable64<-tob64(variable)
   varobj<-obj$datamatic$variables[[variable64]]
   
-  term<-obj$options$simpleModerators
+  term<-obj$options$simple_moderators
 
   term64<-tob64(term)
   results<-list()
@@ -413,7 +413,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     .get_se<-function(alist) {
     ### now we get the estimated means #######
     ### to handle bootstrap, we need to estimate the effects without CI
-    ### and then add the CI with a specific method declared in options$cimethod
+    ### and then add the CI with a specific method declared in options$ci_method
 
 
     if (varobj$type=="factor") {
@@ -441,10 +441,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
                     estName="estimate"
     )
     
-    if (obj$option("dfmethod"))
-      opts_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
+    if (obj$option("df_method"))
+      opts_list[["lmer.df"]]<-tolower(obj$options$df_method)
     
-    if (obj$option("semethod","robust"))
+    if (obj$option("se_method","robust"))
       opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
     
     
@@ -455,11 +455,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     .transnames<-list("ci.lower"=c("asymp.LCL","CI_low","lower.CL"),
                      "ci.upper"=c("asymp.UCL","CI_high","upper.CL"))
     
-    if (!obj$option("cimethod","wald")) {
+    if (!obj$option("ci_method","wald")) {
       
       opts_list$object<-obj$boot_model
       cidata<-.get_se(opts_list)
-      cidata<-as.data.frame(parameters::parameters(cidata,ci_method=obj$options$cimethod))
+      cidata<-as.data.frame(parameters::parameters(cidata,ci_method=obj$options$ci_method))
       
     } else {
     
@@ -506,7 +506,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     names(.anova)[1:length(.names)]<-.names
     
     ### make fix depending of the type of model ###    
-    class(.anova)<-c(paste0("simple_anova_",obj$options$modelSelection),class(.anova))
+    class(.anova)<-c(paste0("simple_anova_",obj$options$model_type),class(.anova))
     .anova<-add_effect_size(.anova,model)
     ### check some stuff 
     .all <- c(term64,variable64)
@@ -541,7 +541,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 .simpleEffects.multinom<-function(model,obj) {
 
 
-        levels <-lapply(obj$options$simpleModerators, function(x) {
+        levels <-lapply(obj$options$simple_moderators, function(x) {
     
                 if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
                         seq_along(obj$datamatic$variables[[tob64(x)]]$levels)
@@ -550,11 +550,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
             })
   
   
-        vars  <- lapply(obj$options$simpleModerators, function(x) obj$datamatic$variables[[tob64(x)]])
+        vars  <- lapply(obj$options$simple_moderators, function(x) obj$datamatic$variables[[tob64(x)]])
   
         rows  <- expand.grid(levels)
-        names(rows)  <-  tob64(obj$options$simpleModerators)
-        variable64   <-  tob64(obj$options$simpleVariable)
+        names(rows)  <-  tob64(obj$options$simple_moderators)
+        variable64   <-  tob64(obj$options$simple_effects)
         varobj       <-  obj$datamatic$variables[[variable64]]
   
         .names       <-  names(rows)
@@ -637,9 +637,9 @@ procedure.simpleInteractions<-function(obj) {
   
      gstart("PROCEDURE: simple Interactions")
   
-      variable<-obj$options$simpleVariable
+      variable<-obj$options$simple_effects
       variable64<-tob64(variable)
-      term<-obj$options$simpleModerators
+      term<-obj$options$simple_moderators
       term64<-tob64(term)
       varobj<-obj$datamatic$variables[[variable64]]
       termobj<-sapply(term64,function(term) obj$datamatic$variables[[term]])
@@ -669,7 +669,7 @@ procedure.simpleInteractions<-function(obj) {
             .names<-setdiff(term64,mods)
             ## this is the table key, if needed
             .key<-c(variable,rev(term[1:(j-1)]))
-            test<-any(jmvcore::composeTerm(sort(.key)) %in% jmvcore::composeTerms(lapply(obj$options$modelTerms,sort)))
+            test<-any(jmvcore::composeTerm(sort(.key)) %in% jmvcore::composeTerms(lapply(obj$options$model_terms,sort)))
             if (!test) {
               msg<-paste("Interaction",jmvcore::composeTerm(.key),"is not in the model, results may be misleading.")
               obj$dispatcher$warnings<-list(topic="simpleInteractions",message=msg)
@@ -680,10 +680,10 @@ procedure.simpleInteractions<-function(obj) {
                             estName="estimate"
                             )
             
-            if (obj$option("dfmethod"))
-              grid_list[["lmer.df"]]<-tolower(obj$options$dfmethod)
+            if (obj$option("df_method"))
+              grid_list[["lmer.df"]]<-tolower(obj$options$df_method)
             
-            if (obj$option("semethod","robust"))
+            if (obj$option("se_method","robust"))
               grid_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
             
             if (varobj$type=="numeric") {
@@ -709,7 +709,7 @@ procedure.simpleInteractions<-function(obj) {
             ### deal with confidence intervals ###
 
             
-            if (!obj$option("cimethod","wald")) {
+            if (!obj$option("ci_method","wald")) {
               
               grid_list$object<-obj$boot_model
               
@@ -720,7 +720,7 @@ procedure.simpleInteractions<-function(obj) {
               
               opts_list[["object"]]<-emgrid
               resgrid<-do.call(emmeans::contrast,opts_list)
-              cidata<-as.data.frame(parameters::model_parameters(resgrid,ci_method=obj$options$cimethod))
+              cidata<-as.data.frame(parameters::model_parameters(resgrid,ci_method=obj$options$ci_method))
               res$est.ci.lower<-cidata$CI_low
               res$est.ci.upper<-cidata$CI_high
               
@@ -778,7 +778,7 @@ procedure.simpleInteractions<-function(obj) {
                   res[[.name]]<-as.character(res[[.name]])
               }
               names(res)[1:length(mods)]<-make.names(paste0("mod_",fromb64(mods)))
-              class(res)<-c(paste0("simple_anova_",obj$options$modelSelection),class(res))
+              class(res)<-c(paste0("simple_anova_",obj$options$model_type),class(res))
               res<-add_effect_size(res,obj$model)
               res
         })

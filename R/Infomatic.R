@@ -23,7 +23,7 @@ Infomatic <- R6::R6Class(
     df=NULL,
     comparison="Difference",
     initialize=function(options,datamatic) {
-      self$modeltype<-options$modelSelection
+      self$modeltype<-options$model_type
       self$caller<-options$.caller
       dep<-options$dep
       dlevs<-datamatic$variables[[tob64(dep)]]$levels_labels
@@ -203,7 +203,7 @@ Infomatic <- R6::R6Class(
         self$deptype       <-   c("numeric","integer")
         self$fit           <-   c("lik" , "aic",  "bic")
         self$r2            <-   c("Marginal","Conditional")
-        self$df            <-   options$dfmethod
+        self$df            <-   options$df_method
       }
       
       
@@ -320,14 +320,14 @@ FIT[["over"]]  <-  list(info="Chi-squared/DF", specs="Overdispersion indicator")
   
   dlevs<-self$datamatic$variables[[tob64(self$options$dep)]]$levels
   dep<-self$options$dep
-  if (self$options$modelSelection %in% c("logistic")) {
+  if (self$options$model_type %in% c("logistic")) {
     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
     
   }
-  if (self$options$modelSelection %in% c("probit")) {
+  if (self$options$model_type %in% c("probit")) {
     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],")")
   }
-  if (self$options$modelSelection %in% c("multinomial")) {
+  if (self$options$model_type %in% c("multinomial")) {
     self$tab_info[["dir"]]$value<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
   }
   

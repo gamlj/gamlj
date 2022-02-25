@@ -55,7 +55,7 @@ Syntax <- R6::R6Class(
       if (self$option("dep_scale"))
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
     
-      if (self$option("semethod","robust"))
+      if (self$option("se_method","robust"))
             warning("All SE are heteroskedasticity-consistent robust SE")
      tab
       
@@ -72,7 +72,7 @@ Syntax <- R6::R6Class(
       
       tab<-list()
       if (self$hasTerms) {
-        .formulalist<-self$options$modelTerms
+        .formulalist<-self$options$model_terms
         ## we want to be sure that the order of terms is the same used by the estimator
         ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
         ## lm() (or other estimator) in different order
@@ -83,7 +83,7 @@ Syntax <- R6::R6Class(
         tab<-lapply(.formulalist, function(x) list(source=.stringifyTerm(x)))
       }
       
-      if (self$options$modelSelection=="lm") {
+      if (self$options$model_type=="lm") {
         if (self$hasTerms)
           tab<-prepend_list(tab,list(source="Model",f="."))
         
@@ -103,10 +103,10 @@ Syntax <- R6::R6Class(
 
       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
       .len<-length(.terms)
-      if (self$options$modelSelection=="multinomial") 
+      if (self$options$model_type=="multinomial") 
         .len  <- .len * (self$datamatic$dep$nlevels-1)
       
-      if (self$options$modelSelection=="ordinal") 
+      if (self$options$model_type=="ordinal") 
         .len  <- .len + (self$datamatic$dep$nlevels-2)
       
       lapply(1:.len, function(t) list(source=""))
@@ -116,7 +116,7 @@ Syntax <- R6::R6Class(
       
         tab<-NULL
         
-        if (self$options$showContrastCode) {
+        if (self$options$show_contrastcodes) {
           
           tab <-lapply(self$options$factors, function(factor) {
             focal<-self$datamatic$variables[[tob64(factor)]]
@@ -132,9 +132,9 @@ Syntax <- R6::R6Class(
     init_main_effectsizes=function() {
 
         alist<-NULL  
-        if (self$option("effectSizeInfo")) {
+        if (self$option("es_info")) {
           alist<-list()
-          for (term in self$options$modelTerms) {
+          for (term in self$options$model_terms) {
             alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
             alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_peta2)
             alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_omega2)
@@ -156,7 +156,7 @@ Syntax <- R6::R6Class(
     init_main_relativerisk=function() {
       
       alist<-NULL
-      if (self$option("effectSize","RR")) {
+      if (self$option("es","RR")) {
         alist  <-  self$init_main_coefficients()
         if (self$hasIntercept)
           alist  <-  alist[-1]
@@ -170,14 +170,11 @@ Syntax <- R6::R6Class(
     ### posthoc means ###
     
     init_posthoc=function() {
-      
-
-      
         lapply(self$options$posthoc, function(.term) {
           p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
           nrow<-p*(p-1)/2
           ncol<-(length(.term)*2)+1
-          if (self$options$modelSelection=="multinomial") {
+          if (self$options$model_type=="multinomial") {
             nrow<-nrow*(self$datamatic$dep$nlevels)
           }
           df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
@@ -191,7 +188,7 @@ Syntax <- R6::R6Class(
         })
 
     },
-    init_posthocEffsize=function() {
+    init_posthocEffectSize=function() {
       self$init_posthoc()
     },
     
@@ -207,7 +204,7 @@ Syntax <- R6::R6Class(
           alist<-lapply(.terms, function(.term) {
             ncol<-length(.term)
             nrow<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
-            if (self$options$modelSelection=="multinomial") {
+            if (self$options$model_type=="multinomial") {
               nrow<-nrow*(self$datamatic$dep$nlevels)
             }
             one<-data.frame(matrix("",ncol=ncol,nrow = nrow))
@@ -224,8 +221,8 @@ Syntax <- R6::R6Class(
     
     init_simpleEffects_anova=function() {
       
-        .var64<-tob64(self$options$simpleVariable)
-        .mods<-rev(self$options$simpleModerators)
+        .var64<-tob64(self$options$simple_effects)
+        .mods<-rev(self$options$simple_moderators)
         .mods64<-tob64(.mods)
         nrow<-prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
@@ -238,16 +235,16 @@ Syntax <- R6::R6Class(
     
     init_simpleEffects_coefficients=function() {
       
-        .var64<-tob64(self$options$simpleVariable)
+        .var64<-tob64(self$options$simple_effects)
         focal<-self$datamatic$variables[[.var64]]
         neffects<-focal$neffects
-        .mods<-rev(self$options$simpleModerators)
+        .mods<-rev(self$options$simple_moderators)
         .mods64<-tob64(.mods)
         
         nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
         
-        if (self$options$modelSelection=="multinomial")
+        if (self$options$model_type=="multinomial")
           nrow <- nrow * (self$datamatic$dep$nlevels-1)
         
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
@@ -260,8 +257,8 @@ Syntax <- R6::R6Class(
       
     
         ### moderators should be reverted in order to match emmeans 
-        .term<-rev(self$options$simpleModerators)
-        .simple<-self$options$simpleVariable
+        .term<-rev(self$options$simple_moderators)
+        .simple<-self$options$simple_effects
         n<-length(.term)
         j<-n
         resultsList<-list()
@@ -311,17 +308,17 @@ Syntax <- R6::R6Class(
     .constructFormula=function() {
       
       # this allows intercept only model to be passed by syntax interface
-      self$hasIntercept<-self$options$fixedIntercept
-      modelTerms<-self$options$modelTerms
-      aOne<-which(unlist(self$options$modelTerms)=="1")
+      self$hasIntercept<-self$options$fixed_intercept
+      modelTerms<-self$options$model_terms
+      aOne<-which(unlist(self$options$model_terms)=="1")
       
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
         self$hasIntercept=TRUE
       }
-      if (self$options$modelSelection=="ordinal") {
+      if (self$options$model_type=="ordinal") {
         self$hasIntercept=TRUE
-        if (self$options$fixedIntercept==FALSE)
+        if (self$options$fixed_intercept==FALSE)
           self$warnings<-list(topic="tab_info",message="Ordinal regression requires the intercept. It has been added to the model")
       }
       
@@ -330,7 +327,7 @@ Syntax <- R6::R6Class(
       
       rands   <-NULL
       cluster <-NULL
-      if (self$option("randomTerms")) {
+      if (self$option("re")) {
          rands<-private$.buildreffects()
          cluster<-self$options$cluster
       }
@@ -352,7 +349,7 @@ Syntax <- R6::R6Class(
     .make_structure=function() {
       
       ## some warnings ###
-      if (self$option("cimethod","boot"))
+      if (self$option("ci_method","boot"))
         self$warnings<-list(topic="tab_info",message="Bootstrap C.I. are being computed, this may take a while")
       
       ### anova table ###
@@ -382,11 +379,11 @@ Syntax <- R6::R6Class(
       
       ##### simple interactions ######
       
-      if (self$options$simpleInteractions) {
-        if (is.something(self$options$simpleVariable) & length(self$options$simpleModerators)>1 ) {
+      if (self$options$simple_interactions) {
+        if (is.something(self$options$simple_effects) & length(self$options$simple_moderators)>1 ) {
           params<-list()
           ### moderators should be reverted in order to match emmeans 
-          .term<-rev(self$options$simpleModerators)
+          .term<-rev(self$options$simple_moderators)
           n<-length(.term)
           j<-n
           params<-list()
@@ -411,7 +408,7 @@ Syntax <- R6::R6Class(
       ### here are specific calls ########
       
       ### relative risk
-      if (self$option("effectSize","RR")) {
+      if (self$option("es","RR")) {
         
         simtab  <-  self$tab_coefficients
         
@@ -421,12 +418,12 @@ Syntax <- R6::R6Class(
         self$tab_relativerisk<-simtab
       }
       
-      if (self$option("randomTerms")) {
-        count<-sum(unlist(sapply(self$options$randomTerms, length)))
+      if (self$option("re")) {
+        count<-sum(unlist(sapply(self$options$re, length)))
         self$tab_random<-rep(list(groups=""),count+1)
       }
       
-      if (self$option("normTest")) {
+      if (self$option("norm_test")) {
         self$tab_normtest<-list(list(name="Kolmogorov-Smirnov"),
                                 list(name="Shapiro-Wilk"))
         
@@ -438,7 +435,7 @@ Syntax <- R6::R6Class(
     },
     .buildreffects=function() {
       
-      terms  <-  self$options$randomTerms
+      terms  <-  self$options$re
       ## this is for R. It overrides the correlatedEffect option 
       correl<-TRUE
       if (length(terms)>1)
@@ -448,7 +445,7 @@ Syntax <- R6::R6Class(
       terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
       
       # split in sublists if option=nocorr
-      if (self$options$correlatedEffects=="nocorr") {
+      if (self$options$re_corr=="nocorr") {
         termslist<-terms[[1]]
         terms<-lapply(termslist,list)
       }

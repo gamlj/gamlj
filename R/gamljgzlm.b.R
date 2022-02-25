@@ -189,11 +189,11 @@ gamljGzlmClass <- R6::R6Class(
 
 
 .formula=function() {
-  jmvcore:::composeFormula(self$options$dep, self$options$modelTerms)
+  jmvcore:::composeFormula(self$options$dep, self$options$model_terms)
 },
 .sourcifyOption = function(option) {
   
-  skip<-c("modelTerms","factors","covs","dep")
+  skip<-c("model_terms","factors","covs","dep")
   defaults<-c(scaling="centered",contrasts="simple")
   
   if (option$name %in% skip)

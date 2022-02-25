@@ -44,49 +44,56 @@ children:
         margin: large
         style: list-inline
         children:
-          - name: effectSize_beta
+          - name: es_beta
             type: CheckBox
+            optionName: es
             optionPart: beta
-            optionName: effectSize
-          - name: effectSize_eta
+          - name: es_eta
             type: CheckBox
+            optionName: es
             optionPart: eta
-            optionName: effectSize
-          - name: effectSize_etap
+          - name: es_etap
             type: CheckBox
+            optionName: es
             optionPart: etap
-            optionName: effectSize
-          - name: effectSize_omega
+          - name: es_omega
             type: CheckBox
+            optionName: es
             optionPart: omega
-            optionName: effectSize
-          - name: effectSize_omegap
+          - name: es_omegap
             type: CheckBox
+            optionName: es
             optionPart: omegap
-            optionName: effectSize
-          - name: effectSize_epsilon
+          - name: es_epsilon
             type: CheckBox
+            optionName: es
             optionPart: epsilon
-            optionName: effectSize
-          - name: effectSize_epsilonp
+          - name: es_epsilonp
             type: CheckBox
+            optionName: es
             optionPart: epsilonp
-            optionName: effectSize
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list
+        style: list-inline
         children:
-          - name: showParamsCI
+          - name: estimates_ci
             type: CheckBox
-          - name: showBetaCI
+          - name: betas_ci
             type: CheckBox
           - type: TextBox
-            name: ciWidth
+            name: ci_width
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI)
+            enable: (estimates_ci || betas_ci)
+      - type: Label
+        label: Estimation
+        margin: large
+        style: list-inline
+        children:
+          - type: CheckBox
+            name: donotrun
   - type: CollapseBox
     label: Model
     collapsed: true
@@ -106,16 +113,16 @@ children:
             transferAction: interactions
             children:
               - type: ListBox
-                name: modelTerms
+                name: model_terms
                 valueFilter: unique
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './gamlj.events::onChange_modelTerms'
+                  change: './gamlj.events::onChange_model_terms'
                 template:
                   type: TermLabel
       - type: CheckBox
-        name: fixedIntercept
+        name: fixed_intercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -140,16 +147,16 @@ children:
             template:
               type: ComboBox
       - type: CheckBox
-        name: showRealNames
+        name: show_contrastnames
       - type: CheckBox
-        name: showContrastCode
+        name: show_contrastcodes
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
     stretchFactor: 1
     children:
       - type: ListBox
-        name: scaling
+        name: covs_scale
         stretchFactor: 1
         showColumnHeaders: false
         columns:
@@ -178,33 +185,34 @@ children:
                 style: list
                 children:
                   - type: RadioButton
-                    name: simpleScale_mean_sd
-                    optionName: simpleScale
+                    name: covs_conditioning_mean_sd
+                    optionName: covs_conditioning
                     optionPart: mean_sd
                     children:
                       - type: TextBox
-                        name: cvalue
+                        name: ccm_value
                         format: number
-                  - name: simpleScale_percent
+                  - name: covs_conditioning_percent
                     type: RadioButton
-                    optionName: simpleScale
+                    optionName: covs_conditioning
                     optionPart: percent
                     children:
                       - type: TextBox
-                        name: percvalue
+                        name: ccp_value
                         label: null
                         suffix: '%'
                         format: number
-                        enable: (simpleScale_percent)
+                        enable: (covs_conditioning_percent)
           - type: LayoutBox
             margin: large
             style: list
             children:
               - type: Label
                 label: Covariates labeling
-                children:
-                  - type: ComboBox
-                    name: simpleScaleLabels
+                children: 
+                      - type: ComboBox
+                        name: covs_scale_labels
+
               - type: Label
                 label: Dependent variable
                 children:
@@ -239,49 +247,49 @@ children:
           - type: Label
             label: Correction
             children:
-              - name: posthocCorr_none
+              - name: posthoc_adjust_none
                 type: CheckBox
-                optionPart: none
-                optionName: posthocCorr
-              - name: posthocCorr_bonf
+                optionPart: 'none'
+                optionName: posthoc_adjust
+              - name: posthoc_adjust_bonf
                 type: CheckBox
                 optionPart: bonf
-                optionName: posthocCorr
-              - name: posthocCorr_tukey
+                optionName: posthoc_adjust
+              - name: posthoc_adjust_tukey
                 type: CheckBox
                 optionPart: tukey
-                optionName: posthocCorr
-              - name: posthocCorr_holm
+                optionName: posthoc_adjust
+              - name: posthoc_adjust_holm
                 type: CheckBox
                 optionPart: holm
-                optionName: posthocCorr
-              - name: posthocCorr_scheffe
+                optionName: posthoc_adjust
+              - name: posthoc_adjust_scheffe
                 type: CheckBox
-                optionName: posthocCorr
+                optionName: posthoc_adjust
                 optionPart: scheffe
-              - name: posthocCorr_sidak
+              - name: posthoc_adjust_sidak
                 type: CheckBox
-                optionName: posthocCorr
+                optionName: posthoc_adjust
                 optionPart: sidak
           - type: Label
             label: Effect size
             children:
-              - name: posthocEffsize_dm
+              - name: posthoc_es_dm
                 type: CheckBox
                 optionPart: dm
-                optionName: posthocEffsize
-              - name: posthocEffsize_ds
+                optionName: posthoc_es
+              - name: posthoc_es_ds
                 type: CheckBox
                 optionPart: ds
-                optionName: posthocEffsize
-              - name: posthocEffsize_g
+                optionName: posthoc_es
+              - name: posthoc_es_g
                 type: CheckBox
                 optionPart: g
-                optionName: posthocEffsize
+                optionName: posthoc_es
               - type: CheckBox
-                name: dci
-                label: Confidence Intervals
-                enable: (posthocEffsize_g || posthocEffsize_dm || posthocEffsize_ds)
+                name: d_ci
+
+
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -363,16 +371,16 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleVariable
+                name: simple_effects
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleModerators
+                name: simple_moderators
                 isTarget: true
       - type: CheckBox
-        name: simpleInteractions
+        name: simple_interactions
         label: Simple interactions
   - type: CollapseBox
     label: Estimated Marginal Means
@@ -406,22 +414,22 @@ children:
         label: Tests
         children:
           - type: CheckBox
-            name: homoTest
+            name: homo_test
             label: Homogeneity tests
           - type: CheckBox
-            name: normTest
+            name: norm_test
             label: Test normality of residuals
       - type: Label
         label: Plots
         children:
           - type: CheckBox
-            name: qqplot
+            name: qq_plot
             label: Q-Q plot of residuals
           - type: CheckBox
-            name: normPlot
+            name: norm_plot
             label: Residuals histogram
           - type: CheckBox
-            name: residPlot
+            name: resid_plot
             label: Residuals-Predicted plot
   - type: CollapseBox
     label: Options
@@ -437,43 +445,43 @@ children:
             label: CI Method
             children:
               - type: RadioButton
-                name: cimethod_wald
-                optionName: cimethod
+                name: ci_method_wald
+                optionName: ci_method
                 optionPart: wald
               - type: RadioButton
-                name: cimethod_quantile
-                optionName: cimethod
+                name: ci_method_quantile
+                optionName: ci_method
                 optionPart: quantile
               - type: RadioButton
-                name: cimethod_bcai
-                optionName: cimethod
+                name: ci_method_bcai
+                optionName: ci_method
                 optionPart: bcai
               - type: TextBox
-                name: bootR
+                name: boot_r
                 format: number
-                enable: (cimethod_quantile || cimethod_bcai)
+                enable: (ci_method_quantile || ci_method_bcai)
           - type: Label
             label: SE Method
             children:
               - type: RadioButton
-                name: semethod_standard
-                optionName: semethod
+                name: se_method_standard
+                optionName: se_method
                 optionPart: standard
               - type: RadioButton
-                name: semethod_robust
-                optionName: semethod
+                name: se_method_robust
+                optionName: se_method
                 optionPart: robust
-      - type: LayoutBox
-        margin: large
-        style: inline
-        children:
           - type: Label
             label: Additional Info
             children:
               - type: CheckBox
-                name: interceptInfo
+                name: intercept_info
               - type: CheckBox
-                name: effectSizeInfo
+                name: es_info
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
           - type: Label
             label: Save
             children:

@@ -25,12 +25,12 @@ items:
         - dep
         - factors
         - cov
-        - modelTerms
-        - fixedIntercept
-        - cimethod
-        - semethod
-        - dci
-        - bootR
+        - model_terms
+        - fixed_intercept
+        - ci_method
+        - se_method
+        - d_ci
+        - boot_r
 
     refs: gamlj
      
@@ -44,8 +44,8 @@ items:
              description: a table of R
              clearWith:
                          - dep
-                         - modelTerms
-                         - fixedIntercept
+                         - model_terms
+                         - fixed_intercept
              rows: 1
              columns:
                     - name: r2
@@ -82,8 +82,8 @@ items:
                   - dep
                   - factors
                   - cov
-                  - modelTerms
-                  - fixedIntercept
+                  - model_terms
+                  - fixed_intercept
   
 
            - name: anova
@@ -92,13 +92,13 @@ items:
              description: a table of ANOVA results
              clearWith:
                          - dep
-                         - modelTerms
+                         - model_terms
                          - contrasts
                          - scaling
                          - dep_scale
-                         - fixedIntercept
-                         - effectSize
-                         - chisqType
+                         - fixed_intercept
+                         - es
+                         - chisq_type
              columns:
                     - name: source
                       title: ""
@@ -120,19 +120,19 @@ items:
              type: Table
              clearWith:
                     - dep
-                    - modelTerms
+                    - model_terms
                     - contrasts
                     - scaling
                     - dep_scale
-                    - fixedIntercept
-                    - paramCIWidth
-                    - cimethod
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
 
              columns:
                     - name: response
                       title: Response 
                       type: text
-                      visible: (modelSelection:multinomial)
+#                      visible: (model_type:multinomial)
                       combineBelow: true
                     - name: source
                       title: "Name"
@@ -150,24 +150,24 @@ items:
                     - name: est.ci.lower
                       type: number
                       title: Lower
-                      visible: (showParamsCI)
+                      visible: (estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
-                      visible: (showParamsCI)
+                      visible: (estimates_ci)
                       
                     - name: expb
                       type: number
                       title: Exp(B)
-                      visible: (effectSize:expb)
+                      visible: (es:expb)
                     - name: expb.ci.lower
                       type: number
                       title: Lower
-                      visible: (effectSize:expb & showExpbCI)
+                      visible: (es:expb & expb_ci)
                     - name: expb.ci.upper
                       type: number
                       title: Upper
-                      visible: (effectSize:expb & showExpbCI)
+                      visible: (es:expb & expb_ci)
                     - name: t
                       title: "z"
                       type: number
@@ -193,7 +193,7 @@ items:
                          - name: cname
                            title: 'Name'
                            type: text
-                           visible: (showRealNames)
+                           visible: (show_contrastnames)
                          - name: clab
                            title: 'Contrast'
                            type: text
@@ -205,20 +205,20 @@ items:
            - name: relativerisk
              title: Relative risk
              type: Table
-             visible: (effectSize:RR)
+             visible: (es:RR)
              clearWith:
                     - dep
-                    - modelTerms
+                    - model_terms
                     - contrasts
                     - scaling
-                    - fixedIntercept
-                    - effectSize
-                    - ciWidth
+                    - fixed_intercept
+                    - es
+                    - ci_width
              columns:
                     - name: source
                       title: "Names"
                       type: text
-                      visible: (showRealNames)
+                      visible: (show_contrastnames)
                     - name: label
                       title: "Effect"
                       type: text
@@ -231,11 +231,11 @@ items:
                     - name: ci.lower
                       type: number
                       title: Lower
-                      visible: (showExpbCI)
+                      visible: (expb_ci)
                     - name: ci.upper
                       type: number
                       title: Upper
-                      visible: (showExpbCI)
+                      visible: (expb_ci)
                     - name: test
                       title: X²
                       type: number
@@ -247,17 +247,17 @@ items:
            - name: paralleltest
              title: Parallel lines test
              type: Table
-             visible: (propodds & modelSelection:ordinal)
+#             visible: (propodds_test & model_type:ordinal)
              clearWith:
                     - dep
-                    - modelTerms
-                    - fixedIntercept
-                    - propodds
+                    - model_terms
+                    - fixed_intercept
+                    - propodds_test
              columns:
                     - name: source
                       title: ""
                       type: text
-                      visible: (showRealNames)
+                      visible: (show_contrastnames)
                     - name: loglik
                       title: "Log-Lik."
                       type: number
@@ -282,27 +282,27 @@ items:
     items: (posthoc)
     clearWith:
         - dep
-        - modelTerms
+        - model_terms
         - contrasts
         - scaling
         - dep_scale
         - posthoc
-        - posthocCorr
-        - cimethod
-        - bootR
+        - posthoc_adjust
+        - ci_method
+        - boot_r
         
     template:
         title:  ""
         type: Table
         clearWith:
               - posthoc
-              - cimethod
+              - ci_method
   
         columns:
         - name: response
           title: Response 
           type: text
-          visible: (modelSelection:multinomial)
+#          visible: (model_type:multinomial)
           combineBelow: true
         - name: estimate
           title: Difference
@@ -313,11 +313,11 @@ items:
         - name: est.ci.lower
           type: number
           title: Lower
-          visible: (showParamsCI)
+          visible: (estimates_ci)
         - name: est.ci.upper
           type: number
           title: Upper
-          visible: (showParamsCI)
+          visible: (estimates_ci)
         - name: test
           title: z
           type: number
@@ -325,22 +325,22 @@ items:
           title: p
           type: number
           format: zto,pvalue
-          visible: (posthocCorr:none)
+          visible: (posthoc_adjust:none)
         - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-          visible: (posthocCorr:bonf)
+          visible: (posthoc_adjust:bonf)
         - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-          visible: (posthocCorr:tukey)
+          visible: (posthoc_adjust:tukey)
         - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-          visible: (posthocCorr:holm)
+          visible: (posthoc_adjust:holm)
 
 
   - name: simpleEffects
@@ -348,19 +348,19 @@ items:
     type: Group
     clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
                  - scaling
                  - dep_scale
-                 - fixedIntercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
-                 - cimethod
-                 - bootR
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - covs_scale
+                 - csm_value
+                 - csp_value
+                 - covs_scale_labels
+                 - ci_method
+                 - boot_r
 
     items:
             - name: anova
@@ -370,16 +370,16 @@ items:
               visible: false
               clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
                  - scaling
-                 - fixedIntercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - covs_scale
+                 - csm_value
+                 - csp_value
+                 - covs_scale_labels
 
               columns:
                  - name: test
@@ -399,26 +399,26 @@ items:
               visible: false
               clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
                  - scaling
                  - dep_scale
-                 - fixedIntercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
-                 - cimethod
-                 - bootR
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - covs_scale
+                 - csm_value
+                 - csp_value
+                 - covs_scale_labels
+                 - ci_method
+                 - boot_r
  
               columns:
                      - name: response
                        title: Response 
                        type: text
                        combineBelow: true
-                       visible: (modelSelection:multinomial)
+#                       visible: (model_type:multinomial)
                      - name: contrast
                        title: "Effect"
                        type: text
@@ -431,23 +431,23 @@ items:
                      - name: est.ci.lower
                        type: number
                        title: Lower
-                       visible: (showParamsCI)
+                       visible: (estimates_ci)
                      - name: est.ci.upper
                        type: number
                        title: Upper
-                       visible: (showParamsCI)
+                       visible: (estimates_ci)
                      - name: expb
                        type: number
                        title: Exp(B)
-                       visible: (effectSize:expb)
+                       visible: (es:expb)
                      - name: expb.ci.lower
                        type: number
                        title: Lower
-                       visible: (showExpbCI)
+                       visible: (expb_ci)
                      - name: expb.ci.upper
                        type: number
                        title: Upper
-                       visible: (showExpbCI)
+                       visible: (expb_ci)
 
                      - name: test
                        title: "z"
@@ -465,13 +465,13 @@ items:
     visible: false
     clearWith:
         - dep
-        - modelTerms
+        - model_terms
         - contrasts
         - scaling
         - dep_scale
-        - fixedIntercept
-        - simpleScaleLabels
-        - ciWidth
+        - fixed_intercept
+        - covs_scale_labels
+        - ci_width
         - emmeans
 
     template:
@@ -508,7 +508,7 @@ items:
                    - name: response
                      title: Response 
                      type: text
-                     visible: (modelSelection:multinomial)
+#                     visible: (model_type:multinomial)
                      
                    - name: estimate
                      title: Estimate
@@ -541,18 +541,18 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - ciWidth
-            - cimethod
+            - ci_width
+            - ci_method
             - emmeans
-            - modelTerms
-            - modelSelection
-            - cimethod
+            - model_terms
+            - model_type
+            - ci_method
 
         columns:
         - name: response
           title: Response 
           type: text
-          visible: (modelSelection:multinomial)
+#          visible: (model_type:multinomial)
           combineBelow: true
 
         - name: estimate
@@ -587,17 +587,17 @@ items:
            - plotSepLines
            - plotSepPlots
            - plotError
-           - ciWidth
+           - ci_width
            - scaling
            - dep_scale
-           - modelTerms
-           - fixedIntercept
-           - simpleScale
-           - simpleScaleLabels
+           - model_terms
+           - fixed_intercept
+           - covs_scale
+           - covs_scale_labels
            - plotDvScale
            - plotRaw
-           - percvalue
-           - cvalue
+           - csp_value
+           - csm_value
            - plotScale
            - plotOriginalScale
            - plotLinesTypes

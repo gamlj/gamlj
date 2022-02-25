@@ -16,8 +16,8 @@ children:
             label: Continuous dependent variable
             children:
               - type: RadioButton
-                name: modelSelection_linear
-                optionName: modelSelection
+                name: model_type_linear
+                optionName: model_type
                 optionPart: linear
                 events:
                   change: './gamlj.events::onChange_model'
@@ -25,20 +25,20 @@ children:
             label: Frequencies
             children:
               - type: RadioButton
-                name: modelSelection_poisson
-                optionName: modelSelection
+                name: model_type_poisson
+                optionName: model_type
                 optionPart: poisson
                 events:
                   change: './gamlj.events::onChange_model'
-              - name: modelSelection_poiover
+              - name: model_type_poiover
                 type: RadioButton
-                optionName: modelSelection
+                optionName: model_type
                 optionPart: poiover
                 events:
                   change: './gamlj.events::onChange_model'
               - type: RadioButton
-                name: modelSelection_nb
-                optionName: modelSelection
+                name: model_type_nb
+                optionName: model_type
                 optionPart: nb
                 events:
                   change: './gamlj.events::onChange_model'
@@ -49,24 +49,24 @@ children:
             label: Categorical dependent variable
             children:
               - type: RadioButton
-                name: modelSelection_logistic
-                optionName: modelSelection
+                name: model_type_logistic
+                optionName: model_type
                 optionPart: logistic
                 events:
                   change: './gamlj.events::onChange_model'
               - type: RadioButton
-                name: modelSelection_probit
-                optionName: modelSelection
+                name: model_type_probit
+                optionName: model_type
                 optionPart: probit
                 events:
                   change: './gamlj.events::onChange_model'
-              - name: modelSelection_ordinal
+              - name: model_type_ordinal
                 type: RadioButton
-                optionName: modelSelection
+                optionName: model_type
                 optionPart: ordinal
               - type: RadioButton
-                name: modelSelection_multinomial
-                optionName: modelSelection
+                name: model_type_multinomial
+                optionName: model_type
                 optionPart: multinomial
                 events:
                   change: './gamlj.events::onChange_model'
@@ -74,17 +74,17 @@ children:
             label: Custom Model
             children:
               - type: RadioButton
-                name: modelSelection_custom
-                optionName: modelSelection
+                name: model_type_custom
+                optionName: model_type
                 optionPart: custom
                 events:
                   change: './gamlj.events::onChange_model'
               - type: ComboBox
                 name: custom_family
-                enable: (modelSelection_custom)
+                enable: (model_type_custom)
               - type: ComboBox
                 name: custom_link
-                enable: (modelSelection_custom)
+                enable: (model_type_custom)
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -117,41 +117,41 @@ children:
               change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
     margin: large
-    style: inline
+    style: list
     children:
       - type: Label
         label: Effect Size
         margin: large
-        style: list
+        style: list-inline
         children:
-          - name: effectSize_expb
+          - name: es_expb
             type: CheckBox
             optionPart: expb
-            optionName: effectSize
-          - name: effectSize_RR
+            optionName: es
+          - name: es_RR
             type: CheckBox
             optionPart: RR
-            optionName: effectSize
-            enable: (modelSelection_logistic)
+            optionName: es
+            enable: (model_type:logistic)
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list
+        style: list-inline
         children:
-          - name: showExpbCI
+          - name: expb_ci
             type: CheckBox
-          - name: showParamsCI
+          - name: estimates_ci
             type: CheckBox
           - type: TextBox
-            name: paramCIWidth
+            name: ci_width
             label: Interval
             suffix: '%'
             format: number
-            enable: (showParamsCI || showExpbCI)
+            enable: (estimates_ci || expb_ci)
       - type: Label
         label: Estimation
         margin: large
-        style: list
+        style: list-inline
         children:
           - name: donotrun
             type: CheckBox
@@ -175,16 +175,16 @@ children:
             transferAction: interactions
             children:
               - type: ListBox
-                name: modelTerms
+                name: model_terms
                 valueFilter: unique
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './gamlj.events::onChange_modelTerms'
+                  change: './gamlj.events::onChange_model_terms'
                 template:
                   type: TermLabel
       - type: CheckBox
-        name: fixedIntercept
+        name: fixed_intercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -209,9 +209,9 @@ children:
             template:
               type: ComboBox
       - type: CheckBox
-        name: showRealNames
+        name: show_contrastnames
       - type: CheckBox
-        name: showContrastCode
+        name: show_contrastcodes
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -247,24 +247,24 @@ children:
                 style: list
                 children:
                   - type: RadioButton
-                    name: simpleScale_mean_sd
-                    optionName: simpleScale
+                    name: covs_scale_mean_sd
+                    optionName: covs_scale
                     optionPart: mean_sd
                     children:
                       - type: TextBox
-                        name: cvalue
+                        name: csm_value
                         format: number
-                  - name: simpleScale_percent
+                  - name: covs_scale_percent
                     type: RadioButton
-                    optionName: simpleScale
+                    optionName: covs_scale
                     optionPart: percent
                     children:
                       - type: TextBox
-                        name: percvalue
+                        name: csp_value
                         label: null
                         suffix: '%'
                         format: number
-                        enable: (simpleScale_percent)
+                        enable: (covs_scale_percent)
           - type: Label
             label: Covariates labeling
             children:
@@ -272,7 +272,10 @@ children:
                 margin: large
                 children:
                   - type: ComboBox
-                    name: simpleScaleLabels
+                    name: covs_scale_labels
+
+##### post hoc #########
+
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -297,26 +300,46 @@ children:
                   type: TermLabel
       - type: LayoutBox
         margin: large
+        style: inline
         children:
           - type: Label
             label: Correction
             children:
-              - name: posthocCorr_none
-                type: CheckBox
-                optionPart: none
-                optionName: posthocCorr
-              - name: posthocCorr_bonf
-                type: CheckBox
-                optionPart: bonf
-                optionName: posthocCorr
-              - name: posthocCorr_tukey
-                type: CheckBox
-                optionPart: tukey
-                optionName: posthocCorr
-              - name: posthocCorr_holm
-                type: CheckBox
-                optionPart: holm
-                optionName: posthocCorr
+                  - type: LayoutBox
+                    margin: small
+                    style: list
+                    children:
+                        - name: posthoc_adjust_none
+                          type: CheckBox
+                          optionPart: none
+                          optionName: posthoc_adjust
+                        - name: posthoc_adjust_bonf
+                          type: CheckBox
+                          optionPart: bonf
+                          optionName: posthoc_adjust
+                        - name: posthoc_adjust_tukey
+                          type: CheckBox
+                          optionPart: tukey
+                          optionName: posthoc_adjust
+                  - type: LayoutBox
+                    margin: small
+                    style: list
+                    children:
+                        - name: posthoc_adjust_holm
+                          type: CheckBox
+                          optionPart: holm
+                          optionName: posthoc_adjust
+                        - name: posthoc_adjust_scheffe
+                          type: CheckBox
+                          optionName: posthoc_adjust
+                          optionPart: scheffe
+                        - name: posthoc_adjust_sidak
+                          type: CheckBox
+                          optionName: posthoc_adjust
+                          optionPart: sidak
+
+##### plots #######
+
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -363,13 +386,6 @@ children:
                 name: errBarDef_ci
                 optionName: plotError
                 optionPart: ci
-                children:
-                  - type: TextBox
-                    name: ciWidth
-                    label: Interval
-                    suffix: '%'
-                    format: number
-                    enable: (errBarDef_ci)
               - name: plotError_se
                 type: RadioButton
                 optionName: plotError
@@ -378,32 +394,34 @@ children:
             label: Plot type
             children:
               - type: RadioButton
-                name: plotScale_response
-                optionName: plotScale
+                name: plot_scale_response
+                optionName: plot_scale
                 optionPart: response
               - type: RadioButton
-                name: plotScale_link
-                optionName: plotScale
+                name: plot_scale_link
+                optionName: plot_scale
                 optionPart: link
-                enable: (!modelSelection_multinomial && !modelSelection_ordinal)
+                enable: (!model_type_multinomial && !model_type_ordinal)
               - type: RadioButton
-                name: plotScale_mean.class
-                optionName: plotScale
+                name: plotcale_mean.class
+                optionName: plot_scale
                 optionPart: mean.class
-                enable: (modelSelection_ordinal)
+                enable: (model_type_ordinal)
           - type: Label
             label: Plot options
             children:
               - type: CheckBox
                 name: plotRaw
-                enable: (!modelSelection_multinomial && !plotScale_link)
+                enable: (!model_type_multinomial && !plot_scale_link)
               - type: CheckBox
                 name: plotDvScale
-                enable: (plotScale_response)
+                enable: (plot_scale_response)
               - type: CheckBox
                 name: plotOriginalScale
               - type: CheckBox
                 name: plotLinesTypes
+
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -421,18 +439,20 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleVariable
+                name: simple_effects
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simpleModerators
+                name: simple_moderators
                 isTarget: true
       - type: CheckBox
-        name: simpleInteractions
+        name: simple_interactions
         label: Simple interactions
-        enable: (!modelSelection_multinomial)
+        enable: (!model_type_multinomial)
+
+
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
@@ -455,6 +475,9 @@ children:
                 isTarget: true
                 template:
                   type: TermLabel
+
+
+
   - type: CollapseBox
     label: Options
     style: list
@@ -469,31 +492,31 @@ children:
             label: CI Method
             children:
               - type: RadioButton
-                name: cimethod_wald
-                optionName: cimethod
+                name: ci_method_wald
+                optionName: ci_method
                 optionPart: wald
-              - name: cimethod_quantile
+              - name: ci_method_quantile
                 type: RadioButton
-                optionName: cimethod
+                optionName: ci_method
                 optionPart: quantile
-              - name: cimethod_bcai
+              - name: ci_method_bcai
                 type: RadioButton
-                optionName: cimethod
+                optionName: ci_method
                 optionPart: bcai
               - type: TextBox
-                name: bootR
+                name: boot_r
                 format: number
-                enable: (cimethod_quantile || cimethod_bcai)
+                enable: (ci_method_quantile || ci_method_bcai)
           - type: Label
             label: Omnibus Chi²
             children:
               - type: RadioButton
-                name: chisqType_lrt
-                optionName: chisqType
+                name: chisq_type_lrt
+                optionName: chisq_type
                 optionPart: lrt
               - type: RadioButton
-                name: chisqType_wald
-                optionName: chisqType
+                name: chisq_type_wald
+                optionName: chisq_type
                 optionPart: wald
           - type: Label
             label: Save
@@ -507,5 +530,5 @@ children:
             label: Test
             children:
               - type: CheckBox
-                name: propodds
-                enable: (modelSelection_ordinal)
+                name: propodds_test
+                enable: (model_type_ordinal)

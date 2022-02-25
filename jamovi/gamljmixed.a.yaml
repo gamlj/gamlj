@@ -27,9 +27,9 @@ formula:
      custom: true
    cluster: 
      custom: true
-   randomTerms: 
+   re: 
      custom: true
-   modelTerms:
+   model_terms:
      custom: true
 
 options:
@@ -94,7 +94,7 @@ options:
           R: >
             a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
 
-    - name: fixedIntercept
+    - name: fixed_ntercept
       title: Intercept
       type: Bool
       default: true
@@ -130,7 +130,7 @@ options:
         - name:  bcai
           title: Bootstrap (BCa)
           
-    - name: bootR
+    - name: boot_r
       title: Bootstrap rep.
       type: Number
       min: 1

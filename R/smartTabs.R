@@ -43,7 +43,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.init_function<-paste0("init_",self$nickname)
                               private$.run_function<-paste0("run_",self$nickname)
                               self$activated<-self$table$visible
-                              
+
                               if ("key" %in% names(table) ) 
                                 self$key<-table$key
                               
@@ -85,7 +85,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               self$title
                               state<-as.list(self$table$state)
                               state$notes<-list()
-                              self$table$setState(state)
+#                              self$table$setState(state)
 
                               
                               tinfo("TABLES: table",self$nickname,"inited")
@@ -209,19 +209,21 @@ SmartTable <- R6::R6Class("SmartTable",
                                 
                                 fun<-private$.run_function
                                 filled<-!self$table$isNotFilled()
+                                
                                 if (filled & ("rowCount" %in% names(self$table))) 
                                   filled<-self$table$rowCount>0
                               }
+                              
                               if (!self$activated)
                                 return(TRUE)
-                              
+
                               if (is.null(fun)) 
                                 return(TRUE)
-                              
+
                               if (is.character(fun))
                                    if (!(fun %in% names(private$.estimator))) 
                                         return(TRUE)
-                              
+
                               return(filled)
                               
                             },
@@ -522,7 +524,7 @@ SmartArray <- R6::R6Class("SmartArray",
                               if (private$.stop())
                                 return()
                               
-                              tinfo("TABLES: array",self$nickname,"inited")
+                              tinfo("TABLES: array",self$nickname,"initiating")
                               self$table$setVisible(TRUE)
                               self$title
                               rtables<-private$.getData()
@@ -549,6 +551,7 @@ SmartArray <- R6::R6Class("SmartArray",
                                 
                                 
                                 jtable  <-  self$table$items[[i]]
+                                
                                 if (inherits(jtable,"Group")) {
                                   aSmartArray<-SmartArray$new(jtable,self)
                                   aSmartArray$initFunction(rtables[[i]])
@@ -566,6 +569,9 @@ SmartArray <- R6::R6Class("SmartArray",
                               }
                               for (obj in self$childrenObjs)
                                 obj$initTable()
+                              
+                              tinfo("TABLES: array",self$nickname,"inited")
+                              
                             },
                             
                             runTable=function() {

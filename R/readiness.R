@@ -20,7 +20,7 @@ if(!is.something(options$dep)) {
       return(result)
     } 
   
-  if (hasName(options,"randomTerms")) {
+  if (hasName(options,"re")) {
      
        if (any(sapply(options$randomTerms,function(x) length(x)==0)))  
        {

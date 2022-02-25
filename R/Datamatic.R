@@ -108,7 +108,7 @@ Variable <- R6::R6Class(
     contrast_labels=NULL,
     levels_labels=NULL,
     method=NULL,
-    scaling="none",
+    covs_scale="none",
     hasCluster=NULL,
     nClusters=0,
     isBetween=FALSE,
@@ -166,7 +166,7 @@ Variable <- R6::R6Class(
            } else {
              
              if (self$datamatic$option("dep_scale")) 
-                 self$scaling<-self$datamatic$options$dep_scale
+                 self$covs_scale<-self$datamatic$options$dep_scale
                  self$contrast_labels<-self$name
 
            }
@@ -177,9 +177,9 @@ Variable <- R6::R6Class(
             
       if (var %in% self$datamatic$options$covs) {
         self$type="numeric"
-        scaling<-sapply(self$datamatic$options$scaling,function(a) a$type)
-        names(scaling)<-unlist(sapply(self$datamatic$options$scaling,function(a) a$var))
-        self$scaling<-ifelse(var %in% names(scaling),scaling[[var]],"centered")
+        covs_scale<-sapply(self$datamatic$options$covs_scale,function(a) a$type)
+        names(covs_scale)<-unlist(sapply(self$datamatic$options$covs_scale,function(a) a$var))
+        self$covs_scale<-ifelse(var %in% names(covs_scale),covs_scale[[var]],"centered")
         
         if (is.factor(vardata)) {
           self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",var,"has been coerced to numeric"))
@@ -494,7 +494,7 @@ Variable <- R6::R6Class(
       private$.update_levels(vardata)
       
       
-      method<-self$scaling
+      method<-self$covs_scale
       
     
 
@@ -561,7 +561,7 @@ Variable <- R6::R6Class(
       
       self$original_levels<-self$levels
       self$original_descriptive<-self$descriptive
-      labels_type<-ifelse(is.null(self$datamatic$options$simpleScaleLabels),"values",self$datamatic$options$simpleScaleLabels)
+      labels_type<-ifelse(is.null(self$datamatic$options$covs_scale_labels),"values",self$datamatic$options$covs_scale_labels)
       ### when called by init, force labels because we cannot compute the values
       ### if not, we can compute the descriptive
       if (length(vardata)==0)
@@ -573,9 +573,9 @@ Variable <- R6::R6Class(
                               sd=sd(vardata,na.rm = TRUE))
       
       
-      if (self$datamatic$options$simpleScale=="mean_sd")  {
+      if (self$datamatic$options$covs_conditioning=="mean_sd")  {
         
-        .span<-ifelse(is.null(self$datamatic$options$cvalue),1,self$datamatic$options$cvalue)
+        .span<-ifelse(is.null(self$datamatic$options$ccm_value),1,self$datamatic$options$ccm_value)
         .labs<-c(paste0("Mean-", .span, "\u00B7", "SD"), "Mean", paste0("Mean+", .span, "\u00B7","SD"))
         .mean <- mean(vardata)
         .sd <- sd(vardata)
@@ -583,9 +583,9 @@ Variable <- R6::R6Class(
         self$method="mean_sd"
 
       }
-      if (self$datamatic$options$simpleScale=="percent") {
+      if (self$datamatic$options$covs_conditioning=="percent") {
         
-        .lspan<-ifelse(is.null(self$datamatic$options$percvalue),25,self$datamatic$options$percvalue)
+        .lspan<-ifelse(is.null(self$datamatic$options$ccp_value),25,self$datamatic$options$ccp_value)
         .span<-.lspan/100
         
         .labs<-c(paste0("50-", .lspan,"\u0025"), "50\u0025", paste0("50+", .lspan,"\u0025"))

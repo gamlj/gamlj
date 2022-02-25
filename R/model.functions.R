@@ -49,11 +49,11 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
 
-      .bootstrap           <-  obj$options$cimethod %in% c("quantile","bcai")
-      .iterations          <-  obj$options$bootR
-      .ci_method           <-  obj$options$cimethod
+      .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
+      .iterations          <-  obj$options$boot_r
+      .ci_method           <-  obj$options$ci_method
       .ci_width            <-  obj$ciwidth
-      .se_method           <-  obj$option("semethod","robust")
+      .se_method           <-  obj$option("se_method","robust")
       
       if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
         
@@ -65,7 +65,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
     
       names(.coefficients) <-  c("source","estimate","se","t","df","p")
       
-      if (obj$option("showParamsCI")) {
+      if (obj$option("estimates_ci")) {
 
         cidata            <-  as.data.frame(parameters::ci(.model,
                                                                ci=.ci_width,
@@ -76,12 +76,12 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
         
       }
 
-      if (obj$option("effectSize","beta")) {
+      if (obj$option("es","beta")) {
         
         if (obj$hasTerms) {
         
         ## if not CI are required, we do not bootstrap again 
-        if (!obj$option("showBetaCI")) ..bootstrap<-FALSE else ..bootstrap<-.bootstrap
+        if (!obj$option("betas_ci")) ..bootstrap<-FALSE else ..bootstrap<-.bootstrap
         if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
         estim<-parameters::parameters(model,
                                       standardize="refit",
@@ -109,9 +109,9 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.glm<-function(model,obj) {
   
-  .bootstrap           <-  obj$options$cimethod %in% c("quantile","bcai")
-  .iterations          <-  obj$options$bootR
-  .ci_method           <-  obj$options$cimethod
+  .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
+  .iterations          <-  obj$options$boot_r
+  .ci_method           <-  obj$options$ci_method
   .ci_width            <-  obj$ciwidth
 
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
@@ -130,7 +130,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
     names(.coefficients)<-goodnames
     
     
-    if (obj$option("effectSize","expb")) {
+    if (obj$option("es","expb")) {
       estim            <-  as.data.frame(parameters::parameters(model,
                                                                 exponentiate=TRUE,
                                                                 bootstrap=.bootstrap,
@@ -145,7 +145,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
     
     
   
-  if (obj$option("showParamsCI")) {
+  if (obj$option("estimates_ci")) {
     
     cidata            <-  as.data.frame(parameters::ci(.model,
                                                        ci=.ci_width,
@@ -169,7 +169,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.lmerModLmerTest<-function(model,obj) {
   
-  results<-try_hard(summary(model,ddf=obj$options$dfmethod))
+  results<-try_hard(summary(model,ddf=obj$options$df_method))
   
   if (!isFALSE(results$error)) {
     obj$errors<-list(topic="tab_coefficients",message=results$error)
@@ -184,9 +184,9 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
   names(.coefficients)  <-  c("estimate","se","df","t","p")
   .coefficients$source  <-  rownames(.coefficients)
   
-  if (obj$options$showParamsCI)
+  if (obj$options$estimates_ci)
     test<-try({
-      method<-ifelse(obj$options$cimethod=="wald","Wald",obj$options$cimethod)
+      method<-ifelse(obj$options$ci_method=="wald","Wald",obj$options$ci_method)
       ci   <-  confint(model,parm = "beta_",level = obj$ciwidth, method=method)
       colnames(ci)  <-  c("ci.lower","ci.upper")
      .coefficients  <-  cbind(.coefficients,ci)
@@ -327,7 +327,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
           return(NULL)
         }
 
-        test<-switch (obj$options$chisqType,
+        test<-switch (obj$options$chisq_type,
                 lrt = "LR",
                 wald= "Wald")
 
@@ -448,7 +448,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
   if (!obj$hasTerms)
      return()
   
-  df<-obj$options$dfmethod
+  df<-obj$options$df_method
   results        <-  try_hard(stats::anova(model,type="3",ddf=df))
   obj$errors    <-  list(topic="tab_anova",message=results$error)
   obj$warnings  <-  list(topic="tab_anova",message=results$warning)
@@ -608,8 +608,8 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
 mf.sourcify<-function(option) {
 
   results<-list(type="transformed",option=option)
-  .ignore<-c('factors', 'dep', 'covs', 'modelTerms','.interface','.caller')
-  .transform<-c("simpleVariable","simpleModerators","plotHAxis","plotSepLines","plotSepPlots")
+  .ignore<-c('factors', 'dep', 'covs', 'model_terms','.interface','.caller')
+  .transform<-c("simple_effects","simple_moderators","plotHAxis","plotSepLines","plotSepPlots")
 
   if (!is.something(option$value))
       results$type="empty"
@@ -617,7 +617,7 @@ mf.sourcify<-function(option) {
   if (option$name %in% .ignore)
     results$type="empty"
   
-  if (option$name =='scaling') {
+  if (option$name =='covs_scale') {
     results$option$value<-sourcifyList(option,"centered")
     results$type="complete"
   }

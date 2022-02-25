@@ -14,9 +14,7 @@ description:
                   gamlj::gamljGzlm(
                             formula = Pain ~ Duration,
                             data = data,
-                             modelSelection = "logistic")
-
-
+                             model_type = "logistic")
 
 formula:
     dep:
@@ -31,10 +29,14 @@ formula:
         from: rhs
         type: vars
         permitted: numeric
-    modelTerms:
+    model_terms:
         from: rhs
         type: terms
 options:
+    - name: data
+      type: Data
+      description:
+          R: the data as a data frame
 
     - name: .caller
       type: String
@@ -45,17 +47,14 @@ options:
       type: String
       default: "jamovi"
       hidden: true
-      
-    - name: data
-      type: Data
-      description:
-          R: the data as a data frame
-
 
     - name: dep
       title: Dependent Variable
       type: Variable
       default:
+      permitted:
+        - factor
+        - numeric
       description:
           R: >
             a string naming the dependent variable from `data`; the variable
@@ -85,8 +84,7 @@ options:
           R: a vector of strings naming the covariates from `data`. Not needed if `formula` is used.
 
 
-
-    - name: modelTerms
+    - name: model_terms
       title: Model Terms
       type: Terms
       default:
@@ -94,7 +92,7 @@ options:
           R: >
             a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
 
-    - name: fixedIntercept
+    - name: fixed_intercept
       title: Intercept
       type: Bool
       default: true
@@ -103,10 +101,11 @@ options:
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
 
-    - name: showParamsCI
-      title: For estimates (B)
+
+    - name: estimates_ci
+      title: For estimates
       type: Bool
-      default: true
+      default: false
       description:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
@@ -115,20 +114,29 @@ options:
       title: Do not run
       type: Bool
       default: false
-      description:
-          R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
 
-    - name: paramCIWidth
-      title: Confidence level
+
+    - name: ci_method
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name:  wald
+          title: Standard (fast)
+        - name: quantile
+          title: Bootstrap (Percent)
+        - name:  bcai
+          title: Bootstrap (BCa)
+          
+    - name: boot_r
+      title: Bootstrap rep.
       type: Number
-      min: 50
-      max: 99.9
-      default: 95
+      min: 1
+      default: 1000
       description:
           R: >
-            a number between 50 and 99.9 (default: 95) specifying the confidence
-            interval width for the parameter estimates
+            a number bootstrap repetitions.
+
 
 
 
@@ -153,6 +161,7 @@ options:
                   - helmert
                   - repeated
                   - polynomial
+
                 default: simple
       description:
           R: >
@@ -161,23 +170,22 @@ options:
             `'repeated'` or `'polynomial'`. If NULL, `simple` is used. Can also be passed as a list of list of the form list(list(var="var1",type="type1")).
 
 
-    - name: showRealNames
+    - name: show_contrastnames
       title: Names in estimates table
       type: Bool
       default: true
       description:
           R: >
-            `TRUE` or `FALSE` (default), shows raw names of the contrasts variables
+            `TRUE` or `FALSE` (default), shows raw names of the contrasts variables in tables
 
 
-    - name: showContrastCode
+    - name: show_contrastcodes
       title: Contrast Coefficients tables
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), shows contrast coefficients tables
-
 
 
 
@@ -209,7 +217,7 @@ options:
             a list of string naming the variables defining the levels for multiple plots
 
     - name: plotRaw
-      title: Y observed scores
+      title: Observed scores
       type: Bool
       default: false
       description:
@@ -217,7 +225,7 @@ options:
             `TRUE` or `FALSE` (default), plot raw data along the predicted values
 
     - name: plotDvScale
-      title: Y-axis full range 
+      title: Y-axis observed range 
       type: Bool
       default: false
       description:
@@ -225,7 +233,7 @@ options:
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
     - name: plotOriginalScale
-      title: X original scale 
+      title: Original scale 
       type: Bool
       default: false
       description:
@@ -240,42 +248,24 @@ options:
           R: >
             `TRUE` or `FALSE` (default), use different linetypes per levels.
 
-
-    - name: plotScale
-      title: type of plot 
-      type: List
-      options:
-        - name: response
-          title: Response
-        - name: link
-          title: Linear predictor
-        - name: mean.class
-          title: Explected class
-      default: response
-      description:
-          R: >
-            Scale the plot Y-axis:  `response` (default), `lp` for linear predictor, or `mean.class` for expected
-            class (only for ordinal regression).
-
-
     - name: plotError
       title: Error Bar Definition
       type: List
       options:
-        - name: none
+        - name: 'none'
           title: None
         - name: ci
           title: Confidence intervals
         - name: se
           title: Standard Error
-      default: none
+      default: 'none'
       description:
           R: >
             `'none'` (default), `'ci'`, or `'se'`. Use no error
             bars, use confidence intervals, or use standard errors on the
             plots, respectively.
 
-    - name: ciWidth
+    - name: ci_width
       title: Confidence level
       type: Number
       min: 50
@@ -285,28 +275,6 @@ options:
           R: >
             a number between 50 and 99.9 (default: 95) specifying the confidence
             interval width for the plots.
-
-    - name: cimethod
-      title: CI Method
-      type: List
-      default: wald
-      options:
-        - name:  wald
-          title: Standard (fast)
-        - name: quantile
-          title: Bootstrap (Percent)
-        - name:  bcai
-          title: Bootstrap (BCa)
-
-
-    - name: bootR
-      title: Bootstrap rep.
-      type: Number
-      min: 1
-      default: 1000
-      description:
-          R: >
-            a number bootstrap repetitions.
 
     - name: emmeans
       title: Estimated Marginal Means
@@ -321,10 +289,12 @@ options:
       type: Terms
       default:
       description:
-          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
+             The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
+             also as a list of the form '`list("x","z",c("x","z")`'
 
 
-    - name: simpleVariable
+    - name: simple_effects
       title: Simple effects variable
       type: Variable
       default:
@@ -332,7 +302,7 @@ options:
           R: >
             The variable for which the simple effects (slopes) are computed
 
-    - name: simpleModerators
+    - name: simple_moderators
       title: Moderators
       type: Variables
       default:
@@ -340,7 +310,7 @@ options:
           R: >
             the variable that provides the levels at which the simple effects are computed
 
-    - name: simpleInteractions
+    - name: simple_interactions
       title: Simple Interactions
       type: Bool
       default: false
@@ -348,7 +318,7 @@ options:
           R: >
             should simple Interactions be computed
 
-    - name: simpleScale
+    - name: covs_scale
       title: Covariates conditioning
       type: List
       options:
@@ -363,7 +333,7 @@ options:
             covariates (if any)
 
 
-    - name: cvalue
+    - name: csm_value
       type: Number
       default: 1
       description:
@@ -371,7 +341,7 @@ options:
             how many st.deviations around the means used to condition simple effects and plots.
             Used if `simpleScale`=`'mean_sd'`
 
-    - name: percvalue
+    - name: csp_value
       type: Number
       default: 25
       min: 5
@@ -382,7 +352,7 @@ options:
             Used if `simpleScale`=`'percent'`
 
 
-    - name: simpleScaleLabels
+    - name: covs_scale_labels
       type: List
       options:
         - name: labels
@@ -406,20 +376,22 @@ options:
 
 
 
-############ generic with some specs ###########
-
-    - name: posthocCorr
+    - name: posthoc_adjust
       title: Correction
       type: NMXList
       options:
           - name: none
-            title: No correction
+            title: No correction (LSD)
           - name: bonf
             title: Bonferroni
           - name: tukey
             title: Tukey 
           - name: holm
             title: Holm
+          - name: scheffe
+            title: Scheffe
+          - name: sidak
+            title: Sidak
       default:
           - bonf
       description:
@@ -427,6 +399,23 @@ options:
             one or more of `'none'`,  `'bonf'`,`'tukey'` 
             `'holm'`; provide no,  Bonferroni, Tukey and
             Holm Post Hoc corrections respectively.
+
+
+
+
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
+
+
+
+############ generic with some specs ###########
+
 
     - name: scaling
       title: Covariates Scaling
@@ -458,20 +447,10 @@ options:
              one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
 
-    - name: predicted
-      title: Predicted
-      type: Output            
-
-    - name: residuals
-      title: Residuals
-      type: Output            
-
-
-
 
 ######### specs here ##########
 
-    - name: showExpbCI
+    - name: expb_ci
       title: For exp(B)
       type: Bool
       default: true
@@ -479,7 +458,7 @@ options:
           R: >
             `TRUE` (default) or `FALSE` , exp(B) CI in table
 
-    - name: effectSize
+    - name: es
       title: Effect Size
       type: NMXList
       options:
@@ -490,7 +469,7 @@ options:
       default:
           - expb
           
-    - name: modelSelection
+    - name: model_type
       title: Model Selection
       type: List
       options:
@@ -562,7 +541,7 @@ options:
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
            
 
-    - name: chisqType
+    - name: chisq_type
       title: Omnibus chi2
       type: List
       options:
@@ -577,13 +556,31 @@ options:
             `'wald'` gives the Wald Chi-squared.
 
 
-    - name: propodds
+    - name: propodds_test
       title: Parallel lines
       type: Bool
       default: false
       description:
           R: >
              Test parallel lines assumptions in cumulative link model (ordinal regression)
+
+
+    - name: plot_scale
+      title: Y-axis scale
+      type: List
+      options:
+        - name: response
+          title: Response
+        - name:  link
+          title: Linear predictor
+        - name:  mean.class
+          title: Mean class
+          
+      default: response
+      description:
+          R: >
+            Chi-squared computation method. `'lrt'` (default) gives LogLikelihood ration test, 
+            `'wald'` gives the Wald Chi-squared.
 
 ...
 

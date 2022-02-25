@@ -7,6 +7,16 @@ const events = {
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updatePlotsSupplier(ui, this);
+        
+        if (typeof ui.propLabel !== 'undefined' ) {
+          
+            if (ui.model_type.getValue()==="ordinal") {
+              ui.propLabel.$el.show();
+            } else {
+              ui.propLabel.$el.hide();
+            }
+        }
+
 
     },
 
@@ -20,7 +30,7 @@ const events = {
 
     },
 
-    onChange_modelTerms: function(ui) {
+    onChange_model_terms: function(ui) {
         filterModelTerms(ui, this);
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
@@ -52,24 +62,24 @@ const events = {
     },
 
      onChange_model: function(ui) {
-        if (typeof ui.effectSize_RR !== 'undefined' ) {
-              ui.effectSize_RR.setValue(false);
+       
+        if (typeof ui.es_RR !== 'undefined' ) {
+              ui.es_RR.setValue(false);
         }
-        if (ui.modelSelection.getValue()==="custom" ||  ui.modelSelection.getValue()==="linear") {
-               ui.effectSize_expb.setValue(false);
-               ui.showParamsCI.setValue(true);
-               ui.showExpbCI.setValue(false);
+        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear") {
+               ui.es_expb.setValue(false);
+               ui.estimates_ci.setValue(true);
+               ui.expb_ci.setValue(false);
         } else  {
-               ui.effectSize_expb.setValue(true);
-               ui.showParamsCI.setValue(false);
-               ui.showExpbCI.setValue(true);
+               ui.es_expb.setValue(true);
+               ui.estimates_ci.setValue(false);
+               ui.expb_ci.setValue(true);
         }
         
-        if (ui.modelSelection.getValue()==="ordinal") {
+        if (ui.model_type.getValue()==="ordinal") {
           ui.propLabel.$el.show();
         } else {
           ui.propLabel.$el.hide();
-
         }
   
         ui.dep.setValue(null);
@@ -278,7 +288,7 @@ var updateContrasts = function(ui, variableList, context) {
 };
 
 var updateScaling = function(ui, variableList, context) {
-    var currentList = context.cloneArray(ui.scaling.value(), []);
+    var currentList = context.cloneArray(ui.covs_scale.value(), []);
 
     var list3 = [];
     for (let i = 0; i < variableList.length; i++) {
@@ -294,7 +304,7 @@ var updateScaling = function(ui, variableList, context) {
         else
             list3.push(found);
     }
-    ui.scaling.setValue(list3);
+    ui.covs_scale.setValue(list3);
 };
 
 

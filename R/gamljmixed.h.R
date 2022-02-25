@@ -12,11 +12,11 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             factors = NULL,
             covs = NULL,
             model_terms = NULL,
-            fixedIntercept = TRUE,
+            fixed_ntercept = TRUE,
             estimates_ci = TRUE,
             donotrun = FALSE,
             ci_method = "wald",
-            bootR = 1000,
+            boot_r = 1000,
             contrasts = NULL,
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
@@ -106,9 +106,9 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "model_terms",
                 model_terms,
                 default=NULL)
-            private$..fixedIntercept <- jmvcore::OptionBool$new(
-                "fixedIntercept",
-                fixedIntercept,
+            private$..fixed_ntercept <- jmvcore::OptionBool$new(
+                "fixed_ntercept",
+                fixed_ntercept,
                 default=TRUE)
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
@@ -126,9 +126,9 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "wald",
                     "quantile",
                     "bcai"))
-            private$..bootR <- jmvcore::OptionNumber$new(
-                "bootR",
-                bootR,
+            private$..boot_r <- jmvcore::OptionNumber$new(
+                "boot_r",
+                boot_r,
                 min=1,
                 default=1000)
             private$..contrasts <- jmvcore::OptionArray$new(
@@ -395,11 +395,11 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..model_terms)
-            self$.addOption(private$..fixedIntercept)
+            self$.addOption(private$..fixed_ntercept)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
-            self$.addOption(private$..bootR)
+            self$.addOption(private$..boot_r)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
@@ -450,11 +450,11 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         model_terms = function() private$..model_terms$value,
-        fixedIntercept = function() private$..fixedIntercept$value,
+        fixed_ntercept = function() private$..fixed_ntercept$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
-        bootR = function() private$..bootR$value,
+        boot_r = function() private$..boot_r$value,
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
@@ -504,11 +504,11 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..factors = NA,
         ..covs = NA,
         ..model_terms = NA,
-        ..fixedIntercept = NA,
+        ..fixed_ntercept = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,
-        ..bootR = NA,
+        ..boot_r = NA,
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
@@ -763,7 +763,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="cname", 
                                         `title`="Name", 
                                         `type`="text", 
-                                        `visible`="(show_contrastname)"),
+                                        `visible`="(show_contrastnames)"),
                                     list(
                                         `name`="clab", 
                                         `title`="Contrast", 
@@ -1339,13 +1339,13 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   needed if \code{formula} is used.
 #' @param model_terms a list of character vectors describing fixed effects
 #'   terms. Not needed if \code{formula} is used.
-#' @param fixedIntercept \code{TRUE} (default) or \code{FALSE}, estimates
+#' @param fixed_ntercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param donotrun .
 #' @param ci_method .
-#' @param bootR a number bootstrap repetitions.
+#' @param boot_r a number bootstrap repetitions.
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
@@ -1475,11 +1475,11 @@ gamljMixed <- function(
     factors = NULL,
     covs = NULL,
     model_terms = NULL,
-    fixedIntercept = TRUE,
+    fixed_ntercept = TRUE,
     estimates_ci = TRUE,
     donotrun = FALSE,
     ci_method = "wald",
-    bootR = 1000,
+    boot_r = 1000,
     contrasts = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
@@ -1548,16 +1548,16 @@ gamljMixed <- function(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
                 name="cluster")
-        if (missing(randomTerms))
-            randomTerms <- gamljMixedClass$private_methods$.marshalFormula(
+        if (missing(re))
+            re <- gamljMixedClass$private_methods$.marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
-                name="randomTerms")
-        if (missing(modelTerms))
-            modelTerms <- gamljMixedClass$private_methods$.marshalFormula(
+                name="re")
+        if (missing(model_terms))
+            model_terms <- gamljMixedClass$private_methods$.marshalFormula(
                 formula=formula,
                 data=`if`( ! missing(data), data, NULL),
-                name="modelTerms")
+                name="model_terms")
     }
 
     if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
@@ -1594,11 +1594,11 @@ gamljMixed <- function(
         factors = factors,
         covs = covs,
         model_terms = model_terms,
-        fixedIntercept = fixedIntercept,
+        fixed_ntercept = fixed_ntercept,
         estimates_ci = estimates_ci,
         donotrun = donotrun,
         ci_method = ci_method,
-        bootR = bootR,
+        boot_r = boot_r,
         contrasts = contrasts,
         show_contrastnames = show_contrastnames,
         show_contrastcodes = show_contrastcodes,
