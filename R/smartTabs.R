@@ -85,8 +85,8 @@ SmartTable <- R6::R6Class("SmartTable",
                               self$title
                               state<-as.list(self$table$state)
                               state$notes<-list()
-#                              self$table$setState(state)
-
+                              private$.spaceBy()
+                              
                               
                               tinfo("TABLES: table",self$nickname,"inited")
                             },
@@ -103,7 +103,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               rtable<-private$.getData()
                               private$.fill(self$table,rtable)
-                              private$.spaceBy()
                               tinfo("TABLES: table",self$nickname,"run")
                               
                             },

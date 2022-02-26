@@ -16,7 +16,7 @@ newversion.R
 problems/
 local/
 .~lock*
-extdata/.~lock*
+extdata/
 
 # Example code in package build process
 *-Ex.R
