@@ -41,7 +41,7 @@ options:
 
     - name: .caller
       type: String
-      default: "glm"
+      default: "lm"
       hidden: true
 
     - name: .interface
@@ -415,7 +415,7 @@ options:
 
 
 
-    - name: posthoc_adjust
+    - name: adjust
       title: Correction
       type: NMXList
       options:
@@ -457,7 +457,7 @@ options:
 
 
 
-    - name: posthoc_es
+    - name: posthoces
       title: Effect size 
       type: NMXList
       options:
@@ -483,7 +483,7 @@ options:
             `TRUE` or `FALSE` (default), d confidence intervals
 
 
-    - name: model_type
+    - name: modeltype
       type: List
       hidden: true
       options:

@@ -5,7 +5,7 @@ mod<-gamlj::gamljGlm(
   data = ToothGrowth,
   dep = "len",
   factors = "supp")
-
+mod
 res<-mod$main$coefficients$asDF
 params<-res$estimate
 testthat::test_that("glm estimates are correct", {

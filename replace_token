@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+first=$1
+second=$2
+cmd="s/$first/$second/g"
+
+cd jamovi/
+
+sed -i -- $cmd *.yaml
+cd ..
+
+cd R/
+sed -i -- $cmd *.R
+cd ..
+exit

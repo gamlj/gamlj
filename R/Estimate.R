@@ -41,7 +41,7 @@ Estimate <- R6::R6Class("Estimate",
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
                                 
                                 ### issue some notes ###
-                                if ((!self$option("ci_method","wald")) & self$option("posthoc") & self$option("posthoc_es") & self$option("d_ci")) 
+                                if ((!self$option("ci_method","wald")) & self$option("posthoc") & self$option("posthoces") & self$option("d_ci")) 
                                   self$dispatcher$warnings<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
                                 tab
                           },                    
@@ -177,8 +177,8 @@ Estimate <- R6::R6Class("Estimate",
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
-                            self$tab_posthoc<-procedure.posthoc(self)
-                            self$tab_posthoc  
+                            tab<-procedure.posthoc(self)
+
                           },
                           
                           run_posthocEffectSize=function() {
@@ -628,10 +628,10 @@ Estimate <- R6::R6Class("Estimate",
                           
                           .fix_names=function(atable) {
                             
-                            .terms           <-  jmvcore::decomposeTerms(atable$source)
-                            .rownames        <-  unlist(lapply(fromb64(.terms,self$vars),jmvcore::stringifyTerm,raise=T))
+                            .terms64         <-  jmvcore::decomposeTerms(atable$source)
+                            .rownames        <-  unlist(lapply(fromb64(.terms64,self$vars),jmvcore::stringifyTerm,raise=T))
                             atable$source    <-  .rownames
-                            atable$label     <-  self$datamatic$get_params_labels(.terms)
+                            atable$label     <-  self$datamatic$get_params_labels(.terms64)
                             
                             if ("response" %in% names(atable)) {
                                    atable$response          <-  factor(atable$response)

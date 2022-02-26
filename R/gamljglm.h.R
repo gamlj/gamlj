@@ -6,7 +6,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Options,
     public = list(
         initialize = function(
-            .caller = "glm",
+            .caller = "lm",
             .interface = "jamovi",
             dep = NULL,
             factors = NULL,
@@ -40,12 +40,12 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
-            posthoc_adjust = list(
+            adjust = list(
                 "bonf"),
-            posthoc_es = list(
+            posthoces = list(
                 "dm"),
             d_ci = FALSE,
-            model_type = "lm",
+            modeltype = "lm",
             es = list(
                 "beta",
                 "etap"),
@@ -68,7 +68,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$...caller <- jmvcore::OptionString$new(
                 ".caller",
                 .caller,
-                default="glm",
+                default="lm",
                 hidden=TRUE)
             private$...interface <- jmvcore::OptionString$new(
                 ".interface",
@@ -276,9 +276,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "uvalues",
                     "uvalues_labels"),
                 default="labels")
-            private$..posthoc_adjust <- jmvcore::OptionNMXList$new(
-                "posthoc_adjust",
-                posthoc_adjust,
+            private$..adjust <- jmvcore::OptionNMXList$new(
+                "adjust",
+                adjust,
                 options=list(
                     "none",
                     "bonf",
@@ -292,9 +292,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
-            private$..posthoc_es <- jmvcore::OptionNMXList$new(
-                "posthoc_es",
-                posthoc_es,
+            private$..posthoces <- jmvcore::OptionNMXList$new(
+                "posthoces",
+                posthoces,
                 options=list(
                     "dm",
                     "ds",
@@ -305,9 +305,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "d_ci",
                 d_ci,
                 default=FALSE)
-            private$..model_type <- jmvcore::OptionList$new(
-                "model_type",
-                model_type,
+            private$..modeltype <- jmvcore::OptionList$new(
+                "modeltype",
+                modeltype,
                 hidden=TRUE,
                 options=list(
                     "lm"),
@@ -405,12 +405,12 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..ccm_value)
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
-            self$.addOption(private$..posthoc_adjust)
+            self$.addOption(private$..adjust)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
-            self$.addOption(private$..posthoc_es)
+            self$.addOption(private$..posthoces)
             self$.addOption(private$..d_ci)
-            self$.addOption(private$..model_type)
+            self$.addOption(private$..modeltype)
             self$.addOption(private$..es)
             self$.addOption(private$..homo_test)
             self$.addOption(private$..qq_plot)
@@ -457,12 +457,12 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ccm_value = function() private$..ccm_value$value,
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
-        posthoc_adjust = function() private$..posthoc_adjust$value,
+        adjust = function() private$..adjust$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
-        posthoc_es = function() private$..posthoc_es$value,
+        posthoces = function() private$..posthoces$value,
         d_ci = function() private$..d_ci$value,
-        model_type = function() private$..model_type$value,
+        modeltype = function() private$..modeltype$value,
         es = function() private$..es$value,
         homo_test = function() private$..homo_test$value,
         qq_plot = function() private$..qq_plot$value,
@@ -508,12 +508,12 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..ccm_value = NA,
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
-        ..posthoc_adjust = NA,
+        ..adjust = NA,
         ..predicted = NA,
         ..residuals = NA,
-        ..posthoc_es = NA,
+        ..posthoces = NA,
         ..d_ci = NA,
-        ..model_type = NA,
+        ..modeltype = NA,
         ..es = NA,
         ..homo_test = NA,
         ..qq_plot = NA,
@@ -603,7 +603,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "model_terms",
-                                "fixed_intercept"),
+                                "fixed_intercept",
+                                "covs_scale",
+                                "contrasts"),
                             rows=1,
                             columns=list(
                                 list(
@@ -897,7 +899,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_method",
                         "ci_width",
                         "boot_r",
-                        "posthoc_adjust"),
+                        "adjust"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -969,7 +971,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_method",
                         "ci_width",
                         "boot_r",
-                        "posthoc_es",
+                        "posthoces",
                         "d_ci"),
                     columns=list(
                         list(
@@ -984,47 +986,47 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="dm", 
                             `title`="d<sub>mod</sub>", 
                             `type`="number", 
-                            `visible`="(posthoc_es:dm)"),
+                            `visible`="(posthoces:dm)"),
                         list(
                             `name`="dm.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoc_es:dm && d_ci)"),
+                            `visible`="(posthoces:dm && d_ci)"),
                         list(
                             `name`="dm.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthoc_es:dm && d_ci)"),
+                            `visible`="(posthoces:dm && d_ci)"),
                         list(
                             `name`="ds", 
                             `title`="d<sub>sample</sub>", 
                             `type`="number", 
-                            `visible`="(posthoc_es:ds)"),
+                            `visible`="(posthoces:ds)"),
                         list(
                             `name`="ds.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoc_es:ds && d_ci)"),
+                            `visible`="(posthoces:ds && d_ci)"),
                         list(
                             `name`="ds.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthoc_es:ds && d_ci)"),
+                            `visible`="(posthoces:ds && d_ci)"),
                         list(
                             `name`="g", 
                             `title`="g<sub>sample</sub>", 
                             `type`="number", 
-                            `visible`="(posthoc_es:g)"),
+                            `visible`="(posthoces:g)"),
                         list(
                             `name`="g.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoc_es:g && d_ci)"),
+                            `visible`="(posthoces:g && d_ci)"),
                         list(
                             `name`="g.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthoc_es:g && d_ci)")))))
+                            `visible`="(posthoces:g && d_ci)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1610,13 +1612,13 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
 #'   to the variable orginal levels, before scaling.
-#' @param posthoc_adjust one or more of \code{'none'},
-#'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
-#'   and Holm Post Hoc corrections respectively.
-#' @param posthoc_es one or more of \code{'dm'},  \code{'ds'},\code{'g'} for
+#' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
+#'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
+#'   respectively.
+#' @param posthoces one or more of \code{'dm'},  \code{'ds'},\code{'g'} for
 #'   Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g
 #' @param d_ci \code{TRUE} or \code{FALSE} (default), d confidence intervals
-#' @param model_type .
+#' @param modeltype .
 #' @param es a list of effect sizes to print out. They can be:  \code{"eta"}
 #'   for eta-squared, \code{'partEta'} for partial eta-squared, \code{'omega'}
 #'   for partial omega-squared, \code{'epsilon'} for partial epsilon-squared,
@@ -1675,7 +1677,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @export
 gamljGlm <- function(
     data,
-    .caller = "glm",
+    .caller = "lm",
     .interface = "jamovi",
     dep = NULL,
     factors = NULL,
@@ -1709,12 +1711,12 @@ gamljGlm <- function(
     ccm_value = 1,
     ccp_value = 25,
     covs_scale_labels = "labels",
-    posthoc_adjust = list(
+    adjust = list(
                 "bonf"),
-    posthoc_es = list(
+    posthoces = list(
                 "dm"),
     d_ci = FALSE,
-    model_type = "lm",
+    modeltype = "lm",
     es = list(
                 "beta",
                 "etap"),
@@ -1822,10 +1824,10 @@ gamljGlm <- function(
         ccm_value = ccm_value,
         ccp_value = ccp_value,
         covs_scale_labels = covs_scale_labels,
-        posthoc_adjust = posthoc_adjust,
-        posthoc_es = posthoc_es,
+        adjust = adjust,
+        posthoces = posthoces,
         d_ci = d_ci,
-        model_type = model_type,
+        modeltype = modeltype,
         es = es,
         homo_test = homo_test,
         qq_plot = qq_plot,

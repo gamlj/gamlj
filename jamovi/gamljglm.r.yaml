@@ -44,6 +44,8 @@ items:
                          - dep
                          - model_terms
                          - fixed_intercept
+                         - covs_scale
+                         - contrasts
              rows: 1
              columns:
                     - name: r1
@@ -306,7 +308,7 @@ items:
               - ci_method
               - ci_width
               - boot_r
-              - posthoc_adjust
+              - adjust
 
         columns:
         - name: estimate
@@ -333,32 +335,32 @@ items:
           title: p
           type: number
           format: zto,pvalue
-#          visible: (posthoc_adjust:none)
+#          visible: (adjust:none)
         - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-#          visible: (posthoc_adjust:bonf)
+#          visible: (adjust:bonf)
         - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-#          visible: (posthoc_adjust:tukey)
+#          visible: (adjust:tukey)
         - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-#          visible: (posthoc_adjust:holm)
+#          visible: (adjust:holm)
         - name: scheffe
           title: p<sub>scheffe</sub>
           type: number
           format: zto,pvalue
-#          visible: (posthoc_adjust:scheffe)
+#          visible: (adjust:scheffe)
         - name: sidak
           title: p<sub>sidak</sub>
           type: number
           format: zto,pvalue
-#          visible: (posthoc_adjust:sidak)
+#          visible: (adjust:sidak)
 
   - name: posthocEffectSize
     title: Comparisons effect size
@@ -374,7 +376,7 @@ items:
               - ci_method
               - ci_width
               - boot_r
-              - posthoc_es
+              - posthoces
               - d_ci
         columns:
         - name: estimate
@@ -386,39 +388,39 @@ items:
         - name: dm
           title: d<sub>mod</sub>
           type: number
-          visible: (posthoc_es:dm)
+          visible: (posthoces:dm)
         - name: dm.ci.lower
           type: number
           title: Lower
-          visible: (posthoc_es:dm && d_ci)
+          visible: (posthoces:dm && d_ci)
         - name: dm.ci.upper
           type: number
           title: Upper
-          visible: (posthoc_es:dm && d_ci)
+          visible: (posthoces:dm && d_ci)
         - name: ds
           title: d<sub>sample</sub>
           type: number
-          visible: (posthoc_es:ds)
+          visible: (posthoces:ds)
         - name: ds.ci.lower
           type: number
           title: Lower
-          visible: (posthoc_es:ds && d_ci)
+          visible: (posthoces:ds && d_ci)
         - name: ds.ci.upper
           type: number
           title: Upper
-          visible: (posthoc_es:ds && d_ci)
+          visible: (posthoces:ds && d_ci)
         - name: g
           title: g<sub>sample</sub> 
           type: number
-          visible: (posthoc_es:g)
+          visible: (posthoces:g)
         - name: g.ci.lower
           type: number
           title: Lower
-          visible: (posthoc_es:g && d_ci)
+          visible: (posthoces:g && d_ci)
         - name: g.ci.upper
           type: number
           title: Upper
-          visible: (posthoc_es:g && d_ci)
+          visible: (posthoces:g && d_ci)
 
 
   - name: simpleEffects

@@ -39,7 +39,7 @@ fromb64<- function(x,...) UseMethod(".fromb64")
     if (length(obj)>1)
         return(unlist(sapply(obj, bogusfromb64,ref=ref,USE.NAMES = F)))
   
-    obj<-gsub(LEVEL_SYMBOL,"",obj,fixed = T)
+    obj<-gsub(LEVEL_SYMBOL,FACTOR_SYMBOL,obj,fixed = T)
     if (!is.b64(obj))
           return(obj)
     
@@ -73,10 +73,10 @@ bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
 
 
 is.b64<-function(a) { 
-    test1<-length(grep(B64_SYMBOL,a,fixed = TRUE))>0
-    test2<-length(grep(LEVEL_SYMBOL,a,fixed = TRUE))>0
-    test3<-length(grep(FACTOR_SYMBOL,a,fixed = TRUE))>0
-    test4<-length(grep(INTERACTION_SYMBOL,a,fixed = TRUE))>0
+    test1  <-  is.there(B64_SYMBOL,a)
+    test2  <-  is.there(LEVEL_SYMBOL,a)
+    test3  <-  is.there(FACTOR_SYMBOL,a)
+    test4  <-  is.there(INTERACTION_SYMBOL,a) 
     any(test1,test2,test3,test4)
 }
 

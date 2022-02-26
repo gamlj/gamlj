@@ -330,6 +330,16 @@ SmartTable <- R6::R6Class("SmartTable",
                             },
                             .spaceBy=function() {
                               
+                              k<-names(self$table$asDF)[1]
+                              
+                              for (j in self$spaceAt) {
+                                mark(str(self$table))
+                                if (j<0) j<-self$table$rowCount+j
+                                self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.END_GROUP)
+                                self$table$addFormat(rowNo=j+1,col=k,jmvcore::Cell.BEGIN_GROUP)
+                                
+                              }
+                              
                               if (is.null(self$spaceBy))
                                    return()
                               
@@ -344,7 +354,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                      .spaceBy=self$spaceBy
                                 
                                 jnames<-names(self$table$columns)
-                                k<-names(self$table$asDF)[1]
 
                                 for (sb in .spaceBy) {
                                   col<-self$table$asDF[[sb]]
@@ -354,13 +363,13 @@ SmartTable <- R6::R6Class("SmartTable",
                                   if (self$spaceMethod=="cb" & length(rows)==length(col)-1)
                                     rows<-NULL
                                 
-                                  for (j in rows)
+                                  for (j in rows) {
+                                    mark(j)
+                                    self$table$addFormat(rowNo=j-1,col=k,jmvcore::Cell.END_GROUP)
                                     self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.BEGIN_GROUP)
-                                  
+                                  }
+
                                 }
-                                
-                                for (j in self$spaceAt)
-                                  self$table$addFormat(rowNo=j,col=1,jmvcore::Cell.BEGIN_GROUP)
                                   
                               })
                               

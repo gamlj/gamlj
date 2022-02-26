@@ -94,19 +94,18 @@ procedure.posthoc <- function(obj) {
     .labs <- sapply(.cont, function(a) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
     })
-    .labs <- fromb64(.labs)
     labs <- do.call("rbind", .labs)
-
-    .vars  <-make.names(.revvars,unique = T)
+    .vars  <- make.names(.revvars,unique = T)
     .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
-     colnames(labs) <- .names
-     tableData <- cbind(labs, tableData)
-     rownames(tableData)<-NULL
+    colnames(labs) <- .names
+    
+    tableData <- cbind(labs, tableData)
+    rownames(tableData)<-NULL
     
     for (.name in .names)
-      tableData[,.name]<-fromb64(as.character(tableData[,.name]))
+      tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
     
-
+     
     if ("response" %in% names(tableData))
         tableData$response<-fromb64(as.character(tableData$response))
     postHocTables[[length(postHocTables)+1]]<-tableData
@@ -162,19 +161,16 @@ procedure.posthoc_effsize <- function(obj) {
     .labs <- sapply(.cont, function(a) {
       sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
     })
-    .labs <- fromb64(.labs)
      labs <- do.call("rbind", .labs)
-
      .vars  <- make.names(.revvars,unique = T)
      .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
       colnames(labs) <- .names
     
       tableData <- cbind(labs, tableData)
       rownames(tableData)<-NULL
-    
+
       for (.name in .names)
-         tableData[,.name]<-as.character(tableData[,.name])
-    
+         tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
     
       d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
       tableData$ds<-d$d
@@ -195,7 +191,7 @@ procedure.posthoc_effsize <- function(obj) {
     tableData$dm<-d$d
     tableData$dm.ci.lower<-d$CI_low
     tableData$dm.ci.upper<-d$CI_high
-  
+
     dTables[[length(dTables)+1]]<-tableData
   }
   
@@ -221,7 +217,7 @@ procedure.posthoc_effsize <- function(obj) {
       referenceGrid <- do.call(emmeans::emmeans,opts_list)
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
-      newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
+      newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
       referenceGrid@grid[terms] <- newlabs
       results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(FALSE,TRUE))
 
@@ -487,9 +483,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     names(.params)[names(.params) %in% term64]<-paste0("mod_",make.names(fromb64(term64),unique = T))
 
     ## add effect sizes
+
     class(.params)<-c(paste0("simple_params_",obj$options$.caller),class(.params))
     .params<-add_effect_size(.params,model,variable64)
-    
+
     ### now we build the anova table ###
     .anova<-as.data.frame(emmeans::test(grid, join=TRUE, by = term64))
     .transnames<-list(test=c("F.ratio"),p="p.value")

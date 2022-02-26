@@ -38,7 +38,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             csm_value = 1,
             csp_value = 25,
             covs_scale_labels = "labels",
-            posthoc_adjust = list(
+            adjust = list(
                 "bonf"),
             model_type = "lmer",
             scaling = NULL,
@@ -253,9 +253,9 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "uvalues",
                     "uvalues_labels"),
                 default="labels")
-            private$..posthoc_adjust <- jmvcore::OptionNMXList$new(
-                "posthoc_adjust",
-                posthoc_adjust,
+            private$..adjust <- jmvcore::OptionNMXList$new(
+                "adjust",
+                adjust,
                 options=list(
                     "none",
                     "bonf",
@@ -421,7 +421,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..csm_value)
             self$.addOption(private$..csp_value)
             self$.addOption(private$..covs_scale_labels)
-            self$.addOption(private$..posthoc_adjust)
+            self$.addOption(private$..adjust)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
             self$.addOption(private$..model_type)
@@ -476,7 +476,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         csm_value = function() private$..csm_value$value,
         csp_value = function() private$..csp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
-        posthoc_adjust = function() private$..posthoc_adjust$value,
+        adjust = function() private$..adjust$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
         model_type = function() private$..model_type$value,
@@ -530,7 +530,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..csm_value = NA,
         ..csp_value = NA,
         ..covs_scale_labels = NA,
-        ..posthoc_adjust = NA,
+        ..adjust = NA,
         ..predicted = NA,
         ..residuals = NA,
         ..model_type = NA,
@@ -818,37 +818,37 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="p", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:none)"),
+                            `visible`="(adjust:none)"),
                         list(
                             `name`="bonf", 
                             `title`="p<sub>bonferroni</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:bonf)"),
+                            `visible`="(adjust:bonf)"),
                         list(
                             `name`="tukey", 
                             `title`="p<sub>tukey</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:tukey)"),
+                            `visible`="(adjust:tukey)"),
                         list(
                             `name`="holm", 
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:holm)"),
+                            `visible`="(adjust:holm)"),
                         list(
                             `name`="scheffe", 
                             `title`="p<sub>scheffe</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:scheffe)"),
+                            `visible`="(adjust:scheffe)"),
                         list(
                             `name`="sidak", 
                             `title`="p<sub>sidak</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:sidak)")))))
+                            `visible`="(adjust:sidak)")))))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="posthocEffsize",
@@ -1397,9 +1397,9 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
 #'   to the variable orginal levels, before scaling.
-#' @param posthoc_adjust one or more of \code{'none'},
-#'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
-#'   and Holm Post Hoc corrections respectively.
+#' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
+#'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
+#'   respectively.
 #' @param model_type .
 #' @param scaling a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
@@ -1501,7 +1501,7 @@ gamljMixed <- function(
     csm_value = 1,
     csp_value = 25,
     covs_scale_labels = "labels",
-    posthoc_adjust = list(
+    adjust = list(
                 "bonf"),
     model_type = "lmer",
     scaling = NULL,
@@ -1620,7 +1620,7 @@ gamljMixed <- function(
         csm_value = csm_value,
         csp_value = csp_value,
         covs_scale_labels = covs_scale_labels,
-        posthoc_adjust = posthoc_adjust,
+        adjust = adjust,
         model_type = model_type,
         scaling = scaling,
         dep_scale = dep_scale,

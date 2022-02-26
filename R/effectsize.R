@@ -83,7 +83,7 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
       return(atable)
 
 .add_es.simple_params_lm<-function(atable,model,variable) {
-  
+
   xstd<-1
   if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
   y<-names(attr(model$terms,"dataClass"))[1]
@@ -93,6 +93,7 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
 }
 
 .add_es.simple_params_glm<-function(atable,model,variable=NULL) {
+
   atable$expb<-exp(atable$estimate)
   atable$expb.ci.lower<-exp(atable$est.ci.lower)
   atable$expb.ci.upper<-exp(atable$est.ci.upper)

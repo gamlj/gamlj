@@ -156,7 +156,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
     
   }
   
-
   .coefficients
   
 }
@@ -350,7 +349,6 @@ mf.anova<- function(x,...) UseMethod(".anova")
         names(.anova)<-transnames(names(.anova),.transnames)
 
         .anova<-.anova[rownames(.anova)!="(Intercept)",]   
-        
         .anova
         
 }
@@ -469,8 +467,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
     # the factors. Here we try to fix it.
     # now we use lmerTest>3.1 that does not seem to have this problem. Check anyway in testing
-  test<-length(grep("F value",names(ano),fixed=T))>0
-  if (test)
+  if (is.there("F value",names(ano)))
       names(ano)<-c("ss","ms","df1","df2","f","p")
   else
       stop("fix anova with chisq")

@@ -376,7 +376,7 @@ options:
 
 
 
-    - name: posthoc_adjust
+    - name: adjust
       title: Correction
       type: NMXList
       options:

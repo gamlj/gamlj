@@ -311,29 +311,29 @@ children:
           - type: Label
             label: Correction
             children:
-              - name: posthoc_adjust_none
+              - name: adjust_none
                 type: CheckBox
                 optionPart: none
-                optionName: posthoc_adjust
-              - name: posthoc_adjust_bonf
+                optionName: adjust
+              - name: adjust_bonf
                 type: CheckBox
                 optionPart: bonf
-                optionName: posthoc_adjust
-              - name: posthoc_adjust_tukey
+                optionName: adjust
+              - name: adjust_tukey
                 type: CheckBox
                 optionPart: tukey
-                optionName: posthoc_adjust
-              - name: posthoc_adjust_holm
+                optionName: adjust
+              - name: adjust_holm
                 type: CheckBox
                 optionPart: holm
-                optionName: posthoc_adjust
-              - name: posthoc_adjust_scheffe
+                optionName: adjust
+              - name: adjust_scheffe
                 type: CheckBox
-                optionName: posthoc_adjust
+                optionName: adjust
                 optionPart: scheffe
-              - name: posthoc_adjust_sidak
+              - name: adjust_sidak
                 type: CheckBox
-                optionName: posthoc_adjust
+                optionName: adjust
                 optionPart: sidak
 
 

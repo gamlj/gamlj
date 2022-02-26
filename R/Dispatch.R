@@ -61,7 +61,7 @@ Dispatch <- R6::R6Class(
      .translate=function(msg) {
       
        for (w in TRANSWARNS) {
-         if (length(grep(w$original,msg,fixed = T))>0)
+         if (is.there(w$original,msg))
              return(w$new)
        }
        return(msg)

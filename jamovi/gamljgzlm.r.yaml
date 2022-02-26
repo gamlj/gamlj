@@ -287,7 +287,7 @@ items:
         - covs_conditioning
         - dep_scale
         - posthoc
-        - posthoc_adjust
+        - adjust
         - ci_method
         - boot_r
         
@@ -325,43 +325,27 @@ items:
           title: p
           type: number
           format: zto,pvalue
-          visible: (posthoc_adjust:none)
+          visible: (adjust:none)
         - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-          visible: (posthoc_adjust:bonf)
+          visible: (adjust:bonf)
         - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-          visible: (posthoc_adjust:tukey)
+          visible: (adjust:tukey)
         - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-          visible: (posthoc_adjust:holm)
+          visible: (adjust:holm)
 
 
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    clearWith:
-                 - dep
-                 - model_terms
-                 - contrasts
-                 - covs_conditioning
-                 - dep_scale
-                 - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
-                 - covs_scale
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
-                 - ci_method
-                 - boot_r
-
     items:
             - name: anova
               title: ANOVA for Simple Effects  of ___key___

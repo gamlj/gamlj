@@ -38,6 +38,7 @@ gamljGlmClass <- R6::R6Class(
 
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
+      aSmartObj$spaceAt<-c(1,-2)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### estimates table ###
@@ -72,7 +73,7 @@ gamljGlmClass <- R6::R6Class(
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       aSmartObj<-SmartArray$new(self$results$posthocEffectSize,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthoc_es))
+      aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthoces))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("dm",self$options$ci_width)

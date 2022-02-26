@@ -56,6 +56,7 @@ is.something <- function(x, ...) UseMethod(".is.something")
 
 .is.something.logical <- function(obj) !is.na(obj)
 
+is.there<-function(pattern,string) length(grep(pattern,string,fixed=T))>0
 
 #### This function run an expression and returns any warnings or errors without stopping the execution.
 #### It does not reterun the results, so the expr should assign a valut to the results

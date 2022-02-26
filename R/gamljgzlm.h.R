@@ -38,7 +38,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
-            posthoc_adjust = list(
+            adjust = list(
                 "bonf"),
             covs_scale = NULL,
             expb_ci = TRUE,
@@ -242,9 +242,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "uvalues",
                     "uvalues_labels"),
                 default="labels")
-            private$..posthoc_adjust <- jmvcore::OptionNMXList$new(
-                "posthoc_adjust",
-                posthoc_adjust,
+            private$..adjust <- jmvcore::OptionNMXList$new(
+                "adjust",
+                adjust,
                 options=list(
                     "none",
                     "bonf",
@@ -379,7 +379,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..ccm_value)
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
-            self$.addOption(private$..posthoc_adjust)
+            self$.addOption(private$..adjust)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
             self$.addOption(private$..covs_scale)
@@ -425,7 +425,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ccm_value = function() private$..ccm_value$value,
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
-        posthoc_adjust = function() private$..posthoc_adjust$value,
+        adjust = function() private$..adjust$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
         covs_scale = function() private$..covs_scale$value,
@@ -470,7 +470,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..ccm_value = NA,
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
-        ..posthoc_adjust = NA,
+        ..adjust = NA,
         ..predicted = NA,
         ..residuals = NA,
         ..covs_scale = NA,
@@ -835,7 +835,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "covs_conditioning",
                     "dep_scale",
                     "posthoc",
-                    "posthoc_adjust",
+                    "adjust",
                     "ci_method",
                     "boot_r"),
                 template=jmvcore::Table$new(
@@ -878,25 +878,25 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="p", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:none)"),
+                            `visible`="(adjust:none)"),
                         list(
                             `name`="bonf", 
                             `title`="p<sub>bonferroni</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:bonf)"),
+                            `visible`="(adjust:bonf)"),
                         list(
                             `name`="tukey", 
                             `title`="p<sub>tukey</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:tukey)"),
+                            `visible`="(adjust:tukey)"),
                         list(
                             `name`="holm", 
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(posthoc_adjust:holm)")))))
+                            `visible`="(adjust:holm)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -908,22 +908,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         super$initialize(
                             options=options,
                             name="simpleEffects",
-                            title="Simple Effects",
-                            clearWith=list(
-                    "dep",
-                    "model_terms",
-                    "contrasts",
-                    "covs_conditioning",
-                    "dep_scale",
-                    "fixed_intercept",
-                    "simple_effects",
-                    "simple_moderators",
-                    "covs_scale",
-                    "ccm_value",
-                    "ccp_value",
-                    "covs_scale_labels",
-                    "ci_method",
-                    "boot_r"))
+                            title="Simple Effects")
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -1312,9 +1297,9 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
 #'   to the variable orginal levels, before scaling.
-#' @param posthoc_adjust one or more of \code{'none'},
-#'   \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,  Bonferroni, Tukey
-#'   and Holm Post Hoc corrections respectively.
+#' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
+#'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
+#'   respectively.
 #' @param covs_scale a named vector of the form \code{c(var1='type',
 #'   var2='type2')} specifying the transformation to apply to covariates, one of
 #'   \code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
@@ -1397,7 +1382,7 @@ gamljGzlm <- function(
     ccm_value = 1,
     ccp_value = 25,
     covs_scale_labels = "labels",
-    posthoc_adjust = list(
+    adjust = list(
                 "bonf"),
     covs_scale = NULL,
     expb_ci = TRUE,
@@ -1502,7 +1487,7 @@ gamljGzlm <- function(
         ccm_value = ccm_value,
         ccp_value = ccp_value,
         covs_scale_labels = covs_scale_labels,
-        posthoc_adjust = posthoc_adjust,
+        adjust = adjust,
         covs_scale = covs_scale,
         expb_ci = expb_ci,
         es = es,
