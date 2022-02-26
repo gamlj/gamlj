@@ -457,6 +457,36 @@ options:
             lists of length > 1, the option is automatially set to `'block'`.
             The option is ignored if the model is passed using `formula`.
 
+
+    - name: re_modelterms
+      title: Model terms
+      type: Bool
+      default: true
+      description:
+          R: >
+            Not in R interface
+
+    - name: re_listing
+      type: List
+      title: "Add"
+      options:
+        - name:  none
+          title: None
+        - name:  main
+          title: Main effects
+        - name:  way2
+          title: Up to 2-way
+        - name:  way3
+          title: Up to 3-way
+        - name:  all
+          title: All possible
+      default: none
+      description:
+          R: >
+             Not in R interface
+
+
+
     - name: reml
       title: REML
       type: Bool

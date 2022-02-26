@@ -635,7 +635,7 @@ gamljMixedClass <- R6::R6Class(
 
   if (self$options$plotRandomEffects) {
        mterms<-self$options$modelTerms
-       forder<-max(sapply(mterms[grep(groupName,mterms)],function(x) length(grep(groupName,x))))
+       forder<-max(sapply(mterms[grep(groupName,mterms,fixed=T)],function(x) length(grep(groupName,x,fixed=T))))
        mterms<-self$options$randomTerms
        rorder<-1
        if (is.something(grep(groupName,mterms)))

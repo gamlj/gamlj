@@ -87,7 +87,6 @@ children:
         children:
           - type: VariablesListBox
             name: covs
-            height: small
             isTarget: true
             events:
               change: './mixed.events::onChange_covariates'
@@ -205,6 +204,17 @@ children:
         margin: large
         style: inline
         children:
+          - type: Label
+            label: List components
+            children:
+              - type: CheckBox
+                name: re_modelterms
+                events:
+                  change: './mixed.events::onEvent_re_list'
+              - type: ComboBox
+                name: re_listing
+                events:
+                  change: './mixed.events::onEvent_re_list'
           - type: Label
             label: Effects correlation
             children:

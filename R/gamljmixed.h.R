@@ -41,6 +41,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             randomTerms = list(
                 list()),
             correlatedEffects = "corr",
+            re_modelterms = TRUE,
+            re_listing = "none",
             reml = TRUE,
             lrtRandomEffects = FALSE,
             ciRE = FALSE,
@@ -278,6 +280,20 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "nocorr",
                     "block"),
                 default="corr")
+            private$..re_modelterms <- jmvcore::OptionBool$new(
+                "re_modelterms",
+                re_modelterms,
+                default=TRUE)
+            private$..re_listing <- jmvcore::OptionList$new(
+                "re_listing",
+                re_listing,
+                options=list(
+                    "none",
+                    "main",
+                    "way2",
+                    "way3",
+                    "all"),
+                default="none")
             private$..reml <- jmvcore::OptionBool$new(
                 "reml",
                 reml,
@@ -371,6 +387,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..cluster)
             self$.addOption(private$..randomTerms)
             self$.addOption(private$..correlatedEffects)
+            self$.addOption(private$..re_modelterms)
+            self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..lrtRandomEffects)
             self$.addOption(private$..ciRE)
@@ -420,6 +438,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         cluster = function() private$..cluster$value,
         randomTerms = function() private$..randomTerms$value,
         correlatedEffects = function() private$..correlatedEffects$value,
+        re_modelterms = function() private$..re_modelterms$value,
+        re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         lrtRandomEffects = function() private$..lrtRandomEffects$value,
         ciRE = function() private$..ciRE$value,
@@ -468,6 +488,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..cluster = NA,
         ..randomTerms = NA,
         ..correlatedEffects = NA,
+        ..re_modelterms = NA,
+        ..re_listing = NA,
         ..reml = NA,
         ..lrtRandomEffects = NA,
         ..ciRE = NA,
@@ -527,7 +549,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "dep_scale",
                     "randomTerms",
                     "modelTerms",
-                    "fixedIntercept"),
+                    "fixedIntercept",
+                    "re_listing"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,

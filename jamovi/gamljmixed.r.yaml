@@ -25,6 +25,7 @@ items:
         - randomTerms
         - modelTerms
         - fixedIntercept
+        - re_listing
 
     refs: gamlj
 
