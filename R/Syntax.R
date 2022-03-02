@@ -156,11 +156,23 @@ Syntax <- R6::R6Class(
 
     init_main_vcov=function() {
   
-       .ncols<-length(self$init_main_coefficients())
-       mat<-as.data.frame(matrix(".",nrow=.ncols,ncol=.ncols+1))
-       names(mat)<-c("source",paste0("c",1:.ncols))
        .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
-       attr(mat,"titles")<-fromb64(.terms)
+       .len <- length(.terms)
+       .titles<-fromb64(.terms)
+      
+       if (self$options$modeltype=="multinomial") {
+         .len  <- .len * (self$datamatic$dep$nlevels-1)
+         .titles<-c(paste("1",.titles,sep=":"),paste("2",.titles,sep=":"))
+         
+       }
+       if (self$options$modeltype=="ordinal") {
+         .len  <- .len + (self$datamatic$dep$nlevels-2)
+         .titles<-c(.titles[-1],paste0("int",1:(self$datamatic$dep$nlevels-1)))
+       }
+       mat<-as.data.frame(matrix(".",nrow=.len,ncol=.len+1))
+       names(mat)<-c("source",paste0("c",1:.len))
+       mark(.titles)
+       attr(mat,"titles")<-.titles
        mat
       },
 

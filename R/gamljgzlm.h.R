@@ -20,6 +20,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             contrasts = NULL,
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
+            vcov = FALSE,
             plotHAxis = NULL,
             plotSepLines = NULL,
             plotSepPlots = NULL,
@@ -152,6 +153,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..show_contrastcodes <- jmvcore::OptionBool$new(
                 "show_contrastcodes",
                 show_contrastcodes,
+                default=FALSE)
+            private$..vcov <- jmvcore::OptionBool$new(
+                "vcov",
+                vcov,
                 default=FALSE)
             private$..plotHAxis <- jmvcore::OptionVariable$new(
                 "plotHAxis",
@@ -361,6 +366,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
+            self$.addOption(private$..vcov)
             self$.addOption(private$..plotHAxis)
             self$.addOption(private$..plotSepLines)
             self$.addOption(private$..plotSepPlots)
@@ -407,6 +413,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
+        vcov = function() private$..vcov$value,
         plotHAxis = function() private$..plotHAxis$value,
         plotSepLines = function() private$..plotSepLines$value,
         plotSepPlots = function() private$..plotSepPlots$value,
@@ -452,6 +459,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
+        ..vcov = NA,
         ..plotHAxis = NA,
         ..plotSepLines = NA,
         ..plotSepPlots = NA,
@@ -543,6 +551,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     fit = function() private$.items[["fit"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
+                    vcov = function() private$.items[["vcov"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
                     relativerisk = function() private$.items[["relativerisk"]],
                     paralleltest = function() private$.items[["paralleltest"]]),
@@ -710,6 +719,24 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="vcov",
+                            title="Coefficients Covariances",
+                            visible="(vcov)",
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "contrasts",
+                                "covs_scale",
+                                "dep_scale",
+                                "fixed_intercept"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="Coefficient", 
+                                    `type`="text", 
+                                    `visible`="(show_contrastnames)"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",
@@ -1256,6 +1283,8 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   names of the contrasts variables in tables
 #' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
 #'   contrast coefficients tables
+#' @param vcov \code{TRUE} or \code{FALSE} (default), shows coefficients
+#'   covariances
 #' @param plotHAxis a string naming the variable placed on the horizontal axis
 #'   of the plot
 #' @param plotSepLines a string naming the variable represented as separate
@@ -1327,6 +1356,7 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$vcov} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$paralleltest} \tab \tab \tab \tab \tab a table \cr
@@ -1364,6 +1394,7 @@ gamljGzlm <- function(
     contrasts = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
+    vcov = FALSE,
     plotHAxis = NULL,
     plotSepLines = NULL,
     plotSepPlots = NULL,
@@ -1469,6 +1500,7 @@ gamljGzlm <- function(
         contrasts = contrasts,
         show_contrastnames = show_contrastnames,
         show_contrastcodes = show_contrastcodes,
+        vcov = vcov,
         plotHAxis = plotHAxis,
         plotSepLines = plotSepLines,
         plotSepPlots = plotSepPlots,

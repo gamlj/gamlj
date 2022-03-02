@@ -72,6 +72,13 @@ gamljGzlmClass <- R6::R6Class(
       ### paralleltest tables
       aSmartObj<-SmartTable$new(self$results$main$paralleltest,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+
+      ### vcov table ###
+      
+      aSmartObj<-SmartTable$new(self$results$main$vcov,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFrom<-2
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ## post hoc #####
       

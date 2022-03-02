@@ -536,16 +536,24 @@ children:
                 optionName: chisq_type
                 optionPart: wald
           - type: Label
+            name: add_info
+            label: Additional info
+            children:
+              - type: CheckBox
+                name: vcov
+              - type: CheckBox
+                name: propodds_test
+                enable: (modeltype_ordinal)
+
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+
+          - type: Label
             label: Save
             children:
               - type: Output
                 name: predicted
               - type: Output
                 name: residuals
-          - type: Label
-            name: propLabel
-            label: Test
-            children:
-              - type: CheckBox
-                name: propodds_test
-                enable: (modeltype_ordinal)

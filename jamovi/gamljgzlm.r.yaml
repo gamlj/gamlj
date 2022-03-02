@@ -176,6 +176,23 @@ items:
                       type: number
                       format: zto,pvalue
 
+           - name: vcov
+             title: Coefficients Covariances
+             type: Table
+             visible: (vcov)
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - dep_scale
+                    - fixed_intercept
+             columns:
+                    - name: source
+                      title: "Coefficient"
+                      type: text
+                      visible: (show_contrastnames)
+
 
 
            - name: contrastCodeTables

@@ -64,7 +64,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$spaceBy="effect"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
-      ### effectsizes table ###
+      ### vcov table ###
       
       aSmartObj<-SmartTable$new(self$results$main$vcov,estimate_machine)
       aSmartObj$expandable<-TRUE

@@ -7,13 +7,14 @@ const events = {
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updatePlotsSupplier(ui, this);
+        mark(ui.propodds_test);
         
-        if (typeof ui.propLabel !== 'undefined' ) {
+        if (typeof ui.propodds_test !== 'undefined' ) {
           
             if (ui.modeltype.getValue()==="ordinal") {
-              ui.propLabel.$el.show();
+              ui.propodds_test.$el.show();
             } else {
-              ui.propLabel.$el.hide();
+              ui.propodds_test.$el.hide();
             }
         }
 
@@ -62,7 +63,7 @@ const events = {
     },
 
      onChange_model: function(ui) {
-       
+
         if (typeof ui.es_RR !== 'undefined' ) {
               ui.es_RR.setValue(false);
         }
@@ -75,11 +76,11 @@ const events = {
                ui.estimates_ci.setValue(false);
                ui.expb_ci.setValue(true);
         }
-        
+
         if (ui.modeltype.getValue()==="ordinal") {
-          ui.propLabel.$el.show();
+          ui.propodds_test.$el.show();
         } else {
-          ui.propLabel.$el.hide();
+          ui.propodds_test.$el.hide();
         }
   
         ui.dep.setValue(null);
@@ -323,6 +324,10 @@ var unique = function(avec) {
   return(avec.filter((v, i, a) => a.indexOf(v) === i));
 };
 
+var mark = function(obj) {
+  
+   console.log(obj);
+};
 
 
 module.exports = events;
