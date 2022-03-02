@@ -480,6 +480,9 @@ children:
                 name: intercept_info
               - type: CheckBox
                 name: es_info
+              - type: CheckBox
+                name: vcov
+
       - type: LayoutBox
         margin: large
         style: inline

@@ -64,6 +64,13 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj$spaceBy="effect"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
+      ### effectsizes table ###
+      
+      aSmartObj<-SmartTable$new(self$results$main$vcov,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandFrom<-2
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      
       ## post hoc #####
       
       aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)

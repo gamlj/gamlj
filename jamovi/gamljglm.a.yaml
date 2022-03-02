@@ -208,6 +208,14 @@ options:
           R: >
             `TRUE` or `FALSE` (default), shows contrast coefficients tables
 
+    - name: vcov
+      title: Coefficients Covariances
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), shows coefficients covariances
+
 
 
     - name: plotHAxis

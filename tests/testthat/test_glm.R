@@ -77,9 +77,9 @@ test_that("glm CI width", {
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math*schtyp*write,
-  ciWidth=90,
-  simpleVariable = "math",
-  simpleModerator = list("schtyp","write"),
+  ci_width=90,
+  simple_effects = "math",
+  simple_moderators = list("schtyp","write"),
 )
 
 testthat::test_that("SE names are fine",{

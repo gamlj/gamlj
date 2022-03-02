@@ -180,6 +180,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               if (!is.list(alist))
                                 stop("SuperTitle must be a list")
+                              
                               .names<-names(self$table$columns)
                               for (stn in names(alist)) {
                                 where<-grep(stn,.names,fixed=T)
@@ -212,7 +213,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 if (filled & ("rowCount" %in% names(self$table))) 
                                   filled<-self$table$rowCount>0
                               }
-                              
+
                               if (!self$activated)
                                 return(TRUE)
 
@@ -222,7 +223,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.character(fun))
                                    if (!(fun %in% names(private$.estimator))) 
                                         return(TRUE)
-
+                              
                               return(filled)
                               
                             },
@@ -287,17 +288,21 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               rtable<-private$.framefy(rtable)
                               .names    <-  names(rtable)
-                              if (is.something(attr(rtable,"titles")))
-                                .titles<-attr(rtable,"titles")
-                              else
-                                .titles<-fromb64(names(rtable))
-                              
+                         
                               .types<-unlist(lapply(rtable,class))
                               .types<-gsub("numeric","number",.types)
                               .types<-gsub("integer","number",.types)
                               .types<-gsub("factor","text",.types)
                               .present<-names(self$table$columns)
+                              .ncols<-length(.present)
                               .names<-setdiff(.names,.present)
+                              
+                              if (is.something(attr(rtable,"titles")))
+                                .titles<-attr(rtable,"titles")
+                              else
+                                .titles<-fromb64(.names)
+                              
+                              
                               
                                 k<-self$expandFrom-1
                                 for (i in seq_along(.names)) {
@@ -307,7 +312,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                          if(i %in% self$combineBelow) cb<-TRUE
                                   } else
                                          if (.names[i] %in% c("new!",self$combineBelow)) cb<-TRUE
-                                         
+                                  if (j>.ncols) j<-NA
                                   self$table$addColumn(index=j,
                                                        name = .names[[i]], 
                                                        title = .titles[[i]], 
@@ -332,7 +337,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               k<-names(self$table$asDF)[1]
                               
                               for (j in self$spaceAt) {
-                                mark(str(self$table))
                                 if (j<0) j<-self$table$rowCount+j
                                 self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.END_GROUP)
                                 self$table$addFormat(rowNo=j+1,col=k,jmvcore::Cell.BEGIN_GROUP)
@@ -363,7 +367,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                     rows<-NULL
                                 
                                   for (j in rows) {
-                                    mark(j)
                                     self$table$addFormat(rowNo=j-1,col=k,jmvcore::Cell.END_GROUP)
                                     self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.BEGIN_GROUP)
                                   }

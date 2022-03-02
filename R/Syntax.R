@@ -152,7 +152,18 @@ Syntax <- R6::R6Class(
       self$tab_intercept<-list(source="(Intercept)")
       
     },
-    
+### vcov more info ###
+
+    init_main_vcov=function() {
+  
+       .ncols<-length(self$init_main_coefficients())
+       mat<-as.data.frame(matrix(".",nrow=.ncols,ncol=.ncols+1))
+       names(mat)<-c("source",paste0("c",1:.ncols))
+       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
+       attr(mat,"titles")<-fromb64(.terms)
+       mat
+      },
+
     init_main_relativerisk=function() {
       
       alist<-NULL

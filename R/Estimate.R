@@ -136,6 +136,15 @@ Estimate <- R6::R6Class("Estimate",
                                              p=p))
                                tab
                           },
+                          run_main_vcov=function() {
+                            
+                            tab<-as.data.frame(stats::vcov(self$model))
+                            names(tab)<-paste0("c",1:dim(tab)[2])
+                            tab$source<-rownames(tab)
+                            tab<-private$.fix_names(tab)
+                            tab
+                          },
+                          
                           run_main_relativerisk=function() {
                             tab<-NULL
                             if (self$isProper) {
