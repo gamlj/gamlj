@@ -1,14 +1,45 @@
 ############# produces R2  ##########
 
-fit.R2<- function(model,...) UseMethod(".R2") 
+fit.R2 <- function(model,obj) {
+  
+  # r2 and tests for the model
+  r2list  <-  r2.est(model,obj)
+  
+  # check if model comparisons are required
+  if (obj$option("comparison")) {
+    ### r2 for the nested model
+    r2nested<-r2.est(obj$nested_model,obj)
+    ### compare the two models
+    comp<-stats::anova(obj$nested_model,model,test=obj$options$comparisontest)
+    r2comp<-as.list(comp[2,])
+    .names<-list(df2="Res.Df",df1="Df",p=c("Pr(>Chi)","Pr(>F)"),f="F")
+    names(r2comp)<-transnames(names(r2comp),.names)
+    ## sometimes the chi-square is not printed out    
+    if (obj$option("comparisontest","LRT") & !hasName(r2comp,"lrt"))
+          r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
+    ### adjust
+    r2comp$r1<-r2list[[1]]$r1-r2nested[[1]]$r1
+    r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
+    
+    r2list<-c(r2list,r2nested,list(r2comp))
+    
+  }
+  r2list
+}
 
-.R2.default<-function(model) {
+
+
+
+r2.est<- function(model,...) UseMethod(".r2") 
+
+
+.r2.default<-function(model) {
    
   performance::r2(model,tolerance =0)
 
 }
 
-.R2.glm<-function(model) {
+.r2.glm<-function(model,obj) {
 
   alist       <-  list()
   # mcFadden and adjusted
@@ -29,7 +60,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
 }
 
-.R2.polr<-function(model) {
+.r2.polr<-function(model) {
 
   alist       <-  list()
   results     <-  fit.compare_null_model(model)
@@ -49,7 +80,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   
 }
   
-.R2.multinom<-function(model) {
+.r2.multinom<-function(model) {
 
   
   llfull<-stats::logLik(model)  ### model loglikelihood
@@ -70,7 +101,7 @@ fit.R2<- function(model,...) UseMethod(".R2")
   return(list(alist))
 }
 
-.R2.lm<-function(model) {
+.r2.lm<-function(model,obj) {
   
   ss<-summary(model)
   results<-list()
@@ -79,10 +110,25 @@ fit.R2<- function(model,...) UseMethod(".R2")
   results$r1<-ss$r.squared
   results$r2<-ss$adj.r.squared
   if (hasName(ss,"fstatistic")) {
-    results$f<-ss$fstatistic[["value"]]
-    results$p<-stats::pf(results$f,results$df1,results$df2, lower.tail = FALSE)
+
+    if (obj$option("comparisontest","LRT")) {
+      
+      ssres <- stats::sigma(model)^2*model$df.residual
+      ### here we estimate the sum of squares of the null model
+      ssnull<-(ss$fstatistic[[1]]*ss$fstatistic[[2]]*ssres/ss$fstatistic[[3]])+ssres
+      n<-sum(ss$df[1:2])
+      ### compute the loglik of the null model
+      loglik0<- -0.5*n*(log(2*pi) + log( ssnull/n ) + 1)
+      loglik1<-as.numeric(stats::logLik(model))
+      results$lrt<-2*(loglik1-loglik0)
+      results$p<-stats::pchisq(results$lrt,results$df1,lower.tail = FALSE)
+
+    } else {    
+      results$f<-ss$fstatistic[["value"]]
+      results$p<-stats::pf(test,results$df1,results$df2, lower.tail = FALSE)
+    }
   } else {
-    warning("R-squared tests cannot be computed")
+    warning("R-squared test cannot be computed")
     
   }
   list(results)
@@ -90,10 +136,10 @@ fit.R2<- function(model,...) UseMethod(".R2")
 }
 
 
-.R2.lmerModLmerTest<-function(model) {
+.r2.lmerModLmerTest<-function(model) {
   
   alist<-list()
-  r2<-.R2.default(model,obj)
+  r2<-.r2.default(model,obj)
   if (is.null(r2))
       return(NULL)
   results<-fit.compare_null_model(model,type="m")
@@ -115,14 +161,13 @@ fit.R2<- function(model,...) UseMethod(".R2")
 
 
 
-######### model comparisons ########
+######### model comparisons for one model ########
 
 fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
 .compare_null_model.default<-function(model) {
   
   data    <-  insight::get_data(model)
-  head(data)
   int<-attr(terms(model),"intercept")
   form<- as.formula(paste("~",int))
   model0  <-  stats::update(model,form ,data=data,evaluate=T)

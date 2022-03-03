@@ -119,10 +119,46 @@ children:
                 itemDropBehaviour: emptyspace
                 events:
                   change: './gamlj.events::onChange_model_terms'
+                  listItemRemoved: './gamlj.events::onChange_model_remove'
                 template:
                   type: TermLabel
-      - type: CheckBox
-        name: fixed_intercept
+          - type: TargetLayoutBox
+            name: nested_layout
+            transferAction: interactions
+            children:
+              - type: ListBox
+                name: nested_terms
+                valueFilter: unique
+                isTarget: true
+                itemDropBehaviour: emptyspace
+                events:
+                   change: './gamlj.events::onChange_nested_add'
+                template:
+                  type: TermLabel
+
+      - type: LayoutBox
+        style: inline
+        children:
+          - type: Label
+            label: Model comparison
+            children:         
+              - type: CheckBox
+                name: comparison
+                events:
+                      change: './gamlj.events::onEvent_comparison'
+              - type: CheckBox
+                name: nested_intercept
+                enable: (comparison)
+              - type: ComboBox
+                name: comparisontest
+                enable: (comparison)
+
+          - type: Label
+            label: Parameters
+            children:         
+              - type: CheckBox
+                name: fixed_intercept
+        
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

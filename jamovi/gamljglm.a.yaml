@@ -30,7 +30,7 @@ formula:
         from: rhs
         type: vars
         permitted: numeric
-    modelTerms:
+    model_terms:
         from: rhs
         type: terms
 options:
@@ -93,6 +93,22 @@ options:
           R: >
             a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
 
+    - name: nested_terms
+      title: Nested Model
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+
+    - name: comparison
+      title: Activate
+      type: Bool
+      default: false
+      description:
+          R: >
+             Not present in R
+
     - name: fixed_intercept
       title: Intercept
       type: Bool
@@ -101,6 +117,27 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
+    - name: nested_intercept
+      title: Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+
+    - name: comparisontest
+      title: Test
+      type: List
+      default: F
+      options:
+        - name:  F
+          title: F-test
+        - name: LRT
+          title: LRT
+
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
 
     - name: estimates_ci

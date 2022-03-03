@@ -12,6 +12,7 @@ Estimate <- R6::R6Class("Estimate",
                           ciwidth=NULL,
                           model=NULL,
                           boot_model=NULL,
+                          nested_model=NULL,
                           tab_simpleAnova=NULL,
                           tab_simpleCoefficients=NULL,
                           boot_variances=NULL,
@@ -25,6 +26,11 @@ Estimate <- R6::R6Class("Estimate",
                             
                             self$model<-private$.estimateModel(data)
                             ginfo("ESTIMATE: initial estimation done")
+                            if (is.something(self$nested_formula64)) {
+                              self$nested_model<-stats::update(self$model,formula=self$nested_formula64)
+
+
+                            }
                           }, # end of public function estimate
 
                           ##### fill the tables #####
@@ -85,7 +91,8 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_r2=function() {
 
-                              fit.R2(self$model)
+                              tab<-fit.R2(self$model,self)
+                              tab
                           },
                           
                           run_main_coefficients=function() {

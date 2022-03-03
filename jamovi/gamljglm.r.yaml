@@ -30,6 +30,9 @@ items:
         - se_method
         - d_ci
         - boot_r
+        - nested_terms
+        - nested_intercept
+        
     refs: gamlj
      
   - name: main
@@ -43,11 +46,16 @@ items:
              clearWith:
                          - dep
                          - model_terms
+                         - nested_terms
+                         - nested_intercept
+                         - comparisontest
                          - fixed_intercept
                          - covs_scale
                          - contrasts
-             rows: 1
              columns:
+                    - name: model
+                      title: Model
+                      visible: (comparison)
                     - name: r1
                       title: R²
                       type: number
@@ -55,18 +63,26 @@ items:
                       title: Adj. R²
                       type: number
                     - name:  df1
-                      title: Num df
+                      title: df
                       type: integer
                     - name:  df2
-                      title: Den df
+                      title: df (res)
                       type: integer
+                      visible: (comparisontest:F)
                     - name: f
                       title: F
                       type: number
+                      visible: (comparisontest:F)
+                    - name: lrt
+                      title: LR X²
+                      type: number
+                      visible: (comparisontest:LRT)
+
                     - name: p
                       title: p
                       type: number
                       format: zto,pvalue
+
                       
            - name: intercept
              title: Intercept Information

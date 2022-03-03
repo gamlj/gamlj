@@ -335,13 +335,12 @@ SmartTable <- R6::R6Class("SmartTable",
                             .spaceBy=function() {
                               
                               k<-names(self$table$asDF)[1]
-                              
+                              try_hard({
                               for (j in self$spaceAt) {
                                 if (j<0) j<-self$table$rowCount+j
                                 self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.END_GROUP)
                                 self$table$addFormat(rowNo=j+1,col=k,jmvcore::Cell.BEGIN_GROUP)
-                                
-                              }
+                              }})
                               
                               if (is.null(self$spaceBy))
                                    return()

@@ -7,7 +7,11 @@ const events = {
         updatePostHocSupplier(ui, this);
         updateSimpleSupplier(ui, this);
         updatePlotsSupplier(ui, this);
-        mark(ui.propodds_test);
+
+
+        if (typeof ui.comparison !== 'undefined' ) {
+              fix_comparison(ui,this);
+        }
         
         if (typeof ui.propodds_test !== 'undefined' ) {
           
@@ -38,10 +42,27 @@ const events = {
         updateEmmeansSupplier(ui, this);
         updatePlotsSupplier(ui, this);
 
+    },
+    onChange_nested_terms: function(ui) {
+    },
+  
+    onChange_nested_add: function(ui) {
 
+      let tvalues=this.cloneArray(ui.model_terms.value(),[]);
+      let nvalues=this.cloneArray(ui.nested_terms.value(),[]);
+      var filtered = nvalues.filter(function(item) {
+         return tvalues.some(function(jtem) {
+           return FormatDef.term.isEqual(jtem, item);
+         });
+      });
+      if (filtered.length !== nvalues.length)
+                  ui.nested_terms.setValue(filtered);
+    },
+    onEvent_comparison: function(ui) {
+         
+         fix_comparison(ui, this);
 
     },
-
     onChange_plotsSupplier: function(ui) {
         let values = this.itemsToValues(ui.plotsSupplier.value());
         this.checkValue(ui.plotHAxis, false, values, FormatDef.variable);
@@ -86,6 +107,11 @@ const events = {
         ui.dep.setValue(null);
       },
 
+    onChange_model_remove: function(ui) {
+      let values=this.cloneArray(ui.model_terms.value(),[]);
+      this.checkValue(ui.nested_terms, true, values, FormatDef.term);
+      
+    },
     onChange_posthocSupplier: function(ui) {
         let values = this.itemsToValues(ui.posthocSupplier.value());
         this.checkValue(ui.posthoc, true, values, FormatDef.term);
@@ -112,6 +138,26 @@ const events = {
             var variablesList = factorsList.concat(covariatesList);
             ui.modelSupplier.setValue(this.valuesToItems(variablesList, FormatDef.variable));
     }
+
+};
+
+var fix_comparison=function(ui, context) {
+  
+            if (ui.comparison.getValue()===true) {
+              
+              ui.nested_layout.$buttons.show();
+              ui.nested_layout.$label.show();
+              ui.nested_layout.container.$el.show();
+              ui.model_terms.$el.height("113px");
+
+            } else {
+              ui.nested_layout.$buttons.hide();
+              ui.nested_layout.$label.hide();
+              ui.nested_layout.container.$el.hide();
+              ui.nested_terms.setValue([]);
+              ui.model_terms.$el.height("246.315px");
+            }
+
 
 };
 

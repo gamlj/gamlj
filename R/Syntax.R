@@ -13,6 +13,7 @@ Syntax <- R6::R6Class(
     hasTerms=FALSE,
     clusters=NULL,
     isProper=NULL,
+    nested_formula64=NULL,
     tab_anova=NULL,
     tab_coefficients=NULL,
     tab_intercept=NULL,
@@ -54,12 +55,33 @@ Syntax <- R6::R6Class(
       
       if (self$option("dep_scale"))
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
-    
+
+      if (self$option("comparison")) {
+        
+         .fullterms<-c(as.numeric(self$hasIntercept),self$options$model_terms)
+         .nestedterms<-c(as.numeric(self$options$nested_intercept),self$options$nested_terms)
+         .formula<-jmvcore::composeFormula(NULL,.nestedterms)
+         
+         .test <- jmvcore::composeFormula(setdiff(.fullterms,.nestedterms))
+         tab[["mc"]]<-list(info="Comparison",value="Nested",specs=.formula)
+         tab[["mctest"]]<-list(info="Comparison",value="Tested",specs=.test)
+         
+      }
+        
       if (self$option("se_method","robust"))
             warning("All SE are heteroskedasticity-consistent robust SE")
      tab
       
     },
+    init_main_r2=function() {
+      
+        tab<-list(model="")
+        if (self$option("comparison"))
+           tab<-list(list(model="Full"),list(model="Nested"),list(model=paste0(greek_vector[["Delta"]],"R²")))
+      tab
+      
+    },
+    
     init_main_fit=function() {
       
             tab<-self$infomatic$info_fit()
@@ -367,6 +389,16 @@ Syntax <- R6::R6Class(
       fixed<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),fixed)
       self$formula<-trimws(paste(fixed,rands,sep =  ""))
       
+      if (self$option("comparison")) {
+        
+        hasIntercept<-self$option("nested_intercept")
+        sep<-"+"
+        if (!is.something(self$options$nested_terms)) sep=""
+        fixed<-jmvcore::composeFormula(NULL,tob64(self$options$nested_terms))
+        fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(hasIntercept),sep),fixed)
+        self$nested_formula64<-trimws(paste(fixed,rands,sep =  ""))
+
+      }
     },
     
     .make_structure=function() {
