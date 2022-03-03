@@ -16,7 +16,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             comparison = FALSE,
             fixed_intercept = TRUE,
             nested_intercept = TRUE,
-            comparisontest = "F",
+            omnibus = "F",
             estimates_ci = TRUE,
             betas_ci = FALSE,
             ci_width = 95,
@@ -124,9 +124,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "nested_intercept",
                 nested_intercept,
                 default=TRUE)
-            private$..comparisontest <- jmvcore::OptionList$new(
-                "comparisontest",
-                comparisontest,
+            private$..omnibus <- jmvcore::OptionList$new(
+                "omnibus",
+                omnibus,
                 default="F",
                 options=list(
                     "F",
@@ -409,7 +409,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..comparison)
             self$.addOption(private$..fixed_intercept)
             self$.addOption(private$..nested_intercept)
-            self$.addOption(private$..comparisontest)
+            self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..betas_ci)
             self$.addOption(private$..ci_width)
@@ -466,7 +466,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         comparison = function() private$..comparison$value,
         fixed_intercept = function() private$..fixed_intercept$value,
         nested_intercept = function() private$..nested_intercept$value,
-        comparisontest = function() private$..comparisontest$value,
+        omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         betas_ci = function() private$..betas_ci$value,
         ci_width = function() private$..ci_width$value,
@@ -522,7 +522,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..comparison = NA,
         ..fixed_intercept = NA,
         ..nested_intercept = NA,
-        ..comparisontest = NA,
+        ..omnibus = NA,
         ..estimates_ci = NA,
         ..betas_ci = NA,
         ..ci_width = NA,
@@ -651,7 +651,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparisontest",
+                                "comparison",
+                                "omnibus",
                                 "fixed_intercept",
                                 "covs_scale",
                                 "contrasts"),
@@ -676,17 +677,17 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="df2", 
                                     `title`="df (res)", 
                                     `type`="integer", 
-                                    `visible`="(comparisontest:F)"),
+                                    `visible`="(omnibus:F)"),
                                 list(
                                     `name`="f", 
                                     `title`="F", 
                                     `type`="number", 
-                                    `visible`="(comparisontest:F)"),
+                                    `visible`="(omnibus:F)"),
                                 list(
                                     `name`="lrt", 
                                     `title`="LR X\u00B2", 
                                     `type`="number", 
-                                    `visible`="(comparisontest:LRT)"),
+                                    `visible`="(omnibus:LRT)"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -1632,8 +1633,8 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
-#' @param comparisontest \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. Not needed if \code{formula} is used.
+#' @param omnibus \code{TRUE} (default) or \code{FALSE}, estimates fixed
+#'   intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param betas_ci \code{TRUE} (default) or \code{FALSE} , parameters CI in
@@ -1774,7 +1775,7 @@ gamljGlm <- function(
     comparison = FALSE,
     fixed_intercept = TRUE,
     nested_intercept = TRUE,
-    comparisontest = "F",
+    omnibus = "F",
     estimates_ci = TRUE,
     betas_ci = FALSE,
     ci_width = 95,
@@ -1893,7 +1894,7 @@ gamljGlm <- function(
         comparison = comparison,
         fixed_intercept = fixed_intercept,
         nested_intercept = nested_intercept,
-        comparisontest = comparisontest,
+        omnibus = omnibus,
         estimates_ci = estimates_ci,
         betas_ci = betas_ci,
         ci_width = ci_width,

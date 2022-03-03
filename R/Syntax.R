@@ -63,8 +63,8 @@ Syntax <- R6::R6Class(
          .formula<-jmvcore::composeFormula(NULL,.nestedterms)
          
          .test <- jmvcore::composeFormula(setdiff(.fullterms,.nestedterms))
-         tab[["mc"]]<-list(info="Comparison",value="Nested",specs=.formula)
-         tab[["mctest"]]<-list(info="Comparison",value="Tested",specs=.test)
+         tab[["mc"]]<-list(info="Comparison",value="Nested model",specs=.formula)
+         tab[["mctest"]]<-list(info="Comparison",value="Tested terms",specs=.test)
          
       }
         

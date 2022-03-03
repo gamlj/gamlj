@@ -10,12 +10,12 @@ fit.R2 <- function(model,obj) {
     ### r2 for the nested model
     r2nested<-r2.est(obj$nested_model,obj)
     ### compare the two models
-    comp<-stats::anova(obj$nested_model,model,test=obj$options$comparisontest)
+    comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
     r2comp<-as.list(comp[2,])
     .names<-list(df2="Res.Df",df1="Df",p=c("Pr(>Chi)","Pr(>F)"),f="F")
     names(r2comp)<-transnames(names(r2comp),.names)
     ## sometimes the chi-square is not printed out    
-    if (obj$option("comparisontest","LRT") & !hasName(r2comp,"lrt"))
+    if (obj$option("omnibus","LRT") & !hasName(r2comp,"lrt"))
           r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
     ### adjust
     r2comp$r1<-r2list[[1]]$r1-r2nested[[1]]$r1
@@ -111,7 +111,7 @@ r2.est<- function(model,...) UseMethod(".r2")
   results$r2<-ss$adj.r.squared
   if (hasName(ss,"fstatistic")) {
 
-    if (obj$option("comparisontest","LRT")) {
+    if (obj$option("omnibus","LRT")) {
       
       ssres <- stats::sigma(model)^2*model$df.residual
       ### here we estimate the sum of squares of the null model
@@ -125,7 +125,7 @@ r2.est<- function(model,...) UseMethod(".r2")
 
     } else {    
       results$f<-ss$fstatistic[["value"]]
-      results$p<-stats::pf(test,results$df1,results$df2, lower.tail = FALSE)
+      results$p<-stats::pf(results$f,results$df1,results$df2, lower.tail = FALSE)
     }
   } else {
     warning("R-squared test cannot be computed")

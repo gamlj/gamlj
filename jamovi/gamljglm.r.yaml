@@ -48,7 +48,8 @@ items:
                          - model_terms
                          - nested_terms
                          - nested_intercept
-                         - comparisontest
+                         - comparison
+                         - omnibus
                          - fixed_intercept
                          - covs_scale
                          - contrasts
@@ -68,15 +69,15 @@ items:
                     - name:  df2
                       title: df (res)
                       type: integer
-                      visible: (comparisontest:F)
+                      visible: (omnibus:F)
                     - name: f
                       title: F
                       type: number
-                      visible: (comparisontest:F)
+                      visible: (omnibus:F)
                     - name: lrt
                       title: LR X²
                       type: number
-                      visible: (comparisontest:LRT)
+                      visible: (omnibus:LRT)
 
                     - name: p
                       title: p

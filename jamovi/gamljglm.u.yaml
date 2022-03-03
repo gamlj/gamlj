@@ -149,15 +149,24 @@ children:
               - type: CheckBox
                 name: nested_intercept
                 enable: (comparison)
-              - type: ComboBox
-                name: comparisontest
-                enable: (comparison)
 
           - type: Label
             label: Parameters
             children:         
               - type: CheckBox
                 name: fixed_intercept
+
+          - type: Label
+            label: Omnibus test
+            children:         
+              - name: omnibus_F
+                type: RadioButton
+                optionName: omnibus
+                optionPart: F
+              - name: omnibus_LRT
+                type: RadioButton
+                optionName: omnibus
+                optionPart: LRT
         
   - type: CollapseBox
     label: Factors Coding

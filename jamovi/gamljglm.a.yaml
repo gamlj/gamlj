@@ -125,7 +125,7 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
-    - name: comparisontest
+    - name: omnibus
       title: Test
       type: List
       default: F
