@@ -393,7 +393,7 @@ options:
                       name: standardized
                     - title: Log
                       name: 'log'
-                    - title: None
+                    - title: Original
                       name: 'none'
 
                 default: centered 
@@ -423,7 +423,7 @@ options:
       description:
           R: >
             how many st.deviations around the means used to condition simple effects and plots.
-            Used if `simpleScale`=`'mean_sd'`
+            Used if `covs_conditioning`=`'mean_sd'`
 
     - name: ccp_value
       type: Number
@@ -626,7 +626,7 @@ options:
       title: Scale
       type: List
       options:
-          - title: None
+          - title: Original
             name: 'none'
           - title: Centered
             name:  'centered'

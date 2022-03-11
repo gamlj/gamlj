@@ -306,6 +306,7 @@ procedure.emmeans<-function(obj) {
   type<-"response"
   results<-list()
   for (term in terms) {
+    
     ### we need to reverse the term because emmeans order levels in a strange way
     term64<-tob64(rev(term))
     
@@ -317,6 +318,9 @@ procedure.emmeans<-function(obj) {
     ## we also get the labels for those values ####
     conditions<-list()
     for (.term in term64) {
+      if (! .term %in% names(obj$datamatic$variables))
+            stop("Variable ",fromb64(term)," is not in the model")
+      
       var<-obj$datamatic$variables[[.term]]
       if( var$type=="numeric") {
         conditions[[.term]]<-var$levels 

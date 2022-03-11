@@ -235,6 +235,7 @@ items:
                     - fixed_intercept
                     - ci_width
                     - ci_method
+                    - betas_ci
                     - boot_r
                     - se_method
 
@@ -343,7 +344,6 @@ items:
               - ci_method
               - ci_width
               - boot_r
-              - adjust
 
         columns:
         - name: estimate
@@ -370,32 +370,32 @@ items:
           title: p
           type: number
           format: zto,pvalue
-#          visible: (adjust:none)
+          visible: (adjust:none)
         - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-#          visible: (adjust:bonf)
+          visible: (adjust:bonf)
         - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-#          visible: (adjust:tukey)
+          visible: (adjust:tukey)
         - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-#          visible: (adjust:holm)
+          visible: (adjust:holm)
         - name: scheffe
           title: p<sub>scheffe</sub>
           type: number
           format: zto,pvalue
-#          visible: (adjust:scheffe)
+          visible: (adjust:scheffe)
         - name: sidak
           title: p<sub>sidak</sub>
           type: number
           format: zto,pvalue
-#          visible: (adjust:sidak)
+          visible: (adjust:sidak)
 
   - name: posthocEffectSize
     title: Comparisons effect size
@@ -707,12 +707,17 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
+            - emmeans
+            - model_terms
             - ci_width
             - ci_method
-            - emmeans
             - se_method
             - boot_r
-            - model_terms
+            - covs_scale
+            - dep_scale
+            - covs_conditioning            
+            - covs_scale_labels   
+            
         columns:
         - name: estimate
           title: 'Mean'

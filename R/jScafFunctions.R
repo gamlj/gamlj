@@ -9,6 +9,7 @@ tinfo <- function(...) {
 
 ginfo <- function(...) {
   if (j_INFO) {
+    cat("\n")
     cat(paste(list(...)))
     cat("\n")
   }

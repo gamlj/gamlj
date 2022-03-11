@@ -331,10 +331,25 @@ testthat::test_that("glm zero-intercept model", {
   testthat::expect_equal(round(res[2,2],2),566514)
 })
 
-library(metafor)
-dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
-dat <- dat.konstantopoulos2011
-res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
-res0 <- rma.mv(yi, vi, data=dat)
-anova(res, res0)
-metafor::anova.rma(res,res0)
+
+### bootstrap
+options("digits"=2)
+mod<-gamlj::gamljGlm(
+  data = hsbdemo,
+  formula=science~math+prog+math:prog, 
+  emmeans = ~prog,
+  betas_ci=T,
+  ci_method = "bcai"
+)
+
+
+testthat::test_that("bootstrap ci make sense", {
+  testthat::expect_true(mod$main$coefficients$asDF[["est.ci.lower"]][3]<0)
+  testthat::expect_true(mod$main$coefficients$asDF[["est.ci.lower"]][1]>0)
+})
+
+testthat::test_that("glm zero-intercept model", {
+  testthat::expect_true(abs(mod$main$coefficients$asDF[["beta.ci.lower"]][3])<1)
+  testthat::expect_true(abs(mod$main$coefficients$asDF[["beta.ci.lower"]][1])<1)
+})
+

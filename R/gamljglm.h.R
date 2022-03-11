@@ -860,6 +860,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "ci_width",
                                 "ci_method",
+                                "betas_ci",
                                 "boot_r",
                                 "se_method"),
                             columns=list(
@@ -976,8 +977,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "se_method",
                         "ci_method",
                         "ci_width",
-                        "boot_r",
-                        "adjust"),
+                        "boot_r"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1009,32 +1009,38 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="p", 
                             `title`="p", 
                             `type`="number", 
-                            `format`="zto,pvalue"),
+                            `format`="zto,pvalue", 
+                            `visible`="(adjust:none)"),
                         list(
                             `name`="bonf", 
                             `title`="p<sub>bonferroni</sub>", 
                             `type`="number", 
-                            `format`="zto,pvalue"),
+                            `format`="zto,pvalue", 
+                            `visible`="(adjust:bonf)"),
                         list(
                             `name`="tukey", 
                             `title`="p<sub>tukey</sub>", 
                             `type`="number", 
-                            `format`="zto,pvalue"),
+                            `format`="zto,pvalue", 
+                            `visible`="(adjust:tukey)"),
                         list(
                             `name`="holm", 
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
-                            `format`="zto,pvalue"),
+                            `format`="zto,pvalue", 
+                            `visible`="(adjust:holm)"),
                         list(
                             `name`="scheffe", 
                             `title`="p<sub>scheffe</sub>", 
                             `type`="number", 
-                            `format`="zto,pvalue"),
+                            `format`="zto,pvalue", 
+                            `visible`="(adjust:scheffe)"),
                         list(
                             `name`="sidak", 
                             `title`="p<sub>sidak</sub>", 
                             `type`="number", 
-                            `format`="zto,pvalue")))))
+                            `format`="zto,pvalue", 
+                            `visible`="(adjust:sidak)")))))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="posthocEffectSize",
@@ -1401,12 +1407,16 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
+                        "emmeans",
+                        "model_terms",
                         "ci_width",
                         "ci_method",
-                        "emmeans",
                         "se_method",
                         "boot_r",
-                        "model_terms"),
+                        "covs_scale",
+                        "dep_scale",
+                        "covs_conditioning",
+                        "covs_scale_labels"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1691,7 +1701,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
 #'   \code{'percent'}. Use to condition the covariates (if any)
 #' @param ccm_value how many st.deviations around the means used to condition
-#'   simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}
+#'   simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}
 #' @param ccp_value offsett (number of percentiles) around the median used to
 #'   condition simple effects and plots. Used if
 #'   \code{simpleScale}=\code{'percent'}

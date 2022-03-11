@@ -359,8 +359,9 @@ Estimate <- R6::R6Class("Estimate",
                           .estimateModel=function(data) {
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
-                                  stop(unlist(self$datamatic$errors))
-                                if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
+                                   stop(unlist(self$datamatic$errors))
+                            
+                              if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
                                     t2  <-  paste(self$infomatic$deptype,collapse = " or ")
                                     t1  <-  self$datamatic$dep$type
                                     m   <-   self$infomatic$model[1]

@@ -48,6 +48,7 @@ mf.getModelData<- function(x,...) UseMethod(".getModelData")
 mf.parameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
+   
 
       .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
       .iterations          <-  obj$options$boot_r
@@ -79,16 +80,23 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       if (obj$option("es","beta")) {
         
         if (obj$hasTerms) {
+        ## if no CI are required, we do not bootstrap again 
+        if (!obj$option("betas_ci")) { 
+                      ..bootstrap<-FALSE 
+                      .ci_method <-"wald"
+        } else 
+                     ..bootstrap<-.bootstrap
         
-        ## if not CI are required, we do not bootstrap again 
-        if (!obj$option("betas_ci")) ..bootstrap<-FALSE else ..bootstrap<-.bootstrap
         if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
-        estim<-parameters::parameters(model,
-                                      standardize="refit",
+        ### up to parameters 0.16.0, if bootstrap is required standardize does not work
+        ### so we standardize before parameters() and feed the model to it
+        zmodel<-mf.standardize(model)
+        estim<-parameters::parameters(zmodel,
                                       bootstrap=..bootstrap,
                                       ci_method=.ci_method,
                                       ci=.ci_width,
                                       iterations=.iterations)
+        
         .coefficients$beta  <-  estim$Coefficient
         .coefficients$beta.ci.lower<-estim$CI_low
         .coefficients$beta.ci.upper<-estim$CI_high
@@ -628,5 +636,27 @@ mf.sourcify<-function(option) {
   }
   results
 }
+
+##### standardize a model #########
+
+mf.standardize<- function(x,...) UseMethod(".standardize")
+
+.standardize.default<-function(model) {
+  stop("I do not know how to standardize model of class",class(model))
+}  
+  
+.standardize.lm<-function(model) {
+  
+  newdata<-model$model
+  types<-attr(terms(model),"dataClasses")
+  for (name in names(types)) {
+    if (types[[name]]=="numeric") 
+      newdata[[name]] <- as.numeric(scale(newdata[[name]]))
+  }
+  update(model,data=newdata)
+  
+}  
+
+  
 
 
