@@ -1,22 +1,3 @@
-mf.addEffectSize<- function(x,...) UseMethod(".addEffectSize")
-
-
-.addEffectSize.default<-function(atable) {
-  return(atable)
-}
-
-
-.addEffectSize.summary_emm<-function(atable) {
-  
-  atable$etaSqP<-effectsize::F_to_eta2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-  atable$omegaSq<-effectsize::F_to_omega2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-  atable$epsilonSq<-effectsize::F_to_epsilon2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-    
-  
-  return(atable)
-}
-
-
 
 ##### get model data #########
 
@@ -87,15 +68,27 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
         } else 
                      ..bootstrap<-.bootstrap
         
-        if (..bootstrap) ginfo("ESTIMATE: we need to reboostrap for betas CI")
+        opts_list<-list(model=mf.standardize(model),
+                        bootstrap=..bootstrap,
+                        ci_method=.ci_method,
+                        ci=.ci_width,
+                        iterations=.iterations                        
+        )
+        
+        if (..bootstrap) {
+              ginfo("ESTIMATE: we need to reboostrap for betas CI")
+              
+          ### check if we can go in paraller ###
+              test<-try_hard(find.package("parallel"))
+              if (isFALSE(test$error)) {
+                      opts_list[["n_cpus"]]<-parallel::detectCores()
+                      opts_list[["parallel"]]<-"multicore"
+               }
+          
+        }
         ### up to parameters 0.16.0, if bootstrap is required standardize does not work
         ### so we standardize before parameters() and feed the model to it
-        zmodel<-mf.standardize(model)
-        estim<-parameters::parameters(zmodel,
-                                      bootstrap=..bootstrap,
-                                      ci_method=.ci_method,
-                                      ci=.ci_width,
-                                      iterations=.iterations)
+        estim<-do.call(parameters::parameters,opts_list)
         
         .coefficients$beta  <-  estim$Coefficient
         .coefficients$beta.ci.lower<-estim$CI_low

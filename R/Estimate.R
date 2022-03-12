@@ -77,7 +77,7 @@ Estimate <- R6::R6Class("Estimate",
                           run_main_anova=function() {
 
                             if (!self$isProper) {
-                                mark("is not proper")
+
                                 if (self$infomatic$caller=="lm") {
                                     self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
                                     return(mf.anova(self$model,self))
@@ -427,9 +427,17 @@ Estimate <- R6::R6Class("Estimate",
 
                           },
                           .bootstrap_model=function() {
+                                
+                                opts_list<-list(model=self$model,iterations=self$options$boot_r)
+                                ### check if we can go in paraller ###
+                                test<-try_hard(find.package("parallel"))
+                                if (isFALSE(test$error)) {
+                                    opts_list[["n_cpus"]]<-parallel::detectCores()
+                                    opts_list[["parallel"]]<-"multicore"
+                                }
                             
                                 gstart("ESTIMATE: estimating bootstrap model")
-                                bmodel<-try_hard(parameters::bootstrap_model(self$model,iterations=self$options$boot_r))
+                                bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
                                 if (!isFALSE(bmodel$error)) {
                                   self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
                                 }  else {
