@@ -31,6 +31,8 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 
 procedure.posthoc <- function(obj) {
   
+  gstart("PROCEDURE: Posthoc")
+  
   terms <- obj$options$posthoc
   dep <- obj$options$dep
   
@@ -110,6 +112,8 @@ procedure.posthoc <- function(obj) {
         tableData$response<-fromb64(as.character(tableData$response))
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
+    gend()
+  
 
     postHocTables
   

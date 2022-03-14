@@ -274,7 +274,6 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=list(
                                 "centered",
                                 "standardized",
-                                "log",
                                 "none"),
                             default="centered"))))
             private$..covs_conditioning <- jmvcore::OptionList$new(
@@ -388,8 +387,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=list(
                     "none",
                     "centered",
-                    "standardized",
-                    "log"),
+                    "standardized"),
                 default="none")
             private$..se_method <- jmvcore::OptionList$new(
                 "se_method",
@@ -977,7 +975,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "se_method",
                         "ci_method",
                         "ci_width",
-                        "boot_r"),
+                        "boot_r",
+                        "dep_scale",
+                        "covs_scale"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1609,7 +1609,7 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 analysisId = analysisId,
                 revision = revision,
                 pause = NULL,
-                completeWhenFilled = TRUE,
+                completeWhenFilled = FALSE,
                 requiresMissings = FALSE)
         }))
 
@@ -1696,8 +1696,8 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param simple_interactions should simple Interactions be computed
 #' @param covs_scale a named vector of the form \code{c(var1='type',
 #'   var2='type2')} specifying the transformation to apply to covariates, one of
-#'   \code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
-#'   \code{'none'}. \code{'none'} leaves the variable as it is.
+#'   \code{'centered'} to the mean, \code{'standardized'} or  \code{'none'}.
+#'   \code{'none'} leaves the variable as it is.
 #' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
 #'   \code{'percent'}. Use to condition the covariates (if any)
 #' @param ccm_value how many st.deviations around the means used to condition

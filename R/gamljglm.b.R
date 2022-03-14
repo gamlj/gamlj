@@ -155,6 +155,10 @@ gamljGlmClass <- R6::R6Class(
       plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
       plotter_machine$initPlots()
       private$.plotter_machine<-plotter_machine
+
+      now<-Sys.time()
+      ginfo("INIT TIME:",now-private$.time," secs")
+      
     },
     .run=function() {
       ginfo("MODULE:  #### phase run ####")
@@ -165,38 +169,60 @@ gamljGlmClass <- R6::R6Class(
       if (!private$.ready$ready) {
         return()
       }
-      
+      runnow<-Sys.time()
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
-
+      mark("Fixed:",paste("itself=",as.numeric(Sys.time()-runnow)),
+           paste("from run=",as.numeric(Sys.time()-runnow)),
+           paste("from begin=",as.numeric(Sys.time()-private$.time)))
+      
       ### run tables ###
+      now<-Sys.time()
+      
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
+      mark("Table:",paste("itself=",as.numeric(Sys.time()-now)),
+                    paste("from run=",as.numeric(Sys.time()-runnow)),
+                    paste("from begin=",as.numeric(Sys.time()-private$.time)))
+      
+      now<-Sys.time()
       for (smarttab in private$.smartObjs)
         smarttab$setNotes(private$.estimate_machine$dispatcher)
+      mark("Notes:",paste("itself=",as.numeric(Sys.time()-now)),
+           paste("from run=",as.numeric(Sys.time()-runnow)),
+           paste("from begin=",as.numeric(Sys.time()-private$.time)))
       
 
-      private$.checkpoint()
+#      private$.checkpoint()
       
       # #save model preds and resids            
       # private$.estimate_machine$savePredRes(self$results) 
       # 
+      now<-Sys.time()
+      if (1==1) {
       private$.plotter_machine$preparePlots()
       
       if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
           self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
           self$results$plotnotes$setVisible(TRUE)
       }  
-      private$.checkpoint()
+      }
+      mark("Plots:",paste("itself=",as.numeric(Sys.time()-now)),
+           paste("from run=",as.numeric(Sys.time()-runnow)),
+           paste("from begin=",as.numeric(Sys.time()-private$.time)))
+      
+#      private$.checkpoint()
       
       ### save the model if we are in R ###
       if (self$options$.interface=="r")
               self$results$.setModel(private$.estimate_machine$model)
       
       ginfo("MODULE:  #### phase end ####")
-      now<-Sys.time()
-      ginfo("TIME:",now-private$.time," secs")
+      
+      ginfo("RUN TIME:",Sys.time()-runnow," secs")
+      
+      ginfo("TIME:",Sys.time()-private$.time," secs")
       
       return()
           

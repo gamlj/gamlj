@@ -189,12 +189,12 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_posthoc=function() {
-                            
+
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
                             tab<-procedure.posthoc(self)
-
+                            tab
                           },
                           
                           run_posthocEffectSize=function() {
@@ -382,18 +382,8 @@ Estimate <- R6::R6Class("Estimate",
                                  }
                             }
                             
-                            ## check random effects for mixed
-                            
-                            if (self$infomatic$caller=="lmer") {
-                              terms<-setdiff(unlist(unlist(self$options$re)),unlist(c("Intercept",self$options$cluster)))
-                              for (t in terms) {
-                                 if(self$datamatic$variables[[tob64(t)]]$isBetween)
-                                     self$dispatcher$warnings<-list(topic="info",message=paste("Variable",t,"does not seem to vary across clusters but its effects are set random."))
-                              }
 
-                          }
-                             ### end of checks ###
-                            
+
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
 
                               opts[["formula"]]<-self$formula64
@@ -406,7 +396,6 @@ Estimate <- R6::R6Class("Estimate",
                               
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-
 
                               results<-try_hard(eval(acall))
                              
@@ -442,7 +431,7 @@ Estimate <- R6::R6Class("Estimate",
                                   self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
                                 }  else {
                                   self$boot_model<-bmodel$obj
-                                  self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method (",self$options$ci_method,"), with",self$options$boot_r,"iterations."))
+                                  self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method (",self$options$ci_method,"), with",self$options$boot_r,"iterations (if not otherwise specified)"))
                                 }
                           },
                           .estimateTests=function() {

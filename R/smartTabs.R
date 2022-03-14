@@ -65,15 +65,12 @@ SmartTable <- R6::R6Class("SmartTable",
 
                             },
                             initTable=function() {
-                              private$.phase<-"init"
                               
+                              private$.phase<-"init"
                               if (private$.stop()) {
                                 return()
                               }
                               
-                              ### init warnings topics ####
-                                private$.set_topics()
-
                               ### ###
 
                               self$table$setVisible(TRUE)
@@ -86,7 +83,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               state<-as.list(self$table$state)
                               state$notes<-list()
                               private$.spaceBy()
-                              
+                            
                               
                               tinfo("TABLES: table",self$nickname,"inited")
                             },
@@ -94,6 +91,8 @@ SmartTable <- R6::R6Class("SmartTable",
                             runTable=function() {
                             
                               tinfo("TABLES: table",self$nickname,"checked for run")
+                              ### init warnings topics ####
+                              private$.set_topics()
                               self$retrieveNotes()
                               private$.phase<-"run"
 
@@ -104,7 +103,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               rtable<-private$.getData()
                               private$.fill(self$table,rtable)
                               tinfo("TABLES: table",self$nickname,"run")
-                              
                             },
                             
                             ci=function(aroot,width=95,label=NULL,format="{}% Confidence Intervals"){
@@ -603,7 +601,7 @@ SmartArray <- R6::R6Class("SmartArray",
                                 obj$runTable()
                                 
                               }
-                              
+
                             },
                             retrieveNotes=function() {
 

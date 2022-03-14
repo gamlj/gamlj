@@ -4,7 +4,6 @@ title: General Linear Model
 menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
-completeWhenFilled: true
 export: true
 description:
     main: |
@@ -391,8 +390,6 @@ options:
                       name:  centered
                     - title: z-scores
                       name: standardized
-                    - title: Log
-                      name: 'log'
                     - title: Original
                       name: 'none'
 
@@ -400,7 +397,7 @@ options:
       description:
           R: >
              a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
-             one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
+             one of `'centered'` to the mean, `'standardized'` or  `'none'`. `'none'` leaves the variable as it is.
 
     - name: covs_conditioning
       title: Covariates conditioning
@@ -629,11 +626,9 @@ options:
           - title: Original
             name: 'none'
           - title: Centered
-            name:  'centered'
+            name:  centered
           - title: z-scores
-            name:  'standardized'
-          - title: Log
-            name: 'log'
+            name:  standardized
 
       default: 'none'
       description:

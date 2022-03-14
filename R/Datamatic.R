@@ -552,7 +552,6 @@ Variable <- R6::R6Class(
       
       ## we then update levels to same the new levels (mean, sd etc)
       private$.update_levels(vardata)
-      
       as.numeric(vardata)
       
     },

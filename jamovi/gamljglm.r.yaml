@@ -344,6 +344,8 @@ items:
               - ci_method
               - ci_width
               - boot_r
+              - dep_scale
+              - covs_scale
 
         columns:
         - name: estimate
