@@ -57,10 +57,10 @@ items:
                     - name: model
                       title: Model
                       visible: (comparison)
-                    - name: r1
+                    - name: r2
                       title: R²
                       type: number
-                    - name: r2
+                    - name: ar2
                       title: Adj. R²
                       type: number
                     - name:  df1

@@ -12,14 +12,20 @@ fit.R2 <- function(model,obj) {
     ### compare the two models
     comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
     r2comp<-as.list(comp[2,])
-    .names<-list(df2="Res.Df",df1="Df",p=c("Pr(>Chi)","Pr(>F)"),f="F")
+
+    .names<-list(df2=c("Res.Df","Resid. Df"),
+                 df1="Df",p=c("Pr(>Chi)","Pr(>F)"),
+                 f="F",
+                 test="Deviance")
+    
     names(r2comp)<-transnames(names(r2comp),.names)
+
     ## sometimes the chi-square is not printed out    
     if (obj$option("omnibus","LRT") & !hasName(r2comp,"lrt"))
           r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
     ### adjust
-    r2comp$r1<-r2list[[1]]$r1-r2nested[[1]]$r1
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
+    r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
     
     r2list<-c(r2list,r2nested,list(r2comp))
     
@@ -54,7 +60,7 @@ r2.est<- function(model,...) UseMethod(".r2")
   
   results     <-  fit.compare_null_model(model)
   alist$test  <-  results$test
-  alist$df    <-  results$df
+  alist$df1    <-  results$df1
   alist$p     <-  results$p
   list(alist)
   
@@ -74,7 +80,7 @@ r2.est<- function(model,...) UseMethod(".r2")
     obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
   
   alist$test  <-  results$test
-  alist$df    <-  results$df
+  alist$df1    <-  results$df1
   alist$p     <-  results$p
   return(list(alist))
   
@@ -96,7 +102,7 @@ r2.est<- function(model,...) UseMethod(".r2")
   # mcFadden 
   alist$r2    <-  as.numeric(1-(llfull/llnull))
   alist$test  <-  compare$`LR stat.`[2]
-  alist$df    <-  compare$`   Df`[2]
+  alist$df1    <-  compare$`   Df`[2]
   alist$p     <-  compare$`Pr(Chi)`[2]
   return(list(alist))
 }
@@ -107,8 +113,8 @@ r2.est<- function(model,...) UseMethod(".r2")
   results<-list()
   results$df1<-ss$fstatistic[["numdf"]]
   results$df2<-ss$fstatistic[["dendf"]]
-  results$r1<-ss$r.squared
-  results$r2<-ss$adj.r.squared
+  results$r2<-ss$r.squared
+  results$ar2<-ss$adj.r.squared
   if (hasName(ss,"fstatistic")) {
 
     if (obj$option("omnibus","LRT")) {
@@ -173,7 +179,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   model0  <-  stats::update(model,form ,data=data,evaluate=T)
   results <-  stats::anova(model0,model,test = "LRT")
   results$test  <-  results$Deviance
-  results$df    <-  results$Df
+  results$df1    <-  results$Df
   results$p     <-  results$`Pr(>Chi)`
   results[2,]
 }
@@ -189,7 +195,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   results$deviance<--2*as.numeric(stats::logLik(model))
   results$null.deviance<--2*as.numeric(stats::logLik(model0))
   results$test  <-  results$`LR stat.`
-  results$df    <-  results$`   Df`
+  results$df1    <-  results$`   Df`
   results$p     <-  results$`Pr(Chi)`
   results
 }
@@ -203,7 +209,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   model0  <-  stats::update(model,form ,data=data,evaluate=T)
   results <-  stats::anova(model0,model)
   results$test  <- results$`LR stat.`
-  results$df    <- results$`   df`
+  results$df1    <- results$`   df`
   results$p    <- results$`Pr(Chi)`
   results[2,]
 }

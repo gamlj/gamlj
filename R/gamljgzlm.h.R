@@ -13,10 +13,15 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs = NULL,
             model_terms = NULL,
             fixed_intercept = TRUE,
+            nested_intercept = TRUE,
+            nested_terms = NULL,
+            comparison = FALSE,
+            omnibus = "LRT",
             estimates_ci = FALSE,
             donotrun = FALSE,
             ci_method = "wald",
             boot_r = 1000,
+            ci_width = 95,
             contrasts = NULL,
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
@@ -29,7 +34,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotOriginalScale = FALSE,
             plotLinesTypes = FALSE,
             plotError = "none",
-            ci_width = 95,
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
@@ -48,7 +52,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             modeltype = "linear",
             custom_family = "gaussian",
             custom_link = "identity",
-            chisq_type = "lrt",
             propodds_test = FALSE,
             plot_scale = "response", ...) {
 
@@ -100,6 +103,25 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "fixed_intercept",
                 fixed_intercept,
                 default=TRUE)
+            private$..nested_intercept <- jmvcore::OptionBool$new(
+                "nested_intercept",
+                nested_intercept,
+                default=TRUE)
+            private$..nested_terms <- jmvcore::OptionTerms$new(
+                "nested_terms",
+                nested_terms,
+                default=NULL)
+            private$..comparison <- jmvcore::OptionBool$new(
+                "comparison",
+                comparison,
+                default=FALSE)
+            private$..omnibus <- jmvcore::OptionList$new(
+                "omnibus",
+                omnibus,
+                default="LRT",
+                options=list(
+                    "wald",
+                    "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
@@ -121,6 +143,12 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 boot_r,
                 min=1,
                 default=1000)
+            private$..ci_width <- jmvcore::OptionNumber$new(
+                "ci_width",
+                ci_width,
+                min=50,
+                max=99.9,
+                default=95)
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -194,12 +222,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ci",
                     "se"),
                 default="none")
-            private$..ci_width <- jmvcore::OptionNumber$new(
-                "ci_width",
-                ci_width,
-                min=50,
-                max=99.9,
-                default=95)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -282,7 +304,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=list(
                                 "centered",
                                 "standardized",
-                                "log",
                                 "none"),
                             default="centered"))))
             private$..expb_ci <- jmvcore::OptionBool$new(
@@ -332,13 +353,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "1/mu^2",
                     "sqrt"),
                 default="identity")
-            private$..chisq_type <- jmvcore::OptionList$new(
-                "chisq_type",
-                chisq_type,
-                options=list(
-                    "lrt",
-                    "wald"),
-                default="lrt")
             private$..propodds_test <- jmvcore::OptionBool$new(
                 "propodds_test",
                 propodds_test,
@@ -359,10 +373,15 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs)
             self$.addOption(private$..model_terms)
             self$.addOption(private$..fixed_intercept)
+            self$.addOption(private$..nested_intercept)
+            self$.addOption(private$..nested_terms)
+            self$.addOption(private$..comparison)
+            self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
+            self$.addOption(private$..ci_width)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
@@ -375,7 +394,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..plotLinesTypes)
             self$.addOption(private$..plotError)
-            self$.addOption(private$..ci_width)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simple_effects)
@@ -394,7 +412,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..modeltype)
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
-            self$.addOption(private$..chisq_type)
             self$.addOption(private$..propodds_test)
             self$.addOption(private$..plot_scale)
         }),
@@ -406,10 +423,15 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs = function() private$..covs$value,
         model_terms = function() private$..model_terms$value,
         fixed_intercept = function() private$..fixed_intercept$value,
+        nested_intercept = function() private$..nested_intercept$value,
+        nested_terms = function() private$..nested_terms$value,
+        comparison = function() private$..comparison$value,
+        omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
+        ci_width = function() private$..ci_width$value,
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
@@ -422,7 +444,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotOriginalScale = function() private$..plotOriginalScale$value,
         plotLinesTypes = function() private$..plotLinesTypes$value,
         plotError = function() private$..plotError$value,
-        ci_width = function() private$..ci_width$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simple_effects = function() private$..simple_effects$value,
@@ -441,7 +462,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         modeltype = function() private$..modeltype$value,
         custom_family = function() private$..custom_family$value,
         custom_link = function() private$..custom_link$value,
-        chisq_type = function() private$..chisq_type$value,
         propodds_test = function() private$..propodds_test$value,
         plot_scale = function() private$..plot_scale$value),
     private = list(
@@ -452,10 +472,15 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs = NA,
         ..model_terms = NA,
         ..fixed_intercept = NA,
+        ..nested_intercept = NA,
+        ..nested_terms = NA,
+        ..comparison = NA,
+        ..omnibus = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,
         ..boot_r = NA,
+        ..ci_width = NA,
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
@@ -468,7 +493,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotOriginalScale = NA,
         ..plotLinesTypes = NA,
         ..plotError = NA,
-        ..ci_width = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simple_effects = NA,
@@ -487,7 +511,6 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..modeltype = NA,
         ..custom_family = NA,
         ..custom_link = NA,
-        ..chisq_type = NA,
         ..propodds_test = NA,
         ..plot_scale = NA)
 )
@@ -542,7 +565,10 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ci_method",
                     "se_method",
                     "d_ci",
-                    "boot_r"),
+                    "boot_r",
+                    "nested_intercept",
+                    "nested_terms",
+                    "comparison"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -569,9 +595,17 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "model_terms",
-                                "fixed_intercept"),
+                                "fixed_intercept",
+                                "nested_intercept",
+                                "nested_terms",
+                                "comparison",
+                                "omnibus"),
                             rows=1,
                             columns=list(
+                                list(
+                                    `name`="model", 
+                                    `title`="Model", 
+                                    `visible`="(comparison)"),
                                 list(
                                     `name`="r2", 
                                     `title`="R\u00B2", 
@@ -581,7 +615,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Adj. R\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="df", 
+                                    `name`="df1", 
                                     `title`="df", 
                                     `type`="integer"),
                                 list(
@@ -598,6 +632,13 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="fit",
                             title="Additional indices",
                             visible=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "fixed_intercept",
+                                "nested_intercept",
+                                "nested_terms",
+                                "comparison"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -606,17 +647,21 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="value", 
                                     `type`="text", 
-                                    `title`="Value"),
+                                    `title`="Model Value"),
+                                list(
+                                    `name`="nested", 
+                                    `type`="text", 
+                                    `title`="Nested Model", 
+                                    `visible`="(comparison)"),
+                                list(
+                                    `name`="diff", 
+                                    `type`="text", 
+                                    `title`="\u0394", 
+                                    `visible`="(comparison)"),
                                 list(
                                     `name`="specs", 
                                     `type`="text", 
-                                    `title`="Comment")),
-                            clearWith=list(
-                                "dep",
-                                "factors",
-                                "cov",
-                                "model_terms",
-                                "fixed_intercept")))
+                                    `title`="Comment"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
@@ -1268,11 +1313,19 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   terms. Not needed if \code{formula} is used.
 #' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
+#' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
+#'   fixed intercept. Not needed if \code{formula} is used.
+#' @param nested_terms a list of character vectors describing effects terms
+#'   for nestet. It can be passed as right-hand formula.
+#' @param comparison Not present in R
+#' @param omnibus .
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
 #'   in tables
 #' @param donotrun .
 #' @param ci_method .
 #' @param boot_r a number bootstrap repetitions.
+#' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
+#'   confidence interval width for the plots.
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
@@ -1302,8 +1355,6 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
-#' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
-#'   confidence interval width for the plots.
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -1341,8 +1392,6 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   gaussian, binomial, gamma and inverse_gaussian .
 #' @param custom_link Distribution family for the custom model, accepts
 #'   identity, log and inverse, onemu2 (for 1/mu^2).
-#' @param chisq_type Chi-squared computation method. \code{'lrt'} (default)
-#'   gives LogLikelihood ration test,  \code{'wald'} gives the Wald Chi-squared.
 #' @param propodds_test Test parallel lines assumptions in cumulative link
 #'   model (ordinal regression)
 #' @param plot_scale Chi-squared computation method. \code{'lrt'} (default)
@@ -1387,10 +1436,15 @@ gamljGzlm <- function(
     covs = NULL,
     model_terms = NULL,
     fixed_intercept = TRUE,
+    nested_intercept = TRUE,
+    nested_terms = NULL,
+    comparison = FALSE,
+    omnibus = "LRT",
     estimates_ci = FALSE,
     donotrun = FALSE,
     ci_method = "wald",
     boot_r = 1000,
+    ci_width = 95,
     contrasts = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
@@ -1403,7 +1457,6 @@ gamljGzlm <- function(
     plotOriginalScale = FALSE,
     plotLinesTypes = FALSE,
     plotError = "none",
-    ci_width = 95,
     emmeans = NULL,
     posthoc = NULL,
     simple_effects = NULL,
@@ -1422,7 +1475,6 @@ gamljGzlm <- function(
     modeltype = "linear",
     custom_family = "gaussian",
     custom_link = "identity",
-    chisq_type = "lrt",
     propodds_test = FALSE,
     plot_scale = "response",
     formula) {
@@ -1482,6 +1534,7 @@ gamljGzlm <- function(
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
     if (inherits(model_terms, "formula")) model_terms <- jmvcore::decomposeFormula(model_terms)
+    if (inherits(nested_terms, "formula")) nested_terms <- jmvcore::decomposeFormula(nested_terms)
     if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
     if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
 
@@ -1493,10 +1546,15 @@ gamljGzlm <- function(
         covs = covs,
         model_terms = model_terms,
         fixed_intercept = fixed_intercept,
+        nested_intercept = nested_intercept,
+        nested_terms = nested_terms,
+        comparison = comparison,
+        omnibus = omnibus,
         estimates_ci = estimates_ci,
         donotrun = donotrun,
         ci_method = ci_method,
         boot_r = boot_r,
+        ci_width = ci_width,
         contrasts = contrasts,
         show_contrastnames = show_contrastnames,
         show_contrastcodes = show_contrastcodes,
@@ -1509,7 +1567,6 @@ gamljGzlm <- function(
         plotOriginalScale = plotOriginalScale,
         plotLinesTypes = plotLinesTypes,
         plotError = plotError,
-        ci_width = ci_width,
         emmeans = emmeans,
         posthoc = posthoc,
         simple_effects = simple_effects,
@@ -1526,7 +1583,6 @@ gamljGzlm <- function(
         modeltype = modeltype,
         custom_family = custom_family,
         custom_link = custom_link,
-        chisq_type = chisq_type,
         propodds_test = propodds_test,
         plot_scale = plot_scale)
 

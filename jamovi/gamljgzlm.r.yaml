@@ -31,6 +31,9 @@ items:
         - se_method
         - d_ci
         - boot_r
+        - nested_intercept
+        - nested_terms
+        - comparison
 
     refs: gamlj
      
@@ -46,15 +49,22 @@ items:
                          - dep
                          - model_terms
                          - fixed_intercept
+                         - nested_intercept
+                         - nested_terms
+                         - comparison
+                         - omnibus
              rows: 1
              columns:
+                    - name: model
+                      title: Model
+                      visible: (comparison)
                     - name: r2
                       title: R²
                       type: number
                     - name: ar2
                       title: Adj. R²
                       type: number
-                    - name:  df
+                    - name:  df1
                       title: df
                       type: integer
                     - name: test
@@ -68,22 +78,33 @@ items:
              title: Additional indices
              type: Table
              visible: true
+             clearWith:
+                         - dep
+                         - model_terms
+                         - fixed_intercept
+                         - nested_intercept
+                         - nested_terms
+                         - comparison
+
              columns:
                     - name: info
                       type: text
                       title: "Info"
                     - name: value
                       type: text
-                      title: "Value"
+                      title: "Model Value"
+                    - name: nested
+                      type: text
+                      title: "Nested Model"
+                      visible: (comparison)
+                    - name: diff
+                      type: text
+                      title: Δ 
+                      visible: (comparison)
+
                     - name: specs
                       type: text
                       title: "Comment"
-             clearWith:
-                  - dep
-                  - factors
-                  - cov
-                  - model_terms
-                  - fixed_intercept
   
 
            - name: anova

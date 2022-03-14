@@ -72,6 +72,44 @@ Estimate <- R6::R6Class("Estimate",
                                 tab[["over"]]$value<-result
                               }
                             }
+                            
+                            #### model comparison #####
+                            if (!is.null(self$nested_model)) {
+                            
+                             for (name in names(tab)) {
+                              if (name=="lik") {
+                                tab[["lik"]]$nested<-as.numeric(stats::logLik(self$nested_model))
+                                tab[["lik"]]$diff<-tab[["lik"]]$value-tab[["lik"]]$nested
+                              }
+                              if (name=="aic") {
+                                tab[["aic"]]$nested<-stats::AIC(self$nested_model)
+                                tab[["aic"]]$diff<-tab[["aic"]]$value-tab[["aic"]]$nested
+                              }
+                              if (name=="bic") {
+                                tab[["bic"]]$nested<-stats::BIC(self$nested_model)
+                                tab[["bic"]]$diff<-tab[["bic"]]$value-tab[["bic"]]$nested
+                                
+                              }
+                              if (name=="dev") {
+                                tab[["dev"]]$nested<-stats::deviance(self$nested_model)
+                                tab[["dev"]]$diff<-tab[["dev"]]$value-tab[["dev"]]$nested
+                              }
+                              if (name=="dfr") {
+                                tab[["dfr"]]$nested<-stats::df.residual(self$nested_model)
+                                tab[["dfr"]]$diff<-tab[["dfr"]]$nested-tab[["dfr"]]$value
+                                
+                              }
+                              if (name=="over") {
+                                value <- sum(stats::residuals(self$nested_model, type = "pearson")^2)
+                                result <- value/stats::df.residual(self$nested_model)
+                                tab[["over"]]$nested<-result
+                                tab[["over"]]$diff<-""
+                                
+                              }
+                            }
+                            }
+                            
+                            
                             tab
                           },
                           run_main_anova=function() {
@@ -396,7 +434,7 @@ Estimate <- R6::R6Class("Estimate",
                               
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-
+mark(acall)
                               results<-try_hard(eval(acall))
                              
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)

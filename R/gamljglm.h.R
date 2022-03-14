@@ -660,11 +660,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Model", 
                                     `visible`="(comparison)"),
                                 list(
-                                    `name`="r1", 
+                                    `name`="r2", 
                                     `title`="R\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="r2", 
+                                    `name`="ar2", 
                                     `title`="Adj. R\u00B2", 
                                     `type`="number"),
                                 list(

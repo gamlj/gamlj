@@ -12,6 +12,7 @@ gamljGlmClass <- R6::R6Class(
     .init=function() {
       ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
+
       private$.time<-Sys.time()
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
@@ -172,26 +173,14 @@ gamljGlmClass <- R6::R6Class(
       runnow<-Sys.time()
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
-      mark("Fixed:",paste("itself=",as.numeric(Sys.time()-runnow)),
-           paste("from run=",as.numeric(Sys.time()-runnow)),
-           paste("from begin=",as.numeric(Sys.time()-private$.time)))
       
       ### run tables ###
-      now<-Sys.time()
       
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
-      mark("Table:",paste("itself=",as.numeric(Sys.time()-now)),
-                    paste("from run=",as.numeric(Sys.time()-runnow)),
-                    paste("from begin=",as.numeric(Sys.time()-private$.time)))
-      
-      now<-Sys.time()
       for (smarttab in private$.smartObjs)
         smarttab$setNotes(private$.estimate_machine$dispatcher)
-      mark("Notes:",paste("itself=",as.numeric(Sys.time()-now)),
-           paste("from run=",as.numeric(Sys.time()-runnow)),
-           paste("from begin=",as.numeric(Sys.time()-private$.time)))
       
 
 #      private$.checkpoint()
@@ -199,7 +188,6 @@ gamljGlmClass <- R6::R6Class(
       # #save model preds and resids            
       # private$.estimate_machine$savePredRes(self$results) 
       # 
-      now<-Sys.time()
       if (1==1) {
       private$.plotter_machine$preparePlots()
       
@@ -208,9 +196,6 @@ gamljGlmClass <- R6::R6Class(
           self$results$plotnotes$setVisible(TRUE)
       }  
       }
-      mark("Plots:",paste("itself=",as.numeric(Sys.time()-now)),
-           paste("from run=",as.numeric(Sys.time()-runnow)),
-           paste("from begin=",as.numeric(Sys.time()-private$.time)))
       
 #      private$.checkpoint()
       

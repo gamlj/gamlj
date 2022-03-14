@@ -100,7 +100,40 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
+    - name: nested_intercept
+      title: Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
+
+    - name: nested_terms
+      title: Nested Model
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+
+    - name: comparison
+      title: Activate
+      type: Bool
+      default: false
+      description:
+          R: >
+             Not present in R
+
+    - name: omnibus
+      title: Test
+      type: List
+      default: LRT
+      options:
+        - name:  wald
+          title: Wald Chi²
+        - name: LRT
+          title: LRT
 
     - name: estimates_ci
       title: For estimates
@@ -138,6 +171,16 @@ options:
             a number bootstrap repetitions.
 
 
+    - name: ci_width
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width for the plots.
 
 
     - name: contrasts
@@ -273,16 +316,6 @@ options:
             bars, use confidence intervals, or use standard errors on the
             plots, respectively.
 
-    - name: ci_width
-      title: Confidence level
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
-      description:
-          R: >
-            a number between 50 and 99.9 (default: 95) specifying the confidence
-            interval width for the plots.
 
     - name: emmeans
       title: Estimated Marginal Means
@@ -443,8 +476,6 @@ options:
                       name:  centered
                     - title: z-scores
                       name: standardized
-                    - title: Log
-                      name: 'log'
                     - title: None
                       name: 'none'
 
@@ -548,20 +579,6 @@ options:
          R: >
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
            
-
-    - name: chisq_type
-      title: Omnibus chi2
-      type: List
-      options:
-        - name: lrt
-          title: LRT
-        - name: wald
-          title: Wald
-      default: lrt
-      description:
-          R: >
-            Chi-squared computation method. `'lrt'` (default) gives LogLikelihood ration test, 
-            `'wald'` gives the Wald Chi-squared.
 
 
     - name: propodds_test

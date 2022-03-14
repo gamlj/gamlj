@@ -327,8 +327,8 @@ mf.anova<- function(x,...) UseMethod(".anova")
           return(NULL)
         }
 
-        test<-switch (obj$options$chisq_type,
-                lrt = "LR",
+        test<-switch (obj$options$omnibus,
+                LRT = "LR",
                 wald= "Wald")
 
         anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))

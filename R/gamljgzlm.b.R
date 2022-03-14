@@ -12,7 +12,9 @@ gamljGzlmClass <- R6::R6Class(
       
       ginfo(paste("MODULE:",self$options$.caller,self$options$modeltype,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
+      
       private$.time<-Sys.time()
+
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         if(private$.ready$report)
@@ -30,10 +32,6 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
-      
-      
-      
-
       
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
@@ -147,8 +145,13 @@ gamljGzlmClass <- R6::R6Class(
       private$.data_machine<-data_machine
       private$.estimate_machine<-estimate_machine
       
+      now<-Sys.time()
+      ginfo("INIT TIME:",now-private$.time," secs")
+      
     },
     .run=function() {
+      
+      runnow<-Sys.time()
       
       ginfo("MODULE:  #### phase run ####")
       
@@ -173,7 +176,11 @@ gamljGzlmClass <- R6::R6Class(
       
       private$.checkpoint()
       
-
+      ginfo("MODULE:  #### phase end ####")
+      
+      ginfo("RUN TIME:",Sys.time()-runnow," secs")
+      
+      ginfo("TIME:",Sys.time()-private$.time," secs")
       
 
     },
