@@ -15,8 +15,11 @@ es.relativerisk<-function(obj) {
                                         id = id_id_id, 
                                         corstr = "exchangeable", data = data)
       params<-as.data.frame(parameters::parameters(results,exponentiate=TRUE))
-
-      names(params)<-c("source","estimate","se","nothing", "ci.lower","ci.upper","test","df","p")
+      
+      if (!obj$option("ci_method","wald"))
+          warning("Wald method for confidence intervals has been used")
+      
+      names(params)<-c("source","estimate","se","nothing", "est.ci.lower","est.ci.upper","test","df","p")
       
 ##      if (params$source[1]=="(Intercept)")
 ##             params <- params[-1,] 

@@ -136,6 +136,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default="wald",
                 options=list(
                     "wald",
+                    "profile",
                     "quantile",
                     "bcai"))
             private$..boot_r <- jmvcore::OptionNumber$new(
@@ -820,7 +821,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_conditioning",
                                 "fixed_intercept",
                                 "es",
-                                "ci_width"),
+                                "ci_width",
+                                "ci_method"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -840,12 +842,12 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="SE", 
                                     `type`="number"),
                                 list(
-                                    `name`="ci.lower", 
+                                    `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(expb_ci)"),
                                 list(
-                                    `name`="ci.upper", 
+                                    `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(expb_ci)"),

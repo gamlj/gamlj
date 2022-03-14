@@ -155,11 +155,13 @@ options:
       default: wald
       options:
         - name:  wald
-          title: Standard (fast)
+          title: Standard 
+        - name:  profile
+          title: Profile 
         - name: quantile
-          title: Bootstrap (Percent)
+          title: Bootstrap Percent 
         - name:  bcai
-          title: Bootstrap (BCa)
+          title: Bootstrap BCa
           
     - name: boot_r
       title: Bootstrap rep.

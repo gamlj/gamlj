@@ -17,8 +17,9 @@ Scaffold <- R6::R6Class("Scaffold",
                                 else
                                   res<-is.something(self$options[[val]])
                                 
+                                
                                 if (!is.null(spec))
-                                  res<-(spec %in% self$options[[val]])
+                                  res<-any(spec %in% self$options[[val]])
                               }
                               res      
                               

@@ -65,6 +65,7 @@ gamljGzlmClass <- R6::R6Class(
       
       ### relativerisk tables
       aSmartObj<-SmartTable$new(self$results$main$relativerisk,estimate_machine)
+      aSmartObj$ci("est",width=self$options$ci_width)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### paralleltest tables

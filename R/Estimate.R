@@ -47,7 +47,7 @@ Estimate <- R6::R6Class("Estimate",
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
                                 
                                 ### issue some notes ###
-                                if ((!self$option("ci_method","wald")) & self$option("posthoc") & self$option("posthoces") & self$option("d_ci")) 
+                                if (self$option("ci_method",c("quantile","bcai")) & self$option("posthoc") & self$option("posthoces") & self$option("d_ci")) 
                                   self$dispatcher$warnings<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
                                 tab
                           },                    
@@ -135,7 +135,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_coefficients=function() {
                             
-                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
+                            if (is.null(self$boot_model) & self$option("ci_method",c("quantile","bcai"))) 
                               private$.bootstrap_model()
 
                             tab<-NULL
@@ -434,13 +434,17 @@ Estimate <- R6::R6Class("Estimate",
                               
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-mark(acall)
                               results<-try_hard(eval(acall))
                              
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
-                              if (!isFALSE(results$error))
-                                 stop(results$error)
+                              if (!isFALSE(results$error)) {
+                                if (self$option("modeltype","custom"))
+                                  stop("No solution has been found for the combination of link function and distribution")
+                                else
+                                  stop(results$error)
+                              }
+                              
                               if (!isFALSE(results$warning))
                                 warning(results$warning)
                               
@@ -465,11 +469,8 @@ mark(acall)
                             
                                 gstart("ESTIMATE: estimating bootstrap model")
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
-                                if (!isFALSE(bmodel$error)) {
-                                  self$dispatcher$warnings<-list(topic="info",message=paste("Bootstrap confidence intervals are not available for this model"))
-                                }  else {
+                                if (isFALSE(bmodel$error)) {
                                   self$boot_model<-bmodel$obj
-                                  self$dispatcher$warnings<-list(topic="info",message=paste("All confidence intervals are estimated with the bootstrap method (",self$options$ci_method,"), with",self$options$boot_r,"iterations (if not otherwise specified)"))
                                 }
                           },
                           .estimateTests=function() {
@@ -488,15 +489,6 @@ mark(acall)
                                 ########## fill basic tables #########
                                 if (!self$hasIntercept & is.something(self$options$factors)) 
                                   self$dispatcher$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
-                                
-                                ### coefficients table ###
-                                
-                                
-                                
-
-                                ### other table ###
-
-                                
 
                                 
                           },

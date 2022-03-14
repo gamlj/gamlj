@@ -136,7 +136,7 @@ Infomatic <- R6::R6Class(
       }
       
       if (self$modeltype=="custom") {
-        
+       
         self$model         <-   c("User Model","Generalized model")
         self$family        <-    paste(options$custom_family,"(",options$custom_link,")")
         self$distribution  <-    options$custom_family

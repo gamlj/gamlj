@@ -556,6 +556,11 @@ children:
                 name: ci_method_wald
                 optionName: ci_method
                 optionPart: wald
+              - type: RadioButton
+                name: ci_method_profile
+                optionName: ci_method
+                optionPart: profile
+
               - name: ci_method_quantile
                 type: RadioButton
                 optionName: ci_method

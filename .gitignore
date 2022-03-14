@@ -9,8 +9,8 @@
 # jamovi
 build/
 build*/
-
 temp/
+jamovisource/
 *.jmo
 newversion.R
 problems/

@@ -56,6 +56,23 @@ Syntax <- R6::R6Class(
       if (self$option("dep_scale"))
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
 
+      ### confidence intervals
+      method<-switch(self$options$ci_method,
+                     wald="Wald",
+                     profile="Profile",
+                     quantile="Bootstrap percent",
+                     bcai="Bootstrap BCa"
+                     )
+      info<-switch(self$options$ci_method,
+                     wald="",
+                     profile="",
+                     quantile=paste(self$options$boot_r, "bootstrap samples"),
+                     bcai=paste(self$options$boot_r, "bootstrap samples")
+      )
+      
+      tab[["ci"]]<-list(info="C.I. method",value=method,specs=info)
+      
+      
       if (self$option("comparison")) {
         
          .fullterms<-c(as.numeric(self$hasIntercept),self$options$model_terms)
