@@ -12,11 +12,16 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             factors = NULL,
             covs = NULL,
             model_terms = NULL,
-            fixed_ntercept = TRUE,
+            fixed_intercept = TRUE,
+            nested_terms = NULL,
+            comparison = FALSE,
+            nested_intercept = TRUE,
+            omnibus = "F",
             estimates_ci = TRUE,
             donotrun = FALSE,
             ci_method = "wald",
             boot_r = 1000,
+            ci_width = 95,
             contrasts = NULL,
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
@@ -28,27 +33,30 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plotOriginalScale = FALSE,
             plotLinesTypes = FALSE,
             plotError = "none",
-            ci_width = 95,
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
             simple_moderators = NULL,
             simple_interactions = FALSE,
-            cov_scale = "mean_sd",
-            csm_value = 1,
-            csp_value = 25,
+            covs_conditioning = "mean_sd",
+            ccm_value = 1,
+            ccp_value = 25,
             covs_scale_labels = "labels",
             adjust = list(
                 "bonf"),
-            model_type = "lmer",
-            scaling = NULL,
+            modeltype = "lmer",
+            covs_scale = NULL,
             dep_scale = "none",
             scale_missing = NULL,
             norm_test = FALSE,
             cluster = NULL,
             re = list(
                 list()),
+            nested_re = list(
+                list()),
             re_corr = "all",
+            re_modelterms = TRUE,
+            re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
             re_ci = FALSE,
@@ -106,10 +114,29 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "model_terms",
                 model_terms,
                 default=NULL)
-            private$..fixed_ntercept <- jmvcore::OptionBool$new(
-                "fixed_ntercept",
-                fixed_ntercept,
+            private$..fixed_intercept <- jmvcore::OptionBool$new(
+                "fixed_intercept",
+                fixed_intercept,
                 default=TRUE)
+            private$..nested_terms <- jmvcore::OptionTerms$new(
+                "nested_terms",
+                nested_terms,
+                default=NULL)
+            private$..comparison <- jmvcore::OptionBool$new(
+                "comparison",
+                comparison,
+                default=FALSE)
+            private$..nested_intercept <- jmvcore::OptionBool$new(
+                "nested_intercept",
+                nested_intercept,
+                default=TRUE)
+            private$..omnibus <- jmvcore::OptionList$new(
+                "omnibus",
+                omnibus,
+                default="F",
+                options=list(
+                    "F",
+                    "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
@@ -131,6 +158,12 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 boot_r,
                 min=1,
                 default=1000)
+            private$..ci_width <- jmvcore::OptionNumber$new(
+                "ci_width",
+                ci_width,
+                min=50,
+                max=99.9,
+                default=95)
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -200,12 +233,6 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ci",
                     "se"),
                 default="none")
-            private$..ci_width <- jmvcore::OptionNumber$new(
-                "ci_width",
-                ci_width,
-                min=50,
-                max=99.9,
-                default=95)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -226,20 +253,20 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "simple_interactions",
                 simple_interactions,
                 default=FALSE)
-            private$..cov_scale <- jmvcore::OptionList$new(
-                "cov_scale",
-                cov_scale,
+            private$..covs_conditioning <- jmvcore::OptionList$new(
+                "covs_conditioning",
+                covs_conditioning,
                 options=list(
                     "mean_sd",
                     "percent"),
                 default="mean_sd")
-            private$..csm_value <- jmvcore::OptionNumber$new(
-                "csm_value",
-                csm_value,
+            private$..ccm_value <- jmvcore::OptionNumber$new(
+                "ccm_value",
+                ccm_value,
                 default=1)
-            private$..csp_value <- jmvcore::OptionNumber$new(
-                "csp_value",
-                csp_value,
+            private$..ccp_value <- jmvcore::OptionNumber$new(
+                "ccp_value",
+                ccp_value,
                 default=25,
                 min=5,
                 max=50)
@@ -269,20 +296,20 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
-            private$..model_type <- jmvcore::OptionList$new(
-                "model_type",
-                model_type,
+            private$..modeltype <- jmvcore::OptionList$new(
+                "modeltype",
+                modeltype,
                 hidden=TRUE,
                 options=list(
                     "lmer"),
                 default="lmer")
-            private$..scaling <- jmvcore::OptionArray$new(
-                "scaling",
-                scaling,
+            private$..covs_scale <- jmvcore::OptionArray$new(
+                "covs_scale",
+                covs_scale,
                 items="(covs)",
                 default=NULL,
                 template=jmvcore::OptionGroup$new(
-                    "scaling",
+                    "covs_scale",
                     NULL,
                     elements=list(
                         jmvcore::OptionVariable$new(
@@ -298,7 +325,6 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "clusterbasedcentered",
                                 "clustermeans",
                                 "clusterbasedstandardized",
-                                "log",
                                 "none"),
                             default="centered"))))
             private$..dep_scale <- jmvcore::OptionList$new(
@@ -310,8 +336,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "standardized",
                     "clusterbasedcentered",
                     "clustermeans",
-                    "clusterbasedstandardized",
-                    "log"),
+                    "clusterbasedstandardized"),
                 default="none")
             private$..scale_missing <- jmvcore::OptionList$new(
                 "scale_missing",
@@ -337,6 +362,14 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 template=jmvcore::OptionTerms$new(
                     "re",
                     NULL))
+            private$..nested_re <- jmvcore::OptionArray$new(
+                "nested_re",
+                nested_re,
+                default=list(
+                    list()),
+                template=jmvcore::OptionTerms$new(
+                    "nested_re",
+                    NULL))
             private$..re_corr <- jmvcore::OptionList$new(
                 "re_corr",
                 re_corr,
@@ -345,6 +378,20 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "none",
                     "block"),
                 default="all")
+            private$..re_modelterms <- jmvcore::OptionBool$new(
+                "re_modelterms",
+                re_modelterms,
+                default=TRUE)
+            private$..re_listing <- jmvcore::OptionList$new(
+                "re_listing",
+                re_listing,
+                options=list(
+                    "none",
+                    "main",
+                    "way2",
+                    "way3",
+                    "all"),
+                default="none")
             private$..reml <- jmvcore::OptionBool$new(
                 "reml",
                 reml,
@@ -395,11 +442,16 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..model_terms)
-            self$.addOption(private$..fixed_ntercept)
+            self$.addOption(private$..fixed_intercept)
+            self$.addOption(private$..nested_terms)
+            self$.addOption(private$..comparison)
+            self$.addOption(private$..nested_intercept)
+            self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
+            self$.addOption(private$..ci_width)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
@@ -411,27 +463,29 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plotOriginalScale)
             self$.addOption(private$..plotLinesTypes)
             self$.addOption(private$..plotError)
-            self$.addOption(private$..ci_width)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simple_effects)
             self$.addOption(private$..simple_moderators)
             self$.addOption(private$..simple_interactions)
-            self$.addOption(private$..cov_scale)
-            self$.addOption(private$..csm_value)
-            self$.addOption(private$..csp_value)
+            self$.addOption(private$..covs_conditioning)
+            self$.addOption(private$..ccm_value)
+            self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
             self$.addOption(private$..adjust)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
-            self$.addOption(private$..model_type)
-            self$.addOption(private$..scaling)
+            self$.addOption(private$..modeltype)
+            self$.addOption(private$..covs_scale)
             self$.addOption(private$..dep_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..norm_test)
             self$.addOption(private$..cluster)
             self$.addOption(private$..re)
+            self$.addOption(private$..nested_re)
             self$.addOption(private$..re_corr)
+            self$.addOption(private$..re_modelterms)
+            self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
             self$.addOption(private$..re_ci)
@@ -450,11 +504,16 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         model_terms = function() private$..model_terms$value,
-        fixed_ntercept = function() private$..fixed_ntercept$value,
+        fixed_intercept = function() private$..fixed_intercept$value,
+        nested_terms = function() private$..nested_terms$value,
+        comparison = function() private$..comparison$value,
+        nested_intercept = function() private$..nested_intercept$value,
+        omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
+        ci_width = function() private$..ci_width$value,
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
@@ -466,27 +525,29 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plotOriginalScale = function() private$..plotOriginalScale$value,
         plotLinesTypes = function() private$..plotLinesTypes$value,
         plotError = function() private$..plotError$value,
-        ci_width = function() private$..ci_width$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simple_effects = function() private$..simple_effects$value,
         simple_moderators = function() private$..simple_moderators$value,
         simple_interactions = function() private$..simple_interactions$value,
-        cov_scale = function() private$..cov_scale$value,
-        csm_value = function() private$..csm_value$value,
-        csp_value = function() private$..csp_value$value,
+        covs_conditioning = function() private$..covs_conditioning$value,
+        ccm_value = function() private$..ccm_value$value,
+        ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
         adjust = function() private$..adjust$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
-        model_type = function() private$..model_type$value,
-        scaling = function() private$..scaling$value,
+        modeltype = function() private$..modeltype$value,
+        covs_scale = function() private$..covs_scale$value,
         dep_scale = function() private$..dep_scale$value,
         scale_missing = function() private$..scale_missing$value,
         norm_test = function() private$..norm_test$value,
         cluster = function() private$..cluster$value,
         re = function() private$..re$value,
+        nested_re = function() private$..nested_re$value,
         re_corr = function() private$..re_corr$value,
+        re_modelterms = function() private$..re_modelterms$value,
+        re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
         re_ci = function() private$..re_ci$value,
@@ -504,11 +565,16 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..factors = NA,
         ..covs = NA,
         ..model_terms = NA,
-        ..fixed_ntercept = NA,
+        ..fixed_intercept = NA,
+        ..nested_terms = NA,
+        ..comparison = NA,
+        ..nested_intercept = NA,
+        ..omnibus = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,
         ..boot_r = NA,
+        ..ci_width = NA,
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
@@ -520,27 +586,29 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plotOriginalScale = NA,
         ..plotLinesTypes = NA,
         ..plotError = NA,
-        ..ci_width = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simple_effects = NA,
         ..simple_moderators = NA,
         ..simple_interactions = NA,
-        ..cov_scale = NA,
-        ..csm_value = NA,
-        ..csp_value = NA,
+        ..covs_conditioning = NA,
+        ..ccm_value = NA,
+        ..ccp_value = NA,
         ..covs_scale_labels = NA,
         ..adjust = NA,
         ..predicted = NA,
         ..residuals = NA,
-        ..model_type = NA,
-        ..scaling = NA,
+        ..modeltype = NA,
+        ..covs_scale = NA,
         ..dep_scale = NA,
         ..scale_missing = NA,
         ..norm_test = NA,
         ..cluster = NA,
         ..re = NA,
+        ..nested_re = NA,
         ..re_corr = NA,
+        ..re_modelterms = NA,
+        ..re_listing = NA,
         ..reml = NA,
         ..re_lrt = NA,
         ..re_ci = NA,
@@ -561,7 +629,6 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
-        posthocEffsize = function() private$.items[["posthocEffsize"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
         simpleInteractions = function() private$.items[["simpleInteractions"]],
         emmeans = function() private$.items[["emmeans"]],
@@ -600,12 +667,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "dep",
                     "factors",
                     "cov",
-                    "modelTerms",
-                    "fixedIntercept",
-                    "cimethod",
+                    "model_terms",
+                    "fixed_intercept",
+                    "ci_method",
                     "semethod",
                     "dci",
-                    "bootR"),
+                    "boot_r"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -627,8 +694,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Model Fit",
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
-                                "fixedIntercept"),
+                                "model_terms",
+                                "fixed_intercept"),
                             rows=1,
                             columns=list(
                                 list(
@@ -662,17 +729,17 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="ANOVA Omnibus tests",
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
+                                "model_terms",
                                 "contrasts",
-                                "scaling",
+                                "covs_covs_scale",
                                 "dep_scale",
-                                "fixedIntercept"),
+                                "fixed_intercept"),
                             columns=list(
                                 list(
                                     `name`="source", 
                                     `title`="", 
                                     `type`="text", 
-                                    `visible`="(cimethod:quantile)"),
+                                    `visible`="(ci_method:quantile)"),
                                 list(
                                     `name`="ss", 
                                     `title`="SS", 
@@ -696,15 +763,14 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Parameter Estimates (Coefficients)",
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
+                                "model_terms",
                                 "contrasts",
-                                "scaling",
+                                "covs_scale",
                                 "dep_scale",
-                                "fixedIntercept",
-                                "ciWidth",
-                                "cimethod",
-                                "bootR",
-                                "semethod"),
+                                "fixed_intercept",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -782,10 +848,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
-                        "semethod",
-                        "cimethod",
-                        "ciWidth",
-                        "bootR"),
+                        "ci_method",
+                        "ci_width",
+                        "boot_r"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -849,76 +914,6 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `type`="number", 
                             `format`="zto,pvalue", 
                             `visible`="(adjust:sidak)")))))
-            self$add(jmvcore::Array$new(
-                options=options,
-                name="posthocEffsize",
-                title="Comparisons effect size",
-                visible=FALSE,
-                items="(posthoc)",
-                template=jmvcore::Table$new(
-                    options=options,
-                    title="Comparisons:  ___key___",
-                    clearWith=list(
-                        "semethod",
-                        "cimethod",
-                        "ciWidth",
-                        "bootR",
-                        "posthocEffsize",
-                        "dci"),
-                    columns=list(
-                        list(
-                            `name`="estimate", 
-                            `title`="Difference", 
-                            `type`="number"),
-                        list(
-                            `name`="se", 
-                            `title`="SE", 
-                            `type`="number"),
-                        list(
-                            `name`="dm", 
-                            `title`="d<sub>mod</sub>", 
-                            `type`="number", 
-                            `visible`="(posthocEffsize:dm)"),
-                        list(
-                            `name`="dm.ci.lower", 
-                            `type`="number", 
-                            `title`="Lower", 
-                            `visible`="(posthocEffsize:dm && dci)"),
-                        list(
-                            `name`="dm.ci.upper", 
-                            `type`="number", 
-                            `title`="Upper", 
-                            `visible`="(posthocEffsize:dm && dci)"),
-                        list(
-                            `name`="ds", 
-                            `title`="d<sub>sample</sub>", 
-                            `type`="number", 
-                            `visible`="(posthocEffsize:ds)"),
-                        list(
-                            `name`="ds.ci.lower", 
-                            `type`="number", 
-                            `title`="Lower", 
-                            `visible`="(posthocEffsize:ds && dci)"),
-                        list(
-                            `name`="ds.ci.upper", 
-                            `type`="number", 
-                            `title`="Upper", 
-                            `visible`="(posthocEffsize:ds && dci)"),
-                        list(
-                            `name`="g", 
-                            `title`="g<sub>sample</sub>", 
-                            `type`="number", 
-                            `visible`="(posthocEffsize:g)"),
-                        list(
-                            `name`="g.ci.lower", 
-                            `type`="number", 
-                            `title`="Lower", 
-                            `visible`="(posthocEffsize:g && dci)"),
-                        list(
-                            `name`="g.ci.upper", 
-                            `type`="number", 
-                            `title`="Upper", 
-                            `visible`="(posthocEffsize:g && dci)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -938,11 +933,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
+                                "model_terms",
                                 "contrasts",
-                                "scaling",
+                                "covs_scale",
                                 "dep_scale",
-                                "fixedIntercept",
+                                "fixed_intercept",
                                 "simpleVariable",
                                 "simpleModerators",
                                 "simpleScale",
@@ -974,11 +969,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
+                                "model_terms",
                                 "contrasts",
-                                "scaling",
+                                "covs_scale",
                                 "dep_scale",
-                                "fixedIntercept",
+                                "fixed_intercept",
                                 "simpleVariable",
                                 "simpleModerators",
                                 "simpleScale",
@@ -986,9 +981,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "percvalue",
                                 "simpleScaleLabels",
                                 "semethod",
-                                "cimethod",
-                                "ciWidth",
-                                "bootR"),
+                                "ci_method",
+                                "ci_width",
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1049,11 +1044,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 title="ANOVA",
                                 clearWith=list(
                                     "dep",
-                                    "modelTerms",
+                                    "model_terms",
                                     "contrasts",
-                                    "scaling",
+                                    "covs_scale",
                                     "dep_scale",
-                                    "fixedIntercept",
+                                    "fixed_intercept",
                                     "simpleScaleLabels"),
                                 columns=list(
                                     list(
@@ -1083,17 +1078,17 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 title="Parameter Estimates",
                                 clearWith=list(
                                     "dep",
-                                    "modelTerms",
+                                    "model_terms",
                                     "contrasts",
-                                    "scaling",
+                                    "covs_scale",
                                     "dep_scale",
-                                    "fixedIntercept",
+                                    "fixed_intercept",
                                     "simpleScaleLabels",
-                                    "ciWidth",
+                                    "ci_width",
                                     "emmeans",
-                                    "ciWidth",
-                                    "cimethod",
-                                    "bootR",
+                                    "ci_width",
+                                    "ci_method",
+                                    "boot_r",
                                     "semethod"),
                                 columns=list(
                                     list(
@@ -1139,12 +1134,12 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
-                        "ciWidth",
-                        "cimethod",
+                        "ci_width",
+                        "ci_method",
                         "emmeans",
                         "semethod",
-                        "bootR",
-                        "modelTerms"),
+                        "boot_r",
+                        "model_terms"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1182,11 +1177,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "plotSepLines",
                         "plotSepPlots",
                         "plotError",
-                        "ciWidth",
-                        "scaling",
+                        "ci_width",
+                        "covs_scale",
                         "dep_scale",
-                        "modelTerms",
-                        "fixedIntercept",
+                        "model_terms",
+                        "fixed_intercept",
                         "simpleScale",
                         "simpleScaleLabels",
                         "plotDvScale",
@@ -1219,7 +1214,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Test for Normality of residuals",
                             visible="(norm_test)",
                             clearWith=list(
-                                "modelTerms",
+                                "model_terms",
                                 "dep"),
                             columns=list(
                                 list(
@@ -1245,7 +1240,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
+                                "model_terms",
                                 "dep_scale")))
                         self$add(jmvcore::Image$new(
                             options=options,
@@ -1259,7 +1254,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "modelTerms")))
+                                "model_terms")))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="residPlot",
@@ -1271,30 +1266,30 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
-                                "modelTerms",
+                                "model_terms",
                                 "dep_scale")))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",
                 title="Predicted Vales",
-                varTitle="`GLM_PRED_${ dep }`",
+                varTitle="`MIXED_PRED_${ dep }`",
                 varDescription="Predicted values",
                 clearWith=list(
                     "dep",
                     "factors",
                     "covs",
-                    "modelTerms")))
+                    "model_terms")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
                 title="Residuals Vales",
-                varTitle="`GLM_RES_${ dep }`",
+                varTitle="`MIXED_RES_${ dep }`",
                 varDescription="Residuals values",
                 clearWith=list(
                     "dep",
                     "factors",
                     "covs",
-                    "modelTerms")))},
+                    "model_terms")))},
         .setModel=function(x) private$..model <- x))
 
 gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -1339,13 +1334,22 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   needed if \code{formula} is used.
 #' @param model_terms a list of character vectors describing fixed effects
 #'   terms. Not needed if \code{formula} is used.
-#' @param fixed_ntercept \code{TRUE} (default) or \code{FALSE}, estimates
+#' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
+#' @param nested_terms a list of character vectors describing effects terms
+#'   for nestet. It can be passed as right-hand formula.
+#' @param comparison Not present in R
+#' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
+#'   fixed intercept. Not needed if \code{formula} is used.
+#' @param omnibus \code{TRUE} (default) or \code{FALSE}, estimates fixed
+#'   intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param donotrun .
 #' @param ci_method .
 #' @param boot_r a number bootstrap repetitions.
+#' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
+#'   confidence interval width for the plots.
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
@@ -1373,8 +1377,6 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
 #'   no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
-#' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
-#'   confidence interval width for the plots.
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -1386,11 +1388,11 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param simple_moderators the variable that provides the levels at which the
 #'   simple effects are computed
 #' @param simple_interactions should simple Interactions be computed
-#' @param cov_scale \code{'mean_sd'} (default), \code{'custom'} , or
+#' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
 #'   \code{'percent'}. Use to condition the covariates (if any)
-#' @param csm_value how many st.deviations around the means used to condition
+#' @param ccm_value how many st.deviations around the means used to condition
 #'   simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}
-#' @param csp_value offsett (number of percentiles) around the median used to
+#' @param ccp_value offsett (number of percentiles) around the median used to
 #'   condition simple effects and plots. Used if
 #'   \code{simpleScale}=\code{'percent'}
 #' @param covs_scale_labels how the levels of a continuous moderator should
@@ -1398,10 +1400,10 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
 #'   to the variable orginal levels, before scaling.
 #' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
-#'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
-#'   respectively.
-#' @param model_type .
-#' @param scaling a list of lists specifying the covariates scaling, one of
+#'   \code{'holm'},\code{'scheffe'}, \code{'tukey'}; provide no,  Bonferroni,
+#'   Tukey and Holm Post Hoc corrections respectively.
+#' @param modeltype .
+#' @param covs_scale a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
 #' @param dep_scale Re-scale the dependent variable.
@@ -1411,11 +1413,14 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}
 #' @param re a list of lists specifying the models random effects.
+#' @param nested_re a list of lists specifying the models random effects.
 #' @param re_corr \code{'all'}, \code{'none'} (default), or \code{'block'}.
 #'   When random effects are passed as list of length 1, it decides whether the
 #'   effects should be correlated,  non correlated. If \code{'re'} is a list of
 #'   lists of length > 1, the option is automatially set to \code{'block'}. The
 #'   option is ignored if the model is passed using \code{formula}.
+#' @param re_modelterms Not in R interface
+#' @param re_listing Not in R interface
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be used rather than ML
 #' @param re_lrt \code{TRUE} or \code{FALSE} (default), LRT for the random
@@ -1445,7 +1450,6 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-#'   \code{results$posthocEffsize} \tab \tab \tab \tab \tab an array of post-hoc effect size \cr
 #'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
 #'   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$simpleInteractions} \tab \tab \tab \tab \tab an array of simple interactions tables \cr
@@ -1475,11 +1479,16 @@ gamljMixed <- function(
     factors = NULL,
     covs = NULL,
     model_terms = NULL,
-    fixed_ntercept = TRUE,
+    fixed_intercept = TRUE,
+    nested_terms = NULL,
+    comparison = FALSE,
+    nested_intercept = TRUE,
+    omnibus = "F",
     estimates_ci = TRUE,
     donotrun = FALSE,
     ci_method = "wald",
     boot_r = 1000,
+    ci_width = 95,
     contrasts = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
@@ -1491,27 +1500,30 @@ gamljMixed <- function(
     plotOriginalScale = FALSE,
     plotLinesTypes = FALSE,
     plotError = "none",
-    ci_width = 95,
     emmeans = NULL,
     posthoc = NULL,
     simple_effects = NULL,
     simple_moderators = NULL,
     simple_interactions = FALSE,
-    cov_scale = "mean_sd",
-    csm_value = 1,
-    csp_value = 25,
+    covs_conditioning = "mean_sd",
+    ccm_value = 1,
+    ccp_value = 25,
     covs_scale_labels = "labels",
     adjust = list(
                 "bonf"),
-    model_type = "lmer",
-    scaling = NULL,
+    modeltype = "lmer",
+    covs_scale = NULL,
     dep_scale = "none",
     scale_missing,
     norm_test = FALSE,
     cluster = NULL,
     re = list(
                 list()),
+    nested_re = list(
+                list()),
     re_corr = "all",
+    re_modelterms = TRUE,
+    re_listing = "none",
     reml = TRUE,
     re_lrt = FALSE,
     re_ci = FALSE,
@@ -1584,6 +1596,7 @@ gamljMixed <- function(
 
     for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
     if (inherits(model_terms, "formula")) model_terms <- jmvcore::decomposeFormula(model_terms)
+    if (inherits(nested_terms, "formula")) nested_terms <- jmvcore::decomposeFormula(nested_terms)
     if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
     if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
 
@@ -1594,11 +1607,16 @@ gamljMixed <- function(
         factors = factors,
         covs = covs,
         model_terms = model_terms,
-        fixed_ntercept = fixed_ntercept,
+        fixed_intercept = fixed_intercept,
+        nested_terms = nested_terms,
+        comparison = comparison,
+        nested_intercept = nested_intercept,
+        omnibus = omnibus,
         estimates_ci = estimates_ci,
         donotrun = donotrun,
         ci_method = ci_method,
         boot_r = boot_r,
+        ci_width = ci_width,
         contrasts = contrasts,
         show_contrastnames = show_contrastnames,
         show_contrastcodes = show_contrastcodes,
@@ -1610,25 +1628,27 @@ gamljMixed <- function(
         plotOriginalScale = plotOriginalScale,
         plotLinesTypes = plotLinesTypes,
         plotError = plotError,
-        ci_width = ci_width,
         emmeans = emmeans,
         posthoc = posthoc,
         simple_effects = simple_effects,
         simple_moderators = simple_moderators,
         simple_interactions = simple_interactions,
-        cov_scale = cov_scale,
-        csm_value = csm_value,
-        csp_value = csp_value,
+        covs_conditioning = covs_conditioning,
+        ccm_value = ccm_value,
+        ccp_value = ccp_value,
         covs_scale_labels = covs_scale_labels,
         adjust = adjust,
-        model_type = model_type,
-        scaling = scaling,
+        modeltype = modeltype,
+        covs_scale = covs_scale,
         dep_scale = dep_scale,
         scale_missing = scale_missing,
         norm_test = norm_test,
         cluster = cluster,
         re = re,
+        nested_re = nested_re,
         re_corr = re_corr,
+        re_modelterms = re_modelterms,
+        re_listing = re_listing,
         reml = reml,
         re_lrt = re_lrt,
         re_ci = re_ci,

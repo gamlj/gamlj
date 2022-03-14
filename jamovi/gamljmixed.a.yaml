@@ -94,10 +94,49 @@ options:
           R: >
             a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
 
-    - name: fixed_ntercept
-      title: Intercept
+    - name: fixed_intercept
+      title: Fixed Intercept
       type: Bool
       default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+
+    - name: nested_terms
+      title: Nested Model
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+
+    - name: comparison
+      title: Activate
+      type: Bool
+      default: false
+      description:
+          R: >
+             Not present in R
+
+
+    - name: nested_intercept
+      title: Nested Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+
+    - name: omnibus
+      title: Test
+      type: List
+      default: F
+      options:
+        - name:  F
+          title: F-test
+        - name: LRT
+          title: LRT
+
       description:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
@@ -138,6 +177,17 @@ options:
       description:
           R: >
             a number bootstrap repetitions.
+
+    - name: ci_width
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width for the plots.
 
 
 
@@ -267,17 +317,6 @@ options:
             bars, use confidence intervals, or use standard errors on the
             plots, respectively.
 
-    - name: ci_width
-      title: Confidence level
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
-      description:
-          R: >
-            a number between 50 and 99.9 (default: 95) specifying the confidence
-            interval width for the plots.
-
     - name: emmeans
       title: Estimated Marginal Means
       type: Terms
@@ -320,8 +359,8 @@ options:
           R: >
             should simple Interactions be computed
 
-    - name: cov_scale
-      title: Covariates conditioning
+    - name: covs_conditioning
+      title: Covariates Conditioning
       type: List
       options:
         - name: mean_sd
@@ -335,7 +374,7 @@ options:
             covariates (if any)
 
 
-    - name: csm_value
+    - name: ccm_value
       type: Number
       default: 1
       description:
@@ -343,7 +382,7 @@ options:
             how many st.deviations around the means used to condition simple effects and plots.
             Used if `simpleScale`=`'mean_sd'`
 
-    - name: csp_value
+    - name: ccp_value
       type: Number
       default: 25
       min: 5
@@ -399,10 +438,8 @@ options:
       description:
           R: >
             one or more of `'none'`,  `'bonf'`,`'tukey'` 
-            `'holm'`; provide no,  Bonferroni, Tukey and
+            `'holm'`,`'scheffe'`, `'tukey'`; provide no,  Bonferroni, Tukey and
             Holm Post Hoc corrections respectively.
-
-
 
 
     - name: predicted
@@ -416,14 +453,14 @@ options:
 
 ############ generic with some specs ###########
 
-    - name: model_type
+    - name: modeltype
       type: List
       hidden: true
       options:
         - name: lmer
       default: lmer
 
-    - name: scaling
+    - name: covs_scale
       title: Covariates Scaling
       type: Array
       items: (covs)
@@ -447,8 +484,6 @@ options:
                       name:  clustermeans
                     - title: z-scores clusterwise
                       name:  clusterbasedstandardized
-                    - title: Log
-                      name: 'log'
                     - title: None
                       name: 'none'
                 default: centered 
@@ -474,8 +509,6 @@ options:
                       name:  clustermeans
                     - title: z-scores clusterwise
                       name:  clusterbasedstandardized
-                    - title: Log
-                      name: 'log'
       default: 'none'
       description:
          R: >
@@ -526,6 +559,15 @@ options:
           R: >
             a list of lists specifying the models random effects.          
 
+    - name: nested_re
+      title: Nested Model Random Coefficients
+      type: Array
+      default: [[]]
+      template:
+          type: Terms
+      description:
+          R: >
+            a list of lists specifying the models random effects.          
 
     - name: re_corr
       title: Effects correlation
@@ -545,6 +587,37 @@ options:
             non correlated. If `'re'` is a list of 
             lists of length > 1, the option is automatially set to `'block'`.
             The option is ignored if the model is passed using `formula`.
+
+
+    - name: re_modelterms
+      title: Model terms
+      type: Bool
+      default: true
+      description:
+          R: >
+            Not in R interface
+            
+            
+    - name: re_listing
+      type: List
+      title: "Add"
+      options:
+        - name:  none
+          title: None
+        - name:  main
+          title: Main effects
+        - name:  way2
+          title: Up to 2-way
+        - name:  way3
+          title: Up to 3-way
+        - name:  all
+          title: All possible
+      default: none
+      description:
+          R: >
+             Not in R interface
+
+
 
     - name: reml
       title: REML

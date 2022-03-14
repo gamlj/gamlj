@@ -24,12 +24,12 @@ items:
         - dep
         - factors
         - cov
-        - modelTerms
-        - fixedIntercept
-        - cimethod
+        - model_terms
+        - fixed_intercept
+        - ci_method
         - semethod
         - dci
-        - bootR
+        - boot_r
     refs: gamlj
      
   - name: main
@@ -42,8 +42,8 @@ items:
              description: a table of R
              clearWith:
                          - dep
-                         - modelTerms
-                         - fixedIntercept
+                         - model_terms
+                         - fixed_intercept
              rows: 1
              columns:
                     - name: r1
@@ -73,17 +73,17 @@ items:
              description: a table of ANOVA results
              clearWith:
                          - dep
-                         - modelTerms
+                         - model_terms
                          - contrasts
-                         - scaling
+                         - covs_covs_scale
                          - dep_scale
-                         - fixedIntercept
+                         - fixed_intercept
  
              columns:
                     - name: source
                       title: ""
                       type: text
-                      visible: (cimethod:quantile)
+                      visible: (ci_method:quantile)
                     - name: ss
                       title: SS
                       type: number
@@ -104,15 +104,14 @@ items:
              type: Table
              clearWith:
                     - dep
-                    - modelTerms
+                    - model_terms
                     - contrasts
-                    - scaling
+                    - covs_scale
                     - dep_scale
-                    - fixedIntercept
-                    - ciWidth
-                    - cimethod
-                    - bootR
-                    - semethod
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - boot_r
 
              columns:
                     - name: source
@@ -184,10 +183,9 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-              - semethod
-              - cimethod
-              - ciWidth
-              - bootR
+              - ci_method
+              - ci_width
+              - boot_r
 
         columns:
         - name: estimate
@@ -241,65 +239,6 @@ items:
           format: zto,pvalue
           visible: (adjust:sidak)
 
-  - name: posthocEffsize
-    title: Comparisons effect size
-    type: Array
-    description: an array of post-hoc effect size
-    visible: false
-    items: (posthoc)
-    template:
-        title:  "Comparisons:  ___key___"
-        type: Table
-        clearWith:
-              - semethod
-              - cimethod
-              - ciWidth
-              - bootR
-              - posthocEffsize
-              - dci
-        columns:
-        - name: estimate
-          title: Difference
-          type: number
-        - name: se
-          title: SE
-          type: number
-        - name: dm
-          title: d<sub>mod</sub>
-          type: number
-          visible: (posthocEffsize:dm)
-        - name: dm.ci.lower
-          type: number
-          title: Lower
-          visible: (posthocEffsize:dm && dci)
-        - name: dm.ci.upper
-          type: number
-          title: Upper
-          visible: (posthocEffsize:dm && dci)
-        - name: ds
-          title: d<sub>sample</sub>
-          type: number
-          visible: (posthocEffsize:ds)
-        - name: ds.ci.lower
-          type: number
-          title: Lower
-          visible: (posthocEffsize:ds && dci)
-        - name: ds.ci.upper
-          type: number
-          title: Upper
-          visible: (posthocEffsize:ds && dci)
-        - name: g
-          title: g<sub>sample</sub> 
-          type: number
-          visible: (posthocEffsize:g)
-        - name: g.ci.lower
-          type: number
-          title: Lower
-          visible: (posthocEffsize:g && dci)
-        - name: g.ci.upper
-          type: number
-          title: Upper
-          visible: (posthocEffsize:g && dci)
 
 
   - name: simpleEffects
@@ -313,11 +252,11 @@ items:
               visible: false
               clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
-                 - scaling
+                 - covs_scale
                  - dep_scale
-                 - fixedIntercept
+                 - fixed_intercept
                  - simpleVariable
                  - simpleModerators
                  - simpleScale
@@ -346,11 +285,11 @@ items:
               visible: false
               clearWith:
                  - dep
-                 - modelTerms
+                 - model_terms
                  - contrasts
-                 - scaling
+                 - covs_scale
                  - dep_scale
-                 - fixedIntercept
+                 - fixed_intercept
                  - simpleVariable
                  - simpleModerators
                  - simpleScale
@@ -358,9 +297,9 @@ items:
                  - percvalue
                  - simpleScaleLabels
                  - semethod
-                 - cimethod
-                 - ciWidth
-                 - bootR
+                 - ci_method
+                 - ci_width
+                 - boot_r
                  
               columns:
                      - name: contrast
@@ -407,11 +346,11 @@ items:
              title: ANOVA 
              clearWith:
                 - dep
-                - modelTerms
+                - model_terms
                 - contrasts
-                - scaling
+                - covs_scale
                 - dep_scale
-                - fixedIntercept
+                - fixed_intercept
                 - simpleScaleLabels
              columns:
                    - name: effect
@@ -436,17 +375,17 @@ items:
              title: Parameter Estimates 
              clearWith:
                 - dep
-                - modelTerms
+                - model_terms
                 - contrasts
-                - scaling
+                - covs_scale
                 - dep_scale
-                - fixedIntercept
+                - fixed_intercept
                 - simpleScaleLabels
-                - ciWidth
+                - ci_width
                 - emmeans
-                - ciWidth
-                - cimethod
-                - bootR
+                - ci_width
+                - ci_method
+                - boot_r
                 - semethod
 
              columns:
@@ -487,12 +426,12 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - ciWidth
-            - cimethod
+            - ci_width
+            - ci_method
             - emmeans
             - semethod
-            - bootR
-            - modelTerms
+            - boot_r
+            - model_terms
         columns:
         - name: estimate
           title: 'Mean'
@@ -529,11 +468,11 @@ items:
            - plotSepLines
            - plotSepPlots
            - plotError
-           - ciWidth
-           - scaling
+           - ci_width
+           - covs_scale
            - dep_scale
-           - modelTerms
-           - fixedIntercept
+           - model_terms
+           - fixed_intercept
            - simpleScale
            - simpleScaleLabels
            - plotDvScale
@@ -557,7 +496,7 @@ items:
           description: a table of normality tests
           visible: (norm_test)
           clearWith:
-              - modelTerms
+              - model_terms
               - dep
           columns:
             - name: name
@@ -582,7 +521,7 @@ items:
           requiresData: true
           clearWith:
             - dep
-            - modelTerms
+            - model_terms
             - dep_scale
 
         - name: normplot
@@ -597,7 +536,7 @@ items:
           clearWith:
             - dep
             - dep_scale
-            - modelTerms
+            - model_terms
         - name: residPlot
           title: Residual-Predicted Scatterplot
           visible: (resid_plot)
@@ -609,7 +548,7 @@ items:
           requiresData: true
           clearWith:
             - dep
-            - modelTerms
+            - model_terms
             - dep_scale
 
 
@@ -618,20 +557,20 @@ items:
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GLM_PRED_${ dep }`'
+    varTitle: '`MIXED_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
         - dep
         - factors
         - covs
-        - modelTerms
+        - model_terms
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GLM_RES_${ dep }`'
+    varTitle: '`MIXED_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
         - dep
         - factors
         - covs
-        - modelTerms
+        - model_terms

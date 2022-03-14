@@ -69,6 +69,14 @@ children:
           - type: TextBox
             name: ci_width
             format: number
+      - type: Label
+        label: Model comparison
+        children:
+              - type: CheckBox
+                name: comparison
+                events:
+                  change: './mixed.events::onEvent_comparison'
+            
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -93,9 +101,47 @@ children:
                 isTarget: true
                 itemDropBehaviour: emptyspace
                 events:
-                  change: './mixed.events::onChange_modelTerms'
+                  change: './gamlj.events::onChange_model_terms'
+                  listItemRemoved: './gamlj.events::onChange_model_remove'
                 template:
                   type: TermLabel
+              - type: CheckBox
+                name: fixed_intercept
+    
+          - type: TargetLayoutBox
+            name: nested_layout
+            transferAction: interactions
+            children:
+              - type: ListBox
+                name: nested_terms
+                valueFilter: unique
+                isTarget: true
+                itemDropBehaviour: emptyspace
+                events:
+                  change: './gamlj.events::onChange_nested_add'
+                template:
+                  type: TermLabel
+              - type: CheckBox
+                name: nested_intercept
+                enable: (comparison)
+                    
+                  
+                  
+      - type: LayoutBox
+        style: inline
+        margin: large
+        children:
+          - type: Label
+            label: Omnibus test
+            children:
+              - name: omnibus_F
+                type: RadioButton
+                optionName: omnibus
+                optionPart: F
+              - name: omnibus_LRT
+                type: RadioButton
+                optionName: omnibus
+                optionPart: LRT
   - type: CollapseBox
     label: Random Effects
     collapsed: true
@@ -104,7 +150,7 @@ children:
       - type: Supplier
         name: randomSupplier
         label: Components
-        persistentItems: false
+        persistentItems: true
         stretchFactor: 1
         events:
           change: './mixed.events::onChange_randomSupplier'
@@ -112,11 +158,12 @@ children:
         children:
           - type: TargetLayoutBox
             transferAction: none
+            name: re_layout
             children:
               - type: ListBox
                 name: re
-                height: large
-                addButton: Add block
+                height: normal
+                addButton: Add correlated effects block
                 events:
                   listItemAdded: './mixed.events::onEvent_nothing'
                   listItemRemoved: './mixed.events::onEvent_nothing'
@@ -129,19 +176,65 @@ children:
                   children:
                     - type: ListBox
                       name: randblockList
+                      height: auto
                       isTarget: true
                       valueFilter: unique
-                      height: auto
                       ghostText: drag term here
                       events:
                         change: './mixed.events::onEvent_addRandomTerm'
                       template:
                         type: TermLabel
                         format: ./rtermFormat
+
+          - type: TargetLayoutBox
+            transferAction: none
+            name: nested_re_layout
+            children:
+              - type: ListBox
+                name: nested_re
+                height: normal
+                addButton: Add correlated effects block
+                events:
+                  listItemAdded: './mixed.events::onEvent_nothing'
+                  listItemRemoved: './mixed.events::onEvent_nothing'
+                selectable: true
+                templateName: linreg-block-template
+                template:
+                  type: LayoutBox
+                  margin: normal
+                  targetArea: true
+                  children:
+                    - type: ListBox
+                      name: re_randblockList
+                      height: auto
+                      isTarget: true
+                      valueFilter: unique
+                      ghostText: drag term here
+                      itemDropBehaviour: emptyspace
+                      events:
+                        change: './mixed.events::onEvent_addRandomTerm'
+                      template:
+                        type: TermLabel
+                        format: ./rtermFormat
+
+
       - type: LayoutBox
         margin: large
         style: inline
         children:
+          - type: Label
+            label: List components
+            children:
+                  - type: CheckBox
+                    name: re_modelterms
+                    events:
+                      change: './mixed.events::onEvent_re_list'
+
+                  - type: ComboBox
+                    name: re_listing
+                    events:
+                      change: './mixed.events::onEvent_re_list'
+
           - type: Label
             label: Effects correlation
             children:
@@ -163,6 +256,7 @@ children:
                     name: re_corr_block
                     optionName: re_corr
                     optionPart: block
+                    
           - type: Label
             label: Tests
             children:
@@ -171,11 +265,6 @@ children:
                 children:
                   - type: CheckBox
                     name: re_lrt
-  - type: LayoutBox
-    margin: large
-    children:
-      - type: CheckBox
-        name: fixed_ntercept
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -203,13 +292,14 @@ children:
         name: show_contrastnames
       - type: CheckBox
         name: show_contrastcodes
+        
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
     stretchFactor: 1
     children:
       - type: ListBox
-        name: scaling
+        name: covs_scale
         stretchFactor: 1
         showColumnHeaders: false
         columns:
@@ -238,25 +328,26 @@ children:
                 label: Covariates conditioning
                 children:
                   - type: RadioButton
-                    name: cov_scale_mean_sd
-                    optionName: cov_scale
+                    name: covs_conditioning_mean_sd
+                    optionName: covs_conditioning
                     optionPart: mean_sd
                     children:
                       - type: TextBox
-                        name: csm_value
+                        name: ccm_value
                         format: number
-                        enable: (cov_scale_mean_sd)
-                  - type: RadioButton
-                    name: cov_scale_percent
-                    optionName: cov_scale
+                        enable: (covs_conditioning_mean_sd)
+
+                  - name: covs_conditioning_percent
+                    type: RadioButton
+                    optionName: covs_conditioning
                     optionPart: percent
                     children:
                       - type: TextBox
-                        name: csp_value
+                        name: ccp_value
                         label: null
                         suffix: '%'
                         format: number
-                        enable: (cov_scale_percent)
+                        enable: (covs_conditioning_percent)
           - type: LayoutBox
             margin: large
             style: list
@@ -277,11 +368,6 @@ children:
                   - type: ComboBox
                     name: scale_missing
                     label: ''
-
-#####  post hoc ##########
-
-
-
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -335,10 +421,6 @@ children:
                 type: CheckBox
                 optionName: adjust
                 optionPart: sidak
-
-
-
-#### plots ###########
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -517,7 +599,6 @@ children:
                 name: boot_r
                 format: number
                 enable: (ci_method_quantile || ci_method_bcai)
-                
           - type: Label
             label: DF Method
             children:
