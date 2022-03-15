@@ -251,6 +251,8 @@ Syntax <- R6::R6Class(
     ### posthoc means ###
     
     init_posthoc=function() {
+      
+
         lapply(self$options$posthoc, function(.term) {
           p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
           nrow<-p*(p-1)/2

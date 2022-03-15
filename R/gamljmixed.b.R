@@ -56,14 +56,6 @@ gamljMixedClass <- R6::R6Class(
 
 
 
-      ## post hoc #####
-      
-      aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
-      aSmartObj$expandable<-TRUE
-      aSmartObj$expandSuperTitle<-"Comparison"
-      aSmartObj$ci("est",self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
-      
 
       ### estimate marginal means
       
@@ -111,6 +103,15 @@ gamljMixedClass <- R6::R6Class(
       ### assumptions nromtest
       aSmartObj<-SmartTable$new(self$results$assumptions$normtest,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+
+      ## post hoc #####
+      
+      aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
+      aSmartObj$expandable<-TRUE
+      aSmartObj$expandSuperTitle<-"Comparison"
+      aSmartObj$ci("est",self$options$ci_width)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      
       
       ### init all ####
 
@@ -141,10 +142,12 @@ gamljMixedClass <- R6::R6Class(
       private$.estimate_machine$estimate(data)
 
       ### run tables ###
-      for (smarttab in private$.smartObjs)
+      for (smarttab in private$.smartObjs) {
            smarttab$runTable()
+           private$.checkpoint()
+      }
 
-      for (smarttab in private$.smartObjs)
+      for (smarttab in private$.smartObjs) 
         smarttab$setNotes(private$.estimate_machine$dispatcher)
       
 

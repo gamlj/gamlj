@@ -20,21 +20,7 @@ items:
          type: text
          title: ""
 
-    clearWith:
-        - dep
-        - factors
-        - cov
-        - model_terms
-        - nested_terms
-        - fixed_intercept
-        - ci_method
-        - semethod
-        - dci
-        - boot_r
-        - comparison
-        - re
-        - nested_re
-        
+
     refs: gamlj
      
   - name: main
@@ -90,7 +76,7 @@ items:
                          - covs_covs_scale
                          - dep_scale
                          - fixed_intercept
- 
+                         - df_method
              columns:
                     - name: source
                       title: ""
@@ -100,10 +86,10 @@ items:
                       type: number
                     - name: df1
                       title: df
-                      type: integer
+                      type: number
                     - name: df2
                       title: df (res)
-                      type: integer
+                      type: number
 
                     - name: f
                       title: F
@@ -127,7 +113,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
-
+                    - df_method
              columns:
                     - name: source
                       title: "Names"
@@ -152,7 +138,7 @@ items:
                       visible: (estimates_ci)
                     - name: df
                       title: "df"
-                      type: integer
+                      type: number
                     - name: t
                       title: "t"
                       type: number
@@ -201,6 +187,7 @@ items:
               - ci_method
               - ci_width
               - boot_r
+              - df_method
 
         columns:
         - name: estimate
@@ -222,7 +209,7 @@ items:
           type: number
         - name: df
           title: df
-          type: integer
+          type: number
         - name: p
           title: p
           type: number
@@ -278,6 +265,7 @@ items:
                  - cvalue
                  - percvalue
                  - simpleScaleLabels
+                 - df_method
  
               columns:
                    - name: test
@@ -285,10 +273,10 @@ items:
                      type: number
                    - name: df1
                      title: Num df
-                     type: integer
+                     type: number
                    - name: df2
                      title: Den df
-                     type: integer
+                     type: number
                    - name: p
                      title: p
                      type: number
@@ -315,7 +303,8 @@ items:
                  - ci_method
                  - ci_width
                  - boot_r
-                 
+                 - df_method
+                
               columns:
                      - name: contrast
                        title: "Effect"
@@ -367,6 +356,8 @@ items:
                 - dep_scale
                 - fixed_intercept
                 - simpleScaleLabels
+                - df_method
+                
              columns:
                    - name: effect
                      title: 'Effect'
@@ -376,10 +367,10 @@ items:
                      type: number
                    - name: df1
                      title: df1
-                     type: integer
+                     type: number
                    - name: df2
                      title: df2
-                     type: integer
+                     type: number
                    - name: p
                      title: p
                      type: number
@@ -397,11 +388,9 @@ items:
                 - fixed_intercept
                 - simpleScaleLabels
                 - ci_width
-                - emmeans
-                - ci_width
                 - ci_method
                 - boot_r
-                - semethod
+                - df_method
 
              columns:
                    - name: effect
@@ -415,7 +404,7 @@ items:
                      type: number
                    - name: df
                      title: df
-                     type: integer
+                     type: number
                    - name: est.ci.lower
                      title: Lower 
                      type: number
@@ -443,10 +432,11 @@ items:
         clearWith:
             - ci_width
             - ci_method
-            - emmeans
-            - semethod
             - boot_r
+            - emmeans
+            - df_method
             - model_terms
+            
         columns:
         - name: estimate
           title: 'Mean'
@@ -456,7 +446,7 @@ items:
           type: number
         - name: df
           title: df
-          type: integer
+          type: number
         - name: est.ci.lower
           title: Lower 
           type: number

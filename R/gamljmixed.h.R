@@ -663,20 +663,6 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `name`="specs", 
                         `type`="text", 
                         `title`="")),
-                clearWith=list(
-                    "dep",
-                    "factors",
-                    "cov",
-                    "model_terms",
-                    "nested_terms",
-                    "fixed_intercept",
-                    "ci_method",
-                    "semethod",
-                    "dci",
-                    "boot_r",
-                    "comparison",
-                    "re",
-                    "nested_re"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -723,7 +709,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df1", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="test", 
                                     `title`="LRT X\u00B2", 
@@ -743,7 +729,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_covs_scale",
                                 "dep_scale",
-                                "fixed_intercept"),
+                                "fixed_intercept",
+                                "df_method"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -756,11 +743,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df1", 
                                     `title`="df", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="df2", 
                                     `title`="df (res)", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="f", 
                                     `title`="F", 
@@ -783,7 +770,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "df_method"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -815,7 +803,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="t", 
                                     `title`="t", 
@@ -863,7 +851,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "ci_method",
                         "ci_width",
-                        "boot_r"),
+                        "boot_r",
+                        "df_method"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -890,7 +879,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="df", 
                             `title`="df", 
-                            `type`="integer"),
+                            `type`="number"),
                         list(
                             `name`="p", 
                             `title`="p", 
@@ -956,7 +945,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "simpleScale",
                                 "cvalue",
                                 "percvalue",
-                                "simpleScaleLabels"),
+                                "simpleScaleLabels",
+                                "df_method"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -965,11 +955,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df1", 
                                     `title`="Num df", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="df2", 
                                     `title`="Den df", 
-                                    `type`="integer"),
+                                    `type`="number"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -996,7 +986,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "semethod",
                                 "ci_method",
                                 "ci_width",
-                                "boot_r"),
+                                "boot_r",
+                                "df_method"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1062,7 +1053,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale",
                                     "dep_scale",
                                     "fixed_intercept",
-                                    "simpleScaleLabels"),
+                                    "simpleScaleLabels",
+                                    "df_method"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1075,11 +1067,11 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     list(
                                         `name`="df1", 
                                         `title`="df1", 
-                                        `type`="integer"),
+                                        `type`="number"),
                                     list(
                                         `name`="df2", 
                                         `title`="df2", 
-                                        `type`="integer"),
+                                        `type`="number"),
                                     list(
                                         `name`="p", 
                                         `title`="p", 
@@ -1098,11 +1090,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "fixed_intercept",
                                     "simpleScaleLabels",
                                     "ci_width",
-                                    "emmeans",
-                                    "ci_width",
                                     "ci_method",
                                     "boot_r",
-                                    "semethod"),
+                                    "df_method"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1119,7 +1109,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     list(
                                         `name`="df", 
                                         `title`="df", 
-                                        `type`="integer"),
+                                        `type`="number"),
                                     list(
                                         `name`="est.ci.lower", 
                                         `title`="Lower", 
@@ -1149,9 +1139,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "ci_width",
                         "ci_method",
-                        "emmeans",
-                        "semethod",
                         "boot_r",
+                        "emmeans",
+                        "df_method",
                         "model_terms"),
                     columns=list(
                         list(
@@ -1165,7 +1155,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="df", 
                             `title`="df", 
-                            `type`="integer"),
+                            `type`="number"),
                         list(
                             `name`="est.ci.lower", 
                             `title`="Lower", 

@@ -122,8 +122,6 @@ children:
               - type: CheckBox
                 name: nested_intercept
                 enable: (comparison)
-
-
   - type: CollapseBox
     label: Random Effects
     collapsed: true
@@ -579,10 +577,11 @@ children:
                 name: df_method_Satterthwaite
                 optionName: df_method
                 optionPart: Satterthwaite
-              - type: RadioButton
-                name: df_method_Kenward-Roger
+              - name: df_method_Kenward-Roger
+                type: RadioButton
                 optionName: df_method
                 optionPart: Kenward-Roger
+                
           - type: Label
             label: Save
             children:

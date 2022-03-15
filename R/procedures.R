@@ -31,6 +31,10 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 
 procedure.posthoc <- function(obj) {
   
+  
+  if (length(terms) == 0) 
+    return()
+
   gstart("PROCEDURE: Posthoc")
   
   terms <- obj$options$posthoc
@@ -50,10 +54,12 @@ procedure.posthoc <- function(obj) {
        vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
   }
   
+  lmer.df = NULL
+  if (obj$option("df_method")) {
+    lmer.df=obj$options$df_method
+  }
   
-  if (length(terms) == 0) 
-    return()
-  
+    
   postHocTables <- list()
   
   for (.vars in terms) {
@@ -62,13 +68,16 @@ procedure.posthoc <- function(obj) {
     ## so the final table will look sorted in a more sensible way
     .revvars<-rev(.vars)
     .term64<-jmvcore::composeTerm(tob64(.revvars))
-     none <- .posthoc(model, .term64, "none", vfun=vfun)
-     bonferroni <- .posthoc(model, .term64, "bonferroni",vfun=vfun)
-     holm <- .posthoc(model, .term64, "holm",vfun=vfun)
-     tukey <- .posthoc(model, .term64, "tukey",vfun=vfun)
-     sidak <- .posthoc(model, .term64, "sidak",vfun=vfun)
-     scheffe <- .posthoc(model, .term64, "scheffe",vfun=vfun)
+     referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df)
+     mark(referenceGrid )
+     none <- summary(graphics::pairs(referenceGrid), adjust = "none",infer = c(FALSE,TRUE))
+     bonferroni <- summary(graphics::pairs(referenceGrid), adjust = "bonf",infer = c(FALSE,TRUE))
+     holm <- summary(graphics::pairs(referenceGrid), adjust = "holm",infer = c(FALSE,TRUE))
+     tukey <- summary(graphics::pairs(referenceGrid), adjust = "tukey",infer = c(FALSE,TRUE))
+     sidak <- summary(graphics::pairs(referenceGrid), adjust = "sidak",infer = c(FALSE,TRUE))
+     scheffe <- summary(graphics::pairs(referenceGrid), adjust = "scheffe",infer = c(FALSE,TRUE))
      cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
+     
      tableData <- as.data.frame(none, stringAsFactors = FALSE)
      .transnames<-list(estimate=c("odds.ratio","ratio"),
                        test=c("z.ratio","t.ratio"),
@@ -83,7 +92,6 @@ procedure.posthoc <- function(obj) {
      tableData$tukey <- tukey$p.value
      tableData$scheffe <- scheffe$p.value
      tableData$sidak <- sidak$p.value
-     
      tableData$est.ci.lower<-cidata$est.ci.lower       
      tableData$est.ci.upper<-cidata$est.ci.upper       
      
@@ -110,6 +118,7 @@ procedure.posthoc <- function(obj) {
      
     if ("response" %in% names(tableData))
         tableData$response<-fromb64(as.character(tableData$response))
+
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
     gend()
@@ -208,25 +217,26 @@ procedure.posthoc_effsize <- function(obj) {
 ###### post hoc ##########
 .posthoc <- function(x, ...) UseMethod(".posthoc")
 
-.posthoc.default <- function(model, term, adjust,vfun=NULL) {
+.posthoc.default <- function(model, term, vfun=NULL,df=NULL) {
 
     termf <- stats::as.formula(paste("~", term))
     
     data <- mf.getModelData(model)
-    opts_list<-list(object=model,specs=termf, type = "response", data = data)
+    opts_list<-list(object=model,specs=termf,adjust="none", type = "response", data = data)
 
     if (is.something(vfun))
          opts_list[["vcov."]]<-vfun    
 
+    if (is.something(df))
+      opts_list[["lmer.df"]]<-tolower(df)    
+    
       referenceGrid <- do.call(emmeans::emmeans,opts_list)
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
       newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
       referenceGrid@grid[terms] <- newlabs
-      results <- summary(graphics::pairs(referenceGrid), adjust = adjust,infer = c(FALSE,TRUE))
-
- 
-  results
+      
+      return(referenceGrid)
 }
 
 .posthoc.multinom <- function(model, term, adjust,ci=FALSE,vfun=NULL) {
