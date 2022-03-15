@@ -77,11 +77,17 @@ Syntax <- R6::R6Class(
         
          .fullterms<-c(as.numeric(self$hasIntercept),self$options$model_terms)
          .nestedterms<-c(as.numeric(self$options$nested_intercept),self$options$nested_terms)
-         .formula<-jmvcore::composeFormula(NULL,.nestedterms)
+         .formula<-fromb64(self$nested_formula64,self$vars)
          
          .test <- jmvcore::composeFormula(setdiff(.fullterms,.nestedterms))
          tab[["mc"]]<-list(info="Comparison",value="Nested model",specs=.formula)
          tab[["mctest"]]<-list(info="Comparison",value="Tested terms",specs=.test)
+         if (self$option("nested_re")) {
+           .test <- jmvcore::composeFormula(setdiff(unlist(self$options$re),unlist(self$options$nested_re)))
+           if (length(.test)>0)
+             tab[["mctest1"]]<-list(info="Comparison",value="Tested random",specs=.test)
+         }
+           
          
       }
         
@@ -92,9 +98,23 @@ Syntax <- R6::R6Class(
     },
     init_main_r2=function() {
       
+        if (self$option(".caller","lmer")) {
+          tab<-list(list(type="Marginal"),list(type="Conditional"))
+          if (self$option("comparison"))
+            tab<-list(list(type="Marginal",model="Full"),
+                      list(type="Conditional",model="Full"),
+                      list(type="Marginal",model="Nested"),
+                      list(type="Conditional",model="Nested"),
+                      list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R²"))
+                      )
+  
+        } else {
         tab<-list(model="")
         if (self$option("comparison"))
-           tab<-list(list(model="Full"),list(model="Nested"),list(model=paste0(greek_vector[["Delta"]],"R²")))
+           tab<-list(list(model="Full"),
+                     list(model="Nested"),
+                     list(model=paste0(greek_vector[["Delta"]],"R²")))
+        }
       tab
       
     },
@@ -210,7 +230,6 @@ Syntax <- R6::R6Class(
        }
        mat<-as.data.frame(matrix(".",nrow=.len,ncol=.len+1))
        names(mat)<-c("source",paste0("c",1:.len))
-       mark(.titles)
        attr(mat,"titles")<-.titles
        mat
       },
@@ -387,10 +406,13 @@ Syntax <- R6::R6Class(
       self$hasTerms <-(length(modelTerms)>0)
       self$isProper <-(self$hasIntercept | self$hasTerms)
       
-      rands   <-NULL
+      rands64   <-NULL
+      rands     <-NULL
+      
       cluster <-NULL
       if (self$option("re")) {
-         rands<-private$.buildreffects()
+         rands64<-private$.buildreffects()
+         rands<-fromb64(rands64,unique(unlist(self$options$re)))
          cluster<-self$options$cluster
       }
       
@@ -398,9 +420,9 @@ Syntax <- R6::R6Class(
       if (!self$hasTerms) sep=""
       self$vars<-c(self$options$dep,unique(unlist(modelTerms)),cluster)
       
-      fixed<-jmvcore::composeFormula(NULL,tob64(modelTerms))
-      fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed)
-      self$formula64<-trimws(paste(fixed,rands,sep =  ""))
+      fixed64<-jmvcore::composeFormula(NULL,tob64(modelTerms))
+      fixed64<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed64)
+      self$formula64<-trimws(paste(fixed64,rands64,sep =  ""))
 
       fixed<-jmvcore::composeFormula(NULL,modelTerms)
       fixed<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),fixed)
@@ -411,9 +433,10 @@ Syntax <- R6::R6Class(
         hasIntercept<-self$option("nested_intercept")
         sep<-"+"
         if (!is.something(self$options$nested_terms)) sep=""
-        fixed<-jmvcore::composeFormula(NULL,tob64(self$options$nested_terms))
-        fixed<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(hasIntercept),sep),fixed)
-        self$nested_formula64<-trimws(paste(fixed,rands,sep =  ""))
+        fixed64<-jmvcore::composeFormula(NULL,tob64(self$options$nested_terms))
+        fixed64<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(hasIntercept),sep),fixed64)
+        rands64<-private$.buildreffects("nested")
+        self$nested_formula64<-trimws(paste(fixed64,rands64,sep =  ""))
 
       }
     },
@@ -505,9 +528,18 @@ Syntax <- R6::R6Class(
       
       
     },
-    .buildreffects=function() {
+    .buildreffects=function(what="full") {
       
-      terms  <-  self$options$re
+      if (!self$option(".caller",c("lmer","glmer")))
+         return()
+      
+      if (what=="full")
+         terms  <-  self$options$re
+      else
+         terms  <-  self$options$nested_re
+      
+      if (is.null(terms))
+          return()
       ## this is for R. It overrides the correlatedEffect option 
       correl<-TRUE
       if (length(terms)>1)
@@ -517,14 +549,15 @@ Syntax <- R6::R6Class(
       terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
       
       # split in sublists if option=nocorr
-      if (self$options$re_corr=="nocorr") {
+      if (self$options$re_corr=="nocorr" & what!="nested") {
         termslist<-terms[[1]]
         terms<-lapply(termslist,list)
       }
+      
       rterms<-""    
       for(i in seq_along(terms)) {
         one<-terms[[i]]
-        one64<-lapply(one,jmvcore::toB64)
+        one64<-tob64(one)
         flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
         res<-do.call("rbind",flatterms)
         ### check blocks coherence
@@ -535,19 +568,14 @@ Syntax <- R6::R6Class(
         
         res<-tapply(res[,1],res[,2],paste)
         res<-sapply(res, function(x) paste(x,collapse = " + "))
-        ### delat with intercept ###
+        ### deal with intercept ###
         for (i in seq_along(res)) {
-          test<-grep(jmvcore::toB64("Intercept"),res[[i]],fixed=TRUE)
+          test<-grep(tob64("Intercept"),res[[i]],fixed=TRUE)
           if (is.something(test))
-            res[[i]]<-gsub(jmvcore::toB64("Intercept"),1,res[[i]])
+            res[[i]]<-gsub(tob64("Intercept"),1,res[[i]])
           else 
             res[[i]]<-paste("0 + ",res[[i]])
         }
-        #                if (is.something(test))
-        #                  res<-gsub(jmvcore::toB64("Intercept"),1,res)
-        #                else
-        #                  res[[1]]<-paste(0,res[[1]],sep = "+")
-        
         ### compose ####
         form<-paste(res,names(res),sep=" | ")
         form<-paste("(",form,")")

@@ -168,32 +168,35 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
   .parameters.glm(model,obj)
 
 .parameters.lmerModLmerTest<-function(model,obj) {
-  
-  results<-try_hard(summary(model,ddf=obj$options$df_method))
-  
-  if (!isFALSE(results$error)) {
-    obj$errors<-list(topic="tab_coefficients",message=results$error)
-    return()
-  }
-  
-  obj$warnings<-list(topic="tab_coefficients",message=results$warning)
-  
-  .summary<-results$obj
+
+    .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
+    .iterations          <-  obj$options$boot_r
+    .ci_method           <-  obj$options$ci_method
+    .ci_width            <-  obj$ciwidth
+
     
-  .coefficients         <-  as.data.frame(.summary$coefficients)
-  names(.coefficients)  <-  c("estimate","se","df","t","p")
-  .coefficients$source  <-  rownames(.coefficients)
-  
-  if (obj$options$estimates_ci)
-    test<-try({
-      method<-ifelse(obj$options$ci_method=="wald","Wald",obj$options$ci_method)
-      ci   <-  confint(model,parm = "beta_",level = obj$ciwidth, method=method)
-      colnames(ci)  <-  c("ci.lower","ci.upper")
-     .coefficients  <-  cbind(.coefficients,ci)
-    })
-  if (jmvcore::isError(test)) {
-    obj$warnings   <-   list(topic="tab_coefficients",message="Random effects C.I. cannot be computed")
-  }
+    .coefficients        <-  as.data.frame(parameters::parameters(
+      model,
+      ci=NULL,
+      effects="fixed"
+    ),stringAsFactors=FALSE)
+    
+    names(.coefficients) <-  c("source","estimate","se","t","df","p")
+    
+    if (obj$option("estimates_ci")) {
+    
+        if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
+      
+      cidata            <-  as.data.frame(parameters::ci(.model,
+                                                         ci=.ci_width,
+                                                         ci_method=.ci_method))
+      
+      .coefficients$est.ci.lower<-cidata$CI_low
+      .coefficients$est.ci.upper<-cidata$CI_high
+      
+    }
+    
+
   
   return(.coefficients)
 }
@@ -449,20 +452,20 @@ mf.anova<- function(x,...) UseMethod(".anova")
   
   df<-obj$options$df_method
   results        <-  try_hard(stats::anova(model,type="3",ddf=df))
-  obj$errors    <-  list(topic="tab_anova",message=results$error)
-  obj$warnings  <-  list(topic="tab_anova",message=results$warning)
+  obj$dispatcher$errors    <-  list(topic="main_anova",message=results$error)
+  obj$dispatcher$warnings  <-  list(topic="main_anova",message=results$warning)
 
   if (!isFALSE(results$error))
       return()
   
   ano<-results$obj
   if (dim(ano)[1]==0) {
-    obj$warnings<-list(topic="tab_anova",message="F-Tests cannot be computed without fixed effects")
+    obj$dispatcher$warnings<-list(topic="main_anova",message="F-Tests cannot be computed without fixed effects")
     return(ano)
   }
   if (dim(ano)[2]==4) {
     ano<-.car.anova(model,df)
-    obj$warnings<-list(topic="tab_anova",message="Degrees of freedom computed with method Kenward-Roger")
+    obj$dispatcher$warnings<-list(topic="main_anova",message="Degrees of freedom computed with method Kenward-Roger")
     
   } 
     # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
@@ -472,7 +475,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
       names(ano)<-c("ss","ms","df1","df2","f","p")
   else
       stop("fix anova with chisq")
-  
+
   return(ano)
 
 }
@@ -510,7 +513,7 @@ mf.fixModel<- function(x,...) UseMethod(".fixModel")
 .fixModel.lmerModLmerTest<-function(model,obj=NULL) {
   
   if (lme4::isSingular(model))
-      obj$warnings<-list(topic="info",message=WARNS[["lmer.singular"]])
+      obj$dispatcher$warnings<-list(topic="info",message=WARNS[["lmer.singular"]])
 
   return(model)
 }
@@ -651,5 +654,15 @@ mf.standardize<- function(x,...) UseMethod(".standardize")
 }  
 
   
+####### model update ##########
+
+
+mf.update<- function(x,...) UseMethod(".update")
+
+.update.default<-function(model,...) {
+   data<-mf.getModelData(model)
+   stats::update(model,data=data,...)
+}
+
 
 

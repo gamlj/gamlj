@@ -26,8 +26,9 @@ Estimate <- R6::R6Class("Estimate",
                             
                             self$model<-private$.estimateModel(data)
                             ginfo("ESTIMATE: initial estimation done")
+                            mark(self$nested_formula64)
                             if (is.something(self$nested_formula64)) {
-                              self$nested_model<-stats::update(self$model,formula=self$nested_formula64)
+                              self$nested_model<-mf.update(self$model,formula=self$nested_formula64)
 
 
                             }
@@ -435,7 +436,6 @@ Estimate <- R6::R6Class("Estimate",
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
                               results<-try_hard(eval(acall))
-                             
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
                               if (!isFALSE(results$error)) {

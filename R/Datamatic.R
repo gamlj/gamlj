@@ -111,7 +111,6 @@ Variable <- R6::R6Class(
     covs_scale="none",
     hasCluster=NULL,
     nClusters=0,
-    isBetween=FALSE,
     initialize=function(var,datamatic) {
       self$name<-var
       self$datamatic<-datamatic
@@ -217,7 +216,7 @@ Variable <- R6::R6Class(
        if (self$type=="cluster") {
          if (!is.factor(vardata)) {
            vardata<-factor(vardata)
-           self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been coerced to factor"))
+           self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been coerced to nominal"),id="clcoe")
          }
          return(vardata)
          
@@ -231,24 +230,7 @@ Variable <- R6::R6Class(
               return()
           }
        
-                
-        ## check if is within or between in case of repeated measures
-        ## because tables can be very long to build, we examine only the first and the last
-        ## cluster. In the majority of the case the guess is good
-        if (is.something(self$hasCluster) && length(vardata)>0) {
-          cluster64<-tob64(self$hasCluster[[1]])
-          levs<-unique(data[[cluster64]])
-          testdata<-data[data[[cluster64]]==levs[1],self$name64]
-          tt<-table(testdata)
-          test1=(max(tt)!=sum(tt))
-          testdata<-data[data[[cluster64]]==levs[length(levs)],self$name64]
-          tt<-table(testdata)
-          test2=(max(tt)!=sum(tt))
-          if (!all(c(test1,test2)))
-               self$isBetween<-TRUE
-        }
-         
-         
+
         contrasts(vardata)<-self$contrast_values
         ### fix levels ####
         levels(vardata)<-paste0(LEVEL_SYMBOL,levels(vardata))

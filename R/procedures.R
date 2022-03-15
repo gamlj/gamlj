@@ -41,7 +41,7 @@ procedure.posthoc <- function(obj) {
    model<-obj$model
    
   .model<-model
-   if (!obj$option("ci_method","wald")) 
+   if (obj$option("ci_method",c("quantile","bcai"))) 
        .model<-obj$boot_model
 
   ### check if we need robust standard error  

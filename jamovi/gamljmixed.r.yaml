@@ -25,11 +25,16 @@ items:
         - factors
         - cov
         - model_terms
+        - nested_terms
         - fixed_intercept
         - ci_method
         - semethod
         - dci
         - boot_r
+        - comparison
+        - re
+        - nested_re
+        
     refs: gamlj
      
   - name: main
@@ -43,28 +48,35 @@ items:
              clearWith:
                          - dep
                          - model_terms
+                         - nested_terms
                          - fixed_intercept
+                         - reml
+                         - comparison
+                         - re
+                         - nested_re
+                         - nested_intercept
              rows: 1
              columns:
-                    - name: r1
+                    - name: model
+                      title: Model
+                      visible: (comparison)
+                    - name: type
+                      type: text
+                      title: Type
+                    - name: r2
                       title: R²
                       type: number
-                    - name: r2
-                      title: Adj. R²
-                      type: number
-                    - name:  df1
-                      title: Num df
+                    - name:  df
+                      title: df1
                       type: integer
-                    - name:  df2
-                      title: Den df
-                      type: integer
-                    - name: f
-                      title: F
+                    - name: test
+                      title: LRT X²
                       type: number
                     - name: p
                       title: p
                       type: number
                       format: zto,pvalue
+
                       
 
            - name: anova
@@ -83,13 +95,16 @@ items:
                     - name: source
                       title: ""
                       type: text
-                      visible: (ci_method:quantile)
                     - name: ss
                       title: SS
                       type: number
-                    - name: df
+                    - name: df1
                       title: df
                       type: integer
+                    - name: df2
+                      title: df (res)
+                      type: integer
+
                     - name: f
                       title: F
                       type: number

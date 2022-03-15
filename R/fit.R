@@ -4,19 +4,22 @@ fit.R2 <- function(model,obj) {
   
   # r2 and tests for the model
   r2list  <-  r2.est(model,obj)
-  
   # check if model comparisons are required
   if (obj$option("comparison")) {
     ### r2 for the nested model
     r2nested<-r2.est(obj$nested_model,obj)
     ### compare the two models
-    comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
+    if (obj$option(".caller",c("lmer","glmer")))
+        comp <-  as.data.frame(performance::test_likelihoodratio(obj$nested_model,model))
+    else  
+        comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
+    
     r2comp<-as.list(comp[2,])
 
     .names<-list(df2=c("Res.Df","Resid. Df"),
-                 df1="Df",p=c("Pr(>Chi)","Pr(>F)"),
+                 df1=c("Df","df_diff"),p=c("Pr(>Chi)","Pr(>F)"),
                  f="F",
-                 test="Deviance")
+                 test=c("Deviance","Chi2"))
     
     names(r2comp)<-transnames(names(r2comp),.names)
 
@@ -24,12 +27,14 @@ fit.R2 <- function(model,obj) {
     if (obj$option("omnibus","LRT") & !hasName(r2comp,"lrt"))
           r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
     ### adjust
+    
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
-    r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
+    if (hasName(r2list[[1]],"ar2"))
+          r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
     
     r2list<-c(r2list,r2nested,list(r2comp))
-    
   }
+
   r2list
 }
 
@@ -39,8 +44,7 @@ fit.R2 <- function(model,obj) {
 r2.est<- function(model,...) UseMethod(".r2") 
 
 
-.r2.default<-function(model) {
-   
+.r2.default<-function(model,obj) {
   performance::r2(model,tolerance =0)
 
 }
@@ -82,6 +86,7 @@ r2.est<- function(model,...) UseMethod(".r2")
   alist$test  <-  results$test
   alist$df1    <-  results$df1
   alist$p     <-  results$p
+
   return(list(alist))
   
 }
@@ -142,25 +147,24 @@ r2.est<- function(model,...) UseMethod(".r2")
 }
 
 
-.r2.lmerModLmerTest<-function(model) {
+.r2.lmerModLmerTest<-function(model,obj) {
   
-  alist<-list()
   r2<-.r2.default(model,obj)
   if (is.null(r2))
       return(NULL)
-  results<-fit.compare_null_model(model,type="m")
-  
-  tests<-results$obj
-  tests$r2<-r2$R2_marginal
-  alist[[1]]<-tests
+  cond<-list(r2="")  
   if (!is.na(r2$R2_conditional)) {
-      tests<-fit.compare_null_model(model,type="c")
-      tests$r2<-r2$R2_conditional
-      alist[[2]]<-tests
-  } else
-      tests<-list(r2="")
-  alist[[2]]<-tests
-  alist
+       cond<-fit.compare_null_model(model,type="c")
+       cond$type<-"Conditional"
+       cond$r2<-r2$R2_conditional
+  }
+  marg<-list(r2="")
+  if (!is.na(r2$R2_marginal)) {
+      marg<-fit.compare_null_model(model,type="m")
+      marg$type="Marginal"
+      marg$r2<-r2$R2_marginal
+  }
+  list(cond,marg)
 
   
 }
@@ -234,7 +238,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
           
   }
   ### please note that here we use performance::test_likelihoodratio, which compute the LRT 
-  ### on the esimated models, no matter what REML is. If one compares the results with 
+  ### on the estimated models, no matter what REML is. If one compares the results with 
   ### lmerTest::anova() they are slightly different because the latter re-estimate the models
   ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
 

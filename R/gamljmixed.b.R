@@ -10,6 +10,7 @@ gamljMixedClass <- R6::R6Class(
     .time=NULL,
     .smartObjs=list(),
     .init=function() {
+      
       ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
@@ -19,6 +20,7 @@ gamljMixedClass <- R6::R6Class(
           self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
         return()
       }
+      emmeans::emm_options(lmerTest.limit = 25000)  
       
       ### set up the R6 workhorse class
       dispatcher<-Dispatch$new()
@@ -33,6 +35,7 @@ gamljMixedClass <- R6::R6Class(
 
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
+      aSmartObj$spaceBy<-"model"
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
 
@@ -61,16 +64,7 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj$ci("est",self$options$ci_width)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
-      aSmartObj<-SmartArray$new(self$results$posthocEffsize,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthocEffsize))
-      aSmartObj$expandable<-TRUE
-      aSmartObj$expandSuperTitle<-"Comparison"
-      aSmartObj$ci("dm",self$options$ci_width)
-      aSmartObj$ci("ds",self$options$ci_width)
-      aSmartObj$ci("g",self$options$ci_width)
-#      aSmartObj$restNotes(self$options$dci==FALSE)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
-      
+
       ### estimate marginal means
       
       aSmartObj<-SmartArray$new(self$results$emmeans,estimate_machine)

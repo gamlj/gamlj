@@ -22,7 +22,7 @@ if(!is.something(options$dep)) {
   
   if (hasName(options,"re")) {
      
-       if (any(sapply(options$randomTerms,function(x) length(x)==0)))  
+       if (any(sapply(options$re,function(x) length(x)==0)))  
        {
          result$ready <- FALSE
          result$report <- TRUE

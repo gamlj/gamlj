@@ -16,7 +16,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             nested_terms = NULL,
             comparison = FALSE,
             nested_intercept = TRUE,
-            omnibus = "F",
+            omnibus = "LRT",
             estimates_ci = TRUE,
             donotrun = FALSE,
             ci_method = "wald",
@@ -133,9 +133,9 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..omnibus <- jmvcore::OptionList$new(
                 "omnibus",
                 omnibus,
-                default="F",
+                hidden=TRUE,
+                default="LRT",
                 options=list(
-                    "F",
                     "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
@@ -668,11 +668,15 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "factors",
                     "cov",
                     "model_terms",
+                    "nested_terms",
                     "fixed_intercept",
                     "ci_method",
                     "semethod",
                     "dci",
-                    "boot_r"),
+                    "boot_r",
+                    "comparison",
+                    "re",
+                    "nested_re"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -695,28 +699,34 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "model_terms",
-                                "fixed_intercept"),
+                                "nested_terms",
+                                "fixed_intercept",
+                                "reml",
+                                "comparison",
+                                "re",
+                                "nested_re",
+                                "nested_intercept"),
                             rows=1,
                             columns=list(
                                 list(
-                                    `name`="r1", 
+                                    `name`="model", 
+                                    `title`="Model", 
+                                    `visible`="(comparison)"),
+                                list(
+                                    `name`="type", 
+                                    `type`="text", 
+                                    `title`="Type"),
+                                list(
+                                    `name`="r2", 
                                     `title`="R\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="r2", 
-                                    `title`="Adj. R\u00B2", 
-                                    `type`="number"),
-                                list(
-                                    `name`="df1", 
-                                    `title`="Num df", 
+                                    `name`="df", 
+                                    `title`="df1", 
                                     `type`="integer"),
                                 list(
-                                    `name`="df2", 
-                                    `title`="Den df", 
-                                    `type`="integer"),
-                                list(
-                                    `name`="f", 
-                                    `title`="F", 
+                                    `name`="test", 
+                                    `title`="LRT X\u00B2", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -738,15 +748,18 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="source", 
                                     `title`="", 
-                                    `type`="text", 
-                                    `visible`="(ci_method:quantile)"),
+                                    `type`="text"),
                                 list(
                                     `name`="ss", 
                                     `title`="SS", 
                                     `type`="number"),
                                 list(
-                                    `name`="df", 
+                                    `name`="df1", 
                                     `title`="df", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="df2", 
+                                    `title`="df (res)", 
                                     `type`="integer"),
                                 list(
                                     `name`="f", 
@@ -1483,7 +1496,7 @@ gamljMixed <- function(
     nested_terms = NULL,
     comparison = FALSE,
     nested_intercept = TRUE,
-    omnibus = "F",
+    omnibus = "LRT",
     estimates_ci = TRUE,
     donotrun = FALSE,
     ci_method = "wald",

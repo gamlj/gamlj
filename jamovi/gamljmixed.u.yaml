@@ -72,11 +72,10 @@ children:
       - type: Label
         label: Model comparison
         children:
-              - type: CheckBox
-                name: comparison
-                events:
-                  change: './mixed.events::onEvent_comparison'
-            
+          - type: CheckBox
+            name: comparison
+            events:
+              change: './mixed.events::onEvent_comparison'
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -107,7 +106,6 @@ children:
                   type: TermLabel
               - type: CheckBox
                 name: fixed_intercept
-    
           - type: TargetLayoutBox
             name: nested_layout
             transferAction: interactions
@@ -124,24 +122,8 @@ children:
               - type: CheckBox
                 name: nested_intercept
                 enable: (comparison)
-                    
-                  
-                  
-      - type: LayoutBox
-        style: inline
-        margin: large
-        children:
-          - type: Label
-            label: Omnibus test
-            children:
-              - name: omnibus_F
-                type: RadioButton
-                optionName: omnibus
-                optionPart: F
-              - name: omnibus_LRT
-                type: RadioButton
-                optionName: omnibus
-                optionPart: LRT
+
+
   - type: CollapseBox
     label: Random Effects
     collapsed: true
@@ -165,8 +147,7 @@ children:
                 height: normal
                 addButton: Add correlated effects block
                 events:
-                  listItemAdded: './mixed.events::onEvent_nothing'
-                  listItemRemoved: './mixed.events::onEvent_nothing'
+                  change: './mixed.events::onChange_nested_re_add'
                 selectable: true
                 templateName: linreg-block-template
                 template:
@@ -185,7 +166,6 @@ children:
                       template:
                         type: TermLabel
                         format: ./rtermFormat
-
           - type: TargetLayoutBox
             transferAction: none
             name: nested_re_layout
@@ -216,8 +196,6 @@ children:
                       template:
                         type: TermLabel
                         format: ./rtermFormat
-
-
       - type: LayoutBox
         margin: large
         style: inline
@@ -225,16 +203,14 @@ children:
           - type: Label
             label: List components
             children:
-                  - type: CheckBox
-                    name: re_modelterms
-                    events:
-                      change: './mixed.events::onEvent_re_list'
-
-                  - type: ComboBox
-                    name: re_listing
-                    events:
-                      change: './mixed.events::onEvent_re_list'
-
+              - type: CheckBox
+                name: re_modelterms
+                events:
+                  change: './mixed.events::onEvent_re_list'
+              - type: ComboBox
+                name: re_listing
+                events:
+                  change: './mixed.events::onEvent_re_list'
           - type: Label
             label: Effects correlation
             children:
@@ -256,7 +232,6 @@ children:
                     name: re_corr_block
                     optionName: re_corr
                     optionPart: block
-                    
           - type: Label
             label: Tests
             children:
@@ -292,7 +267,6 @@ children:
         name: show_contrastnames
       - type: CheckBox
         name: show_contrastcodes
-        
   - type: CollapseBox
     label: Covariates Scaling
     collapsed: true
@@ -336,7 +310,6 @@ children:
                         name: ccm_value
                         format: number
                         enable: (covs_conditioning_mean_sd)
-
                   - name: covs_conditioning_percent
                     type: RadioButton
                     optionName: covs_conditioning

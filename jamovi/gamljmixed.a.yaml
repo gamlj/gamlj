@@ -130,10 +130,9 @@ options:
     - name: omnibus
       title: Test
       type: List
-      default: F
+      hidden: true
+      default: LRT
       options:
-        - name:  F
-          title: F-test
         - name: LRT
           title: LRT
 

@@ -117,6 +117,9 @@ const events = {
 
     },    
 
+    onChange_nested_re_add: function(ui) {
+
+    },
 
    onEvent_nothing: function(ui, data) {
            // remove error notes if any
