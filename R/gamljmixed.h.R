@@ -709,7 +709,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df1", 
-                                    `type`="number"),
+                                    `type`="integer"),
                                 list(
                                     `name`="test", 
                                     `title`="LRT X\u00B2", 

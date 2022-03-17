@@ -69,7 +69,6 @@ procedure.posthoc <- function(obj) {
     .revvars<-rev(.vars)
     .term64<-jmvcore::composeTerm(tob64(.revvars))
      referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df)
-     mark(referenceGrid )
      none <- summary(graphics::pairs(referenceGrid), adjust = "none",infer = c(FALSE,TRUE))
      bonferroni <- summary(graphics::pairs(referenceGrid), adjust = "bonf",infer = c(FALSE,TRUE))
      holm <- summary(graphics::pairs(referenceGrid), adjust = "holm",infer = c(FALSE,TRUE))
@@ -155,8 +154,10 @@ procedure.posthoc_effsize <- function(obj) {
     ## so the final table will look sorted in a more sensible way
    .term64 <- jmvcore::composeTerm(tob64(.revvars))
     
-    base <- .posthoc(model, .term64, "none", vfun=vfun)
-    tableData <- as.data.frame(base, stringAsFactors = FALSE)
+    referenceGrid <- .posthoc(model, .term64, vfun=vfun)
+    none <- summary(graphics::pairs(referenceGrid), adjust = "none",infer = c(FALSE,TRUE))
+    
+    tableData <- as.data.frame(none, stringAsFactors = FALSE)
 
     .transnames<-list(estimate=c("odds.ratio","ratio"),
                       test=c("z.ratio","t.ratio"),
@@ -184,7 +185,7 @@ procedure.posthoc_effsize <- function(obj) {
 
       for (.name in .names)
          tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
-    
+
       d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
       tableData$ds<-d$d
       tableData$ds.ci.lower<-d$CI_low
