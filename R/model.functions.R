@@ -660,9 +660,27 @@ mf.standardize<- function(x,...) UseMethod(".standardize")
 mf.update<- function(x,...) UseMethod(".update")
 
 .update.default<-function(model,...) {
+
    data<-mf.getModelData(model)
    stats::update(model,data=data,...)
 }
 
+.update.lmerModLmerTest<-function(model,...) {
+
+  .args<-list(...)
+  data<-mf.getModelData(model)
+  
+  if (hasName(.args,"formula")) {
+    .formula<-as.formula(.args$formula)
+     test<-lme4::findbars(.formula)
+    
+     if (!is.something(test)) {
+       warning("No random coefficients specified. A linear model is used instead.")
+       return(stats::lm(formula = .formula,data=data))
+     }
+  }
+  
+  stats::update(model,data=data,...)
+}
 
 

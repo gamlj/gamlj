@@ -41,6 +41,7 @@ items:
                          - re
                          - nested_re
                          - nested_intercept
+
              rows: 1
              columns:
                     - name: model
@@ -52,8 +53,8 @@ items:
                     - name: r2
                       title: R²
                       type: number
-                    - name:  df
-                      title: df1
+                    - name:  df1
+                      title: df
                       type: integer
                     - name: test
                       title: LRT X²
@@ -62,8 +63,8 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
+             refs: parameters
 
-                      
 
            - name: anova
              title: ANOVA Omnibus tests

@@ -57,12 +57,16 @@ Syntax <- R6::R6Class(
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
 
       ### confidence intervals
+      if (self$option("ci_method",c("quantile","bcai")))
+          self$dispatcher$warnings<-list(topic="info",message="Please wait, computing bootstrap confidence intervals may take a while",init=TRUE)
+        
       method<-switch(self$options$ci_method,
                      wald="Wald",
                      profile="Profile",
                      quantile="Bootstrap percent",
                      bcai="Bootstrap BCa"
-                     )
+      
+                                    )
       info<-switch(self$options$ci_method,
                      wald="",
                      profile="",
@@ -100,13 +104,14 @@ Syntax <- R6::R6Class(
       
         if (self$option(".caller","lmer")) {
           tab<-list(list(type="Marginal"),list(type="Conditional"))
-          if (self$option("comparison"))
-            tab<-list(list(type="Marginal",model="Full"),
-                      list(type="Conditional",model="Full"),
-                      list(type="Marginal",model="Nested"),
+          if (self$option("comparison")) {
+            tab<-list(list(type="Conditional",model="Full"),
+                      list(type="Marginal",model="Full"),
                       list(type="Conditional",model="Nested"),
+                      list(type="Marginal",model="Nested"),
                       list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R²"))
                       )
+          }
   
         } else {
         tab<-list(model="")
@@ -437,7 +442,8 @@ Syntax <- R6::R6Class(
         if (!is.something(self$options$nested_terms)) sep=""
         fixed64<-jmvcore::composeFormula(NULL,tob64(self$options$nested_terms))
         fixed64<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(hasIntercept),sep),fixed64)
-        rands64<-private$.buildreffects("nested")
+        if (self$option("re"))
+            rands64<-private$.buildreffects("nested")
         self$nested_formula64<-trimws(paste(fixed64,rands64,sep =  ""))
 
       }
@@ -534,24 +540,22 @@ Syntax <- R6::R6Class(
       
       if (!self$option(".caller",c("lmer","glmer")))
          return()
-      
       if (what=="full")
          terms  <-  self$options$re
-      else
+      else 
          terms  <-  self$options$nested_re
       
       if (is.null(terms))
           return()
-      ## this is for R. It overrides the correlatedEffect option 
-      correl<-TRUE
+      ## this is for R. It overrides the re_corr option 
+      correl<-self$options$re_corr
       if (length(terms)>1)
         correl  <-  "block"
-      
       # remove empty sublists
       terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
       
-      # split in sublists if option=nocorr
-      if (self$options$re_corr=="nocorr" & what!="nested") {
+      # split in sublists if option re_corr=none
+      if (correl=="none" & what!="nested") {
         termslist<-terms[[1]]
         terms<-lapply(termslist,list)
       }
@@ -570,6 +574,7 @@ Syntax <- R6::R6Class(
         
         res<-tapply(res[,1],res[,2],paste)
         res<-sapply(res, function(x) paste(x,collapse = " + "))
+
         ### deal with intercept ###
         for (i in seq_along(res)) {
           test<-grep(tob64("Intercept"),res[[i]],fixed=TRUE)

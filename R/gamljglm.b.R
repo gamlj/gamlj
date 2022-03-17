@@ -22,7 +22,7 @@ gamljGlmClass <- R6::R6Class(
       }
       
       ### set up the R6 workhorse class
-      dispatcher<-Dispatch$new()
+      dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
       estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
      
@@ -153,9 +153,9 @@ gamljGlmClass <- R6::R6Class(
       private$.estimate_machine<-estimate_machine
       
       ######## plotting class #######
-      plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
-      plotter_machine$initPlots()
-      private$.plotter_machine<-plotter_machine
+  #    plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
+  #    plotter_machine$initPlots()
+  #    private$.plotter_machine<-plotter_machine
 
       now<-Sys.time()
       ginfo("INIT TIME:",now-private$.time," secs")
@@ -188,14 +188,13 @@ gamljGlmClass <- R6::R6Class(
       # #save model preds and resids            
       # private$.estimate_machine$savePredRes(self$results) 
       # 
-      if (1==1) {
-      private$.plotter_machine$preparePlots()
+      # private$.plotter_machine$preparePlots()
+      # 
+      # if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
+      #     self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
+      #     self$results$plotnotes$setVisible(TRUE)
+      # }  
       
-      if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
-          self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
-          self$results$plotnotes$setVisible(TRUE)
-      }  
-      }
       
 #      private$.checkpoint()
       

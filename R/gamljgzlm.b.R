@@ -23,7 +23,7 @@ gamljGzlmClass <- R6::R6Class(
       }
       
       ### set up the R6 workhorse class
-      dispatcher<-Dispatch$new()
+      dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
       estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
       

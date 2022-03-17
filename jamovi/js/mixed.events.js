@@ -159,7 +159,19 @@ var fix_comparison=function(ui, context) {
               ui.re.$el.height("243.315px");
 
             }
-
+           // start the nested random effects equal to the model random effects
+           var renested=context.cloneArray(ui.nested_re.value(), [[]]);
+           console.log(renested);
+           if (renested[0].length === 0) {
+              var relist=context.cloneArray(ui.re.value(), [[]]);
+              ui.nested_re.setValue(relist);
+           }
+           var fenested=context.cloneArray(ui.nested_terms.value(), [[]]);
+           if (fenested.length===0) {
+           // start the nested fixed effects equal to the model fixed effects
+             var felist=context.cloneArray(ui.model_terms.value(), []);
+             ui.nested_terms.setValue(felist);
+           }
 
 };
 

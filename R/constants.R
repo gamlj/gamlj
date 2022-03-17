@@ -10,7 +10,7 @@ FACTOR_SYMBOL= "..f_f_f.."
 LEVEL_SYMBOL = "..l_l_l.."
 INTERACTION_SYMBOL=":"
 B64_SYMBOL="..b_b_b.."
-
+B64_REGEX="\\.\\.b_b_b\\.\\."
 
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")

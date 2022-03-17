@@ -30,8 +30,29 @@ bogustob64<-function(obj,ref) tob64(obj,ref)
 
 fromb64<- function(x,...) UseMethod(".fromb64")
 
-
 .fromb64.default<-function(obj,ref=NULL) {
+
+  if (!is.something(obj))
+    return(obj)
+  
+  if (length(obj)>1)
+    return(unlist(sapply(obj, bogusfromb64,ref=ref,USE.NAMES = F)))
+  
+  bregex<-paste0("(?<=",B64_REGEX,")\\w+")
+  matches64<-stringr::str_extract_all(obj,bregex)[[1]]
+  matches<-jmvcore::fromB64(matches64)
+  astring<-obj
+  for (i in seq_along(matches64))
+      astring<-stringr::str_replace_all(astring,matches64[i],matches[i])
+  astring<-stringr::str_replace_all(astring,B64_SYMBOL,"")
+  astring<-stringr::str_replace_all(astring,FACTOR_SYMBOL,"")
+  astring<-stringr::str_replace_all(astring,LEVEL_SYMBOL,"")
+  astring<-stringr::str_replace_all(astring,INTERACTION_SYMBOL,":")
+  astring
+}
+
+
+.fromb64.old<-function(obj,ref=NULL) {
     
     if (!is.something(obj))
         return(obj)

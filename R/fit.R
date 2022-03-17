@@ -1,6 +1,8 @@
 ############# produces R2  ##########
 
 fit.R2 <- function(model,obj) {
+
+
   
   # r2 and tests for the model
   r2list  <-  r2.est(model,obj)
@@ -8,12 +10,13 @@ fit.R2 <- function(model,obj) {
   if (obj$option("comparison")) {
     ### r2 for the nested model
     r2nested<-r2.est(obj$nested_model,obj)
+
     ### compare the two models
     if (obj$option(".caller",c("lmer","glmer")))
         comp <-  as.data.frame(performance::test_likelihoodratio(obj$nested_model,model))
     else  
         comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
-    
+
     r2comp<-as.list(comp[2,])
 
     .names<-list(df2=c("Res.Df","Resid. Df"),
@@ -22,12 +25,26 @@ fit.R2 <- function(model,obj) {
                  test=c("Deviance","Chi2"))
     
     names(r2comp)<-transnames(names(r2comp),.names)
-
-    ## sometimes the chi-square is not printed out    
-    if (obj$option("omnibus","LRT") & !hasName(r2comp,"lrt"))
-          r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
-    ### adjust
     
+    ### give some warning
+
+    if (r2comp$df1<0)
+        obj$dispatcher$warnings<-list(topic="main_r2",message="Nested model is not actually nested in the full model ")
+
+    if (r2comp$df1==0)
+       obj$dispatcher$warnings<-list(topic="main_r2",message="Nested and full models are identical, try removing some term from the nested model")
+    
+    ### if two different estimation (mixed vs lm) are compared, be sure
+    ### all rows are filled
+    if (length(r2list)>length(r2nested))
+          r2nested[[2]]<-r2nested[[1]]
+    
+    
+    ## sometimes the chi-square is not printed out    
+#    if (obj$option("omnibus","LRT") & !hasName(r2comp,"lrt"))
+#          r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
+    ### adjust
+
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
     if (hasName(r2list[[1]],"ar2"))
           r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
@@ -132,10 +149,13 @@ r2.est<- function(model,...) UseMethod(".r2")
       loglik0<- -0.5*n*(log(2*pi) + log( ssnull/n ) + 1)
       loglik1<-as.numeric(stats::logLik(model))
       results$lrt<-2*(loglik1-loglik0)
+      results$test<-results$lrt
+      
       results$p<-stats::pchisq(results$lrt,results$df1,lower.tail = FALSE)
 
     } else {    
       results$f<-ss$fstatistic[["value"]]
+      results$test<-results$f
       results$p<-stats::pf(results$f,results$df1,results$df2, lower.tail = FALSE)
     }
   } else {
@@ -243,8 +263,8 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
 
   results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
-  names(results)<-c("nothing1","nothing2","nothing3","df","test","p")
-  results[2,c("df","test","p")]
+  names(results)<-c("nothing1","nothing2","nothing3","df1","test","p")
+  results[2,c("df1","test","p")]
 }
 
 null.deviance<-function(model) {

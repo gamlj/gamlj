@@ -186,3 +186,15 @@ transnames<-function(original,ref) {
     ifelse(length(i)>0,i,x)
   }))
 }
+
+is.listOfList<-function(obj) {
+  if (length(obj)==0)
+     return(FALSE)
+   
+  if (inherits(obj,"list")) {
+    child<-obj[[1]]
+    return(inherits(obj,"list"))
+  }
+  return(FALSE)
+}
+

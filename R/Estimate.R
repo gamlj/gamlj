@@ -26,11 +26,16 @@ Estimate <- R6::R6Class("Estimate",
                             
                             self$model<-private$.estimateModel(data)
                             ginfo("ESTIMATE: initial estimation done")
-                            mark(self$nested_formula64)
                             if (is.something(self$nested_formula64)) {
-                              self$nested_model<-mf.update(self$model,formula=self$nested_formula64)
-
-
+                              obj<-try_hard(mf.update(self$model,formula=self$nested_formula64))
+                              self$nested_model<-obj$obj
+                              if (!isFALSE(obj$warning))
+                                    self$dispatcher$warnings<-list(topic="main_r2",
+                                                             message=paste("Nested model:",obj$warning))
+                              if (!isFALSE(obj$error))
+                                    self$dispatcher$warnings<-list(topic="main_r2",
+                                                             message=paste("Nested model:",obj$error))
+                              
                             }
                           }, # end of public function estimate
 

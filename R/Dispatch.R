@@ -4,23 +4,44 @@ Dispatch <- R6::R6Class(
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   public=list(
-    initialize=function() { }
+    tables=NULL,
+    initialize=function(results) { 
+    self$tables<-results
+    }
   ),
   active=list(
         warnings=function(obj) {
 
-              if (missing(obj))
-                           return(private$.warnings)
-              if (is.null(obj$message))
-                           return()
-              if (obj$message==FALSE)
-                           return()
-              obj<-fromb64(obj)
-              topic<-private$.warnings[[obj$topic]]
-              id<-tob64(ifelse(hasName(obj,"id"),obj$id,as.character(length(topic)+1)))
-              msg<-private$.translate(obj$message)
-              topic[[id]]<-msg
-              private$.warnings[[obj$topic]]<-topic
+          
+              if (missing(obj)) return()
+              if (is.null(obj$message)) return()
+              if (isFALSE(obj$message)) return()
+          
+              if (is.null(obj$topic)) stop("warnings messages should have a topic (a table path)")
+              obj$message<-fromb64(obj$message)
+              
+              path<-stringr::str_split(obj$topic,"_")[[1]]
+              tableobj<-self$tables
+              found<-FALSE
+              for (aname in path)
+                 if (hasName(tableobj,aname)) {
+                       found<-TRUE
+                       tableobj<-tableobj[[aname]]
+                 }
+              
+               if (!found) stop("a message was sent to a non-existing result object ",obj$topic)
+               state<-as.list(tableobj$state)
+
+               if (!hasName(obj,"id")) obj$id<-jmvcore::toB64(obj$message)
+               
+               if (!inherits(tableobj,"Table")) 
+                     what<-obj$id
+               else
+                     what<-length(state$notes)+1
+                              
+               state$notes[[what]]<-obj
+               tableobj$setState(state)
+          
           },
         errors=function(obj) {
           
