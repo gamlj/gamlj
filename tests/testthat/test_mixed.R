@@ -170,8 +170,10 @@ model<-gamlj::gamljMixed(
   data = data,
   scaling = list(list(
     var="beer",
-    type="standardized")))
-
+    type="standardized")),
+  plotHAxis = "beer",
+  plotRandomEffects = T)
+model
 testthat::test_that("standardizing", {
   testthat::expect_equal(model$main$fixed$asDF[2,2],.8506,tolerance = .002)
 })
