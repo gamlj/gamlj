@@ -526,6 +526,7 @@ Estimate <- R6::R6Class("Estimate",
                                 ### random components data frame ######
                                   if (is.null(self$tab_random))
                                       return()
+                            
                                   vc<-as.data.frame(lme4::VarCorr(self$model))
                                   variances<-which(is.na(vc$var2))
                                   covariances<-which(!is.na(vc$var2))
@@ -540,7 +541,6 @@ Estimate <- R6::R6Class("Estimate",
                                   ### Variance partitioning coefficients
                                   vartot<-sum(params$var)
                                   params$vpc<-params$var/vartot
-                                  
                                   
                                   ### confidence intervals
                                   ci_covariances<-NULL

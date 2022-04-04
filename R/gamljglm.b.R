@@ -31,7 +31,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
-
+      return()
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
@@ -179,9 +179,7 @@ gamljGlmClass <- R6::R6Class(
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
-      for (smarttab in private$.smartObjs)
-        smarttab$setNotes(private$.estimate_machine$dispatcher)
-      
+
 
 #      private$.checkpoint()
       
@@ -197,10 +195,6 @@ gamljGlmClass <- R6::R6Class(
       
       
 #      private$.checkpoint()
-      
-      ### save the model if we are in R ###
-      if (self$options$.interface=="r")
-              self$results$.setModel(private$.estimate_machine$model)
       
       ginfo("MODULE:  #### phase end ####")
       
