@@ -329,9 +329,10 @@ gplots.twoWaysPlot <- function(image, theme, depName, groupName, linesName, erro
             data <- image$state$randomData
             data <- stats::aggregate(data$y, list(data$cluster, data$group), mean)
             names(data) <- c("cluster", "group", "y")
+            ginfo("Plotting random effect from two-way plot continuous")
 
-            p <- p + ggplot2::geom_smooth(data = data, aes_string(x = "group", y = "y", group = "cluster"),
-                                          se=FALSE,alpha = 0.5, size = 0.2, color = "gray64", 
+            p <- p + ggplot2::geom_line(data = data, aes_string(x = "group", y = "y", group = "cluster"),
+                                          se=FALSE,alpha = 0.7, size = 0.3, color = "gray64", 
                 show.legend = F)
         }
         if (errorType != "") 
@@ -392,8 +393,8 @@ gplots.oneWayPlot <- function(image, theme, depName, groupName, errorType = "non
             data <- stats::aggregate(data$y, list(data$cluster, data$group), mean)
             names(data) <- c("cluster", "group", "y")
             ginfo("Random effects plotting")
-            p <- p + ggplot2::geom_smooth(data = data, aes_string(x = "group", y = "y", group = "cluster"),
-                                          se=FALSE, alpha = 0.5, size = 0.2, color="gray64", show.legend = F)
+            p <- p + ggplot2::geom_line(data = data, aes_string(x = "group", y = "y", group = "cluster"),
+                                          se=FALSE, size = 0.3, color="gray30", show.legend = F)
         }
 
         if (errorType != "") 
