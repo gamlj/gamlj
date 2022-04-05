@@ -42,9 +42,11 @@ conditioning <- R6::R6Class("conditioning", public = list(labels_type = "labels"
     if (is.data.frame(vardata)) {
         for (name in self$vars) if (name %in% names(vardata)) .storeValues(vardata[, name], name)
     } else .storeValues(vardata, varname)
-}, print = function() {
-    print(private$cond_specs)
-}, updateValues = function(var, values, decode = F) {
+}, 
+   print = function() {
+     print(private$cond_specs)
+   },
+   updateValues = function(var, values, decode = F) {
 
     if (decode) var <- jmvcore::fromB64(var)
 
@@ -112,7 +114,7 @@ conditioning <- R6::R6Class("conditioning", public = list(labels_type = "labels"
         }
         if (obj == "percent") {
             if (span == 1) span <- 25
-            res <- list(method = "percent", span = span, labels = c(paste0(50 - span, "xxx"), "50xx", paste0(50 + span, "xxx")), values = NULL)
+            res <- list(method = "percent", span = span, labels = c(paste0(50 - span, "th"), "50th", paste0(50 + span, "th")), values = NULL)
             return(res)
         }
     }
