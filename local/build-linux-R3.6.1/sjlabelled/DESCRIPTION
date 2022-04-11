@@ -1,0 +1,32 @@
+Package: sjlabelled
+Type: Package
+Encoding: UTF-8
+Title: Labelled Data Utility Functions
+Version: 1.1.2
+Authors@R: c(
+    person("Daniel", "Lüdecke", role = c("aut", "cre"), email = "d.luedecke@uke.de", comment = c(ORCID = "0000-0002-8895-3206")),
+    person("David", "Ranzolin", role = "ctb", email = "daranzolin@gmail.com")
+    )
+Maintainer: Daniel Lüdecke <d.luedecke@uke.de>
+Description: Collection of functions dealing with labelled data, like reading and 
+    writing data between R and other statistical software packages like 'SPSS',
+    'SAS' or 'Stata', and working with labelled data. This includes easy ways 
+    to get, set or change value and variable label attributes, to convert 
+    labelled vectors into factors or numeric (and vice versa), or to deal with 
+    multiple declared missing values.
+License: GPL-3
+Depends: R (>= 3.2)
+Imports: haven (>= 1.1.2), insight (>= 0.7.0), stats, tools, utils
+Suggests: dplyr, magrittr, sjmisc, sjPlot, knitr, rlang, rmarkdown,
+        snakecase, testthat
+URL: https://strengejacke.github.io/sjlabelled
+BugReports: https://github.com/strengejacke/sjlabelled/issues
+RoxygenNote: 7.0.2
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2020-01-17 09:11:04 UTC; mail
+Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>),
+  David Ranzolin [ctb]
+Repository: CRAN
+Date/Publication: 2020-01-17 12:00:02 UTC
+Built: R 3.6.1; ; 2020-01-23 15:01:46 UTC; unix

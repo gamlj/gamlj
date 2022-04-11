@@ -1,0 +1,337 @@
+---
+name:  gamljGzml
+title: Generalized Linear Models
+jrs: '1.0'
+
+items:
+
+    - name: info
+      title: Model Info
+      type: Table
+      columns:
+       - name: info
+         type: text
+         title: "Info"
+       - name: value
+         type: text
+         title: "Value"
+       - name: comm
+         type: text
+         title: "Comment"
+         
+      clearWith:
+        - dep
+        - factors
+        - cov
+        - modelTerms
+        - modelSelection
+
+    - name: main
+      title: "Analysis of Deviance: Omnibus Tests"
+      type: Table
+      description: a table of Chi-square tests results
+      clearWith:
+        - dep
+        - modelTerms
+        - ss
+
+      columns:
+        - name: name
+          title: ""
+          type: text
+
+        - name: test
+          title: X²
+          type: number
+
+        - name: df
+          title: df
+          type: integer
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+
+    - name: estimates
+      title: Model Coefficients (Parameter Estimates)
+      type: Table
+      description: a table of Coefficients
+      clearWith:
+        - dep
+        - modelTerms
+        - scaling
+        - contrasts
+        - expb
+      columns:
+        - name: dep
+          title: "Response Groups"
+          type: text
+          visible: (modelSelection:multinomial)
+          combineBelow: true
+        - name: name
+          title: ""
+          type: text
+        - name: label
+          title: "Contrast"
+          type: text
+          visible: (showContrasts)
+        - name: estimate
+          title: Estimate
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: cilow
+          type: number
+          title: Lower
+          visible: (showParamsCI)
+        - name: cihig
+          type: number
+          title: Upper
+          visible: (showParamsCI)
+        - name: expb
+          title: exp(B)
+          type: number
+          visible: (expb && !modelSelection:probit)
+
+        - name: z
+          title: z
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: contrasts
+      title: Contrasts Coding 
+      type: Array
+      description: an array of contrasts definitions tables
+      visible: (showContrastsTable)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title: Contrasts - $key
+        type: Table
+        clearWith:
+
+        columns:
+          - name: term
+            title: "Term"
+            type: text
+          - name: contrast
+            title: "Contrast"
+            type: text
+          - name: groups
+            title: "Groups to levels"
+            type: text
+
+
+    - name: simpleEffectsAnovas
+      title: Simple Effects Analysis of Deviance
+      type: Array
+      description: an array of simple Effects Chisquared test tables
+      visible: (simpleVariable)
+      clearWith:
+        - dep
+        - modelTerms
+        - contrasts
+        - scaling
+      template:
+        title: Simple Effecs  $key 
+        type: Table
+        columns:
+          - name: variable
+            title: "Effect"
+            type: text
+          - name: level
+            title: "Moderator Levels"
+            type: text
+          - name: test
+            title: X² 
+            type: number
+          - name: df 
+            title: df
+            type: integer
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+
+
+    - name: simpleEffects
+      title: Simple Effects Parameters 
+      type: Array
+      description: an array of simple Effects tables
+      visible: (simpleVariable)
+      clearWith:
+        - dep
+        - modelTerms
+        - contrasts
+        - scaling
+      template:
+        title: Simple Effects $key
+        type: Table
+        clearWith:
+        columns:
+          - name: dep
+            title: "Response Groups"
+            type: text
+            visible: (modelSelection:multinomial)
+            combineBelow: true
+
+          - name: variable
+            title: "Effect"
+            type: text
+          - name: level
+            title: "Moderator Levels"
+            type: text
+          - name: estimate
+            title: "Estimate"
+          - name: se
+            title: SE
+            type: number
+          - name: expb
+            title: exp(B)
+            type: number
+            visible: (expb && !modelSelection:probit)
+
+          - name: z
+            title: z
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+
+
+
+    - name: model
+      type: Property
+      description: The underlying `glm` object
+
+
+
+
+    - name: postHoc
+      title: Post Hoc Tests
+      type: Array
+      description: an array of post-hoc tables
+      items: (postHoc)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title:  ""
+        type: Table
+        columns:
+        - name: dep
+          title: "Response Groups"
+          type: text
+          visible: (modelSelection:multinomial)
+          combineBelow: true
+        - name: contrast
+          title: ""
+          type: number
+          visible: false
+        - name: estimate
+          title: Difference
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: test
+          title: test
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:none)
+        - name: pbonf
+          title: p<sub>bonferroni</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:bonf)
+        - name: pholm
+          title: p<sub>holm</sub>
+          type: number
+          format: zto,pvalue
+          visible: (postHocCorr:holm)
+
+    - name: emeansTables
+      title: Estimated Marginal Means 
+      type: Array
+      description: an array of predicted means tables
+      visible: (eDesc)
+      clearWith:
+        - dep
+        - modelTerms
+      template:
+        title:  $key
+        type: Table
+        columns:
+        - name: dep
+          title: "Response Groups"
+          type: text
+          visible: (modelSelection:multinomial)
+          combineBelow: true
+        - name: lsmean
+          title: Mean
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: lower
+          title: Lower
+          type: number
+        - name: upper
+          title: Upper
+          type: number
+
+
+
+    - name: descPlot
+      title: Effects Plots
+      visible: (plotHAxis)
+      type: Image
+      description: a descriptives plot
+      width: 500
+      height: 300
+      renderFun: .descPlot
+      clearWith:
+        - dep
+        - plotHAxis
+        - plotSepLines
+        - plotSepPlots
+        - plotError
+        - ciWidth
+        - scaling
+        - modelTerms
+        - plotRaw
+        
+    - name: descPlots
+      title: Results Plots
+      type: Array
+      description: an array of results plots
+      visible: (plotSepPlots)
+      template:
+          title: $key
+          type: Image
+          renderFun: .descPlot
+          clearWith:
+           - dep
+           - plotHAxis
+           - plotSepLines
+           - plotSepPlots
+           - plotError
+           - ciWidth
+           - scaling
+           - modelTerms
+           - plotRaw
+           - plotDvScale
+
+
+

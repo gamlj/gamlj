@@ -1,0 +1,45 @@
+Package: insight
+Type: Package
+Title: Easy Access to Model Information for Various Model Objects
+Description: A tool to provide an easy, intuitive and consistent access to 
+   information contained in various R models, like model formulas, model terms, 
+   information about random effects, data that was used to fit the model or 
+   data from response variables. 'insight' mainly revolves around two types 
+   of functions: Functions that find (the names of) information, starting with 
+   'find_', and functions that get the underlying data, starting with 'get_'. 
+   The package has a consistent syntax and works with many different model 
+   objects, where otherwise functions to access these information are missing.
+Version: 0.8.0
+Authors@R: c(person("Daniel", "Lüdecke", role = c("aut", "cre"), email = "d.luedecke@uke.de", comment = c(ORCID = "0000-0002-8895-3206")),
+             person("Dominique", "Makowski", role = c("aut", "ctb"), email = "dom.makowski@gmail.com", comment = c(ORCID = "0000-0001-5375-9967")),
+             person("Indrajeet", "Patil", role = c("aut", "ctb"), email = "patilindrajeet.science@gmail.com", comment = c(ORCID = "0000-0003-1995-6531")),
+             person("Philip", "Waggoner", role = c("aut", "ctb"), email = "philip.waggoner@gmail.com", comment = c(ORCID = "0000-0002-7825-7573")))
+Maintainer: Daniel Lüdecke <d.luedecke@uke.de>
+License: GPL-3
+URL: https://easystats.github.io/insight/
+BugReports: https://github.com/easystats/insight/issues
+Depends: R (>= 3.2)
+Imports: methods, stats, utils
+Suggests: AER, afex, aod, BayesFactor, bayestestR, betareg, biglm,
+        blavaan, blme, brms, censReg, cgam, coxme, cplm, crch,
+        estimatr, feisr, fixest, gam, gamm4, gamlss, gbm, gee, geepack,
+        GLMMadaptive, glmmTMB, gmnl, HRQoL, httr, lavaan, lfe, logistf,
+        MASS, Matrix, MCMCglmm, mlogit, multgee, lme4, mgcv, nnet,
+        nlme, ordinal, panelr, plm, pscl, quantreg, rms, robustbase,
+        robustlmm, rstanarm, rstudioapi, speedglm, splines, statmod,
+        survey, survival, tripack, truncreg, testthat, VGAM, knitr,
+        rmarkdown, spelling
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+VignetteBuilder: knitr
+Language: en-US
+NeedsCompilation: no
+Packaged: 2020-01-14 08:46:09 UTC; mail
+Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>),
+  Dominique Makowski [aut, ctb] (<https://orcid.org/0000-0001-5375-9967>),
+  Indrajeet Patil [aut, ctb] (<https://orcid.org/0000-0003-1995-6531>),
+  Philip Waggoner [aut, ctb] (<https://orcid.org/0000-0002-7825-7573>)
+Repository: CRAN
+Date/Publication: 2020-01-14 11:20:30 UTC
+Built: R 3.6.1; ; 2020-01-23 15:01:40 UTC; unix

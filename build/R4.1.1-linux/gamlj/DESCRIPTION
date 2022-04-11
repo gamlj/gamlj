@@ -1,0 +1,20 @@
+Package: gamlj
+Type: Package
+Title: GAMLj Suite for linear models
+Version: 2.9.3
+Author: Marcello Gallucci
+Maintainer: Marcello Gallucci <mcfanda@gmail.com>
+Description: A suite for estimating linear models, such as the general linear model, linear mixed models,
+             generalized linear models and generalized mixed models. For each family, models can be estimated
+             with categorical and/or continuous variables, with options to facilitate estimation of 
+             interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes, and visualization of the results.
+License: GPL
+Encoding: UTF-8
+LazyData: true
+Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0), car, lmerTest, nnet,
+        MASS, gridExtra, ggplot2, effectsize, performance, geepack,
+        ordinal
+RoxygenNote: 7.1.1
+Suggests: rmarkdown, knitr
+VignetteBuilder: knitr
+Built: R 4.1.1; ; 2022-02-08 12:57:02 UTC; unix

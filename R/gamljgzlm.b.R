@@ -170,11 +170,7 @@ gamljGzlmClass <- R6::R6Class(
       for (smarttab in private$.smartObjs)
         smarttab$runTable()
       
-      ### retrive additional warnings and errors
-      for (smarttab in private$.smartObjs)
-        smarttab$setNotes(private$.estimate_machine$dispatcher)
-      
-      
+
       private$.checkpoint()
       
       ginfo("MODULE:  #### phase end ####")

@@ -198,3 +198,38 @@ is.listOfList<-function(obj) {
   return(FALSE)
 }
 
+ebind<-function(...) {
+  tabs<-list(...)
+  .names<-unique(unlist(sapply(tabs,colnames)))
+  tabs<-lapply(tabs, function(atab) {
+    atab<-as.data.frame(atab)
+    for (name in .names)
+      if (!hasName(atab,name))
+        atab[[name]]<-NA
+    atab
+  })
+  return(do.call(rbind,tabs))
+  
+}
+
+ebind_square<-function(...) {
+  tabs<-list(...)
+  .names<-unique(unlist(sapply(tabs,colnames)))
+  .max<-max(unlist(sapply(tabs,dim)))
+ 
+  tabs<-lapply(tabs, function(atab) {
+    atab<-as.data.frame(atab)
+    for (name in .names) 
+      if (!hasName(atab,name))
+        atab[[name]]<-NA
+    if (dim(atab)[1]<.max)
+        atab[(dim(atab)[1]+1):.max,]<-NA
+    atab
+  })
+  return(do.call(rbind,tabs))
+  
+}
+
+
+#fromb64<-function(x) return(x)
+#to64<-function(x) return(x)

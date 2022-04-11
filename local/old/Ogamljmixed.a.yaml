@@ -1,0 +1,623 @@
+---
+name: gamljMixed
+title: Mixed Model
+menuGroup: Linear Models
+version: '2.0.0'
+jas: '1.2'
+completeWhenFilled: false
+export: true
+description:
+    main: Mixed Linear Model
+    R:
+        dontrun: false
+        usage: |
+              data(subjects_by_stimuli)
+
+              gamlj::gamljMixed(
+                     formula = y ~ 1 + cond+( 1|subj ),
+                     data = subjects_by_stimuli)
+
+              gamlj::gamljMixed(
+                     data = subjects_by_stimuli,
+                     dep = "y",
+                     factors = "cond",
+                     modelTerms = "cond",
+                     cluster = "subj",
+                     randomTerms=list(list(c("cond","subj"))))
+
+        
+
+formula:
+   dep:
+     custom: true
+   factors: 
+     custom: true
+   covs: 
+     custom: true
+   cluster: 
+     custom: true
+   randomTerms: 
+     custom: true
+   modelTerms:
+     custom: true
+     
+options:
+    - name: data
+      type: Data
+      description:
+          R: the data as a data frame
+          
+          
+    - name: caller
+      type: String
+      default: "lmer"
+      hidden: true
+
+    - name: modelSelection
+      type: List
+      hidden: true
+      options:
+        - name: "lmer"
+      default: "lmer"
+          
+
+    - name: dep
+      title: Dependent Variable
+      type: Variable
+      default:
+      permitted:
+        - numeric
+      description:
+          R: >
+            a string naming the dependent variable from `data`, variable
+            must be numeric
+
+    - name: factors
+      title: Factors
+      type: Variables
+      permitted:
+        - factor
+      default:
+      description:
+          R: a vector of strings naming the fixed factors from `data`
+
+    - name: covs
+      title: Covariates
+      type: Variables
+      permitted:
+        - numeric
+      default:
+      description:
+          R: a vector of strings naming the covariates from `data`
+
+
+
+    - name: modelTerms
+      title: Model Terms
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing fixed effects terms
+
+
+    - name: fixedIntercept
+      title: Fixed Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept
+
+
+
+
+    - name: showParamsCI
+      title: Confidence intervals
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , parameters CI in table
+
+
+    - name: paramCIWidth
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width for the parameter estimates
+
+
+
+    - name: contrasts
+      title: Factors Coding
+      type: Array
+      items: (factors)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                  - simple
+                  - deviation
+                  - dummy
+                  - difference
+                  - helmert
+                  - repeated
+                  - polynomial
+                default: simple
+      description:
+          R: >
+            a list of lists specifying the factor and type of contrast to use,
+            one of `'deviation'`, `'simple'`, `'difference'`, `'helmert'`,
+            `'repeated'` or `'polynomial'`
+
+
+    - name: showRealNames
+      title: Names in estimates table
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide raw names of the contrasts variables
+
+
+    - name: showContrastCode
+      title: Contrast Coefficients tables
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide contrast coefficients tables
+
+
+    - name: plotHAxis
+      title: Horizontal axis
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable placed on the horizontal axis of the
+            plot
+
+    - name: plotSepLines
+      title: Separate lines
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable represented as separate lines in the
+            plot
+
+    - name: plotSepPlots
+      title: Separate plots
+      type: Variables
+      default:
+      
+      description:
+          R: >
+            a list of string naming the variables defining the levels for multiple plots
+
+
+
+
+    - name: plotRaw
+      title: Observed scores
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide descriptive statistics
+
+    - name: plotDvScale
+      title: Y-axis observed range 
+      type: Bool
+      default: false
+      description:
+          R: >
+             `TRUE` or `FALSE` (default), scale the plot Y-Axis to the max and the min
+             of the dependent variable observed scores.
+
+    - name: plotLinesTypes
+      title: Varying line types 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use different linetypes per levels.
+
+    - name: plotError
+      title: Error Bar Definition
+      type: List
+      options:
+        - name: none
+          title: None
+        - name: ci
+          title: Confidence intervals
+        - name: se
+          title: Standard Error
+      default: none
+      description:
+          R: >
+            `'none'`, `'ci'` (default), or `'se'`. Use no error
+            bars, use confidence intervals, or use standard errors on the
+            plots, respectively
+
+    - name: ciWidth
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width
+
+
+    - name: posthoc
+      title: Post Hoc Tests
+      type: Terms
+      default:
+      description:
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`)
+
+
+    - name: emmeans
+      title: Estimated Marginal Means
+      type: Terms
+      default:
+      description:
+          R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
+
+
+    - name: simpleVariable
+      title: Simple effects variable
+      type: Variable
+      default:
+      description:
+          R: >
+            The variable for which the simple effects (slopes) are computed
+
+    - name: simpleModerators
+      title: Moderators
+      type: Variables
+      default:
+      description:
+          R: >
+            the variable that provides the levels at which the simple effects computed
+
+
+
+    - name: simpleScale
+      title: Covariates conditioning
+      type: List
+      options:
+        - name: mean_sd
+          title: Mean ±  SD
+        - name: percent
+          title: Percentiles 50 ± offset 
+      default: mean_sd
+      description:
+          R: >
+            `'mean_sd'` (default), `'custom'` , or `'custom_percent'`. Use to condition the
+            covariates (if any)
+
+
+    - name: cvalue
+      type: Number
+      default: 1
+      description:
+          R: >
+            offset value for conditioning
+
+    - name: percvalue
+      type: Number
+      default: 25
+      min: 5
+      max: 50
+      description:
+          R: >
+            offset value for conditioning
+
+    - name: simpleScaleLabels
+      title: Moderators labeling
+      type: List
+      options:
+        - name: labels
+          title: Labels
+        - name: values
+          title: Values
+        - name: values_labels
+          title: Values + Labels
+        - name:  uvalues
+          title: Unscaled Values
+        - name: uvalues_labels
+          title: Unscaled Values + Labels
+          
+      default: labels
+      description:
+            R: >
+             decide the labeling of simple effects in tables and plots. 
+             `labels` indicates that only labels are used, such as `Mean` and 
+             `Mean + 1 SD`. `values` uses the actual values as labels. `values_labels` uses both.
+
+    - name: simpleInteractions
+      title: Simple Interactions
+      type: Bool
+      default: false
+      description:
+          R: >
+            should simple Interactions be computed
+
+
+############ generic with some specs ###########
+
+    - name: postHocCorr
+      title: Correction
+      type: NMXList
+      options:
+          - name: none
+            title: No correction
+          - name: bonf
+            title: Bonferroni
+          - name: holm
+            title: Holm
+      default:
+          - bonf
+      description:
+          R: >
+            one or more of `'none'`,  `'bonf'`, or
+            `'holm'`; provide no,  Bonferroni, and
+            Holm Post Hoc corrections respectively
+
+    - name: scaling
+      title: Covariates Scaling
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Centered clusterwise
+                      name:  clusterbasedcentered
+                    - title: Clusters means
+                      name:  clustermeans
+                    - title: z-scores clusterwise
+                      name:  clusterbasedstandardized
+                    - title: Log
+                      name: 'log'
+                    - title: None
+                      name: 'none'
+                default: centered 
+      description:
+          R: >
+            a list of lists specifying the covariates scaling,
+            one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: None
+            name: 'none'
+          - title: Centered
+            name:  'centered'
+          - title: z-scores
+            name: standardized
+          - title: Centered clusterwise
+            name:  clusterbasedcentered
+          - title: z-scores clusterwise
+            name:  clusterbasedstandardized
+          - title: Log
+            name:  log
+
+      default: "none"
+      description:
+         R: >
+           Re-scale the dependent variable.
+
+
+############ mixed model specifics ##############
+
+    - name: cluster
+      title: Cluster variables
+      type: Variables
+      default:  
+      suggested:
+        - nominal
+      description:
+          R: a vector of strings naming the clustering variables from `data` 
+
+    - name: randomTerms
+      title: Random Coefficients
+      type: Array
+      default: [[]]
+      template:
+          type: Terms
+      description:
+          R: >
+            a list of lists specifying the models random effects.          
+
+
+    - name: correlatedEffects
+      title: Effects correlation
+      type: List
+      options:
+        - name: corr
+          title: Correlated
+        - name: nocorr
+          title: Not correlated
+        - name: block
+          title: Correlated by block
+      default: corr
+      description:
+          R: >
+            `'nocorr'`, `'corr'` (default), or `'block'`. When random effects
+            are passed as list of length 1, it decides whether the effects should be correlated, 
+            non correlated. If `'randomTerms'` is a list of 
+            lists of length > 1, the option is automatially set to `'block'`.
+            The option is ignored if the model is passed using `formula`.
+
+    - name: reml
+      title: REML
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
+
+    - name: lrtRandomEffects
+      title: LRT for Random Effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), LRT for the random effects
+
+    - name: ciRE
+      title: Random Effect C.I. (slow)
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), confidence intervals for the random effects
+
+    - name: plotRandomEffects
+      title: Random effects  
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), add random effects predicted values in the
+            plot
+            
+    - name: plotOriginalScale
+      title: Original scales
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use original scale for covariates.
+
+            
+    - name: cimethod
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name: wald
+          title: Wald (fast)
+        - name:  profile
+          title: Profile (slow)
+        - name: boot
+          title: Bootstrap (very slow)
+
+    - name: dfmethod
+      title: DF Method
+      type: List
+      default: Satterthwaite
+      options:
+        - name: Satterthwaite
+          title: Satterthwaite
+        - name:  Kenward-Roger
+          title: "Kenward-Roger"
+
+
+
+    - name: qqplot
+      title: Q-Q plot of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+
+    - name: homoTest
+      title: Residual Variances Homogeneity tests
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), perform homogeneity tests
+
+
+    - name: normTest
+      title: Normality of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a test for normality of residuals
+    - name: normPlot
+      title: Histogram of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+
+
+    - name: residPlot
+      title: Residuals-Predicted scatterplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+
+    - name: clusterBoxplot
+      title: Residuals by cluster boxplot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a boxplot of random effects by the first defined clustering variable
+
+    - name: clusterResPred
+      title: Residuals vs Predcted by cluster 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), residuals vs predicted by the first defined clustering variable
+
+    - name: randHist
+      title: Histogram of random Coefficients
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide histogram of random Coefficients
+
+    - name: predicted
+      title: Predicted
+      type: Output            
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+
+
+...
+

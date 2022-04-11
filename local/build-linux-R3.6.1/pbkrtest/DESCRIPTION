@@ -1,0 +1,24 @@
+Package: pbkrtest
+Version: 0.4-7
+Title: Parametric Bootstrap and Kenward Roger Based Methods for Mixed
+        Model Comparison
+Author: Ulrich Halekoh <uhalekoh@health.sdu.dk> Søren Højsgaard
+    <sorenh@math.aau.dk>
+Maintainer: Søren Højsgaard <sorenh@math.aau.dk>
+Description: Test in mixed effects models. Attention is on mixed effects models
+    as implemented in the 'lme4' package. This package implements a parametric
+    bootstrap test and a Kenward Roger modification of F-tests for linear mixed
+    effects models and a parametric bootstrap test for generalized linear mixed
+    models.
+URL: http://people.math.aau.dk/~sorenh/software/pbkrtest/
+Depends: R (>= 3.2.3), lme4 (>= 1.1.10)
+Imports: Matrix (>= 1.2.3), parallel, MASS, methods
+Encoding: UTF-8
+ZipData: no
+License: GPL (>= 2)
+RoxygenNote: 5.0.1
+NeedsCompilation: no
+Packaged: 2017-03-12 20:05:38 UTC; sorenh
+Repository: CRAN
+Date/Publication: 2017-03-15 08:49:25
+Built: R 3.6.1; ; 2020-01-22 00:30:01 UTC; unix

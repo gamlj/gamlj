@@ -1,0 +1,11 @@
+bibentry(
+  bibtype = "article",
+	title = "ggeffects: Tidy Data Frames of Marginal Effects from Regression Models.",
+	volume = "3",
+	doi = "10.21105/joss.00772",
+	number = "26",
+	journal = "Journal of Open Source Software",
+	author = person("Daniel", "Lüdecke"),
+	year = "2018",
+	pages = "772"
+)

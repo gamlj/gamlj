@@ -1,0 +1,11 @@
+bibentry(
+  bibtype = "article",
+	title = "sjmisc: Data and Variable Transformation Functions.",
+	volume = "3",
+	doi = "10.21105/joss.00754",
+	number = "26",
+	journal = "Journal of Open Source Software",
+	author = person("Daniel", "Lüdecke"),
+	year = "2018",
+	pages = "754"
+)

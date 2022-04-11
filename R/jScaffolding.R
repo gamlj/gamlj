@@ -5,8 +5,10 @@ Scaffold <- R6::R6Class("Scaffold",
                             options=NULL,
                             dispatcher=NULL,
                             initialize=function(options,dispatcher) {
+                              
                               self$options<-options
                               self$dispatcher<-dispatcher
+                              
                             },
                             option=function(val,spec=NULL) {
                               

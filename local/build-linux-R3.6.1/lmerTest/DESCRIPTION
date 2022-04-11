@@ -1,0 +1,39 @@
+Package: lmerTest
+Type: Package
+Title: Tests in Linear Mixed Effects Models
+Version: 3.1-1
+Authors@R: c(person("Alexandra", "Kuznetsova", role = c("aut")),
+                   person("Per", "Bruun Brockhoff", role = c("aut", "ths"),
+                   email = "perbb@dtu.dk"),
+                   person("Rune", "Haubo Bojesen Christensen", role =  c("aut"),
+		   email = "Rune@ChristensenStatistics.dk"),
+		   person("Sofie", "Pødenphant Jensen", role=c("ctb", "cre"), email="sofp@dtu.dk"))
+Depends: R (>= 3.2.5), lme4 (>= 1.1-10), stats, methods
+Imports: numDeriv, MASS, ggplot2
+Suggests: pbkrtest (>= 0.4-3), tools
+Description: Provides p-values in type I, II or III anova and summary tables
+    for lmer model fits (cf. lme4) via Satterthwaite's degrees of freedom method. A
+    Kenward-Roger method is also available via the pbkrtest package. Model selection
+    methods include step, drop1 and anova-like tables for random effects (ranova).
+    Methods for Least-Square means (LS-means) and tests of linear contrasts of fixed
+    effects are also available.
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+URL: https://github.com/runehaubo/lmerTestR
+BugReports: https://github.com/runehaubo/lmerTestR/issues
+RoxygenNote: 6.1.1
+Collate: 'anova_contrasts.R' 'contest.R' 'contrast_utils.R'
+        'data_documentation.R' 'drop1.R' 'estimability.R' 'legacy.R'
+        'lmer.R' 'lmerTest.R' 'lmer_anova.R' 'lmer_summary.R'
+        'ls_means.R' 'ranova.R' 'step.R' 'terms_utils.R' 'utils.R'
+NeedsCompilation: no
+Packaged: 2019-12-13 10:17:26 UTC; sofp
+Author: Alexandra Kuznetsova [aut],
+  Per Bruun Brockhoff [aut, ths],
+  Rune Haubo Bojesen Christensen [aut],
+  Sofie Pødenphant Jensen [ctb, cre]
+Maintainer: Sofie Pødenphant Jensen <sofp@dtu.dk>
+Repository: CRAN
+Date/Publication: 2019-12-13 11:20:03 UTC
+Built: R 3.6.1; ; 2020-01-22 00:30:08 UTC; unix

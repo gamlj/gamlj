@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Daniel Lüdecke" />
+
+<meta name="date" content="2020-01-08" />
+
+<title>The Design Philosophy of Functions in sjmisc</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The Design Philosophy of Functions in sjmisc</h1>
+<h4 class="author">Daniel Lüdecke</h4>
+<h4 class="date">2020-01-08</h4>
+
+
+
+<p>Basically, this package complements the <em>dplyr</em> package in that <em>sjmisc</em> takes over data transformation tasks on variables, like recoding, dichotomizing or grouping variables, setting and replacing missing values, etc. The data transformation functions also support labelled data.</p>
+<div id="the-design-of-data-transformation-functions" class="section level1">
+<h1>The design of data transformation functions</h1>
+<p>The design of data transformation functions in this package follows, where appropriate, the <em>tidyverse-approach</em>, with the first argument of a function always being the data (either a data frame or vector), followed by variable names that should be processed by the function. If no variables are specified as argument, the function applies to the complete data that was indicated as first function argument.</p>
+<div id="the-data-argument" class="section level2">
+<h2>The data-argument</h2>
+<p>A major difference to dplyr-functions like <code>select()</code> or <code>filter()</code> is that the data-argument (the first argument of each function), may either be a <em>data frame</em> or a <em>vector</em>. The returned object for each function <em>equals the type of the data-argument</em>:</p>
+<ul>
+<li>If the data-argument is a vector, the function returns a vector.</li>
+<li>If the data-argument is a data frame, the function returns a data frame.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(sjmisc)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">data</span>(efc)</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># returns a vector</span></a>
+<a class="sourceLine" id="cb1-5" title="5">x &lt;-<span class="st"> </span><span class="kw">rec</span>(efc<span class="op">$</span>e42dep, <span class="dt">rec =</span> <span class="st">&quot;1,2=1; 3,4=2&quot;</span>)</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="kw">str</span>(x)</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="co">#&gt;  num [1:908] 2 2 2 2 2 2 2 2 2 2 ...</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co">#&gt;  - attr(*, &quot;label&quot;)= chr &quot;elder&#39;s dependency&quot;</span></a>
+<a class="sourceLine" id="cb1-9" title="9"></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="co"># returns a data frame</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="kw">rec</span>(efc, e42dep, <span class="dt">rec =</span> <span class="st">&quot;1,2=1; 3,4=2&quot;</span>, <span class="dt">append =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="co">#&gt;   e42dep_r</span></a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="co">#&gt; 1        2</span></a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="co">#&gt; 2        2</span></a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="co">#&gt; 3        2</span></a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="co">#&gt; 4        2</span></a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="co">#&gt; 5        2</span></a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="co">#&gt; 6        2</span></a></code></pre></div>
+<p>This design-choice is mainly due to compatibility- and convenience-reasons. It does not affect the usual “tidyverse-workflow” or when using pipe-chains.</p>
+</div>
+<div id="the--ellipses-argument" class="section level2">
+<h2>The …-ellipses-argument</h2>
+<p>The selection of variables specified in the <code>...</code>-ellipses-argument is powered by dplyr’s <code>select()</code> and tidyselect’s <code>select_helpers()</code>. This means, you can use existing functions like <code>:</code> to select a range of variables, or also use tidyselect’s <code>select_helpers</code>, like <code>contains()</code> or <code>one_of()</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># select all variables with &quot;cop&quot; in their names, and also</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co"># the range from c161sex to c175empl</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="kw">rec</span>(</a>
+<a class="sourceLine" id="cb2-4" title="4">  efc, <span class="kw">contains</span>(<span class="st">&quot;cop&quot;</span>), c161sex<span class="op">:</span>c175empl, </a>
+<a class="sourceLine" id="cb2-5" title="5">  <span class="dt">rec =</span> <span class="st">&quot;0,1=0; else=1&quot;</span>, </a>
+<a class="sourceLine" id="cb2-6" title="6">  <span class="dt">append =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb2-7" title="7">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">#&gt;   c82cop1_r c83cop2_r c84cop3_r c85cop4_r c86cop5_r c87cop6_r c88cop7_r</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="co">#&gt; 1         1         1         1         1         0         0         1</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co">#&gt; 2         1         1         1         1         1         0         1</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co">#&gt; 3         1         1         0         1         0         0         0</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co">#&gt; 4         1         0         1         0         0         0         0</span></a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="co">#&gt; 5         1         1         0         1         1         1         0</span></a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="co">#&gt; 6         1         1         1         1         1         1         1</span></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="co">#&gt;   c89cop8_r c90cop9_r c161sex_r c172code_r c175empl_r</span></a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="co">#&gt; 1         1         1         1          1          0</span></a>
+<a class="sourceLine" id="cb2-17" title="17"><span class="co">#&gt; 2         1         1         1          1          0</span></a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="co">#&gt; 3         1         1         0          0          0</span></a>
+<a class="sourceLine" id="cb2-19" title="19"><span class="co">#&gt; 4         1         1         0          1          0</span></a>
+<a class="sourceLine" id="cb2-20" title="20"><span class="co">#&gt; 5         1         1         1          1          0</span></a>
+<a class="sourceLine" id="cb2-21" title="21"><span class="co">#&gt; 6         0         0         0          1          0</span></a>
+<a class="sourceLine" id="cb2-22" title="22"></a>
+<a class="sourceLine" id="cb2-23" title="23"><span class="co"># center all variables with &quot;age&quot; in name, variable c12hour</span></a>
+<a class="sourceLine" id="cb2-24" title="24"><span class="co"># and all variables from column 19 to 21</span></a>
+<a class="sourceLine" id="cb2-25" title="25"><span class="kw">center</span>(efc, c12hour, <span class="kw">contains</span>(<span class="st">&quot;age&quot;</span>), <span class="dv">19</span><span class="op">:</span><span class="dv">21</span>, <span class="dt">append =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb2-26" title="26"><span class="co">#&gt;   c12hour_c   e17age_c  c160age_c barthtot_c  neg_c_7_c pos_v_4_c</span></a>
+<a class="sourceLine" id="cb2-27" title="27"><span class="co">#&gt; 1 -26.39911   3.878788  2.5371809  10.453001  0.1502242 -0.476731</span></a>
+<a class="sourceLine" id="cb2-28" title="28"><span class="co">#&gt; 2 105.60089   8.878788  0.5371809  10.453001  8.1502242 -1.476731</span></a>
+<a class="sourceLine" id="cb2-29" title="29"><span class="co">#&gt; 3  27.60089   2.878788 26.5371809 -29.546999 -0.8497758  0.523269</span></a>
+<a class="sourceLine" id="cb2-30" title="30"><span class="co">#&gt; 4 125.60089 -12.121212 15.5371809 -64.546999 -1.8497758  2.523269</span></a>
+<a class="sourceLine" id="cb2-31" title="31"><span class="co">#&gt; 5 125.60089   4.878788 -6.4628191 -39.546999  0.1502242  2.523269</span></a>
+<a class="sourceLine" id="cb2-32" title="32"><span class="co">#&gt; 6 -26.39911   5.878788  2.5371809  -4.546999  7.1502242 -3.476731</span></a></code></pre></div>
+</div>
+<div id="the-function-types" class="section level2">
+<h2>The function-types</h2>
+<p>There are two types of function designs:</p>
+<div id="coercingconverting-functions" class="section level3">
+<h3>coercing/converting functions</h3>
+<p>Functions like <code>to_factor()</code> or <code>to_label()</code>, which convert variables into other types or add additional information like variable or value labels as attribute, typically <em>return the complete data frame</em> that was given as first argument <em>without any new variables</em>. The variables specified in the <code>...</code>-ellipses argument are converted (overwritten), all other variables remain unchanged.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">x &lt;-<span class="st"> </span>efc[, <span class="dv">3</span><span class="op">:</span><span class="dv">5</span>]</a>
+<a class="sourceLine" id="cb3-2" title="2"></a>
+<a class="sourceLine" id="cb3-3" title="3">x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str</span>()</a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co">#&gt; &#39;data.frame&#39;:    908 obs. of  3 variables:</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">#&gt;  $ e16sex: num  2 2 2 2 2 2 1 2 2 2 ...</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt;   ..- attr(*, &quot;label&quot;)= chr &quot;elder&#39;s gender&quot;</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt;   ..- attr(*, &quot;labels&quot;)= Named num  1 2</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="co">#&gt;   .. ..- attr(*, &quot;names&quot;)= chr  &quot;male&quot; &quot;female&quot;</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co">#&gt;  $ e17age: num  83 88 82 67 84 85 74 87 79 83 ...</span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co">#&gt;   ..- attr(*, &quot;label&quot;)= chr &quot;elder&#39; age&quot;</span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co">#&gt;  $ e42dep: num  3 3 3 4 4 4 4 4 4 4 ...</span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="co">#&gt;   ..- attr(*, &quot;label&quot;)= chr &quot;elder&#39;s dependency&quot;</span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="co">#&gt;   ..- attr(*, &quot;labels&quot;)= Named num  1 2 3 4</span></a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="co">#&gt;   .. ..- attr(*, &quot;names&quot;)= chr  &quot;independent&quot; &quot;slightly dependent&quot; &quot;moderately dependent&quot; &quot;severely dependent&quot;</span></a>
+<a class="sourceLine" id="cb3-15" title="15"></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="kw">to_factor</span>(x, e42dep, e16sex) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str</span>()</a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="co">#&gt; &#39;data.frame&#39;:    908 obs. of  3 variables:</span></a>
+<a class="sourceLine" id="cb3-18" title="18"><span class="co">#&gt;  $ e16sex: Factor w/ 2 levels &quot;1&quot;,&quot;2&quot;: 2 2 2 2 2 2 1 2 2 2 ...</span></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="co">#&gt;   ..- attr(*, &quot;labels&quot;)= Named num  1 2</span></a>
+<a class="sourceLine" id="cb3-20" title="20"><span class="co">#&gt;   .. ..- attr(*, &quot;names&quot;)= chr  &quot;male&quot; &quot;female&quot;</span></a>
+<a class="sourceLine" id="cb3-21" title="21"><span class="co">#&gt;   ..- attr(*, &quot;label&quot;)= chr &quot;elder&#39;s gender&quot;</span></a>
+<a class="sourceLine" id="cb3-22" title="22"><span class="co">#&gt;  $ e17age: num  83 88 82 67 84 85 74 87 79 83 ...</span></a>
+<a class="sourceLine" id="cb3-23" title="23"><span class="co">#&gt;   ..- attr(*, &quot;label&quot;)= chr &quot;elder&#39; age&quot;</span></a>
+<a class="sourceLine" id="cb3-24" title="24"><span class="co">#&gt;  $ e42dep: Factor w/ 4 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;: 3 3 3 4 4 4 4 4 4 4 ...</span></a>
+<a class="sourceLine" id="cb3-25" title="25"><span class="co">#&gt;   ..- attr(*, &quot;labels&quot;)= Named num  1 2 3 4</span></a>
+<a class="sourceLine" id="cb3-26" title="26"><span class="co">#&gt;   .. ..- attr(*, &quot;names&quot;)= chr  &quot;independent&quot; &quot;slightly dependent&quot; &quot;moderately dependent&quot; &quot;severely dependent&quot;</span></a>
+<a class="sourceLine" id="cb3-27" title="27"><span class="co">#&gt;   ..- attr(*, &quot;label&quot;)= chr &quot;elder&#39;s dependency&quot;</span></a></code></pre></div>
+</div>
+<div id="transformationrecoding-functions" class="section level3">
+<h3>transformation/recoding functions</h3>
+<p>Functions like <code>rec()</code> or <code>dicho()</code>, which transform or recode variables, by default add <em>the transformed or recoded variables</em> to the data frame, so they return the new variables <em>and</em> the original data as combined data frame. To return <em>only the transformed and recoded variables</em> specified in the <code>...</code>-ellipses argument, use argument <code>append = FALSE</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># complete data, including new columns</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">rec</span>(efc, c82cop1, c83cop2, <span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>, <span class="dt">append =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt;   c12hour e15relat e16sex e17age e42dep c82cop1 c83cop2 c84cop3 c85cop4 c86cop5</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt; 1      16        2      2     83      3       3       2       2       2       1</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co">#&gt; 2     148        2      2     88      3       3       3       3       3       4</span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="co">#&gt; 3      70        1      2     82      3       2       2       1       4       1</span></a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="co">#&gt; 4     168        1      2     67      4       4       1       3       1       1</span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="co">#&gt; 5     168        2      2     84      4       3       2       1       2       2</span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt; 6      16        2      2     85      4       2       2       3       3       3</span></a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="co">#&gt;   c87cop6 c88cop7 c89cop8 c90cop9 c160age c161sex c172code c175empl barthtot</span></a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="co">#&gt; 1       1       2       3       3      56       2        2        1       75</span></a>
+<a class="sourceLine" id="cb4-12" title="12"><span class="co">#&gt; 2       1       3       2       2      54       2        2        1       75</span></a>
+<a class="sourceLine" id="cb4-13" title="13"><span class="co">#&gt; 3       1       1       4       3      80       1        1        0       35</span></a>
+<a class="sourceLine" id="cb4-14" title="14"><span class="co">#&gt; 4       1       1       2       4      69       1        2        0        0</span></a>
+<a class="sourceLine" id="cb4-15" title="15"><span class="co">#&gt; 5       2       1       4       4      47       2        2        0       25</span></a>
+<a class="sourceLine" id="cb4-16" title="16"><span class="co">#&gt; 6       2       2       1       1      56       1        2        1       60</span></a>
+<a class="sourceLine" id="cb4-17" title="17"><span class="co">#&gt;   neg_c_7 pos_v_4 quol_5 resttotn tot_sc_e n4pstu nur_pst c82cop1_r c83cop2_r</span></a>
+<a class="sourceLine" id="cb4-18" title="18"><span class="co">#&gt; 1      12      12     14        0        4      0      NA         2         0</span></a>
+<a class="sourceLine" id="cb4-19" title="19"><span class="co">#&gt; 2      20      11     10        4        0      0      NA         2         2</span></a>
+<a class="sourceLine" id="cb4-20" title="20"><span class="co">#&gt; 3      11      13      7        0        1      2       2         0         0</span></a>
+<a class="sourceLine" id="cb4-21" title="21"><span class="co">#&gt; 4      10      15     12        2        0      3       3         2         0</span></a>
+<a class="sourceLine" id="cb4-22" title="22"><span class="co">#&gt; 5      12      15     19        2        1      2       2         2         0</span></a>
+<a class="sourceLine" id="cb4-23" title="23"><span class="co">#&gt; 6      19       9      8        1        3      2       2         0         0</span></a>
+<a class="sourceLine" id="cb4-24" title="24"></a>
+<a class="sourceLine" id="cb4-25" title="25"><span class="co"># only new columns</span></a>
+<a class="sourceLine" id="cb4-26" title="26"><span class="kw">rec</span>(efc, c82cop1, c83cop2, <span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>, <span class="dt">append =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb4-27" title="27"><span class="co">#&gt;   c82cop1_r c83cop2_r</span></a>
+<a class="sourceLine" id="cb4-28" title="28"><span class="co">#&gt; 1         2         0</span></a>
+<a class="sourceLine" id="cb4-29" title="29"><span class="co">#&gt; 2         2         2</span></a>
+<a class="sourceLine" id="cb4-30" title="30"><span class="co">#&gt; 3         0         0</span></a>
+<a class="sourceLine" id="cb4-31" title="31"><span class="co">#&gt; 4         2         0</span></a>
+<a class="sourceLine" id="cb4-32" title="32"><span class="co">#&gt; 5         2         0</span></a>
+<a class="sourceLine" id="cb4-33" title="33"><span class="co">#&gt; 6         0         0</span></a></code></pre></div>
+<p>These variables usually get a suffix, so you can bind these variables as new columns to a data frame, for instance with <code>add_columns()</code>. The function <code>add_columns()</code> is useful if you want to bind/add columns within a pipe-chain <em>to the end</em> of a data frame.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">efc <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw">rec</span>(c82cop1, c83cop2, <span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>, <span class="dt">append =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="st">  </span><span class="kw">add_columns</span>(efc) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="st">  </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt;   c12hour e15relat e16sex e17age e42dep c82cop1 c83cop2 c84cop3 c85cop4 c86cop5</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="co">#&gt; 1      16        2      2     83      3       3       2       2       2       1</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co">#&gt; 2     148        2      2     88      3       3       3       3       3       4</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="co">#&gt; 3      70        1      2     82      3       2       2       1       4       1</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co">#&gt; 4     168        1      2     67      4       4       1       3       1       1</span></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="co">#&gt; 5     168        2      2     84      4       3       2       1       2       2</span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="co">#&gt; 6      16        2      2     85      4       2       2       3       3       3</span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co">#&gt;   c87cop6 c88cop7 c89cop8 c90cop9 c160age c161sex c172code c175empl barthtot</span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="co">#&gt; 1       1       2       3       3      56       2        2        1       75</span></a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="co">#&gt; 2       1       3       2       2      54       2        2        1       75</span></a>
+<a class="sourceLine" id="cb5-15" title="15"><span class="co">#&gt; 3       1       1       4       3      80       1        1        0       35</span></a>
+<a class="sourceLine" id="cb5-16" title="16"><span class="co">#&gt; 4       1       1       2       4      69       1        2        0        0</span></a>
+<a class="sourceLine" id="cb5-17" title="17"><span class="co">#&gt; 5       2       1       4       4      47       2        2        0       25</span></a>
+<a class="sourceLine" id="cb5-18" title="18"><span class="co">#&gt; 6       2       2       1       1      56       1        2        1       60</span></a>
+<a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt;   neg_c_7 pos_v_4 quol_5 resttotn tot_sc_e n4pstu nur_pst c82cop1_r c83cop2_r</span></a>
+<a class="sourceLine" id="cb5-20" title="20"><span class="co">#&gt; 1      12      12     14        0        4      0      NA         2         0</span></a>
+<a class="sourceLine" id="cb5-21" title="21"><span class="co">#&gt; 2      20      11     10        4        0      0      NA         2         2</span></a>
+<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; 3      11      13      7        0        1      2       2         0         0</span></a>
+<a class="sourceLine" id="cb5-23" title="23"><span class="co">#&gt; 4      10      15     12        2        0      3       3         2         0</span></a>
+<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; 5      12      15     19        2        1      2       2         2         0</span></a>
+<a class="sourceLine" id="cb5-25" title="25"><span class="co">#&gt; 6      19       9      8        1        3      2       2         0         0</span></a></code></pre></div>
+<p>If <code>append = TRUE</code> and <code>suffix = &quot;&quot;</code>, recoded variables will replace (overwrite) existing variables.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># complete data, existing columns c82cop1 and c83cop2 are replaced</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">rec</span>(efc, c82cop1, c83cop2, <span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>, <span class="dt">append =</span> <span class="ot">TRUE</span>, <span class="dt">suffix =</span> <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co">#&gt;   c12hour e15relat e16sex e17age e42dep c82cop1 c83cop2 c84cop3 c85cop4 c86cop5</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co">#&gt; 1      16        2      2     83      3       2       0       2       2       1</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co">#&gt; 2     148        2      2     88      3       2       2       3       3       4</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co">#&gt; 3      70        1      2     82      3       0       0       1       4       1</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co">#&gt; 4     168        1      2     67      4       2       0       3       1       1</span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="co">#&gt; 5     168        2      2     84      4       2       0       1       2       2</span></a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="co">#&gt; 6      16        2      2     85      4       0       0       3       3       3</span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="co">#&gt;   c87cop6 c88cop7 c89cop8 c90cop9 c160age c161sex c172code c175empl barthtot</span></a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="co">#&gt; 1       1       2       3       3      56       2        2        1       75</span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="co">#&gt; 2       1       3       2       2      54       2        2        1       75</span></a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="co">#&gt; 3       1       1       4       3      80       1        1        0       35</span></a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="co">#&gt; 4       1       1       2       4      69       1        2        0        0</span></a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="co">#&gt; 5       2       1       4       4      47       2        2        0       25</span></a>
+<a class="sourceLine" id="cb6-16" title="16"><span class="co">#&gt; 6       2       2       1       1      56       1        2        1       60</span></a>
+<a class="sourceLine" id="cb6-17" title="17"><span class="co">#&gt;   neg_c_7 pos_v_4 quol_5 resttotn tot_sc_e n4pstu nur_pst</span></a>
+<a class="sourceLine" id="cb6-18" title="18"><span class="co">#&gt; 1      12      12     14        0        4      0      NA</span></a>
+<a class="sourceLine" id="cb6-19" title="19"><span class="co">#&gt; 2      20      11     10        4        0      0      NA</span></a>
+<a class="sourceLine" id="cb6-20" title="20"><span class="co">#&gt; 3      11      13      7        0        1      2       2</span></a>
+<a class="sourceLine" id="cb6-21" title="21"><span class="co">#&gt; 4      10      15     12        2        0      3       3</span></a>
+<a class="sourceLine" id="cb6-22" title="22"><span class="co">#&gt; 5      12      15     19        2        1      2       2</span></a>
+<a class="sourceLine" id="cb6-23" title="23"><span class="co">#&gt; 6      19       9      8        1        3      2       2</span></a></code></pre></div>
+</div>
+</div>
+<div id="sjmisc-and-dplyr" class="section level2">
+<h2>sjmisc and dplyr</h2>
+<p>The functions of <strong>sjmisc</strong> are designed to work together seamlessly with other packages from the tidyverse, like <strong>dplyr</strong>. For instance, you can use the functions from <strong>sjmisc</strong> both within a pipe-worklflow to manipulate data frames, or to create new variables with <code>mutate()</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">efc <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw">select</span>(c82cop1, c83cop2) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw">rec</span>(<span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="st">  </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="co">#&gt;   c82cop1 c83cop2 c82cop1_r c83cop2_r</span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co">#&gt; 1       3       2         2         0</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co">#&gt; 2       3       3         2         2</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="co">#&gt; 3       2       2         0         0</span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="co">#&gt; 4       4       1         2         0</span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="co">#&gt; 5       3       2         2         0</span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="co">#&gt; 6       2       2         0         0</span></a>
+<a class="sourceLine" id="cb7-12" title="12"></a>
+<a class="sourceLine" id="cb7-13" title="13">efc <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="st">  </span><span class="kw">select</span>(c82cop1, c83cop2) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-15" title="15"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb7-16" title="16">    <span class="dt">c82cop1_dicho =</span> <span class="kw">rec</span>(c82cop1, <span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>),</a>
+<a class="sourceLine" id="cb7-17" title="17">    <span class="dt">c83cop2_dicho =</span> <span class="kw">rec</span>(c83cop2, <span class="dt">rec =</span> <span class="st">&quot;1,2=0; 3:4=2&quot;</span>)</a>
+<a class="sourceLine" id="cb7-18" title="18">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-19" title="19"><span class="st">  </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb7-20" title="20"><span class="co">#&gt;   c82cop1 c83cop2 c82cop1_dicho c83cop2_dicho</span></a>
+<a class="sourceLine" id="cb7-21" title="21"><span class="co">#&gt; 1       3       2             2             0</span></a>
+<a class="sourceLine" id="cb7-22" title="22"><span class="co">#&gt; 2       3       3             2             2</span></a>
+<a class="sourceLine" id="cb7-23" title="23"><span class="co">#&gt; 3       2       2             0             0</span></a>
+<a class="sourceLine" id="cb7-24" title="24"><span class="co">#&gt; 4       4       1             2             0</span></a>
+<a class="sourceLine" id="cb7-25" title="25"><span class="co">#&gt; 5       3       2             2             0</span></a>
+<a class="sourceLine" id="cb7-26" title="26"><span class="co">#&gt; 6       2       2             0             0</span></a></code></pre></div>
+<p>This makes it easy to adapt the <strong>sjmisc</strong> functions to your own workflow.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

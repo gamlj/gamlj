@@ -146,9 +146,6 @@ gamljMixedClass <- R6::R6Class(
            smarttab$runTable()
       }
 
-      for (smarttab in private$.smartObjs) 
-        smarttab$setNotes(private$.estimate_machine$dispatcher)
-      
 
       private$.checkpoint()
       

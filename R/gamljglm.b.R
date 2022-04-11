@@ -31,7 +31,7 @@ gamljGlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
 
-      return()
+     
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)

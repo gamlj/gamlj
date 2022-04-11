@@ -1,0 +1,64 @@
+Package: effectsize
+Type: Package
+Title: Indices of Effect Size and Standardized Parameters
+Version: 0.4.4
+Authors@R: c(
+    person("Mattan S.", 
+        "Ben-Shachar", 
+        role = c("aut", "cre"), 
+        email = "matanshm@post.bgu.ac.il", 
+        comment = c(ORCID = "0000-0002-4287-4801")),
+    person("Dominique", 
+        "Makowski", 
+        role = c("aut"),
+        email = "dom.makowski@gmail.com",
+        comment = c(ORCID = "0000-0001-5375-9967")),
+    person("Daniel", 
+        "Lüdecke", 
+        role = c("aut"), 
+        email = "d.luedecke@uke.de", 
+        comment = c(ORCID = "0000-0002-8895-3206")),
+    person("Indrajeet", 
+        "Patil", 
+        role = c("ctb"), 
+        email = "patilindrajeet.science@gmail.com", 
+        comment = c(ORCID = "0000-0003-1995-6531", Twitter = "@patilindrajeets")),
+    person("Ken", 
+        "Kelley", 
+        role = c("ctb")),
+    person("David", 
+        "Stanley", 
+        role = c("ctb"))
+    )
+Maintainer: Mattan S. Ben-Shachar <matanshm@post.bgu.ac.il>
+License: GPL-3
+URL: https://easystats.github.io/effectsize/
+BugReports: https://github.com/easystats/effectsize/issues/
+Description: Provide utilities to work with indices of effect size and standardized parameters for a wide variety of models (see list of supported models in insight; Lüdecke, Waggoner & Makowski (2019) <doi:10.21105/joss.01412>), allowing computation of and conversion between indices such as Cohen's d, r, odds, etc.
+Depends: R (>= 3.4)
+Imports: bayestestR (>= 0.8.2), insight (>= 0.13.1), parameters (>=
+        0.12.0), stats, utils
+Suggests: afex, BayesFactor, boot, brms, car, correlation, covr, dplyr,
+        emmeans, gamm4, ggplot2, knitr, lavaan, lm.beta, lme4,
+        lmerTest, MASS, mediation, modelbased, MuMIn, performance,
+        pscl, rlang, rmarkdown, rstan, rstanarm, rstantools, see,
+        testthat, tidyr, spelling
+RoxygenNote: 7.1.1.9001
+Language: en-US
+VignetteBuilder: knitr
+Encoding: UTF-8
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+NeedsCompilation: no
+Packaged: 2021-03-13 06:01:47 UTC; USER
+Author: Mattan S. Ben-Shachar [aut, cre]
+    (<https://orcid.org/0000-0002-4287-4801>),
+  Dominique Makowski [aut] (<https://orcid.org/0000-0001-5375-9967>),
+  Daniel Lüdecke [aut] (<https://orcid.org/0000-0002-8895-3206>),
+  Indrajeet Patil [ctb] (<https://orcid.org/0000-0003-1995-6531>,
+    @patilindrajeets),
+  Ken Kelley [ctb],
+  David Stanley [ctb]
+Repository: CRAN
+Date/Publication: 2021-03-14 15:50:23 UTC
+Built: R 4.0.4; ; 2021-03-28 08:12:03 UTC; windows

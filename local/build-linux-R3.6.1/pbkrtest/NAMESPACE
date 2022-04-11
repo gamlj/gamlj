@@ -1,0 +1,104 @@
+exportPattern("^[^\\.]")
+
+import(lme4)
+importFrom(MASS, ginv)
+
+importFrom(parallel, clusterCall, clusterExport, clusterSetRNGStream)
+
+importClassesFrom(Matrix, Matrix)
+importFrom(Matrix, Matrix, sparseMatrix, rankMatrix)
+importMethodsFrom(Matrix, t, isSymmetric, "%*%", solve, diag, chol, chol2inv, forceSymmetric, "*")
+
+
+importFrom("graphics", "abline", "legend", "lines", "plot")
+importFrom("methods", "as", "is")
+importFrom("stats", "as.formula", "family", "formula", "getCall",
+             "logLik", "model.matrix", "pchisq", "pf", "pgamma",
+             "printCoefmat", "quantile", "simulate", "terms",
+             "update", "update.formula", "var", "vcov")
+
+if(getRversion() >= "3.3.0") importFrom("stats", "sigma")
+
+
+
+S3method( getLRT, mer                          )
+S3method( get_SigmaG, mer                      )
+S3method( KRmodcomp_init, mer                  )
+S3method( KRmodcomp, mer                       )
+S3method( model2restrictionMatrix, mer         )
+S3method( PBmodcomp, mer                       )
+S3method( PBrefdist, mer                       )
+S3method( restrictionMatrix2model, mer         )
+S3method( vcovAdj, mer                         )
+
+
+S3method( as.data.frame, XXmodcomp             )
+S3method( get_ddf_Lb, lmerMod                  )
+S3method( get_Lb_ddf, lmerMod                  )
+S3method( getLRT, lm                           )
+S3method( getLRT, merMod                       )
+S3method( get_SigmaG, lmerMod                  )
+
+S3method( KRmodcomp_init, lmerMod              )
+
+S3method( KRmodcomp, lmerMod                   )
+S3method( model2restrictionMatrix, lm          )
+
+S3method( model2restrictionMatrix, merMod      )
+S3method( PBmodcomp, lm                        )
+
+S3method( PBmodcomp, merMod                    )
+S3method( PBrefdist, lm                        )
+
+S3method( PBrefdist, merMod                    )
+S3method( plot, PBmodcomp                      )
+S3method( print, KRmodcomp                     )
+S3method( print, PBmodcomp                     )
+S3method( print, summaryPB                     )
+S3method( restrictionMatrix2model, lm          )
+
+S3method( restrictionMatrix2model, merMod      )
+S3method( summary, KRmodcomp                   )
+S3method( summary, PBmodcomp                   )
+S3method( vcovAdj, lmerMod                     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
