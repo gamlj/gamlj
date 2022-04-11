@@ -102,10 +102,18 @@ gposthoc.populate <- function(model, options, tables) {
             table$setState("there is work done")
             tableData <- as.data.frame(none)
             tableData$contrast <- as.character(tableData$contrast)
-            colnames(tableData)[1:6] <- c("contrast", "estimate", "se", "df", "test", "p")
-            tableData$pbonf <- bonferroni[, 6]
-            tableData$pholm <- holm[, 6]
-            tableData$ptukey <- tukey[, 6]
+
+            .transnames<-list(estimate=c("odds.ratio","ratio"),
+                              test=c("z.ratio","t.ratio"),
+                              p="p.value",
+                              se="SE",
+                              response=dep
+            )
+            names(tableData)<-transnames(names(tableData),.transnames)    
+            
+            tableData$pbonf <- bonferroni$p.value
+            tableData$pholm <- holm$p.value
+            tableData$ptukey <- tukey$p.value
         }
 
         .cont <- as.character(tableData$contrast)
