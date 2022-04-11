@@ -266,6 +266,7 @@ test<-ph[ph$c1=="0" & ph$c2=="1" & ph$c3=="6" & ph$c4=="1", ]
 testthat::test_that("posthoc in mixed", {
   testthat::expect_equal(as.numeric(test[6]),155.5,tol=.00001)
   testthat::expect_equal(as.numeric(test[9]),66,tol=.00001)
+  testthat::expect_equal(as.numeric(test[10]),0,tol=.00001)
 })
 
 es2.anova<-gobj2$main$anova$asDF
