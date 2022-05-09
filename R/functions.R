@@ -44,6 +44,7 @@ fromb64<- function(x,...) UseMethod(".fromb64")
   astring<-obj
   for (i in seq_along(matches64))
       astring<-stringr::str_replace_all(astring,matches64[i],matches[i])
+
   astring<-stringr::str_replace_all(astring,B64_SYMBOL,"")
   astring<-stringr::str_replace_all(astring,FACTOR_SYMBOL,"")
   astring<-stringr::str_replace_all(astring,LEVEL_SYMBOL,"")

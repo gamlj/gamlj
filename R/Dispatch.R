@@ -109,7 +109,9 @@ Dispatch <- R6::R6Class(
                       .translate=function(msg) {
       
                             for (w in TRANS_WARNS) {
-                                 msg<-gsub(w$original,w$new,msg,fixed=T)
+                                 test<-grep(w$original,msg,fixed=T)
+                                 if (length(test)>0)
+                                    msg<-jmvcore::format(w$new,msg)
                             }
                            return(msg)
 

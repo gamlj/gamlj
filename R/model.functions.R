@@ -326,7 +326,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 .anova.glm<-function(model,obj) {
 
         if (!obj$hasTerms) {
-          obj$dispatcher$warnings  <-  list(topic="tab_anova",message="Omnibus tests cannot be computed")
+          obj$dispatcher$warnings  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
           return(NULL)
         }
 
@@ -335,7 +335,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
                 wald= "Wald")
 
         anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))
-        
+
         ### LR is less lenient than Wald
         if (test=="LR" & !isFALSE(anoobj$error)) {
            anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))
