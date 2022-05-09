@@ -148,6 +148,8 @@ items:
                     - fixed_intercept
                     - ci_width
                     - ci_method
+                    - expb_ci
+                    - es
 
              columns:
                     - name: response

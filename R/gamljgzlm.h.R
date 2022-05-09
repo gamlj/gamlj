@@ -706,7 +706,9 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "dep_scale",
                                 "fixed_intercept",
                                 "ci_width",
-                                "ci_method"),
+                                "ci_method",
+                                "expb_ci",
+                                "es"),
                             columns=list(
                                 list(
                                     `name`="response", 

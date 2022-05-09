@@ -160,6 +160,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             retrieveNotes=function(dispatcher=NULL) {
 
                                   notes<-self$table$state$notes
+
                                   ### remove init only message
                                   presentnotes<-notes
                                   if (private$.phase=="run") 
@@ -172,10 +173,9 @@ SmartTable <- R6::R6Class("SmartTable",
                                                 }
                                           }
                                       }
-
                                    for (anote in presentnotes) {
                                      if (anote$topic %in% self$topics)
-                                         self$table$setNote(anote$id,anote$message)
+                                         self$table$setNote(anote$id,fromb64(anote$message))
                                     }
                               
                             },
@@ -327,7 +327,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 
                                 if (warning!=FALSE) {
                                   if ("notes" %in% names(self$table)) {
-                                      self$table$setNote(jmvcore::toB64(warning),warning,init=FALSE)
+                                      self$table$setNote(jmvcore::toB64(warning),fromb64(warning),init=FALSE)
                                   } 
                                 }
                                 
@@ -338,6 +338,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               rtable
                             },
                             .fill=function(jtable,rtable) {
+                              
                               maxrow<-jtable$rowCount
                               
                               .insert<-function(i,w) {
