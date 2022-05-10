@@ -38,9 +38,11 @@ items:
                          - fixed_intercept
                          - reml
                          - comparison
-                         - re
                          - nested_re
                          - nested_intercept
+                         - re
+                         - re_corr
+                         
 
              rows: 1
              columns:
@@ -78,6 +80,9 @@ items:
                          - dep_scale
                          - fixed_intercept
                          - df_method
+                         - re
+                         - re_corr
+                         
              columns:
                     - name: source
                       title: ""
@@ -113,8 +118,12 @@ items:
                     - fixed_intercept
                     - ci_width
                     - ci_method
+                    - estimates_ci
                     - boot_r
                     - df_method
+                    - re
+                    - re_corr
+
              columns:
                     - name: source
                       title: "Names"
@@ -175,6 +184,121 @@ items:
                            type: text
                            visible: false
 
+           - name: random
+             title: Random Components
+             type: Table
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - dep_scale
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - df_method
+                    - re
+                    - re_corr
+                    - re_ci
+             columns:
+                    - name: groups
+                      title: "Groups"
+                      type: text
+                      combineBelow: true
+                    - name: name
+                      title: "Name"
+                      type: text
+                    - name: std
+                      title: "SD"
+                      type: number
+                    - name: var
+                      title: "Variance"
+                      type: number
+                    - name: var.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (re_ci)
+                    - name: var.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (re_ci)
+                    - name: icc
+                      title: "ICC"
+                      type: number
+
+           - name: randomCov
+             title: Random Parameters correlations
+             type: Table
+             visible: false
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - dep_scale
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - df_method
+                    - re
+                    - re_corr
+ 
+             columns:
+                   - name: groups
+                     title: "Groups"
+                     combineBelow: true
+                     type: text
+                   - name: name1
+                     title: "name"
+                     type: text
+                   - name: name2
+                     title: "name2"
+                     type: text
+                   - name: cov
+                     title: "Corr."
+                     type: number
+
+           - name: lrtRandomEffectsTable
+             title: Random Effect LRT
+             type: Table
+             visible: (re_lrt)
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - dep_scale
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - df_method
+                    - re
+                    - re_corr
+
+             columns:
+                   - name: test
+                     title: "Test"
+                     combineBelow: true
+                     type: text
+                   - name: npar
+                     title: "N. par"
+                     type: number
+                   - name: AIC
+                     title: "AIC"
+                     type: number
+                   - name: LRT
+                     title: "LRT"
+                     type: number
+                   - name: Df
+                     title: "df"
+                     type: number
+                   - name: Pr(>Chisq)
+                     title: "p"
+                     type: number
+                     format: zto,pvalue
 
   - name: posthoc
     title: Post Hoc Tests
@@ -185,10 +309,19 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-              - ci_method
-              - ci_width
-              - boot_r
-              - df_method
+                    - boot_r
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - dep_scale
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - df_method
+                    - re
+                    - re_corr
 
         columns:
         - name: estimate

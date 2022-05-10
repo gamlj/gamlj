@@ -251,8 +251,23 @@ Syntax <- R6::R6Class(
     },
     init_main_paralleltest=function() {
       
+        
       self$init_main_anova()
     },
+
+    # random effect variances for lmer
+    init_main_random=function() {
+      
+      if (self$option("re_ci")) 
+            self$dispatcher$warnings<-list(topic="main_random",
+                                           message="Computation of C.I. may take a while. Please be patient.",
+                                           init=TRUE)
+      
+      rows<-sum(length(unlist(self$options$re)))
+      data.frame(group=rep("",(rows/2)+1))
+
+    },
+
     ### posthoc means ###
     
     init_posthoc=function() {

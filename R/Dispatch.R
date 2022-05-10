@@ -2,8 +2,8 @@
 #### warnings can be sent to tables or array. The table needs not to be created (like a keyed table within an array)
 #### to receive a warning. The warning is stored in the parent and then passed to the tabe
 #### Errors must be sent to existing (already defined) objects
-#### warnings can be transient (get remove after init) when init=TRUE is passed
-#### warnings and error are passed only to visible tables.
+#### warnings can be transient (ggt remove after init) when init=TRUE is passed
+#### warnings and errors are passed only to visible tables.
 #### errors are passed directly to the jamovi object. If option final=TRUE, a `stop()` is issued
 
 Dispatch <- R6::R6Class(

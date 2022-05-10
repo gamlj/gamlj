@@ -231,7 +231,41 @@ Estimate <- R6::R6Class("Estimate",
                             }
                             tab
                           },
-                          
+                          run_main_random=function() {
+    
+                              vc<-as.data.frame(lme4::VarCorr(self$model))
+                              
+                              if (self$option("re_ci")) {
+                                method     <-  ifelse(self$options$ci_method=="wald","Wald",self$options$ci_method)
+                                results    <-  try_hard(stats::profile(self$model,which="theta_",optimizer=self$model@optinfo$optimizer,prof.scale=c("varcov")))
+                                self$dispatcher$warnings<-list(topic="main_random",message=results$warning)
+                                cidata         <-  as.data.frame(confint(results$obj,parm = "theta_",level = self$ciwidth, method=method))
+                                names(cidata)  <-  c("var.ci.lower","var.ci.upper")
+                                vc<-cbind(vc,cidata)
+                                self$dispatcher$warnings<-list(topic="main_random",message="Computation of C.I. make take a while. Please be patient.",init=TRUE)
+                                self$dispatcher$warnings<-list(topic="main_random",message="C.I. are computed with the profile method")
+                              }
+                              
+                              variances<-which(is.na(vc$var2))
+                              params<-vc[variances,]
+                              .transnames<-c(groups="grp",name="var1",name2="var2",var="vcov",std="sdcor")
+                              names(params)<-transnames(names(params),.transnames)
+                              
+                              params$groups <- fromb64(params$groups)
+                              params$name <- fromb64(params$name)
+                              params$icc<-NA
+                              
+                              int<-which(params$name %in% "(Intercept)")
+                              for (i in int)
+                                  params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
+
+                              ngrp<-vapply(self$model@flist,nlevels,1)
+                              .names<-fromb64(names(ngrp))
+                              info<-paste("Number of Obs:", self$model@devcomp$dims[[1]],", groups:",paste(.names),ngrp,collapse = ", ")
+                              self$dispatcher$warnings<-list(topic="main_random",message=info)
+                              params
+                          },
+
                           run_posthoc=function() {
 
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
@@ -401,6 +435,7 @@ Estimate <- R6::R6Class("Estimate",
                           .storageTable=NULL,
                           .hasStorage=FALSE,
                           .estimateModel=function(data) {
+                            
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
                                    stop(unlist(self$datamatic$errors))
@@ -493,7 +528,7 @@ Estimate <- R6::R6Class("Estimate",
                                 
                                 ########## fill basic tables #########
                                 if (!self$hasIntercept & is.something(self$options$factors)) 
-                                  self$dispatcher$warnings<-list(topic="tab_coefficients",message=WARNS["nointercept"])
+                                  self$dispatcher$warnings<-list(topic="main_coefficients",message=WARNS["nointercept"])
 
                                 
                           },
@@ -527,46 +562,8 @@ Estimate <- R6::R6Class("Estimate",
                                   if (is.null(self$tab_random))
                                       return()
                             
-                                  vc<-as.data.frame(lme4::VarCorr(self$model))
-                                  variances<-which(is.na(vc$var2))
-                                  covariances<-which(!is.na(vc$var2))
-                                  params<-vc[variances,]
-                                  names(params)<-c("groups","name","nothing","var","std")
-                                  params$groups <- fromb64(params$groups,self$vars)
-                                  params$name <- fromb64(params$name,self$vars)
-                                  params$icc<-NA
-                                  int<-which("(Intercept)" %in% params$name)
-                                  for (i in int)
-                                        params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
-                                  ### Variance partitioning coefficients
-                                  vartot<-sum(params$var)
-                                  params$vpc<-params$var/vartot
-                                  
-                                  ### confidence intervals
-                                  ci_covariances<-NULL
-                                  if (self$option("re_ci")) {
-                                    
-                                      method     <-  ifelse(self$options$ci_method=="wald","Wald",self$options$ci_method)
-                                      results    <-  try_hard(stats::profile(self$model,which="theta_",optimizer=self$model@optinfo$optimizer,prof.scale=c("varcov")))
 
-                                      self$dispatcher$warnings<-list(topic="tab_random",message=results$warning)
-
-                                      ci         <-  as.data.frame(confint(results$obj,parm = "theta_",level = self$ciwidth, method=method))
-                                      names(ci)  <-  c("ci.lower","ci.upper")
-                                      ci_var_pos <-  unlist(lapply(names(lme4::getME(self$model,"theta")), function(n) length(strsplit(n,".",fixed = T)[[1]][-1])==1))
-                                      ci_variances <- ci[ci_var_pos,]
-                                      ci_covariances <- ci[!ci_var_pos,]
-                                      params<-cbind(params,ci_variances)
-                                      self$dispatcher$warnings<-list(topic="tab_random",message="C.I. are computed with the profile method")
-                                  }
-
-                                  self$tab_random<-params
-                                  ngrp<-vapply(self$model@flist,nlevels,1)
-                                  .names<-fromb64(names(ngrp))
-                                  info<-paste("Number of Obs:", self$model@devcomp$dims[[1]],", groups:",paste(.names),ngrp,collapse = ", ")
-                                  self$dispatcher$warnings<-list(topic="tab_random",message=info)
-
-
+                                covariances<-which(!is.na(vc$var2))
                                 if (is.something(covariances)) {
                                   
                                   params<-vc[covariances,]
@@ -699,7 +696,7 @@ Estimate <- R6::R6Class("Estimate",
 )  # end of class
 
 
-### additional functions usefull for estimation of some model ###
+### additional functions useful for estimation of some model ###
 
 estimate_lmer<-function(...) {
   opts<-list(...)

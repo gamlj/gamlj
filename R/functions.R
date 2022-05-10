@@ -42,9 +42,10 @@ fromb64<- function(x,...) UseMethod(".fromb64")
   matches64<-stringr::str_extract_all(obj,bregex)[[1]]
   matches<-jmvcore::fromB64(matches64)
   astring<-obj
-  for (i in seq_along(matches64))
-      astring<-stringr::str_replace_all(astring,matches64[i],matches[i])
-
+  for (i in seq_along(matches64)) {
+      if (!is.na(matches64[i]))
+         astring<-stringr::str_replace_all(astring,matches64[i],matches[i])
+  }
   astring<-stringr::str_replace_all(astring,B64_SYMBOL,"")
   astring<-stringr::str_replace_all(astring,FACTOR_SYMBOL,"")
   astring<-stringr::str_replace_all(astring,LEVEL_SYMBOL,"")
@@ -111,3 +112,15 @@ is.listOfList<-function(obj) {
   return(FALSE)
 }
   
+count_random<-function(form) {
+  
+  b<-lme4::findbars(as.formula(form))
+  print(b)
+  sum(sapply(b, function(x) {what<-as.character(x[[2]])
+  if (length(what)==1)
+    return(1)
+  else
+    return(length(strsplit(what[[2]],"+",fixed=T)[[1]]))
+  })
+  )
+}
