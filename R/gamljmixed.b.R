@@ -58,6 +58,11 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$main$random,estimate_machine)
       aSmartObj$ci("var",self$options$ci_width)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+
+      ### random variances table
+      aSmartObj<-SmartTable$new(self$results$main$randomcov,estimate_machine)
+      aSmartObj$activateOnData<-TRUE
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### estimate marginal means
       

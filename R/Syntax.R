@@ -267,6 +267,10 @@ Syntax <- R6::R6Class(
       data.frame(group=rep("",(rows/2)+1))
 
     },
+    init_main_randomcov=function() {
+      return()
+},
+
 
     ### posthoc means ###
     

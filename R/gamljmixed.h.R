@@ -672,7 +672,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     coefficients = function() private$.items[["coefficients"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
                     random = function() private$.items[["random"]],
-                    randomCov = function() private$.items[["randomCov"]],
+                    randomcov = function() private$.items[["randomcov"]],
                     lrtRandomEffectsTable = function() private$.items[["lrtRandomEffectsTable"]]),
                 private = list(),
                 public=list(
@@ -902,7 +902,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,
-                            name="randomCov",
+                            name="randomcov",
                             title="Random Parameters correlations",
                             visible=FALSE,
                             clearWith=list(
@@ -925,7 +925,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `combineBelow`=TRUE, 
                                     `type`="text"),
                                 list(
-                                    `name`="name1", 
+                                    `name`="name", 
                                     `title`="name", 
                                     `type`="text"),
                                 list(
@@ -933,7 +933,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="name2", 
                                     `type`="text"),
                                 list(
-                                    `name`="cov", 
+                                    `name`="std", 
                                     `title`="Corr.", 
                                     `type`="number"))))
                         self$add(jmvcore::Table$new(
@@ -1603,7 +1603,7 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
 #'   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$randomcov} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$lrtRandomEffectsTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr

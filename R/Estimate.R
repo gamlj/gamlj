@@ -15,6 +15,7 @@ Estimate <- R6::R6Class("Estimate",
                           nested_model=NULL,
                           tab_simpleAnova=NULL,
                           tab_simpleCoefficients=NULL,
+                          tab_randomcov=NULL,
                           boot_variances=NULL,
                           
                           initialize=function(options,dispatcher,datamatic) {
@@ -246,26 +247,39 @@ Estimate <- R6::R6Class("Estimate",
                                 self$dispatcher$warnings<-list(topic="main_random",message="C.I. are computed with the profile method")
                               }
                               
+                              .transnames<-c(var="vcov",std="sdcor")
+                              names(vc)<-transnames(names(vc),.transnames)
+                              grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
+                              
+                              vc$groups <- fromb64(grp)
+                              var1<-gsub(LEVEL_SYMBOL," = ",vc$var1,fixed = T)
+                              vc$name   <- fromb64(var1)
+                              var2<-gsub(LEVEL_SYMBOL," = ",vc$var2,fixed = T)
+                              vc$name2  <- fromb64(var2)
+                              
                               variances<-which(is.na(vc$var2))
                               params<-vc[variances,]
-                              .transnames<-c(groups="grp",name="var1",name2="var2",var="vcov",std="sdcor")
-                              names(params)<-transnames(names(params),.transnames)
-                              
-                              params$groups <- fromb64(params$groups)
-                              params$name <- fromb64(params$name)
                               params$icc<-NA
                               
                               int<-which(params$name %in% "(Intercept)")
                               for (i in int)
                                   params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
-
                               ngrp<-vapply(self$model@flist,nlevels,1)
                               .names<-fromb64(names(ngrp))
                               info<-paste("Number of Obs:", self$model@devcomp$dims[[1]],", groups:",paste(.names),ngrp,collapse = ", ")
                               self$dispatcher$warnings<-list(topic="main_random",message=info)
+                              covariances<-which(!is.na(vc$var2))
+                            if (nrow(vc[covariances,])>0) {
+                                self$tab_randomcov<-vc[covariances,]
+                              }
                               params
                           },
+                          run_main_randomcov=function() {
 
+                            if (is.something(self$tab_randomcov))
+                                return(self$tab_randomcov)
+                          },
+                          
                           run_posthoc=function() {
 
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
@@ -703,7 +717,6 @@ estimate_lmer<-function(...) {
   data<-opts$data
   reml<-opts$reml
   for (opt in opts$optimizers) {
-      
             model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
             if (mf.converged(model))
             break()

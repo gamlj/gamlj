@@ -2,8 +2,6 @@
 
 fit.R2 <- function(model,obj) {
 
-
-  
   # r2 and tests for the model
   r2list  <-  r2.est(model,obj)
   # check if model comparisons are required
@@ -18,7 +16,6 @@ fit.R2 <- function(model,obj) {
         comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
 
     r2comp<-as.list(comp[2,])
-
     .names<-list(df2=c("Res.Df","Resid. Df"),
                  df1=c("Df","df_diff"),p=c("Pr(>Chi)","Pr(>F)"),
                  f="F",
@@ -46,23 +43,27 @@ fit.R2 <- function(model,obj) {
     ### adjust
 
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
+    if (length(r2comp$r2)==0)
+      r2comp$r2<-NA
+    
     if (hasName(r2list[[1]],"ar2"))
           r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
-    
-    r2list<-c(r2list,r2nested,list(r2comp))
+      r2list<-c(r2list,r2nested,list(r2comp))
   }
-
+  for (r in r2list) {
+    if (is.na(r$r2)) {
+      mark("r2 na for", r)
+    }
+        
+  }
   r2list
 }
-
-
-
 
 r2.est<- function(model,...) UseMethod(".r2") 
 
 
-.r2.default<-function(model,obj) {
-  performance::r2(model,tolerance =0)
+.r2.default<-function(model,obj,model="Full") {
+a<- performance::r2(model,tolerance =0)
 
 }
 
@@ -75,9 +76,6 @@ r2.est<- function(model,...) UseMethod(".r2")
   
   if (alist$ar2<0)
     alist$ar2 <- 0
-  
-  if (any(sapply(alist,is.null)))
-    warning("R-squared cannot be computed")
   
   results     <-  fit.compare_null_model(model)
   alist$test  <-  results$test
@@ -96,9 +94,6 @@ r2.est<- function(model,...) UseMethod(".r2")
 
   alist$r2    <-  1-(results$deviance/results$null.deviance)
   alist$ar2   <-  ""
-
-  if (is.null(alist$r2))
-    obj$warnings  <-  list(topic="tab_r2",message="R-squared cannot be computed")
   
   alist$test  <-  results$test
   alist$df1    <-  results$df1
@@ -159,8 +154,7 @@ r2.est<- function(model,...) UseMethod(".r2")
       results$p<-stats::pf(results$f,results$df1,results$df2, lower.tail = FALSE)
     }
   } else {
-    warning("R-squared test cannot be computed")
-    
+     results$test<-NA
   }
   list(results)
   
@@ -170,23 +164,21 @@ r2.est<- function(model,...) UseMethod(".r2")
 .r2.lmerModLmerTest<-function(model,obj) {
   
   r2<-.r2.default(model,obj)
-  if (is.null(r2))
-      return(NULL)
-  cond<-list(r2="")  
-  if (!is.na(r2$R2_conditional)) {
-       cond<-fit.compare_null_model(model,type="c")
-       cond$type<-"Conditional"
-       cond$r2<-r2$R2_conditional
-  }
-  marg<-list(r2="")
-  if (!is.na(r2$R2_marginal)) {
-      marg<-fit.compare_null_model(model,type="m")
-      marg$type="Marginal"
-      marg$r2<-r2$R2_marginal
-  }
-  list(cond,marg)
-
+  if (is.null(r2) || is.na(r2)) 
+      r2<-list(R2_conditional=NA,R2_marginal=NA)
   
+  cond<-fit.compare_null_model(model,type="c")
+  cond$type<-"Conditional"
+  cond$r2<-r2$R2_conditional
+  
+  .marg<-fit.compare_null_model(model,type="m")
+   if (is.null(.marg))
+          warning("Marginal R'\u00B2' tests cannot be computed for the marginal model")
+   else 
+          marg<-.marg
+  marg$type="Marginal"
+  marg$r2<-r2$R2_marginal
+  list(cond,marg)
 }
 
 
@@ -244,18 +236,22 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
   int<-attr(terms(model),"intercept")
   
+     
   if (type=="c") {
 
           form<-as.formula(paste(formula(model)[[2]],"~",int))
           model0<-stats::lm(form,data=data)
           
   } else  {
+          if (int==0) 
+              return(NULL)
     
           re<-lme4::findbars(formula(model))
           re<-paste("(",re,")",collapse = "+")
-          form<-update(formula(model),paste("~",int," + ",re))
-          model0  <-  stats::update(model, form ,data=data)
-          
+          dep<-insight::model_info(model)$model_terms$response
+          form<-paste(dep,"~",int," + ",re)
+          model0  <-  stats::update(model, formula=form)
+
   }
   ### please note that here we use performance::test_likelihoodratio, which compute the LRT 
   ### on the estimated models, no matter what REML is. If one compares the results with 

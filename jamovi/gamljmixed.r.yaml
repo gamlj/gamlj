@@ -227,7 +227,7 @@ items:
                       title: "ICC"
                       type: number
 
-           - name: randomCov
+           - name: randomcov
              title: Random Parameters correlations
              type: Table
              visible: false
@@ -244,19 +244,19 @@ items:
                     - df_method
                     - re
                     - re_corr
- 
+
              columns:
                    - name: groups
                      title: "Groups"
                      combineBelow: true
                      type: text
-                   - name: name1
+                   - name: name
                      title: "name"
                      type: text
                    - name: name2
                      title: "name2"
                      type: text
-                   - name: cov
+                   - name: std
                      title: "Corr."
                      type: number
 
