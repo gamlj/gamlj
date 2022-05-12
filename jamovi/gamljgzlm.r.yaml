@@ -165,7 +165,7 @@ items:
                     - name: estimate
                       title: "RR"
                       type: number
-                    - name: lower.ECL
+                    - name: lower.CL
                       type: number
                       title: Lower
                       visible: (showExpbCI)

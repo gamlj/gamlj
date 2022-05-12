@@ -603,7 +603,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="RR", 
                                     `type`="number"),
                                 list(
-                                    `name`="lower.ECL", 
+                                    `name`="lower.CL", 
                                     `type`="number", 
                                     `title`="Lower", 
                                     `visible`="(showExpbCI)"),

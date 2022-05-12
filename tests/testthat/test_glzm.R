@@ -54,13 +54,20 @@ mod<-gamlj::gamljGzlm(
   data = hsbdemo,
   modelSelection = "logistic",
   postHoc =  "honors",
-  plotHAxis = "write"
+  plotHAxis = "write",
+  effectSize=c("RR","expb")
 )
 
 
 testthat::test_that("gzlm posthoc", {
   testthat::expect_equal(round(mod$postHocs[[1]]$asDF[[5]],3),1.635)
   testthat::expect_equal(as.character(mod$postHocs[[1]]$asDF[[3]]),"not enrolled")
+})
+
+testthat::test_that("gzlm relative risk", {
+  testthat::expect_equal(mod$main$relativerisk$asDF$estimate[2],1.0048,tol)
+  testthat::expect_equal(as.character(mod$main$relativerisk$asDF$source[2]),"honors1")
+  testthat::expect_equal(mod$main$relativerisk$asDF$upper.CL[3],1.035,tol)
 })
 
 res<-mod$main$fixed$asDF
