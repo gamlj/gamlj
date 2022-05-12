@@ -81,8 +81,9 @@ pred.means <- function(model, terms, cov_conditioning = conditioning$new(), inte
 
 .internal.emmc <- function(levs, data = data, variable = variable) {
     # remove possible average covariates values in the levels passed by emmeans
+
     levs <- sapply(levs, function(b) {
-        v <- strsplit(b, ",")[[1]]
+            v <- strsplit(b, ",")[[1]]
         v[length(v)]
     })
     # get the contrast weights
@@ -193,7 +194,7 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
     dfres<-model$df.residual
     sumr<-summary(model)
     N<-dfres+sumr$fstatistic[[2]]+1
-    ssres<-sigma(model)^2*dfres
+    ssres<-stats::sigma(model)^2*dfres
     ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
     df<-ff$df1
     SS<-df*ff$F.ratio*ssres/dfres
@@ -206,9 +207,9 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
     
     ### beta in parameter estimates ###
     xstd<-1
-    if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
+    if (!is.factor(model$model[,variable])) xstd<-stats::sd(model$model[,variable])
     y<-names(attr(model$terms,"dataClass"))[1]
-    ystd<-sd(model$model[,y])
+    ystd<-stats::sd(model$model[,y])
     params<-results[[1]]
     params$beta<-params$estimate*(xstd/ystd)
     list(params, ff)
