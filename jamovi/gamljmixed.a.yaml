@@ -378,8 +378,8 @@ options:
       default: 1
       description:
           R: >
-            how many st.deviations around the means used to condition simple effects and plots.
-            Used if `simpleScale`=`'mean_sd'`
+            Covariates conditioning mean offset value: how many st.deviations around the means used to condition simple effects and plots.
+            Used if `covs_conditioning`=`'mean_sd'`
 
     - name: ccp_value
       type: Number
@@ -388,9 +388,8 @@ options:
       max: 50
       description:
           R: >
-            offsett (number of percentiles) around the median used to condition simple effects and plots.
-            Used if `simpleScale`=`'percent'`
-
+            Covariates conditioning percentile offset value: number of percentiles around the median used to condition simple effects and plots.
+            Used if `covs_conditioning`=`'percent'`
 
     - name: covs_scale_labels
       type: List

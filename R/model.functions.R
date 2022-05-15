@@ -67,6 +67,9 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                       .ci_method <-"wald"
         } else 
                      ..bootstrap<-.bootstrap
+
+        ### up to parameters 0.16.0, if bootstrap is required standardize does not work
+        ### so we standardize before parameters() and feed the model to it
         
         opts_list<-list(model=mf.standardize(model),
                         bootstrap=..bootstrap,
@@ -86,8 +89,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                }
           
         }
-        ### up to parameters 0.16.0, if bootstrap is required standardize does not work
-        ### so we standardize before parameters() and feed the model to it
         estim<-do.call(parameters::parameters,opts_list)
         
         .coefficients$beta  <-  estim$Coefficient
@@ -126,7 +127,7 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
         goodnames<-c("source","estimate","se","t","df","p","response")
     }
     else
-      goodnames<-c("source","estimate","se","t","df","p")
+        goodnames<-c("source","estimate","se","t","df","p")
 
     names(.coefficients)<-goodnames
     
@@ -173,13 +174,16 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
     .iterations          <-  obj$options$boot_r
     .ci_method           <-  obj$options$ci_method
     .ci_width            <-  obj$ciwidth
+    .df_method           <-  switch (obj$options$df_method,
+                                     Satterthwaite = "satterthwaite",
+                                     "Kenward-Roger" = "kenward"
+                             )
 
-    mark("in params")
-    
     .coefficients        <-  as.data.frame(parameters::parameters(
       model,
       ci=NULL,
-      effects="fixed"
+      effects="fixed",
+      ci_method=.df_method
     ),stringAsFactors=FALSE)
 
     names(.coefficients) <-  c("source","estimate","se","t","df","p")
@@ -199,7 +203,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
       
     }
     
-
   
   return(.coefficients)
 }

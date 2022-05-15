@@ -316,7 +316,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 es,
                 options=list(
                     "expb",
-                    "RR"),
+                    "RR",
+                    "marginals"),
                 default=list(
                     "expb"))
             private$..modeltype <- jmvcore::OptionList$new(
@@ -580,6 +581,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     coefficients = function() private$.items[["coefficients"]],
                     vcov = function() private$.items[["vcov"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
+                    marginals = function() private$.items[["marginals"]],
                     relativerisk = function() private$.items[["relativerisk"]],
                     paralleltest = function() private$.items[["paralleltest"]]),
                 private = list(),
@@ -811,6 +813,59 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `title`="bogus", 
                                         `type`="text", 
                                         `visible`=FALSE)))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="marginals",
+                            title="Marginal Effects",
+                            visible="(es:marginals)",
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "contrasts",
+                                "covs_conditioning",
+                                "fixed_intercept",
+                                "es",
+                                "ci_width",
+                                "ci_method"),
+                            columns=list(
+                                list(
+                                    `name`="level", 
+                                    `title`="Level", 
+                                    `type`="text", 
+                                    `visible`="(modeltype:multinomial)"),
+                                list(
+                                    `name`="source", 
+                                    `title`="Name", 
+                                    `type`="text"),
+                                list(
+                                    `name`="contrast", 
+                                    `title`="Effect", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="AME", 
+                                    `type`="number"),
+                                list(
+                                    `name`="se", 
+                                    `title`="SE", 
+                                    `type`="number"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper"),
+                                list(
+                                    `name`="test", 
+                                    `title`="z", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="relativerisk",
@@ -1411,6 +1466,7 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$vcov} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
+#'   \code{results$main$marginals} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$paralleltest} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr

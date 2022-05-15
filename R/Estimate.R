@@ -1,4 +1,4 @@
-## This class takes care of estimating the model and return the results. It inherit from Syntax, and defines the same tables
+## This class takes care of estimating the model and returns the results. It inherits from Syntax, and defines the same tables
 ## defined by Syntax, but it fill them with the results. It also adds a few tables not defined in Syntax
 
 ## Any function that produce a table goes here
@@ -196,6 +196,14 @@ Estimate <- R6::R6Class("Estimate",
                             tab<-private$.fix_names(tab)
                             tab
                           },
+                          run_main_marginals=function() {
+                            tab<-NULL
+                            if (self$isProper) {
+                              tab       <-  es.marginals(self)
+                              tab       <-  private$.fix_names(tab)
+                            }
+                            tab
+                          },
                           
                           run_main_relativerisk=function() {
                             tab<-NULL
@@ -243,14 +251,17 @@ Estimate <- R6::R6Class("Estimate",
                                 cidata         <-  as.data.frame(confint(results$obj,parm = "theta_",level = self$ciwidth, method=method))
                                 names(cidata)  <-  c("var.ci.lower","var.ci.upper")
                                 vc<-cbind(vc,cidata)
-                                self$dispatcher$warnings<-list(topic="main_random",message="Computation of C.I. make take a while. Please be patient.",init=TRUE)
                                 self$dispatcher$warnings<-list(topic="main_random",message="C.I. are computed with the profile method")
                               }
                               
                               .transnames<-c(var="vcov",std="sdcor")
                               names(vc)<-transnames(names(vc),.transnames)
                               grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
-                              
+                              ### if the model has no intercept or intercept and 
+                              ### effects of factors are set as uncorrelated
+                              ### lmer() estimate random means, and name them
+                              ### factornamefactorlevel. We fix this make the 
+                              ### labels more intuitive
                               vc$groups <- fromb64(grp)
                               var1<-gsub(LEVEL_SYMBOL," = ",vc$var1,fixed = T)
                               vc$name   <- fromb64(var1)
@@ -266,7 +277,13 @@ Estimate <- R6::R6Class("Estimate",
                                   params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
                               ngrp<-vapply(self$model@flist,nlevels,1)
                               .names<-fromb64(names(ngrp))
-                              info<-paste("Number of Obs:", self$model@devcomp$dims[[1]],", groups:",paste(.names),ngrp,collapse = ", ")
+
+                              info<-paste("Number of Obs:", 
+                                          self$model@devcomp$dims[[1]],
+                                          ", groups:",
+                                          paste(.names,ngrp,sep="=",collapse = " "),
+                                          collapse=", ")
+                              
                               self$dispatcher$warnings<-list(topic="main_random",message=info)
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {
@@ -692,15 +709,25 @@ Estimate <- R6::R6Class("Estimate",
                             .rownames        <-  unlist(lapply(fromb64(.terms64,self$vars),jmvcore::stringifyTerm,raise=T))
                             atable$source    <-  .rownames
                             atable$label     <-  self$datamatic$get_params_labels(.terms64)
-                            
+
                             if ("response" %in% names(atable)) {
                                    atable$response          <-  factor(atable$response)
                                    levels(atable$response)  <-  unlist(self$datamatic$dep$contrast_labels)
                                    atable$response          <-  as.character(atable$response)
                             }
+                            if ("level" %in% names(atable)) {
+                              atable$level          <-  factor(atable$level)
+                              levels(atable$level)  <-  unlist(self$datamatic$dep$levels_labels)
+                              atable$level          <-  as.character(atable$level)
+                            }
+                            
                             if ("Component" %in% names(atable))
                                                atable$source[atable$Component=="alpha"]<-"Threshold"
-                            
+
+                            if ("contrast" %in% names(atable)) {
+                              atable$contrast<-fromb64(atable$contrast)
+                              atable$contrast[atable$contrast==""]<-atable$source[atable$contrast==""]
+                            }
                             return(atable)
 
                           }

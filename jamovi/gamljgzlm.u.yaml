@@ -134,6 +134,10 @@ children:
             type: CheckBox
             optionPart: expb
             optionName: es
+          - name: es_marginals
+            type: CheckBox
+            optionPart: marginals
+            optionName: es
           - name: es_RR
             type: CheckBox
             optionPart: RR

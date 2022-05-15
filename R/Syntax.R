@@ -57,9 +57,7 @@ Syntax <- R6::R6Class(
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
 
       ### confidence intervals
-      if (self$option("ci_method",c("quantile","bcai")))
-          self$dispatcher$warnings<-list(topic="info",message="Please wait, computing bootstrap confidence intervals may take a while",init=TRUE)
-        
+
       method<-switch(self$options$ci_method,
                      wald="Wald",
                      profile="Profile",

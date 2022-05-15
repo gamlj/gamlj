@@ -4,17 +4,32 @@ fit.R2 <- function(model,obj) {
 
   # r2 and tests for the model
   r2list  <-  r2.est(model,obj)
+  r2list<-lapply(r2list,function(a) { 
+          a$note="R^2"
+          a
+          })
   # check if model comparisons are required
   if (obj$option("comparison")) {
+
+    r2list<-lapply(r2list,function(a) { 
+      a$note="R^2 of the full model"
+      a
+    })
+    
     ### r2 for the nested model
     r2nested<-r2.est(obj$nested_model,obj)
+
+    r2nested<-lapply(r2nested,function(a) { 
+      a$note="R^2 of the nested model"
+      a
+    })
+    
 
     ### compare the two models
     if (obj$option(".caller",c("lmer","glmer")))
         comp <-  as.data.frame(performance::test_likelihoodratio(obj$nested_model,model))
     else  
         comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
-
     r2comp<-as.list(comp[2,])
     .names<-list(df2=c("Res.Df","Resid. Df"),
                  df1=c("Df","df_diff"),p=c("Pr(>Chi)","Pr(>F)"),
@@ -45,29 +60,39 @@ fit.R2 <- function(model,obj) {
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
     if (length(r2comp$r2)==0)
       r2comp$r2<-NA
-    
+    r2comp$note<-"R^2 difference "
     if (hasName(r2list[[1]],"ar2"))
           r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
       r2list<-c(r2list,r2nested,list(r2comp))
   }
+  
   for (r in r2list) {
     if (is.na(r$r2)) {
-      mark("r2 na for", r)
+      token<-r$note
+      if (hasName(r,"type"))
+         token<-paste(r$type,token)
+      msg <- jmvcore::format("{0}  cannot be computed",token)
+      obj$dispatcher$warnings<-list(topic="main_r2",message=msg)
     }
-        
   }
   r2list
 }
 
 r2.est<- function(model,...) UseMethod(".r2") 
 
-
-.r2.default<-function(model,obj,model="Full") {
-a<- performance::r2(model,tolerance =0)
+.r2.default<-function(model,  obj) {
+  results<-try_hard(performance::r2(model,tolerance =0))
+  
+  if (!isFALSE(results$warning))
+      mark(results$warning)
+  if (!isFALSE(results$error))
+     warning(results$error)
+  mark(results$obj)
+  return(results$obj)  
 
 }
 
-.r2.glm<-function(model,obj) {
+.r2.glm<-function(model,  obj) {
 
   alist       <-  list()
   # mcFadden and adjusted
@@ -85,7 +110,7 @@ a<- performance::r2(model,tolerance =0)
   
 }
 
-.r2.polr<-function(model) {
+.r2.polr<-function(model,   obj) {
 
   alist       <-  list()
   results     <-  fit.compare_null_model(model)
@@ -98,12 +123,11 @@ a<- performance::r2(model,tolerance =0)
   alist$test  <-  results$test
   alist$df1    <-  results$df1
   alist$p     <-  results$p
-
   return(list(alist))
   
 }
   
-.r2.multinom<-function(model) {
+.r2.multinom<-function(model,obj) {
 
   
   llfull<-stats::logLik(model)  ### model loglikelihood
@@ -121,10 +145,11 @@ a<- performance::r2(model,tolerance =0)
   alist$test  <-  compare$`LR stat.`[2]
   alist$df1    <-  compare$`   Df`[2]
   alist$p     <-  compare$`Pr(Chi)`[2]
+
   return(list(alist))
 }
 
-.r2.lm<-function(model,obj) {
+.r2.lm<-function(model, obj) {
   
   ss<-summary(model)
   results<-list()
@@ -156,14 +181,16 @@ a<- performance::r2(model,tolerance =0)
   } else {
      results$test<-NA
   }
+   
   list(results)
   
 }
 
 
-.r2.lmerModLmerTest<-function(model,obj) {
+.r2.lmerModLmerTest<-function(model, obj) {
   
   r2<-.r2.default(model,obj)
+  
   if (is.null(r2) || is.na(r2)) 
       r2<-list(R2_conditional=NA,R2_marginal=NA)
   
@@ -171,11 +198,9 @@ a<- performance::r2(model,tolerance =0)
   cond$type<-"Conditional"
   cond$r2<-r2$R2_conditional
   
-  .marg<-fit.compare_null_model(model,type="m")
-   if (is.null(.marg))
-          warning("Marginal R'\u00B2' tests cannot be computed for the marginal model")
-   else 
-          marg<-.marg
+  marg<-fit.compare_null_model(model,type="m")
+  if (is.null(marg))
+     marg<-list()   
   marg$type="Marginal"
   marg$r2<-r2$R2_marginal
   list(cond,marg)

@@ -1,3 +1,27 @@
+es.marginals<-function(obj) {
+  
+  model          <-  obj$model
+  ciWidth        <-  obj$ciwidth
+  data           <-  insight::get_data(model)
+  type           <-  "response"
+  if (inherits(model,c("polr","multinom")))
+      type <- "probs"
+  
+  results<-try_hard(marginaleffects::marginaleffects(model=model, type=type))
+  params<-as.data.frame(summary(results$obj,conf.level = ciWidth))
+
+  names(params)<-transnames(names(params),
+                            list("level"="group",
+                                 "source"="term",
+                                 "se"="std.error",
+                                 "test"="statistic",
+                                 "p"= "p.value",
+                                 "est.ci.lower"="conf.low",
+                                 "est.ci.upper"="conf.high")
+                             )
+  return(params)
+  
+}      
 
 es.relativerisk<-function(obj) {
       model          <-  obj$model
@@ -15,7 +39,7 @@ es.relativerisk<-function(obj) {
                                         id = id_id_id, 
                                         corstr = "exchangeable", data = data)
       params<-as.data.frame(parameters::parameters(results,exponentiate=TRUE))
-      
+
       if (!obj$option("ci_method","wald"))
           warning("Wald method for confidence intervals has been used")
       

@@ -686,6 +686,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="r2",
                             title="Model Fit",
                             clearWith=list(
+                                "relm",
                                 "dep",
                                 "model_terms",
                                 "nested_terms",
@@ -729,6 +730,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="anova",
                             title="ANOVA Omnibus tests",
                             clearWith=list(
+                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -744,8 +746,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="", 
                                     `type`="text"),
                                 list(
-                                    `name`="ss", 
-                                    `title`="SS", 
+                                    `name`="f", 
+                                    `title`="F", 
                                     `type`="number"),
                                 list(
                                     `name`="df1", 
@@ -754,10 +756,6 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df2", 
                                     `title`="df (res)", 
-                                    `type`="number"),
-                                list(
-                                    `name`="f", 
-                                    `title`="F", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -769,6 +767,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="coefficients",
                             title="Parameter Estimates (Coefficients)",
                             clearWith=list(
+                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -855,6 +854,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="random",
                             title="Random Components",
                             clearWith=list(
+                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -906,6 +906,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Random Parameters correlations",
                             visible=FALSE,
                             clearWith=list(
+                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -942,6 +943,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Random Effect LRT",
                             visible="(re_lrt)",
                             clearWith=list(
+                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -990,7 +992,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
-                        "boot_r",
+                        "relm",
                         "dep",
                         "model_terms",
                         "contrasts",
@@ -1002,7 +1004,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "boot_r",
                         "df_method",
                         "re",
-                        "re_corr"),
+                        "re_corr",
+                        "adjust"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1084,18 +1087,20 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="ANOVA for Simple Effects  of ___key___",
                             visible=FALSE,
                             clearWith=list(
+                                "reml",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
                                 "covs_scale",
                                 "dep_scale",
                                 "fixed_intercept",
-                                "simpleVariable",
-                                "simpleModerators",
-                                "simpleScale",
-                                "cvalue",
-                                "percvalue",
-                                "simpleScaleLabels",
+                                "simple_effects",
+                                "simple_moderators",
+                                "simple_scale",
+                                "ccm_value",
+                                "ccp_value",
+                                "covs_scale_labels",
+                                "covs_conditioning",
                                 "df_method"),
                             columns=list(
                                 list(
@@ -1121,23 +1126,22 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Parameter Estimates for simple effects of ___key___",
                             visible=FALSE,
                             clearWith=list(
+                                "reml",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
                                 "covs_scale",
                                 "dep_scale",
                                 "fixed_intercept",
-                                "simpleVariable",
-                                "simpleModerators",
-                                "simpleScale",
-                                "cvalue",
-                                "percvalue",
-                                "simpleScaleLabels",
-                                "semethod",
-                                "ci_method",
-                                "ci_width",
-                                "boot_r",
-                                "df_method"),
+                                "simple_effects",
+                                "simple_moderators",
+                                "simple_scale",
+                                "ccm_value",
+                                "ccp_value",
+                                "covs_scale_labels",
+                                "covs_conditioning",
+                                "df_method",
+                                "ci_method"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1197,13 +1201,19 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 name="anova",
                                 title="ANOVA",
                                 clearWith=list(
+                                    "reml",
                                     "dep",
                                     "model_terms",
-                                    "contrasts",
                                     "covs_scale",
                                     "dep_scale",
                                     "fixed_intercept",
-                                    "simpleScaleLabels",
+                                    "simple_effects",
+                                    "simple_moderators",
+                                    "simple_scale",
+                                    "ccm_value",
+                                    "ccp_value",
+                                    "covs_scale_labels",
+                                    "covs_conditioning",
                                     "df_method"),
                                 columns=list(
                                     list(
@@ -1232,17 +1242,23 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 name="coefficients",
                                 title="Parameter Estimates",
                                 clearWith=list(
+                                    "reml",
                                     "dep",
                                     "model_terms",
-                                    "contrasts",
                                     "covs_scale",
                                     "dep_scale",
                                     "fixed_intercept",
-                                    "simpleScaleLabels",
-                                    "ci_width",
+                                    "simple_effects",
+                                    "simple_moderators",
+                                    "simple_scale",
+                                    "ccm_value",
+                                    "ccp_value",
+                                    "covs_scale_labels",
+                                    "covs_conditioning",
+                                    "df_method",
+                                    "se_method",
                                     "ci_method",
-                                    "boot_r",
-                                    "df_method"),
+                                    "boot_r"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1287,6 +1303,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
+                        "reml",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1368,7 +1385,9 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible="(norm_test)",
                             clearWith=list(
                                 "model_terms",
-                                "dep"),
+                                "dep",
+                                "reml",
+                                "re"),
                             columns=list(
                                 list(
                                     `name`="name", 
@@ -1428,10 +1447,10 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 varTitle="`MIXED_PRED_${ dep }`",
                 varDescription="Predicted values",
                 clearWith=list(
+                    "reml",
                     "dep",
-                    "factors",
-                    "covs",
-                    "model_terms")))
+                    "model_terms",
+                    "re")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1439,10 +1458,10 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 varTitle="`MIXED_RES_${ dep }`",
                 varDescription="Residuals values",
                 clearWith=list(
+                    "reml",
                     "dep",
-                    "factors",
-                    "covs",
-                    "model_terms")))},
+                    "model_terms",
+                    "re")))},
         .setModel=function(x) private$..model <- x))
 
 gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -1543,11 +1562,12 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param simple_interactions should simple Interactions be computed
 #' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
 #'   \code{'percent'}. Use to condition the covariates (if any)
-#' @param ccm_value how many st.deviations around the means used to condition
-#'   simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}
-#' @param ccp_value offsett (number of percentiles) around the median used to
-#'   condition simple effects and plots. Used if
-#'   \code{simpleScale}=\code{'percent'}
+#' @param ccm_value Covariates conditioning mean offset value: how many
+#'   st.deviations around the means used to condition simple effects and plots.
+#'   Used if \code{covs_conditioning}=\code{'mean_sd'}
+#' @param ccp_value Covariates conditioning percentile offset value: number of
+#'   percentiles around the median used to condition simple effects and plots.
+#'   Used if \code{covs_conditioning}=\code{'percent'}
 #' @param covs_scale_labels how the levels of a continuous moderator should
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer

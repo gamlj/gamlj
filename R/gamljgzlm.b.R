@@ -67,6 +67,11 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$main$relativerisk,estimate_machine)
       aSmartObj$ci("est",width=self$options$ci_width)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+
+      ### marginal effects tables
+      aSmartObj<-SmartTable$new(self$results$main$marginals,estimate_machine)
+      aSmartObj$ci("est",width=self$options$ci_width)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### paralleltest tables
       aSmartObj<-SmartTable$new(self$results$main$paralleltest,estimate_machine)

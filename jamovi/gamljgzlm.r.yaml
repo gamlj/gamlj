@@ -242,6 +242,50 @@ items:
                            type: text
                            visible: false
 
+           - name:  marginals
+             title: Marginal Effects
+             type: Table
+             visible: (es:marginals)
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_conditioning
+                    - fixed_intercept
+                    - es
+                    - ci_width
+                    - ci_method
+             columns:
+                    - name: level
+                      title: "Level"
+                      type: text
+                      visible: (modeltype:multinomial)
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: contrast
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "AME"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                    - name: test
+                      title: z
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
            - name: relativerisk
              title: Relative risk
              type: Table

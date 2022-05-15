@@ -1,5 +1,9 @@
-######  ##########
+## Here are procedures, such as simple effects or posthoc tests, that may
+## be different from model to model (so they dispatch a S3 call), and 
+## produce one or more tables. 
 
+
+######  ##########
 procedure.beta<- function(x,...) UseMethod(".beta")
 
 .beta.default<-function(model) {

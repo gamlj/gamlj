@@ -19,8 +19,6 @@ items:
        - name: specs
          type: text
          title: ""
-
-
     refs: gamlj
      
   - name: main
@@ -32,6 +30,7 @@ items:
              type: Table
              description: a table of R
              clearWith:
+                         - relm
                          - dep
                          - model_terms
                          - nested_terms
@@ -73,6 +72,7 @@ items:
              type: Table
              description: a table of ANOVA results
              clearWith:
+                         - relm
                          - dep
                          - model_terms
                          - contrasts
@@ -87,9 +87,10 @@ items:
                     - name: source
                       title: ""
                       type: text
-                    - name: ss
-                      title: SS
+                    - name: f
+                      title: F
                       type: number
+
                     - name: df1
                       title: df
                       type: number
@@ -97,9 +98,6 @@ items:
                       title: df (res)
                       type: number
 
-                    - name: f
-                      title: F
-                      type: number
                     - name: p
                       title: p
                       type: number
@@ -110,6 +108,7 @@ items:
              title:  Parameter Estimates (Coefficients)
              type: Table
              clearWith:
+                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -188,6 +187,7 @@ items:
              title: Random Components
              type: Table
              clearWith:
+                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -232,6 +232,7 @@ items:
              type: Table
              visible: false
              clearWith:
+                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -265,6 +266,7 @@ items:
              type: Table
              visible: (re_lrt)
              clearWith:
+                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -309,7 +311,7 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-                    - boot_r
+                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -322,6 +324,7 @@ items:
                     - df_method
                     - re
                     - re_corr
+                    - adjust
 
         columns:
         - name: estimate
@@ -387,18 +390,20 @@ items:
               description: a table of ANOVA for simple effects
               visible: false
               clearWith:
+                 - reml
                  - dep
                  - model_terms
                  - contrasts
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
+                 - simple_effects
+                 - simple_moderators
+                 - simple_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - covs_conditioning
                  - df_method
  
               columns:
@@ -421,23 +426,22 @@ items:
               type: Table
               visible: false
               clearWith:
+                 - reml
                  - dep
                  - model_terms
                  - contrasts
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simpleVariable
-                 - simpleModerators
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
-                 - semethod
-                 - ci_method
-                 - ci_width
-                 - boot_r
+                 - simple_effects
+                 - simple_moderators
+                 - simple_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - covs_conditioning
                  - df_method
+                 - ci_method
                 
               columns:
                      - name: contrast
@@ -483,15 +487,20 @@ items:
              name: anova
              title: ANOVA 
              clearWith:
-                - dep
-                - model_terms
-                - contrasts
-                - covs_scale
-                - dep_scale
-                - fixed_intercept
-                - simpleScaleLabels
-                - df_method
-                
+                 - reml
+                 - dep
+                 - model_terms
+                 - covs_scale
+                 - dep_scale
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - simple_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - covs_conditioning
+                 - df_method
              columns:
                    - name: effect
                      title: 'Effect'
@@ -514,17 +523,23 @@ items:
              name: coefficients
              title: Parameter Estimates 
              clearWith:
-                - dep
-                - model_terms
-                - contrasts
-                - covs_scale
-                - dep_scale
-                - fixed_intercept
-                - simpleScaleLabels
-                - ci_width
-                - ci_method
-                - boot_r
-                - df_method
+                 - reml
+                 - dep
+                 - model_terms
+                 - covs_scale
+                 - dep_scale
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - simple_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - covs_conditioning
+                 - df_method
+                 - se_method
+                 - ci_method
+                 - boot_r
 
              columns:
                    - name: effect
@@ -564,6 +579,7 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
+            - reml
             - ci_width
             - ci_method
             - boot_r
@@ -637,6 +653,9 @@ items:
           clearWith:
               - model_terms
               - dep
+              - reml
+              - re
+              
           columns:
             - name: name
               title: Test
@@ -699,17 +718,18 @@ items:
     varTitle: '`MIXED_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
+        - reml
         - dep
-        - factors
-        - covs
         - model_terms
+        - re
   - name: residuals
     title: Residuals Vales
     type: Output            
     varTitle: '`MIXED_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
+        - reml
         - dep
-        - factors
-        - covs
         - model_terms
+        - re
+        

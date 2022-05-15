@@ -507,6 +507,9 @@ options:
             title: Odd Ratios (expB)
           - name: RR
             title: Relative Risk (RR)
+          - name: marginals
+            title: Marginal Effects
+            
       default:
           - expb
           
