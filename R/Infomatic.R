@@ -12,16 +12,17 @@ Infomatic <- R6::R6Class(
     direction=NULL,
     rcall=NULL,
     call=NULL,
-    emmeans=NULL,
-    predict="response",
-    fit=NULL,
-    deptype=NULL,
-    depnlevels=NULL,
-    calloptions=NULL,
-    r2=NULL,
-    optimized=FALSE,
-    df=NULL,
-    comparison="Difference",
+    emmeans     =  NULL,
+    predict     =  "response",
+    fit         =  NULL,
+    deptype     =  NULL,
+    depnlevels  =  NULL,
+    calloptions =  NULL,
+    r2          =  NULL,
+    optimized   =  FALSE,
+    df          =   NULL,
+    comparison  =  "Difference",
+    posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
     initialize=function(options,datamatic) {
       self$modeltype<-options$modeltype
       self$caller<-options$.caller
@@ -159,7 +160,7 @@ Infomatic <- R6::R6Class(
         self$link          <-    "logit"
         self$emmeans       <-   "expected class"
         self$comparison    <-    "Ratio"
-        
+        self$predict       <-     "class"
         ### compute direction ###
         theory             <-     paste('P(Y',greek_vector['leq'],'j)/P(Y', greek_vector['gt'],' j)')
         actual             <-     paste("j=",paste(dlevs,collapse = " | "))

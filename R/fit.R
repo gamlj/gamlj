@@ -87,7 +87,6 @@ r2.est<- function(model,...) UseMethod(".r2")
       mark(results$warning)
   if (!isFALSE(results$error))
      warning(results$error)
-  mark(results$obj)
   return(results$obj)  
 
 }

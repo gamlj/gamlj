@@ -63,6 +63,11 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$main$randomcov,estimate_machine)
       aSmartObj$activateOnData<-TRUE
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+
+      ### random variances lrt table
+      aSmartObj<-SmartTable$new(self$results$main$ranova,estimate_machine)
+      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      
       
       ### estimate marginal means
       
@@ -156,8 +161,8 @@ gamljMixedClass <- R6::R6Class(
 
       private$.checkpoint()
       
-      # #save model preds and resids            
-      # private$.estimate_machine$savePredRes(self$results) 
+       #save model preds and resids            
+       private$.estimate_machine$savePredRes(self$results) 
       # 
 #      private$.plotter_machine$preparePlots()
       

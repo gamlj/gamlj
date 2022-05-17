@@ -118,7 +118,6 @@ items:
                          - covs_conditioning
                          - dep_scale
                          - fixed_intercept
-                         - es
                          - chisq_type
              columns:
                     - name: source
@@ -256,9 +255,10 @@ items:
                     - ci_width
                     - ci_method
              columns:
-                    - name: level
-                      title: "Level"
+                    - name: response
+                      title: "Response"
                       type: text
+                      combineBelow: true
                       visible: (modeltype:multinomial)
                     - name: source
                       title: "Name"
@@ -685,8 +685,7 @@ items:
     varDescription: Predicted values
     clearWith:
         - dep
-        - factors
-        - covs
+        - model_terms
   - name: residuals
     title: Residuals Vales
     type: Output            

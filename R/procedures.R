@@ -42,7 +42,7 @@ procedure.posthoc <- function(obj) {
   gstart("PROCEDURE: Posthoc")
   
   terms <- obj$options$posthoc
-  dep <- obj$options$dep
+  dep <- tob64(obj$options$dep)
   
 
   ### we set the model, if we need bootstrap ci, we give the bootstrapped model
@@ -59,7 +59,7 @@ procedure.posthoc <- function(obj) {
   }
   
   lmer.df = NULL
-  if (obj$option("df_method")) {
+  if (obj$option("df_method",c("Satterthwaite","Kenward-Roger"))) {
     lmer.df=obj$options$df_method
   }
   
@@ -73,54 +73,55 @@ procedure.posthoc <- function(obj) {
     .revvars<-rev(.vars)
     .term64<-jmvcore::composeTerm(tob64(.revvars))
      referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df)
-     none <- summary(graphics::pairs(referenceGrid), adjust = "none",infer = c(FALSE,TRUE))
-     bonferroni <- summary(graphics::pairs(referenceGrid), adjust = "bonf",infer = c(FALSE,TRUE))
-     holm <- summary(graphics::pairs(referenceGrid), adjust = "holm",infer = c(FALSE,TRUE))
-     tukey <- summary(graphics::pairs(referenceGrid), adjust = "tukey",infer = c(FALSE,TRUE))
-     sidak <- summary(graphics::pairs(referenceGrid), adjust = "sidak",infer = c(FALSE,TRUE))
-     scheffe <- summary(graphics::pairs(referenceGrid), adjust = "scheffe",infer = c(FALSE,TRUE))
-     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
      
+     if (obj$option("modeltype","multinomial"))
+            .pairs<-graphics::pairs(referenceGrid,by=dep)
+     else
+            .pairs<-graphics::pairs(referenceGrid)
+     
+     none <- summary(.pairs, adjust = "none",infer = c(FALSE,TRUE))
      tableData <- as.data.frame(none, stringAsFactors = FALSE)
+     
+     for (adj in obj$options$adjust) {
+       arow <- summary(.pairs, adjust = adj,infer = c(FALSE,TRUE))
+       tableData[[adj]]<- arow$p.value
+     }
+     mark("here we are 2")
+     
      .transnames<-list(estimate=c("odds.ratio","ratio"),
                        test=c("z.ratio","t.ratio"),
                        p="p.value",
                        se="SE",
                        response=tob64(dep)
      )
-     names(tableData)<-transnames(names(tableData),.transnames)    
-     tableData$contrast <- as.character(tableData$contrast)
-     tableData$bonf <- bonferroni$p.value
-     tableData$holm <- holm$p.value
-     tableData$tukey <- tukey$p.value
-     tableData$scheffe <- scheffe$p.value
-     tableData$sidak <- sidak$p.value
+     names(tableData)<-transnames(names(tableData),.transnames)  
+     ## confidence intervals
+     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
      tableData$est.ci.lower<-cidata$est.ci.lower       
      tableData$est.ci.upper<-cidata$est.ci.upper       
-     
 
-    .cont <- as.character(tableData$contrast)
-    .cont <- gsub(" - ", "-", .cont, fixed = T)
-    .cont <- gsub(" / ", "/", .cont, fixed = T)
+     ## we create one column for each contrast level
+     tableData$contrast <- as.character(tableData$contrast)
 
-
-    .labs <- sapply(.cont, function(a) {
-      sapply(strsplit(as.character(a), "[- ,/]"), trimws, USE.NAMES = F, simplify = F)
+    .cont <- tableData$contrast
+    .cont <- gsub("[- ,/]","", .cont)
+    
+    .labs <- lapply(.cont, function(a) {
+      lapply(strsplit(as.character(a), LEVEL_SYMBOL)[[1]], trimws)[-1]
     })
     labs <- do.call("rbind", .labs)
     .vars  <- make.names(.revvars,unique = T)
     .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
+
     colnames(labs) <- .names
-    
     tableData <- cbind(labs, tableData)
-    rownames(tableData)<-NULL
     
     for (.name in .names)
       tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
     
      
-    if ("response" %in% names(tableData))
-        tableData$response<-fromb64(as.character(tableData$response))
+    if (dep %in% names(tableData))
+        tableData$response<-fromb64(as.character(tableData[[dep]]))
 
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
@@ -226,7 +227,7 @@ procedure.posthoc_effsize <- function(obj) {
 
     termf <- stats::as.formula(paste("~", term))
     
-    data <- mf.getModelData(model)
+    data <- insight::get_data(model)
     opts_list<-list(object=model,specs=termf,adjust="none", type = "response", data = data)
 
     if (is.something(vfun))
@@ -244,27 +245,22 @@ procedure.posthoc_effsize <- function(obj) {
       return(referenceGrid)
 }
 
-.posthoc.multinom <- function(model, term, adjust,ci=FALSE,vfun=NULL) {
+.posthoc.multinom <- function(model, term, adjust,ci=FALSE,vfun=NULL,df=NULL) {
 
   if (inherits(model,"bootstrap_model") )
        model<-attr(model,"original_model")
-      
-  results <- try({
+
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)
-    tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
+    termf <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
     data <- insight::get_data(model)
+    referenceGrid <- emmeans::emmeans(model, termf, transform = "response", data = data)
+    terms <- jmvcore::decomposeTerm(term)
+    labs <- referenceGrid@grid[terms]
+    newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
+    referenceGrid@grid[terms] <- newlabs
     
-    suppressMessages({
-      referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
-      terms <- jmvcore::decomposeTerm(term)
-      labs <- referenceGrid@grid[terms]
-      newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
-      referenceGrid@grid[terms] <- newlabs
-      results <- summary(graphics::pairs(referenceGrid, by=dep, adjust = adjust),infer = c(ci,TRUE))
-    })
-  })
-  return(results)
+  return(referenceGrid)
 }
 
 
@@ -290,7 +286,7 @@ procedure.posthoc_effsize <- function(obj) {
 
   if (inherits(model,"bootstrap_model") )
     model<-attr(model,"original_model")
-  
+
   results <- try({
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)

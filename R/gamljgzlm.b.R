@@ -178,6 +178,11 @@ gamljGzlmClass <- R6::R6Class(
 
       private$.checkpoint()
       
+      #save model preds and resids            
+      private$.estimate_machine$savePredRes(self$results) 
+      
+      private$.checkpoint()
+      
       ginfo("MODULE:  #### phase end ####")
       
       ginfo("RUN TIME:",Sys.time()-runnow," secs")

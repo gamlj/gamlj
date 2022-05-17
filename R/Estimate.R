@@ -200,7 +200,6 @@ Estimate <- R6::R6Class("Estimate",
                             tab<-NULL
                             if (self$isProper) {
                               tab       <-  es.marginals(self)
-                              tab       <-  private$.fix_names(tab)
                             }
                             tab
                           },
@@ -280,9 +279,9 @@ Estimate <- R6::R6Class("Estimate",
 
                               info<-paste("Number of Obs:", 
                                           self$model@devcomp$dims[[1]],
-                                          ", groups:",
-                                          paste(.names,ngrp,sep="=",collapse = " "),
-                                          collapse=", ")
+                                          ", Number of groups:",
+                                          paste(.names,ngrp,sep=" ",collapse = ", "),
+                                          collapse="; ")
                               
                               self$dispatcher$warnings<-list(topic="main_random",message=info)
                               covariances<-which(!is.na(vc$var2))
@@ -295,6 +294,16 @@ Estimate <- R6::R6Class("Estimate",
 
                             if (is.something(self$tab_randomcov))
                                 return(self$tab_randomcov)
+                          },
+                          run_main_ranova=function() {
+                            
+                            ## for intercept only model, lmerTest::ranova()
+                            ## looks for "data" in parent env 
+                            data<-self$model@frame
+                            results  <- try_hard(as.data.frame((lmerTest::ranova(self$model))))
+                            tab      <- results$obj[-1,]
+                            tab$test <- fromb64(rownames(results$obj[-1,]))
+                            tab
                           },
                           
                           run_posthoc=function() {
@@ -393,20 +402,30 @@ Estimate <- R6::R6Class("Estimate",
                             table
                           },
                           
+                          
                           savePredRes=function(results) {
                             
                             if (self$options$predicted && results$predicted$isNotFilled()) {
                                 ginfo("Saving predicted")
-                                p<-stats::predict(self$model,type=self$infomatic$predict)
+
+                                preds<-stats::predict(self$model,type=self$infomatic$predict)
+                                pdf <- data.frame(P=preds, row.names=rownames(insight::get_data(self$model)))
+                                for (p in seq_len(ncol(pdf)))
+                                       if (is.factor(pdf[[p]]))
+                                           pdf[[p]]<-fromb64(as.character(pdf[[p]]))
+                              names(pdf)  <- paste0(paste0("GZLM_PRED_",self$options$dep),fromb64(names(pdf)))  
                               # we need the rownames in case there are missing in the datasheet
-                                pdf <- data.frame(predicted=p, row.names=rownames(mf.getModelData(self$model)))
-                                results$predicted$setValues(p)
+                              results$predicted$set(1:ncol(pdf),
+                                                      names(pdf),
+                                                      rep("Predicted",ncol(pdf)),
+                                                      rep("continuous",ncol(pdf)))
+                                results$predicted$setValues(pdf)
                             }
                             if (self$options$residuals && results$residuals$isNotFilled()) {
                                 ginfo("Saving residuals")
                                 p<-stats::resid(self$model)
                               # we need the rownames in case there are missing in the datasheet
-                              pdf <- data.frame(residuals=p, row.names=rownames(mf.getModelData(self$model)))
+                              pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model)))
                               results$residuals$setValues(pdf)
                             }
                           },
@@ -463,8 +482,6 @@ Estimate <- R6::R6Class("Estimate",
                         privat=list(
                           .data64=NULL,
                           .contr_index=0,
-                          .storageTable=NULL,
-                          .hasStorage=FALSE,
                           .estimateModel=function(data) {
                             
                               ### check the dependent variable ####
@@ -627,16 +644,6 @@ Estimate <- R6::R6Class("Estimate",
 
                             },
 
-                          .estimateEffectSizes=function() {
-
-                            ## relative risks
-                            
-                            if (is.something(self$tab_relativerisk)) {
-                               tab<-es.relativerisk(self)
-                               self$tab_relativerisk<-private$.fix_names(tab)
-                            }
-                            
-                          },
                           .estimateSimpleEffects=function() {
                             
                             results<-try_hard(procedure.simpleEffects(self$model,self))
@@ -649,64 +656,11 @@ Estimate <- R6::R6Class("Estimate",
                             }
                             
                         },
-                          
-                          
-                        
-                         .estimateAssumptions=function() {
-                           
-                           if (self$option("homo_test")) {
-                             
-                             factors<-intersect(unique(unlist(self$options$model_terms)),self$options$factors)
-                             
-                             if (length(factors)>0) {
-                               factors64<-tob64(factors)
-                               data<-mf.getModelData(self$model)
-                               data$res<-stats::residuals(self$model)
-                               rhs <- paste0('`', factors64, '`', collapse=':')
-                               formula <- as.formula(paste0('`res`~', rhs))
-                               result <- car::leveneTest(formula, data, center="mean")
-                               self$tab_levene<-list(list(
-                                       test=result[1,'F value'],
-                                       df1=result[1,'Df'],
-                                       df2=result[2,'Df'],
-                                       p=result[1,'Pr(>F)']))
-                             } else {
-                               
-                               self$dispatcher$warnings<-list(topic="tab_levene",message="Levene's test requires at least one factor in the model")
-                               
-                             }
-                             
-                             if (is.something(self$tab_normtest)) {
-                               
-                               self$tab_normtest<-list()
-                               
-                               resids<-stats::residuals(self$model)
-                               ### komogorov-smirnov
-                               test<-stats::ks.test(resids,"pnorm",mean(resids),sd(resids))
-                               self$tab_normtest[[1]]<-list(test=test$statistic,p=test$p.value)
-                               
-                               ### shapiro-wilk
-                               
-                               test<-try_hard(stats::shapiro.test(resids))
-                               
-                               if (!isFALSE(test$error))
-                                   self$dispatcher$warnings<-list(topic="tab_normtest",message="Shapiro-Wilk not available due to the very large number of cases")
-                               else
-                                   self$tab_normtest[[2]]<-list(test=test$obj$statistic,p=test$obj$p.value)
-                               
 
-                             }
-
-                             
-                           }
-                           
-
-                         },
-                          
                           .fix_names=function(atable) {
                             
                             .terms64         <-  jmvcore::decomposeTerms(atable$source)
-                            .rownames        <-  unlist(lapply(fromb64(.terms64,self$vars),jmvcore::stringifyTerm,raise=T))
+                            .rownames        <-  unlist(lapply(fromb64(.terms64),jmvcore::stringifyTerm,raise=T))
                             atable$source    <-  .rownames
                             atable$label     <-  self$datamatic$get_params_labels(.terms64)
 

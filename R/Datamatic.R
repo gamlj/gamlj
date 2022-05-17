@@ -501,7 +501,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         vardata<-sdata[[self$name64]]
-        self$datamatic$dispatcher$warnings<-list(topic="data",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
+        self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
       }
       if (method=="clusterbasedstandardized") {    
         cluster64<-tob64(self$hasCluster[1])
@@ -517,7 +517,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,ddata,by=cluster64)
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
         vardata<-sdata[[self$name64]]
-        self$datamatic$dispatcher$warnings<-list(topic="data",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
+        self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
         
       }
 
@@ -528,7 +528,7 @@ Variable <- R6::R6Class(
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
         vardata<-sdata[["mean"]]
-        self$datamatic$dispatcher$warnings<-list(topic="data",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
+        self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
         
       }
       

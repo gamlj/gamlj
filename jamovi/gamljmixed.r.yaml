@@ -261,7 +261,7 @@ items:
                      title: "Corr."
                      type: number
 
-           - name: lrtRandomEffectsTable
+           - name: ranova
              title: Random Effect LRT
              type: Table
              visible: (re_lrt)

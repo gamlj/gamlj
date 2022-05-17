@@ -181,10 +181,10 @@ gamljGlmClass <- R6::R6Class(
 
 
 
-#      private$.checkpoint()
+      private$.checkpoint()
       
-      # #save model preds and resids            
-      # private$.estimate_machine$savePredRes(self$results) 
+      #save model preds and resids            
+      private$.estimate_machine$savePredRes(self$results) 
       # 
       # private$.plotter_machine$preparePlots()
       # 

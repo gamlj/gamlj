@@ -197,12 +197,12 @@ Syntax <- R6::R6Class(
         if (self$option("es_info")) {
           alist<-list()
           for (term in self$options$model_terms) {
-            alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
-            alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_peta2)
-            alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_omega2)
-            alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_pomega2)
-            alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_epsilon2)
-            alist[[length(alist)+1]]<-list(effect=jmvcore::stringifyTerm(term),name=letter_pepsilon2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_peta2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_omega2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_pomega2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_epsilon2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_pepsilon2)
           }
         }
         alist

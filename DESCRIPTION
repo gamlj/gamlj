@@ -13,7 +13,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, lmerTest,
          nnet, MASS, gridExtra, ggplot2, effectsize, performance, geepack, ordinal,
-         marginaleffects
+         margins
 RoxygenNote: >= 7.1.1
 Suggests: 
     rmarkdown,

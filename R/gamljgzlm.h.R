@@ -676,7 +676,6 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_conditioning",
                                 "dep_scale",
                                 "fixed_intercept",
-                                "es",
                                 "chisq_type"),
                             columns=list(
                                 list(
@@ -829,9 +828,10 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_method"),
                             columns=list(
                                 list(
-                                    `name`="level", 
-                                    `title`="Level", 
+                                    `name`="response", 
+                                    `title`="Response", 
                                     `type`="text", 
+                                    `combineBelow`=TRUE, 
                                     `visible`="(modeltype:multinomial)"),
                                 list(
                                     `name`="source", 
@@ -1314,8 +1314,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 varDescription="Predicted values",
                 clearWith=list(
                     "dep",
-                    "factors",
-                    "covs")))
+                    "model_terms")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",

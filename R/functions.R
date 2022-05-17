@@ -103,6 +103,15 @@ is.b64<-function(a) {
     any(test1,test2,test3,test4)
 }
 
+### basic functions ###
+
+`ladd<-`<-function(x,value) {
+  x[[length(x)+1]]<-value
+  return(x)
+}
+
+
+
 is.listOfList<-function(obj) {
 
     if (inherits(obj,"list")) {
