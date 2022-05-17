@@ -165,8 +165,13 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
 .parameters.multinom<-function(model,obj) 
         .parameters.glm(model,obj)
     
-.parameters.polr<-function(model,obj) 
-  .parameters.glm(model,obj)
+.parameters.polr<-function(model,obj) {
+  params<-.parameters.glm(model,obj)
+  params$label<-params$source
+  check<-grep(LEVEL_SYMBOL,params$source,fixed=TRUE)
+  params$source[check]<-"(Threshold)"
+  params
+ }
 
 .parameters.lmerModLmerTest<-function(model,obj) {
 

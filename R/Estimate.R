@@ -662,8 +662,12 @@ Estimate <- R6::R6Class("Estimate",
                             .terms64         <-  jmvcore::decomposeTerms(atable$source)
                             .rownames        <-  unlist(lapply(fromb64(.terms64),jmvcore::stringifyTerm,raise=T))
                             atable$source    <-  .rownames
-                            atable$label     <-  self$datamatic$get_params_labels(.terms64)
-
+                            
+                            if (!("label" %in% names(atable)))
+                                atable$label     <-  self$datamatic$get_params_labels(.terms64)
+                            else 
+                              atable$label     <-  self$datamatic$get_params_labels(atable$label)
+                            
                             if ("response" %in% names(atable)) {
                                    atable$response          <-  factor(atable$response)
                                    levels(atable$response)  <-  unlist(self$datamatic$dep$contrast_labels)

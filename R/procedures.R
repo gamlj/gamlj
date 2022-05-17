@@ -282,19 +282,18 @@ procedure.posthoc_effsize <- function(obj) {
   results
   
 }
-.posthoc_ci.multinom=function(model,term,width,method,vfun=NULL) {
+.posthoc_ci.multinom=function(referenceGrid,term,width,method,vfun=NULL) {
 
   if (inherits(model,"bootstrap_model") )
     model<-attr(model,"original_model")
 
-  results <- try({
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)
     tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
     data <- insight::get_data(model)
     
-    suppressMessages({
       referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
+      
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
       newlabs <- sapply(labs, function(a) sapply(a, function(b) tob64(as.character(b))))
@@ -303,9 +302,7 @@ procedure.posthoc_effsize <- function(obj) {
       results<-as.data.frame(cbind(results$lower.CL,results$upper.CL))
       names(results)<-c("est.ci.lower","est.ci.upper")
       results
-    })
-  })
-  return(results)
+return(results)
   
 }
 

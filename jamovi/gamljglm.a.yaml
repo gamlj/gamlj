@@ -487,6 +487,7 @@ options:
     - name: predicted
       title: Predicted
       type: Output            
+      initInRun: true
 
     - name: residuals
       title: Residuals
