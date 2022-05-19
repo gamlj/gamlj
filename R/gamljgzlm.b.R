@@ -10,7 +10,7 @@ gamljGzlmClass <- R6::R6Class(
     .smartObjs=list(),
     .init=function() {
       
-      ginfo(paste("MODULE:",self$options$.caller,self$options$modeltype,"  #### phase init  ####"))
+      ginfo(paste("MODULE:",self$options$.caller,self$options$model_type,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       
       private$.time<-Sys.time()
@@ -38,7 +38,7 @@ gamljGzlmClass <- R6::R6Class(
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       ### some models do not have adjusted r2 ###
-      if (self$options$modeltype %in% c("multinomial","ordinal", "custom"))
+      if (self$options$model_type %in% c("multinomial","ordinal", "custom"))
              self$results$main$r2$getColumn("ar2")$setVisible(FALSE)
       
       

@@ -8,7 +8,7 @@
 data(fivegroups)
 }
 \description{
-Data with five groups and a continuous dependent variable for checking contrasts results
+Simulated data with five groups and a continuous dependent variable for checking contrasts results
 }
 \examples{
 data(fivegroups)

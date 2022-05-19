@@ -81,7 +81,7 @@ gamljGlmClass <- R6::R6Class(
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
       
       aSmartObj<-SmartArray$new(self$results$posthocEffectSize,estimate_machine)
-      aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthoces))
+      aSmartObj$activated<-(is.something(self$options$posthoc) & is.something(self$options$posthoc_es))
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("dm",self$options$ci_width)
@@ -156,7 +156,7 @@ gamljGlmClass <- R6::R6Class(
   #    plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
   #    plotter_machine$initPlots()
   #    private$.plotter_machine<-plotter_machine
-
+      
       now<-Sys.time()
       ginfo("INIT TIME:",now-private$.time," secs")
       
@@ -179,8 +179,6 @@ gamljGlmClass <- R6::R6Class(
       for (smarttab in private$.smartObjs)
            smarttab$runTable()
 
-
-
       private$.checkpoint()
       
       #save model preds and resids            
@@ -193,8 +191,9 @@ gamljGlmClass <- R6::R6Class(
       #     self$results$plotnotes$setVisible(TRUE)
       # }  
       
-      
-#      private$.checkpoint()
+
+     if (self$options$.interface=="R") 
+       self$results$.setModel(private$.estimate_machine$model)
       
       ginfo("MODULE:  #### phase end ####")
       

@@ -8,7 +8,7 @@
 data(beers_bars)
 }
 \description{
-Data for random coefficients regression, with smiles as dependent
+Simulated data testing random coefficients regression, with smiles as dependent
 variable, beers as independent variable, and bars as cluster
 }
 \examples{

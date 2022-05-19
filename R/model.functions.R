@@ -46,7 +46,6 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
                                                                     ),stringAsFactors=FALSE)
     
       names(.coefficients) <-  c("source","estimate","se","t","df","p")
-      
       if (obj$option("estimates_ci")) {
 
         cidata            <-  as.data.frame(parameters::ci(.model,
@@ -612,37 +611,8 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
 .aliased.polr<-function(model) {
   ### to do 
   FALSE
-  
 }
 
-### sourcify syntax for all models ####
-
-mf.sourcify<-function(option) {
-
-  results<-list(type="transformed",option=option)
-  .ignore<-c('factors', 'dep', 'covs', 'model_terms','.interface','.caller')
-  .transform<-c("simple_effects","simple_moderators","plotHAxis","plotSepLines","plotSepPlots")
-
-  if (!is.something(option$value))
-      results$type="empty"
-  
-  if (option$name %in% .ignore)
-    results$type="empty"
-  
-  if (option$name =='covs_scale') {
-    results$option$value<-sourcifyList(option,"centered")
-    results$type="complete"
-  }
-  if (option$name =='contrasts') {
-    results$option$value<-sourcifyList(option,"simple")
-    results$type="complete"
-  }
-  
-  if (option$name %in% .transform) {
-    results$option$value<-sourcifyVars(option$value)
-  }
-  results
-}
 
 ##### standardize a model #########
 
@@ -655,12 +625,12 @@ mf.standardize<- function(x,...) UseMethod(".standardize")
 .standardize.lm<-function(model) {
   
   newdata<-model$model
-  types<-attr(terms(model),"dataClasses")
+  types<-attr(stats::terms(model),"dataClasses")
   for (name in names(types)) {
     if (types[[name]]=="numeric") 
       newdata[[name]] <- as.numeric(scale(newdata[[name]]))
   }
-  update(model,data=newdata)
+  stats::update(model,data=newdata)
   
 }  
 
@@ -681,8 +651,8 @@ mf.update<- function(x,...) UseMethod(".update")
   .args<-list(...)
   data<-mf.getModelData(model)
   
-  if (hasName(.args,"formula")) {
-    .formula<-as.formula(.args$formula)
+  if (utils::hasName(.args,"formula")) {
+    .formula<-stats::as.formula(.args$formula)
      test<-lme4::findbars(.formula)
     
      if (!is.something(test)) {

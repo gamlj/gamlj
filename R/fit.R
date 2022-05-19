@@ -53,7 +53,7 @@ fit.R2 <- function(model,obj) {
     
     
     ## sometimes the chi-square is not printed out    
-#    if (obj$option("omnibus","LRT") & !hasName(r2comp,"lrt"))
+#    if (obj$option("omnibus","LRT") & !utils::hasName(r2comp,"lrt"))
 #          r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
     ### adjust
 
@@ -61,7 +61,7 @@ fit.R2 <- function(model,obj) {
     if (length(r2comp$r2)==0)
       r2comp$r2<-NA
     r2comp$note<-"R^2 difference "
-    if (hasName(r2list[[1]],"ar2"))
+    if (utils::hasName(r2list[[1]],"ar2"))
           r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
       r2list<-c(r2list,r2nested,list(r2comp))
   }
@@ -69,7 +69,7 @@ fit.R2 <- function(model,obj) {
   for (r in r2list) {
     if (is.na(r$r2)) {
       token<-r$note
-      if (hasName(r,"type"))
+      if (utils::hasName(r,"type"))
          token<-paste(r$type,token)
       msg <- jmvcore::format("{0}  cannot be computed",token)
       obj$dispatcher$warnings<-list(topic="main_r2",message=msg)
@@ -135,7 +135,7 @@ r2.est<- function(model,...) UseMethod(".r2")
 #  nullmodel <- eval.parent(nullmodel)
   llnull<-stats::logLik(nullmodel)
   r2<-as.numeric(1-(llfull/llnull))  
-  compare<-anova(nullmodel,model)
+  compare<-stats::anova(nullmodel,model)
   
 
   alist       <-  list()
@@ -156,7 +156,7 @@ r2.est<- function(model,...) UseMethod(".r2")
   results$df2<-ss$fstatistic[["dendf"]]
   results$r2<-ss$r.squared
   results$ar2<-ss$adj.r.squared
-  if (hasName(ss,"fstatistic")) {
+  if (utils::hasName(ss,"fstatistic")) {
 
     if (obj$option("omnibus","LRT")) {
       
@@ -214,8 +214,8 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 .compare_null_model.default<-function(model) {
   
   data    <-  insight::get_data(model)
-  int<-attr(terms(model),"intercept")
-  form<- as.formula(paste("~",int))
+  int<-attr(stats::terms(model),"intercept")
+  form<- stats::as.formula(paste("~",int))
   model0  <-  stats::update(model,form ,data=data,evaluate=T)
   results <-  stats::anova(model0,model,test = "LRT")
   results$test  <-  results$Deviance
@@ -227,7 +227,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
 .compare_null_model.polr<-function(model) {
 
-  form<- as.formula("~1")
+  form<- stats::as.formula("~1")
   data<-mf.getModelData(model)
   model0  <-  stats::update(model,form ,data=data,evaluate=T)
   .results <-  stats::anova(model0,model)
@@ -244,8 +244,8 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 .compare_null_model.negbin<-function(model) {
   
   data    <-  mf.getModelData(model)
-  int<-attr(terms(model),"intercept")
-  form<- as.formula(paste("~",int))
+  int<-attr(stats::terms(model),"intercept")
+  form<- stats::as.formula(paste("~",int))
   model0  <-  stats::update(model,form ,data=data,evaluate=T)
   results <-  stats::anova(model0,model)
   results$test  <- results$`LR stat.`
@@ -258,19 +258,19 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   
   data    <-  mf.getModelData(model)
 
-  int<-attr(terms(model),"intercept")
+  int<-attr(stats::terms(model),"intercept")
   
      
   if (type=="c") {
 
-          form<-as.formula(paste(formula(model)[[2]],"~",int))
+          form<-stats::as.formula(paste(stats::formula(model)[[2]],"~",int))
           model0<-stats::lm(form,data=data)
           
   } else  {
           if (int==0) 
               return(NULL)
     
-          re<-lme4::findbars(formula(model))
+          re<-lme4::findbars(stats::formula(model))
           re<-paste("(",re,")",collapse = "+")
           dep<-insight::model_info(model)$model_terms$response
           form<-paste(dep,"~",int," + ",re)
@@ -288,8 +288,8 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 }
 
 null.deviance<-function(model) {
-      int<-attr(terms(model),"intercept")
-      form<- as.formula(paste("~",int))
+      int<-attr(stats::terms(model),"intercept")
+      form<- stats::as.formula(paste("~",int))
       model0  <-  stats::update(model,form ,evaluate=T)
       stats::deviance(model0)
 }

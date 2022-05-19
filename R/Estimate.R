@@ -21,7 +21,7 @@ Estimate <- R6::R6Class("Estimate",
                           initialize=function(options,dispatcher,datamatic) {
                             super$initialize(options,dispatcher,datamatic)
                             self$ciwidth <- options$ci_width/100
-                            self$subclass<-paste0("model_",options$modeltype)
+                            self$subclass<-paste0("model_",options$model_type)
                           },
                           estimate = function(data) {
                             
@@ -54,7 +54,7 @@ Estimate <- R6::R6Class("Estimate",
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
                                 
                                 ### issue some notes ###
-                                if (self$option("ci_method",c("quantile","bcai")) & self$option("posthoc") & self$option("posthoces") & self$option("d_ci")) 
+                                if (self$option("ci_method",c("quantile","bcai")) & self$option("posthoc") & self$option("posthoc_es") & self$option("d_ci")) 
                                   self$dispatcher$warnings<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
                                 tab
                           },                    
@@ -405,17 +405,14 @@ Estimate <- R6::R6Class("Estimate",
                           
                           savePredRes=function(results) {
                             
+                            
                             if (self$options$predicted && results$predicted$isNotFilled()) {
                                 ginfo("Saving predicted")
 
-                                preds<-stats::predict(self$model,type=self$infomatic$predict)
-                                pdf <- data.frame(P=preds, row.names=rownames(insight::get_data(self$model)))
-                                for (p in seq_len(ncol(pdf)))
-                                       if (is.factor(pdf[[p]]))
-                                           pdf[[p]]<-fromb64(as.character(pdf[[p]]))
-                              names(pdf)  <- paste0(paste0("GZLM_PRED_",self$options$dep),fromb64(names(pdf)))  
-                              # we need the rownames in case there are missing in the datasheet
-                              results$predicted$set(1:ncol(pdf),
+                                
+                                pdf <- predicted(self$model,self)
+                                
+                                results$predicted$set(1:ncol(pdf),
                                                       names(pdf),
                                                       rep("Predicted",ncol(pdf)),
                                                       rep("continuous",ncol(pdf)))
@@ -527,7 +524,7 @@ Estimate <- R6::R6Class("Estimate",
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
                               if (!isFALSE(results$error)) {
-                                if (self$option("modeltype","custom"))
+                                if (self$option("model_type","custom"))
                                   stop("No solution has been found for the combination of link function and distribution")
                                 else
                                   stop(results$error)

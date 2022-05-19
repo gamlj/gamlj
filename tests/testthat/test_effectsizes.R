@@ -11,7 +11,9 @@ modss<-f*sigma(mod)^2*mdf/edf
 .anova<-car::Anova(mod,type=3)
 
 
-gmod<-gamlj::gamljGlm(formula = form,iris,effectSize = c("eta","etap","omega","omegap","epsilon","epsilonp"))
+gmod<-gamlj::gamljGlm(formula = form,
+                      iris,
+                      es = c("eta","etap","omega","omegap","epsilon","epsilonp"))
 
 ganov<-gmod$main$anova$asDF
 ganeff<-ganov[ganov$source!="Residuals" & ganov$source!="Model" & ganov$source!="Total",]

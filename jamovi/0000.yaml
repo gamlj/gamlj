@@ -118,6 +118,6 @@ datasets:
       - Generalized Mixed models
       - Negative Binomial mixed models
 usesNative: true
-minApp: 1.8.0
+minApp: 2.3.1
 
 ...

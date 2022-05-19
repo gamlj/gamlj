@@ -107,7 +107,7 @@ Syntax <- R6::R6Class(
                       list(type="Marginal",model="Full"),
                       list(type="Conditional",model="Nested"),
                       list(type="Marginal",model="Nested"),
-                      list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R²"))
+                      list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
                       )
           }
   
@@ -145,7 +145,7 @@ Syntax <- R6::R6Class(
         tab<-lapply(.formulalist, function(x) list(source=.stringifyTerm(x)))
       }
       
-      if (self$options$modeltype=="lm") {
+      if (self$options$model_type=="lm") {
         if (self$hasTerms)
           tab<-prepend_list(tab,list(source="Model",f="."))
         
@@ -165,10 +165,10 @@ Syntax <- R6::R6Class(
 
       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
       .len<-length(.terms)
-      if (self$options$modeltype=="multinomial") 
+      if (self$options$model_type=="multinomial") 
         .len  <- .len * (self$datamatic$dep$nlevels-1)
       
-      if (self$options$modeltype=="ordinal") 
+      if (self$options$model_type=="ordinal") 
         .len  <- .len + (self$datamatic$dep$nlevels-2)
       
       lapply(1:.len, function(t) list(source=""))
@@ -222,12 +222,12 @@ Syntax <- R6::R6Class(
        .len <- length(.terms)
        .titles<-fromb64(.terms)
       
-       if (self$options$modeltype=="multinomial") {
+       if (self$options$model_type=="multinomial") {
          .len  <- .len * (self$datamatic$dep$nlevels-1)
          .titles<-c(paste("1",.titles,sep=":"),paste("2",.titles,sep=":"))
          
        }
-       if (self$options$modeltype=="ordinal") {
+       if (self$options$model_type=="ordinal") {
          .len  <- .len + (self$datamatic$dep$nlevels-2)
          .titles<-c(.titles[-1],paste0("int",1:(self$datamatic$dep$nlevels-1)))
        }
@@ -279,7 +279,7 @@ Syntax <- R6::R6Class(
           p<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
           nrow<-p*(p-1)/2
           ncol<-(length(.term)*2)+1
-          if (self$options$modeltype=="multinomial") {
+          if (self$options$model_type=="multinomial") {
             nrow<-nrow*(self$datamatic$dep$nlevels)
           }
           df<-as.data.frame(matrix("",ncol=ncol,nrow=nrow))
@@ -309,7 +309,7 @@ Syntax <- R6::R6Class(
           alist<-lapply(.terms, function(.term) {
             ncol<-length(.term)
             nrow<-prod(unlist(lapply(.term,function(t) self$datamatic$variables[[t]]$nlevels)))
-            if (self$options$modeltype=="multinomial") {
+            if (self$options$model_type=="multinomial") {
               nrow<-nrow*(self$datamatic$dep$nlevels)
             }
             one<-data.frame(matrix("",ncol=ncol,nrow = nrow))
@@ -349,7 +349,7 @@ Syntax <- R6::R6Class(
         nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
         
-        if (self$options$modeltype=="multinomial")
+        if (self$options$model_type=="multinomial")
           nrow <- nrow * (self$datamatic$dep$nlevels-1)
         
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
@@ -421,7 +421,7 @@ Syntax <- R6::R6Class(
         modelTerms[[aOne]]<-NULL
         self$hasIntercept=TRUE
       }
-      if (self$options$modeltype=="ordinal") {
+      if (self$options$model_type=="ordinal") {
         self$hasIntercept=TRUE
         if (self$options$fixed_intercept==FALSE)
           self$warnings<-list(topic="tab_info",message="Ordinal regression requires the intercept. It has been added to the model")
@@ -617,17 +617,6 @@ Syntax <- R6::R6Class(
 ) # End Rclass
 
 
-.nicifyLabels<-function(labels) {
-  
-  flabs<-grep(DUMMY_TAIL,names(labels),fixed=T)
-  
-  for (i in flabs)
-    labels[[i]]<-paste0(labels[[i]],paste0(rep(IMPROBABLE_SEQ,i),collapse = ""))
-  news<-jmvcore::stringifyTerm(labels,raise=T)
-  for (i in seq_along(news))
-    news[[i]]<-gsub(IMPROBABLE_SEQ,"",news[[i]],fixed=T)
-  news
-}
 
 .stringifyTerm<-function(term) {
   jmvcore::stringifyTerm(term,raise=T)

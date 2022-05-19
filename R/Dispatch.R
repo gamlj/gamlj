@@ -37,7 +37,7 @@ Dispatch <- R6::R6Class(
                                 
                                 if (!is.something(table)) stop("SCAFFOLD: a message was sent to a non-existing result object: ",obj$topic)
                                 state<-as.list(table$state)
-                                if (!hasName(obj,"id")) obj$id<-jmvcore::toB64(obj$message)
+                                if (!utils::hasName(obj,"id")) obj$id<-jmvcore::toB64(obj$message)
                                 
                                 obj$message<-private$.translate(obj$message)
                                 
@@ -66,7 +66,7 @@ Dispatch <- R6::R6Class(
                                if (!is.list(obj))
                                      stop("SCAFFOLD: Error requires a named list with `topic` and `message`")
           
-                               if (!hasName(obj,"topic") | !hasName(obj,"message"))
+                               if (!utils::hasName(obj,"topic") | !utils::hasName(obj,"message"))
                                     stop("SCAFFOLD:: Error requires a named list with `topic` and `message`")
   
 
@@ -75,7 +75,7 @@ Dispatch <- R6::R6Class(
           
                                obj$message<-private$.translate(obj$message)
                           
-                               if (hasName(obj,"final") && (obj$final))
+                               if (utils::hasName(obj,"final") && (obj$final))
                                    stop(obj$message)
                           
                                path<-stringr::str_split(obj$topic,"_")[[1]]
@@ -96,7 +96,7 @@ Dispatch <- R6::R6Class(
                         tableobj<-self$tables
                         found<-FALSE
                         for (aname in path)
-                          if (hasName(tableobj,aname)) {
+                          if (utils::hasName(tableobj,aname)) {
                             found<-TRUE
                             tableobj<-tableobj[[aname]]
                           }

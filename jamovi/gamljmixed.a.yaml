@@ -451,7 +451,7 @@ options:
 
 ############ generic with some specs ###########
 
-    - name: modeltype
+    - name: model_type
       type: List
       hidden: true
       options:

@@ -4,7 +4,7 @@ title: General Linear Model
 menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
-export: true
+export: false
 description:
     main: |
            General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
@@ -136,8 +136,7 @@ options:
 
       description:
           R: >
-            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
-
+             Omnibus tests are based on F-test `F` (default) or loglikelihood ration test `LRT`.
 
     - name: estimates_ci
       title: Estimates C.I.
@@ -410,9 +409,8 @@ options:
       default: mean_sd
       description:
           R: >
-            `'mean_sd'` (default), `'custom'` , or `'percent'`. Use to condition the
-            covariates (if any)
-
+              '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots.
+              '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
 
     - name: ccm_value
       type: Number
@@ -477,7 +475,7 @@ options:
           - bonf
       description:
           R: >
-            one or more of `'none'`,  `'bonf'`,`'tukey'` 
+            adjustment method for postho tests. One or more of `'none'`,  `'bonf'`,`'tukey'` 
             `'holm'`; provide no,  Bonferroni, Tukey and
             Holm Post Hoc corrections respectively.
 
@@ -500,7 +498,7 @@ options:
 
 
 
-    - name: posthoces
+    - name: posthoc_es
       title: Effect size 
       type: NMXList
       options:
@@ -512,7 +510,7 @@ options:
             title: Hedge's g (sample SD)
       description:
           R: >
-            one or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD ) 
+            effect size indices for mean comparisons. One or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD ) 
             or Hedge's g
       default:
           - dm
@@ -526,7 +524,7 @@ options:
             `TRUE` or `FALSE` (default), d confidence intervals
 
 
-    - name: modeltype
+    - name: model_type
       type: List
       hidden: true
       options:
@@ -559,9 +557,10 @@ options:
       description:
           R: >
              a list of effect sizes to print out. They can be:
-              `"eta"` for eta-squared, `'partEta'` for partial eta-squared,
-             `'omega'` for partial omega-squared, `'epsilon'` for partial epsilon-squared, and `'beta'` for standardized
-             coefficients (betas). Default is `"beta"` and `"parEta"`.
+              `"eta"` for eta-squared, `'etap'` for partial eta-squared,
+             `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
+             `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
+              and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
           
     - name: homo_test
       title: Residual Variances Homogeneity tests

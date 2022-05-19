@@ -49,7 +49,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             expb_ci = TRUE,
             es = list(
                 "expb"),
-            modeltype = "linear",
+            model_type = "linear",
             custom_family = "gaussian",
             custom_link = "identity",
             propodds_test = FALSE,
@@ -320,9 +320,9 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "marginals"),
                 default=list(
                     "expb"))
-            private$..modeltype <- jmvcore::OptionList$new(
-                "modeltype",
-                modeltype,
+            private$..model_type <- jmvcore::OptionList$new(
+                "model_type",
+                model_type,
                 options=list(
                     "linear",
                     "poisson",
@@ -411,7 +411,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..expb_ci)
             self$.addOption(private$..es)
-            self$.addOption(private$..modeltype)
+            self$.addOption(private$..model_type)
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
             self$.addOption(private$..propodds_test)
@@ -461,7 +461,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs_scale = function() private$..covs_scale$value,
         expb_ci = function() private$..expb_ci$value,
         es = function() private$..es$value,
-        modeltype = function() private$..modeltype$value,
+        model_type = function() private$..model_type$value,
         custom_family = function() private$..custom_family$value,
         custom_link = function() private$..custom_link$value,
         propodds_test = function() private$..propodds_test$value,
@@ -510,7 +510,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs_scale = NA,
         ..expb_ci = NA,
         ..es = NA,
-        ..modeltype = NA,
+        ..model_type = NA,
         ..custom_family = NA,
         ..custom_link = NA,
         ..propodds_test = NA,
@@ -715,7 +715,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="response", 
                                     `title`="Response", 
                                     `type`="text", 
-                                    `visible`="(modeltype:multinomial)", 
+                                    `visible`="(model_type:multinomial)", 
                                     `combineBelow`=TRUE),
                                 list(
                                     `name`="source", 
@@ -832,7 +832,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Response", 
                                     `type`="text", 
                                     `combineBelow`=TRUE, 
-                                    `visible`="(modeltype:multinomial)"),
+                                    `visible`="(model_type:multinomial)"),
                                 list(
                                     `name`="source", 
                                     `title`="Name", 
@@ -921,7 +921,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=options,
                             name="paralleltest",
                             title="Parallel lines test",
-                            visible="(propodds_test & modeltype:ordinal)",
+                            visible="(propodds_test & model_type:ordinal)",
                             clearWith=list(
                                 "dep",
                                 "model_terms",
@@ -980,7 +980,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="response", 
                             `title`="Response", 
                             `type`="text", 
-                            `visible`="(modeltype:multinomial)", 
+                            `visible`="(model_type:multinomial)", 
                             `combineBelow`=TRUE),
                         list(
                             `name`="estimate", 
@@ -1097,7 +1097,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Response", 
                                     `type`="text", 
                                     `combineBelow`=TRUE, 
-                                    `visible`="(modeltype:multinomial)"),
+                                    `visible`="(model_type:multinomial)"),
                                 list(
                                     `name`="contrast", 
                                     `title`="Effect", 
@@ -1207,7 +1207,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="response", 
                                         `title`="Response", 
                                         `type`="text", 
-                                        `visible`="(modeltype:multinomial)"),
+                                        `visible`="(model_type:multinomial)"),
                                     list(
                                         `name`="estimate", 
                                         `title`="Estimate", 
@@ -1247,14 +1247,14 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_method",
                         "emmeans",
                         "model_terms",
-                        "modeltype",
+                        "model_type",
                         "ci_method"),
                     columns=list(
                         list(
                             `name`="response", 
                             `title`="Response", 
                             `type`="text", 
-                            `visible`="(modeltype:multinomial)", 
+                            `visible`="(model_type:multinomial)", 
                             `combineBelow`=TRUE),
                         list(
                             `name`="estimate", 
@@ -1312,6 +1312,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 title="Predicted Vales",
                 varTitle="`GZLM_PRED_${ dep }`",
                 varDescription="Predicted values",
+                initInRun=TRUE,
                 clearWith=list(
                     "dep",
                     "model_terms")))
@@ -1346,311 +1347,4 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 completeWhenFilled = FALSE,
                 requiresMissings = FALSE)
         }))
-
-#' Generalized Linear Models
-#'
-#' Generalized Linear Model
-#'
-#' @examples
-#' data<-emmeans::neuralgia
-#'  gamlj::gamljGzlm(
-#'            formula = Pain ~ Duration,
-#'            data = data,
-#'             model_type = "logistic")
-#'
-#' @param data the data as a data frame
-#' @param .caller .
-#' @param .interface .
-#' @param dep a string naming the dependent variable from \code{data}; the
-#'   variable must be numeric. Not needed if \code{formula} is used.
-#' @param factors a vector of strings naming the fixed factors from
-#'   \code{data}. Not needed if \code{formula} is used.
-#' @param covs a vector of strings naming the covariates from \code{data}. Not
-#'   needed if \code{formula} is used.
-#' @param model_terms a list of character vectors describing fixed effects
-#'   terms. Not needed if \code{formula} is used.
-#' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. Not needed if \code{formula} is used.
-#' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. Not needed if \code{formula} is used.
-#' @param nested_terms a list of character vectors describing effects terms
-#'   for nestet. It can be passed as right-hand formula.
-#' @param comparison Not present in R
-#' @param omnibus .
-#' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
-#'   in tables
-#' @param donotrun .
-#' @param ci_method .
-#' @param boot_r a number bootstrap repetitions.
-#' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
-#'   confidence interval width for the plots.
-#' @param contrasts a named vector of the form \code{c(var1="type",
-#'   var2="type2")} specifying the type of contrast to use, one of
-#'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
-#'   \code{simple} is used. Can also be passed as a list of list of the form
-#'   list(list(var="var1",type="type1")).
-#' @param show_contrastnames \code{TRUE} or \code{FALSE} (default), shows raw
-#'   names of the contrasts variables in tables
-#' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
-#'   contrast coefficients tables
-#' @param vcov \code{TRUE} or \code{FALSE} (default), shows coefficients
-#'   covariances
-#' @param plotHAxis a string naming the variable placed on the horizontal axis
-#'   of the plot
-#' @param plotSepLines a string naming the variable represented as separate
-#'   lines in the plot
-#' @param plotSepPlots a list of string naming the variables defining the
-#'   levels for multiple plots
-#' @param plotRaw \code{TRUE} or \code{FALSE} (default), plot raw data along
-#'   the predicted values
-#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), set the Y-axis
-#'   range equal to the range of the observed values.
-#' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
-#'   original scale for covariates.
-#' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
-#'   linetypes per levels.
-#' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
-#'   no error bars, use confidence intervals, or use standard errors on the
-#'   plots, respectively.
-#' @param emmeans a rhs formula with the terms specifying the marginal means
-#'   to estimate (of the form \code{'~x+x:z'})
-#' @param posthoc a rhs formula with the terms specifying the table to apply
-#'   the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-#'   so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-#'   passed also as a list of the form '}list("x","z",c("x","z")`'
-#' @param simple_effects The variable for which the simple effects (slopes)
-#'   are computed
-#' @param simple_moderators the variable that provides the levels at which the
-#'   simple effects are computed
-#' @param simple_interactions should simple Interactions be computed
-#' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
-#'   \code{'percent'}. Use to condition the covariates (if any)
-#' @param ccm_value how many st.deviations around the means used to condition
-#'   simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}
-#' @param ccp_value offsett (number of percentiles) around the median used to
-#'   condition simple effects and plots. Used if
-#'   \code{simpleScale}=\code{'percent'}
-#' @param covs_scale_labels how the levels of a continuous moderator should
-#'   appear in tables and plots: \code{labels}, \code{values} and
-#'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
-#'   to the variable orginal levels, before scaling.
-#' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
-#'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
-#'   respectively.
-#' @param covs_scale a named vector of the form \code{c(var1='type',
-#'   var2='type2')} specifying the transformation to apply to covariates, one of
-#'   \code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
-#'   \code{'none'}. \code{'none'} leaves the variable as it is.
-#' @param expb_ci \code{TRUE} (default) or \code{FALSE} , exp(B) CI in table
-#' @param es .
-#' @param modeltype Select the generalized linear model:
-#'   \code{linear},\code{poisson},\code{logistic},\code{multinomial}
-#' @param custom_family Distribution family for the custom model, accepts
-#'   gaussian, binomial, gamma and inverse_gaussian .
-#' @param custom_link Distribution family for the custom model, accepts
-#'   identity, log and inverse, onemu2 (for 1/mu^2).
-#' @param propodds_test Test parallel lines assumptions in cumulative link
-#'   model (ordinal regression)
-#' @param plot_scale Chi-squared computation method. \code{'lrt'} (default)
-#'   gives LogLikelihood ration test,  \code{'wald'} gives the Wald Chi-squared.
-#' @param formula (optional) the formula to use, see the examples
-#' @return A results object containing:
-#' \tabular{llllll}{
-#'   \code{results$model} \tab \tab \tab \tab \tab The underlying estimated model \cr
-#'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
-#'   \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
-#'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$vcov} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
-#'   \code{results$main$marginals} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$paralleltest} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-#'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
-#'   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$simpleInteractions} \tab \tab \tab \tab \tab an array of simple interactions tables \cr
-#'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
-#'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
-#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
-#'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
-#'   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
-#' }
-#'
-#' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
-#'
-#' \code{results$info$asDF}
-#'
-#' \code{as.data.frame(results$info)}
-#'
-#' @export
-gamljGzlm <- function(
-    data,
-    .caller = "glm",
-    .interface = "jamovi",
-    dep = NULL,
-    factors = NULL,
-    covs = NULL,
-    model_terms = NULL,
-    fixed_intercept = TRUE,
-    nested_intercept = TRUE,
-    nested_terms = NULL,
-    comparison = FALSE,
-    omnibus = "LRT",
-    estimates_ci = FALSE,
-    donotrun = FALSE,
-    ci_method = "wald",
-    boot_r = 1000,
-    ci_width = 95,
-    contrasts = NULL,
-    show_contrastnames = TRUE,
-    show_contrastcodes = FALSE,
-    vcov = FALSE,
-    plotHAxis = NULL,
-    plotSepLines = NULL,
-    plotSepPlots = NULL,
-    plotRaw = FALSE,
-    plotDvScale = FALSE,
-    plotOriginalScale = FALSE,
-    plotLinesTypes = FALSE,
-    plotError = "none",
-    emmeans = NULL,
-    posthoc = NULL,
-    simple_effects = NULL,
-    simple_moderators = NULL,
-    simple_interactions = FALSE,
-    covs_conditioning = "mean_sd",
-    ccm_value = 1,
-    ccp_value = 25,
-    covs_scale_labels = "labels",
-    adjust = list(
-                "bonf"),
-    covs_scale = NULL,
-    expb_ci = TRUE,
-    es = list(
-                "expb"),
-    modeltype = "linear",
-    custom_family = "gaussian",
-    custom_link = "identity",
-    propodds_test = FALSE,
-    plot_scale = "response",
-    formula) {
-
-    if ( ! requireNamespace("jmvcore", quietly=TRUE))
-        stop("gamljGzlm requires jmvcore to be installed (restart may be required)")
-
-    if ( ! missing(formula)) {
-        if (missing(dep))
-            dep <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="lhs",
-                subset="1",
-                required=TRUE)
-        if (missing(factors))
-            factors <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="rhs",
-                type="vars",
-                permitted="factor")
-        if (missing(covs))
-            covs <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="rhs",
-                type="vars",
-                permitted="numeric")
-        if (missing(model_terms))
-            model_terms <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="rhs",
-                type="terms")
-    }
-
-    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
-    if ( ! missing(simple_effects)) simple_effects <- jmvcore::resolveQuo(jmvcore::enquo(simple_effects))
-    if ( ! missing(simple_moderators)) simple_moderators <- jmvcore::resolveQuo(jmvcore::enquo(simple_moderators))
-    if (missing(data))
-        data <- jmvcore::marshalData(
-            parent.frame(),
-            `if`( ! missing(dep), dep, NULL),
-            `if`( ! missing(factors), factors, NULL),
-            `if`( ! missing(covs), covs, NULL),
-            `if`( ! missing(plotHAxis), plotHAxis, NULL),
-            `if`( ! missing(plotSepLines), plotSepLines, NULL),
-            `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
-            `if`( ! missing(simple_effects), simple_effects, NULL),
-            `if`( ! missing(simple_moderators), simple_moderators, NULL))
-
-    for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(model_terms, "formula")) model_terms <- jmvcore::decomposeFormula(model_terms)
-    if (inherits(nested_terms, "formula")) nested_terms <- jmvcore::decomposeFormula(nested_terms)
-    if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
-    if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
-
-    options <- gamljGzlmOptions$new(
-        .caller = .caller,
-        .interface = .interface,
-        dep = dep,
-        factors = factors,
-        covs = covs,
-        model_terms = model_terms,
-        fixed_intercept = fixed_intercept,
-        nested_intercept = nested_intercept,
-        nested_terms = nested_terms,
-        comparison = comparison,
-        omnibus = omnibus,
-        estimates_ci = estimates_ci,
-        donotrun = donotrun,
-        ci_method = ci_method,
-        boot_r = boot_r,
-        ci_width = ci_width,
-        contrasts = contrasts,
-        show_contrastnames = show_contrastnames,
-        show_contrastcodes = show_contrastcodes,
-        vcov = vcov,
-        plotHAxis = plotHAxis,
-        plotSepLines = plotSepLines,
-        plotSepPlots = plotSepPlots,
-        plotRaw = plotRaw,
-        plotDvScale = plotDvScale,
-        plotOriginalScale = plotOriginalScale,
-        plotLinesTypes = plotLinesTypes,
-        plotError = plotError,
-        emmeans = emmeans,
-        posthoc = posthoc,
-        simple_effects = simple_effects,
-        simple_moderators = simple_moderators,
-        simple_interactions = simple_interactions,
-        covs_conditioning = covs_conditioning,
-        ccm_value = ccm_value,
-        ccp_value = ccp_value,
-        covs_scale_labels = covs_scale_labels,
-        adjust = adjust,
-        covs_scale = covs_scale,
-        expb_ci = expb_ci,
-        es = es,
-        modeltype = modeltype,
-        custom_family = custom_family,
-        custom_link = custom_link,
-        propodds_test = propodds_test,
-        plot_scale = plot_scale)
-
-    analysis <- gamljGzlmClass$new(
-        options = options,
-        data = data)
-
-    analysis$run()
-
-    analysis$results
-}
 

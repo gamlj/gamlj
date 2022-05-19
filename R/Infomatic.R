@@ -4,7 +4,7 @@ Infomatic <- R6::R6Class(
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   public=list(
     caller=NULL,
-    modeltype=NULL,
+    model_type=NULL,
     model=NULL,
     distribution=NULL,
     family=NULL,
@@ -24,7 +24,7 @@ Infomatic <- R6::R6Class(
     comparison  =  "Difference",
     posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
     initialize=function(options,datamatic) {
-      self$modeltype<-options$modeltype
+      self$model_type<-options$model_type
       self$caller<-options$.caller
       dep<-options$dep
       dlevs<-datamatic$variables[[tob64(dep)]]$levels_labels
@@ -36,7 +36,7 @@ Infomatic <- R6::R6Class(
       
       
 
-      if (self$modeltype=="lm") {
+      if (self$model_type=="lm") {
         self$model        <-   c("Linear Model","OLS Model for continuous y")
         self$distribution <-  "gaussian"
         self$call         <-  "lm"
@@ -44,7 +44,7 @@ Infomatic <- R6::R6Class(
         self$deptype      <-  c("numeric","integer")
         
       }
-      if (self$modeltype=="linear") {
+      if (self$model_type=="linear") {
         self$model        <-   c("Linear Model","ML Model for continuous y")
         self$distribution <-  "gaussian"
         self$call          <-   CALLS[[self$caller]]
@@ -55,7 +55,7 @@ Infomatic <- R6::R6Class(
         
       }
       
-      if (self$modeltype=="logistic") {
+      if (self$model_type=="logistic") {
         
         self$model        <-   c("Logistic Model","Model for binary y")
         self$distribution  <-  "binomial"
@@ -75,7 +75,7 @@ Infomatic <- R6::R6Class(
         self$direction     <-  c(theory,actual)
         
       }
-      if (self$modeltype=="probit") {
+      if (self$model_type=="probit") {
         
         self$model         <-   c("Probit Model","Model for binary y")
         self$distribution  <-  "binomial"
@@ -93,7 +93,7 @@ Infomatic <- R6::R6Class(
         actual             <-   paste("P(",dep,"=",dlevs[2],")")
         self$direction     <-   c(theory,actual)
       }
-      if (self$modeltype=="poisson") {
+      if (self$model_type=="poisson") {
         
         self$model         <-   c("Poisson Model","Model for count y")
         self$distribution  <-   "poisson"
@@ -107,7 +107,7 @@ Infomatic <- R6::R6Class(
         self$comparison    <-    "Ratio"
         
       }
-      if (self$modeltype=="poiover") {
+      if (self$model_type=="poiover") {
         
         self$model         <-   c("Poisson Model","Model for overdispersed count y")
         self$distribution  <-   "quasi-poisson"
@@ -124,7 +124,7 @@ Infomatic <- R6::R6Class(
         self$deptype       <-   "integer"
         
       }
-      if (self$modeltype=="nb") {
+      if (self$model_type=="nb") {
         
         self$model         <-   c("Negative Binomial Model","Model for overdispersed count y")
         self$distribution  <-   "nb"
@@ -136,7 +136,7 @@ Infomatic <- R6::R6Class(
         self$comparison    <-    "Ratio"
       }
       
-      if (self$modeltype=="custom") {
+      if (self$model_type=="custom") {
        
         self$model         <-   c("User Model","Generalized model")
         self$family        <-    paste(options$custom_family,"(",options$custom_link,")")
@@ -149,7 +149,7 @@ Infomatic <- R6::R6Class(
         self$deptype       <-   c("numeric","integer","factor")
       }
 
-      if (self$modeltype=="ordinal") {
+      if (self$model_type=="ordinal") {
         
         self$model         <-   c("Ordinal GLM","Proportional odds logistic")
         self$distribution  <-    "logistic"
@@ -171,7 +171,7 @@ Infomatic <- R6::R6Class(
         
       }
       
-      if (self$modeltype=="multinomial") {
+      if (self$model_type=="multinomial") {
         
         self$model         <-   c("Multinomial Model","Model for categorical y")
         self$distribution  <-    "multinomial"
@@ -192,7 +192,7 @@ Infomatic <- R6::R6Class(
         
       }
       
-      if (self$modeltype=="lmer") {
+      if (self$model_type=="lmer") {
         
         self$model         <-   c("Mixed Model","Linear Mixed model for continuous y")
         self$distribution  <-    "gaussian"
@@ -316,19 +316,19 @@ FIT[["over"]]  <-  list(info="Chi-squared/DF", specs="Overdispersion indicator")
 
 .explainPrediction=function() {
   
-  if (!hasName(self$tab_info,"dir"))
+  if (!utils::hasName(self$tab_info,"dir"))
     return()
   
   dlevs<-self$datamatic$variables[[tob64(self$options$dep)]]$levels
   dep<-self$options$dep
-  if (self$options$modeltype %in% c("logistic")) {
+  if (self$options$model_type %in% c("logistic")) {
     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
     
   }
-  if (self$options$modeltype %in% c("probit")) {
+  if (self$options$model_type %in% c("probit")) {
     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],")")
   }
-  if (self$options$modeltype %in% c("multinomial")) {
+  if (self$options$model_type %in% c("multinomial")) {
     self$tab_info[["dir"]]$value<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
   }
   

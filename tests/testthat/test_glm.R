@@ -1,28 +1,60 @@
 context("glm")
-tol<-.001
+tol<-.0001
 
-mod<-gamlj::gamljGlm(
+mod0<-gamlj::gamljGlm(
+  data = ToothGrowth,
+  formula=len~supp+dose)
+
+mod1<-gamlj::gamljGlm(
   data = ToothGrowth,
   dep = "len",
-  factors = "supp")
-mod
-res<-mod$main$coefficients$asDF
-params<-res$estimate
-testthat::test_that("glm estimates are correct", {
-  testthat::expect_equal(params[2], -3.70)
-  testthat::expect_equal(round(res$est.ci.upper[2],2), 0.17)
-  testthat::expect_equal(round(res$est.ci.lower[2],2),-7.57)
-  testthat::expect_equal(round(res$p[2],2),0.06)
-  testthat::expect_equal(as.character(mod$info$asDF[[2]][[3]]),"Gaussian")
+  factors = "supp",
+  covs="dose")
+
+testthat::test_that("equivalent model input (1)", {
+  testthat::expect_equal(mod0$info$asDF$specs[2],mod1$info$asDF$specs[2])
+  testthat::expect_equal(mod0$main$anova$asDF$f[3],mod1$main$anova$asDF$f[3])
+  testthat::expect_equal(mod0$main$coefficients$asDF$label[2],mod0$main$coefficients$asDF$label[2])
+  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[1],mod0$main$coefficients$asDF$est.ci.lower[1])
+  })
+
+
+mod0<-gamlj::gamljGlm(
+  data = ToothGrowth,
+  dep = "len",
+  factors = "supp",
+  covs="dose",
+  model_terms = list("dose","supp",c("dose","supp")))
+
+mod1<-gamlj::gamljGlm(
+  data = ToothGrowth,
+  dep = "len",
+  factors = "supp",
+  covs="dose",
+  model_terms = ~dose+supp+dose:supp)
+
+testthat::test_that("equivalent model input (2)", {
+  testthat::expect_equal(mod0$info$asDF$specs[2],mod1$info$asDF$specs[2])
+  testthat::expect_equal(mod0$main$anova$asDF$f[3],mod1$main$anova$asDF$f[3])
+  testthat::expect_equal(mod0$main$coefficients$asDF$label[2],mod0$main$coefficients$asDF$label[2])
+  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[1],mod0$main$coefficients$asDF$est.ci.lower[1])
 })
 
-a<-mod$main$anova$asDF
+
+testthat::test_that("glm estimates are correct", {
+  testthat::expect_equal(mod0$main$coefficients$asDF$estimate[3], -3.70,tolerance = tol)
+  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.upper[2], 11.45,tolerance = tol)
+  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[3],-5.811,tol)
+  testthat::expect_equal(mod0$main$coefficients$asDF$p[3],0.00089,tol)
+})
+
+a<-mod0$main$anova$asDF
 resid<-a$ss[a$source=="Residuals"]
 eff<-a$ss[a$source=="supp"]
 peta<-eff/(eff+resid)
 
-test_that("glm p eta2 are correct", {
-  expect_equal(a$etaSqP[a$source=="supp"],peta)
+testthat::test_that("glm p eta2 are correct", {
+  testthat::expect_equal(a$etaSqP[a$source=="supp"],peta)
 })
 
 
@@ -41,37 +73,37 @@ testthat::test_that("intercept only works",
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
-  ciWidth=90,
-  simpleVariable = "math",
-  simpleModerator = "schtyp",
-  plotHAxis = "math",
-  effectSize = c("eta","etap","omega","omegap")
+  ci_width = 90,
+  simple_effects  = "math",
+  simple_moderators  = "schtyp",
+  es = c("eta","etap","omega","omegap")
 )
+
 mod$simpleEffects$anova$asDF
 r.anova<-mod$main$anova$asDF
 
-test_that("glm anova is correct", {
-  expect_equal(as.character(r.anova[3,1]),"schtyp")
-  expect_equal(round(r.anova[4,4],3),0.276)
-  expect_equal(round(r.anova[3,6],5),7e-05)
-  expect_equal(round(r.anova[3,8],5),-0.00299)
-  expect_equal(round(r.anova[1,9],5),.38828)
+testthat::test_that("glm anova is correct", {
+  testthat::expect_equal(as.character(r.anova[3,1]),"schtyp")
+  testthat::expect_equal(round(r.anova[4,4],3),0.276)
+  testthat::expect_equal(round(r.anova[3,6],5),7e-05)
+  testthat::expect_equal(round(r.anova[3,8],5),-0.00299)
+  testthat::expect_equal(round(r.anova[1,9],5),.38828)
   
 })
 
 se.params<-mod$simpleEffects$coefficients$asDF
 
-test_that("glm anova simple effects", {
-  expect_equal(as.character(se.params[1,1]),"private")
-  expect_equal(round(se.params[2,5],3),0.574)
+testthat::test_that("glm anova simple effects", {
+  testthat::expect_equal(as.character(se.params[1,1]),"private")
+  testthat::expect_equal(round(se.params[2,5],3),0.574)
 })
 
-test_that("glm plot", {
-  expect_is(mod$mainPlots[[1]],"Image")
-})
+#testthat::test_that("glm plot", {
+#  testthat::expect_is(mod$mainPlots[[1]],"Image")
+#})
 
-test_that("glm CI width", {
-  expect_equal(round(mod$main$coefficients$asDF[2,5],3),0.495)
+testthat::test_that("glm CI width", {
+  testthat::expect_equal(round(mod$main$coefficients$asDF[2,5],3),0.495)
 })
 
 mod<-gamlj::gamljGlm(
@@ -91,10 +123,10 @@ testthat::test_that("SE names are fine",{
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math*schtyp*write,
-  ciWidth=90,
-  simpleVariable = "schtyp",
-  simpleModerator = list("math","write"),
-  simpleInteractions = T
+  ci_width=90,
+  simple_effects  = "schtyp",
+  simple_moderators  = list("math","write"),
+  simple_interactions  = T
 )
 
 testthat::test_that("SE multiple moderators iv=categorical",{
@@ -102,7 +134,6 @@ testthat::test_that("SE multiple moderators iv=categorical",{
   testthat::expect_equal(mod$simpleEffects$anova$asDF$test[1],1.469,tol)
 }
 )
-mod$simpleInteractions[[1]]$coefficients$asDF
 
 testthat::test_that("simple interaction",{
   testthat::expect_equal(mod$simpleInteractions[[1]]$anova$asDF$effect[1],"schtyp:math")
@@ -119,12 +150,12 @@ hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~c1*c2,
-  posthocCorr = "bonf",
-  posthoc =  list("c1",c("c1","c2"))
+  posthoc =  list("c1",c("c1","c2")),
+  adjust = "bonf"
 )
 
-test_that("glm labels do not square", {
-  expect_equal(as.character(mod$main$coefficients$asDF[4,1]),"c11:c21")
+testthat::test_that("glm labels do not square", {
+  testthat::expect_equal(as.character(mod$main$coefficients$asDF[4,1]),"c11:c21")
 })
 
 ph<-mod$posthoc
@@ -145,17 +176,17 @@ mod<-gamlj::gamljGlm(
   formula=science~math+schtyp+math:schtyp,
   posthoc  = list("schtyp")
 )
-mod$posthoc[[1]]$asDF
-test_that("glm posthoc", {
-  expect_equal(round(mod$posthoc[[1]]$asDF[[5]],3),1.528)
-  expect_equal(as.character(mod$posthoc[[1]]$asDF[[3]]),"public")
+
+testthat::test_that("glm posthoc", {
+  testthat::expect_equal(round(mod$posthoc[[1]]$asDF[[5]],3),1.528)
+  testthat::expect_equal(as.character(mod$posthoc[[1]]$asDF[[3]]),"public")
 })
 
 
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
-  effectSizeInfo = T
+  es_info =  T
 )
 tab<-mod$main$effectsizes$asDF
 
@@ -171,40 +202,40 @@ names(data)[3]<-c("Gender (test ?)")
 mod<-gamlj::gamljGlm(
   data = data,
   formula=science~math+`Gender (test ?)`+math:`Gender (test ?)`,
-  simpleModerator = `Gender (test ?)`,
-  simpleVariable = math,
+  simple_effects = `Gender (test ?)`,
+  simple_moderators  = math,
   posthoc = "Gender (test ?)"
 )
-
-se.params<-mod$simpleEffects$coefficients$asDF
 
 
 testthat::test_that("glm weird names", {
   testthat::expect_equal(as.character(mod$main$coefficients$asDF[3,1]),"Gender (test ?)1")
-  testthat::expect_equal(as.character(se.params[2,1]),"male")
-  testthat::expect_equal(round(se.params[1,6],digits=5),0.80708)
+  testthat::expect_equal(as.character(mod$simpleEffects$coefficients$asDF[2,1]),"Mean")
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$estimate[3],2.4591,tol)
 })
 
-data$sex<-factor(data$`Gender (test ?)`,levels=c("male","female"))
+data$sex<-factor(data$`Gender (test ?)`,levels=c("female","male"))
 
 mod2<-gamlj::gamljGlm(
   data = data,
   formula=science~math+sex+math:sex,
-  simpleVariable = math,
-  simpleModerator = sex
+  simple_effects  = math,
+  simple_moderators  = sex
 )
 
-se.params2<-mod2$simpleEffects$coefficients$asDF
+
 testthat::test_that("glm weird names", {
   testthat::expect_equal(as.character(se.params2[2,1]),"female")
-  testthat::expect_equal(round(se.params2[1,5],digits=5),round(se.params[2,5],digits=5))
+  testthat::expect_true(
+    all(mod$main$coefficients$asDF$estimate==mod2$main$coefficients$asDF$estimate)
+  )
 })
 
 mod3<-gamlj::gamljGlm(
   data = data,
   formula=science~math+math:`Gender (test ?)`+`Gender (test ?)`,
-  simpleModerator = `Gender (test ?)`,
-  simpleVariable = math
+  simple_effects  = `Gender (test ?)`,
+  simple_moderators  = math
 )
 
 res<-mod$main$anova$asDF
@@ -225,12 +256,9 @@ ok<-gamlj::gamljGlm(
   data = data,
   formula=science~math*ses*female,
   posthoc = list(c("ses","female")),
-  posthocEffsize = c("dm")
+  posthoc_es  = c("dm")
   
 )
-ok$posthoc[[1]]
-ok$posthoc[[1]]$asDF
-ok$posthocEffsize[[1]]$asDF
 
 data$`weird ?`<-hsbdemo$ses
 data$`weird !`<-hsbdemo$female
@@ -240,8 +268,8 @@ levels(data$`weird ?`)<-c("a?","b?","c?")
 weird<-gamlj::gamljGlm(
   data = data,
   formula=science~math*`weird !`*`weird ?`,
-  simpleModerator = list("weird !","weird ?"),
-  simpleVariable = math,
+  simple_moderators  = list("weird !","weird ?"),
+  simple_effects  = math,
   posthoc = list(c("weird !","weird ?"))
 )
 
@@ -258,8 +286,8 @@ mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp, 
   emmeans = ~schtyp,
-  homoTest = T,
-  normTest = T
+  homo_test  = T,
+  norm_test  = T
 )
 res<-mod$emmeans[[1]]$asDF
 testthat::test_that("glm EMM", {
@@ -281,7 +309,7 @@ mod<-gamlj::gamljGlm(
   contrasts = list(list(
       var="schtyp",
       type="deviation")),
-  qqplot = T
+  qq_plot  = T
 )
 res<-mod$main$coefficients$asDF
 testthat::test_that("glm contrasts", {
@@ -289,10 +317,10 @@ testthat::test_that("glm contrasts", {
   testthat::expect_equal(round(res[1,3],2),51.96)
 })
 
-plot<-mod$assumptions$qqplot$plot$fun()
-testthat::test_that("glm assumptions plot", {
-  testthat::expect_true(ggplot2::is.ggplot(plot))
-})
+#plot<-mod$assumptions$qqplot$plot$fun()
+#testthat::test_that("glm assumptions plot", {
+#  testthat::expect_true(ggplot2::is.ggplot(plot))
+#})
 
 
 
@@ -322,7 +350,7 @@ testthat::test_that("glm intercept only model", {
 
 mod<-gamlj::gamljGlm(
   formula = read ~ 1,  data = data,
-  fixedIntercept=FALSE
+  fixed_intercept =FALSE
 )
 
 res<-mod$main$anova$asDF
@@ -333,7 +361,6 @@ testthat::test_that("glm zero-intercept model", {
 
 
 ### bootstrap
-options("digits"=2)
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
   formula=science~math+prog+math:prog, 
@@ -343,13 +370,46 @@ mod<-gamlj::gamljGlm(
 )
 
 
+mod$main$coefficients$asDF
+
 testthat::test_that("bootstrap ci make sense", {
-  testthat::expect_true(mod$main$coefficients$asDF[["est.ci.lower"]][3]<0)
-  testthat::expect_true(mod$main$coefficients$asDF[["est.ci.lower"]][1]>0)
+  testthat::expect_true(mod$main$coefficients$asDF[["est.ci.lower"]][3]<mod$main$coefficients$asDF[["estimate"]][3])
+  testthat::expect_true(mod$main$coefficients$asDF[["est.ci.upper"]][1]>mod$main$coefficients$asDF[["estimate"]][1])
 })
 
+
+mod<-gamlj::gamljGlm(
+  data = hsbdemo,
+  formula=science~0+math+prog+math:prog, 
+  emmeans = ~prog
+)
 testthat::test_that("glm zero-intercept model", {
-  testthat::expect_true(abs(mod$main$coefficients$asDF[["beta.ci.lower"]][3])<1)
-  testthat::expect_true(abs(mod$main$coefficients$asDF[["beta.ci.lower"]][1])<1)
+  testthat::expect_equal(abs(mod$main$coefficients$asDF$estimate[1]),.72,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$se[4],1.3814,tol)
+})
+
+mod<-gamlj::gamljGlm(
+  data = hsbdemo,
+  formula=science~1+math+prog+math:prog, 
+  omnibus = "LRT"
+)
+
+testthat::test_that("model comparison", {
+  testthat::expect_equal(
+    sum(mod$main$r2$asDF$r2),.41604
+    ,tol)
+})
+
+
+
+mod<-gamlj::gamljGlm(
+  data = hsbdemo,
+  formula=science~1+math+prog+math:prog, 
+  nested_terms = ~math
+)
+testthat::test_that("model comparison", {
+  testthat::expect_equal(
+    mod$main$r2$asDF$ar[1]-mod$main$r2$asDF$ar[2],mod$main$r2$asDF$ar[3]
+    ,tol)
 })
 

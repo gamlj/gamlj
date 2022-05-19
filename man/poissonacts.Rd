@@ -8,7 +8,7 @@
 data(poissonacts)
 }
 \description{
-Simulated data of a poisson distributed dependent variables with some independent variabes
+Simulated data of a Poisson distributed dependent variables with some independent variabes
 }
 \examples{
 data(poissonacts)

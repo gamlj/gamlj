@@ -11,7 +11,7 @@ if(!is.something(options$dep)) {
     return(result)
 } 
 
-  if (hasName(options,"cluster"))
+  if (utils::hasName(options,"cluster"))
     if (!is.something(options$cluster))  
     {
       result$ready <- FALSE
@@ -20,7 +20,7 @@ if(!is.something(options$dep)) {
       return(result)
     } 
   
-  if (hasName(options,"re")) {
+  if (utils::hasName(options,"re")) {
      
        if (any(sapply(options$re,function(x) length(x)==0)))  
        {

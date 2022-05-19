@@ -4,7 +4,7 @@ title: Generalized Linear Models
 menuGroup: Linear Models
 version: '2.0.3'
 jas: '1.2'
-export: true
+export: false
 description:
     main: Generalized Linear Model
     R:
@@ -513,7 +513,7 @@ options:
       default:
           - expb
           
-    - name: modeltype
+    - name: model_type
       title: Model Selection
       type: List
       options:

@@ -11,10 +11,11 @@ Description: A suite for estimating linear models, such as the general linear mo
 License: GPL
 Encoding: UTF-8
 LazyData: true
-Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, lmerTest,
-         nnet, MASS, gridExtra, ggplot2, effectsize, performance, geepack, ordinal,
+Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, lmerTest, lme4,
+         boot, glue, insight,parameters,rlang,sandwich, stringr,
+         nnet, MASS, ggplot2, effectsize, performance, geepack, ordinal,
          margins
-RoxygenNote: >= 7.1.1
+RoxygenNote:  7.1.2
 Suggests: 
     rmarkdown,
     knitr

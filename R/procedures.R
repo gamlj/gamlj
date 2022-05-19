@@ -45,12 +45,11 @@ procedure.posthoc <- function(obj) {
   dep <- tob64(obj$options$dep)
   
 
-  ### we set the model, if we need bootstrap ci, we give the bootstrapped model
+  ### we set the model, if we need bootstrap ci, we switch to the bootstrapped model
+  ### later on
+  
    model<-obj$model
-   
-  .model<-model
-   if (obj$option("ci_method",c("quantile","bcai"))) 
-       .model<-obj$boot_model
+
 
   ### check if we need robust standard error  
   vfun<-NULL
@@ -74,7 +73,7 @@ procedure.posthoc <- function(obj) {
     .term64<-jmvcore::composeTerm(tob64(.revvars))
      referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df)
      
-     if (obj$option("modeltype","multinomial"))
+     if (obj$option("model_type","multinomial"))
             .pairs<-graphics::pairs(referenceGrid,by=dep)
      else
             .pairs<-graphics::pairs(referenceGrid)
@@ -86,8 +85,7 @@ procedure.posthoc <- function(obj) {
        arow <- summary(.pairs, adjust = adj,infer = c(FALSE,TRUE))
        tableData[[adj]]<- arow$p.value
      }
-     mark("here we are 2")
-     
+
      .transnames<-list(estimate=c("odds.ratio","ratio"),
                        test=c("z.ratio","t.ratio"),
                        p="p.value",
@@ -96,7 +94,10 @@ procedure.posthoc <- function(obj) {
      )
      names(tableData)<-transnames(names(tableData),.transnames)  
      ## confidence intervals
-     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
+     if (obj$option("ci_method",c("quantile","bcai"))) 
+       model<-obj$boot_model
+     
+     cidata<-.posthoc_ci(model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
      tableData$est.ci.lower<-cidata$est.ci.lower       
      tableData$est.ci.upper<-cidata$est.ci.upper       
 
@@ -104,7 +105,7 @@ procedure.posthoc <- function(obj) {
      tableData$contrast <- as.character(tableData$contrast)
 
     .cont <- tableData$contrast
-    .cont <- gsub("[- ,/]","", .cont)
+    .cont <- gsub("[-,/]","", .cont)
     
     .labs <- lapply(.cont, function(a) {
       lapply(strsplit(as.character(a), LEVEL_SYMBOL)[[1]], trimws)[-1]
@@ -205,7 +206,7 @@ procedure.posthoc_effsize <- function(obj) {
     ## here we use the model sigma as the denominator. This is the approach used in
     ## emmeans::eff_size default. 
     
-    t<-sqrt(df)*tableData$estimate/(2*sigma(model))
+    t<-sqrt(df)*tableData$estimate/(2*stats::sigma(model))
     d<-effectsize::t_to_d(t,df_error = df,ci = obj$ciwidth)
     tableData$dm<-d$d
     tableData$dm.ci.lower<-d$CI_low
@@ -282,7 +283,7 @@ procedure.posthoc_effsize <- function(obj) {
   results
   
 }
-.posthoc_ci.multinom=function(referenceGrid,term,width,method,vfun=NULL) {
+.posthoc_ci.multinom=function(model,term,width,method,vfun=NULL) {
 
   if (inherits(model,"bootstrap_model") )
     model<-attr(model,"original_model")
@@ -323,7 +324,7 @@ procedure.emmeans<-function(obj) {
     term64<-tob64(rev(term))
     
     ## include the dependent for multinomial ##
-    if (obj$options$modeltype=="multinomial")
+    if (obj$options$model_type=="multinomial")
         term64<-c(obj$datamatic$dep$name64,term64)
     
     ## first we get the levels of covs at which to condition the estimation ##
@@ -381,7 +382,7 @@ procedure.emmeans<-function(obj) {
     }
 
     ## rename the dependent for multinomial ##
-    if (obj$options$modeltype=="multinomial"){
+    if (obj$options$model_type=="multinomial"){
          names(tableData)[1]<-"response"
          tableData<-tableData[order(tableData$response),]
     }
@@ -519,7 +520,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     names(.anova)[1:length(.names)]<-.names
     
     ### make fix depending of the type of model ###    
-    class(.anova)<-c(paste0("simple_anova_",obj$options$modeltype),class(.anova))
+    class(.anova)<-c(paste0("simple_anova_",obj$options$model_type),class(.anova))
     .anova<-add_effect_size(.anova,model)
     ### check some stuff 
     .all <- c(term64,variable64)
@@ -791,7 +792,7 @@ procedure.simpleInteractions<-function(obj) {
                   res[[.name]]<-as.character(res[[.name]])
               }
               names(res)[1:length(mods)]<-make.names(paste0("mod_",fromb64(mods)))
-              class(res)<-c(paste0("simple_anova_",obj$options$modeltype),class(res))
+              class(res)<-c(paste0("simple_anova_",obj$options$model_type),class(res))
               res<-add_effect_size(res,obj$model)
               res
         })

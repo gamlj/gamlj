@@ -47,10 +47,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale_labels = "labels",
             adjust = list(
                 "bonf"),
-            posthoces = list(
+            posthoc_es = list(
                 "dm"),
             d_ci = FALSE,
-            modeltype = "lm",
+            model_type = "lm",
             es = list(
                 "beta",
                 "etap"),
@@ -319,9 +319,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
-            private$..posthoces <- jmvcore::OptionNMXList$new(
-                "posthoces",
-                posthoces,
+            private$..posthoc_es <- jmvcore::OptionNMXList$new(
+                "posthoc_es",
+                posthoc_es,
                 options=list(
                     "dm",
                     "ds",
@@ -332,9 +332,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "d_ci",
                 d_ci,
                 default=FALSE)
-            private$..modeltype <- jmvcore::OptionList$new(
-                "modeltype",
-                modeltype,
+            private$..model_type <- jmvcore::OptionList$new(
+                "model_type",
+                model_type,
                 hidden=TRUE,
                 options=list(
                     "lm"),
@@ -439,9 +439,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..adjust)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
-            self$.addOption(private$..posthoces)
+            self$.addOption(private$..posthoc_es)
             self$.addOption(private$..d_ci)
-            self$.addOption(private$..modeltype)
+            self$.addOption(private$..model_type)
             self$.addOption(private$..es)
             self$.addOption(private$..homo_test)
             self$.addOption(private$..qq_plot)
@@ -496,9 +496,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         adjust = function() private$..adjust$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
-        posthoces = function() private$..posthoces$value,
+        posthoc_es = function() private$..posthoc_es$value,
         d_ci = function() private$..d_ci$value,
-        modeltype = function() private$..modeltype$value,
+        model_type = function() private$..model_type$value,
         es = function() private$..es$value,
         homo_test = function() private$..homo_test$value,
         qq_plot = function() private$..qq_plot$value,
@@ -552,9 +552,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..adjust = NA,
         ..predicted = NA,
         ..residuals = NA,
-        ..posthoces = NA,
+        ..posthoc_es = NA,
         ..d_ci = NA,
-        ..modeltype = NA,
+        ..model_type = NA,
         ..es = NA,
         ..homo_test = NA,
         ..qq_plot = NA,
@@ -1055,7 +1055,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_method",
                         "ci_width",
                         "boot_r",
-                        "posthoces",
+                        "posthoc_es",
                         "d_ci"),
                     columns=list(
                         list(
@@ -1070,47 +1070,47 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="dm", 
                             `title`="d<sub>mod</sub>", 
                             `type`="number", 
-                            `visible`="(posthoces:dm)"),
+                            `visible`="(posthoc_es:dm)"),
                         list(
                             `name`="dm.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoces:dm && d_ci)"),
+                            `visible`="(posthoc_es:dm && d_ci)"),
                         list(
                             `name`="dm.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthoces:dm && d_ci)"),
+                            `visible`="(posthoc_es:dm && d_ci)"),
                         list(
                             `name`="ds", 
                             `title`="d<sub>sample</sub>", 
                             `type`="number", 
-                            `visible`="(posthoces:ds)"),
+                            `visible`="(posthoc_es:ds)"),
                         list(
                             `name`="ds.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoces:ds && d_ci)"),
+                            `visible`="(posthoc_es:ds && d_ci)"),
                         list(
                             `name`="ds.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthoces:ds && d_ci)"),
+                            `visible`="(posthoc_es:ds && d_ci)"),
                         list(
                             `name`="g", 
                             `title`="g<sub>sample</sub>", 
                             `type`="number", 
-                            `visible`="(posthoces:g)"),
+                            `visible`="(posthoc_es:g)"),
                         list(
                             `name`="g.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoces:g && d_ci)"),
+                            `visible`="(posthoc_es:g && d_ci)"),
                         list(
                             `name`="g.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(posthoces:g && d_ci)")))))
+                            `visible`="(posthoc_es:g && d_ci)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1612,348 +1612,4 @@ gamljGlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 completeWhenFilled = FALSE,
                 requiresMissings = FALSE)
         }))
-
-#' General Linear Model
-#'
-#' General Linear Model. Estimates models using \code{lm()} function and 
-#' provides options to facilitate estimation of 
-#' interactions, simple slopes, simple effects, post-hoc tests, contrast 
-#' analysis, effect size indexes and visualization of the results.
-#' 
-#'
-#' @examples
-#' data('ToothGrowth')
-#' gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
-#'
-#' @param data the data as a data frame
-#' @param .caller .
-#' @param .interface .
-#' @param dep a string naming the dependent variable from \code{data}; the
-#'   variable must be numeric. Not needed if \code{formula} is used.
-#' @param factors a vector of strings naming the fixed factors from
-#'   \code{data}. Not needed if \code{formula} is used.
-#' @param covs a vector of strings naming the covariates from \code{data}. Not
-#'   needed if \code{formula} is used.
-#' @param model_terms a list of character vectors describing fixed effects
-#'   terms. Not needed if \code{formula} is used.
-#' @param nested_terms a list of character vectors describing effects terms
-#'   for nestet. It can be passed as right-hand formula.
-#' @param comparison Not present in R
-#' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. Not needed if \code{formula} is used.
-#' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. Not needed if \code{formula} is used.
-#' @param omnibus \code{TRUE} (default) or \code{FALSE}, estimates fixed
-#'   intercept. Not needed if \code{formula} is used.
-#' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
-#'   in table
-#' @param betas_ci \code{TRUE} (default) or \code{FALSE} , parameters CI in
-#'   table
-#' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
-#'   confidence interval width for the plots.
-#' @param donotrun .
-#' @param ci_method .
-#' @param boot_r a number bootstrap repetitions.
-#' @param contrasts a named vector of the form \code{c(var1="type",
-#'   var2="type2")} specifying the type of contrast to use, one of
-#'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
-#'   \code{simple} is used. Can also be passed as a list of list of the form
-#'   list(list(var="var1",type="type1")).
-#' @param show_contrastnames \code{TRUE} or \code{FALSE} (default), shows raw
-#'   names of the contrasts variables in tables
-#' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
-#'   contrast coefficients tables
-#' @param vcov \code{TRUE} or \code{FALSE} (default), shows coefficients
-#'   covariances
-#' @param plotHAxis a string naming the variable placed on the horizontal axis
-#'   of the plot
-#' @param plotSepLines a string naming the variable represented as separate
-#'   lines in the plot
-#' @param plotSepPlots a list of string naming the variables defining the
-#'   levels for multiple plots
-#' @param plotRaw \code{TRUE} or \code{FALSE} (default), plot raw data along
-#'   the predicted values
-#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), set the Y-axis
-#'   range equal to the range of the observed values.
-#' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
-#'   original scale for covariates.
-#' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
-#'   linetypes per levels.
-#' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
-#'   no error bars, use confidence intervals, or use standard errors on the
-#'   plots, respectively.
-#' @param emmeans a rhs formula with the terms specifying the marginal means
-#'   to estimate (of the form \code{'~x+x:z'})
-#' @param posthoc a rhs formula with the terms specifying the table to apply
-#'   the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-#'   so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-#'   passed also as a list of the form '}list("x","z",c("x","z")`'
-#' @param simple_effects The variable for which the simple effects (slopes)
-#'   are computed
-#' @param simple_moderators the variable that provides the levels at which the
-#'   simple effects are computed
-#' @param simple_interactions should simple Interactions be computed
-#' @param covs_scale a named vector of the form \code{c(var1='type',
-#'   var2='type2')} specifying the transformation to apply to covariates, one of
-#'   \code{'centered'} to the mean, \code{'standardized'} or  \code{'none'}.
-#'   \code{'none'} leaves the variable as it is.
-#' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
-#'   \code{'percent'}. Use to condition the covariates (if any)
-#' @param ccm_value how many st.deviations around the means used to condition
-#'   simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}
-#' @param ccp_value offsett (number of percentiles) around the median used to
-#'   condition simple effects and plots. Used if
-#'   \code{simpleScale}=\code{'percent'}
-#' @param covs_scale_labels how the levels of a continuous moderator should
-#'   appear in tables and plots: \code{labels}, \code{values} and
-#'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
-#'   to the variable orginal levels, before scaling.
-#' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
-#'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
-#'   respectively.
-#' @param posthoces one or more of \code{'dm'},  \code{'ds'},\code{'g'} for
-#'   Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g
-#' @param d_ci \code{TRUE} or \code{FALSE} (default), d confidence intervals
-#' @param modeltype .
-#' @param es a list of effect sizes to print out. They can be:  \code{"eta"}
-#'   for eta-squared, \code{'partEta'} for partial eta-squared, \code{'omega'}
-#'   for partial omega-squared, \code{'epsilon'} for partial epsilon-squared,
-#'   and \code{'beta'} for standardized coefficients (betas). Default is
-#'   \code{"beta"} and \code{"parEta"}.
-#' @param homo_test \code{TRUE} or \code{FALSE} (default), perform homogeneity
-#'   tests
-#' @param qq_plot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
-#'   residuals
-#' @param norm_test \code{TRUE} or \code{FALSE} (default), provide a test for
-#'   normality of residuals
-#' @param norm_plot \code{TRUE} or \code{FALSE} (default), provide a histogram
-#'   of residuals superimposed by a normal distribution
-#' @param resid_plot \code{TRUE} or \code{FALSE} (default), provide a
-#'   scatterplot of the residuals against predicted
-#' @param intercept_info \code{TRUE} or \code{FALSE} (default), provide
-#'   ìnformation about the intercept (F test, effect size indexes)
-#' @param es_info \code{TRUE} or \code{FALSE} (default), provide ìnformation
-#'   about the effect size indexes
-#' @param dep_scale Re-scale the dependent variable.
-#' @param se_method .
-#' @param formula (optional) the formula to use, see the examples
-#' @return A results object containing:
-#' \tabular{llllll}{
-#'   \code{results$model} \tab \tab \tab \tab \tab a property \cr
-#'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
-#'   \code{results$main$intercept} \tab \tab \tab \tab \tab a table of information for the model intercept \cr
-#'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
-#'   \code{results$main$effectsizes} \tab \tab \tab \tab \tab a table of effect size indeces \cr
-#'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$vcov} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
-#'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
-#'   \code{results$posthocEffectSize} \tab \tab \tab \tab \tab an array of post-hoc effect size \cr
-#'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
-#'   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$simpleInteractions} \tab \tab \tab \tab \tab an array of simple interactions tables \cr
-#'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
-#'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
-#'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
-#'   \code{results$assumptions$homotest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-#'   \code{results$assumptions$normtest} \tab \tab \tab \tab \tab a table of normality tests \cr
-#'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
-#'   \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
-#'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
-#'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
-#'   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
-#' }
-#'
-#' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
-#'
-#' \code{results$info$asDF}
-#'
-#' \code{as.data.frame(results$info)}
-#'
-#' @export
-gamljGlm <- function(
-    data,
-    .caller = "lm",
-    .interface = "jamovi",
-    dep = NULL,
-    factors = NULL,
-    covs = NULL,
-    model_terms = NULL,
-    nested_terms = NULL,
-    comparison = FALSE,
-    fixed_intercept = TRUE,
-    nested_intercept = TRUE,
-    omnibus = "F",
-    estimates_ci = TRUE,
-    betas_ci = FALSE,
-    ci_width = 95,
-    donotrun = FALSE,
-    ci_method = "wald",
-    boot_r = 1000,
-    contrasts = NULL,
-    show_contrastnames = TRUE,
-    show_contrastcodes = FALSE,
-    vcov = FALSE,
-    plotHAxis = NULL,
-    plotSepLines = NULL,
-    plotSepPlots = NULL,
-    plotRaw = FALSE,
-    plotDvScale = FALSE,
-    plotOriginalScale = FALSE,
-    plotLinesTypes = FALSE,
-    plotError = "none",
-    emmeans = NULL,
-    posthoc = NULL,
-    simple_effects = NULL,
-    simple_moderators = NULL,
-    simple_interactions = FALSE,
-    covs_scale = NULL,
-    covs_conditioning = "mean_sd",
-    ccm_value = 1,
-    ccp_value = 25,
-    covs_scale_labels = "labels",
-    adjust = list(
-                "bonf"),
-    posthoces = list(
-                "dm"),
-    d_ci = FALSE,
-    modeltype = "lm",
-    es = list(
-                "beta",
-                "etap"),
-    homo_test = FALSE,
-    qq_plot = FALSE,
-    norm_test = FALSE,
-    norm_plot = FALSE,
-    resid_plot = FALSE,
-    intercept_info = FALSE,
-    es_info = FALSE,
-    dep_scale = "none",
-    se_method = "standard",
-    formula) {
-
-    if ( ! requireNamespace("jmvcore", quietly=TRUE))
-        stop("gamljGlm requires jmvcore to be installed (restart may be required)")
-
-    if ( ! missing(formula)) {
-        if (missing(dep))
-            dep <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="lhs",
-                subset="1",
-                required=TRUE)
-        if (missing(factors))
-            factors <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="rhs",
-                type="vars",
-                permitted="factor")
-        if (missing(covs))
-            covs <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="rhs",
-                type="vars",
-                permitted="numeric")
-        if (missing(model_terms))
-            model_terms <- jmvcore::marshalFormula(
-                formula=formula,
-                data=`if`( ! missing(data), data, NULL),
-                from="rhs",
-                type="terms")
-    }
-
-    if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
-    if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
-    if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
-    if ( ! missing(simple_effects)) simple_effects <- jmvcore::resolveQuo(jmvcore::enquo(simple_effects))
-    if ( ! missing(simple_moderators)) simple_moderators <- jmvcore::resolveQuo(jmvcore::enquo(simple_moderators))
-    if (missing(data))
-        data <- jmvcore::marshalData(
-            parent.frame(),
-            `if`( ! missing(dep), dep, NULL),
-            `if`( ! missing(factors), factors, NULL),
-            `if`( ! missing(covs), covs, NULL),
-            `if`( ! missing(plotHAxis), plotHAxis, NULL),
-            `if`( ! missing(plotSepLines), plotSepLines, NULL),
-            `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
-            `if`( ! missing(simple_effects), simple_effects, NULL),
-            `if`( ! missing(simple_moderators), simple_moderators, NULL))
-
-    for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-    if (inherits(model_terms, "formula")) model_terms <- jmvcore::decomposeFormula(model_terms)
-    if (inherits(nested_terms, "formula")) nested_terms <- jmvcore::decomposeFormula(nested_terms)
-    if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
-    if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
-
-    options <- gamljGlmOptions$new(
-        .caller = .caller,
-        .interface = .interface,
-        dep = dep,
-        factors = factors,
-        covs = covs,
-        model_terms = model_terms,
-        nested_terms = nested_terms,
-        comparison = comparison,
-        fixed_intercept = fixed_intercept,
-        nested_intercept = nested_intercept,
-        omnibus = omnibus,
-        estimates_ci = estimates_ci,
-        betas_ci = betas_ci,
-        ci_width = ci_width,
-        donotrun = donotrun,
-        ci_method = ci_method,
-        boot_r = boot_r,
-        contrasts = contrasts,
-        show_contrastnames = show_contrastnames,
-        show_contrastcodes = show_contrastcodes,
-        vcov = vcov,
-        plotHAxis = plotHAxis,
-        plotSepLines = plotSepLines,
-        plotSepPlots = plotSepPlots,
-        plotRaw = plotRaw,
-        plotDvScale = plotDvScale,
-        plotOriginalScale = plotOriginalScale,
-        plotLinesTypes = plotLinesTypes,
-        plotError = plotError,
-        emmeans = emmeans,
-        posthoc = posthoc,
-        simple_effects = simple_effects,
-        simple_moderators = simple_moderators,
-        simple_interactions = simple_interactions,
-        covs_scale = covs_scale,
-        covs_conditioning = covs_conditioning,
-        ccm_value = ccm_value,
-        ccp_value = ccp_value,
-        covs_scale_labels = covs_scale_labels,
-        adjust = adjust,
-        posthoces = posthoces,
-        d_ci = d_ci,
-        modeltype = modeltype,
-        es = es,
-        homo_test = homo_test,
-        qq_plot = qq_plot,
-        norm_test = norm_test,
-        norm_plot = norm_plot,
-        resid_plot = resid_plot,
-        intercept_info = intercept_info,
-        es_info = es_info,
-        dep_scale = dep_scale,
-        se_method = se_method)
-
-    analysis <- gamljGlmClass$new(
-        options = options,
-        data = data)
-
-    analysis$run()
-
-    analysis$results
-}
 

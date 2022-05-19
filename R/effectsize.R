@@ -54,7 +54,7 @@ es.marginals<-function(obj) {
   data           <-  insight::get_data(model)
   groups         <-  model$lev[-1]
   ref_lev        <-  model$lev[1]
-  form           <-  formula(model$terms)
+  form           <-  stats::formula(model$terms)
   dep            <-  all.vars(form)[1]
   results        <-  list()
 
@@ -62,7 +62,7 @@ es.marginals<-function(obj) {
     
     .data<-data[data[[dep]]==g | data[[dep]]==ref_lev,]
     try_hard( {
-      .model<-stats::glm(form,.data,family=binomial())
+      .model<-stats::glm(form,.data,family=stats::binomial())
       .results<-summary(margins::margins(.model),level=ciWidth,by_factor=FALSE)
     })
     .results$or<-1:nrow(.results)
@@ -77,6 +77,7 @@ es.marginals<-function(obj) {
 
 
 es.relativerisk<-function(obj) {
+  
       model          <-  obj$model
       data           <-  insight::get_data(model)
       data$id_id_id  <-  seq_len(dim(data)[1])
@@ -87,8 +88,8 @@ es.relativerisk<-function(obj) {
       
       data[,depobj$name64]  <-  as.numeric(data[[depobj$name64]]==levs[2])
 
-      results<-geepack::geeglm(as.formula(obj$formula64),
-                                        family = poisson(link = "log"),
+      results<-geepack::geeglm(stats::as.formula(obj$formula64),
+                                        family = stats::poisson(link = "log"),
                                         id = id_id_id, 
                                         corstr = "exchangeable", data = data)
       params<-as.data.frame(parameters::parameters(results,exponentiate=TRUE))
@@ -114,7 +115,7 @@ es.glm_variances<-function(model,obj) {
      dfres         <-  model$df.residual
      sumr          <-  summary(model)
      N             <-  dfres+sumr$fstatistic[[2]]+1
-     ssres         <-  sigma(model)^2*dfres
+     ssres         <-  stats::sigma(model)^2*dfres
      ssmod         <-  sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
      SS            <-  df*atable$test*ssres/dfres
      
@@ -161,9 +162,9 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
 .add_es.simple_params_lm<-function(atable,model,variable) {
 
   xstd<-1
-  if (!is.factor(model$model[,variable])) xstd<-sd(model$model[,variable])
+  if (!is.factor(model$model[,variable])) xstd<-stats::sd(model$model[,variable])
   y<-names(attr(model$terms,"dataClass"))[1]
-  ystd<-sd(model$model[,y])
+  ystd<-stats::sd(model$model[,y])
   atable$beta<-atable$estimate*(xstd/ystd) 
   atable
 }
@@ -182,7 +183,7 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
   dfres<-model$df.residual
   sumr<-summary(model)
   N<-dfres+sumr$fstatistic[[2]]+1
-  ssres<-sigma(model)^2*dfres
+  ssres<-stats::sigma(model)^2*dfres
   ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
   df<-atable$df1
   SS<-df*atable$test*ssres/dfres
@@ -247,7 +248,7 @@ es.var_boot_fun<-function(data,indices,model=NULL) {
    names(atable)<-c("ss","df","test","p")
    dfres<-model$df.residual
    sumr<-summary(model)
-   ssres<-sigma(model)^2*dfres
+   ssres<-stats::sigma(model)^2*dfres
    ssmod<-sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
    ss<-atable$ss
    unlist(c(ss,ssmod,ssres))

@@ -2,19 +2,44 @@ context("gzlm")
 data("hsbdemo")
 tol<-0.001
 
+mod0<-gamlj::gamljGzlm(
+  formula = schtyp ~ write + honors + honors:write,
+  data = hsbdemo,
+  model_type = "logistic")
+
+mod1<-gamlj::gamljGzlm(
+  data = hsbdemo,
+  model_type = "logistic",
+  dep = "schtyp",
+  factors = "honors",
+  covs="write",
+  model_terms = ~write + honors + honors:write)
+
+options(digits = 3)
+
+testthat::test_that("equivalent model input (1)", {
+  testthat::expect_equal(mod0$info$asDF$specs[2],mod1$info$asDF$specs[2])
+  testthat::expect_equal(mod0$main$anova$asDF$f[3],mod1$main$anova$asDF$f[3])
+  testthat::expect_equal(mod0$main$coefficients$asDF$label[2],mod0$main$coefficients$asDF$label[2])
+  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[1],mod0$main$coefficients$asDF$est.ci.lower[1])
+})
+
+
+
+
 testthat::test_that("gzlm logistic coherence",{
   testthat::expect_error(gamlj::gamljGzlm(
     formula = ses ~ 1,
     data = hsbdemo,
-   modelSelection = "logistic")
+    model_type =  "logistic")
 )}
 )
 data("hsbdemo")
 mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
-  showParamsCI = TRUE,
-  modelSelection = "logistic")
+  estimates_ci  = TRUE,
+  model_type = "logistic")
 
 res<-mod$main$coefficients$asDF
 testthat::test_that("glm estimates are correct", {
@@ -25,16 +50,17 @@ testthat::test_that("glm estimates are correct", {
   testthat::expect_equal(mod$main$fit$asDF$value[2],175.787,tolerance=tol)
 })
 
+data<-hsbdemo
 
 mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
-  modelSelection = "logistic",
-  ciWidth=90,
-  simpleVariable = "write",
-  simpleModerator = "honors",
+  model_type = "logistic",
+  ci_width =90,
+  simple_effects  = "write",
+  simple_moderators =  "honors",
   plotHAxis = "write",
-  showContrastCode=T
+  show_contrastcodes=T
   )
 
 r.anova<-mod$main$anova$asDF
@@ -47,13 +73,11 @@ testthat::test_that("contrasts are correct", {
   testthat::expect_equal(r.show,"-0.5")
 })
 
-se.params<-mod$simpleEffects$coefficients$asDF
-
 
 mod<-gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
-  modelSelection = "logistic",
+  model_type = "logistic",
   posthoc =  "honors",
   plotHAxis = "write"
 )
@@ -71,19 +95,20 @@ testthat::test_that("glm contrasts", {
   testthat::expect_equal(round(res[1,3],2),1.36)
 })
 
-testthat::test_that("gzlm plot", {
-  testthat::expect_is(mod$mainPlots,"Image")
-})
+
+#testthat::test_that("gzlm plot", {
+#  testthat::expect_is(mod$mainPlots,"Image")
+#})
 
 testthat::test_that("gzlm CI width", {
-  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[2],-.204,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[4],.6072,tol)
 })
 
 
-mod<-gamlj::gamljGzlm(showParamsCI = F,
+mod<-gamlj::gamljGzlm(
   formula = schtyp ~ 1,
   data = hsbdemo,
-  modelSelection = "logistic")
+  model_type = "logistic")
 
 testthat::test_that("intercept only works",
           testthat::expect_equal(round(mod$main$coefficients$asDF[1,3],digits=3),1.658)
@@ -96,7 +121,7 @@ names(data)[3]<-c("Gender (test ?)")
 mod<-gamlj::gamljGzlm(
   formula=schtyp~math+`Gender (test ?)`+math:`Gender (test ?)`,
   data=data,
-  modelSelection = "logistic",
+  model_type = "logistic",
   emmeans = ~`Gender (test ?)`)
 
 testthat::test_that("glm weird names", {
@@ -112,7 +137,7 @@ testthat::test_that("glm EMM", {
 mod<-gamlj::gamljGzlm(
   formula=prog~math+ses*female,
   data=hsbdemo,
-  modelSelection = "multinomial",
+  model_type = "multinomial",
   posthoc = ~ses:female)
 
 
@@ -131,7 +156,7 @@ testthat::test_that("Multinomial posthoc works", {
 mod2<-gamlj::gamljGzlm(
   formula=prog~ses*female+math,
   data=hsbdemo,
-  modelSelection = "multinomial")
+  model_type = "multinomial")
 
 
 
@@ -152,18 +177,17 @@ data$age<-factor(data$age)
 mod<-gamlj::gamljGzlm(
   formula=acts~agg_test*age,
   data=data,
-  modelSelection = "poisson",
-  simpleVariable = agg_test,
-  simpleModerators = age,
+  model_type = "poisson",
+  simple_effects = agg_test,
+  simple_moderators  = age,
   posthoc = ~age,
   emmeans =  ~agg_test)
 
-mod
 testthat::test_that("Poisson works", {
 
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1],.1064,tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1],68.38,tol)
-  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1],-3.578,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6],.8577,tol)
   testthat::expect_equal(mod$main$r2$asDF$r2,.898,tol)
   testthat::expect_equal(mod$main$fit$asDF$value[4],9.82,tol)
   testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2],.338,tol)
@@ -174,25 +198,23 @@ testthat::test_that("Poisson works", {
 })
 
 data$q<-data$acts+1
-#contrasts(data$age)<-contr.sum(3)
-#data$x<-data$agg_test-mean(data$agg_test)
-#rmod<-glm(formula=q~x*age,data=data,family = Gamma())
+
 mod<-gamlj::gamljGzlm(
   formula=q~agg_test*age,
   data=data,
-  modelSelection = "custom",
+  model_type = "custom",
   custom_family = "Gamma",
   custom_link = "inverse",
-  simpleVariable = agg_test,
-  simpleModerators = age,
+  simple_effects = agg_test,
+  simple_moderators  = age,
   posthoc = ~age,
   emmeans =  ~agg_test
 )
-
+mod
 testthat::test_that("Custom model works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1],2.151,tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1],168.42,tol)
-  testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1],.695,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[[1]],1.994,tol)
   testthat::expect_equal(mod$main$r2$asDF$r2,.870,tol)
   testthat::expect_equal(mod$main$fit$asDF$value[4],2.538,tol)
   testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2],1.448,tol)
@@ -212,11 +234,12 @@ testthat::expect_warning({
 mod<-gamlj::gamljGzlm(
   formula=q~agg_test*age,
   data=data,
-  modelSelection = "nb",
-  simpleVariable = agg_test,
-  simpleModerators = age,
+  model_type =  "nb",
+  simple_effects  = agg_test,
+  simple_moderators  = age,
   posthoc = ~age,
-  emmeans =  ~agg_test
+  emmeans =  ~agg_test,
+  estimates_ci=TRUE
   )
 })
 
@@ -241,11 +264,12 @@ data$q<-as.integer(data$q)
 mod<-gamlj::gamljGzlm(
   formula=q~agg_test*age,
   data=data,
-  modelSelection = "poiover",
-  simpleVariable = agg_test,
-  simpleModerators = age,
+  model_type =  "poiover",
+  simple_effects =  agg_test,
+  simple_moderators = age,
   posthoc = ~age,
-  emmeans =  ~agg_test
+  emmeans =  ~agg_test,
+  estimates_ci = TRUE
 )
 
 testthat::test_that("quasi poisson binomial works", {

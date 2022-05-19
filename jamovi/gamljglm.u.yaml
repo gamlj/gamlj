@@ -321,18 +321,18 @@ children:
           - type: Label
             label: Effect size
             children:
-              - name: posthoces_dm
+              - name: posthoc_es_dm
                 type: CheckBox
                 optionPart: dm
-                optionName: posthoces
-              - name: posthoces_ds
+                optionName: posthoc_es
+              - name: posthoc_es_ds
                 type: CheckBox
                 optionPart: ds
-                optionName: posthoces
-              - name: posthoces_g
+                optionName: posthoc_es
+              - name: posthoc_es_g
                 type: CheckBox
                 optionPart: g
-                optionName: posthoces
+                optionName: posthoc_es
               - type: CheckBox
                 name: d_ci
 

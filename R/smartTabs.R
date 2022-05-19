@@ -569,10 +569,10 @@ SmartArray <- R6::R6Class("SmartArray",
                             initialize=function(tables,estimator=NULL) {
                               
                               super$initialize(tables,estimator)
-                              if (hasName(tables,"itemKeys"))
+                              if (utils::hasName(tables,"itemKeys"))
                                     self$children<-tables$itemKeys 
                               else 
-                                if (hasName(tables,"itemNames"))
+                                if (utils::hasName(tables,"itemNames"))
                                   self$children<-tables$itemNames 
                                 
 

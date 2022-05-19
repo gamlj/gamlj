@@ -44,7 +44,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale_labels = "labels",
             adjust = list(
                 "bonf"),
-            modeltype = "lmer",
+            model_type = "lmer",
             covs_scale = NULL,
             dep_scale = "none",
             scale_missing = NULL,
@@ -296,9 +296,9 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
-            private$..modeltype <- jmvcore::OptionList$new(
-                "modeltype",
-                modeltype,
+            private$..model_type <- jmvcore::OptionList$new(
+                "model_type",
+                model_type,
                 hidden=TRUE,
                 options=list(
                     "lmer"),
@@ -475,7 +475,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..adjust)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
-            self$.addOption(private$..modeltype)
+            self$.addOption(private$..model_type)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..dep_scale)
             self$.addOption(private$..scale_missing)
@@ -537,7 +537,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         adjust = function() private$..adjust$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
-        modeltype = function() private$..modeltype$value,
+        model_type = function() private$..model_type$value,
         covs_scale = function() private$..covs_scale$value,
         dep_scale = function() private$..dep_scale$value,
         scale_missing = function() private$..scale_missing$value,
@@ -598,7 +598,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..adjust = NA,
         ..predicted = NA,
         ..residuals = NA,
-        ..modeltype = NA,
+        ..model_type = NA,
         ..covs_scale = NA,
         ..dep_scale = NA,
         ..scale_missing = NA,
@@ -1575,7 +1575,7 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
 #'   \code{'holm'},\code{'scheffe'}, \code{'tukey'}; provide no,  Bonferroni,
 #'   Tukey and Holm Post Hoc corrections respectively.
-#' @param modeltype .
+#' @param model_type .
 #' @param covs_scale a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
@@ -1687,7 +1687,7 @@ gamljMixed <- function(
     covs_scale_labels = "labels",
     adjust = list(
                 "bonf"),
-    modeltype = "lmer",
+    model_type = "lmer",
     covs_scale = NULL,
     dep_scale = "none",
     scale_missing,
@@ -1814,7 +1814,7 @@ gamljMixed <- function(
         ccp_value = ccp_value,
         covs_scale_labels = covs_scale_labels,
         adjust = adjust,
-        modeltype = modeltype,
+        model_type = model_type,
         covs_scale = covs_scale,
         dep_scale = dep_scale,
         scale_missing = scale_missing,

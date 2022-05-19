@@ -413,7 +413,7 @@ items:
               - ci_method
               - ci_width
               - boot_r
-              - posthoces
+              - posthoc_es
               - d_ci
         columns:
         - name: estimate
@@ -425,39 +425,39 @@ items:
         - name: dm
           title: d<sub>mod</sub>
           type: number
-          visible: (posthoces:dm)
+          visible: (posthoc_es:dm)
         - name: dm.ci.lower
           type: number
           title: Lower
-          visible: (posthoces:dm && d_ci)
+          visible: (posthoc_es:dm && d_ci)
         - name: dm.ci.upper
           type: number
           title: Upper
-          visible: (posthoces:dm && d_ci)
+          visible: (posthoc_es:dm && d_ci)
         - name: ds
           title: d<sub>sample</sub>
           type: number
-          visible: (posthoces:ds)
+          visible: (posthoc_es:ds)
         - name: ds.ci.lower
           type: number
           title: Lower
-          visible: (posthoces:ds && d_ci)
+          visible: (posthoc_es:ds && d_ci)
         - name: ds.ci.upper
           type: number
           title: Upper
-          visible: (posthoces:ds && d_ci)
+          visible: (posthoc_es:ds && d_ci)
         - name: g
           title: g<sub>sample</sub> 
           type: number
-          visible: (posthoces:g)
+          visible: (posthoc_es:g)
         - name: g.ci.lower
           type: number
           title: Lower
-          visible: (posthoces:g && d_ci)
+          visible: (posthoc_es:g && d_ci)
         - name: g.ci.upper
           type: number
           title: Upper
-          visible: (posthoces:g && d_ci)
+          visible: (posthoc_es:g && d_ci)
 
 
   - name: simpleEffects

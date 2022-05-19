@@ -1,6 +1,6 @@
 #' Beers at bars
 #'
-#' Data for random coefficients regression, with smiles as dependent
+#' Simulated data testing random coefficients regression, with smiles as dependent
 #' variable, beers as independent variable, and bars as cluster
 #'
 #' @docType data
@@ -13,7 +13,7 @@ NULL
 
 #' Subjects by stimuli cross-classification dataset
 #'
-#' Data for Subjects by stimuli cross-classification examples
+#' Simulated data for subjects by stimuli cross-classification examples
 #'
 #' @docType data
 #' @name subjects_by_stimuli
@@ -25,7 +25,7 @@ NULL
 
 #' Subjects by stimuli nested classification dataset
 #'
-#' Data for stimuli nested in subjects classification examples
+#' Simulated data for stimuli nested in subjects classification examples
 #'
 #' @docType data
 #' @name subjects_on_stimuli
@@ -49,7 +49,7 @@ NULL
 
 #' Sport data with curvilinear effects
 #'
-#' Data for curvilinear effects
+#' Simulated data for curvilinear effects examples
 #'
 #' @docType data
 #' @name qsport
@@ -74,7 +74,7 @@ NULL
 
 #' Five groups for contrasts
 #'
-#' Data with five groups and a continuous dependent variable for checking contrasts results
+#' Simulated data with five groups and a continuous dependent variable for checking contrasts results
 #'
 #' @docType data
 #' @name fivegroups
@@ -86,7 +86,7 @@ NULL
 
 #' Poisson data
 #'
-#'  Simulated data of a poisson distributed dependent variables with some independent variabes
+#'  Simulated data of a Poisson distributed dependent variables with some independent variabes
 #'
 #' @docType data
 #' @name poissonacts

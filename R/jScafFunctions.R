@@ -204,7 +204,7 @@ ebind<-function(...) {
   tabs<-lapply(tabs, function(atab) {
     atab<-as.data.frame(atab)
     for (name in .names)
-      if (!hasName(atab,name))
+      if (!utils::hasName(atab,name))
         atab[[name]]<-NA
     atab
   })
@@ -220,7 +220,7 @@ ebind_square<-function(...) {
   tabs<-lapply(tabs, function(atab) {
     atab<-as.data.frame(atab)
     for (name in .names) 
-      if (!hasName(atab,name))
+      if (!utils::hasName(atab,name))
         atab[[name]]<-NA
     if (dim(atab)[1]<.max)
         atab[(dim(atab)[1]+1):.max,]<-NA
