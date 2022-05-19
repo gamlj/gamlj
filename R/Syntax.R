@@ -116,7 +116,7 @@ Syntax <- R6::R6Class(
         if (self$option("comparison"))
            tab<-list(list(model="Full"),
                      list(model="Nested"),
-                     list(model=paste0(greek_vector[["Delta"]],"R²")))
+                     list(model=paste0(greek_vector[["Delta"]],"R\u00B2")))
         }
       tab
       

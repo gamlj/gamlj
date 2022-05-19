@@ -52,10 +52,6 @@ fit.R2 <- function(model,obj) {
           r2nested[[2]]<-r2nested[[1]]
     
     
-    ## sometimes the chi-square is not printed out    
-#    if (obj$option("omnibus","LRT") & !utils::hasName(r2comp,"lrt"))
-#          r2comp$lrt<-as.numeric(2*(stats::logLik(model)-stats::logLik(obj$nested_model)))
-    ### adjust
 
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
     if (length(r2comp$r2)==0)

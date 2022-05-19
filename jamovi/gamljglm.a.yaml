@@ -2,7 +2,7 @@
 name: gamljGlm
 title: General Linear Model
 menuGroup: Linear Models
-version: '2.0.3'
+version: '3.0.0'
 jas: '1.2'
 export: false
 description:

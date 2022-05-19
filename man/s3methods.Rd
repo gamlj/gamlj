@@ -13,6 +13,8 @@
 \method{print}{jmvrobj}(x, ...)
 }
 \arguments{
+\item{object}{a gamlj results object of the class `gamlj`}
+
 \item{x}{a gamlj results object of the class `gamlj`}
 }
 \value{

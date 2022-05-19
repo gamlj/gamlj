@@ -6,94 +6,122 @@
 \usage{
 gamljGlmMixed(
   data,
-  caller = "lmer",
-  modelSelection = "lmer",
+  .caller = "glmer",
+  .interface = "jamovi",
   dep = NULL,
   factors = NULL,
   covs = NULL,
-  modelTerms = NULL,
-  fixedIntercept = TRUE,
-  showParamsCI = TRUE,
-  paramCIWidth = 95,
+  model_terms = NULL,
+  fixed_intercept = TRUE,
+  nested_terms = NULL,
+  comparison = FALSE,
+  nested_intercept = TRUE,
+  omnibus = "LRT",
+  estimates_ci = TRUE,
+  donotrun = FALSE,
+  ci_method = "wald",
+  boot_r = 1000,
+  ci_width = 95,
   contrasts = NULL,
-  showRealNames = TRUE,
-  showContrastCode = FALSE,
+  show_contrastnames = TRUE,
+  show_contrastcodes = FALSE,
   plotHAxis = NULL,
   plotSepLines = NULL,
   plotSepPlots = NULL,
   plotRaw = FALSE,
   plotDvScale = FALSE,
+  plotOriginalScale = FALSE,
   plotLinesTypes = FALSE,
   plotError = "none",
-  ciWidth = 95,
-  posthoc = NULL,
   emmeans = NULL,
-  simpleVariable = NULL,
-  simpleModerators = NULL,
-  simpleScale = "mean_sd",
-  cvalue = 1,
-  percvalue = 25,
-  simpleScaleLabels = "labels",
-  simpleInteractions = FALSE,
-  postHocCorr = list("bonf"),
-  scaling = NULL,
-  dep_scale = "none",
+  posthoc = NULL,
+  simple_effects = NULL,
+  simple_moderators = NULL,
+  simple_interactions = FALSE,
+  covs_conditioning = "mean_sd",
+  ccm_value = 1,
+  ccp_value = 25,
+  covs_scale_labels = "labels",
+  adjust = list("bonf"),
+  model_type = "linear",
+  covs_scale = NULL,
+  scale_missing,
+  norm_test = FALSE,
   cluster = NULL,
-  randomTerms = list(list()),
-  correlatedEffects = "corr",
+  re = list(list()),
+  nested_re = list(list()),
+  re_corr = "all",
+  re_modelterms = TRUE,
+  re_listing = "none",
   reml = TRUE,
-  lrtRandomEffects = FALSE,
-  ciRE = FALSE,
-  plotRandomEffects = FALSE,
-  plotOriginalScale = FALSE,
-  cimethod = "wald",
-  dfmethod = "Satterthwaite",
-  qqplot = FALSE,
-  homoTest = FALSE,
-  normTest = FALSE,
-  normPlot = FALSE,
-  residPlot = FALSE,
-  clusterBoxplot = FALSE,
-  clusterResPred = FALSE,
-  randHist = FALSE,
+  re_lrt = FALSE,
+  re_ci = FALSE,
+  df_method = "Satterthwaite",
+  norm_plot = FALSE,
+  qq_plot = FALSE,
+  resid_plot = FALSE,
+  cluster_boxplot = FALSE,
+  cluster_respred = FALSE,
+  rand_hist = FALSE,
   formula
 )
 }
 \arguments{
 \item{data}{the data as a data frame}
 
-\item{caller}{.}
+\item{.caller}{.}
 
-\item{modelSelection}{.}
+\item{.interface}{.}
 
-\item{dep}{a string naming the dependent variable from \code{data},
-variable must be numeric}
+\item{dep}{a string naming the dependent variable from \code{data}; the
+variable must be numeric. Not needed if \code{formula} is used.}
 
 \item{factors}{a vector of strings naming the fixed factors from
-\code{data}}
+\code{data}. Not needed if \code{formula} is used.}
 
-\item{covs}{a vector of strings naming the covariates from \code{data}}
+\item{covs}{a vector of strings naming the covariates from \code{data}. Not
+needed if \code{formula} is used.}
 
-\item{modelTerms}{a list of character vectors describing fixed effects
-terms}
+\item{model_terms}{a list of character vectors describing fixed effects
+terms. Not needed if \code{formula} is used.}
 
-\item{fixedIntercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept}
+\item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
+fixed intercept. Not needed if \code{formula} is used.}
 
-\item{showParamsCI}{\code{TRUE} (default) or \code{FALSE} , parameters CI
+\item{nested_terms}{a list of character vectors describing effects terms
+for nestet. It can be passed as right-hand formula.}
+
+\item{comparison}{Not present in R}
+
+\item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
+fixed intercept. Not needed if \code{formula} is used.}
+
+\item{omnibus}{\code{TRUE} (default) or \code{FALSE}, estimates fixed
+intercept. Not needed if \code{formula} is used.}
+
+\item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
 
-\item{paramCIWidth}{a number between 50 and 99.9 (default: 95) specifying
-the confidence interval width for the parameter estimates}
+\item{donotrun}{.}
 
-\item{contrasts}{a list of lists specifying the factor and type of contrast
-to use, one of \code{'deviation'}, \code{'simple'}, \code{'difference'},
-\code{'helmert'}, \code{'repeated'} or \code{'polynomial'}}
+\item{ci_method}{.}
 
-\item{showRealNames}{\code{TRUE} or \code{FALSE} (default), provide raw
-names of the contrasts variables}
+\item{boot_r}{a number bootstrap repetitions.}
 
-\item{showContrastCode}{\code{TRUE} or \code{FALSE} (default), provide
+\item{ci_width}{a number between 50 and 99.9 (default: 95) specifying the
+confidence interval width for the plots.}
+
+\item{contrasts}{a named vector of the form \code{c(var1="type",
+var2="type2")} specifying the type of contrast to use, one of
+\code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
+\code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+\code{simple} is used. Can also be passed as a list of list of the form
+list(list(var="var1",type="type1")).}
+
+\item{show_contrastnames}{\code{TRUE} or \code{FALSE} (default), shows raw
+names of the contrasts variables in tables}
+
+\item{show_contrastcodes}{\code{TRUE} or \code{FALSE} (default), shows
 contrast coefficients tables}
 
 \item{plotHAxis}{a string naming the variable placed on the horizontal axis
@@ -105,128 +133,130 @@ lines in the plot}
 \item{plotSepPlots}{a list of string naming the variables defining the
 levels for multiple plots}
 
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), provide descriptive
-statistics}
+\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
+the predicted values}
 
-\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), scale the plot
-Y-Axis to the max and the min of the dependent variable observed scores.}
-
-\item{plotLinesTypes}{\code{TRUE} or \code{FALSE} (default), use different
-linetypes per levels.}
-
-\item{plotError}{\code{'none'}, \code{'ci'} (default), or \code{'se'}. Use
-no error bars, use confidence intervals, or use standard errors on the
-plots, respectively}
-
-\item{ciWidth}{a number between 50 and 99.9 (default: 95) specifying the
-confidence interval width}
-
-\item{posthoc}{a rhs formula with the terms specifying the table to apply
-the comparisons (of the form \code{'~x+x:z'})}
-
-\item{emmeans}{a rhs formula with the terms specifying the marginal means
-to estimate (of the form \code{'~x+x:z'})}
-
-\item{simpleVariable}{The variable for which the simple effects (slopes)
-are computed}
-
-\item{simpleModerators}{the variable that provides the levels at which the
-simple effects computed}
-
-\item{simpleScale}{\code{'mean_sd'} (default), \code{'custom'} , or
-\code{'custom_percent'}. Use to condition the covariates (if any)}
-
-\item{cvalue}{offset value for conditioning}
-
-\item{percvalue}{offset value for conditioning}
-
-\item{simpleScaleLabels}{decide the labeling of simple effects in tables
-and plots.  \code{labels} indicates that only labels are used, such as
-\code{Mean} and  \code{Mean + 1 SD}. \code{values} uses the actual values
-as labels. \code{values_labels} uses both.}
-
-\item{simpleInteractions}{should simple Interactions be computed}
-
-\item{postHocCorr}{one or more of \code{'none'},  \code{'bonf'}, or
-\code{'holm'}; provide no,  Bonferroni, and Holm Post Hoc corrections
-respectively}
-
-\item{scaling}{a list of lists specifying the covariates scaling, one of
-\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
-\code{'none'} leaves the variable as it is}
-
-\item{dep_scale}{Re-scale the dependent variable.}
-
-\item{cluster}{a vector of strings naming the clustering variables from
-\code{data}}
-
-\item{randomTerms}{a list of lists specifying the models random effects.}
-
-\item{correlatedEffects}{\code{'nocorr'}, \code{'corr'} (default), or
-\code{'block'}. When random effects are passed as list of length 1, it
-decides whether the effects should be correlated,  non correlated. If
-\code{'randomTerms'} is a list of  lists of length > 1, the option is
-automatially set to \code{'block'}. The option is ignored if the model is
-passed using \code{formula}.}
-
-\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-be used rather than ML}
-
-\item{lrtRandomEffects}{\code{TRUE} or \code{FALSE} (default), LRT for the
-random effects}
-
-\item{ciRE}{\code{TRUE} or \code{FALSE} (default), confidence intervals for
-the random effects}
-
-\item{plotRandomEffects}{\code{TRUE} or \code{FALSE} (default), add random
-effects predicted values in the plot}
+\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), set the Y-axis
+range equal to the range of the observed values.}
 
 \item{plotOriginalScale}{\code{TRUE} or \code{FALSE} (default), use
 original scale for covariates.}
 
-\item{cimethod}{.}
+\item{plotLinesTypes}{\code{TRUE} or \code{FALSE} (default), use different
+linetypes per levels.}
 
-\item{dfmethod}{.}
+\item{plotError}{\code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
+no error bars, use confidence intervals, or use standard errors on the
+plots, respectively.}
 
-\item{qqplot}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
-residuals}
+\item{emmeans}{a rhs formula with the terms specifying the marginal means
+to estimate (of the form \code{'~x+x:z'})}
 
-\item{homoTest}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
-tests}
+\item{posthoc}{a rhs formula with the terms specifying the table to apply
+the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
+so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
+passed also as a list of the form '}list("x","z",c("x","z")`'}
 
-\item{normTest}{\code{TRUE} or \code{FALSE} (default), provide a test for
+\item{simple_effects}{The variable for which the simple effects (slopes)
+are computed}
+
+\item{simple_moderators}{the variable that provides the levels at which the
+simple effects are computed}
+
+\item{simple_interactions}{should simple Interactions be computed}
+
+\item{covs_conditioning}{\code{'mean_sd'} (default), \code{'custom'} , or
+\code{'percent'}. Use to condition the covariates (if any)}
+
+\item{ccm_value}{Covariates conditioning mean offset value: how many
+st.deviations around the means used to condition simple effects and plots.
+Used if \code{covs_conditioning}=\code{'mean_sd'}}
+
+\item{ccp_value}{Covariates conditioning percentile offset value: number of
+percentiles around the median used to condition simple effects and plots.
+Used if \code{covs_conditioning}=\code{'percent'}}
+
+\item{covs_scale_labels}{how the levels of a continuous moderator should
+appear in tables and plots: \code{labels}, \code{values} and
+\code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
+to the variable orginal levels, before scaling.}
+
+\item{adjust}{one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
+\code{'holm'},\code{'scheffe'}, \code{'tukey'}; provide no,  Bonferroni,
+Tukey and Holm Post Hoc corrections respectively.}
+
+\item{model_type}{Select the generalized linear model:
+\code{poisson},\code{logistic},\code{multinomial}, \code{nb},\code{ordinal}}
+
+\item{covs_scale}{a list of lists specifying the covariates scaling, one of
+\code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
+\code{'none'} leaves the variable as it is}
+
+\item{scale_missing}{.}
+
+\item{norm_test}{\code{TRUE} or \code{FALSE} (default), provide a test for
 normality of residuals}
 
-\item{normPlot}{\code{TRUE} or \code{FALSE} (default), provide a histogram
+\item{cluster}{a vector of strings naming the clustering variables from
+\code{data}}
+
+\item{re}{a list of lists specifying the models random effects.}
+
+\item{nested_re}{a list of lists specifying the models random effects.}
+
+\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
+When random effects are passed as list of length 1, it decides whether the
+effects should be correlated,  non correlated. If \code{'re'} is a list of
+lists of length > 1, the option is automatially set to \code{'block'}. The
+option is ignored if the model is passed using \code{formula}.}
+
+\item{re_modelterms}{Not in R interface}
+
+\item{re_listing}{Not in R interface}
+
+\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
+be used rather than ML}
+
+\item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
+effects}
+
+\item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
+for the random effects}
+
+\item{df_method}{.}
+
+\item{norm_plot}{\code{TRUE} or \code{FALSE} (default), provide a histogram
 of residuals superimposed by a normal distribution}
 
-\item{residPlot}{\code{TRUE} or \code{FALSE} (default), provide a
+\item{qq_plot}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
+residuals}
+
+\item{resid_plot}{\code{TRUE} or \code{FALSE} (default), provide a
 scatterplot of the residuals against predicted}
 
-\item{clusterBoxplot}{\code{TRUE} or \code{FALSE} (default), provide a
+\item{cluster_boxplot}{\code{TRUE} or \code{FALSE} (default), provide a
 boxplot of random effects by the first defined clustering variable}
 
-\item{clusterResPred}{\code{TRUE} or \code{FALSE} (default), residuals vs
+\item{cluster_respred}{\code{TRUE} or \code{FALSE} (default), residuals vs
 predicted by the first defined clustering variable}
 
-\item{randHist}{\code{TRUE} or \code{FALSE} (default), provide histogram of
-random Coefficients}
+\item{rand_hist}{\code{TRUE} or \code{FALSE} (default), provide histogram
+of random Coefficients}
 
 \item{formula}{(optional) the formula to use, see the examples}
 }
 \value{
 A results object containing:
 \tabular{llllll}{
-  \code{results$model} \tab \tab \tab \tab \tab The underlying \code{lmer} object \cr
+  \code{results$model} \tab \tab \tab \tab \tab a property \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
-  \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
-  \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
-  \code{results$main$randomCov} \tab \tab \tab \tab \tab a table \cr
-  \code{results$main$randomTests} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
+  \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$randomcov} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$ranova} \tab \tab \tab \tab \tab a table \cr
   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
   \code{results$simpleEffects$coefficients} \tab \tab \tab \tab \tab a table \cr
@@ -234,14 +264,10 @@ A results object containing:
   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
-  \code{results$assumptions$homoTest} \tab \tab \tab \tab \tab a table of homogeneity tests \cr
-  \code{results$assumptions$normTest} \tab \tab \tab \tab \tab a table of normality tests \cr
+  \code{results$assumptions$normtest} \tab \tab \tab \tab \tab a table of normality tests \cr
   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
-  \code{results$assumptions$normPlot} \tab \tab \tab \tab \tab Residual histogram \cr
+  \code{results$assumptions$normplot} \tab \tab \tab \tab \tab Residual histogram \cr
   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
-  \code{results$assumptions$clusterResPred} \tab \tab \tab \tab \tab Residuals vs Predicted by cluster \cr
-  \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
-  \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
 }
@@ -253,21 +279,12 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Mixed Linear Model
+Generalized Mixed  Model
 }
 \examples{
-data(subjects_by_stimuli)
-
-gamlj::gamljMixed(
-       formula = y ~ 1 + cond+( 1|subj ),
-       data = subjects_by_stimuli)
-
-gamlj::gamljMixed(
-       data = subjects_by_stimuli,
-       dep = "y",
-       factors = "cond",
-       modelTerms = "cond",
-       cluster = "subj",
-       randomTerms=list(list(c("cond","subj"))))
+data(schoolexam)
+gamlj::gamljGlmMixed(
+       formula = pass ~ 1 + math+( 1|school ),
+       data = schoolexam)
 
 }

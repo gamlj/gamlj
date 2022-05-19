@@ -112,24 +112,3 @@ is.b64<-function(a) {
 
 
 
-is.listOfList<-function(obj) {
-
-    if (inherits(obj,"list")) {
-       child<-obj[[1]]
-       return(inherits(obj,"list"))
-    }
-  return(FALSE)
-}
-  
-count_random<-function(form) {
-  
-  b<-lme4::findbars(as.formula(form))
-  print(b)
-  sum(sapply(b, function(x) {what<-as.character(x[[2]])
-  if (length(what)==1)
-    return(1)
-  else
-    return(length(strsplit(what[[2]],"+",fixed=T)[[1]]))
-  })
-  )
-}

@@ -7,8 +7,6 @@ formula<-y~1+cond+(1|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli,
-  plotHAxis = cond,
-  residPlot=T, randHist = T, clusterBoxplot = T
 )
 infotable<-model$info$asDF
 

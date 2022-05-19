@@ -329,7 +329,8 @@ options:
       type: Terms
       default:
       description:
-          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
+          R: >
+             a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
              The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
              also as a list of the form '`list("x","z",c("x","z")`'
 
@@ -522,11 +523,11 @@ options:
       title: Scale on 
       type: List
       options:
-                    - title: Complete cases
-                      name: 'complete'
-                    - title: Columnwise 
-                      name: colwise
-
+          - title: Complete cases
+            name: 'complete'
+          - title: Columnwise 
+            name: colwise
+      default: 'complete'
 
 
     - name: norm_test

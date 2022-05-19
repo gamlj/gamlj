@@ -8,26 +8,14 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 
 .beta.default<-function(model) {
   
-  data<-.getData(model)
+  data<-insight::get_data(model)
   for (var in names(data)) {
     if (!is.factor(data[[var]]))
         data[[var]]<-as.numeric(scale(data[[var]]))
   }
-  z<-update(model,data)
+  z<-stats::update(model,data)
   parameters::parameters(model)$Coefficient
 }
-
-
-##### get model data #########
-
-.getData<- function(x,...) UseMethod(".getData")
-
-.getData.default<-function(model) {
-  return(model$model)
-}
-
-.getData.lmer<-function(model) 
-  return(model@frame)
 
 
 
@@ -575,18 +563,18 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          parameters  <-  data.frame()
          anovas      <-  data.frame()
          
-         data64      <-  mf.getModelData(model)
+         data64      <-  insight::get_data(model)
          
          ## here we do the actual simple model for each combination of moderator levels ####
          for (i in 1:nrow(rows)) {
                 .data1<-data64
                  for (.name in .names) {
                         if (is.factor(.data1[[.name]]))
-                               contrasts(.data1[[.name]])<-contr.treatment(nlevels(.data1[[.name]]),base = rows[i,.name])
+                               stats::contrasts(.data1[[.name]])<-stats::contr.treatment(nlevels(.data1[[.name]]),base = rows[i,.name])
                         else
                                .data1[[.name]]<-.data1[[.name]]-rows[i,.name]
                  }
-                 .model  <-  update(model,data=.data1)
+                 .model  <-  stats::update(model,data=.data1)
                  params  <-  as.data.frame(parameters::parameters(.model))
                  params  <-  params[params$Parameter %in% varobj$paramsnames64,]
                  params[,.names]  <-  rows[i,]      

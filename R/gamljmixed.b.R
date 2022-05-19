@@ -21,13 +21,11 @@ gamljMixedClass <- R6::R6Class(
         return()
       }
       emmeans::emm_options(lmerTest.limit = 25000)  
-      
       ### set up the R6 workhorse class
       dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
       estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
-     
-      
+
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
@@ -143,13 +141,12 @@ gamljMixedClass <- R6::R6Class(
 #      private$.plotter_machine<-plotter_machine
     },
     .run=function() {
-      ginfo("MODULE:  #### phase run ####")
+      ginfo("MODULE:",self$options$.caller,"  #### phase run ####")
       
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()
       }
-      
       data<-private$.data_machine$cleandata(self$data)
       private$.estimate_machine$estimate(data)
 
@@ -173,7 +170,7 @@ gamljMixedClass <- R6::R6Class(
       private$.checkpoint()
       
       ### save the model if we are in R ###
-      if (self$options$.interface=="r")
+      if (self$options$.interface=="R")
               self$results$.setModel(private$.estimate_machine$model)
       
       ginfo("MODULE:  #### phase end ####")
@@ -193,8 +190,6 @@ gamljMixedClass <- R6::R6Class(
   return(plot)
   
 },
-
-
 
 .qqPlot=function(image, ggtheme, theme, ...) {
 
@@ -230,17 +225,91 @@ gamljMixedClass <- R6::R6Class(
   
 },
 
+.marshalFormula= function(formula, data, name) {
 
+  mark(name)
+  return()
+  fixed<-lme4::nobars(formula)
+  bars<-lme4::findbars(formula)
+  rterms<-lapply(bars,all.vars)
+  rvars<-unlist(sapply(rterms,function(a) if (length(a)>1) a[[length(a)-1]]))
+  if (name=="dep")
+    return(jmvcore::marshalFormula(fixed,data,from = "lhs"))  
+  if (name=="factors") {
+    ffactors<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='factor')
+    rfactors<-unlist(lapply(rvars, function(a) {if (is.factor(data[[a]])) a}))
+    return(c(ffactors,rfactors))
+  }
+  if (name=="covs") {
+    fcovs<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='numeric')
+    rcovs<-unlist(lapply(rvars, function(a) {if (is.numeric(data[[a]])) a}))
+    return(c(fcovs,rcovs))
+  }
+  if (name=="cluster") {
+    return(sapply(rterms,function(a) a[[length(a)]] ))
+  }
+  if (name=="re") {
+    bars<-lme4::findbars(formula)
+    fullist<-list()
+    for (b in seq_along(bars)) {
+      cluster=bars[[b]][[3]]
+      bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)[[1]]
+      barlist<-list()
+      j<-0
+      for (term in bar) {
+        term<-trimws(jmvcore::decomposeTerm(term))
+        if (length(term)==1 && term=="1")
+          term="Intercept"
+        if (length(term)==1 && term=="0")
+          next()              
+        alist<-c(term,as.character(cluster))
+        j<-j+1
+        barlist[[j]]<-alist
+      }
+      fullist[[b]]<-barlist
+    }
+    return(fullist)
+  }
+  
+  if (name=="model_terms") {
+    return(jmvcore::marshalFormula(fixed,data,from='rhs',type='terms'))
+  }
+  
+},
 .sourcifyOption = function(option) {
 
-  skip<-c("modelTerms","factors","covs","dep")
-  defaults<-c(scaling="centered",contrasts="simple")
+  skip<-NO_R_OPTS
   
+  if (option$name=="nested_re") {
+      if (!self$options$comparison)
+          return('')
+      if (!is.something(self$options$nested_re))
+          return('')
+      form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))  
+      terms<-paste("(",lme4::findbars(form),")",collapse =  " + ")
+      return(paste0("nested_re = ~",terms))
+  }
+  
+  
+  if (option$name=="nested_terms") {
+    if (!self$options$comparison)
+      return('')
+    if (!is.something(self$options$nested_terms))
+      return('')
+    form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))
+    terms<-lme4::nobars(form)[[3]]
+    return(paste0("nested_terms = ~",terms))
+     }
+  
+  
+
+  defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
   if (option$name %in% skip)
      return('')
- sourcifyOption(option,defaults)
+  sourcifyOption(option,defaults)
 
 }
+
 )
 )
 

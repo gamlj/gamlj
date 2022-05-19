@@ -530,7 +530,7 @@ mf.fixModel<- function(x,...) UseMethod(".fixModel")
 
 .fixModel.multinom<-function(model,obj=NULL) {
   
-  model$call$formula <- as.formula(model)
+  model$call$formula <- stats::as.formula(model)
   return(model)
 }
 

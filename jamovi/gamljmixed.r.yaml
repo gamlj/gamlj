@@ -30,7 +30,6 @@ items:
              type: Table
              description: a table of R
              clearWith:
-                         - relm
                          - dep
                          - model_terms
                          - nested_terms
@@ -76,7 +75,7 @@ items:
                          - dep
                          - model_terms
                          - contrasts
-                         - covs_covs_scale
+                         - covs_scale
                          - dep_scale
                          - fixed_intercept
                          - df_method
@@ -399,7 +398,7 @@ items:
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
-                 - simple_scale
+                 - covs_conditioning
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
@@ -435,7 +434,7 @@ items:
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
-                 - simple_scale
+                 - covs_conditioning
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
@@ -495,7 +494,7 @@ items:
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
-                 - simple_scale
+                 - covs_conditioning
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
@@ -531,13 +530,12 @@ items:
                  - fixed_intercept
                  - simple_effects
                  - simple_moderators
-                 - simple_scale
+                 - covs_conditioning
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
                  - covs_conditioning
                  - df_method
-                 - se_method
                  - ci_method
                  - boot_r
 
@@ -617,26 +615,6 @@ items:
           width: 600
           height: 400
 
-          clearWith:
-           - dep
-           - plotHAxis
-           - plotSepLines
-           - plotSepPlots
-           - plotError
-           - ci_width
-           - covs_scale
-           - dep_scale
-           - model_terms
-           - fixed_intercept
-           - simpleScale
-           - simpleScaleLabels
-           - plotDvScale
-           - plotRaw
-           - percvalue
-           - cvalue
-           - plotOriginalScale
-           - plotLinesTypes
-
   - name: plotnotes
     type: Html
     visible: false
@@ -708,9 +686,6 @@ items:
             - dep
             - model_terms
             - dep_scale
-
-
-
 
   - name: predicted
     title: Predicted Vales

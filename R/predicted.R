@@ -1,7 +1,7 @@
 predicted<- function(model,...) UseMethod(".predicted")
 
 .predicted.default<-function(model,obj) {
-  mark(class(model))
+
   root<-toupper(abbreviate(obj$options$model_type))
   preds<-stats::predict(model,type=obj$infomatic$predict)
   pdf <- data.frame(PRED=preds, row.names=rownames(insight::get_data(model)))

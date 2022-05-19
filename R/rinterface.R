@@ -172,6 +172,24 @@ gamlj_assumptionsPlots <- function(object) {
 }
 
 
+#' Coefficients covariances for a GAMLj model 
+#'
+#' Returns the parameters variances and covariances
+#'
+#' @param  object of class `gamlj*Results` 
+#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
+#' @return an table of class gamlj*Results 
+#' @author Marcello Gallucci
+#' @export 
+
+vcov.gamlj <- function(object, ...) {
+    
+    if(utils::hasName(object,"main") && utils::hasName(object$main,"vcov"))
+       return(object$main$vcov)
+    mod<-gamlj_update(object, vcov=T,...)
+    mod$main$vcov
+}
+
 
 #' Extract data 
 #'
@@ -179,8 +197,9 @@ gamlj_assumptionsPlots <- function(object) {
 #' transformed according to GAMLj options. It is usefull to run additional 
 #' models with other R packages with the same setup used by GAMLj
 #'
+#'@name   get_data
 #' @param object a gamlj results object of the class `gamlj*Results`
-#'  
+#' @aliases get_data.gamlj
 #' @return a dataset
 #' @author Marcello Gallucci
 #' @examples 
@@ -208,7 +227,7 @@ get_data.gamlj <- function(object) {
     .factors<-.names[sapply(.data,is.factor)]
     for (f in .factors) {
         levels(.data[[f]])<-gsub(LEVEL_SYMBOL,"",levels(.data[[f]]))
-        colnames(stats::contrasts(.data[[f]]))<-gsub(FACTOR_SYMBOL,"",colnames(contrasts(.data[[f]])))
+        colnames(stats::contrasts(.data[[f]]))<-gsub(FACTOR_SYMBOL,"",colnames(stats::contrasts(.data[[f]])))
     }
     .data
 }
@@ -416,7 +435,6 @@ simpleEffects.gamlj <- function(object, formula = NULL, ...) {
 #' and print them in R style.
 
 #' @param object a gamlj results object of the class `gamlj`
-#' @param ... further arguments passed to or from other methods. 
 #' @return a list of table as data.frame
 #' @author Marcello Gallucci
 #' @examples

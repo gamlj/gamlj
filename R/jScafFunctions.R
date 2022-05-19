@@ -136,9 +136,19 @@ sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
   if (is.something(def) & option$name %in% names(def)) {
     test<-all(sapply(alist,function(a) a$type)==def[[option$name]])
     if (test)
-    return("")
+      return('')
   }
   paste0(option$name,"=c(",paste(sapply(alist,function(a) paste0(sourcifyName(a$var),' = \"',a$type,'\"')),collapse=", "),")")
+}
+
+
+.sourcifyOption.OptionList<-function(option,def=NULL) {
+  
+  if (length(option$value)==0)
+    return('')
+  if (option$value==option$default)
+       return('')
+  paste0(option$name,"='",option$value,"'")
 }
 
 

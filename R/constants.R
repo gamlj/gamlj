@@ -16,6 +16,20 @@ TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
+######## options not in the R syntax #####
+NO_R_OPTS<-c(
+            "model_terms",
+            "factors",
+            "covs",
+            "dep",
+            "re",
+            "cluster",
+            "donotrun",
+            "comparison",
+            "re_modelterms",
+            "re_listing"
+           )
+
 
 ######### warning ######################
 

@@ -53,15 +53,19 @@ testthat::test_that("updating", {
 
 
 data("hsbdemo")
+
 mod<-gamlj::gamljGzlm(
   formula = prog ~ write +  ses*female,
   data = hsbdemo,
-  showParamsCI = TRUE,
+  estimates_ci = TRUE,
   plotHAxis = write,
   plotSepLines = ses,
   plotSepPlots = female,
-  modelSelection = "multinomial")
+  model_type =  "multinomial")
 
+mod2<-update(mod,vcov=T)
+
+vcov(mod2)
 mplots<-plot(mod)
 
 testthat::test_that("plot ok", {

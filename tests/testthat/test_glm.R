@@ -1,5 +1,4 @@
 context("glm")
-tol<-.0001
 
 mod0<-gamlj::gamljGlm(
   data = ToothGrowth,
