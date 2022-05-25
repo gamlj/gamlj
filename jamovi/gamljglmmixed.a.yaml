@@ -469,7 +469,7 @@ options:
           title: Ordinal (proportional odds)
         - name: multinomial
           title: Multinomial
-      default: linear
+      default: logistic
       description:
           R: >
             Select the generalized linear model: `poisson`,`logistic`,`multinomial`, `nb`,`ordinal`
@@ -520,7 +520,7 @@ options:
                       name: 'complete'
                     - title: Columnwise 
                       name: colwise
-
+      default: complete
 
 
     - name: norm_test

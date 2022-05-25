@@ -46,7 +46,7 @@ gamljMixed(
   model_type = "lmer",
   covs_scale = NULL,
   dep_scale = "none",
-  scale_missing,
+  scale_missing = "complete",
   norm_test = FALSE,
   cluster = NULL,
   re = list(list()),

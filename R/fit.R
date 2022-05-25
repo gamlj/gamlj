@@ -61,7 +61,6 @@ fit.R2 <- function(model,obj) {
           r2comp$ar2<-r2list[[1]]$ar2-r2nested[[1]]$ar2
       r2list<-c(r2list,r2nested,list(r2comp))
   }
-  
   for (r in r2list) {
     if (is.na(r$r2)) {
       token<-r$note
@@ -202,6 +201,9 @@ r2.est<- function(model,...) UseMethod(".r2")
 }
 
 
+.r2.glmerMod<-function(model,obj)
+    .r2.lmerModLmerTest(model,obj)
+
 
 ######### model comparisons for one model ########
 
@@ -252,7 +254,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
 .compare_null_model.lmerModLmerTest<-function(model,type="c") {
   
-  data    <-  mf.getModelData(model)
+  data    <-  insight::get_data(model)
 
   int<-attr(stats::terms(model),"intercept")
   
@@ -282,6 +284,41 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   names(results)<-c("nothing1","nothing2","nothing3","df1","test","p")
   results[2,c("df1","test","p")]
 }
+
+.compare_null_model.glmerMod<-function(model,type="c") {
+  
+  data    <-  insight::get_data(model)
+  
+  int<-attr(stats::terms(model),"intercept")
+  
+  
+  if (type=="c") {
+    
+    form<-stats::as.formula(paste(stats::formula(model)[[2]],"~",int))
+    model0<-stats::glm(form,data=data,family = insight::get_family(model))
+    
+  } else  {
+    if (int==0) 
+      return(NULL)
+    
+    re<-lme4::findbars(stats::formula(model))
+    re<-paste("(",re,")",collapse = "+")
+    dep<-insight::model_info(model)$model_terms$response
+    form<-paste(dep,"~",int," + ",re)
+    model0  <-  stats::update(model, formula=form)
+    
+  }
+  ### please note that here we use performance::test_likelihoodratio, which compute the LRT 
+  ### on the estimated models, no matter what REML is. If one compares the results with 
+  ### lmerTest::anova() they are slightly different because the latter re-estimate the models
+  ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
+  
+  results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
+  names(results)<-c("nothing1","nothing2","nothing3","df1","test","p")
+  results[2,c("df1","test","p")]
+}
+
+
 
 null.deviance<-function(model) {
       int<-attr(stats::terms(model),"intercept")

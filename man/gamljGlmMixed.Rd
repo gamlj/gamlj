@@ -43,9 +43,9 @@ gamljGlmMixed(
   ccp_value = 25,
   covs_scale_labels = "labels",
   adjust = list("bonf"),
-  model_type = "linear",
+  model_type = "logistic",
   covs_scale = NULL,
-  scale_missing,
+  scale_missing = "complete",
   norm_test = FALSE,
   cluster = NULL,
   re = list(list()),
@@ -251,6 +251,7 @@ A results object containing:
   \code{results$model} \tab \tab \tab \tab \tab a property \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
+  \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr

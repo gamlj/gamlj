@@ -66,6 +66,38 @@ items:
                       format: zto,pvalue
              refs: parameters
 
+           - name: fit
+             title: Additional indices
+             type: Table
+             visible: true
+             clearWith:
+                         - dep
+                         - model_terms
+                         - fixed_intercept
+                         - nested_intercept
+                         - nested_terms
+                         - comparison
+
+             columns:
+                    - name: info
+                      type: text
+                      title: "Info"
+                    - name: value
+                      type: text
+                      title: "Model Value"
+                    - name: nested
+                      type: text
+                      title: "Nested Model"
+                      visible: (comparison)
+                    - name: diff
+                      type: text
+                      title: Δ 
+                      visible: (comparison)
+
+                    - name: specs
+                      type: text
+                      title: "Comment"
+  
 
            - name: anova
              title: ANOVA Omnibus tests
@@ -76,7 +108,7 @@ items:
                          - dep
                          - model_terms
                          - contrasts
-                         - covs_covs_scale
+                         - covs_scale
                          - fixed_intercept
                          - df_method
                          - re
@@ -86,17 +118,12 @@ items:
                     - name: source
                       title: ""
                       type: text
-                    - name: f
-                      title: F
+                    - name: test
+                      title: X²
                       type: number
-
-                    - name: df1
+                    - name: df
                       title: df
                       type: number
-                    - name: df2
-                      title: df (res)
-                      type: number
-
                     - name: p
                       title: p
                       type: number
@@ -143,11 +170,8 @@ items:
                       type: number
                       title: Upper
                       visible: (estimates_ci)
-                    - name: df
-                      title: "df"
-                      type: number
-                    - name: t
-                      title: "t"
+                    - name: z
+                      title: "z"
                       type: number
                     - name: p
                       title: "p"

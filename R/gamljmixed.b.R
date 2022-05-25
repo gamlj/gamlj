@@ -14,6 +14,7 @@ gamljMixedClass <- R6::R6Class(
       ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
+      
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         if(private$.ready$report)

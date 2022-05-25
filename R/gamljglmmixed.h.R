@@ -44,9 +44,9 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             covs_scale_labels = "labels",
             adjust = list(
                 "bonf"),
-            model_type = "linear",
+            model_type = "logistic",
             covs_scale = NULL,
-            scale_missing = NULL,
+            scale_missing = "complete",
             norm_test = FALSE,
             cluster = NULL,
             re = list(
@@ -305,7 +305,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "nb",
                     "ordinal",
                     "multinomial"),
-                default="linear")
+                default="logistic")
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -335,7 +335,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 scale_missing,
                 options=list(
                     "complete",
-                    "colwise"))
+                    "colwise"),
+                default="complete")
             private$..norm_test <- jmvcore::OptionBool$new(
                 "norm_test",
                 norm_test,
@@ -657,6 +658,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 inherit = jmvcore::Group,
                 active = list(
                     r2 = function() private$.items[["r2"]],
+                    fit = function() private$.items[["fit"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
@@ -716,6 +718,41 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             refs="parameters"))
                         self$add(jmvcore::Table$new(
                             options=options,
+                            name="fit",
+                            title="Additional indices",
+                            visible=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "fixed_intercept",
+                                "nested_intercept",
+                                "nested_terms",
+                                "comparison"),
+                            columns=list(
+                                list(
+                                    `name`="info", 
+                                    `type`="text", 
+                                    `title`="Info"),
+                                list(
+                                    `name`="value", 
+                                    `type`="text", 
+                                    `title`="Model Value"),
+                                list(
+                                    `name`="nested", 
+                                    `type`="text", 
+                                    `title`="Nested Model", 
+                                    `visible`="(comparison)"),
+                                list(
+                                    `name`="diff", 
+                                    `type`="text", 
+                                    `title`="\u0394", 
+                                    `visible`="(comparison)"),
+                                list(
+                                    `name`="specs", 
+                                    `type`="text", 
+                                    `title`="Comment"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
                             name="anova",
                             title="ANOVA Omnibus tests",
                             clearWith=list(
@@ -723,7 +760,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "dep",
                                 "model_terms",
                                 "contrasts",
-                                "covs_covs_scale",
+                                "covs_scale",
                                 "fixed_intercept",
                                 "df_method",
                                 "re",
@@ -734,16 +771,12 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="", 
                                     `type`="text"),
                                 list(
-                                    `name`="f", 
-                                    `title`="F", 
+                                    `name`="test", 
+                                    `title`="X\u00B2", 
                                     `type`="number"),
                                 list(
-                                    `name`="df1", 
+                                    `name`="df", 
                                     `title`="df", 
-                                    `type`="number"),
-                                list(
-                                    `name`="df2", 
-                                    `title`="df (res)", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -797,12 +830,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="Upper", 
                                     `visible`="(estimates_ci)"),
                                 list(
-                                    `name`="df", 
-                                    `title`="df", 
-                                    `type`="number"),
-                                list(
-                                    `name`="t", 
-                                    `title`="t", 
+                                    `name`="z", 
+                                    `title`="z", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -1575,6 +1604,7 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$model} \tab \tab \tab \tab \tab a property \cr
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
+#'   \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
@@ -1643,9 +1673,9 @@ gamljGlmMixed <- function(
     covs_scale_labels = "labels",
     adjust = list(
                 "bonf"),
-    model_type = "linear",
+    model_type = "logistic",
     covs_scale = NULL,
-    scale_missing,
+    scale_missing = "complete",
     norm_test = FALSE,
     cluster = NULL,
     re = list(

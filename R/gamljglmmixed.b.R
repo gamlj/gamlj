@@ -39,6 +39,9 @@ gamljGlmMixedClass <- R6::R6Class(
         aSmartObj$spaceBy<-"model"
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
+        ### additional fit table ###
+        aSmartObj<-SmartTable$new(self$results$main$fit,estimate_machine)
+        private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
         ### anova table ###
         aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
@@ -282,16 +285,37 @@ gamljGlmMixedClass <- R6::R6Class(
         
       },
       
-      
       .sourcifyOption = function(option) {
         
-        skip<-NO_R_OPTS
+        
+        
+        if (option$name=="nested_re") {
+          if (!self$options$comparison)
+            return('')
+          if (!is.something(self$options$nested_re))
+            return('')
+          form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))  
+          terms<-paste("(",lme4::findbars(form),")",collapse =  " + ")
+          return(paste0("nested_re = ~",terms))
+        }
+        
+        
+        if (option$name=="nested_terms") {
+          if (!self$options$comparison)
+            return('')
+          if (!is.something(self$options$nested_terms))
+            return('')
+          form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))
+          terms<-lme4::nobars(form)[[3]]
+          return(paste0("nested_terms = ~",terms))
+        }
+        
+        
         
         defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
-        if (option$name %in% skip)
+        if (option$name %in% NO_R_OPTS)
           return('')
         sourcifyOption(option,defaults)
-        
       }
     )
   )

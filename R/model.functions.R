@@ -1,29 +1,4 @@
 
-##### get model data #########
-
-mf.getModelData<- function(x,...) UseMethod(".getModelData")
-
-    .getModelData.default<-function(model) {
-         return(model$model)
-}
-
-.getModelData.glmerMod<-function(model) 
-      return(.getModelData.lmer(model))
-
-.getModelData.glmer<-function(model) 
-      return(.getModelData.lmer(model))
-
-.getModelData.merModLmerTest<-function(model) 
-      return(.getModelData.lmer(model))
-
-.getModelData.lmerModLmerTest<-function(model) 
-      return(.getModelData.lmer(model))
-
-.getModelData.lmer<-function(model) 
-      return(model@frame)
-
-
-
 ############# produces to get parameters in a somehow standard format ##########
 
 mf.parameters<- function(x,...) UseMethod(".parameters")
@@ -211,121 +186,43 @@ mf.parameters<- function(x,...) UseMethod(".parameters")
   return(.coefficients)
 }
 
+.parameters.glmerMod<-function(model,obj) {
+    
+    .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
+    .iterations          <-  obj$options$boot_r
+    .ci_method           <-  obj$options$ci_method
+    .ci_width            <-  obj$ciwidth
 
-
-
-############# produces summary in a somehow standard format ##########
-
-mf.summary<- function(x,...) UseMethod(".mf.summary")
-
-    .mf.summary.default<-function(model) {
-          return(FALSE)
-}
-
-.fix_coeffs<-function(parameters, coeffs) {
-
-    if (length(coeffs)==dim(parameters)[1]) {
-        return(as.data.frame(parameters))
-  }
-  
-  ### fix missing coefficients ########
-    all_coefs<-data.frame(all=coeffs)
-    rownames(all_coefs)<-names(coeffs)
-    all_coefs$order<-1:length(all_coefs$all)
-    res<-merge(parameters,all_coefs,by="row.names",all=T)
-    res<-res[order(res$order),]
-    rownames(res)<-res$Row.names
-    res[,c("Row.names", "order","all")]<-NULL
-  ########################
-  res
-}
-  
-.mf.summary.lm<-function(model){
-    smr<-summary(model)
-    params<-smr$coefficients
-    params<-.fix_coeffs(params,smr$aliased)
-    if (nrow(params)[1]==0)
-        return(as.data.frame(NULL))
-    params$df<-smr$df[2]
-    colnames(params)<-c("estimate","se","t","p","df")
-    params
-  ###########################à
-  as.data.frame(params,stringsAsFactors = F)
-}
-
-.mf.summary.merModLmerTest<-function(model)
-       .mf.summary.lmer(model)
-
-.mf.summary.lmerModLmerTest<-function(model)
-      .mf.summary.lmer(model)
-
-.mf.summary.glmerMod<-function(model) {
-    smr<-summary(model)
-    params<-stats::coef(smr)
-    all_coefs<-lme4::fixef(model,add.dropped=T)
-    params<-.fix_coeffs(params,all_coefs)
-    if (nrow(params)[1]==0)
-        return(as.data.frame(NULL))
-    expb<-exp(params[,"Estimate"])  
-    params<-cbind(params,expb)
-    colnames(params)<-c("estimate","se","z","p","expb")
-  as.data.frame(params,stringsAsFactors = F)
-}
-.mf.summary.lmerMod<-function(model)
-      .mf.summary.lmer(model)
-
-.mf.summary.lmer<-function(model) {
-    ss<-summary(model)$coefficients
-    ss<-as.data.frame(ss,stringsAsFactors = F)
-       
-    if (dim(ss)[2]==3) {
-          ano<-car::Anova(model,test="F",type=3)
-          lnames<-rownames(ss)
-          matching<-which(lnames %in% rownames(ss))
-          ss$df<-NA
-          ss$df[matching]<-ano$Df.res[matching]
-          ss$p<-NA
-          ss$p[matching]<-ano$`Pr(>F)`[matching]
-          ss<-ss[,c(1,2,4,3,5)]       
-          if (any(is.null(ss$df)))
-               attr(ss,"warning")<-"lmer.df"
+    .coefficients        <-  as.data.frame(parameters::parameters(
+      model,
+      ci=NULL,
+      effects="fixed",
+    ),stringAsFactors=FALSE)
+    
+    names(.coefficients) <-  c("source","estimate","se","z","df","p")
+    
+    if (obj$option("estimates_ci")) {
+      
+      if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
+      
+      
+      cidata            <-  as.data.frame(parameters::ci(.model,
+                                                         ci=.ci_width,
+                                                         ci_method=.ci_method))
+      
+      
+      .coefficients$est.ci.lower<-cidata$CI_low
+      .coefficients$est.ci.upper<-cidata$CI_high
+      
     }
-    colnames(ss)<-c("estimate","se","df","t","p")
-  ss
-}
+    
+    return(.coefficients)
+  }
 
-.mf.summary.glm<-function(model) {
-     smr<-summary(model)
-     params<-smr$coefficients
-     params<-.fix_coeffs(params,smr$aliased)
-     if (nrow(params)[1]==0)
-        return(as.data.frame(NULL))
-     expb<-exp(params[,"Estimate"])  
-     params<-cbind(params,expb)
-     colnames(params)<-c("estimate","se","z","p","expb")
-     as.data.frame(params,stringsAsFactors = F)
-}
 
-.mf.summary.multinom<-function(model) {
 
-     sumr<-summary(model)
-     rcof<-sumr$coefficients
-     cof<-as.data.frame(matrix(rcof,ncol=1))
-     names(cof)<-"estimate"
-     cof$dep<-rownames(rcof)
-     cof$variable<-rep(colnames(rcof),each=nrow(rcof))
-     se<-matrix(sumr$standard.errors,ncol=1)
-     cof$se<-as.numeric(se)
-     cof$expb<-exp(cof$estimate)  
-     cof$z<-cof$estimate/cof$se
-     cof$p<-(1 - stats::pnorm(abs(cof$z), 0, 1)) * 2
-     ss<-as.data.frame(cof,stringsAsFactors = F)
-     ss<-cof[order(ss$dep),]
-     lab<-model$lab[1]
-     ss$dep<-sapply(ss$dep, function(a) paste(a,"-",lab))
-     ss
-}
-  
+
+
 ############# produces anova/deviance table in a somehow standard format ##########
 mf.anova<- function(x,...) UseMethod(".anova")
 
@@ -448,10 +345,11 @@ mf.anova<- function(x,...) UseMethod(".anova")
       reslist    
   }
 
-.anova.glmerMod<-function(model,df="Satterthwaite") {
+.anova.glmerMod<-function(model,obj) {
   ginfo("using .anova.glmerMod")
   ano<-.car.anova(model)
-  names(ano)<-c("test","df1","p")
+  names(ano)<-c("test","df","p")
+  if (nrow(ano)==0) ano<-NULL
   ano  
 }
   
@@ -491,6 +389,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
 }
 
 .car.anova<-function(model,df) {
+  
   ginfo("mf.anova uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
@@ -649,7 +548,7 @@ mf.update<- function(x,...) UseMethod(".update")
 .update.lmerModLmerTest<-function(model,...) {
 
   .args<-list(...)
-  data<-mf.getModelData(model)
+  data<-insight::get_data(model)
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)

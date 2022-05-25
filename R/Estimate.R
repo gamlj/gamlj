@@ -274,6 +274,16 @@ Estimate <- R6::R6Class("Estimate",
                               int<-which(params$name %in% "(Intercept)")
                               for (i in int)
                                   params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
+
+                              nr<-nrow(params)+1
+                              if (params$grp[nrow(params)]!="Residual"){
+                                  params[nr,"groups"] <- "Residual"
+                                  params[nr,"name"]  <- ""
+                                  params[nr,"var"]   <- insight::get_variance_residual(self$model)
+                                  params[nr,"std"]   <- sqrt(params[nr,"var"]) 
+                                    
+                              }
+                                
                               ngrp<-vapply(self$model@flist,nlevels,1)
                               .names<-fromb64(names(ngrp))
 
@@ -480,7 +490,7 @@ Estimate <- R6::R6Class("Estimate",
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
-                            
+                              mark(data)
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
                                    stop(unlist(self$datamatic$errors))

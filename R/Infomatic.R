@@ -33,6 +33,9 @@ Infomatic <- R6::R6Class(
       if (self$caller=="glm") {
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
       }
+      if (self$caller=="glmer") {
+        self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
+      }
       
       
 
@@ -300,9 +303,11 @@ LINFO[["sqrt"]]       <-  c("Square root","Square root of y")
 
 CALLS<-list()
 CALLS[["glm"]]<-"glm"
+CALLS[["glmer"]]<-"glmer"
 
 FUNCS<-list()
 FUNCS[["glm"]]<-"stats::glm"
+FUNCS[["glmer"]]<-"lme4::glmer"
 
 FIT<-list()
 FIT[["lik"]]   <-  list(info="LogLikelihood",  specs="")
