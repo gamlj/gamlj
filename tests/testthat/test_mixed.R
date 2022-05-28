@@ -141,7 +141,6 @@ model<-gamlj::gamljMixed(
   data = adddata, 
   scaling = c("x"="clusterbasedstandardized")
 )
-model
 testthat::test_that("standardizing with more clusters",{
                     testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
                     testthat::expect_equal(model$main$fixed$asDF$estimate[1],19.60,tolerance = tol)
