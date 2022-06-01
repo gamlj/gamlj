@@ -80,27 +80,29 @@ es.relativerisk<-function(obj) {
   
       model          <-  obj$model
       data           <-  insight::get_data(model)
-      data$id_id_id  <-  seq_len(dim(data)[1])
+      ciWidth        <-  obj$ciwidth
       depobj         <-  obj$datamatic$variables[[tob64(obj$options$dep)]]
       levs           <-  levels(data[[depobj$name64]])
-      ciWidth        <-  obj$ciwidth
-      
+
       
       data[,depobj$name64]  <-  as.numeric(data[[depobj$name64]]==levs[2])
-
-      results<-geepack::geeglm(stats::as.formula(obj$formula64),
-                                        family = stats::poisson(link = "log"),
-                                        id = id_id_id, 
-                                        corstr = "exchangeable", data = data)
-      params<-as.data.frame(parameters::parameters(results,exponentiate=TRUE))
+      
+      ## in previous versions the geepack::gee() poisson model was used
+      ## now we use glm poisson(log) because with robust standard errors
+      ## results are practically the same and it's faster (and we do not
+      ## need to load geepack)
+      
+      results   <- stats::update(model,data=data,family = stats::poisson())
+      params<-as.data.frame(parameters::parameters(results,
+                                                   vcov=sandwich::vcovHC,
+                                                   ci_method="wald",
+                                                   exponentiate=TRUE,
+                                                   effects="fixed"))
 
       if (!obj$option("ci_method","wald"))
           warning("Wald method for confidence intervals has been used")
       
       names(params)<-c("source","estimate","se","nothing", "est.ci.lower","est.ci.upper","test","df","p")
-      
-##      if (params$source[1]=="(Intercept)")
-##             params <- params[-1,] 
       
       return(params)
 
