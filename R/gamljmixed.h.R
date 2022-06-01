@@ -728,7 +728,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
-                            title="ANOVA Omnibus tests",
+                            title="Fixed Effects Omnibus Tests",
                             clearWith=list(
                                 "relm",
                                 "dep",
@@ -765,7 +765,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
-                            title="Parameter Estimates (Coefficients)",
+                            title="Parameter Estimates (Fixed coefficients)",
                             clearWith=list(
                                 "relm",
                                 "dep",

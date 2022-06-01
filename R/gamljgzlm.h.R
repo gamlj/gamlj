@@ -852,11 +852,13 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="est.ci.lower", 
                                     `type`="number", 
-                                    `title`="Lower"),
+                                    `title`="Lower", 
+                                    `visible`="(expb_ci | estimates_ci)"),
                                 list(
                                     `name`="est.ci.upper", 
                                     `type`="number", 
-                                    `title`="Upper"),
+                                    `title`="Upper", 
+                                    `visible`="(expb_ci | estimates_ci)"),
                                 list(
                                     `name`="test", 
                                     `title`="z", 
@@ -902,15 +904,15 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
-                                    `visible`="(expb_ci)"),
+                                    `visible`="(expb_ci | estimates_ci)"),
                                 list(
                                     `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(expb_ci)"),
+                                    `visible`="(expb_ci | estimates_ci)"),
                                 list(
                                     `name`="test", 
-                                    `title`="X\u00B2", 
+                                    `title`="z", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -1226,7 +1228,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `type`="number"),
                                     list(
                                         `name`="t", 
-                                        `title`="t", 
+                                        `title`="z", 
                                         `type`="number"),
                                     list(
                                         `name`="p", 

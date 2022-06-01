@@ -110,14 +110,16 @@ NULL
 #' data(schoolexam)
 NULL
 
-#' Clustered data for Negative Binomial model
+#' Clustered data for generalized mixed model
 #'
-#' Modified version of a dataset in Long, J. S., & Freese, J. (2006). Regression models for categorical dependent variables using Stata. Stata press.
-#' Data present number of articles published by PhD students in a three year period with some predictors. Data are clustered by program.
+#' Generated data to test generalized mixed models. The variables can be used:
+#'  `x` and `z` as two continuous independent variables; `w` as categorical independent variable;
+#' `ybin` as dichotomous dependent variable; `ypoi` as count variable (Poisson);
+#' `cluster` as the clustering variable.
 #' @docType data
-#' @name phdpubs
-#' @usage data(phdpubs)
+#' @name glmmixeddata
+#' @usage data(glmmixeddata)
 #' @keywords datasets
 #' @examples
-#' data(phdpubs)
+#' data(glmmixeddata)
 NULL

@@ -67,7 +67,7 @@ items:
 
 
            - name: anova
-             title: ANOVA Omnibus tests
+             title: Fixed Effects Omnibus Tests
              type: Table
              description: a table of ANOVA results
              clearWith:
@@ -104,7 +104,7 @@ items:
 
 
            - name: coefficients
-             title:  Parameter Estimates (Coefficients)
+             title:  Parameter Estimates (Fixed coefficients)
              type: Table
              clearWith:
                     - relm

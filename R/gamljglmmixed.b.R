@@ -50,13 +50,25 @@ gamljGlmMixedClass <- R6::R6Class(
         ### estimates table ###
         aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
         aSmartObj$ci("est",self$options$ci_width)
-        aSmartObj$ci("beta",self$options$ci_width,label=greek_vector[["beta"]])
+        aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
+        aSmartObj$spaceBy<-"response"
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
         ### contrasts code tables
         aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
         aSmartObj$expandable<-TRUE
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+        
+        ### relativerisk tables
+        aSmartObj<-SmartTable$new(self$results$main$relativerisk,estimate_machine)
+        aSmartObj$ci("est",width=self$options$ci_width)
+        private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+        
+        ### marginal effects tables
+        aSmartObj<-SmartTable$new(self$results$main$marginals,estimate_machine)
+        aSmartObj$ci("est",width=self$options$ci_width)
+        private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+        
         
         ### random variances table
         aSmartObj<-SmartTable$new(self$results$main$random,estimate_machine)
@@ -116,16 +128,16 @@ gamljGlmMixedClass <- R6::R6Class(
         aSmartObj$spaceBy<-"new!"
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
-        ### assumptions nromtest
-        aSmartObj<-SmartTable$new(self$results$assumptions$normtest,estimate_machine)
-        private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
-        
+
         ## post hoc #####
         
         aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
         aSmartObj$expandable<-TRUE
         aSmartObj$expandSuperTitle<-"Comparison"
         aSmartObj$ci("est",self$options$ci_width)
+        aSmartObj$combineBelow<-"response"
+        aSmartObj$expandFrom<-2
+        aSmartObj$setColumnTitle("estimate",estimate_machine$infomatic$comparison)
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
         
@@ -288,7 +300,7 @@ gamljGlmMixedClass <- R6::R6Class(
       .sourcifyOption = function(option) {
         
         
-        
+
         if (option$name=="nested_re") {
           if (!self$options$comparison)
             return('')
@@ -303,14 +315,13 @@ gamljGlmMixedClass <- R6::R6Class(
         if (option$name=="nested_terms") {
           if (!self$options$comparison)
             return('')
-          if (!is.something(self$options$nested_terms))
-            return('')
+          if (!is.something(self$options$nested_terms)) 
+            if (!self$options$nested_intercept)
+                 return('')
           form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))
-          terms<-lme4::nobars(form)[[3]]
-          return(paste0("nested_terms = ~",terms))
+          terms<-as.character(lme4::nobars(form))
+          return(paste0("nested_terms = ~",terms[[length(terms)]]))
         }
-        
-        
         
         defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
         if (option$name %in% NO_R_OPTS)

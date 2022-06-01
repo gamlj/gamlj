@@ -108,14 +108,43 @@ children:
     margin: large
     style: inline
     children:
-      - type: Label
-        label: Estimation
+      - type: LayoutBox
         style: list
         children:
-          - type: CheckBox
-            name: reml
-          - name: donotrun
+           - type: Label
+             label: Estimation
+             style: list
+             children:
+                - name: donotrun
+                  type: CheckBox
+           - type: Label
+             label: Model comparison
+             children: 
+                - type: CheckBox
+                  name: comparison
+                  events:
+                       change: './mixed.events::onEvent_comparison'
+
+
+      - type: Label
+        label: Effect Size
+        margin: large
+        style: list
+        children:
+          - name: es_expb
             type: CheckBox
+            optionPart: expb
+            optionName: es
+          - name: es_marginals
+            type: CheckBox
+            optionPart: marginals
+            optionName: es
+          - name: es_RR
+            type: CheckBox
+            optionPart: RR
+            optionName: es
+            enable: (model_type:logistic)
+
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -127,16 +156,13 @@ children:
           - name: re_ci
             type: CheckBox
             label: Random variances
+          - name: expb_ci
+            type: CheckBox
+            label: Fixed Exp(B)
           - type: TextBox
             name: ci_width
             format: number
-      - type: Label
-        label: Model comparison
-        children:
-          - type: CheckBox
-            name: comparison
-            events:
-              change: './mixed.events::onEvent_comparison'
+
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -299,11 +325,6 @@ children:
                 children:
                   - type: CheckBox
                     name: re_lrt
-  - type: LayoutBox
-    margin: large
-    children:
-      - type: ComboBox
-        name: omnibus
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

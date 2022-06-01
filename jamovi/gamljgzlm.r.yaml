@@ -275,9 +275,12 @@ items:
                     - name: est.ci.lower
                       type: number
                       title: Lower
+                      visible: (expb_ci | estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
+                      visible: (expb_ci | estimates_ci)
+                      
                     - name: test
                       title: z
                       type: number
@@ -316,13 +319,13 @@ items:
                     - name: est.ci.lower
                       type: number
                       title: Lower
-                      visible: (expb_ci)
+                      visible: (expb_ci | estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
-                      visible: (expb_ci)
+                      visible: (expb_ci | estimates_ci)
                     - name: test
-                      title: X²
+                      title: z
                       type: number
                     - name: p
                       title: "p"
@@ -592,7 +595,7 @@ items:
                      title: Upper
                      type: number
                    - name: t
-                     title: t
+                     title: z
                      type: number
                    - name: p
                      title: p

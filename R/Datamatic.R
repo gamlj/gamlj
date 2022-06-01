@@ -233,7 +233,7 @@ Variable <- R6::R6Class(
 
         contrasts(vardata)<-self$contrast_values
         ### fix levels ####
-        levels(vardata)<-paste0(LEVEL_SYMBOL,levels(vardata))
+        levels(vardata)<-paste0(LEVEL_SYMBOL,tob64(levels(vardata)))
         
         return(vardata)
 

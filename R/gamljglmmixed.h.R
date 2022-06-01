@@ -13,10 +13,12 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             covs = NULL,
             model_terms = NULL,
             fixed_intercept = TRUE,
+            es = list(
+                "expb"),
+            expb_ci = FALSE,
             nested_terms = NULL,
             comparison = FALSE,
             nested_intercept = TRUE,
-            omnibus = "LRT",
             estimates_ci = TRUE,
             donotrun = FALSE,
             ci_method = "wald",
@@ -56,7 +58,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             re_corr = "all",
             re_modelterms = TRUE,
             re_listing = "none",
-            reml = TRUE,
             re_lrt = FALSE,
             re_ci = FALSE,
             df_method = "Satterthwaite",
@@ -115,6 +116,19 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "fixed_intercept",
                 fixed_intercept,
                 default=TRUE)
+            private$..es <- jmvcore::OptionNMXList$new(
+                "es",
+                es,
+                options=list(
+                    "expb",
+                    "RR",
+                    "marginals"),
+                default=list(
+                    "expb"))
+            private$..expb_ci <- jmvcore::OptionBool$new(
+                "expb_ci",
+                expb_ci,
+                default=FALSE)
             private$..nested_terms <- jmvcore::OptionTerms$new(
                 "nested_terms",
                 nested_terms,
@@ -127,13 +141,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "nested_intercept",
                 nested_intercept,
                 default=TRUE)
-            private$..omnibus <- jmvcore::OptionList$new(
-                "omnibus",
-                omnibus,
-                default="LRT",
-                options=list(
-                    "wald",
-                    "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
@@ -385,10 +392,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "way3",
                     "all"),
                 default="none")
-            private$..reml <- jmvcore::OptionBool$new(
-                "reml",
-                reml,
-                default=TRUE)
             private$..re_lrt <- jmvcore::OptionBool$new(
                 "re_lrt",
                 re_lrt,
@@ -436,10 +439,11 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..covs)
             self$.addOption(private$..model_terms)
             self$.addOption(private$..fixed_intercept)
+            self$.addOption(private$..es)
+            self$.addOption(private$..expb_ci)
             self$.addOption(private$..nested_terms)
             self$.addOption(private$..comparison)
             self$.addOption(private$..nested_intercept)
-            self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
@@ -478,7 +482,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..re_corr)
             self$.addOption(private$..re_modelterms)
             self$.addOption(private$..re_listing)
-            self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
             self$.addOption(private$..re_ci)
             self$.addOption(private$..df_method)
@@ -497,10 +500,11 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         covs = function() private$..covs$value,
         model_terms = function() private$..model_terms$value,
         fixed_intercept = function() private$..fixed_intercept$value,
+        es = function() private$..es$value,
+        expb_ci = function() private$..expb_ci$value,
         nested_terms = function() private$..nested_terms$value,
         comparison = function() private$..comparison$value,
         nested_intercept = function() private$..nested_intercept$value,
-        omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
@@ -539,7 +543,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         re_corr = function() private$..re_corr$value,
         re_modelterms = function() private$..re_modelterms$value,
         re_listing = function() private$..re_listing$value,
-        reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
         re_ci = function() private$..re_ci$value,
         df_method = function() private$..df_method$value,
@@ -557,10 +560,11 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..covs = NA,
         ..model_terms = NA,
         ..fixed_intercept = NA,
+        ..es = NA,
+        ..expb_ci = NA,
         ..nested_terms = NA,
         ..comparison = NA,
         ..nested_intercept = NA,
-        ..omnibus = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,
@@ -599,7 +603,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..re_corr = NA,
         ..re_modelterms = NA,
         ..re_listing = NA,
-        ..reml = NA,
         ..re_lrt = NA,
         ..re_ci = NA,
         ..df_method = NA,
@@ -624,7 +627,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         emmeans = function() private$.items[["emmeans"]],
         mainPlots = function() private$.items[["mainPlots"]],
         plotnotes = function() private$.items[["plotnotes"]],
-        assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
     private = list(
@@ -662,6 +664,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
+                    marginals = function() private$.items[["marginals"]],
+                    relativerisk = function() private$.items[["relativerisk"]],
                     random = function() private$.items[["random"]],
                     randomcov = function() private$.items[["randomcov"]],
                     ranova = function() private$.items[["ranova"]]),
@@ -677,12 +681,10 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             name="r2",
                             title="Model Fit",
                             clearWith=list(
-                                "relm",
                                 "dep",
                                 "model_terms",
                                 "nested_terms",
                                 "fixed_intercept",
-                                "reml",
                                 "comparison",
                                 "nested_re",
                                 "nested_intercept",
@@ -719,15 +721,18 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="fit",
-                            title="Additional indices",
+                            title="Additional Indices",
                             visible=TRUE,
                             clearWith=list(
                                 "dep",
                                 "model_terms",
                                 "fixed_intercept",
-                                "nested_intercept",
+                                "comparison",
                                 "nested_terms",
-                                "comparison"),
+                                "nested_re",
+                                "nested_intercept",
+                                "re",
+                                "re_corr"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -754,7 +759,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
-                            title="ANOVA Omnibus tests",
+                            title="Fixed Effects Omnibus Tests",
                             clearWith=list(
                                 "relm",
                                 "dep",
@@ -786,9 +791,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
-                            title="Parameter Estimates (Coefficients)",
+                            title="Parameter Estimates (Fixed Coefficients)",
                             clearWith=list(
-                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -830,6 +834,21 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="Upper", 
                                     `visible`="(estimates_ci)"),
                                 list(
+                                    `name`="expb", 
+                                    `type`="number", 
+                                    `title`="Exp(B)", 
+                                    `visible`="(es:expb)"),
+                                list(
+                                    `name`="expb.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(es:expb & expb_ci)"),
+                                list(
+                                    `name`="expb.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(es:expb & expb_ci)"),
+                                list(
                                     `name`="z", 
                                     `title`="z", 
                                     `type`="number"),
@@ -865,6 +884,119 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                         `title`="bogus", 
                                         `type`="text", 
                                         `visible`=FALSE)))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="marginals",
+                            title="Marginal Effects",
+                            visible="(es:marginals)",
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "contrasts",
+                                "covs_scale",
+                                "fixed_intercept",
+                                "ci_width",
+                                "ci_method",
+                                "estimates_ci",
+                                "boot_r",
+                                "df_method",
+                                "re",
+                                "re_corr"),
+                            columns=list(
+                                list(
+                                    `name`="response", 
+                                    `title`="Response", 
+                                    `type`="text", 
+                                    `combineBelow`=TRUE, 
+                                    `visible`="(model_type:multinomial)"),
+                                list(
+                                    `name`="source", 
+                                    `title`="Name", 
+                                    `type`="text"),
+                                list(
+                                    `name`="contrast", 
+                                    `title`="Effect", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="AME", 
+                                    `type`="number"),
+                                list(
+                                    `name`="se", 
+                                    `title`="SE", 
+                                    `type`="number"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper"),
+                                list(
+                                    `name`="test", 
+                                    `title`="z", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="relativerisk",
+                            title="Relative risk",
+                            visible="(es:RR)",
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "contrasts",
+                                "covs_scale",
+                                "fixed_intercept",
+                                "ci_width",
+                                "ci_method",
+                                "estimates_ci",
+                                "boot_r",
+                                "df_method",
+                                "re",
+                                "re_corr"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="Name", 
+                                    `type`="text", 
+                                    `visible`="(show_contrastnames)"),
+                                list(
+                                    `name`="label", 
+                                    `title`="Effect", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="RR", 
+                                    `type`="number"),
+                                list(
+                                    `name`="se", 
+                                    `title`="SE", 
+                                    `type`="number"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(expb_ci | estimates_ci)"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(expb_ci | estimates_ci)"),
+                                list(
+                                    `name`="test", 
+                                    `title`="z", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="random",
@@ -1005,7 +1137,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     options=options,
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
-                        "relm",
                         "dep",
                         "model_terms",
                         "contrasts",
@@ -1019,6 +1150,12 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         "re_corr",
                         "adjust"),
                     columns=list(
+                        list(
+                            `name`="response", 
+                            `title`="Response", 
+                            `type`="text", 
+                            `visible`="(model_type:multinomial)", 
+                            `combineBelow`=TRUE),
                         list(
                             `name`="estimate", 
                             `title`="Difference", 
@@ -1039,11 +1176,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             `visible`="(estimates_ci)"),
                         list(
                             `name`="test", 
-                            `title`="t", 
-                            `type`="number"),
-                        list(
-                            `name`="df", 
-                            `title`="df", 
+                            `title`="z", 
                             `type`="number"),
                         list(
                             `name`="p", 
@@ -1099,7 +1232,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="ANOVA for Simple Effects  of ___key___",
                             visible=FALSE,
                             clearWith=list(
-                                "reml",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -1120,11 +1252,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `type`="number"),
                                 list(
                                     `name`="df1", 
-                                    `title`="Num df", 
-                                    `type`="number"),
-                                list(
-                                    `name`="df2", 
-                                    `title`="Den df", 
+                                    `title`="df", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -1137,7 +1265,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="Parameter Estimates for simple effects of ___key___",
                             visible=FALSE,
                             clearWith=list(
-                                "reml",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -1151,7 +1278,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "covs_scale_labels",
                                 "covs_conditioning",
                                 "df_method",
-                                "ci_method"),
+                                "ci_method",
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1176,12 +1304,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="Upper", 
                                     `visible`="(estimates_ci)"),
                                 list(
-                                    `name`="df", 
-                                    `title`="df", 
-                                    `type`="number"),
-                                list(
                                     `name`="test", 
-                                    `title`="t", 
+                                    `title`="z", 
                                     `type`="number"),
                                 list(
                                     `name`="p", 
@@ -1211,7 +1335,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 name="anova",
                                 title="ANOVA",
                                 clearWith=list(
-                                    "reml",
                                     "dep",
                                     "model_terms",
                                     "covs_scale",
@@ -1231,15 +1354,11 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                         `type`="text"),
                                     list(
                                         `name`="test", 
-                                        `title`="F", 
+                                        `title`="X\u00B2", 
                                         `type`="number"),
                                     list(
                                         `name`="df1", 
                                         `title`="df1", 
-                                        `type`="number"),
-                                    list(
-                                        `name`="df2", 
-                                        `title`="df2", 
                                         `type`="number"),
                                     list(
                                         `name`="p", 
@@ -1251,7 +1370,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 name="coefficients",
                                 title="Parameter Estimates",
                                 clearWith=list(
-                                    "reml",
                                     "dep",
                                     "model_terms",
                                     "covs_scale",
@@ -1293,7 +1411,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                         `type`="number"),
                                     list(
                                         `name`="t", 
-                                        `title`="t", 
+                                        `title`="z", 
                                         `type`="number"),
                                     list(
                                         `name`="p", 
@@ -1310,7 +1428,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     options=options,
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
-                        "reml",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1325,10 +1442,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         list(
                             `name`="se", 
                             `title`="SE", 
-                            `type`="number"),
-                        list(
-                            `name`="df", 
-                            `title`="df", 
                             `type`="number"),
                         list(
                             `name`="est.ci.lower", 
@@ -1352,79 +1465,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 options=options,
                 name="plotnotes",
                 visible=FALSE))
-            self$add(R6::R6Class(
-                inherit = jmvcore::Group,
-                active = list(
-                    normtest = function() private$.items[["normtest"]],
-                    qqplot = function() private$.items[["qqplot"]],
-                    normplot = function() private$.items[["normplot"]],
-                    residPlot = function() private$.items[["residPlot"]]),
-                private = list(),
-                public=list(
-                    initialize=function(options) {
-                        super$initialize(
-                            options=options,
-                            name="assumptions",
-                            title="Assumption Checks")
-                        self$add(jmvcore::Table$new(
-                            options=options,
-                            name="normtest",
-                            title="Test for Normality of residuals",
-                            visible="(norm_test)",
-                            clearWith=list(
-                                "model_terms",
-                                "dep",
-                                "reml",
-                                "re"),
-                            columns=list(
-                                list(
-                                    `name`="name", 
-                                    `title`="Test", 
-                                    `type`="number"),
-                                list(
-                                    `name`="test", 
-                                    `title`="Statistics", 
-                                    `type`="number"),
-                                list(
-                                    `name`="p", 
-                                    `type`="number", 
-                                    `format`="zto,pvalue"))))
-                        self$add(jmvcore::Image$new(
-                            options=options,
-                            name="qqplot",
-                            title="Q-Q Plot",
-                            visible="(qq_plot)",
-                            width=450,
-                            height=400,
-                            renderFun=".qqPlot",
-                            requiresData=TRUE,
-                            clearWith=list(
-                                "dep",
-                                "model_terms")))
-                        self$add(jmvcore::Image$new(
-                            options=options,
-                            name="normplot",
-                            title="Residual histogram",
-                            visible="(norm_plot)",
-                            width=450,
-                            height=400,
-                            renderFun=".normPlot",
-                            requiresData=TRUE,
-                            clearWith=list(
-                                "dep",
-                                "model_terms")))
-                        self$add(jmvcore::Image$new(
-                            options=options,
-                            name="residPlot",
-                            title="Residual-Predicted Scatterplot",
-                            visible="(resid_plot)",
-                            width=450,
-                            height=400,
-                            renderFun=".residPlot",
-                            requiresData=TRUE,
-                            clearWith=list(
-                                "dep",
-                                "model_terms")))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",
@@ -1432,7 +1472,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 varTitle="`GZMIXED_PRED_${ dep }`",
                 varDescription="Predicted values",
                 clearWith=list(
-                    "reml",
                     "dep",
                     "model_terms",
                     "re")))
@@ -1443,7 +1482,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 varTitle="`GZMIXED_RES_${ dep }`",
                 varDescription="Residuals values",
                 clearWith=list(
-                    "reml",
                     "dep",
                     "model_terms",
                     "re")))},
@@ -1493,13 +1531,15 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   terms. Not needed if \code{formula} is used.
 #' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
+#' @param es Effect size indices. \code{expb} (default) exponentiates the
+#'   coefficients. For dichotomous dependent variables relative risk indices
+#'   (RR) can be obtained. \code{marginals} computes the marginal effects.
+#' @param expb_ci \code{TRUE} (default) or \code{FALSE} , exp(B) CI in table
 #' @param nested_terms a list of character vectors describing effects terms
 #'   for nestet. It can be passed as right-hand formula.
 #' @param comparison Not present in R
 #' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
-#' @param omnibus \code{TRUE} (default) or \code{FALSE}, estimates fixed
-#'   intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
 #' @param donotrun .
@@ -1579,8 +1619,6 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   option is ignored if the model is passed using \code{formula}.
 #' @param re_modelterms Not in R interface
 #' @param re_listing Not in R interface
-#' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-#'   be used rather than ML
 #' @param re_lrt \code{TRUE} or \code{FALSE} (default), LRT for the random
 #'   effects
 #' @param re_ci \code{TRUE} or \code{FALSE} (default), confidence intervals
@@ -1605,9 +1643,11 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$info} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
 #'   \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
-#'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+#'   \code{results$main$anova} \tab \tab \tab \tab \tab a table of omnibus \cr
 #'   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
+#'   \code{results$main$marginals} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$randomcov} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$ranova} \tab \tab \tab \tab \tab a table \cr
@@ -1618,10 +1658,6 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
 #'   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
 #'   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
-#'   \code{results$assumptions$normtest} \tab \tab \tab \tab \tab a table of normality tests \cr
-#'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
-#'   \code{results$assumptions$normplot} \tab \tab \tab \tab \tab Residual histogram \cr
-#'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
 #'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
 #'   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
 #' }
@@ -1642,10 +1678,12 @@ gamljGlmMixed <- function(
     covs = NULL,
     model_terms = NULL,
     fixed_intercept = TRUE,
+    es = list(
+                "expb"),
+    expb_ci = FALSE,
     nested_terms = NULL,
     comparison = FALSE,
     nested_intercept = TRUE,
-    omnibus = "LRT",
     estimates_ci = TRUE,
     donotrun = FALSE,
     ci_method = "wald",
@@ -1685,7 +1723,6 @@ gamljGlmMixed <- function(
     re_corr = "all",
     re_modelterms = TRUE,
     re_listing = "none",
-    reml = TRUE,
     re_lrt = FALSE,
     re_ci = FALSE,
     df_method = "Satterthwaite",
@@ -1769,10 +1806,11 @@ gamljGlmMixed <- function(
         covs = covs,
         model_terms = model_terms,
         fixed_intercept = fixed_intercept,
+        es = es,
+        expb_ci = expb_ci,
         nested_terms = nested_terms,
         comparison = comparison,
         nested_intercept = nested_intercept,
-        omnibus = omnibus,
         estimates_ci = estimates_ci,
         donotrun = donotrun,
         ci_method = ci_method,
@@ -1809,7 +1847,6 @@ gamljGlmMixed <- function(
         re_corr = re_corr,
         re_modelterms = re_modelterms,
         re_listing = re_listing,
-        reml = reml,
         re_lrt = re_lrt,
         re_ci = re_ci,
         df_method = df_method,

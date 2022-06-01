@@ -94,10 +94,12 @@ procedure.posthoc <- function(obj) {
 
     .cont <- tableData$contrast
     .cont <- gsub("[-,/]","", .cont)
-    
+
+
     .labs <- lapply(.cont, function(a) {
       lapply(strsplit(as.character(a), LEVEL_SYMBOL)[[1]], trimws)[-1]
     })
+
     labs <- do.call("rbind", .labs)
     .vars  <- make.names(.revvars,unique = T)
     .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))

@@ -1,225 +1,4 @@
 
-############# produces to get parameters in a somehow standard format ##########
-
-mf.parameters<- function(x,...) UseMethod(".parameters")
-
-.parameters.default<-function(model,obj) {
-   
-
-      .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
-      .iterations          <-  obj$options$boot_r
-      .ci_method           <-  obj$options$ci_method
-      .ci_width            <-  obj$ciwidth
-      .se_method           <-  obj$option("se_method","robust")
-      
-      if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
-        
-      .coefficients        <-  as.data.frame(parameters::parameters(
-                                                                   model,
-                                                                   robust=.se_method,
-                                                                   ci=NULL,
-                                                                    ),stringAsFactors=FALSE)
-    
-      names(.coefficients) <-  c("source","estimate","se","t","df","p")
-      if (obj$option("estimates_ci")) {
-
-        cidata            <-  as.data.frame(parameters::ci(.model,
-                                                               ci=.ci_width,
-                                                               ci_method=.ci_method))
-        
-        .coefficients$est.ci.lower<-cidata$CI_low
-        .coefficients$est.ci.upper<-cidata$CI_high
-        
-      }
-
-      if (obj$option("es","beta")) {
-        
-        if (obj$hasTerms) {
-        ## if no CI are required, we do not bootstrap again 
-        if (!obj$option("betas_ci")) { 
-                      ..bootstrap<-FALSE 
-                      .ci_method <-"wald"
-        } else 
-                     ..bootstrap<-.bootstrap
-
-        ### up to parameters 0.16.0, if bootstrap is required standardize does not work
-        ### so we standardize before parameters() and feed the model to it
-        
-        opts_list<-list(model=mf.standardize(model),
-                        bootstrap=..bootstrap,
-                        ci_method=.ci_method,
-                        ci=.ci_width,
-                        iterations=.iterations                        
-        )
-        
-        if (..bootstrap) {
-              ginfo("ESTIMATE: we need to reboostrap for betas CI")
-              
-          ### check if we can go in paraller ###
-              test<-try_hard(find.package("parallel"))
-              if (isFALSE(test$error)) {
-                      opts_list[["n_cpus"]]<-parallel::detectCores()
-                      opts_list[["parallel"]]<-"multicore"
-               }
-          
-        }
-        estim<-do.call(parameters::parameters,opts_list)
-        
-        .coefficients$beta  <-  estim$Coefficient
-        .coefficients$beta.ci.lower<-estim$CI_low
-        .coefficients$beta.ci.upper<-estim$CI_high
-  
-        
-          } else {
-            .coefficients$beta  <-  0
-            .coefficients$beta.ci.lower<-0
-            .coefficients$beta.ci.upper<-0
-            
-          }
-      }
-
-      .coefficients
-
-}
-
-
-.parameters.glm<-function(model,obj) {
-  
-  .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
-  .iterations          <-  obj$options$boot_r
-  .ci_method           <-  obj$options$ci_method
-  .ci_width            <-  obj$ciwidth
-
-  if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
-  
-    .coefficients        <-  as.data.frame(parameters::parameters(
-      model,
-      ci=NULL,
-    ),stringAsFactors=FALSE)
-    
-    if ("Response" %in% names(.coefficients)) {
-        goodnames<-c("source","estimate","se","t","df","p","response")
-    }
-    else
-        goodnames<-c("source","estimate","se","t","df","p")
-
-    names(.coefficients)<-goodnames
-    
-    
-    if (obj$option("es","expb")) {
-      estim            <-  as.data.frame(parameters::parameters(model,
-                                                                exponentiate=TRUE,
-                                                                bootstrap=.bootstrap,
-                                                                iterations=.iterations,
-                                                                ci=.ci_width,
-                                                                ci_method=.ci_method))
-      
-      .coefficients$expb          <-  estim$Coefficient
-      .coefficients$expb.ci.lower <-  estim$CI_low
-      .coefficients$expb.ci.upper <-  estim$CI_high
-    }
-    
-    
-  
-  if (obj$option("estimates_ci")) {
-    
-    cidata            <-  as.data.frame(parameters::ci(.model,
-                                                       ci=.ci_width,
-                                                       ci_method=.ci_method))
-    
-    .coefficients$est.ci.lower<-cidata$CI_low
-    .coefficients$est.ci.upper<-cidata$CI_high
-    
-  }
-  
-  .coefficients
-  
-}
-
-.parameters.multinom<-function(model,obj) 
-        .parameters.glm(model,obj)
-    
-.parameters.polr<-function(model,obj) {
-  params<-.parameters.glm(model,obj)
-  params$label<-params$source
-  check<-grep(LEVEL_SYMBOL,params$source,fixed=TRUE)
-  params$source[check]<-"(Threshold)"
-  params
- }
-
-.parameters.lmerModLmerTest<-function(model,obj) {
-
-    .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
-    .iterations          <-  obj$options$boot_r
-    .ci_method           <-  obj$options$ci_method
-    .ci_width            <-  obj$ciwidth
-    .df_method           <-  switch (obj$options$df_method,
-                                     Satterthwaite = "satterthwaite",
-                                     "Kenward-Roger" = "kenward"
-                             )
-
-    .coefficients        <-  as.data.frame(parameters::parameters(
-      model,
-      ci=NULL,
-      effects="fixed",
-      ci_method=.df_method
-    ),stringAsFactors=FALSE)
-
-    names(.coefficients) <-  c("source","estimate","se","t","df","p")
-
-    if (obj$option("estimates_ci")) {
-    
-        if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
-        
-        
-      cidata            <-  as.data.frame(parameters::ci(.model,
-                                                         ci=.ci_width,
-                                                         ci_method=.ci_method))
-      
-
-      .coefficients$est.ci.lower<-cidata$CI_low
-      .coefficients$est.ci.upper<-cidata$CI_high
-      
-    }
-    
-  
-  return(.coefficients)
-}
-
-.parameters.glmerMod<-function(model,obj) {
-    
-    .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
-    .iterations          <-  obj$options$boot_r
-    .ci_method           <-  obj$options$ci_method
-    .ci_width            <-  obj$ciwidth
-
-    .coefficients        <-  as.data.frame(parameters::parameters(
-      model,
-      ci=NULL,
-      effects="fixed",
-    ),stringAsFactors=FALSE)
-    
-    names(.coefficients) <-  c("source","estimate","se","z","df","p")
-    
-    if (obj$option("estimates_ci")) {
-      
-      if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
-      
-      
-      cidata            <-  as.data.frame(parameters::ci(.model,
-                                                         ci=.ci_width,
-                                                         ci_method=.ci_method))
-      
-      
-      .coefficients$est.ci.lower<-cidata$CI_low
-      .coefficients$est.ci.upper<-cidata$CI_high
-      
-    }
-    
-    return(.coefficients)
-  }
-
-
 
 
 
@@ -312,8 +91,7 @@ mf.anova<- function(x,...) UseMethod(".anova")
   
   #####
   # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
-  ## effectsize:: package uses as total sum of squares the sum of the effects SS (plus residuals)
-  ## In unbalanced designs, the sum does not necessarely correspond to the model SS (plus residuals)
+  ## In unbalanced designs, the sum does not necessarily correspond to the model SS (plus residuals)
   ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
   ## and many properties of the non-partial indices are broken. 
   ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
@@ -541,7 +319,7 @@ mf.update<- function(x,...) UseMethod(".update")
 
 .update.default<-function(model,...) {
 
-   data<-mf.getModelData(model)
+   data<-insight::get_data(model)
    stats::update(model,data=data,...)
 }
 
@@ -564,3 +342,20 @@ mf.update<- function(x,...) UseMethod(".update")
 }
 
 
+.update.glmerMod<-function(model,...) {
+  
+  .args<-list(...)
+  data<-insight::get_data(model)
+
+  if (utils::hasName(.args,"formula")) {
+    .formula<-stats::as.formula(.args$formula)
+    test<-lme4::findbars(.formula)
+    
+    if (!is.something(test)) {
+      warning("No random coefficients specified. A generalized linear model is used instead.")
+      return(stats::glm(formula = .formula,data=data,family=family(model)))
+    }
+  }
+  
+  stats::update(model,data=data,...)
+}

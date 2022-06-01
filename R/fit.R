@@ -13,6 +13,7 @@ fit.R2 <- function(model,obj) {
 
     r2list<-lapply(r2list,function(a) { 
       a$note="R^2 of the full model"
+      a$model="Full"
       a
     })
     
@@ -21,15 +22,16 @@ fit.R2 <- function(model,obj) {
 
     r2nested<-lapply(r2nested,function(a) { 
       a$note="R^2 of the nested model"
+      a$model="Nested"
       a
     })
     
-
     ### compare the two models
-    if (obj$option(".caller",c("lmer","glmer")))
-        comp <-  as.data.frame(performance::test_likelihoodratio(obj$nested_model,model))
+    if (obj$option(".caller",c("lmer","glmer")) || obj$option("omnibus","LRT"))
+         comp <-  as.data.frame(performance::test_likelihoodratio(obj$nested_model,model))
     else  
         comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
+
     r2comp<-as.list(comp[2,])
     .names<-list(df2=c("Res.Df","Resid. Df"),
                  df1=c("Df","df_diff"),p=c("Pr(>Chi)","Pr(>F)"),
@@ -37,7 +39,8 @@ fit.R2 <- function(model,obj) {
                  test=c("Deviance","Chi2"))
     
     names(r2comp)<-transnames(names(r2comp),.names)
-    
+    r2comp$model<-paste0(greek_vector[["Delta"]],"R",'\u00B2')
+    r2comp$type<-"Comparison"
     ### give some warning
 
     if (r2comp$df1<0)
@@ -48,8 +51,8 @@ fit.R2 <- function(model,obj) {
     
     ### if two different estimation (mixed vs lm) are compared, be sure
     ### all rows are filled
-    if (length(r2list)>length(r2nested))
-          r2nested[[2]]<-r2nested[[1]]
+#    if (length(r2list)>length(r2nested))
+#          r2nested[[2]]<-r2nested[[1]]
     
     
 
@@ -70,6 +73,7 @@ fit.R2 <- function(model,obj) {
       obj$dispatcher$warnings<-list(topic="main_r2",message=msg)
     }
   }
+
   r2list
 }
 
@@ -82,7 +86,9 @@ r2.est<- function(model,...) UseMethod(".r2")
       mark(results$warning)
   if (!isFALSE(results$error))
      warning(results$error)
-  return(results$obj)  
+  results<-results$obj
+
+  return(results)  
 
 }
 
@@ -98,8 +104,9 @@ r2.est<- function(model,...) UseMethod(".r2")
   
   results     <-  fit.compare_null_model(model)
   alist$test  <-  results$test
-  alist$df1    <-  results$df1
+  alist$df1   <-  results$df1
   alist$p     <-  results$p
+  alist$type  <-  "R-squared"
   list(alist)
   
 }
@@ -125,7 +132,7 @@ r2.est<- function(model,...) UseMethod(".r2")
 
   
   llfull<-stats::logLik(model)  ### model loglikelihood
-  data<-mf.getModelData(model)
+  data<-insight::get_data(model)
   nullmodel <- stats::update(model, ~ 1, data=data,  evaluate = T)
 #  nullmodel <- eval.parent(nullmodel)
   llnull<-stats::logLik(nullmodel)
@@ -226,7 +233,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 .compare_null_model.polr<-function(model) {
 
   form<- stats::as.formula("~1")
-  data<-mf.getModelData(model)
+  data<-insight::get_data(model)
   model0  <-  stats::update(model,form ,data=data,evaluate=T)
   .results <-  stats::anova(model0,model)
   results<-.results[2,]
@@ -241,7 +248,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
 
 .compare_null_model.negbin<-function(model) {
   
-  data    <-  mf.getModelData(model)
+  data    <-  insight::get_data(model)
   int<-attr(stats::terms(model),"intercept")
   form<- stats::as.formula(paste("~",int))
   model0  <-  stats::update(model,form ,data=data,evaluate=T)

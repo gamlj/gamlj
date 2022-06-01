@@ -99,6 +99,39 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
+
+    - name: es
+      title: Effect Size
+      type: NMXList
+      options:
+          - name: expb
+            title: Odd Ratios (expB)
+          - name: RR
+            title: Relative Risk (RR)
+          - name: marginals
+            title: Marginal Effects
+            
+      default:
+          - expb
+      description:
+          R: >
+            Effect size indices. `expb` (default) exponentiates the coefficients. For
+            dichotomous dependent variables relative risk indices (RR) can be obtained.
+            `marginals` computes the marginal effects.
+          ui: >
+            Effect size indices. `Odd Rations` (default) exponentiates the coefficients. For
+            dichotomous dependent variables `Relative Risk ` indices  can be obtained.
+            `Marginal Effects` computes the marginal effects (if the model allows).
+
+    - name: expb_ci
+      title: For exp(B)
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , exp(B) CI in table
+
+
     - name: nested_terms
       title: Nested Model
       type: Terms
@@ -124,19 +157,6 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
-    - name: omnibus
-      title: Test
-      type: List
-      default: LRT
-      options:
-        - name:  wald
-          title: Wald Chi²
-        - name: LRT
-          title: LRT
-
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
 
 
@@ -611,13 +631,6 @@ options:
 
 
 
-    - name: reml
-      title: REML
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
 
     - name: re_lrt
       title: LRT for Random Effects

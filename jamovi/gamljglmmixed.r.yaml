@@ -30,12 +30,10 @@ items:
              type: Table
              description: a table of R
              clearWith:
-                         - relm
                          - dep
                          - model_terms
                          - nested_terms
                          - fixed_intercept
-                         - reml
                          - comparison
                          - nested_re
                          - nested_intercept
@@ -67,16 +65,19 @@ items:
              refs: parameters
 
            - name: fit
-             title: Additional indices
+             title: Additional Indices
              type: Table
              visible: true
              clearWith:
                          - dep
                          - model_terms
                          - fixed_intercept
-                         - nested_intercept
-                         - nested_terms
                          - comparison
+                         - nested_terms
+                         - nested_re
+                         - nested_intercept
+                         - re
+                         - re_corr
 
              columns:
                     - name: info
@@ -100,9 +101,9 @@ items:
   
 
            - name: anova
-             title: ANOVA Omnibus tests
+             title: Fixed Effects Omnibus Tests
              type: Table
-             description: a table of ANOVA results
+             description: a table of omnibus
              clearWith:
                          - relm
                          - dep
@@ -131,10 +132,9 @@ items:
 
 
            - name: coefficients
-             title:  Parameter Estimates (Coefficients)
+             title:  Parameter Estimates (Fixed Coefficients)
              type: Table
              clearWith:
-                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -170,6 +170,18 @@ items:
                       type: number
                       title: Upper
                       visible: (estimates_ci)
+                    - name: expb
+                      type: number
+                      title: Exp(B)
+                      visible: (es:expb)
+                    - name: expb.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (es:expb & expb_ci)
+                    - name: expb.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (es:expb & expb_ci)
                     - name: z
                       title: "z"
                       type: number
@@ -204,6 +216,103 @@ items:
                            title: 'bogus'
                            type: text
                            visible: false
+
+
+           - name:  marginals
+             title: Marginal Effects
+             type: Table
+             visible: (es:marginals)
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - estimates_ci
+                    - boot_r
+                    - df_method
+                    - re
+                    - re_corr
+             columns:
+                    - name: response
+                      title: "Response"
+                      type: text
+                      combineBelow: true
+                      visible: (model_type:multinomial)
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: contrast
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "AME"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                    - name: test
+                      title: z
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+           - name: relativerisk
+             title: Relative risk
+             type: Table
+             visible: (es:RR)
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - fixed_intercept
+                    - ci_width
+                    - ci_method
+                    - estimates_ci
+                    - boot_r
+                    - df_method
+                    - re
+                    - re_corr
+             columns:
+                    - name: source
+                      title: "Name"
+                      type: text
+                      visible: (show_contrastnames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "RR"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (expb_ci | estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (expb_ci | estimates_ci)
+                    - name: test
+                      title: z
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
            - name: random
              title: Random Components
@@ -330,7 +439,6 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -345,6 +453,12 @@ items:
                     - adjust
 
         columns:
+        - name: response
+          title: Response 
+          type: text
+          visible: (model_type:multinomial)
+          combineBelow: true
+
         - name: estimate
           title: Difference
           type: number
@@ -360,10 +474,7 @@ items:
           title: Upper
           visible: (estimates_ci)
         - name: test
-          title: t
-          type: number
-        - name: df
-          title: df
+          title: z
           type: number
         - name: p
           title: p
@@ -408,7 +519,6 @@ items:
               description: a table of ANOVA for simple effects
               visible: false
               clearWith:
-                 - reml
                  - dep
                  - model_terms
                  - contrasts
@@ -422,16 +532,13 @@ items:
                  - covs_scale_labels
                  - covs_conditioning
                  - df_method
- 
+
               columns:
                    - name: test
                      title: F
                      type: number
                    - name: df1
-                     title: Num df
-                     type: number
-                   - name: df2
-                     title: Den df
+                     title: df
                      type: number
                    - name: p
                      title: p
@@ -443,7 +550,6 @@ items:
               type: Table
               visible: false
               clearWith:
-                 - reml
                  - dep
                  - model_terms
                  - contrasts
@@ -458,6 +564,8 @@ items:
                  - covs_conditioning
                  - df_method
                  - ci_method
+                 - boot_r
+
                 
               columns:
                      - name: contrast
@@ -477,11 +585,8 @@ items:
                        type: number
                        title: Upper
                        visible: (estimates_ci)
-                     - name: df
-                       title: "df"
-                       type: number
                      - name: test
-                       title: "t"
+                       title: "z"
                        type: number
                      - name: p
                        title: "p"
@@ -503,7 +608,6 @@ items:
              name: anova
              title: ANOVA 
              clearWith:
-                 - reml
                  - dep
                  - model_terms
                  - covs_scale
@@ -516,18 +620,16 @@ items:
                  - covs_scale_labels
                  - covs_conditioning
                  - df_method
+
              columns:
                    - name: effect
                      title: 'Effect'
                      type: text
                    - name: test
-                     title: F
+                     title: X²
                      type: number
                    - name: df1
                      title: df1
-                     type: number
-                   - name: df2
-                     title: df2
                      type: number
                    - name: p
                      title: p
@@ -538,7 +640,6 @@ items:
              name: coefficients
              title: Parameter Estimates 
              clearWith:
-                 - reml
                  - dep
                  - model_terms
                  - covs_scale
@@ -574,7 +675,7 @@ items:
                      title: Upper
                      type: number
                    - name: t
-                     title: t
+                     title: z
                      type: number
                    - name: p
                      title: p
@@ -592,7 +693,6 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - reml
             - ci_width
             - ci_method
             - boot_r
@@ -606,9 +706,6 @@ items:
           type: number
         - name: se
           title: SE
-          type: number
-        - name: df
-          title: df
           type: number
         - name: est.ci.lower
           title: Lower 
@@ -635,72 +732,6 @@ items:
     type: Html
     visible: false
 
-  - name: assumptions
-    title: Assumption Checks
-    type: Group
-    items:
-        - name: normtest
-          title: Test for Normality of residuals
-          type: Table
-          description: a table of normality tests
-          visible: (norm_test)
-          clearWith:
-              - model_terms
-              - dep
-              - reml
-              - re
-              
-          columns:
-            - name: name
-              title: Test
-              type: number
-
-            - name: test
-              title: Statistics
-              type: number
-            - name: p
-              type: number
-              format: zto,pvalue
-
-        - name: qqplot
-          title: Q-Q Plot
-          visible: (qq_plot)
-          type: Image
-          description: a q-q plot
-          width: 450
-          height: 400
-          renderFun: .qqPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - model_terms
-
-        - name: normplot
-          title: Residual histogram
-          visible: (norm_plot)
-          type: Image
-          description: Residual histogram
-          width: 450
-          height: 400
-          renderFun: .normPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - model_terms
-        - name: residPlot
-          title: Residual-Predicted Scatterplot
-          visible: (resid_plot)
-          type: Image
-          description: Residual Predicted plot
-          width: 450
-          height: 400
-          renderFun: .residPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - model_terms
-
-
 
 
   - name: predicted
@@ -709,7 +740,6 @@ items:
     varTitle: '`GZMIXED_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
-        - reml
         - dep
         - model_terms
         - re
@@ -719,7 +749,6 @@ items:
     varTitle: '`GZMIXED_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
-        - reml
         - dep
         - model_terms
         - re

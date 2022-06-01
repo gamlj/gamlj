@@ -512,6 +512,15 @@ options:
             
       default:
           - expb
+      description:
+          R: >
+            Effect size indices. `expb` (default) exponentiates the coefficients. For
+            dichotomous dependent variables relative risk indices (RR) can be obtained.
+            `marginals` computes the marginal effects.
+          ui: >
+            Effect size indices. `Odd Rations` (default) exponentiates the coefficients. For
+            dichotomous dependent variables `Relative Risk ` indices  can be obtained.
+            `Marginal Effects` computes the marginal effects (if the model allows).
           
     - name: model_type
       title: Model Selection
