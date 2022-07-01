@@ -70,7 +70,7 @@ Estimate <- R6::R6Class("Estimate",
                               if (name=="bic")
                                 tab[["bic"]]$value<-stats::BIC(self$model)
                               if (name=="dev")
-                                tab[["dev"]]$value<-stats::deviance(self$model)
+                                tab[["dev"]]$value<-insight::get_deviance(self$model)
                               if (name=="dfr")
                                 tab[["dfr"]]$value<-stats::df.residual(self$model)
                               if (name=="over") {
@@ -98,7 +98,7 @@ Estimate <- R6::R6Class("Estimate",
                                 
                               }
                               if (name=="dev") {
-                                tab[["dev"]]$nested<-stats::deviance(self$nested_model)
+                                tab[["dev"]]$nested<-insight::get_deviance(self$nested_model)
                                 tab[["dev"]]$diff<-tab[["dev"]]$value-tab[["dev"]]$nested
                               }
                               if (name=="dfr") {
@@ -125,13 +125,13 @@ Estimate <- R6::R6Class("Estimate",
 
                                 if (self$infomatic$caller=="lm") {
                                     self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
-                                    return(mf.anova(self$model,self))
+                                    return(ganova(self$model,self))
                                 }   else { 
                                     self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["error.zeromodel"])
                                     return(NULL)
                                 }
                             }
-                            mf.anova(self$model,self)
+                            ganova(self$model,self)
                           },
                           
                           run_main_r2=function() {
@@ -240,21 +240,8 @@ Estimate <- R6::R6Class("Estimate",
                             tab
                           },
                           run_main_random=function() {
-    
-                              vc<-as.data.frame(lme4::VarCorr(self$model))
-                              
-                              if (self$option("re_ci")) {
-                                method     <-  ifelse(self$options$ci_method=="wald","Wald",self$options$ci_method)
-                                results    <-  try_hard(stats::profile(self$model,which="theta_",optimizer=self$model@optinfo$optimizer,prof.scale=c("varcov")))
-                                self$dispatcher$warnings<-list(topic="main_random",message=results$warning)
-                                cidata         <-  as.data.frame(confint(results$obj,parm = "theta_",level = self$ciwidth, method=method))
-                                names(cidata)  <-  c("var.ci.lower","var.ci.upper")
-                                vc<-cbind(vc,cidata)
-                                self$dispatcher$warnings<-list(topic="main_random",message="C.I. are computed with the profile method")
-                              }
-                              
-                              .transnames<-c(var="vcov",std="sdcor")
-                              names(vc)<-transnames(names(vc),.transnames)
+                            
+                              vc<-gVarCorr(self$model,self)
                               grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
                               ### if the model has no intercept or intercept and 
                               ### effects of factors are set as uncorrelated
@@ -273,27 +260,19 @@ Estimate <- R6::R6Class("Estimate",
                               
                               int<-which(params$name %in% "(Intercept)")
                               for (i in int)
-                                  params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model))
+                                  params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model,verbose = FALSE))
 
                               nr<-nrow(params)+1
                               if (params$grp[nrow(params)]!="Residual"){
                                   params[nr,"groups"] <- "Residual"
                                   params[nr,"name"]  <- ""
-                                  params[nr,"var"]   <- insight::get_variance_residual(self$model)
+                                  params[nr,"var"]   <- insight::get_variance_residual(self$model,verbose = FALSE)
                                   params[nr,"std"]   <- sqrt(params[nr,"var"]) 
-                                    
                               }
                                 
-                              ngrp<-vapply(self$model@flist,nlevels,1)
-                              .names<-fromb64(names(ngrp))
-
-                              info<-paste("Number of Obs:", 
-                                          self$model@devcomp$dims[[1]],
-                                          ", Number of groups:",
-                                          paste(.names,ngrp,sep=" ",collapse = ", "),
-                                          collapse="; ")
                               
-                              self$dispatcher$warnings<-list(topic="main_random",message=info)
+                              self$dispatcher$warnings<-list(topic="main_random",message=attr(vc,"info"))
+                              
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {
                                 self$tab_randomcov<-vc[covariances,]
@@ -515,7 +494,12 @@ Estimate <- R6::R6Class("Estimate",
                                                stop(paste(self$infomatic$model[1],"requires a minimum of",abs(nreq),"levels"))
                                  }
                             }
-                            
+                             ### Some functions, such as lme4::glmer.nb 
+                             ### require a package to be loaded 
+                             ### in the function parent environment.
+                             ### we give the required functions to them
+                             glmer<-lme4::glmer
+                             ###
 
 
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
@@ -530,6 +514,8 @@ Estimate <- R6::R6Class("Estimate",
                               
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
+                              
+                              
                               results<-try_hard(eval(acall))
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
@@ -558,6 +544,7 @@ Estimate <- R6::R6Class("Estimate",
                                 ### check if we can go in paraller ###
                                 test<-try_hard(find.package("parallel"))
                                 if (isFALSE(test$error)) {
+                                    ginfo("we go in parallel")
                                     opts_list[["n_cpus"]]<-parallel::detectCores()
                                     opts_list[["parallel"]]<-"multicore"
                                 }
@@ -598,7 +585,7 @@ Estimate <- R6::R6Class("Estimate",
                               if (name=="bic")
                                   self$tab_fit[["bic"]]$value<-stats::BIC(self$model)
                               if (name=="dev")
-                                  self$tab_fit[["dev"]]$value<-stats::deviance(self$model)
+                                  self$tab_fit[["dev"]]$value<-insight::get_deviance(self$model)
                               if (name=="dfr")
                                   self$tab_fit[["dfr"]]$value<-stats::df.residual(self$model)
                               if (name=="over") {

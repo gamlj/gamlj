@@ -19,7 +19,6 @@ fit.R2 <- function(model,obj) {
     
     ### r2 for the nested model
     r2nested<-r2.est(obj$nested_model,obj)
-
     r2nested<-lapply(r2nested,function(a) { 
       a$note="R^2 of the nested model"
       a$model="Nested"
@@ -28,10 +27,11 @@ fit.R2 <- function(model,obj) {
     
     ### compare the two models
     if (obj$option(".caller",c("lmer","glmer")) || obj$option("omnibus","LRT"))
-         comp <-  as.data.frame(performance::test_likelihoodratio(obj$nested_model,model))
+         comp <- try_hard( as.data.frame(performance::test_likelihoodratio(obj$nested_model,model)))
     else  
-        comp<-stats::anova(obj$nested_model,model,test=obj$options$omnibus)
-
+        comp<-try_hard(stats::anova(obj$nested_model,model,test=obj$options$omnibus))
+    
+    comp<-comp$obj
     r2comp<-as.list(comp[2,])
     .names<-list(df2=c("Res.Df","Resid. Df"),
                  df1=c("Df","df_diff"),p=c("Pr(>Chi)","Pr(>F)"),
@@ -49,11 +49,7 @@ fit.R2 <- function(model,obj) {
     if (r2comp$df1==0)
        obj$dispatcher$warnings<-list(topic="main_r2",message="Nested and full models are identical, try removing some term from the nested model")
     
-    ### if two different estimation (mixed vs lm) are compared, be sure
-    ### all rows are filled
-#    if (length(r2list)>length(r2nested))
-#          r2nested[[2]]<-r2nested[[1]]
-    
+
     
 
     r2comp$r2<-r2list[[1]]$r2-r2nested[[1]]$r2
@@ -198,12 +194,15 @@ r2.est<- function(model,...) UseMethod(".r2")
   cond<-fit.compare_null_model(model,type="c")
   cond$type<-"Conditional"
   cond$r2<-r2$R2_conditional
-  
+  mark("in r2 lmer")
   marg<-fit.compare_null_model(model,type="m")
+  mark("in r2 after")
   if (is.null(marg))
      marg<-list()   
+
   marg$type="Marginal"
   marg$r2<-r2$R2_marginal
+
   list(cond,marg)
 }
 
@@ -211,6 +210,8 @@ r2.est<- function(model,...) UseMethod(".r2")
 .r2.glmerMod<-function(model,obj)
     .r2.lmerModLmerTest(model,obj)
 
+.r2.clmm<-function(model,obj)
+  .r2.lmerModLmerTest(model,obj)
 
 ######### model comparisons for one model ########
 
@@ -282,7 +283,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
           model0  <-  stats::update(model, formula=form)
 
   }
-  ### please note that here we use performance::test_likelihoodratio, which compute the LRT 
+  ### here we use performance::test_likelihoodratio, which compute the LRT 
   ### on the estimated models, no matter what REML is. If one compares the results with 
   ### lmerTest::anova() they are slightly different because the latter re-estimate the models
   ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
@@ -310,7 +311,7 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
     
     re<-lme4::findbars(stats::formula(model))
     re<-paste("(",re,")",collapse = "+")
-    dep<-insight::model_info(model)$model_terms$response
+    dep<-insight::find_response(model)
     form<-paste(dep,"~",int," + ",re)
     model0  <-  stats::update(model, formula=form)
     
@@ -323,6 +324,40 @@ fit.compare_null_model<- function(x,...) UseMethod(".compare_null_model")
   results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
   names(results)<-c("nothing1","nothing2","nothing3","df1","test","p")
   results[2,c("df1","test","p")]
+}
+
+
+.compare_null_model.clmm<-function(model,type="c") {
+  
+  data    <-  insight::get_data(model)
+  
+  int<-attr(stats::terms(model),"intercept")
+  dep<-insight::find_response(model)
+  
+  if (type=="c") {
+    int<-1
+    form<-stats::as.formula(paste(dep,"~",int))
+    model0<-ordinal::clm(form,data=data)
+    
+  } else  {
+    if (int==0) 
+      return(NULL)
+
+    re<-lme4::findbars(stats::formula(model))
+    re<-paste("(",re,")",collapse = "+")
+    form<-as.formula(paste(dep,"~",int," + ",re))
+    model0  <-  ordinal::clmm(formula=form,data=data)
+
+  }
+  ### here we use performance::test_likelihoodratio, which compute the LRT 
+  ### on the estimated models, no matter what REML is. If one compares the results with 
+  ### lmerTest::anova() they are slightly different because the latter re-estimate the models
+  ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
+
+  results <-  as.data.frame(performance::test_likelihoodratio(model0,model))
+  names(results)<-c("nothing1","nothing2","nothing3","df1","test","p")
+  results[2,c("df1","test","p")]
+
 }
 
 

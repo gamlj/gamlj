@@ -100,7 +100,7 @@ Syntax <- R6::R6Class(
     },
     init_main_r2=function() {
       
-        if (self$option(".caller","lmer")) {
+        if (self$option(".caller",c("lmer","glmer"))) {
           tab<-list(list(type="Marginal"),list(type="Conditional"))
           if (self$option("comparison")) {
             tab<-list(list(type="Conditional",model="Full"),

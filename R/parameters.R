@@ -88,7 +88,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method
   .ci_width            <-  obj$ciwidth
-  
+
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
   
   .coefficients        <-  as.data.frame(parameters::parameters(
@@ -96,15 +96,16 @@ gparameters<- function(x,...) UseMethod(".parameters")
     ci=NULL,
   ),stringAsFactors=FALSE)
   
-  if ("Response" %in% names(.coefficients)) {
-    goodnames<-c("source","estimate","se","t","df","p","response")
-  }
-  else
-    goodnames<-c("source","estimate","se","t","df","p")
+
+  .transnames<-list(source="Parameter",
+    estimate="Coefficient",
+    se="SE",
+    test=c("z","t"),
+    df="df_error",
+    est.ci.lower="CI_low",est.ci.upper="CI_high")
+  names(.coefficients)<-transnames(names(.coefficients),.transnames)
   
-  names(.coefficients)<-goodnames
-  
-  
+    
   if (obj$option("es","expb")) {
     estim            <-  as.data.frame(parameters::parameters(model,
                                                               exponentiate=TRUE,
@@ -130,7 +131,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
     .coefficients$est.ci.upper<-cidata$CI_high
     
   }
-  
   .coefficients
   
 }
@@ -145,6 +145,15 @@ gparameters<- function(x,...) UseMethod(".parameters")
   params$source[check]<-"(Threshold)"
   params
 }
+
+.parameters.clmm<-function(model,obj) {
+  
+  params<-.parameters.polr(model,obj)
+  params<-params[params$Effects=="fixed",]
+  params
+  
+}
+
 
 .parameters.lmerModLmerTest<-function(model,obj) {
   
@@ -230,7 +239,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
     
   }
   
-
   return(.coefficients)
 }
 

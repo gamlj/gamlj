@@ -63,7 +63,7 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
-             refs: parameters
+             refs: goodness
 
 
            - name: anova

@@ -88,7 +88,7 @@ const events = {
         if (typeof ui.es_RR !== 'undefined' ) {
               ui.es_RR.setValue(false);
         }
-        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear") {
+        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear")        {
                ui.es_expb.setValue(false);
                ui.estimates_ci.setValue(true);
                ui.expb_ci.setValue(false);
@@ -98,10 +98,18 @@ const events = {
                ui.expb_ci.setValue(true);
         }
 
-        if (ui.model_type.getValue()==="ordinal") {
-          ui.propodds_test.$el.show();
-        } else {
-          ui.propodds_test.$el.hide();
+        if (typeof ui.propodds_test !== 'undefined') {
+              if (ui.model_type.getValue()==="ordinal") {
+                  ui.propodds_test.$el.show();
+              } else {
+                  ui.propodds_test.$el.hide();
+              }
+        }
+
+        if (  ui.model_type.getValue() === 'ordinal') {
+              ui.ci_method_wald.setValue(true);
+              ui.ci_method_quantile.setEnabled(false);
+              ui.ci_method_ci_method_bcai.setEnabled(false);
         }
   
         ui.dep.setValue(null);

@@ -22,4 +22,10 @@
         `year`=2020, 
         `title`="Extracting, Computing and Exploring the Parameters of Statistical Models using R", 
         `publisher`="CRAN", 
-        `url`="https://github.com/easystats/parameters"))
+        `url`="https://github.com/easystats/parameters"), 
+    `goodness`=list(
+        `type`="software", 
+        `author`="Gallucci, M.", 
+        `year`=2020, 
+        `title`="Model goodness of fit in GAMLj", 
+        `url`="https://gamlj.github.io/details_goodness.html"))

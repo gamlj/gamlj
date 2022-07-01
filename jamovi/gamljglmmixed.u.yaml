@@ -13,9 +13,6 @@ children:
         margin: large
         children:
           - type: Label
-            label: Continuous dependent variable
-            children: []
-          - type: Label
             label: Frequencies
             children:
               - type: RadioButton
@@ -23,19 +20,13 @@ children:
                 optionName: model_type
                 optionPart: poisson
                 events:
-                  change: './gamlj.events::onChange_model'
-              - name: model_type_poiover
-                type: RadioButton
-                optionName: model_type
-                optionPart: poiover
-                events:
-                  change: './gamlj.events::onChange_model'
+                  change: './gzmixed.events::onChange_model'
               - type: RadioButton
                 name: model_type_nb
                 optionName: model_type
                 optionPart: nb
                 events:
-                  change: './gamlj.events::onChange_model'
+                  change: './gzmixed.events::onChange_model'
       - type: LayoutBox
         margin: large
         children:
@@ -47,25 +38,25 @@ children:
                 optionName: model_type
                 optionPart: logistic
                 events:
-                  change: './gamlj.events::onChange_model'
+                  change: './gzmixed.events::onChange_model'
               - type: RadioButton
                 name: model_type_probit
                 optionName: model_type
                 optionPart: probit
                 events:
-                  change: './gamlj.events::onChange_model'
+                  change: './gzmixed.events::onChange_model'
               - name: model_type_ordinal
                 type: RadioButton
                 optionName: model_type
                 optionPart: ordinal
                 events:
-                  change: './gamlj.events::onChange_model'
+                  change: './gzmixed.events::onChange_model'
               - type: RadioButton
                 name: model_type_multinomial
                 optionName: model_type
                 optionPart: multinomial
                 events:
-                  change: './gamlj.events::onChange_model'
+                  change: './gzmixed.events::onChange_model'
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -111,21 +102,19 @@ children:
       - type: LayoutBox
         style: list
         children:
-           - type: Label
-             label: Estimation
-             style: list
-             children:
-                - name: donotrun
-                  type: CheckBox
-           - type: Label
-             label: Model comparison
-             children: 
-                - type: CheckBox
-                  name: comparison
-                  events:
-                       change: './mixed.events::onEvent_comparison'
-
-
+          - type: Label
+            label: Estimation
+            style: list
+            children:
+              - name: donotrun
+                type: CheckBox
+          - type: Label
+            label: Model comparison
+            children:
+              - type: CheckBox
+                name: comparison
+                events:
+                  change: './mixed.events::onEvent_comparison'
       - type: Label
         label: Effect Size
         margin: large
@@ -143,8 +132,7 @@ children:
             type: CheckBox
             optionPart: RR
             optionName: es
-            enable: (model_type:logistic)
-
+            enable: '(model_type:logistic)'
       - type: Label
         label: Confidence Intervals
         margin: large
@@ -162,7 +150,6 @@ children:
           - type: TextBox
             name: ci_width
             format: number
-
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true
@@ -640,6 +627,10 @@ children:
                 name: ci_method_wald
                 optionName: ci_method
                 optionPart: wald
+              - name: ci_method_profile
+                type: RadioButton
+                optionName: ci_method
+                optionPart: profile
               - type: RadioButton
                 name: ci_method_quantile
                 optionName: ci_method
@@ -652,24 +643,6 @@ children:
                 name: boot_r
                 format: number
                 enable: (ci_method_quantile || ci_method_bcai)
-          - type: Label
-            label: DF Method
-            children:
-              - type: RadioButton
-                name: df_method_Satterthwaite
-                optionName: df_method
-                optionPart: Satterthwaite
-              - name: df_method_Kenward-Roger
-                type: RadioButton
-                optionName: df_method
-                optionPart: Kenward-Roger
-          - type: LayoutBox
-            margin: large
-            children:
-              - name: ci_method_profile
-                type: RadioButton
-                optionName: ci_method
-                optionPart: profile
           - type: Label
             label: Save
             children:

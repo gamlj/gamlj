@@ -690,7 +690,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))
+                                    `format`="zto,pvalue")),
+                            refs="goodness"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="intercept",
@@ -1389,7 +1390,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `title`="Upper", 
                                         `type`="number"),
                                     list(
-                                        `name`="t", 
+                                        `name`="test", 
                                         `title`="t", 
                                         `type`="number"),
                                     list(

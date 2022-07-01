@@ -74,6 +74,8 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
+             refs: goodness
+                      
            - name: fit
              title: Additional indices
              type: Table
@@ -190,7 +192,7 @@ items:
                       type: number
                       title: Upper
                       visible: (es:expb & expb_ci)
-                    - name: t
+                    - name: test
                       title: "z"
                       type: number
                     - name: p
@@ -520,7 +522,6 @@ items:
                        type: number
                        title: Upper
                        visible: (expb_ci)
-
                      - name: test
                        title: "z"
                        type: number
@@ -594,7 +595,7 @@ items:
                    - name: est.ci.upper
                      title: Upper
                      type: number
-                   - name: t
+                   - name: test
                      title: z
                      type: number
                    - name: p

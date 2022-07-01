@@ -187,7 +187,6 @@ options:
           title: Bootstrap Percent 
         - name:  bcai
           title: Bootstrap BCa
-          
     - name: boot_r
       title: Bootstrap rep.
       type: Number
@@ -481,8 +480,6 @@ options:
           title: Probit
         - name: poisson
           title: Poisson
-        - name: poiover
-          title: Poisson (overdispersion)
         - name : nb
           title: Negative Binomial
         - name: ordinal
@@ -647,17 +644,6 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), confidence intervals for the random effects
-
-####### options ########
-    - name: df_method
-      title: DF Method
-      type: List
-      default: Satterthwaite
-      options:
-        - name: Satterthwaite
-          title: Satterthwaite
-        - name:  Kenward-Roger
-          title: "Kenward-Roger  (slow)"
 
 
 

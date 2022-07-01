@@ -62,7 +62,7 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
-             refs: parameters
+             refs: goodness
 
            - name: fit
              title: Additional Indices
@@ -105,7 +105,6 @@ items:
              type: Table
              description: a table of omnibus
              clearWith:
-                         - relm
                          - dep
                          - model_terms
                          - contrasts
@@ -182,7 +181,7 @@ items:
                       type: number
                       title: Upper
                       visible: (es:expb & expb_ci)
-                    - name: z
+                    - name: test
                       title: "z"
                       type: number
                     - name: p
@@ -362,7 +361,6 @@ items:
              type: Table
              visible: false
              clearWith:
-                    - relm
                     - dep
                     - model_terms
                     - contrasts
@@ -535,7 +533,7 @@ items:
 
               columns:
                    - name: test
-                     title: F
+                     title: X²
                      type: number
                    - name: df1
                      title: df
@@ -664,9 +662,6 @@ items:
                      type: number
                    - name: se
                      title: SE
-                     type: number
-                   - name: df
-                     title: df
                      type: number
                    - name: est.ci.lower
                      title: Lower 

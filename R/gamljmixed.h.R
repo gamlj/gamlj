@@ -724,7 +724,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue")),
-                            refs="parameters"))
+                            refs="goodness"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",

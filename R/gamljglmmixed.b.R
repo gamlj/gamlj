@@ -12,7 +12,7 @@ gamljGlmMixedClass <- R6::R6Class(
       .smartObjs=list(),
       .init=function() {
         
-        ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
+        ginfo(paste("MODULE:",self$options$.caller,self$options$model_type,"  #### phase init  ####"))
         class(private$.results) <- c('gamlj', class(private$.results))
         private$.time<-Sys.time()
         private$.ready<-readiness(self$options)

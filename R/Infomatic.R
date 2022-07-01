@@ -130,8 +130,9 @@ Infomatic <- R6::R6Class(
       if (self$model_type=="nb") {
         
         self$model         <-   c("Negative Binomial Model","Model for overdispersed count y")
+        self$call          <-   "glm(er).nb"
         self$distribution  <-   "nb"
-        self$rcall         <-   "MASS::glm.nb"
+        self$rcall         <-   NB[[self$caller]]
         self$link          <-   "log"
         self$emmeans       <-   "expected counts"
         self$direction     <-   c("y","Dependent variable counts")
@@ -157,8 +158,7 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Ordinal GLM","Proportional odds logistic")
         self$distribution  <-    "logistic"
         self$call          <-    "ordinal"
-        #self$rcall         <-    "ordinal::clm"  
-        self$rcall        <-    "MASS::polr"
+        self$rcall        <-     ORDINAL[[self$caller]]
         self$calloptions   <-    list(model=TRUE, Hess=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "expected class"
@@ -278,6 +278,8 @@ Infomatic <- R6::R6Class(
   ) # end of private
 )
 
+
+
 ###### info definition for models ##########
 
 DINFO<-list()
@@ -302,12 +304,21 @@ LINFO[["sqrt"]]       <-  c("Square root","Square root of y")
 
 
 CALLS<-list()
-CALLS[["glm"]]<-"glm"
-CALLS[["glmer"]]<-"glmer"
+CALLS[["glm"]]<-"stats::glm"
+CALLS[["glmer"]]<-"lme4::glmer"
 
 FUNCS<-list()
 FUNCS[["glm"]]<-"stats::glm"
 FUNCS[["glmer"]]<-"lme4::glmer"
+
+NB<-list()
+NB[["glm"]]<-"MASS::glm.nb"
+NB[["glmer"]]<-"lme4::glmer.nb"
+
+ORDINAL<-list()
+ORDINAL[["glm"]]<-"MASS::polr"
+ORDINAL[["glmer"]]<-"ordinal::clmm"
+
 
 FIT<-list()
 FIT[["lik"]]   <-  list(info="LogLikelihood",  specs="")

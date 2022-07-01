@@ -60,7 +60,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             re_listing = "none",
             re_lrt = FALSE,
             re_ci = FALSE,
-            df_method = "Satterthwaite",
             norm_plot = FALSE,
             qq_plot = FALSE,
             resid_plot = FALSE,
@@ -308,7 +307,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "logistic",
                     "probit",
                     "poisson",
-                    "poiover",
                     "nb",
                     "ordinal",
                     "multinomial"),
@@ -400,13 +398,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "re_ci",
                 re_ci,
                 default=FALSE)
-            private$..df_method <- jmvcore::OptionList$new(
-                "df_method",
-                df_method,
-                default="Satterthwaite",
-                options=list(
-                    "Satterthwaite",
-                    "Kenward-Roger"))
             private$..norm_plot <- jmvcore::OptionBool$new(
                 "norm_plot",
                 norm_plot,
@@ -484,7 +475,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..re_listing)
             self$.addOption(private$..re_lrt)
             self$.addOption(private$..re_ci)
-            self$.addOption(private$..df_method)
             self$.addOption(private$..norm_plot)
             self$.addOption(private$..qq_plot)
             self$.addOption(private$..resid_plot)
@@ -545,7 +535,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         re_listing = function() private$..re_listing$value,
         re_lrt = function() private$..re_lrt$value,
         re_ci = function() private$..re_ci$value,
-        df_method = function() private$..df_method$value,
         norm_plot = function() private$..norm_plot$value,
         qq_plot = function() private$..qq_plot$value,
         resid_plot = function() private$..resid_plot$value,
@@ -605,7 +594,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..re_listing = NA,
         ..re_lrt = NA,
         ..re_ci = NA,
-        ..df_method = NA,
         ..norm_plot = NA,
         ..qq_plot = NA,
         ..resid_plot = NA,
@@ -717,7 +705,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue")),
-                            refs="parameters"))
+                            refs="goodness"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="fit",
@@ -761,7 +749,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             name="anova",
                             title="Fixed Effects Omnibus Tests",
                             clearWith=list(
-                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -849,7 +836,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="Upper", 
                                     `visible`="(es:expb & expb_ci)"),
                                 list(
-                                    `name`="z", 
+                                    `name`="test", 
                                     `title`="z", 
                                     `type`="number"),
                                 list(
@@ -1053,7 +1040,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="Random Parameters correlations",
                             visible=FALSE,
                             clearWith=list(
-                                "relm",
                                 "dep",
                                 "model_terms",
                                 "contrasts",
@@ -1248,7 +1234,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             columns=list(
                                 list(
                                     `name`="test", 
-                                    `title`="F", 
+                                    `title`="X\u00B2", 
                                     `type`="number"),
                                 list(
                                     `name`="df1", 
@@ -1396,10 +1382,6 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     list(
                                         `name`="se", 
                                         `title`="SE", 
-                                        `type`="number"),
-                                    list(
-                                        `name`="df", 
-                                        `title`="df", 
                                         `type`="number"),
                                     list(
                                         `name`="est.ci.lower", 
@@ -1623,7 +1605,6 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   effects
 #' @param re_ci \code{TRUE} or \code{FALSE} (default), confidence intervals
 #'   for the random effects
-#' @param df_method .
 #' @param norm_plot \code{TRUE} or \code{FALSE} (default), provide a histogram
 #'   of residuals superimposed by a normal distribution
 #' @param qq_plot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
@@ -1725,7 +1706,6 @@ gamljGlmMixed <- function(
     re_listing = "none",
     re_lrt = FALSE,
     re_ci = FALSE,
-    df_method = "Satterthwaite",
     norm_plot = FALSE,
     qq_plot = FALSE,
     resid_plot = FALSE,
@@ -1849,7 +1829,6 @@ gamljGlmMixed <- function(
         re_listing = re_listing,
         re_lrt = re_lrt,
         re_ci = re_ci,
-        df_method = df_method,
         norm_plot = norm_plot,
         qq_plot = qq_plot,
         resid_plot = resid_plot,
