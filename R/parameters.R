@@ -135,8 +135,11 @@ gparameters<- function(x,...) UseMethod(".parameters")
   
 }
 
-.parameters.multinom<-function(model,obj) 
-  .parameters.glm(model,obj)
+.parameters.multinom<-function(model,obj) {
+  params<-.parameters.glm(model,obj)
+  names(params)<-tolower(names(params))
+  params
+}
 
 .parameters.polr<-function(model,obj) {
   params<-.parameters.glm(model,obj)
