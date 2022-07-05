@@ -226,7 +226,6 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
     ciWidth <- interval/100
     dep <- names(attr(stats::terms(model), "dataClasses"))[1]
 
-    
     preds_int <- jmvcore::composeTerm(vars)
     preds_form <- stats::as.formula(paste("~", dep, "|", preds_int))
     condlist <- cov_conditioning$values(vars, decode = T)
@@ -243,8 +242,9 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
     }
 
     vals <- expand.grid(.vals)
+    levs <- expand.grid(.levs)
     form <- model$call$formula
-    results <- NULL
+    anovas <- NULL
     params <- NULL
     if (is.factor(data[[variable]])) 
         contrast <- paste(variable, 1:(length(levels(data[[variable]])) - 1), sep = "_._._") else contrast <- variable
@@ -256,33 +256,32 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
         .model <- nnet::multinom(form, data = .data, model = T)
         ano <- car::Anova(.model, type = 3)
         ano <- ano[rownames(ano) == variable, ]
-        results <- rbind(results, ano)
+        anovas <- rbind(anovas, ano)
         param <- mf.summary(.model)
         citry <- try({
             param <- mf.confint(.model, level = ciWidth, param)
         })
         param <- param[param$variable %in% contrast, ]
+        for (name in preds)
+                 param[[name]]<-levs[[name]][l]
+        
         params <- rbind(params, param)
     }
-    results <- as.data.frame(results)
+    anovas <- as.data.frame(anovas)
+
+    names(params)[names(params) %in% preds]<-lnames
+    names(params)[names(params) %in% c("se", "z","p")]<-c("SE", "z.ratio","p.value")
+    for (l in lnames) 
+        params[[l]]<-as.character(params[[l]])
     
-    names(results) <- c("chisq", "df", "p.value")
-    results <- cbind(vals, results)
-    ff <- .fixLabels(results, preds, cov_conditioning)
-    .levs[["dep"]] <- levels(factor(params[["dep"]]))
-    .levs <- .levs[c("dep", preds)]
-    levs <- expand.grid(.levs)
-    params <- cbind(levs[,-1], params)
-    
-    names(ff)[1:length(lnames)] <- lnames
-    names(params)[1:length(lnames)] <- lnames
-    names(params)[-(1:(length(lnames)))] <- c("estimate", "dep", "variable", "SE", "expb", "z.ratio", "p.value", "lower.CL", "upper.CL","lower.ECL", "upper.ECL")
-    for (name in lnames) {
-        ff[, name] <- as.character(ff[, name])
-        params[, name] <- as.character(params[, name])
-    }
-    params[, "dep"] <- as.character(params[, "dep"])
-    list(params, ff)
+
+    names(anovas) <- c("chisq", "df", "p.value")
+    names(levs)<-lnames
+    anovas <- cbind(levs, anovas)
+    for (l in lnames) 
+           anovas[[l]]<-as.character(anovas[[l]])
+
+    list(params, anovas)
 
 }
 
