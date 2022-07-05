@@ -273,7 +273,7 @@ pred.simpleEstimates <- function(x, ...) UseMethod(".simpleEstimates")
     names(params)[names(params) %in% c("se", "z","p")]<-c("SE", "z.ratio","p.value")
     for (l in lnames) 
         params[[l]]<-as.character(params[[l]])
-a<-factor(c("q","q","a","a"))
+    
 
     names(anovas) <- c("chisq", "df", "p.value")
     names(levs)<-lnames
