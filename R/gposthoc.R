@@ -100,6 +100,7 @@ gposthoc.populate <- function(model, options, tables) {
         if (is.character(none)) 
             table$setNote("nojoy", WARNS["ph.nojoy"]) else {
             table$setState("there is work done")
+        
             tableData <- as.data.frame(none)
             tableData$contrast <- as.character(tableData$contrast)
 
@@ -181,8 +182,7 @@ gposthoc.populate <- function(model, options, tables) {
         tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
         data <- mf.getModelData(model)
         suppressMessages({
-
-            referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
+            referenceGrid <- emmeans::emmeans(model, tterm, data = data)
             terms <- jmvcore::decomposeTerm(term)
             labs <- referenceGrid@grid[terms]
             newlabs <- sapply(labs, function(a) sapply(a, function(b) jmvcore::toB64(as.character(b))))
