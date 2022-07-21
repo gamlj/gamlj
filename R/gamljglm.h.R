@@ -761,7 +761,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="ss", 
                                     `title`="SS", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="df", 
                                     `title`="df", 
@@ -769,7 +770,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="f", 
                                     `title`="F", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -875,21 +877,25 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="se", 
                                     `title`="SE", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
+                                    `format`="zto", 
                                     `visible`="(estimates_ci)"),
                                 list(
                                     `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(estimates_ci)"),
+                                    `visible`="(estimates_ci)", 
+                                    `format`="zto"),
                                 list(
                                     `name`="beta", 
                                     `type`="number", 
@@ -900,11 +906,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="beta.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
+                                    `format`="zto", 
                                     `visible`="(betas_ci)"),
                                 list(
                                     `name`="beta.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
+                                    `format`="zto", 
                                     `visible`="(betas_ci)"),
                                 list(
                                     `name`="df", 
@@ -913,7 +921,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="t", 
                                     `title`="t", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -983,20 +992,24 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="estimate", 
                             `title`="Difference", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="se", 
                             `title`="SE", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="est.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
+                            `format`="zto", 
                             `visible`="(estimates_ci)"),
                         list(
                             `name`="est.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
+                            `format`="zto", 
                             `visible`="(estimates_ci)"),
                         list(
                             `name`="test", 
@@ -1062,55 +1075,66 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="estimate", 
                             `title`="Difference", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="se", 
                             `title`="SE", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="dm", 
                             `title`="d<sub>mod</sub>", 
                             `type`="number", 
-                            `visible`="(posthoc_es:dm)"),
+                            `visible`="(posthoc_es:dm)", 
+                            `format`="zto"),
                         list(
                             `name`="dm.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(posthoc_es:dm && d_ci)"),
+                            `visible`="(posthoc_es:dm && d_ci)", 
+                            `format`="zto"),
                         list(
                             `name`="dm.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:dm && d_ci)"),
                         list(
                             `name`="ds", 
                             `title`="d<sub>sample</sub>", 
                             `type`="number", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:ds)"),
                         list(
                             `name`="ds.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:ds && d_ci)"),
                         list(
                             `name`="ds.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:ds && d_ci)"),
                         list(
                             `name`="g", 
                             `title`="g<sub>sample</sub>", 
                             `type`="number", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:g)"),
                         list(
                             `name`="g.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:g && d_ci)"),
                         list(
                             `name`="g.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
+                            `format`="zto", 
                             `visible`="(posthoc_es:g && d_ci)")))))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -1222,20 +1246,24 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="se", 
                                     `title`="SE", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="est.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
+                                    `format`="zto", 
                                     `visible`="(estimates_ci)"),
                                 list(
                                     `name`="est.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
+                                    `format`="zto", 
                                     `visible`="(estimates_ci)"),
                                 list(
                                     `name`="beta", 
@@ -1246,11 +1274,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df", 
-                                    `type`="number"),
+                                    `type`="integer", 
+                                    `format`="zto"),
                                 list(
                                     `name`="test", 
                                     `title`="t", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -1372,11 +1402,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     list(
                                         `name`="estimate", 
                                         `title`="Estimate", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `format`="zto"),
                                     list(
                                         `name`="se", 
                                         `title`="SE", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `format`="zto"),
                                     list(
                                         `name`="df", 
                                         `title`="df", 
@@ -1384,15 +1416,18 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     list(
                                         `name`="est.ci.lower", 
                                         `title`="Lower", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `format`="zto"),
                                     list(
                                         `name`="est.ci.upper", 
                                         `title`="Upper", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `format`="zto"),
                                     list(
                                         `name`="test", 
                                         `title`="t", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `format`="zto"),
                                     list(
                                         `name`="p", 
                                         `title`="p", 
@@ -1422,11 +1457,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="estimate", 
                             `title`="Mean", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="se", 
                             `title`="SE", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="df", 
                             `title`="df", 
@@ -1434,11 +1471,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="est.ci.lower", 
                             `title`="Lower", 
-                            `type`="number"),
+                            `type`="number", 
+                            `format`="zto"),
                         list(
                             `name`="est.ci.upper", 
                             `title`="Upper", 
-                            `type`="number")))))
+                            `type`="number", 
+                            `format`="zto")))))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="mainPlots",

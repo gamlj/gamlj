@@ -230,7 +230,7 @@ ci_effectsize<-function(es,df,dfres,obj,what="any") {
         res
   } else {
     terms<-seq_along(es)  
-    get_boot_ci(what,terms,obj$boot_variances,type=obj$options$cimethod,width=obj$ciwidth,df = df,dfres=dfres,N=N)
+    get_boot_ci(what,terms,obj$boot_variances,type=obj$options$ci_method,width=obj$ciwidth,df = df,dfres=dfres,N=N)
     
     }
 }

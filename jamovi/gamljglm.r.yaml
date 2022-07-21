@@ -149,12 +149,14 @@ items:
                     - name: ss
                       title: SS
                       type: number
+                      format: zto
                     - name: df
                       title: df
                       type: integer
                     - name: f
                       title: F
                       type: number
+                      format: zto
                     - name: p
                       title: p
                       type: number
@@ -251,17 +253,21 @@ items:
                     - name: estimate
                       title: "Estimate"
                       type: number
+                      format: zto
                     - name: se
                       title: SE
                       type: number
+                      format: zto
                     - name: est.ci.lower
                       type: number
                       title: Lower
+                      format: zto
                       visible: (estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
                       visible: (estimates_ci)
+                      format: zto
                     - name: beta
                       type: number
                       title: β
@@ -270,10 +276,12 @@ items:
                     - name: beta.ci.lower
                       type: number
                       title: Lower
+                      format: zto
                       visible: (betas_ci)
                     - name: beta.ci.upper
                       type: number
                       title: Upper
+                      format: zto
                       visible: (betas_ci)
                     - name: df
                       title: "df"
@@ -281,6 +289,7 @@ items:
                     - name: t
                       title: "t"
                       type: number
+                      format: zto
                     - name: p
                       title: "p"
                       type: number
@@ -352,16 +361,20 @@ items:
         - name: estimate
           title: Difference
           type: number
+          format: zto       
         - name: se
           title: SE
           type: number
+          format: zto       
         - name: est.ci.lower
           type: number
           title: Lower
+          format: zto          
           visible: (estimates_ci)
         - name: est.ci.upper
           type: number
           title: Upper
+          format: zto       
           visible: (estimates_ci)
         - name: test
           title: t
@@ -420,44 +433,55 @@ items:
         - name: estimate
           title: Difference
           type: number
+          format: zto       
         - name: se
           title: SE
           type: number
+          format: zto       
         - name: dm
           title: d<sub>mod</sub>
           type: number
           visible: (posthoc_es:dm)
+          format: zto       
         - name: dm.ci.lower
           type: number
           title: Lower
           visible: (posthoc_es:dm && d_ci)
+          format: zto       
         - name: dm.ci.upper
           type: number
           title: Upper
+          format: zto       
           visible: (posthoc_es:dm && d_ci)
         - name: ds
           title: d<sub>sample</sub>
           type: number
+          format: zto       
           visible: (posthoc_es:ds)
         - name: ds.ci.lower
           type: number
           title: Lower
+          format: zto       
           visible: (posthoc_es:ds && d_ci)
         - name: ds.ci.upper
           type: number
           title: Upper
+          format: zto       
           visible: (posthoc_es:ds && d_ci)
         - name: g
           title: g<sub>sample</sub> 
           type: number
+          format: zto       
           visible: (posthoc_es:g)
         - name: g.ci.lower
           type: number
           title: Lower
+          format: zto       
           visible: (posthoc_es:g && d_ci)
         - name: g.ci.upper
           type: number
           title: Upper
+          format: zto       
           visible: (posthoc_es:g && d_ci)
 
 
@@ -554,16 +578,20 @@ items:
                      - name: estimate
                        title: "Estimate"
                        type: number
+                       format: zto
                      - name: se
                        title: SE
                        type: number
+                       format: zto
                      - name: est.ci.lower
                        type: number
                        title: Lower
+                       format: zto
                        visible: (estimates_ci)
                      - name: est.ci.upper
                        type: number
                        title: Upper
+                       format: zto
                        visible: (estimates_ci)
                      - name: beta
                        type: number
@@ -572,10 +600,12 @@ items:
                        format: zto
                      - name: df
                        title: "df"
-                       type: number
+                       type: integer
+                       format: zto
                      - name: test
                        title: "t"
                        type: number
+                       format: zto
                      - name: p
                        title: "p"
                        type: number
@@ -679,21 +709,26 @@ items:
                    - name: estimate
                      title: Estimate
                      type: number
+                     format: zto       
                    - name: se
                      title: SE
                      type: number
+                     format: zto       
                    - name: df
                      title: df
                      type: integer
                    - name: est.ci.lower
                      title: Lower 
                      type: number
+                     format: zto       
                    - name: est.ci.upper
                      title: Upper
                      type: number
+                     format: zto       
                    - name: test
                      title: t
                      type: number
+                     format: zto       
                    - name: p
                      title: p
                      type: number
@@ -725,18 +760,22 @@ items:
         - name: estimate
           title: 'Mean'
           type: number
+          format: zto       
         - name: se
           title: SE
           type: number
+          format: zto       
         - name: df
           title: df
           type: integer
         - name: est.ci.lower
           title: Lower 
           type: number
+          format: zto       
         - name: est.ci.upper
           title: Upper
           type: number
+          format: zto       
 
 
 
