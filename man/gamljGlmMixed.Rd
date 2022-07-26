@@ -13,10 +13,11 @@ gamljGlmMixed(
   covs = NULL,
   model_terms = NULL,
   fixed_intercept = TRUE,
+  es = list("expb"),
+  expb_ci = FALSE,
   nested_terms = NULL,
   comparison = FALSE,
   nested_intercept = TRUE,
-  omnibus = "LRT",
   estimates_ci = TRUE,
   donotrun = FALSE,
   ci_method = "wald",
@@ -53,10 +54,8 @@ gamljGlmMixed(
   re_corr = "all",
   re_modelterms = TRUE,
   re_listing = "none",
-  reml = TRUE,
   re_lrt = FALSE,
   re_ci = FALSE,
-  df_method = "Satterthwaite",
   norm_plot = FALSE,
   qq_plot = FALSE,
   resid_plot = FALSE,
@@ -88,6 +87,12 @@ terms. Not needed if \code{formula} is used.}
 \item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
 
+\item{es}{Effect size indices. \code{expb} (default) exponentiates the
+coefficients. For dichotomous dependent variables relative risk indices
+(RR) can be obtained. \code{marginals} computes the marginal effects.}
+
+\item{expb_ci}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in table}
+
 \item{nested_terms}{a list of character vectors describing effects terms
 for nestet. It can be passed as right-hand formula.}
 
@@ -95,9 +100,6 @@ for nestet. It can be passed as right-hand formula.}
 
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
-
-\item{omnibus}{\code{TRUE} (default) or \code{FALSE}, estimates fixed
-intercept. Not needed if \code{formula} is used.}
 
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
@@ -214,16 +216,11 @@ option is ignored if the model is passed using \code{formula}.}
 
 \item{re_listing}{Not in R interface}
 
-\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-be used rather than ML}
-
 \item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
 effects}
 
 \item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
 for the random effects}
-
-\item{df_method}{.}
 
 \item{norm_plot}{\code{TRUE} or \code{FALSE} (default), provide a histogram
 of residuals superimposed by a normal distribution}
@@ -252,9 +249,11 @@ A results object containing:
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
   \code{results$main$fit} \tab \tab \tab \tab \tab a table \cr
-  \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
+  \code{results$main$anova} \tab \tab \tab \tab \tab a table of omnibus \cr
   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr
+  \code{results$main$marginals} \tab \tab \tab \tab \tab a table \cr
+  \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$randomcov} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$ranova} \tab \tab \tab \tab \tab a table \cr
@@ -265,10 +264,6 @@ A results object containing:
   \code{results$emmeans} \tab \tab \tab \tab \tab an array of predicted means tables \cr
   \code{results$mainPlots} \tab \tab \tab \tab \tab an array of results plots \cr
   \code{results$plotnotes} \tab \tab \tab \tab \tab a html \cr
-  \code{results$assumptions$normtest} \tab \tab \tab \tab \tab a table of normality tests \cr
-  \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
-  \code{results$assumptions$normplot} \tab \tab \tab \tab \tab Residual histogram \cr
-  \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
 }
