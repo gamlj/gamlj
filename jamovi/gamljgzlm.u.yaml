@@ -564,7 +564,6 @@ children:
                 name: ci_method_profile
                 optionName: ci_method
                 optionPart: profile
-
               - name: ci_method_quantile
                 type: RadioButton
                 optionName: ci_method
@@ -585,7 +584,7 @@ children:
                 name: vcov
               - type: CheckBox
                 name: propodds_test
-                enable: (model_type_ordinal)
+            
 
       - type: LayoutBox
         margin: large

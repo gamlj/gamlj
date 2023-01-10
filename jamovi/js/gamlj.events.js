@@ -109,7 +109,7 @@ const events = {
         if (  ui.model_type.getValue() === 'ordinal') {
               ui.ci_method_wald.setValue(true);
               ui.ci_method_quantile.setEnabled(false);
-              ui.ci_method_ci_method_bcai.setEnabled(false);
+              ui.ci_method_bcai.setEnabled(false);
         }
   
         ui.dep.setValue(null);
