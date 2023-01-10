@@ -82,7 +82,6 @@ Estimate <- R6::R6Class("Estimate",
                             
                             #### model comparison #####
                             if (!is.null(self$nested_model)) {
-                            mark(self$nested_model)
                               
                              for (name in names(tab)) {
                               if (name=="lik") {
@@ -218,7 +217,7 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_main_paralleltest=function() {
                             tab<-NULL
-                            if (self$isProper) {
+                            if (self$hasTerms) {
                               obj<-try_hard({
                                 form<-formula(paste(self$formula64,collapse = ""))
                                 mod<-do.call(ordinal::clm,list(formula=form,data=self$model$model))
@@ -237,7 +236,8 @@ Estimate <- R6::R6Class("Estimate",
                               tab<-tab[rownames(tab)!="<none>",]
                               names(tab)<-c("df","loglik","aic", "test","p")
                               
-                            }
+                            } else
+                               warning("Parallel test cannot be computed")
                             tab
                           },
                           run_main_random=function() {

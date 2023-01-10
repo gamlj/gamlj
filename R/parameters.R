@@ -1,4 +1,4 @@
-############# produces to get parameters in a somehow standard format ##########
+############# produces parameters in a somehow standard format ##########
 
 gparameters<- function(x,...) UseMethod(".parameters")
 
@@ -118,9 +118,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
     .coefficients$expb.ci.lower <-  estim$CI_low
     .coefficients$expb.ci.upper <-  estim$CI_high
   }
-  
-  
-  
+
   if (obj$option("estimates_ci")) {
     
     cidata            <-  as.data.frame(parameters::ci(.model,
