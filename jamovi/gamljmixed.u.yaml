@@ -35,6 +35,17 @@ children:
             isTarget: true
             events:
               change: './mixed.events::onChange_covariates'
+
+      - type: TargetLayoutBox
+        label: Cluster variables
+        children:
+          - type: VariablesListBox
+            name: cluster
+            height: small
+            isTarget: true
+            events:
+              change: './mixed.events::onChange_cluster'
+
   - type: LayoutBox
     margin: large
     style: inline
@@ -580,13 +591,3 @@ children:
                 name: predicted
               - type: Output
                 name: residuals
-  - type: VariableSupplier
-    persistentItems: false
-    stretchFactor: 1
-    children:
-      - type: TargetLayoutBox
-        label: Cluster variables
-        children:
-          - type: VariablesListBox
-            name: cluster
-            isTarget: true
