@@ -82,7 +82,8 @@ Estimate <- R6::R6Class("Estimate",
                             
                             #### model comparison #####
                             if (!is.null(self$nested_model)) {
-                            
+                            mark(self$nested_model)
+                              
                              for (name in names(tab)) {
                               if (name=="lik") {
                                 tab[["lik"]]$nested<-as.numeric(stats::logLik(self$nested_model))

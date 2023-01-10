@@ -77,7 +77,6 @@ r2.est<- function(model,...) UseMethod(".r2")
 
 .r2.default<-function(model,  obj) {
   results<-try_hard(performance::r2(model,tolerance =0))
-  
   if (!isFALSE(results$warning))
       mark(results$warning)
   if (!isFALSE(results$error))
@@ -115,11 +114,10 @@ r2.est<- function(model,...) UseMethod(".r2")
   # mcFadden 
 
   alist$r2    <-  1-(results$deviance/results$null.deviance)
-  alist$ar2   <-  ""
-  
   alist$test  <-  results$test
   alist$df1    <-  results$df1
   alist$p     <-  results$p
+ 
   return(list(alist))
   
 }
