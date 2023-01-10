@@ -11,6 +11,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             dep = NULL,
             factors = NULL,
             covs = NULL,
+            offset = NULL,
             model_terms = NULL,
             fixed_intercept = TRUE,
             nested_intercept = TRUE,
@@ -94,6 +95,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ordinal"),
                 permitted=list(
                     "numeric"),
+                default=NULL)
+            private$..offset <- jmvcore::OptionVariable$new(
+                "offset",
+                offset,
                 default=NULL)
             private$..model_terms <- jmvcore::OptionTerms$new(
                 "model_terms",
@@ -373,6 +378,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
+            self$.addOption(private$..offset)
             self$.addOption(private$..model_terms)
             self$.addOption(private$..fixed_intercept)
             self$.addOption(private$..nested_intercept)
@@ -423,6 +429,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
+        offset = function() private$..offset$value,
         model_terms = function() private$..model_terms$value,
         fixed_intercept = function() private$..fixed_intercept$value,
         nested_intercept = function() private$..nested_intercept$value,
@@ -472,6 +479,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
+        ..offset = NA,
         ..model_terms = NA,
         ..fixed_intercept = NA,
         ..nested_intercept = NA,
@@ -570,7 +578,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "boot_r",
                     "nested_intercept",
                     "nested_terms",
-                    "comparison"),
+                    "comparison",
+                    "offset"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -602,7 +611,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "nested_intercept",
                                 "nested_terms",
                                 "comparison",
-                                "omnibus"),
+                                "omnibus",
+                                "offset"),
                             rows=1,
                             columns=list(
                                 list(
@@ -642,7 +652,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "nested_intercept",
                                 "nested_terms",
-                                "comparison"),
+                                "comparison",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -677,7 +688,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_conditioning",
                                 "dep_scale",
                                 "fixed_intercept",
-                                "chisq_type"),
+                                "chisq_type",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -710,7 +722,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_width",
                                 "ci_method",
                                 "expb_ci",
-                                "es"),
+                                "es",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -780,7 +793,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "dep_scale",
-                                "fixed_intercept"),
+                                "fixed_intercept",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -826,7 +840,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "es",
                                 "ci_width",
-                                "ci_method"),
+                                "ci_method",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -882,7 +897,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "es",
                                 "ci_width",
-                                "ci_method"),
+                                "ci_method",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -971,13 +987,15 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "posthoc",
                     "adjust",
                     "ci_method",
-                    "boot_r"),
+                    "boot_r",
+                    "offset"),
                 template=jmvcore::Table$new(
                     options=options,
                     title="",
                     clearWith=list(
                         "posthoc",
-                        "ci_method"),
+                        "ci_method",
+                        "offset"),
                     columns=list(
                         list(
                             `name`="response", 
@@ -1059,7 +1077,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "ccm_value",
                                 "ccp_value",
-                                "covs_scale_labels"),
+                                "covs_scale_labels",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1093,7 +1112,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ccp_value",
                                 "covs_scale_labels",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "offset"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -1161,7 +1181,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "fixed_intercept",
                     "covs_scale_labels",
                     "ci_width",
-                    "emmeans"),
+                    "emmeans",
+                    "offset"),
                 template=R6::R6Class(
                     inherit = jmvcore::Group,
                     active = list(
@@ -1251,7 +1272,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "emmeans",
                         "model_terms",
                         "model_type",
-                        "ci_method"),
+                        "ci_method",
+                        "offset"),
                     columns=list(
                         list(
                             `name`="response", 
@@ -1304,7 +1326,8 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ccm_value",
                         "plotScale",
                         "plotOriginalScale",
-                        "plotLinesTypes"))))
+                        "plotLinesTypes",
+                        "offset"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1324,11 +1347,7 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="residuals",
                 title="Residuals Vales",
                 varTitle="`GZLM_RES_${ dep }`",
-                varDescription="Residuals values",
-                clearWith=list(
-                    "dep",
-                    "factors",
-                    "covs")))},
+                varDescription="Residuals values"))},
         .setModel=function(x) private$..model <- x))
 
 gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

@@ -511,8 +511,12 @@ Estimate <- R6::R6Class("Estimate",
                                           opts[["family"]]<-str2lang(self$infomatic$family)    
                               
                               for (opt in names(self$infomatic$calloptions))
-                                        opts[[opt]]<-self$infomatic$calloptions[[opt]]    
+                                        opts[[opt]]<-self$infomatic$calloptions[[opt]]   
                               
+                              
+                              if (self$option("offset"))
+                                opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
+                              mark(opts[["formula"]])
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
                               
@@ -534,7 +538,7 @@ Estimate <- R6::R6Class("Estimate",
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
 
                               .model<-mf.fixModel(results$obj,self)
-                              
+                              mark(.model)
                               return(.model)
 
 

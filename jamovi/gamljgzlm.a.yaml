@@ -83,6 +83,12 @@ options:
       description:
           R: a vector of strings naming the covariates from `data`. Not needed if `formula` is used.
 
+    - name: offset
+      title: Offset
+      type: Variable
+      default:
+      description:
+          R: a vector of strings naming the offset variables.
 
     - name: model_terms
       title: Model Terms

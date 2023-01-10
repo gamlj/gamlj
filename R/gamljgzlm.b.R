@@ -12,7 +12,6 @@ gamljGzlmClass <- R6::R6Class(
       
       ginfo(paste("MODULE:",self$options$.caller,self$options$model_type,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
-      
       private$.time<-Sys.time()
 
       private$.ready<-readiness(self$options)
@@ -21,12 +20,12 @@ gamljGzlmClass <- R6::R6Class(
           self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
         return()
       }
-      
+
       ### set up the R6 workhorse class
       dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
       estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
-      
+
       
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)

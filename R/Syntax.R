@@ -93,9 +93,14 @@ Syntax <- R6::R6Class(
          
       }
         
+      if (self$option("offset"))
+         tab[["offset"]]<-list(info="Offset",value=self$options$offset,specs="Coefficient set to 1")
+      
+      
       if (self$option("se_method","robust"))
-            warning("All SE are heteroskedasticity-consistent robust SE")
-     tab
+        warning("All SE are heteroskedasticity-consistent robust SE")
+      
+      tab
       
     },
     init_main_r2=function() {
@@ -419,12 +424,13 @@ Syntax <- R6::R6Class(
       
       if (is.something(aOne)) {
         modelTerms[[aOne]]<-NULL
-        self$hasIntercept=TRUE
+        self$hasIntercept<-TRUE
       }
       if (self$options$model_type=="ordinal") {
-        self$hasIntercept=TRUE
+        self$hasIntercept<-TRUE
         if (self$options$fixed_intercept==FALSE)
-          self$warnings<-list(topic="tab_info",message="Ordinal regression requires the intercept. It has been added to the model")
+          self$dispatcher$warnings<-list(topic="info",message="Ordinal regression requires the intercept. It has been added to the model")
+        
       }
       
       self$hasTerms <-(length(modelTerms)>0)
@@ -470,7 +476,7 @@ Syntax <- R6::R6Class(
       
       ## some warnings ###
       if (self$option("ci_method","boot"))
-        self$warnings<-list(topic="tab_info",message="Bootstrap C.I. are being computed, this may take a while")
+        self$dispatcher$warnings<-list(topic="info",message="Bootstrap C.I. are being computed, this may take a while")
       
       ### anova table ###
       

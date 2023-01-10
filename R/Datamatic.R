@@ -17,6 +17,8 @@ Datamatic <- R6::R6Class(
       self$vars<-unlist(c(options$dep,options$factors,options$covs))
       if (utils::hasName(options,"cluster"))
         self$vars<-c(options$cluster,self$vars)
+      if (utils::hasName(options,"offset"))
+        self$vars<-c(options$offset,self$vars)
       
       private$.inspect_data(data)
       
@@ -204,14 +206,31 @@ Variable <- R6::R6Class(
            self$nClusters<-length(self$datamatic$options$cluster)
         }
       }
-        
+      
+      if (self$datamatic$option("offset")) {
+        if (var %in% self$datamatic$options$offset) 
+            self$type="numeric"
+        }
+      
+      ### end offset ####
+      
       return(self)  
       
     },
     get_values=function(data) {
 
-      
+      mark(self$name,self$name64)
+      mark(names(data))
        vardata<-data[[self$name64]]
+       if (self$type=="numeric") {
+         mark(vardata)
+         if (is.factor(vardata)) {
+           self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been coerced to mumeric"))
+           vardata<-as.numeric(vardata)
+         }
+         return(vardata)
+       }
+         
 
        if (self$type=="cluster") {
          if (!is.factor(vardata)) {

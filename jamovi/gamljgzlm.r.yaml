@@ -34,6 +34,7 @@ items:
         - nested_intercept
         - nested_terms
         - comparison
+        - offset
 
     refs: gamlj
      
@@ -53,6 +54,8 @@ items:
                          - nested_terms
                          - comparison
                          - omnibus
+                         - offset
+
              rows: 1
              columns:
                     - name: model
@@ -87,6 +90,7 @@ items:
                          - nested_intercept
                          - nested_terms
                          - comparison
+                         - offset
 
              columns:
                     - name: info
@@ -121,6 +125,8 @@ items:
                          - dep_scale
                          - fixed_intercept
                          - chisq_type
+                         - offset
+
              columns:
                     - name: source
                       title: ""
@@ -151,6 +157,7 @@ items:
                     - ci_method
                     - expb_ci
                     - es
+                    - offset
 
              columns:
                     - name: response
@@ -211,6 +218,8 @@ items:
                     - covs_scale
                     - dep_scale
                     - fixed_intercept
+                    - offset
+                    
              columns:
                     - name: source
                       title: "Coefficient"
@@ -256,6 +265,8 @@ items:
                     - es
                     - ci_width
                     - ci_method
+                    - offset
+                    
              columns:
                     - name: response
                       title: "Response"
@@ -304,6 +315,8 @@ items:
                     - es
                     - ci_width
                     - ci_method
+                    - offset
+                    
              columns:
                     - name: source
                       title: "Name"
@@ -343,6 +356,7 @@ items:
                     - model_terms
                     - fixed_intercept
                     - propodds_test
+                  
              columns:
                     - name: source
                       title: ""
@@ -380,6 +394,7 @@ items:
         - adjust
         - ci_method
         - boot_r
+        - offset
         
     template:
         title:  ""
@@ -387,6 +402,7 @@ items:
         clearWith:
               - posthoc
               - ci_method
+              - offset
   
         columns:
         - name: response
@@ -454,6 +470,7 @@ items:
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
+                 - offset
 
               columns:
                  - name: test
@@ -486,6 +503,7 @@ items:
                  - covs_scale_labels
                  - ci_method
                  - boot_r
+                 - offset
  
               columns:
                      - name: response
@@ -546,6 +564,7 @@ items:
         - covs_scale_labels
         - ci_width
         - emmeans
+        - offset
 
     template:
         title:  "Interaction: ___key___"
@@ -620,6 +639,7 @@ items:
             - model_terms
             - model_type
             - ci_method
+            - offset
 
         columns:
         - name: response
@@ -674,6 +694,7 @@ items:
            - plotScale
            - plotOriginalScale
            - plotLinesTypes
+           - offset
 
 
   - name: plotnotes
@@ -696,9 +717,5 @@ items:
     type: Output            
     varTitle: '`GZLM_RES_${ dep }`'
     varDescription: Residuals values
-    clearWith:
-        - dep
-        - factors
-        - covs
 
 
