@@ -219,11 +219,9 @@ Variable <- R6::R6Class(
     },
     get_values=function(data) {
 
-      mark(self$name,self$name64)
-      mark(names(data))
        vardata<-data[[self$name64]]
        if (self$type=="numeric") {
-         mark(vardata)
+
          if (is.factor(vardata)) {
            self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been coerced to mumeric"))
            vardata<-as.numeric(vardata)

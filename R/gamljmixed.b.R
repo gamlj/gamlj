@@ -21,12 +21,13 @@ gamljMixedClass <- R6::R6Class(
           self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
         return()
       }
+      
       emmeans::emm_options(lmerTest.limit = 25000)  
       ### set up the R6 workhorse class
       dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
       estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
-
+      
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
       private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
