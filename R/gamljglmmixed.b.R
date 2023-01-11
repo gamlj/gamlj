@@ -300,33 +300,24 @@ gamljGlmMixedClass <- R6::R6Class(
       .sourcifyOption = function(option) {
         
         
-
-        if (option$name=="nested_re") {
-          if (!self$options$comparison)
-            return('')
-          if (!is.something(self$options$nested_re))
-            return('')
-          form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))  
-          terms<-paste("(",lme4::findbars(form),")",collapse =  " + ")
-          return(paste0("nested_re = ~",terms))
-        }
+        if (option$name=="nested_re") 
+          return('')
         
+        if (option$name=="nested_terms") 
+          return('')
         
-        if (option$name=="nested_terms") {
-          if (!self$options$comparison)
-            return('')
-          if (!is.something(self$options$nested_terms)) 
-            if (!self$options$nested_intercept)
-                 return('')
-          form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))
-          terms<-as.character(lme4::nobars(form))
-          return(paste0("nested_terms = ~",terms[[length(terms)]]))
-        }
+        if (option$name=="comparison") 
+          if (self$options$comparison) {
+            form<-stats::as.formula(fromb64(private$.estimate_machine$nested_formula64))  
+            return(paste0("nested_model = ",deparse(form)))
+          }
+        
         
         defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
         if (option$name %in% NO_R_OPTS)
           return('')
         sourcifyOption(option,defaults)
+        
       }
     )
   )
