@@ -1303,12 +1303,20 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
                         "reml",
+                        "emmeans",
+                        "model_terms",
                         "ci_width",
                         "ci_method",
+                        "se_method",
                         "boot_r",
-                        "emmeans",
-                        "df_method",
-                        "model_terms"),
+                        "covs_scale",
+                        "dep_scale",
+                        "covs_conditioning",
+                        "covs_scale_labels",
+                        "covs_conditioning",
+                        "covs_scale_labels",
+                        "ccp_value",
+                        "ccm_value"),
                     columns=list(
                         list(
                             `name`="estimate", 

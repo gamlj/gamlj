@@ -1452,7 +1452,11 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "covs_scale",
                         "dep_scale",
                         "covs_conditioning",
-                        "covs_scale_labels"),
+                        "covs_scale_labels",
+                        "covs_conditioning",
+                        "covs_scale_labels",
+                        "ccp_value",
+                        "ccm_value"),
                     columns=list(
                         list(
                             `name`="estimate", 

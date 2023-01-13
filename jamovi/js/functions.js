@@ -1,3 +1,5 @@
+var rtermFormat = require('./rtermFormat');
+
 const fun = {
 
     calcModelTerms: function(ui, context) {
@@ -197,6 +199,18 @@ const fun = {
               ui.nested_layout.$label.show();
               ui.nested_layout.container.$el.show();
               ui.model_terms.$el.height("113px");
+             
+             if (ui.nested_re !== undefined) { 
+                 ui.nested_re_layout.$buttons.show();
+                 ui.nested_re_layout.$label.show();
+                 ui.nested_re_layout.container.$el.show();
+                 ui.re.$el.height("113px");
+                 var renested=context.cloneArray(ui.nested_re.value(), [[]]);
+                 if (renested[0].length === 0) {
+                         var relist=context.cloneArray(ui.re.value(), [[]]);
+                         ui.nested_re.setValue(relist);
+                 }
+             }
 
             } else {
               ui.nested_layout.$buttons.hide();
@@ -204,11 +218,25 @@ const fun = {
               ui.nested_layout.container.$el.hide();
               ui.nested_terms.setValue([]);
               ui.model_terms.$el.height("246.315px");
+
+              if (ui.nested_re !== undefined) { 
+             
+                  ui.nested_re.setValue([[]]);
+                  ui.nested_re_layout.$buttons.hide();
+                  ui.nested_re_layout.$label.hide();
+                  ui.nested_re_layout.container.$el.hide();
+                  ui.re.$el.height("243.315px");
+                  
+              }
+
+              
             }
 
 
          },
+         
   fixRandomEffects: function(ui, context) {
+         
             var option=ui.re_corr.value();
             var oldOption = context.workspace.re_corr;
             context.workspace.re_corr=option;

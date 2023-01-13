@@ -3,6 +3,7 @@ var fun=require('./functions');
 
 const events = {
     update: function(ui) {
+        this.setCustomVariable("Intercept", "none", "");
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);

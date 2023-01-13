@@ -633,13 +633,20 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - ci_width
-            - ci_method
             - emmeans
             - model_terms
-            - model_type
+            - ci_width
             - ci_method
-            - offset
+            - se_method
+            - boot_r
+            - covs_scale
+            - dep_scale
+            - covs_conditioning            
+            - covs_scale_labels   
+            - covs_conditioning
+            - covs_scale_labels
+            - ccp_value
+            - ccm_value
 
         columns:
         - name: response

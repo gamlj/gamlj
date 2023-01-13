@@ -755,6 +755,11 @@ items:
             - dep_scale
             - covs_conditioning            
             - covs_scale_labels   
+            - covs_conditioning
+            - covs_scale_labels
+            - ccp_value
+            - ccm_value
+            
             
         columns:
         - name: estimate
