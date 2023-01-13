@@ -122,6 +122,9 @@ children:
                   listItemRemoved: './gamlj.events::onChange_model_remove'
                 template:
                   type: TermLabel
+              - type: CheckBox
+                name: fixed_intercept
+                  
           - type: TargetLayoutBox
             name: nested_layout
             transferAction: interactions
@@ -135,6 +138,9 @@ children:
                    change: './gamlj.events::onChange_nested_add'
                 template:
                   type: TermLabel
+              - type: CheckBox
+                name: nested_intercept
+                enable: (comparison)
 
       - type: LayoutBox
         style: inline
@@ -146,15 +152,6 @@ children:
                 name: comparison
                 events:
                       change: './gamlj.events::onEvent_comparison'
-              - type: CheckBox
-                name: nested_intercept
-                enable: (comparison)
-
-          - type: Label
-            label: Parameters
-            children:         
-              - type: CheckBox
-                name: fixed_intercept
 
           - type: Label
             label: Omnibus test

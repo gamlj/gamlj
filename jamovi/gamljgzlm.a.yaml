@@ -107,7 +107,7 @@ options:
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
     - name: nested_intercept
-      title: Intercept
+      title: Nested intercept
       type: Bool
       default: true
       description:

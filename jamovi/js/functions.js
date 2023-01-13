@@ -253,7 +253,7 @@ const fun = {
 
  updateRandomSupplier: function(ui, context) {
    
-   if (typeof ui.randomSupplier !== 'undefined' ) {
+   if (typeof ui.randomSupplier == 'undefined' ) {
               return;
         }
 
