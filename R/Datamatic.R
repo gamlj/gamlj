@@ -223,10 +223,10 @@ Variable <- R6::R6Class(
        if (self$type=="numeric") {
 
          if (is.factor(vardata)) {
-           self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been coerced to mumeric"))
            vardata<-as.numeric(vardata)
          }
-         return(vardata)
+         return(private$.continuous_values(data))
+         
        }
          
 
@@ -256,10 +256,6 @@ Variable <- R6::R6Class(
 
       }
     
-
-        ### if we are here, it means this is a continuos variable
-        ### we need to pass the data for when clustering is needed
-         return(private$.continuous_values(data))
       },
       
       contrast_codes=function(type) {
@@ -549,7 +545,7 @@ Variable <- R6::R6Class(
         
       }
       
-      ## we then update levels to same the new levels (mean, sd etc)
+      ## we then update levels the new levels (mean, sd etc)
       private$.update_levels(vardata)
       as.numeric(vardata)
       
