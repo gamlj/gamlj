@@ -72,9 +72,9 @@ const events = {
     },
     onChange_plotsSupplier: function(ui) {
         let values = this.itemsToValues(ui.plotsSupplier.value());
-        this.checkValue(ui.plotHAxis, false, values, FormatDef.variable);
-        this.checkValue(ui.plotSepLines, false, values, FormatDef.variable);
-        this.checkValue(ui.plotSepPlots, true, values, FormatDef.variable);
+        this.checkValue(ui.plot_x, false, values, FormatDef.variable);
+        this.checkValue(ui.plot_z, false, values, FormatDef.variable);
+        this.checkValue(ui.plot_by, true, values, FormatDef.term);
     },
     onUpdate_plotsSupplier: function(ui) {
         fun.updatePlotsSupplier(ui, this);

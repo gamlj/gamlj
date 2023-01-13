@@ -253,7 +253,7 @@ options:
 
 
 
-    - name: plotHAxis
+    - name: plot_x
       title: Horizontal axis
       type: Variable
       default:
@@ -262,7 +262,7 @@ options:
             a string naming the variable placed on the horizontal axis of the
             plot
 
-    - name: plotSepLines
+    - name: plot_z
       title: Separate lines
       type: Variable
       default:
@@ -271,14 +271,16 @@ options:
             a string naming the variable represented as separate lines in the
             plot
 
-    - name: plotSepPlots
+    - name: plot_by
       title: Separate plots
-      type: Variables
+      type: Terms
       default:
       
       description:
           R: >
-            a list of string naming the variables defining the levels for multiple plots
+            a lsh formula indicating variables or combinations of variables defining
+            the levels at which a separate plot should be produced. It can be
+            `~a` or `~a+a:b` etc.
 
     - name: plotRaw
       title: Observed scores

@@ -351,20 +351,25 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotHAxis
+                name: plot_x
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepLines
+                name: plot_z
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
+            transferAction: interactions
             children:
-              - type: VariablesListBox
-                name: plotSepPlots
+              - type: ListBox
+                name: plot_by
+                valueFilter: unique
                 isTarget: true
+                itemDropBehaviour: emptyspace
+                template:
+                  type: TermLabel
       - type: LayoutBox
         margin: large
         style: inline

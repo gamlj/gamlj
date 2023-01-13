@@ -797,10 +797,9 @@ items:
 
           clearWith:
            - dep
-           - plotHAxis
-           - plotSepLines
-           - plotSepPlots
-           - plotError
+           - plot_x
+           - plot_z
+           - plot_by
            - ci_width
            - covs_scale
            - dep_scale
@@ -808,12 +807,8 @@ items:
            - fixed_intercept
            - covs_conditioning
            - covs_scale_labels
-           - plotDvScale
-           - plotRaw
            - ccp_value
            - ccm_value
-           - plotOriginalScale
-           - plotLinesTypes
 
   - name: plotnotes
     type: Html

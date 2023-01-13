@@ -27,9 +27,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
             vcov = FALSE,
-            plotHAxis = NULL,
-            plotSepLines = NULL,
-            plotSepPlots = NULL,
+            plot_x = NULL,
+            plot_z = NULL,
+            plot_by = NULL,
             plotRaw = FALSE,
             plotDvScale = FALSE,
             plotOriginalScale = FALSE,
@@ -199,17 +199,17 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "vcov",
                 vcov,
                 default=FALSE)
-            private$..plotHAxis <- jmvcore::OptionVariable$new(
-                "plotHAxis",
-                plotHAxis,
+            private$..plot_x <- jmvcore::OptionVariable$new(
+                "plot_x",
+                plot_x,
                 default=NULL)
-            private$..plotSepLines <- jmvcore::OptionVariable$new(
-                "plotSepLines",
-                plotSepLines,
+            private$..plot_z <- jmvcore::OptionVariable$new(
+                "plot_z",
+                plot_z,
                 default=NULL)
-            private$..plotSepPlots <- jmvcore::OptionVariables$new(
-                "plotSepPlots",
-                plotSepPlots,
+            private$..plot_by <- jmvcore::OptionTerms$new(
+                "plot_by",
+                plot_by,
                 default=NULL)
             private$..plotRaw <- jmvcore::OptionBool$new(
                 "plotRaw",
@@ -418,9 +418,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
             self$.addOption(private$..vcov)
-            self$.addOption(private$..plotHAxis)
-            self$.addOption(private$..plotSepLines)
-            self$.addOption(private$..plotSepPlots)
+            self$.addOption(private$..plot_x)
+            self$.addOption(private$..plot_z)
+            self$.addOption(private$..plot_by)
             self$.addOption(private$..plotRaw)
             self$.addOption(private$..plotDvScale)
             self$.addOption(private$..plotOriginalScale)
@@ -475,9 +475,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
         vcov = function() private$..vcov$value,
-        plotHAxis = function() private$..plotHAxis$value,
-        plotSepLines = function() private$..plotSepLines$value,
-        plotSepPlots = function() private$..plotSepPlots$value,
+        plot_x = function() private$..plot_x$value,
+        plot_z = function() private$..plot_z$value,
+        plot_by = function() private$..plot_by$value,
         plotRaw = function() private$..plotRaw$value,
         plotDvScale = function() private$..plotDvScale$value,
         plotOriginalScale = function() private$..plotOriginalScale$value,
@@ -531,9 +531,9 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
         ..vcov = NA,
-        ..plotHAxis = NA,
-        ..plotSepLines = NA,
-        ..plotSepPlots = NA,
+        ..plot_x = NA,
+        ..plot_z = NA,
+        ..plot_by = NA,
         ..plotRaw = NA,
         ..plotDvScale = NA,
         ..plotOriginalScale = NA,
@@ -1494,10 +1494,9 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     height=400,
                     clearWith=list(
                         "dep",
-                        "plotHAxis",
-                        "plotSepLines",
-                        "plotSepPlots",
-                        "plotError",
+                        "plot_x",
+                        "plot_z",
+                        "plot_by",
                         "ci_width",
                         "covs_scale",
                         "dep_scale",
@@ -1505,12 +1504,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "fixed_intercept",
                         "covs_conditioning",
                         "covs_scale_labels",
-                        "plotDvScale",
-                        "plotRaw",
                         "ccp_value",
-                        "ccm_value",
-                        "plotOriginalScale",
-                        "plotLinesTypes"))))
+                        "ccm_value"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
