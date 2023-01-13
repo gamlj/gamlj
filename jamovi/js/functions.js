@@ -1,25 +1,6 @@
-var fix_comparison=function(ui, context) {
-  
-            if (ui.comparison.getValue()===true) {
-              
-              ui.nested_layout.$buttons.show();
-              ui.nested_layout.$label.show();
-              ui.nested_layout.container.$el.show();
-              ui.model_terms.$el.height("113px");
+const fun = {
 
-            } else {
-              ui.nested_layout.$buttons.hide();
-              ui.nested_layout.$label.hide();
-              ui.nested_layout.container.$el.hide();
-              ui.nested_terms.setValue([]);
-              ui.model_terms.$el.height("246.315px");
-            }
-
-
-};
-
-var calcModelTerms = function(ui, context) {
-    mark("calcModelTerms");
+    calcModelTerms: function(ui, context) {
     var variableList = context.cloneArray(ui.factors.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);
     var combinedList = variableList.concat(covariatesList);
@@ -79,25 +60,76 @@ var calcModelTerms = function(ui, context) {
         ui.model_terms.setValue(termsList);
      }
      
-    updateContrasts(ui, variableList, context);
-    updateScaling(ui, covariatesList, context);
-};
+    this.updateContrasts(ui, variableList, context);
+    this.updateScaling(ui, covariatesList, context);
+} ,
+  
+  updateContrasts: function(ui, variableList, context) {
+    var currentList = context.cloneArray(ui.contrasts.value(), []);
 
-var updateSimpleSupplier = function(ui, context) {
-      
-        var termsList = context.cloneArray(ui.model_terms.value(), []);
-        var varList=[];
-        for (var j = 0; j < termsList.length; j++) {
-            var newTerm=context.clone(termsList[j]);
-            if (newTerm.length==1) {
-                  varList.push(newTerm[0]); // was varList.push(newTerm);
+    var list3 = [];
+    for (let i = 0; i < variableList.length; i++) {
+        let found = null;
+        for (let j = 0; j < currentList.length; j++) {
+            if (currentList[j].var === variableList[i]) {
+                found = currentList[j];
+                break;
             }
         }
-        varList=context.valuesToItems(varList, FormatDef.variable);
-        ui.simpleSupplier.setValue(varList);
-    };
+        if (found === null)
+            list3.push({ var: variableList[i], type: "simple" });
+        else
+            list3.push(found);
+    }
 
-var updatePlotsSupplier = function(ui, context) {
+    ui.contrasts.setValue(list3);
+},
+  updateScaling: function(ui, variableList, context) {
+    var currentList = context.cloneArray(ui.covs_scale.value(), []);
+
+    var list3 = [];
+    for (let i = 0; i < variableList.length; i++) {
+        let found = null;
+        for (let j = 0; j < currentList.length; j++) {
+            if (currentList[j].var === variableList[i]) {
+                found = currentList[j];
+                break;
+            }
+        }
+        if (found === null)
+            list3.push({ var: variableList[i], type: "centered" });
+        else
+            list3.push(found);
+    }
+    ui.covs_scale.setValue(list3);
+},
+
+ updatePostHocSupplier: function(ui, context) {
+    var termsList = context.cloneArray(ui.model_terms.value(), []);
+    var covariatesList = context.cloneArray(ui.covs.value(), []);
+    var list = [];
+    for (var j = 0; j < termsList.length; j++) {
+        var term = termsList[j];
+        if (containsCovariate(term, covariatesList) === false)
+            list.push(term);
+    }
+    ui.posthocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
+},
+
+  updateEmmeansSupplier: function(ui, context) {
+    var termsList = context.cloneArray(ui.model_terms.value(), []);
+    var list = [];
+    for (var j = 0; j < termsList.length; j++) {
+        var term = termsList[j];
+
+        if (unique(term).length===term.length)
+              list.push(term);
+    }
+    ui.emmeansSupplier.setValue(context.valuesToItems(list, FormatDef.term));
+
+},
+
+   updatePlotsSupplier: function(ui, context) {
 
         var termsList = context.cloneArray(ui.model_terms.value(), []);
         var varList=[];
@@ -110,112 +142,9 @@ var updatePlotsSupplier = function(ui, context) {
         varList=context.valuesToItems(varList, FormatDef.variable);
         ui.plotsSupplier.setValue(varList);
     
-    };
+    },
 
-
-var updatePostHocSupplier = function(ui, context) {
-    var termsList = context.cloneArray(ui.model_terms.value(), []);
-    var covariatesList = context.cloneArray(ui.covs.value(), []);
-    var list = [];
-    for (var j = 0; j < termsList.length; j++) {
-        var term = termsList[j];
-        if (containsCovariate(term, covariatesList) === false)
-            list.push(term);
-    }
-    ui.posthocSupplier.setValue(context.valuesToItems(list, FormatDef.term));
-};
-
-var updateEmmeansSupplier = function(ui, context) {
-    var termsList = context.cloneArray(ui.model_terms.value(), []);
-    var list = [];
-    for (var j = 0; j < termsList.length; j++) {
-        var term = termsList[j];
-
-        if (unique(term).length===term.length)
-              list.push(term);
-    }
-    ui.emmeansSupplier.setValue(context.valuesToItems(list, FormatDef.term));
-
-};
-
-var fixRandomEffects = function(ui, context) {
-            var option=ui.re_corr.value();
-            var oldOption = context.workspace.re_corr;
-            context.workspace.re_corr=option;
-          
-
-            if (ui.re_corr.value()=="block") {
-                  if (oldOption==="corr" || oldOption==="nocorr")
-                        ui.re.setValue(Array([]));
-                  // make sure the add button is visible                      
-                  var button= ui.re.$addButton;
-                  button[0].style.visibility="visible";
-                  // get the re field to manipulate the children
-                  var target= ui.re;
-                  target.$el[0].lastElementChild.style.borderColor=null;
-                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
-                  // remove possibility to kill the first row
-                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
-                  
-
-             } else {
-                 var data = context.cloneArray(ui.re.value(),[]);
-                 var one = flatMulti(data,context);
-                 var button= ui.re.$addButton;
-                 button[0].style.visibility="hidden";
-                 var target= ui.re;
-                 target.setValue(Array(one));
-                 var one = target.controls[0];
-                 target.$el[0].lastElementChild.style.borderColor="transparent";
-                 one.$el[0].childNodes[0].style.visibility="hidden";
-                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
-             }
-
-  
-};
-
-var updateRandomSupplier = function(ui, context) {
-  
-    var factorList = context.cloneArray(ui.factors.value(), []);
-    var covariatesList = context.cloneArray(ui.covs.value(), []);
-    var variableList = factorList.concat(covariatesList);
-    var model_terms = context.cloneArray(ui.model_terms.value(), []); 
-    var termsList=[];
-    termsList = context.getCombinations(variableList);
-    termsList=unique(termsList.concat(model_terms));
-    context.sortArraysByLength(termsList);
-//    ui.randomSupplier.setValue(context.valuesToItems(termsList, FormatDef.term));
-    var clusterList = context.cloneArray(ui.cluster.value(), []);
-    if (clusterList.length<1) {
-                ui.randomSupplier.setValue(context.valuesToItems([], rtermFormat));                  return;
-    }
-    termsList.unshift(["Intercept"]);
-    var alist=[];
-    for (var i=0; i < clusterList.length; i++) {
-     for (var j = 0; j < termsList.length; j++) {
-       var item=context.cloneArray(termsList[j]);
-       item[item.length]=clusterList[i];
-       alist.push(item);
-     }
-    }
-    context.sortArraysByLength(alist);
-//    console.log("random supplierList");
-      var formatted=context.valuesToItems(alist, rtermFormat);
-    ui.randomSupplier.setValue(formatted);
-    
-};
-
-var filterRandomTerms = function(ui, context) {
-//    console.log("filter random effects");  
-    var termsList = context.cloneArray(ui.re.value(), []);
-    var unique = termsList.filter((v, i, a) => a.indexOf(v) === i); 
-    if (unique.length!=termsList.length)
-      ui.re.setValue(unique);
-  
-};
-
-
-var filterModelTerms = function(ui, context) {
+ filterModelTerms: function(ui, context) {
   
     var termsList = context.cloneArray(ui.model_terms.value(), []);
     var diff = context.findChanges("termsList", termsList, true, FormatDef.term);
@@ -243,64 +172,216 @@ var filterModelTerms = function(ui, context) {
 
     if (changed)
         ui.model_terms.setValue(termsList);
-};
-
-var updateContrasts = function(ui, variableList, context) {
-    var currentList = context.cloneArray(ui.contrasts.value(), []);
-
-    var list3 = [];
-    for (let i = 0; i < variableList.length; i++) {
-        let found = null;
-        for (let j = 0; j < currentList.length; j++) {
-            if (currentList[j].var === variableList[i]) {
-                found = currentList[j];
-                break;
+},
+  updateSimpleSupplier: function(ui, context) {
+      
+        var termsList = context.cloneArray(ui.model_terms.value(), []);
+        var varList=[];
+        for (var j = 0; j < termsList.length; j++) {
+            var newTerm=context.clone(termsList[j]);
+            if (newTerm.length==1) {
+                  varList.push(newTerm[0]); // was varList.push(newTerm);
             }
         }
-        if (found === null)
-            list3.push({ var: variableList[i], type: "simple" });
-        else
-            list3.push(found);
-    }
+        varList=context.valuesToItems(varList, FormatDef.variable);
+        ui.simpleSupplier.setValue(varList);
+    },
 
-    ui.contrasts.setValue(list3);
-};
 
-var updateScaling = function(ui, variableList, context) {
-    var currentList = context.cloneArray(ui.covs_scale.value(), []);
-    var list3 = [];
-    for (let i = 0; i < variableList.length; i++) {
-        let found = null;
-        for (let j = 0; j < currentList.length; j++) {
-            if (currentList[j].var === variableList[i]) {
-                found = currentList[j];
-                break;
+
+       fix_comparison:function(ui, context) {
+  
+            if (ui.comparison.getValue()===true) {
+              
+              ui.nested_layout.$buttons.show();
+              ui.nested_layout.$label.show();
+              ui.nested_layout.container.$el.show();
+              ui.model_terms.$el.height("113px");
+
+            } else {
+              ui.nested_layout.$buttons.hide();
+              ui.nested_layout.$label.hide();
+              ui.nested_layout.container.$el.hide();
+              ui.nested_terms.setValue([]);
+              ui.model_terms.$el.height("246.315px");
             }
+
+
+         },
+  fixRandomEffects: function(ui, context) {
+            var option=ui.re_corr.value();
+            var oldOption = context.workspace.re_corr;
+            context.workspace.re_corr=option;
+            
+            if (ui.re_corr.value()=="block") {
+                  if (oldOption==="corr" || oldOption==="nocorr")
+                        ui.re.setValue(Array([]));
+                  // make sure the add button is visible                      
+                  var button= ui.re.$addButton;
+                  button[0].style.visibility="visible";
+                  // get the re field to manipulate the children
+                  var target= ui.re;
+                  target.$el[0].lastElementChild.style.borderColor=null;
+                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+                  // remove possibility to kill the first row
+                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+                  
+
+             } else {
+                 var data = context.cloneArray(ui.re.value(),[]);
+                 var one = flatMulti(data,context);
+                 var button= ui.re.$addButton;
+                 button[0].style.visibility="hidden";
+                 var target= ui.re;
+                 target.setValue(Array(one));
+                 var one = target.controls[0];
+                 target.$el[0].lastElementChild.style.borderColor="transparent";
+                 one.$el[0].childNodes[0].style.visibility="hidden";
+                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+             }
+             
+             // handle the nested random effects
+                 // be sure there's at least one slot available
+                 if (ui.nested_re.value().length===0)
+                         ui.nested_re.setValue([[]]);
+                  // remove possibility to kill the first row
+                  ui.nested_re.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+
+
+  
+},
+
+ updateRandomSupplier: function(ui, context) {
+   
+   if (typeof ui.randomSupplier !== 'undefined' ) {
+              return;
         }
-        if (found === null)
-            list3.push({ var: variableList[i], type: "centered" });
-        else
-            list3.push(found);
+
+    console.log("updating random supplier");
+// first we check if the update is needed    
+    var clusterList = context.cloneArray(ui.cluster.value(), []);
+    if (clusterList.length<1) {
+                ui.randomSupplier.setValue(context.valuesToItems([], rtermFormat));
+                return;
     }
-    ui.covs_scale.setValue(list3);
-};
+    var termsList=[];
+// then we check how to prepare the list
 
+    var order = 0
 
-
-var containsCovariate = function(value, covariates) {
-    for (var i = 0; i < covariates.length; i++) {
-        if (FormatDef.term.contains(value, covariates[i]))
-            return true;
+    if ( ui.re_modelterms.value() === true) {
+         termsList = context.cloneArray(ui.model_terms.value(), []); 
     }
+    var option = ui.re_listing.value();
 
-    return false;
+    if (  option != "none" ) {
+       var factorList = context.cloneArray(ui.factors.value(), []);
+       var covariatesList = context.cloneArray(ui.covs.value(), []);
+       var variablesList = factorList.concat(covariatesList);
+
+        if ( option === "main") order = 1;
+        if ( option === "way2") order = 2;
+        if ( option === "way3") order = 3;
+        if ( option === "all")  order = variablesList.length
+        
+        termsList = unique(termsList.concat(interactions(variablesList, order)));
+        
+    }
+    termsList.unshift(["Intercept"]);
+
+    var alist=[];
+    for (var i=0; i < clusterList.length; i++) {
+     for (var j = 0; j < termsList.length; j++) {
+       var item=context.cloneArray(termsList[j]);
+       item[item.length]=clusterList[i];
+       alist.push(item);
+     }
+    }
+    var formatted=context.valuesToItems(alist, rtermFormat);
+
+    ui.randomSupplier.setValue(formatted);
+  
+
+},
+
+
+         mark: function(obj) {
+               console.log(obj);
+         }
+
+}
+
+
+
+module.exports=fun
+
+
+var mark = function(obj) {
+  console.log(obj);
 };
 
 var unique = function(avec) {
-  
   return(avec.filter((v, i, a) => a.indexOf(v) === i));
 };
 
+
+var containsCovariate = function(value, covariates) {
+  for (var i = 0; i < covariates.length; i++) {
+    if (FormatDef.term.contains(value, covariates[i]))
+      return true;
+  }
+  
+  return false;
+};
+
+function interactions(set,order) {
+
+    var inter=[], j
+    for (j = 0; j < order; j++) {
+        inter=inter.concat(k_combinations(set,j+1))
+    }
+    return inter;
+};
+
+function k_combinations(set, k) {
+	var i, j, combs, head, tailcombs;
+	
+	if (k > set.length || k <= 0) {
+		return [];
+	}
+	
+	// K-sized set has only one K-sized subset.
+	if (k == set.length) {
+		return [set];
+	}
+	
+	// There is N 1-sized subsets in a N-sized set.
+	if (k == 1) {
+		combs = [];
+		for (i = 0; i < set.length; i++) {
+			combs.push([set[i]]);
+		}
+		return combs;
+	}
+	
+	combs = [];
+	for (i = 0; i < set.length - k + 1; i++) {
+		head = set.slice(i, i + 1);
+		tailcombs = k_combinations(set.slice(i + 1), k - 1);
+		for (j = 0; j < tailcombs.length; j++) {
+			combs.push(head.concat(tailcombs[j]));
+		}
+	}
+	return combs;
+};
+
+var flatMulti = function(cosmos,context) {
+  var light = []
+  for (var i=0 ; i < cosmos.length; i++) {
+    light=addToList(light,cosmos[i],context);
+  }
+  return unique(light);
+};
 
 var addToList = function(quantum, cosmos, context) {
   
@@ -325,13 +406,12 @@ var flatMulti = function(cosmos,context) {
 };
 
 
-
 var ssort= function(str){
   str = str.replace(/[`\[\]"\\\/]/gi, '');
   var arr = str.split(',');
   var sorted = arr.sort();
   return sorted.join('');
-}
+};
 
 var normalize = function(cosmos) {
 
@@ -406,11 +486,4 @@ var dim = function(aList) {
 
   
     return(value);
-};
-
-
-
-var mark = function(obj) {
-  
-   console.log(obj);
 };

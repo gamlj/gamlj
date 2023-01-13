@@ -3,7 +3,7 @@ title: Generalized Mixed Model
 jus: '2.0'
 compilerMode: tame
 events:
-  update: './mixed.events::update'
+  update: './gamlj.events::update'
 children:
   - type: LayoutBox
     margin: large
@@ -20,13 +20,13 @@ children:
                 optionName: model_type
                 optionPart: poisson
                 events:
-                  change: './gzmixed.events::onChange_model'
+                  change: './gamlj.events::onChange_model'
               - type: RadioButton
                 name: model_type_nb
                 optionName: model_type
                 optionPart: nb
                 events:
-                  change: './gzmixed.events::onChange_model'
+                  change: './gamlj.events::onChange_model'
       - type: LayoutBox
         margin: large
         children:
@@ -38,25 +38,25 @@ children:
                 optionName: model_type
                 optionPart: logistic
                 events:
-                  change: './gzmixed.events::onChange_model'
+                  change: './gamlj.events::onChange_model'
               - type: RadioButton
                 name: model_type_probit
                 optionName: model_type
                 optionPart: probit
                 events:
-                  change: './gzmixed.events::onChange_model'
+                  change: './gamlj.events::onChange_model'
               - name: model_type_ordinal
                 type: RadioButton
                 optionName: model_type
                 optionPart: ordinal
                 events:
-                  change: './gzmixed.events::onChange_model'
+                  change: './gamlj.events::onChange_model'
               - type: RadioButton
                 name: model_type_multinomial
                 optionName: model_type
                 optionPart: multinomial
                 events:
-                  change: './gzmixed.events::onChange_model'
+                  change: './gamlj.events::onChange_model'
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -79,14 +79,14 @@ children:
             name: factors
             isTarget: true
             events:
-              change: './mixed.events::onChange_factors'
+              change: './gamlj.events::onChange_factors'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
             name: covs
             isTarget: true
             events:
-              change: './mixed.events::onChange_covariates'
+              change: './gamlj.events::onChange_covariates'
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
@@ -94,7 +94,7 @@ children:
             height: small
             isTarget: true
             events:
-              change: './mixed.events::onChange_cluster'
+              change: './gamlj.events::onChange_cluster'
   - type: LayoutBox
     margin: large
     style: inline
@@ -114,7 +114,7 @@ children:
               - type: CheckBox
                 name: comparison
                 events:
-                  change: './mixed.events::onEvent_comparison'
+                  change: './gamlj.events::onEvent_comparison'
       - type: Label
         label: Effect Size
         margin: large
@@ -207,8 +207,8 @@ children:
         persistentItems: true
         stretchFactor: 1
         events:
-          change: './mixed.events::onChange_randomSupplier'
-          update: './mixed.events::onUpdate_randomSupplier'
+          change: './gamlj.events::onChange_randomSupplier'
+          update: './gamlj.events::onUpdate_randomSupplier'
         children:
           - type: TargetLayoutBox
             transferAction: none
@@ -219,7 +219,7 @@ children:
                 height: normal
                 addButton: Add correlated effects block
                 events:
-                  change: './mixed.events::onChange_nested_re_add'
+                  change: './gamlj.events::onChange_nested_re_add'
                 selectable: true
                 templateName: linreg-block-template
                 template:
@@ -234,7 +234,7 @@ children:
                       valueFilter: unique
                       ghostText: drag term here
                       events:
-                        change: './mixed.events::onEvent_addRandomTerm'
+                        change: './gamlj.events::onEvent_addRandomTerm'
                       template:
                         type: TermLabel
                         format: ./rtermFormat
@@ -247,8 +247,8 @@ children:
                 height: normal
                 addButton: Add correlated effects block
                 events:
-                  listItemAdded: './mixed.events::onEvent_nothing'
-                  listItemRemoved: './mixed.events::onEvent_nothing'
+                  listItemAdded: './gamlj.events::onEvent_nothing'
+                  listItemRemoved: './gamlj.events::onEvent_nothing'
                 selectable: true
                 templateName: linreg-block-template
                 template:
@@ -264,7 +264,7 @@ children:
                       ghostText: drag term here
                       itemDropBehaviour: emptyspace
                       events:
-                        change: './mixed.events::onEvent_addRandomTerm'
+                        change: './gamlj.events::onEvent_addRandomTerm'
                       template:
                         type: TermLabel
                         format: ./rtermFormat
@@ -278,11 +278,11 @@ children:
               - type: CheckBox
                 name: re_modelterms
                 events:
-                  change: './mixed.events::onEvent_re_list'
+                  change: './gamlj.events::onEvent_re_list'
               - type: ComboBox
                 name: re_listing
                 events:
-                  change: './mixed.events::onEvent_re_list'
+                  change: './gamlj.events::onEvent_re_list'
           - type: Label
             label: Effects correlation
             children:
@@ -295,7 +295,7 @@ children:
                     optionName: re_corr
                     optionPart: all
                     events:
-                      change: './mixed.events::onEvent_corr'
+                      change: './gamlj.events::onEvent_corr'
                   - type: RadioButton
                     name: re_corr_none
                     optionName: re_corr
