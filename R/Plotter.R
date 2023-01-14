@@ -173,7 +173,7 @@ Plotter <- R6::R6Class(
       
       qqplot=function(theme,ggtheme)  {
         
-              if (!self$option("qqplot"))
+              if (!self$option("qq_plot"))
                          return()
         
               if (!is.something(private$.operator$model))
@@ -181,18 +181,18 @@ Plotter <- R6::R6Class(
 
               residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
               df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
-              plot<-ggplot2::ggplot(data=df, aes(y=y, x=x)) +
-                          geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
-                          geom_point(aes(x=x,y=y), size=2, colour=theme$color[1]) +
-                          xlab("Theoretical Quantiles") +
-                          ylab("Standardized Residuals") 
+              plot<-ggplot2::ggplot(data=df, ggplot2::aes(y=y, x=x)) +
+                ggplot2::geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
+                ggplot2::geom_point(ggplot2::aes(x=x,y=y), size=2, colour=theme$color[1]) +
+                ggplot2::xlab("Theoretical Quantiles") +
+                ggplot2::ylab("Standardized Residuals") 
       
                plot+ggtheme
       },
       
       normplot=function(theme,ggtheme)  {
         
-        if (!self$option("normPlot"))
+        if (!self$option("norm_plot"))
           return()
         
         if (!is.something(private$.operator$model))
@@ -203,12 +203,13 @@ Plotter <- R6::R6Class(
         data <- as.data.frame(stats::residuals(private$.operator$model))
         names(data) <- "x"
         # library(ggplot2)
-        plot <- ggplot2::ggplot(data = data, aes_string(x = "x")) + labs(x = "Residuals", y = "density")
+        plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = "x")) +
+          ggplot2::labs(x = "Residuals", y = "density")
         
-        plot <- plot + ggplot2::geom_histogram(aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
+        plot <- plot + ggplot2::geom_histogram(ggplot2::aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
         plot <- plot + ggplot2::stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))
         
-        themeSpec <- theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+        themeSpec <- ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
         plot <- plot + ggtheme + themeSpec
         
         return(plot)
@@ -216,7 +217,7 @@ Plotter <- R6::R6Class(
       },
       residPlot=function(theme,ggtheme)  {
         
-        if (!self$option("residPlot"))
+        if (!self$option("resid_plot"))
           return()
         
         if (!is.something(private$.operator$model))
@@ -229,9 +230,10 @@ Plotter <- R6::R6Class(
             data$pred <- stats::predict(private$.operator$model)
       
               # library(ggplot2)
-            plot <- ggplot(data = data, aes_string(x = "pred", y = "res")) + labs(x = "Predicted", y = "Residuals")
+            plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = "pred", y = "res")) + 
+                       ggplot2::labs(x = "Predicted", y = "Residuals")
       
-            plot <- plot + geom_point(shape = 21, color = color, fill = fill)
+            plot <- plot + ggplot2::geom_point(shape = 21, color = color, fill = fill)
             plot <- plot + ggtheme
             return(plot)
       },
@@ -250,8 +252,9 @@ Plotter <- R6::R6Class(
         cluster<-image$state$cluster
 
         fmodel<-lme4::fortify.merMod(private$.operator$model)
-        plot<-ggplot(fmodel, aes_string(cluster,".resid")) + geom_boxplot() + coord_flip()
-        plot<-plot+xlab(fromb64(cluster))+ylab("Residuals")
+        plot<-ggplot2::ggplot(fmodel, ggplot2::aes_string(cluster,".resid")) +
+              ggplot2::geom_boxplot() + ggplot2::coord_flip()
+        plot<-plot+ggplot2::xlab(fromb64(cluster))+ylab("Residuals")
         plot<-plot+ ggtheme 
 
         return(plot)
@@ -295,15 +298,15 @@ Plotter <- R6::R6Class(
               fill <- theme$fill[2]
               color <- theme$color[1]
               alpha <- 0.4
-              plot <- ggplot(data=data, aes(x=x)) +
-                            labs(x="Coefficients", y='density')
+              plot <- ggplot2::ggplot(data=data, ggplot2::aes(x=x)) +
+                           ggplot2::labs(x="Coefficients", y='density')
           
-              plot <- plot + geom_histogram(aes(y=..density..), position="identity",
+              plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y=..density..), position="identity",
                                         stat="bin", color=color, fill=fill)
-              plot <- plot + stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
+              plot <- plot + ggplot2::stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
           
-              themeSpec <- theme(axis.text.y=element_blank(),
-                             axis.ticks.y=element_blank())
+              themeSpec <- theme(axis.text.y=ggplot2::element_blank(),
+                             axis.ticks.y=ggplot2::element_blank())
               plot <- plot + ggtheme + themeSpec
           
           
