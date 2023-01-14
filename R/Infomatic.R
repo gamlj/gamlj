@@ -143,7 +143,7 @@ Infomatic <- R6::R6Class(
       if (self$model_type=="custom") {
        
         self$model         <-   c("User Model","Generalized model")
-        self$family        <-    paste(options$custom_family,"(",options$custom_link,")")
+        self$family        <-    paste0(options$custom_family,"('",options$custom_link,"')")
         self$distribution  <-    options$custom_family
         self$call          <-    CALLS[[self$caller]]
         self$rcall         <-    FUNCS[[self$caller]]

@@ -34,7 +34,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_yscale = FALSE,
             plot_xoriginal = FALSE,
             plot_black = FALSE,
-            plot_around = "none",
+            plot_around = "ci",
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
@@ -234,7 +234,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "none",
                     "ci",
                     "se"),
-                default="none")
+                default="ci")
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,

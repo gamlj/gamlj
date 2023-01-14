@@ -317,7 +317,7 @@ options:
           title: Confidence intervals
         - name: se
           title: Standard Error
-      default: 'none'
+      default: ci
       description:
           R: >
             `'none'` (default), `'ci'`, or `'se'`. Use no error

@@ -95,6 +95,10 @@ const events = {
         if (typeof ui.es_RR !== 'undefined' ) {
               ui.es_RR.setValue(false);
         }
+        if (typeof ui.plot_scale !== 'undefined' ) {
+              ui.plot_scale.setValue('response');
+        }
+
         if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear")        {
                ui.es_expb.setValue(false);
                ui.estimates_ci.setValue(true);

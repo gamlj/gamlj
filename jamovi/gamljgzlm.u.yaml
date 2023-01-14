@@ -454,7 +454,7 @@ children:
                 name: plot_scale_link
                 optionName: plot_scale
                 optionPart: link
-                enable: (!model_type_multinomial && !model_type_ordinal)
+                enable: (!model_type_multinomial && !model_type_ordinal && !model_type_linear)
               - type: RadioButton
                 name: plotcale_mean.class
                 optionName: plot_scale
