@@ -189,9 +189,7 @@ const fun = {
         ui.simpleSupplier.setValue(varList);
     },
 
-
-
-       fix_comparison:function(ui, context) {
+   fix_comparison:function(ui, context) {
   
             if (ui.comparison.getValue()===true) {
               

@@ -361,15 +361,10 @@ children:
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
-            transferAction: interactions
             children:
-              - type: ListBox
+              - type: VariablesListBox
                 name: plot_by
-                valueFilter: unique
                 isTarget: true
-                itemDropBehaviour: emptyspace
-                template:
-                  type: TermLabel
       - type: LayoutBox
         margin: large
         style: inline
@@ -378,31 +373,31 @@ children:
             label: Display
             children:
               - type: RadioButton
-                name: errBarDef_none
-                optionName: plotError
+                name: plot_around_none
+                optionName: plot_around
                 optionPart: none
               - type: RadioButton
-                name: errBarDef_ci
-                optionName: plotError
+                name: plot_around_ci
+                optionName: plot_around
                 optionPart: ci
-              - name: plotError_se
+              - name: plot_around_se
                 type: RadioButton
-                optionName: plotError
+                optionName: plot_around
                 optionPart: se
           - type: Label
             label: Plot
             children:
               - type: CheckBox
-                name: plotRaw
+                name: plot_raw
               - type: CheckBox
-                name: plotDvScale
+                name: plot_yscale
           - type: Label
             label: Use
             children:
               - type: CheckBox
-                name: plotOriginalScale
+                name: plot_xoriginal
               - type: CheckBox
-                name: plotLinesTypes
+                name: plot_black
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

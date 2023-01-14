@@ -273,16 +273,14 @@ options:
 
     - name: plot_by
       title: Separate plots
-      type: Terms
+      type: Variables
       default:
       
       description:
           R: >
-            a lsh formula indicating variables or combinations of variables defining
-            the levels at which a separate plot should be produced. It can be
-            `~a` or `~a+a:b` etc.
+            a list of variables defining the levels at which a separate plot should be produced.
 
-    - name: plotRaw
+    - name: plot_raw
       title: Observed scores
       type: Bool
       default: false
@@ -290,7 +288,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), plot raw data along the predicted values
 
-    - name: plotDvScale
+    - name: plot_yscale
       title: Y-axis observed range 
       type: Bool
       default: false
@@ -298,7 +296,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
-    - name: plotOriginalScale
+    - name: plot_xoriginal
       title: Original scale 
       type: Bool
       default: false
@@ -306,7 +304,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), use original scale for covariates.
 
-    - name: plotLinesTypes
+    - name: plot_black
       title: Varying line types 
       type: Bool
       default: false
@@ -314,7 +312,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), use different linetypes per levels.
 
-    - name: plotError
+    - name: plot_around
       title: Error Bar Definition
       type: List
       options:

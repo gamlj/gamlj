@@ -74,7 +74,7 @@ const events = {
         let values = this.itemsToValues(ui.plotsSupplier.value());
         this.checkValue(ui.plot_x, false, values, FormatDef.variable);
         this.checkValue(ui.plot_z, false, values, FormatDef.variable);
-        this.checkValue(ui.plot_by, true, values, FormatDef.term);
+        this.checkValue(ui.plot_by, true, values, FormatDef.variable);
     },
     onUpdate_plotsSupplier: function(ui) {
         fun.updatePlotsSupplier(ui, this);

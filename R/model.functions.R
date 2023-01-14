@@ -1,8 +1,5 @@
 
 
-
-
-
 mf.getModelFactors<-function(model) {
   names(attr(stats::model.matrix(model),"contrasts"))
 } 
@@ -189,3 +186,14 @@ mf.update<- function(x,...) UseMethod(".update")
   
   stats::update(model,data=data,...)
 }
+
+### model data extraction 
+
+mf.data<- function(x,...) UseMethod(".data")
+
+.data.default<-function(model) model$model
+
+.data.glmerMod<-function(model) model@frame
+
+.data.lmerModLmerTest<-function(model) model@frame
+

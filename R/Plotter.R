@@ -26,17 +26,16 @@ Plotter <- R6::R6Class(
             private$.results<-results
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
-            self$scatterRaw<-self$options$plotRaw
+            self$scatterRaw<-self$options$plot_raw
             if ("plotScale" %in% names(self$options))
                     self$scatterType<-self$options$plotScale
             else 
                     self$scatterType<-"response"
-            self$dispatcher<-Dispatch$new()
+            self$dispatcher<-operator$dispatcher
       },
 
       initPlots=function() {
            private$.initMainPlot()
-
       },
       preparePlots=function(image, ggtheme, theme, ...) {
         ## here are the plots that require some preparations. Other types of plots 
@@ -70,18 +69,16 @@ Plotter <- R6::R6Class(
                     
         } else {
                      names(data)[1:2]<-c("x","z")
-                     if (isFALSE(self$options$plotLinesTypes)) {
-                    .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", colour = "z")
-                    .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",color = "z" ,fill="z")
+                     if (isFALSE(self$options$plot_black)) {
+                         .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", colour = "z")
+                         .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",color = "z" ,fill="z")
                      } else {
-                       
-                       .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", linetype = "z")
-                       .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",linetype = "z" ,fill="z")
-                       
+                         .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", linetype = "z")
+                         .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",linetype = "z" ,fill="z")
                      }
         }
         
-        ## initializa plot 
+        ## initialize plot 
         p <- ggplot2::ggplot()
         
         # give a scale to the Y axis
@@ -94,6 +91,7 @@ Plotter <- R6::R6Class(
         if (self$scatterRaw) {
           
           rawdata<-self$rawData[[image$key]]
+
           y<-self$scatterY$name64
           x<-self$scatterX$name64
           z<-self$scatterZ$name64
@@ -132,8 +130,6 @@ Plotter <- R6::R6Class(
 
         }
         
-        
-        
         ######### fix the bars ##########        
         if (self$scatterBars) {
           if (self$scatterX$type=="factor")
@@ -157,9 +153,9 @@ Plotter <- R6::R6Class(
               p <- p +  ggplot2::geom_point(data = data,
                                             .aestetics,
                                             shape = 21, size = 4, fill="white",
-                                            position = self$scatterDodge)
+                                            position = self$scatterDodge,show.legend = FALSE)
         
-        if (isFALSE(self$options$plotLinesTypes))
+        if (isFALSE(self$options$plot_black))
            p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, colour = self$scatterClabel)
         else
           p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, linetype = self$scatterClabel)
@@ -172,7 +168,6 @@ Plotter <- R6::R6Class(
         #   p<-p+ggplot2::scale_x_continuous(labels= newlabs)
         # }
            
-        
         return(p)        
       },
       
@@ -323,16 +318,16 @@ Plotter <- R6::R6Class(
     .operator=NULL,
     .initMainPlot=function() {
       
-            if (!is.something(self$options$plotHAxis)) 
+            if (!is.something(self$options$plot_x)) 
                    return()
             
             ginfo("PLOTTER: init main plot")
       
             resultsgroup<-private$.results$get("mainPlots")
             y<-self$options$dep
-            x<-self$options$plotHAxis
-            z<-self$options$plotSepLines
-            moderators<-self$options$plotSepPlots
+            x<-self$options$plot_x
+            z<-self$options$plot_z
+            moderators<-self$options$plot_by
             
             if (self$options$model_type=="multinomial") {
                      moderators < c(z,moderators)
@@ -366,25 +361,21 @@ Plotter <- R6::R6Class(
                      self$scatterZ<-private$.datamatic$variables[[tob64(z)]]
              
 
-             if (self$options$plotError != "none") {
+             if (self$options$plot_around != "none") {
                self$scatterBars<-TRUE
                self$scatterDodge <- ggplot2::position_dodge(0.2)
-               self$scatterClabel <- paste(self$scatterZ$name, paste0("(", toupper(self$options$plotError), ")"), sep = "\n")
+               self$scatterClabel <- paste(self$scatterZ$name, paste0("(", toupper(self$options$plot_around), ")"), sep = "\n")
              } else {
                self$scatterDodge<-ggplot2::position_dodge(0)
                self$scatterClabel <- self$scatterZ$name
              }
-             
-             
-             
-             
 
     },
     .prepareMainPlot=function() {
-      
+
       
 
-      if (!is.something(self$options$plotHAxis)) 
+      if (!is.something(self$options$plot_x)) 
         return()
 
       ginfo("PLOTTER: prepare main plot")
@@ -395,27 +386,17 @@ Plotter <- R6::R6Class(
       if (test)
            return()
       
-      
       moderators<-self$scatterModerators
-
-
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
 
-      #### compute the levels combinations
-      #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
-      #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
-      ### for the raw data, it selects only if the moderator is a factor, whereas all data for the 
-      ### continuous are retained
-      #### TODO: this is abstruse, try changing it
-      
-      dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
-      rawData<-mf.getModelData(private$.operator$model)
+      rawData<-mf.data(private$.operator$model)
       for (var in names(rawData)) {
         if (is.factor(rawData[[var]]))
-           levels(rawData[[var]])<-gsub(LEVEL_SYMBOL,"",levels(rawData[[var]]),fixed = T)
+            levels(rawData[[var]])<-private$.datamatic$variables[[var]]$levels_labels
+        
+#           levels(rawData[[var]])<-gsub(LEVEL_SYMBOL,"",levels(rawData[[var]]),fixed = T)
       }
-      
       ### here we deal with plotting random effects, if needed
       randomData<-NULL
       if (self$option("plotRandomEffects")) {
@@ -446,7 +427,7 @@ Plotter <- R6::R6Class(
         dep64  <- self$scatterY$name64
 
         ### give a range to the y-axis, if needed
-        if (self$options$plotDvScale)
+        if (self$options$plot_yscale)
             self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
 
       if (self$option("modelSelection","multinomial")) {
@@ -475,15 +456,22 @@ Plotter <- R6::R6Class(
       #### deal with rescaling
       if (self$scatterXscale) {
         data[[self$scatterX$name64]]<-private$.rescale(self$scatterX,data[[self$scatterX$name64]])
-        if (is.something(rawData))
+      if (is.something(rawData))
           rawData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,rawData[[self$scatterX$name64]])
         if (is.something(randomData))
           randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
-        
       }
       
       
-      
+      #### compute the levels combinations
+      #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
+      #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
+      ### for the raw data, it selects only if the moderator is a factor, whereas all data for the 
+      ### continuous are retained
+      #### TODO: this is abstruse, try changing it
+
+      dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
+
       if (is.something(dims))  {
         
              grid<-expand.grid(dims,stringsAsFactors = FALSE)
@@ -503,7 +491,7 @@ Plotter <- R6::R6Class(
                 
                 if (self$scatterRaw) {
                        if (length(selectable)>0) {
-                            sel<-paste(paste0("data$",.sel64,sep=""),paste0('"',selgrid[i,],'"'),sep="==",collapse = " & ")
+                            sel<-paste(paste0("rawData$",.sel64,sep=""),paste0('"',selgrid[i,],'"'),sep="==",collapse = " & ")
                             raw<-rawData[eval(parse(text=sel)),]
                        } else
                             raw<-rawData
@@ -649,9 +637,9 @@ Plotter <- R6::R6Class(
       
       if (xobj$type=="numeric") {
            conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
-           if (self$option("plotOriginalScale")) {
+           if (self$option("plot_xoriginal")) {
                  self$scatterXscale<-TRUE
-                 self$dispatcher$warnings<-list(topic="plot",message="Note: The X-axis is in the X-variable original scale")
+#                 self$dispatcher$warnings<-list(topic="plotnotes",message="Note: The X-axis is in the X-variable original scale")
            }
       }
       allterm64<-c(x64,term64)
@@ -690,11 +678,12 @@ Plotter <- R6::R6Class(
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####
       names(tableData)<-c(allterm64,"estimate","se","df","lower","upper")
-      if (self$options$plotError=="se") {
+      
+      if (self$options$plot_around=="se") {
            tableData$lower<-tableData$estimate-tableData$se
            tableData$upper<-tableData$estimate+tableData$se
       }
-      if (self$options$plotError=="none") {
+      if (self$options$plot_around=="none") {
         tableData$lower<-NULL
         tableData$upper<-NULL
       }
@@ -708,21 +697,22 @@ Plotter <- R6::R6Class(
               tableData[[term]]<-factor(tableData[[term]])
               levels(tableData[[term]])<-private$.datamatic$variables[[term]]$levels_labels
       }
+      
       tableData
       
     },
     .rescale=function(varobj,values) {
-      
-      if (varobj$scaling=="clusterbasedcentered")
-          self$dispatcher$warnings<-list(topic="plot",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` is the original scale is necessary.")
-        
+
+      if (varobj$covs_scale=="clusterbasedcentered")
+          self$dispatcher$warnings<-list(topic="plot",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
+
 #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
 #      len <- max(min(len,na.rm = T),0)
-      if (varobj$scaling=="centered")
+      if (varobj$covs_scale=="centered")
           values<-values+varobj$original_descriptive$mean
-      if (varobj$scaling=="standardized") 
+      if (varobj$covs_scale=="standardized") 
         values<-varobj$original_descriptive$sd*values+varobj$original_descriptive$mean
-      if (varobj$scaling=="log") 
+      if (varobj$covs_scale=="log") 
         values<-exp(values)
       
       values
