@@ -38,8 +38,11 @@ Dispatch <- R6::R6Class(
                                 if (!is.something(table)) stop("SCAFFOLD: a message was sent to a non-existing result object: ",obj$topic)
                                 state<-as.list(table$state)
                                 if (!utils::hasName(obj,"id")) obj$id<-jmvcore::toB64(obj$message)
-                                
+
                                 obj$message<-private$.translate(obj$message)
+
+                                if (is.null(obj$message))
+                                  return()
                                 
                                 if (inherits(table,"Html")) {
                                   content<-table$content
@@ -72,9 +75,11 @@ Dispatch <- R6::R6Class(
 
                                if (is.null(obj$message) || obj$message==FALSE)
                                     return()
-          
                                obj$message<-private$.translate(obj$message)
-                          
+                               
+                               if (is.null(obj$message))
+                                 return()
+                               
                                if (utils::hasName(obj,"final") && (obj$final))
                                    stop(obj$message)
                           
@@ -106,11 +111,15 @@ Dispatch <- R6::R6Class(
                              return(NULL)
                         
                       },
+                      
                       .translate=function(msg) {
                             for (w in TRANS_WARNS) {
                                  test<-grep(w$original,msg,fixed=T)
-                                 if (length(test)>0)
-                                    msg<-jmvcore::format(w$new,msg)
+                                 if (length(test)>0) {
+                                   if (is.null(w$new))
+                                      return(NULL)
+                                   msg<-jmvcore::format(w$new,msg)
+                                 }
                             }
                            return(fromb64(msg))
 

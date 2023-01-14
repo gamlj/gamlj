@@ -27,8 +27,8 @@ Plotter <- R6::R6Class(
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
             self$scatterRaw<-self$options$plot_raw
-            if ("plotScale" %in% names(self$options))
-                    self$scatterType<-self$options$plotScale
+            if (self$option("plot_scale"))
+                    self$scatterType<-self$options$plot_scale
             else 
                     self$scatterType<-"response"
             self$dispatcher<-operator$dispatcher
@@ -74,7 +74,7 @@ Plotter <- R6::R6Class(
                          .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",color = "z" ,fill="z")
                      } else {
                          .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", linetype = "z")
-                         .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",linetype = "z" ,fill="z")
+                         .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",linetype = "z" )
                      }
         }
         
@@ -331,20 +331,20 @@ Plotter <- R6::R6Class(
             x<-self$options$plot_x
             z<-self$options$plot_z
             moderators<-self$options$plot_by
-            
+            mark(self$options$model_type)
+            mark(z)
             if (self$options$model_type=="multinomial") {
-                     moderators < c(z,moderators)
-                     z   <- self$options$dep
-                     self$scatterType="response"
+                     moderators       <- c(z,moderators)
+                     z                <- self$options$dep
+                     self$scatterType <- "response"
             }
-            
+
             if (self$options$model_type=="ordinal" & self$scatterType!="mean.class") {
-                     moderators < c(z,moderators)
-                     z   <- self$options$dep
-              
+                     moderators <- c(z,moderators)
+                     z          <- self$options$dep
             }
             
-            
+
             dims<-unlist(lapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$nlevels))
 
             if (!is.something(dims))
@@ -421,7 +421,7 @@ Plotter <- R6::R6Class(
         y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
           # end of zeroing 
         randomData<-as.data.frame(cbind(y,rawData))
-        self$dispatcher$warnings<-list(topic="plot",message=paste("Random effects are plotted across",self$scatterCluster$name))
+        self$dispatcher$warnings<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
 
       }
       ### end of random ###
@@ -433,7 +433,7 @@ Plotter <- R6::R6Class(
         if (self$options$plot_yscale)
             self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
 
-      if (self$option("modelSelection","multinomial")) {
+      if (self$option("model_type","multinomial")) {
         self$scatterRaw<-FALSE
       }
       
@@ -450,9 +450,9 @@ Plotter <- R6::R6Class(
            levels(rawData[[dep64]])<-0:(self$scatterY$nlevels-1)
            rawData[[dep64]]<-as.numeric(as.character(rawData[[dep64]]))
         }
-        if (self$option("modelSelection","ordinal")) {
+        if (self$option("model_type","ordinal")) {
           rawData[[dep64]]<-rawData[[dep64]]+1
-          if (self$option("plotScale","mean.class"))
+          if (self$option("plot_scale","mean.class"))
                     self$scatterRange<-c(1,self$scatterY$nlevels)
         }
 
@@ -642,7 +642,7 @@ Plotter <- R6::R6Class(
            conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
            if (self$option("plot_xoriginal")) {
                  self$scatterXscale<-TRUE
-#                 self$dispatcher$warnings<-list(topic="plotnotes",message="Note: The X-axis is in the X-variable original scale")
+                 self$dispatcher$warnings<-list(topic="plotnotes",message="Note: The X-axis is in the X-variable original scale")
            }
       }
       allterm64<-c(x64,term64)
@@ -650,8 +650,8 @@ Plotter <- R6::R6Class(
       mode <- NULL
 
       
-      if (self$option("modelSelection","ordinal")) {
-            if (self$option("plotScale","mean.class"))
+      if (self$option("model_type","ordinal")) {
+            if (self$option("plot_scale","mean.class"))
                   mode<-"mean.class"
             else  {
                   mode<-"prob"
@@ -660,7 +660,6 @@ Plotter <- R6::R6Class(
       }
 
       ### now we get the estimated means #######
-
       em_opts<-list(
         private$.operator$model,
         specs=allterm64,
@@ -675,8 +674,8 @@ Plotter <- R6::R6Class(
              em_opts[["lmer.df"]]<-self$options$dfmethod
 
       results<-try_hard(do.call(emmeans::emmeans,em_opts))
-      self$dispatcher$warnings<-list("topic"="plot",message=results$warning)
-      self$dispatcher$errors<-list("topic"="plot",message=results$error)
+      self$dispatcher$warnings<-list("topic"="plotnotes",message=results$warning)
+      self$dispatcher$errors<-list("topic"="plotnotes",message=results$error)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####
@@ -707,7 +706,7 @@ Plotter <- R6::R6Class(
     .rescale=function(varobj,values) {
 
       if (varobj$covs_scale=="clusterbasedcentered")
-          self$dispatcher$warnings<-list(topic="plot",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
+          self$dispatcher$warnings<-list(topic="plotnotes",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
 
 #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
 #      len <- max(min(len,na.rm = T),0)

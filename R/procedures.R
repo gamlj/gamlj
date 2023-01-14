@@ -329,8 +329,6 @@ procedure.emmeans<-function(obj) {
         conditions[[.term]]<-var$levels 
       }
     }
-mark(var)    
-mark(conditions[[.term]])  
     ### prepare the options ###
     opts_list<-list(object=obj$model,
                     specs=term64,
@@ -352,7 +350,7 @@ mark(conditions[[.term]])
     ### now we get the estimated means #######
     referenceGrid<-do.call(emmeans::emmeans,opts_list)
     tableData<-as.data.frame(referenceGrid)
-    mark(tableData)
+
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
     

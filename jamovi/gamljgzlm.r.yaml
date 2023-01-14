@@ -708,7 +708,6 @@ items:
     visible: false
 
 
-
   - name: predicted
     title: Predicted Vales
     type: Output            

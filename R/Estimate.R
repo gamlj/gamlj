@@ -516,11 +516,9 @@ Estimate <- R6::R6Class("Estimate",
                               
                               if (self$option("offset"))
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
-                        
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-                              
-                              
+
                               results<-try_hard(eval(acall))
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               

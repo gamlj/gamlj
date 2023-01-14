@@ -85,7 +85,7 @@ Datamatic <- R6::R6Class(
       self$data_structure64<-self$cleandata(data)
       self$dep<-self$variables[[tob64(self$options$dep)]]
     }
-    
+
   ) #end of private
 )
 
@@ -220,13 +220,11 @@ Variable <- R6::R6Class(
     get_values=function(data) {
 
        vardata<-data[[self$name64]]
-       if (self$type=="numeric") {
-
-         if (is.factor(vardata)) {
+       if (self$type=="numeric" || self$type=="integer") {
+          if (is.factor(vardata)) {
            vardata<-as.numeric(vardata)
          }
          return(private$.continuous_values(data))
-         
        }
          
 
