@@ -27,14 +27,14 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
             vcov = FALSE,
-            plotHAxis = NULL,
-            plotSepLines = NULL,
-            plotSepPlots = NULL,
-            plotRaw = FALSE,
-            plotDvScale = FALSE,
-            plotOriginalScale = FALSE,
-            plotLinesTypes = FALSE,
-            plotError = "none",
+            plot_x = NULL,
+            plot_z = NULL,
+            plot_by = NULL,
+            plot_raw = FALSE,
+            plot_yscale = FALSE,
+            plot_xoriginal = FALSE,
+            plot_black = FALSE,
+            plot_around = "none",
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
@@ -192,37 +192,37 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "vcov",
                 vcov,
                 default=FALSE)
-            private$..plotHAxis <- jmvcore::OptionVariable$new(
-                "plotHAxis",
-                plotHAxis,
+            private$..plot_x <- jmvcore::OptionVariable$new(
+                "plot_x",
+                plot_x,
                 default=NULL)
-            private$..plotSepLines <- jmvcore::OptionVariable$new(
-                "plotSepLines",
-                plotSepLines,
+            private$..plot_z <- jmvcore::OptionVariable$new(
+                "plot_z",
+                plot_z,
                 default=NULL)
-            private$..plotSepPlots <- jmvcore::OptionVariables$new(
-                "plotSepPlots",
-                plotSepPlots,
+            private$..plot_by <- jmvcore::OptionVariables$new(
+                "plot_by",
+                plot_by,
                 default=NULL)
-            private$..plotRaw <- jmvcore::OptionBool$new(
-                "plotRaw",
-                plotRaw,
+            private$..plot_raw <- jmvcore::OptionBool$new(
+                "plot_raw",
+                plot_raw,
                 default=FALSE)
-            private$..plotDvScale <- jmvcore::OptionBool$new(
-                "plotDvScale",
-                plotDvScale,
+            private$..plot_yscale <- jmvcore::OptionBool$new(
+                "plot_yscale",
+                plot_yscale,
                 default=FALSE)
-            private$..plotOriginalScale <- jmvcore::OptionBool$new(
-                "plotOriginalScale",
-                plotOriginalScale,
+            private$..plot_xoriginal <- jmvcore::OptionBool$new(
+                "plot_xoriginal",
+                plot_xoriginal,
                 default=FALSE)
-            private$..plotLinesTypes <- jmvcore::OptionBool$new(
-                "plotLinesTypes",
-                plotLinesTypes,
+            private$..plot_black <- jmvcore::OptionBool$new(
+                "plot_black",
+                plot_black,
                 default=FALSE)
-            private$..plotError <- jmvcore::OptionList$new(
-                "plotError",
-                plotError,
+            private$..plot_around <- jmvcore::OptionList$new(
+                "plot_around",
+                plot_around,
                 options=list(
                     "none",
                     "ci",
@@ -394,14 +394,14 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
             self$.addOption(private$..vcov)
-            self$.addOption(private$..plotHAxis)
-            self$.addOption(private$..plotSepLines)
-            self$.addOption(private$..plotSepPlots)
-            self$.addOption(private$..plotRaw)
-            self$.addOption(private$..plotDvScale)
-            self$.addOption(private$..plotOriginalScale)
-            self$.addOption(private$..plotLinesTypes)
-            self$.addOption(private$..plotError)
+            self$.addOption(private$..plot_x)
+            self$.addOption(private$..plot_z)
+            self$.addOption(private$..plot_by)
+            self$.addOption(private$..plot_raw)
+            self$.addOption(private$..plot_yscale)
+            self$.addOption(private$..plot_xoriginal)
+            self$.addOption(private$..plot_black)
+            self$.addOption(private$..plot_around)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simple_effects)
@@ -445,14 +445,14 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
         vcov = function() private$..vcov$value,
-        plotHAxis = function() private$..plotHAxis$value,
-        plotSepLines = function() private$..plotSepLines$value,
-        plotSepPlots = function() private$..plotSepPlots$value,
-        plotRaw = function() private$..plotRaw$value,
-        plotDvScale = function() private$..plotDvScale$value,
-        plotOriginalScale = function() private$..plotOriginalScale$value,
-        plotLinesTypes = function() private$..plotLinesTypes$value,
-        plotError = function() private$..plotError$value,
+        plot_x = function() private$..plot_x$value,
+        plot_z = function() private$..plot_z$value,
+        plot_by = function() private$..plot_by$value,
+        plot_raw = function() private$..plot_raw$value,
+        plot_yscale = function() private$..plot_yscale$value,
+        plot_xoriginal = function() private$..plot_xoriginal$value,
+        plot_black = function() private$..plot_black$value,
+        plot_around = function() private$..plot_around$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simple_effects = function() private$..simple_effects$value,
@@ -495,14 +495,14 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
         ..vcov = NA,
-        ..plotHAxis = NA,
-        ..plotSepLines = NA,
-        ..plotSepPlots = NA,
-        ..plotRaw = NA,
-        ..plotDvScale = NA,
-        ..plotOriginalScale = NA,
-        ..plotLinesTypes = NA,
-        ..plotError = NA,
+        ..plot_x = NA,
+        ..plot_z = NA,
+        ..plot_by = NA,
+        ..plot_raw = NA,
+        ..plot_yscale = NA,
+        ..plot_xoriginal = NA,
+        ..plot_black = NA,
+        ..plot_around = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simple_effects = NA,
@@ -1316,25 +1316,24 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     height=400,
                     clearWith=list(
                         "dep",
-                        "plotHAxis",
-                        "plotSepLines",
-                        "plotSepPlots",
-                        "plotError",
+                        "plot_x",
+                        "plot_z",
+                        "plot_by",
+                        "plot_raw",
+                        "plot_yscale",
+                        "plot_scale",
+                        "plot_xoriginal",
+                        "plot_black",
+                        "plot_around",
                         "ci_width",
-                        "covs_conditioning",
+                        "covs_scale",
                         "dep_scale",
                         "model_terms",
                         "fixed_intercept",
-                        "covs_scale",
+                        "covs_conditioning",
                         "covs_scale_labels",
-                        "plotDvScale",
-                        "plotRaw",
                         "ccp_value",
-                        "ccm_value",
-                        "plotScale",
-                        "plotOriginalScale",
-                        "plotLinesTypes",
-                        "offset"))))
+                        "ccm_value"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",

@@ -391,6 +391,8 @@ children:
                     type: CheckBox
                     optionName: adjust
                     optionPart: sidak
+
+
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -408,19 +410,19 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotHAxis
+                name: plot_x
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepLines
+                name: plot_z
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepPlots
+                name: plot_by
                 isTarget: true
       - type: LayoutBox
         margin: large
@@ -430,16 +432,16 @@ children:
             label: Display
             children:
               - type: RadioButton
-                name: errBarDef_none
-                optionName: plotError
+                name: plot_around_none
+                optionName: plot_around
                 optionPart: none
               - type: RadioButton
-                name: errBarDef_ci
-                optionName: plotError
+                name: plot_around_ci
+                optionName: plot_around
                 optionPart: ci
-              - name: plotError_se
+              - name: plot_around_se
                 type: RadioButton
-                optionName: plotError
+                optionName: plot_around
                 optionPart: se
           - type: Label
             label: Plot type
@@ -462,15 +464,15 @@ children:
             label: Plot options
             children:
               - type: CheckBox
-                name: plotRaw
+                name: plot_raw
                 enable: (!model_type_multinomial && !plot_scale_link)
               - type: CheckBox
-                name: plotDvScale
-                enable: (plot_scale_response)
+                name: plot_yscale
+                enable: (plot_scale_response && !model_type_multinomial && !model_type_logistic && !model_type_probit)
               - type: CheckBox
-                name: plotOriginalScale
+                name: plot_xoriginal
               - type: CheckBox
-                name: plotLinesTypes
+                name: plot_black
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

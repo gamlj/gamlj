@@ -297,7 +297,7 @@ options:
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
     - name: plot_xoriginal
-      title: Original scale 
+      title: X original scale 
       type: Bool
       default: false
       description:

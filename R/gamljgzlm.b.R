@@ -150,6 +150,11 @@ gamljGzlmClass <- R6::R6Class(
       private$.data_machine<-data_machine
       private$.estimate_machine<-estimate_machine
       
+      ######## plotting class #######
+      plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
+      plotter_machine$initPlots()
+      private$.plotter_machine<-plotter_machine
+      
       now<-Sys.time()
       ginfo("INIT TIME:",now-private$.time," secs")
       
@@ -176,6 +181,10 @@ gamljGzlmClass <- R6::R6Class(
       
 
       private$.checkpoint()
+      
+      ### do plots 
+      private$.plotter_machine$preparePlots()
+      
       
       #save model preds and resids            
       private$.estimate_machine$savePredRes(self$results) 
