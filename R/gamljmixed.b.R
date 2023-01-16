@@ -138,9 +138,11 @@ gamljMixedClass <- R6::R6Class(
       private$.estimate_machine<-estimate_machine
       
       ######## plotting class #######
-#      plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
-#      plotter_machine$initPlots()
-#      private$.plotter_machine<-plotter_machine
+      plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
+      plotter_machine$initPlots()
+      private$.plotter_machine<-plotter_machine
+      self$results$plotnotes$setContent("")
+      
     },
     .run=function() {
       ginfo("MODULE:",self$options$.caller,"  #### phase run ####")
@@ -163,7 +165,7 @@ gamljMixedClass <- R6::R6Class(
        #save model preds and resids            
        private$.estimate_machine$savePredRes(self$results) 
       # 
-#      private$.plotter_machine$preparePlots()
+      private$.plotter_machine$preparePlots()
       
 #      if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
 #          self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))

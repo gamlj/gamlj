@@ -140,25 +140,21 @@ ganova<- function(x,...) UseMethod(".anova")
   if (!isFALSE(results$error))
     return()
   
-  ano<-results$obj
-  if (dim(ano)[1]==0) {
+  .anova<-results$obj
+  if (dim(.anova)[1]==0) {
     obj$dispatcher$warnings<-list(topic="main_anova",message="F-Tests cannot be computed without fixed effects")
-    return(ano)
+    return(.anova)
   }
-  if (dim(ano)[2]==4) {
-    ano<-.car.anova(model,df)
+  if (dim(.anova)[2]==4) {
+    .anova<-.car.anova(model,df)
     obj$dispatcher$warnings<-list(topic="main_anova",message="Degrees of freedom computed with method Kenward-Roger")
     
   } 
-  # lmerTest 2.0-33 does not produce the F-test for continuous IV if they appear in the model before
-  # the factors. Here we try to fix it.
-  # now we use lmerTest>3.1 that does not seem to have this problem. Check anyway in testing
-  if (is.there("F value",names(ano)))
-    names(ano)<-c("ss","ms","df1","df2","f","p")
-  else
-    stop("fix anova with chisq")
   
-  return(ano)
+  .transnames<-list("f"=c("F","F value"),df1=c("Df","NumDF"),df2=c("Df.res","DenDF"),p=("Pr(>F)"))
+  names(.anova)<-transnames(names(.anova),.transnames)
+  
+  return(.anova)
   
 }
 
@@ -184,16 +180,17 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .car.anova<-function(model,df) {
   
-  ginfo("mf.anova uses car::Anova")
+  ginfo("ganova uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
-  ano<-car::Anova(model,type=3,test=test)
+  .anova<-car::Anova(model,type=3,test=test)
   if (attr(stats::terms(model),"intercept")==1)
-    ano<-ano[-1,]
-  attr(ano,"method")<-"Kenward-Roger"
-  attr(ano,"statistic")<-test
-  ano
+    .anova<-.anova[-1,]
+  
+  attr(.anova,"method")<-"Kenward-Roger"
+  attr(.anova,"statistic")<-test
+  .anova
 }
 
 

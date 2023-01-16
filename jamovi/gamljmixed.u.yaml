@@ -412,19 +412,19 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotHAxis
+                name: plot_x
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepLines
+                name: plot_z
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepPlots
+                name: plot_by
                 isTarget: true
       - type: LayoutBox
         margin: large
@@ -435,30 +435,33 @@ children:
             children:
               - type: RadioButton
                 name: errBarDef_none
-                optionName: plotError
+                optionName: plot_around
                 optionPart: none
               - type: RadioButton
                 name: errBarDef_ci
-                optionName: plotError
+                optionName: plot_around
                 optionPart: ci
               - name: plotError_se
                 type: RadioButton
-                optionName: plotError
+                optionName: plot_around
                 optionPart: se
           - type: Label
             label: Plot
             children:
               - type: CheckBox
-                name: plotRaw
+                name: plot_raw
               - type: CheckBox
-                name: plotDvScale
+                name: plot_yscale
+              - type: CheckBox
+                name: plot_re
+
           - type: Label
             label: Use
             children:
               - type: CheckBox
-                name: plotOriginalScale
+                name: plot_xoriginal
               - type: CheckBox
-                name: plotLinesTypes
+                name: plot_black
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -577,13 +580,14 @@ children:
             label: DF Method
             children:
               - type: RadioButton
-                name: df_method_Satterthwaite
+                name: df_method_satterthwaite
                 optionName: df_method
                 optionPart: Satterthwaite
-              - name: df_method_Kenward-Roger
+              - name: df_method_kenward_roger
                 type: RadioButton
                 optionName: df_method
                 optionPart: Kenward-Roger
+
           - type: Label
             label: Save
             children:

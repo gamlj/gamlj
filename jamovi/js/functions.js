@@ -341,7 +341,6 @@ const fun = {
 
 module.exports=fun
 
-
 var mark = function(obj) {
   console.log(obj);
 };

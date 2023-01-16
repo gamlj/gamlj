@@ -240,7 +240,7 @@ options:
 
 
 
-    - name: plotHAxis
+    - name: plot_x
       title: Horizontal axis
       type: Variable
       default:
@@ -249,7 +249,7 @@ options:
             a string naming the variable placed on the horizontal axis of the
             plot
 
-    - name: plotSepLines
+    - name: plot_z
       title: Separate lines
       type: Variable
       default:
@@ -258,7 +258,7 @@ options:
             a string naming the variable represented as separate lines in the
             plot
 
-    - name: plotSepPlots
+    - name: plot_by
       title: Separate plots
       type: Variables
       default:
@@ -267,7 +267,7 @@ options:
           R: >
             a list of string naming the variables defining the levels for multiple plots
 
-    - name: plotRaw
+    - name: plot_raw
       title: Observed scores
       type: Bool
       default: false
@@ -275,7 +275,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), plot raw data along the predicted values
 
-    - name: plotDvScale
+    - name: plot_yscale
       title: Y-axis observed range 
       type: Bool
       default: false
@@ -283,7 +283,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
 
-    - name: plotOriginalScale
+    - name: plot_xoriginal
       title: Original scale 
       type: Bool
       default: false
@@ -291,7 +291,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), use original scale for covariates.
 
-    - name: plotLinesTypes
+    - name: plot_black
       title: Varying line types 
       type: Bool
       default: false
@@ -299,7 +299,7 @@ options:
           R: >
             `TRUE` or `FALSE` (default), use different linetypes per levels.
 
-    - name: plotError
+    - name: plot_around
       title: Error Bar Definition
       type: List
       options:
@@ -315,6 +315,14 @@ options:
             `'none'` (default), `'ci'`, or `'se'`. Use no error
             bars, use confidence intervals, or use standard errors on the
             plots, respectively.
+
+    - name: plot_re
+      title: Random effects
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), add predicted values based on random effect in plot 
 
     - name: emmeans
       title: Estimated Marginal Means
@@ -652,10 +660,13 @@ options:
           title: Satterthwaite
         - name:  Kenward-Roger
           title: "Kenward-Roger  (slow)"
-
-
-
-
+      description:
+          R: >
+              The method for computing the denominator degrees of freedom and F-statistics.
+              "Satterthwaite" (default) uses Satterthwaite’s method; "Kenward-Roger"
+              uses Kenward-Roger’s method, "lme4" returns the lme4-anova table, i.e.,
+              using the anova method for lmerMod objects as defined in the lme4-package
+              
     - name: norm_plot
       title: Histogram of residuals
       type: Bool

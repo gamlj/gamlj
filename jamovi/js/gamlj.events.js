@@ -204,6 +204,34 @@ module.exports = events;
 
 // local functions 
 
+
+var removeFromList = function(quantum, cosmos, context, order = 1) {
+
+     cosmos=normalize(cosmos);
+     quantum=normalize(quantum);
+     if (cosmos===undefined)
+        return([]);
+     var cosmos = context.cloneArray(cosmos);
+       for (var i = 0; i < cosmos.length; i++) {
+          if (cosmos[i]===undefined)
+             break;
+          var aCosmos = context.cloneArray(cosmos[i]);
+           for (var k = 0; k < quantum.length; k++) {
+             var  test = order === 0 ? FormatDef.term.isEqual(aCosmos,quantum[k]) : FormatDef.term.contains(aCosmos,quantum[k]);
+                 if (test && (aCosmos.length >= order)) {
+                        cosmos.splice(i, 1);
+                        i -= 1;
+                    break;    
+                    }
+          }
+            
+       }
+  
+    return(cosmos);
+};
+
+
+
 var removeFromMultiList = function(quantum, cosmos, context, strict = 1) {
 
     var cosmos = context.cloneArray(cosmos);
@@ -213,4 +241,35 @@ var removeFromMultiList = function(quantum, cosmos, context, strict = 1) {
     return(cosmos);
 };
 
+var dim = function(aList) {
+
+    if (!Array.isArray(aList))
+           return(0);
+    if (!Array.isArray(aList[0]))
+           return(1);
+    if (!Array.isArray(aList[0][0]))
+           return(2);
+    if (!Array.isArray(aList[0][0][0]))
+           return(3);
+    if (!Array.isArray(aList[0][0][0][0]))
+           return(4);
+
+  
+    return(value);
+};
+
+var normalize = function(cosmos) {
+
+  if (cosmos===undefined)
+          return [];
+  if (dim(cosmos)===0)
+          cosmos=[cosmos]
+          
+        for (var i = 0; i < cosmos.length; i++) {
+            var aValue = cosmos[i];
+            var newValue=dim(aValue)>0 ? aValue : [aValue];
+            cosmos[i]=newValue
+        }
+        return cosmos;
+}
 
