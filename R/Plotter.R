@@ -331,8 +331,6 @@ Plotter <- R6::R6Class(
             x<-self$options$plot_x
             z<-self$options$plot_z
             moderators<-self$options$plot_by
-            mark(self$options$model_type)
-            mark(z)
             if (self$options$model_type=="multinomial") {
                      moderators       <- c(z,moderators)
                      z                <- self$options$dep
@@ -397,37 +395,14 @@ Plotter <- R6::R6Class(
       ### here we deal with plotting random effects, if needed
       randomData<-NULL
       if (self$option("plot_re")) {
-        mark(self$options$model_terms)
-        mark(self$scatterX)
-        testf<-unlist(lapply(self$options$model_terms, function(x) all(self$scatterX$name %in% x)))
-        fixed<-self$options$model_terms[testf]
-        mark(self$options$re)
-        testr<-unlist(lapply(self$options$re, 
-                             function(x) lapply(x, function(z) ("Intercept" %in% z) || all(self$scatterX$name %in% z[-length(z)]))))
-        re<-self$options$re[testr]
-        fixed64<-jmvcore::composeFormula(self$scatterY$name64,tob64(fixed))
-        fixed64<-gsub("~",paste("~",as.numeric(self$operator$hasIntercept),"+"),fixed64)
-        
-        self$formula64<-trimws(paste(fixed64,rands64,sep =  ""))
-        
-
-        newdata<-rawData
-        mvars<-names(newdata)
         self$scatterCluster<-private$.datamatic$variables[[private$.operator$clusters[[1]]]]
-        tozero<-setdiff(mvars,c(self$scatterX$name64,self$scatterY$name64,self$scatterCluster$name64))
-        toaggregate<-list()
-        for(v in tozero)
-          if (!is.factor(newdata[,v])) {
-            center<-mean(newdata[,v])
-            newdata[,v]<-center
-          } else {
-            d<-dim(contrasts(newdata[,v]))
-            contrasts(newdata[,v])<-matrix(0,d[1],d[2])
-          }
-        
-        y<-stats::predict(private$.operator$model,type="response",newdata=newdata,allow.new.levels=TRUE)
-        # end of zeroing 
+        formula<-private$.operator$formulaobj$keep(self$scatterX$name)
+        model<-update(private$.operator$model,formula=formula)
+        y<-stats::predict(model,type="response")
         randomData<-as.data.frame(cbind(y,rawData))
+        if (self$scatterX$type=="factor")
+             levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
+                    
         self$dispatcher$warnings<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
         
       }
@@ -547,6 +522,8 @@ Plotter <- R6::R6Class(
              if (!is.null(randomData)) {
                
                rdata<-randomData
+               mark(head(rdata))
+               mark(self$scatterCluster$name64)
                selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
               .rnames<-c("cluster","x","y")
                rdata<- stats::aggregate(rdata$y, selectorlist, mean)
