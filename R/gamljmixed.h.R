@@ -34,6 +34,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_black = FALSE,
             plot_around = "none",
             plot_re = FALSE,
+            plot_re_method = "average",
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
@@ -238,6 +239,13 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plot_re",
                 plot_re,
                 default=FALSE)
+            private$..plot_re_method <- jmvcore::OptionList$new(
+                "plot_re_method",
+                plot_re_method,
+                default="average",
+                options=list(
+                    "average",
+                    "full"))
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -470,6 +478,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_re)
+            self$.addOption(private$..plot_re_method)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simple_effects)
@@ -533,6 +542,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
         plot_re = function() private$..plot_re$value,
+        plot_re_method = function() private$..plot_re_method$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simple_effects = function() private$..simple_effects$value,
@@ -595,6 +605,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_black = NA,
         ..plot_around = NA,
         ..plot_re = NA,
+        ..plot_re_method = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simple_effects = NA,
@@ -1547,6 +1558,7 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   plots, respectively.
 #' @param plot_re \code{TRUE} or \code{FALSE} (default), add predicted values
 #'   based on random effect in plot
+#' @param plot_re_method .
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -1679,6 +1691,7 @@ gamljMixed <- function(
     plot_black = FALSE,
     plot_around = "none",
     plot_re = FALSE,
+    plot_re_method = "average",
     emmeans = NULL,
     posthoc = NULL,
     simple_effects = NULL,
@@ -1808,6 +1821,7 @@ gamljMixed <- function(
         plot_black = plot_black,
         plot_around = plot_around,
         plot_re = plot_re,
+        plot_re_method = plot_re_method,
         emmeans = emmeans,
         posthoc = posthoc,
         simple_effects = simple_effects,

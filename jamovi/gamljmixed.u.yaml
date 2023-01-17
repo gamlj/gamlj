@@ -35,7 +35,6 @@ children:
             isTarget: true
             events:
               change: './gamlj.events::onChange_covariates'
-
       - type: TargetLayoutBox
         label: Cluster variables
         children:
@@ -45,7 +44,6 @@ children:
             isTarget: true
             events:
               change: './gamlj.events::onChange_cluster'
-
   - type: LayoutBox
     margin: large
     style: inline
@@ -452,9 +450,6 @@ children:
                 name: plot_raw
               - type: CheckBox
                 name: plot_yscale
-              - type: CheckBox
-                name: plot_re
-
           - type: Label
             label: Use
             children:
@@ -462,6 +457,27 @@ children:
                 name: plot_xoriginal
               - type: CheckBox
                 name: plot_black
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+               - type: Label
+                 label: Random Effects
+                 children:
+                    - type: CheckBox
+                      name: plot_re
+                    - type: RadioButton
+                      name: plot_re_method_average
+                      optionName: plot_re_method
+                      optionPart: average
+                      enable: (plot_re)
+
+                    - type: RadioButton
+                      name: plot_re_method_full
+                      optionName: plot_re_method
+                      optionPart: full
+                      enable: (plot_re)
+                      
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -490,6 +506,7 @@ children:
       - type: CheckBox
         name: simple_interactions
         label: Simple interactions
+        
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
@@ -587,7 +604,6 @@ children:
                 type: RadioButton
                 optionName: df_method
                 optionPart: Kenward-Roger
-
           - type: Label
             label: Save
             children:

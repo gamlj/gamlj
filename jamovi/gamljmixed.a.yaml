@@ -323,6 +323,15 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), add predicted values based on random effect in plot 
+    - name: plot_re_method
+      type: List
+      default: average
+      options:
+        - name:  average
+          title: Average method
+        - name:  full
+          title: Full predicted method
+
 
     - name: emmeans
       title: Estimated Marginal Means

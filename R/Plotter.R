@@ -402,14 +402,26 @@ Plotter <- R6::R6Class(
       randomData<-NULL
       if (self$option("plot_re")) {
         self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
-        formula<-private$.operator$formulaobj$keep(self$scatterX$name)
-        model<-update(private$.operator$model,formula=formula)
+
+        if (self$option("plot_re_method","average")) {
+            formula<-private$.operator$formulaobj$keep(self$scatterX$name)
+            model<-update(private$.operator$model,formula=formula)
+        } else
+            model<-private$.operator$model
+        
         y<-stats::predict(model,type="response")
+        
         randomData<-as.data.frame(cbind(y,rawData))
         if (self$scatterX$type=="factor")
              levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
                     
         self$dispatcher$warnings<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
+        # prepare a test for between variables to plot dots for random effects
+        test<-tapply(as.numeric(rawData[[self$scatterX$name64]]),rawData[[self$scatterCluster$name64]],sd)
+        test<-sum(sapply(test,function(x) as.numeric(is.na(x) || x==0)))
+        nc<-self$scatterCluster$nlevels
+        xbetween<-FALSE
+        if ((test/nc)>.30) xbetween<-TRUE
         
       }
       ### end of random ###
@@ -417,8 +429,7 @@ Plotter <- R6::R6Class(
       ## deal with raw data, if needed
 
       if (self$option("plot_raw")) {
-        
-            for (var in names(rawData)) {
+            for (var in intersect(names(rawData),names(private$.datamatic$variables))) {
                   varobj<-private$.datamatic$variables[[var]]
                   if (varobj$type=="factor")
                   levels(rawData[[var]])<-varobj$levels_labels
@@ -514,6 +525,7 @@ Plotter <- R6::R6Class(
                        .rnames<-c("cluster","x","y")
                         rdata<- stats::aggregate(rdata$y, selectorlist, mean)
                         names(rdata)<-.rnames
+                        attr(rdata,"xbetween")<-xbetween
                         self$randomData[[i]]<-rdata
                 }
              }
@@ -532,11 +544,7 @@ Plotter <- R6::R6Class(
               .rnames<-c("cluster","x","y")
                rdata<- stats::aggregate(rdata$y, selectorlist, mean)
                names(rdata)<-.rnames
-               attr(rdata,"xbetween")<-FALSE
-               test<-tapply(as.numeric(rdata$x),rdata$cluster,sd)
-               test<-sum(sapply(test,function(x) as.numeric(is.na(x) || x==0)))
-               nc<-self$scatterCluster$nlevels
-               if ((test/nc)>.30) attr(rdata,"xbetween")<-TRUE
+               attr(rdata,"xbetween")<-xbetween
                self$randomData[[1]]<-rdata
                
              }
