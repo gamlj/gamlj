@@ -25,7 +25,17 @@ Scaffold <- R6::R6Class("Scaffold",
                               }
                               res      
                               
+                            },
+                            optionValue=function(val) {
+                              
+                              test<-utils::hasName(self$options,val)
+                              if (test) 
+                                return(self$options[[val]])
+                              else
+                                return(NULL)
                             }
+                            
+                            
                             
                             
                           )

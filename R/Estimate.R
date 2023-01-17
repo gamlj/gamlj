@@ -219,7 +219,7 @@ Estimate <- R6::R6Class("Estimate",
                             tab<-NULL
                             if (self$hasTerms) {
                               obj<-try_hard({
-                                form<-formula(paste(self$formula64,collapse = ""))
+                                form<-formula(paste(self$formulaobj$formula64(),collapse = ""))
                                 mod<-do.call(ordinal::clm,list(formula=form,data=self$model$model))
                                 ordinal::nominal_test(mod)
                                 
@@ -505,7 +505,7 @@ Estimate <- R6::R6Class("Estimate",
 
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
 
-                              opts[["formula"]]<-self$formula64
+                              opts[["formula"]]<-self$formulaobj$formula64()
                               
                               if (is.something(self$infomatic$family))
                                           opts[["family"]]<-str2lang(self$infomatic$family)    

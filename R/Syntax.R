@@ -9,6 +9,7 @@ Syntax <- R6::R6Class(
     vars=NULL,
     formula=NULL,
     formula64=NULL,
+    formulaobj=NULL,
     hasIntercept=TRUE,
     hasTerms=FALSE,
     clusters=NULL,
@@ -41,6 +42,18 @@ Syntax <- R6::R6Class(
       self$datamatic<-datamatic
       
       #### we prepare the model syntax
+      self$formulaobj<-gFormula$new()
+      self$formulaobj$dep<-self$options$dep
+      self$formulaobj$fixed<-self$options$model_terms
+      self$formulaobj$random<-self$optionValue("re")
+      self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
+      self$formulaobj$nested_fixed<-self$optionValue("nested_terms")
+      self$formulaobj$nested_random<-self$optionValue("nested_re")
+      self$formulaobj$nested_intercept<-self$optionValue("nested_intercept")
+      self$formulaobj$offset<-self$optionValue("offset")
+      mark(self$formulaobj$nested_tested_random())
+      mark(self$formulaobj$nested_tested_fixed())
+      
       private$.constructFormula()
       
       ### infomatic class takes care of all info about different models
@@ -51,7 +64,7 @@ Syntax <- R6::R6Class(
     
     init_info=function() {
       tab                   <-   self$infomatic$info_table()
-      tab[["call"]]$specs   <-    self$formula
+      tab[["call"]]$specs   <-    self$formulaobj$formula()
       
       if (self$option("dep_scale"))
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
@@ -77,20 +90,19 @@ Syntax <- R6::R6Class(
       
       if (self$option("comparison")) {
         
-         .fullterms<-c(as.numeric(self$hasIntercept),self$options$model_terms)
-         .nestedterms<-c(as.numeric(self$options$nested_intercept),self$options$nested_terms)
-         .formula<-fromb64(self$nested_formula64,self$vars)
+         tab[["mc"]]<-list(info="Comparison",
+                           value="Nested model",
+                           specs=self$formulaobj$nested_formula())
          
-         .test <- jmvcore::composeFormula(setdiff(.fullterms,.nestedterms))
-         tab[["mc"]]<-list(info="Comparison",value="Nested model",specs=.formula)
-         tab[["mctest"]]<-list(info="Comparison",value="Tested terms",specs=.test)
+         tab[["mctest"]]<-list(info="Comparison",
+                               value="Tested terms",
+                               specs=self$formulaobj$nested_tested_fixed())
+         
          if (self$option("nested_re")) {
-           .test <- jmvcore::composeFormula(setdiff(unlist(self$options$re),unlist(self$options$nested_re)))
-           if (length(.test)>0)
-             tab[["mctest1"]]<-list(info="Comparison",value="Tested random",specs=.test)
+             tab[["mctest1"]]<-list(info="Comparison",
+                                    value="Tested random",
+                                    specs=self$formulaobj$nested_tested_random())
          }
-           
-         
       }
         
       if (self$option("offset"))

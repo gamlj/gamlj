@@ -7,42 +7,84 @@ gFormula <- R6::R6Class(
   public=list(
     dep=NULL,
     random=NULL,
-    random_corr=NULL,
     offset=NULL,
     clusters=NULL,
-    hasIntercept=TRUE,
+    nested_intercept=TRUE,
+    nested_random=NULL,
+    fixed_intercept=TRUE,
     isProper=FALSE,
     lhs=function() {
-      jmvcore::composeFormula(NULL,private$.fixed)
+      private$.buildfixed(NULL,private$.fixed)
     },
     lhs64=function() {
-      jmvcore::composeFormula(NULL,tob64(private$.fixed))
+      private$.buildfixed(tob64(private$.fixed))
     },
     fixed_formula=function() {
-      jmvcore::composeFormula(self$dep,private$.fixed)
+      private$.buildfixed(self$dep,self$fixed)
     },
     fixed_formula64=function() {
-      jmvcore::composeFormula(tob64(self$dep),tob64(private$.fixed))
+      private$.buildfixed(tob64(self$dep),tob64(self$fixed))
     },
     random_formula=function() {
-        private$.buildrandom("plain")
+        private$.buildrandom(self$random,self$random_corr,"plain")
     },
     random_formula64=function() {
-      private$.buildrandom("b64")
-    },
-    
-    pretty=function(){
-      .formula<-attr(terms(as.formula(self$formula())),"term.labels")
-      .formulalist<-jmvcore::decomposeTerms(.formula)
-      lapply(.formulalist, function(x) list(source=jmvcore::stringifyTerm(x,raise=T)))
+      private$.buildrandom(self$random,self$random_corr,"b64")
     },
     formula=function() {
       paste(self$fixed_formula(),self$random_formula())
     },
     formula64=function() {
       paste(self$fixed_formula64(),self$random_formula64())
-    }
+    },
+    nested_fixed_formula=function() {
+      
+      if (is.null(self$nested_fixed))
+         return(NULL)
+      
+      private$.buildfixed(self$dep,self$nested_fixed)
+    },    
+    nested_fixed_formula64=function() {
+      private$.buildfixed(tob64(self$dep),tob64(self$nested_fixed))
+    },    
     
+    nested_random_formula=function() {
+      private$.buildrandom(self$nested_random,"block","plain")
+    },    
+    nested_random_formula64=function() {
+      private$.buildrandom(self$nested_random,"block","b64")
+    },    
+    nested_formula=function() {
+      if (is.null(self$nested_fixed))
+        return(NULL)
+      paste(self$nested_fixed_formula(),self$nested_random_formula())
+    },
+    nested_formula64=function() {
+      paste(self$nested_fixed_formula(),self$nested_random_formula())
+    },
+    nested_tested_fixed=function() {
+       if (is.something(private$.nested_fixed))
+        return(private$.buildfixed(self$dep,setdiff(private$.fixed,private$.nested_fixed)))
+    },
+    nested_tested_random=function() {
+      if (is.something(private$.nested_fixed))
+        return(private$.buildfixed(NULL,setdiff(unlist(self$random),unlist(self$nested_random))))
+    },
+    keep=function(term) {
+      
+      w<-unlist(lapply(private$.fixed,function(x) (all(term==x) || is.numeric(x))))
+      fixed=private$.fixed[w]
+      f<-private$.buildfixed(tob64(self$dep),tob64(fixed))
+      r<-NULL
+      if (is.something(self$random)) {
+        alist<-lapply(self$random,function(z) lapply(z,function(x) {
+          w<-all(term==x[-length(x)] ) || x[-length(x)]=="Intercept"
+          if (isFALSE(w)) return(NULL) else return(x)
+        } ))
+      r<-private$.buildrandom(clean_lol(alist),self$random_corr,"b64")
+      }
+      paste(f,r)
+    }
 
   ), #end of public
   active=list(
@@ -51,26 +93,58 @@ gFormula <- R6::R6Class(
          return(private$.fixed)
       
       aOne<-which(unlist(alist)=="1")
-      
       if (is.something(aOne)) {
         alist[[aOne]]<-NULL
-        self$hasIntercept<-TRUE
-      }
+        self$fixed_intercept<-TRUE
+      } 
+      aZero<-which(unlist(alist)=="0")
+      if (is.something(aZero)) {
+        alist[[aZero]]<-NULL
+        self$fixed_intercept<-FALSE
+      } 
+      alist<-c(as.numeric(self$fixed_intercept),alist)
       private$.fixed<-alist
+    },
+    nested_fixed=function(alist) {
+
+      if (missing(alist))
+        return(private$.nested_fixed)
+      
+      aOne<-which(unlist(alist)=="1")
+      if (is.something(aOne)) {
+        alist[[aOne]]<-NULL
+        self$nested_intercept<-TRUE
+      } 
+      aZero<-which(unlist(alist)=="0")
+      if (is.something(aZero)) {
+        alist[[aZero]]<-NULL
+        self$nested_intercept<-FALSE
+      } 
+      private$.nested_fixed<-c(as.numeric(self$nested_intercept),alist)
+    },
+    
+    random_corr=function(avalue) {
+      if (missing(avalue))
+         return(private$.random_corr)
+      if (is.null(avalue))
+         return(avalue)
+      private$.random_corr=avalue
     }
 
   ), #end of active
   private = list(
     .fixed=NULL,
-    .buildrandom=function(encoding) {
+    .nested_fixed=NULL,
+    .random_corr="all",
+    .buildfixed=function(dep,terms) {
+      gsub("`0`",0,gsub("`1`",1,jmvcore::composeFormula(dep,terms)))
+    },
+    .buildrandom=function(terms,correl,encoding) {
       
-      if (is.null(self$random))
+      if (!is.something(terms))
          return()
       
-        terms<-self$random
-        
         ## this is for R. It overrides the re_corr option 
-        correl<-self$random_corr
         if (length(terms)>1)
           correl  <-  "block"
         # remove empty sublists
@@ -96,7 +170,7 @@ gFormula <- R6::R6Class(
           if (length(unique(res[,2]))>1 && correl=="block")
             stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
           
-          self$clusters<-c(self$clusters,unique(res[,2]))
+  #        self$clusters<-c(self$clusters,unique(res[,2]))
           
           res<-tapply(res[,1],res[,2],paste)
           res<-sapply(res, function(x) paste(x,collapse = " + "))
@@ -115,8 +189,8 @@ gFormula <- R6::R6Class(
           rterms<-paste(rterms,form,sep = "+ ")
         }
         ## paste and return ``
-        rterms<-paste(rterms,collapse = "")
-        rterms
+        rterms<-trimws(paste(rterms,collapse = ""))
+        return(rterms)
       
     }
   ) #end of private
