@@ -125,6 +125,12 @@ Plotter <- R6::R6Class(
                                                   color="gray74",
                                                   size = 0.4, 
                                                   alpha = .80)
+                      if (attr(randomData,"xbetween"))
+                                  p <- p + ggplot2::geom_point(data = randomData, 
+                                                  .aesrandom,
+                                                  color="gray4",
+                                                  size = 0.4, 
+                                                  alpha = .80)
                       
           }
 
@@ -395,7 +401,7 @@ Plotter <- R6::R6Class(
       ### here we deal with plotting random effects, if needed
       randomData<-NULL
       if (self$option("plot_re")) {
-        self$scatterCluster<-private$.datamatic$variables[[private$.operator$clusters[[1]]]]
+        self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
         formula<-private$.operator$formulaobj$keep(self$scatterX$name)
         model<-update(private$.operator$model,formula=formula)
         y<-stats::predict(model,type="response")
@@ -522,12 +528,15 @@ Plotter <- R6::R6Class(
              if (!is.null(randomData)) {
                
                rdata<-randomData
-               mark(head(rdata))
-               mark(self$scatterCluster$name64)
                selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
               .rnames<-c("cluster","x","y")
                rdata<- stats::aggregate(rdata$y, selectorlist, mean)
                names(rdata)<-.rnames
+               attr(rdata,"xbetween")<-FALSE
+               test<-tapply(as.numeric(rdata$x),rdata$cluster,sd)
+               test<-sum(sapply(test,function(x) as.numeric(is.na(x) || x==0)))
+               nc<-self$scatterCluster$nlevels
+               if ((test/nc)>.30) attr(rdata,"xbetween")<-TRUE
                self$randomData[[1]]<-rdata
                
              }

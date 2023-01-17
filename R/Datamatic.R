@@ -113,6 +113,7 @@ Variable <- R6::R6Class(
     covs_scale="none",
     hasCluster=NULL,
     nClusters=0,
+    isBetween=FALSE,
     initialize=function(var,datamatic) {
       self$name<-var
       self$datamatic<-datamatic
@@ -196,6 +197,7 @@ Variable <- R6::R6Class(
       
       if (self$datamatic$option("cluster")) {
         if (self$name %in% self$datamatic$options$cluster) {
+            if (!is.factor(vardata)) stop("Cluster variable ",self$name," should be a nominal variable")
             self$type="cluster"
             self$levels<-levels(vardata)
             self$levels_labels<-levels(vardata)
@@ -261,7 +263,7 @@ Variable <- R6::R6Class(
         private$.contrast_values(self$levels,type)
         
       }
-      
+
   
   ), # end of public
   private=list(

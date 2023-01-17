@@ -33,7 +33,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   
   if (obj$option("es","beta")) {
     
-    if (obj$hasTerms) {
+    if (obj$formulaobj$hasTerms) {
       ## if no CI are required, we do not bootstrap again 
       if (!obj$option("betas_ci")) { 
         ..bootstrap<-FALSE 
@@ -190,8 +190,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
     .coefficients$est.ci.upper<-cidata$CI_high
     
   }
-  
-  
   return(.coefficients)
 }
 

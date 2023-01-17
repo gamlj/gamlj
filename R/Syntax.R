@@ -7,14 +7,10 @@ Syntax <- R6::R6Class(
   inherit = Scaffold,
   public=list(
     vars=NULL,
-    formula=NULL,
-    formula64=NULL,
     formulaobj=NULL,
     hasIntercept=TRUE,
     hasTerms=FALSE,
-    clusters=NULL,
     isProper=NULL,
-    nested_formula64=NULL,
     tab_anova=NULL,
     tab_coefficients=NULL,
     tab_intercept=NULL,
@@ -51,11 +47,10 @@ Syntax <- R6::R6Class(
       self$formulaobj$nested_random<-self$optionValue("nested_re")
       self$formulaobj$nested_intercept<-self$optionValue("nested_intercept")
       self$formulaobj$offset<-self$optionValue("offset")
-      mark(self$formulaobj$nested_tested_random())
-      mark(self$formulaobj$nested_tested_fixed())
+      self$formulaobj$update_terms(self$datamatic$data_structure64)
+
       
-      private$.constructFormula()
-      
+
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(options,datamatic)
       
@@ -150,37 +145,26 @@ Syntax <- R6::R6Class(
     init_main_anova=function() {
       
       tab<-list()
-      if (self$hasTerms) {
-        .formulalist<-self$options$model_terms
-        ## we want to be sure that the order of terms is the same used by the estimator
-        ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
-        ## lm() (or other estimator) in different order
-        .formula<-jmvcore::composeFormula(NULL,.formulalist)
-#        .formula<-terms(as.formula(.formula))
-        .formula<-attr(terms(as.formula(.formula)),"term.labels")
-        .formulalist<-jmvcore::decomposeTerms(.formula)
-        tab<-lapply(.formulalist, function(x) list(source=.stringifyTerm(x)))
+      if (self$formulaobj$hasTerms) {
+        tab<-lapply(self$formulaobj$anova_terms, function(x) list(source=.stringifyTerm(x)))
       }
       
       if (self$options$model_type=="lm") {
-        if (self$hasTerms)
+        if (self$formulaobj$hasTerms)
           tab<-prepend_list(tab,list(source="Model",f="."))
-        
         tab<-append_list(tab,list(source="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
         tab<-append_list(tab,list(source="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
       }       
       ### we need at least a row otherwise we cannot add notes to the table
       if (!is.something(tab))
         tab[[1]]<-list(test="")
-      
       tab
     },
     
     ### parameter estimates ####
     init_main_coefficients=function() {
       
-
-      .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
+      .terms<-colnames(model.matrix(as.formula(self$formulaobj$fixed_formula64()),self$datamatic$data_structure64))
       .len<-length(.terms)
       if (self$options$model_type=="multinomial") 
         .len  <- .len * (self$datamatic$dep$nlevels-1)
@@ -235,7 +219,7 @@ Syntax <- R6::R6Class(
 
     init_main_vcov=function() {
   
-       .terms<-colnames(model.matrix(lme4::nobars(as.formula(self$formula64)),self$datamatic$data_structure64))
+       .terms<-self$formulaobj$params_terms
        .len <- length(.terms)
        .titles<-fromb64(.terms)
       
@@ -266,7 +250,6 @@ Syntax <- R6::R6Class(
     },
     init_main_paralleltest=function() {
       
-        
       self$init_main_anova()
     },
 
@@ -427,63 +410,6 @@ Syntax <- R6::R6Class(
   
   private=list(
     
-    .constructFormula=function() {
-      
-      # this allows intercept only model to be passed by syntax interface
-      self$hasIntercept<-self$options$fixed_intercept
-      modelTerms<-self$options$model_terms
-      aOne<-which(unlist(self$options$model_terms)=="1")
-      
-      if (is.something(aOne)) {
-        modelTerms[[aOne]]<-NULL
-        self$hasIntercept<-TRUE
-      }
-      if (self$options$model_type=="ordinal") {
-        self$hasIntercept<-TRUE
-        if (self$options$fixed_intercept==FALSE)
-          self$dispatcher$warnings<-list(topic="info",message="Ordinal regression requires the intercept. It has been added to the model")
-        
-      }
-      
-      self$hasTerms <-(length(modelTerms)>0)
-      self$isProper <-(self$hasIntercept | self$hasTerms)
-      
-      rands64   <-NULL
-      rands     <-NULL
-      
-      cluster <-NULL
-      if (self$option("re")) {
-         rands64<-private$.buildreffects()
-         rands<-fromb64(rands64,unique(unlist(self$options$re)))
-         cluster<-self$options$cluster
-      }
-      
-      sep<-"+"
-      if (!self$hasTerms) sep=""
-      self$vars<-c(self$options$dep,unique(unlist(modelTerms)),cluster)
-      
-      fixed64<-jmvcore::composeFormula(NULL,tob64(modelTerms))
-      fixed64<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(self$hasIntercept),sep),fixed64)
-      self$formula64<-trimws(paste(fixed64,rands64,sep =  ""))
-
-      fixed<-jmvcore::composeFormula(NULL,modelTerms)
-      fixed<-gsub("~",paste(self$options$dep,"~",as.numeric(self$hasIntercept),sep),fixed)
-      self$formula<-trimws(paste(fixed,rands,sep =  ""))
-      
-      if (self$option("comparison")) {
-        
-        hasIntercept<-self$option("nested_intercept")
-        sep<-"+"
-        if (!is.something(self$options$nested_terms)) sep=""
-        fixed64<-jmvcore::composeFormula(NULL,tob64(self$options$nested_terms))
-        fixed64<-gsub("~",paste(tob64(self$options$dep),"~",as.numeric(hasIntercept),sep),fixed64)
-        if (self$option("re"))
-            rands64<-private$.buildreffects("nested")
-        self$nested_formula64<-trimws(paste(fixed64,rands64,sep =  ""))
-
-      }
-    },
-    
     .make_structure=function() {
       
       ## some warnings ###
@@ -570,65 +496,8 @@ Syntax <- R6::R6Class(
       
       
       
-    },
-    .buildreffects=function(what="full") {
-      
-      if (!self$option(".caller",c("lmer","glmer")))
-         return()
-      if (what=="full")
-         terms  <-  self$options$re
-      else 
-         terms  <-  self$options$nested_re
-      
-      if (is.null(terms))
-          return()
-      ## this is for R. It overrides the re_corr option 
-      correl<-self$options$re_corr
-      if (length(terms)>1)
-        correl  <-  "block"
-      # remove empty sublists
-      terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
-      
-      # split in sublists if option re_corr=none
-      if (correl=="none" & what!="nested") {
-        termslist<-terms[[1]]
-        terms<-lapply(termslist,list)
-      }
-      
-      rterms<-""    
-      for(i in seq_along(terms)) {
-        one<-terms[[i]]
-        one64<-tob64(one)
-        flatterms<-lapply(one64,function(x) c(jmvcore::composeTerm(head(x,-1)),tail(x,1)))
-        res<-do.call("rbind",flatterms)
-        ### check blocks coherence
-        if (length(unique(res[,2]))>1 && correl=="block")
-          stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
-        
-        self$clusters<-c(self$clusters,unique(res[,2]))
-        
-        res<-tapply(res[,1],res[,2],paste)
-        res<-sapply(res, function(x) paste(x,collapse = " + "))
-
-        ### deal with intercept ###
-        for (i in seq_along(res)) {
-          test<-grep(tob64("Intercept"),res[[i]],fixed=TRUE)
-          if (is.something(test))
-            res[[i]]<-gsub(tob64("Intercept"),1,res[[i]])
-          else 
-            res[[i]]<-paste("0 + ",res[[i]])
-        }
-        ### compose ####
-        form<-paste(res,names(res),sep=" | ")
-        form<-paste("(",form,")")
-        rterms<-paste(rterms,form,sep = "+")
-      }
-      ## paste and return ``
-      rterms<-paste(rterms,collapse = "")
-      rterms
     }
-    
-    
+
   ) # end of private
 ) # End Rclass
 

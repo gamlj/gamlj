@@ -6,13 +6,15 @@ gFormula <- R6::R6Class(
   cloneable=FALSE, 
   public=list(
     dep=NULL,
-    random=NULL,
     offset=NULL,
     clusters=NULL,
     nested_intercept=TRUE,
     nested_random=NULL,
     fixed_intercept=TRUE,
+    hasTerms=FALSE,
     isProper=FALSE,
+    anova_terms=NULL,
+    params_terms=NULL,
     lhs=function() {
       private$.buildfixed(NULL,private$.fixed)
     },
@@ -84,6 +86,21 @@ gFormula <- R6::R6Class(
       r<-private$.buildrandom(clean_lol(alist),self$random_corr,"b64")
       }
       paste(f,r)
+    },
+    update_terms=function(data) {
+      .formulalist<-self$fixed
+      ## we want to be sure that the order of terms is the same used by the estimator
+      ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
+      ## lm() (or other estimator) in different order
+      .formula<-jmvcore::composeFormula(NULL,.formulalist)
+      .formula<-attr(terms(as.formula(.formula)),"term.labels")
+      .formulalist<-jmvcore::decomposeTerms(.formula)
+       self$anova_terms<-fromb64(.formulalist)
+       self$params_terms<-fromb64(colnames(model.matrix(as.formula(self$fixed_formula64()),data)))
+
+       
+      
+      
     }
 
   ), #end of public
@@ -103,6 +120,8 @@ gFormula <- R6::R6Class(
         self$fixed_intercept<-FALSE
       } 
       alist<-c(as.numeric(self$fixed_intercept),alist)
+      self$hasTerms<-length(alist)>1
+      self$isProper <-(self$fixed_intercept | self$hasTerms)
       private$.fixed<-alist
     },
     nested_fixed=function(alist) {
@@ -122,6 +141,14 @@ gFormula <- R6::R6Class(
       } 
       private$.nested_fixed<-c(as.numeric(self$nested_intercept),alist)
     },
+    random=function(alist) {
+      
+      if (missing(alist))
+        return(private$.random)
+      
+      self$clusters<-unique(unlist(lapply(alist,function(z) lapply(z,function(x) x[length(x)]))))
+      private$.random<-alist
+    },
     
     random_corr=function(avalue) {
       if (missing(avalue))
@@ -134,6 +161,7 @@ gFormula <- R6::R6Class(
   ), #end of active
   private = list(
     .fixed=NULL,
+    .random=NULL,
     .nested_fixed=NULL,
     .random_corr="all",
     .buildfixed=function(dep,terms) {

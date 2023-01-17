@@ -121,7 +121,7 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_main_anova=function() {
 
-                            if (!self$isProper) {
+                            if (!self$formulaobj$isProper) {
 
                                 if (self$infomatic$caller=="lm") {
                                     self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
@@ -146,7 +146,7 @@ Estimate <- R6::R6Class("Estimate",
                               private$.bootstrap_model()
 
                             tab<-NULL
-                            if (self$isProper) {
+                            if (self$formulaobj$isProper) {
                               tab       <-  gparameters(self$model,self)
                               tab       <-  private$.fix_names(tab)
                             }
@@ -198,7 +198,7 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           run_main_marginals=function() {
                             tab<-NULL
-                            if (self$isProper) {
+                            if (self$formulaobj$isProper) {
                               tab       <-  es.marginals(self)
                             }
                             tab
@@ -206,7 +206,7 @@ Estimate <- R6::R6Class("Estimate",
                           
                           run_main_relativerisk=function() {
                             tab<-NULL
-                            if (self$isProper) {
+                            if (self$formulaobj$isProper) {
                               tab       <-  es.relativerisk(self)
                               tab       <-  private$.fix_names(tab)
                             }

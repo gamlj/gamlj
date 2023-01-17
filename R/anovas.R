@@ -7,7 +7,7 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .anova.glm<-function(model,obj) {
   
-  if (!obj$hasTerms) {
+  if (!obj$formulaobj$hasTerms) {
     obj$dispatcher$warnings  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
     return(NULL)
   }
@@ -57,7 +57,7 @@ ganova<- function(x,...) UseMethod(".anova")
   effss<-anovatab[!(rownames(anovatab) %in% c("Residuals")),]
   reds<-list(ss=anovatab$ss[rownames(anovatab)=="Residuals"],df=anovatab$df[rownames(anovatab)=="Residuals"])
   ## returns if model has no terms
-  if (!obj$hasTerms) {
+  if (!obj$formulaobj$hasTerms) {
     tots<-list(ss=reds$ss,df=reds$df)
     return(list(reds,tots))
   }
@@ -129,7 +129,7 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .anova.lmerModLmerTest<-function(model,obj) {
   
-  if (!obj$hasTerms)
+  if (!obj$formulaobj$hasTerms)
     return()
   
   df<-obj$options$df_method
@@ -166,7 +166,7 @@ ganova<- function(x,...) UseMethod(".anova")
   ## drop. We also have to be careful when there is only one predictors,
   ## because drop1 will not work . This results in Type II testing
 
-  if (!obj$hasTerms)
+  if (!obj$formulaobj$formulaobj$hasTerms)
     return()
 
   results<-emmeans::joint_tests(model)
