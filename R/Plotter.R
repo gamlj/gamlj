@@ -45,7 +45,6 @@ Plotter <- R6::R6Class(
         private$.prepareMainPlot()
         private$.prepareClusterBoxplot()
         private$.prepareClusterResPred()
-        
         private$.prepareRandHist()
         
       },
@@ -223,8 +222,8 @@ Plotter <- R6::R6Class(
       },
       residPlot=function(theme,ggtheme)  {
         
-        if (!self$option("resid_plot"))
-          return()
+#        if (!self$option("resid_plot") && !self$option("cluster_respred") )
+#          return()
         
         if (!is.something(private$.operator$model))
           return()
@@ -248,7 +247,7 @@ Plotter <- R6::R6Class(
         
         ########## working here ##########
 
-        if (!self$option("clusterBoxplot"))
+        if (!self$option("cluster_boxplot"))
           return()
         
 
@@ -260,7 +259,7 @@ Plotter <- R6::R6Class(
         fmodel<-lme4::fortify.merMod(private$.operator$model)
         plot<-ggplot2::ggplot(fmodel, ggplot2::aes_string(cluster,".resid")) +
               ggplot2::geom_boxplot() + ggplot2::coord_flip()
-        plot<-plot+ggplot2::xlab(fromb64(cluster))+ylab("Residuals")
+        plot<-plot+ggplot2::xlab(fromb64(cluster))+ggplot2::ylab("Residuals")
         plot<-plot+ ggtheme 
 
         return(plot)
@@ -270,7 +269,7 @@ Plotter <- R6::R6Class(
         
         ########## working here ##########
         
-        if (!self$option("clusterResPred"))
+        if (!self$option("cluster_respred"))
           return()
         
         
@@ -281,10 +280,9 @@ Plotter <- R6::R6Class(
         data<-lme4::fortify.merMod(private$.operator$model)
         plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = ".fitted", y = ".resid",color=cluster)) 
         plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
-        
         plot <- plot + ggplot2::geom_point(shape = 21)
         plot <- plot + ggtheme
-        
+        plot <- plot + ggplot2::theme(legend.position="bottom")
         return(plot)
         
       },
@@ -292,7 +290,7 @@ Plotter <- R6::R6Class(
         randHist=function(image,ggtheme,theme)  {
   
   
-              if (!self$option("randHist"))
+              if (!self$option("rand_hist"))
                   return()
   
   
@@ -311,7 +309,7 @@ Plotter <- R6::R6Class(
                                         stat="bin", color=color, fill=fill)
               plot <- plot + ggplot2::stat_function(fun = dnorm, args = list(mean = mean(data$x), sd = sd(data$x)))  
           
-              themeSpec <- theme(axis.text.y=ggplot2::element_blank(),
+              themeSpec <- ggplot2::theme(axis.text.y=ggplot2::element_blank(),
                              axis.ticks.y=ggplot2::element_blank())
               plot <- plot + ggtheme + themeSpec
           
@@ -553,7 +551,7 @@ Plotter <- R6::R6Class(
     },
     .prepareClusterBoxplot=function() {
       
-      if (!self$option("clusterBoxplot"))
+      if (!self$option("cluster_boxplot"))
         return()
       
       ### we get the clusters from the model because the model may contain less cluster variables than selected
@@ -572,7 +570,7 @@ Plotter <- R6::R6Class(
     },
     .prepareClusterResPred=function() {
       
-      if (!self$option("clusterResPred"))
+      if (!self$option("cluster_respred"))
         return()
       
       ### we get the clusters from the model because the model may contain less cluster variables than selected
@@ -592,7 +590,7 @@ Plotter <- R6::R6Class(
     
     .prepareRandHist=function() {
       
-      if (!self$option("randHist"))
+      if (!self$option("rand_hist"))
         return()
       
   

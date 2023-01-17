@@ -659,7 +659,7 @@ items:
           visible: (qq_plot)
           type: Image
           description: a q-q plot
-          width: 450
+          width: 500
           height: 400
           renderFun: .qqPlot
           requiresData: true
@@ -673,7 +673,7 @@ items:
           visible: (norm_plot)
           type: Image
           description: Residual histogram
-          width: 450
+          width: 500
           height: 400
           renderFun: .normPlot
           requiresData: true
@@ -686,7 +686,7 @@ items:
           visible: (resid_plot)
           type: Image
           description: Residual Predicted plot
-          width: 450
+          width: 500
           height: 400
           renderFun: .residPlot
           requiresData: true
@@ -694,6 +694,54 @@ items:
             - dep
             - model_terms
             - dep_scale
+
+        - name: clusterBoxplot
+          title: Residuals by cluster boxplot
+          type: Array
+          description: Residuals boxplot by cluster
+          visible: (cluster_boxplot)
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .clusterBoxplot
+             width: 500
+             height: 400
+
+        - name: clusterResPred
+          title: Residual by cluster
+          type: Array
+          description: an array of random coefficients histograms
+          visible: (cluster_respred)
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .clusterResPred
+             width: 500
+             height: 800
+
+        - name: randHist
+          title: Random coefficients histogram
+          type: Array
+          description: an array of random coefficients histograms
+          visible: (rand_hist)
+          clearWith:
+            - dep
+            - dep_scale
+            - modelTerms
+          template:
+             title: $key
+             type: Image
+             renderFun: .randHist
+             width: 500
+             height: 400
 
   - name: predicted
     title: Predicted Vales

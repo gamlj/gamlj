@@ -223,6 +223,37 @@ gamljMixedClass <- R6::R6Class(
   return(plot)
 },
 
+.clusterBoxplot=function(image, ggtheme, theme, ...) {
+  
+  if (!private$.ready$ready) 
+    return()
+  
+  plot<-private$.plotter_machine$clusterBoxplot(image,ggtheme,theme)
+  return(plot)
+},
+.clusterResPred=function(image, ggtheme, theme, ...) {
+  
+  if (!private$.ready$ready) 
+    return()
+  
+  plot<-private$.plotter_machine$clusterResPred(image,ggtheme,theme)
+  
+  return(plot)
+},
+
+.randHist=function(image, ggtheme, theme, ...) {
+  
+  if (!private$.ready$ready) 
+    return()
+  
+  plot<-private$.plotter_machine$randHist(image,ggtheme,theme)
+
+  return(plot)
+},
+
+
+
+
 .formula=function() {
   
   private$.estimate_machine$formula
@@ -231,7 +262,6 @@ gamljMixedClass <- R6::R6Class(
 
 .marshalFormula= function(formula, data, name) {
 
-  mark(name)
   return()
   fixed<-lme4::nobars(formula)
   bars<-lme4::findbars(formula)

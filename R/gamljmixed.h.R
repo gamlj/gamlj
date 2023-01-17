@@ -1377,7 +1377,10 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     normtest = function() private$.items[["normtest"]],
                     qqplot = function() private$.items[["qqplot"]],
                     normplot = function() private$.items[["normplot"]],
-                    residPlot = function() private$.items[["residPlot"]]),
+                    residPlot = function() private$.items[["residPlot"]],
+                    clusterBoxplot = function() private$.items[["clusterBoxplot"]],
+                    clusterResPred = function() private$.items[["clusterResPred"]],
+                    randHist = function() private$.items[["randHist"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -1413,7 +1416,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="qqplot",
                             title="Q-Q Plot",
                             visible="(qq_plot)",
-                            width=450,
+                            width=500,
                             height=400,
                             renderFun=".qqPlot",
                             requiresData=TRUE,
@@ -1426,7 +1429,7 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="normplot",
                             title="Residual histogram",
                             visible="(norm_plot)",
-                            width=450,
+                            width=500,
                             height=400,
                             renderFun=".normPlot",
                             requiresData=TRUE,
@@ -1439,14 +1442,59 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="residPlot",
                             title="Residual-Predicted Scatterplot",
                             visible="(resid_plot)",
-                            width=450,
+                            width=500,
                             height=400,
                             renderFun=".residPlot",
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
                                 "model_terms",
-                                "dep_scale")))}))$new(options=options))
+                                "dep_scale")))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterBoxplot",
+                            title="Residuals by cluster boxplot",
+                            visible="(cluster_boxplot)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterBoxplot",
+                                width=500,
+                                height=400)))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterResPred",
+                            title="Residual by cluster",
+                            visible="(cluster_respred)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterResPred",
+                                width=500,
+                                height=800)))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="randHist",
+                            title="Random coefficients histogram",
+                            visible="(rand_hist)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "modelTerms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".randHist",
+                                width=500,
+                                height=400)))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",
@@ -1650,6 +1698,9 @@ gamljMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$assumptions$qqplot} \tab \tab \tab \tab \tab a q-q plot \cr
 #'   \code{results$assumptions$normplot} \tab \tab \tab \tab \tab Residual histogram \cr
 #'   \code{results$assumptions$residPlot} \tab \tab \tab \tab \tab Residual Predicted plot \cr
+#'   \code{results$assumptions$clusterBoxplot} \tab \tab \tab \tab \tab Residuals boxplot by cluster \cr
+#'   \code{results$assumptions$clusterResPred} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
+#'   \code{results$assumptions$randHist} \tab \tab \tab \tab \tab an array of random coefficients histograms \cr
 #'   \code{results$predicted} \tab \tab \tab \tab \tab an output \cr
 #'   \code{results$residuals} \tab \tab \tab \tab \tab an output \cr
 #' }
