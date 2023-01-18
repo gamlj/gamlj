@@ -1,4 +1,4 @@
-context("effectsizes")
+testthat::context("effectsizes")
 tol<-.0001
 N<-dim(iris)[1]
 form<-Sepal.Length~Sepal.Width+Petal.Width+Species

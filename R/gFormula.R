@@ -10,7 +10,7 @@ gFormula <- R6::R6Class(
     clusters=NULL,
     nested_intercept=TRUE,
     nested_random=NULL,
-    fixed_intercept=TRUE,
+    fixed_intercept=NULL,
     hasTerms=FALSE,
     isProper=FALSE,
     anova_terms=NULL,
@@ -62,7 +62,7 @@ gFormula <- R6::R6Class(
       paste(self$nested_fixed_formula(),self$nested_random_formula())
     },
     nested_formula64=function() {
-      paste(self$nested_fixed_formula(),self$nested_random_formula())
+      paste(self$nested_fixed_formula64(),self$nested_random_formula64())
     },
     nested_tested_fixed=function() {
        if (is.something(private$.nested_fixed))
@@ -89,7 +89,7 @@ gFormula <- R6::R6Class(
     },
     update_terms=function(data) {
       .formulalist<-self$fixed
-      ## we want to be sure that the order of terms is the same used by the estimator
+      ## we want to be sure that the order of terms is the same used by the emator
       ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
       ## lm() (or other estimator) in different order
       .formula<-jmvcore::composeFormula(NULL,.formulalist)
@@ -97,10 +97,6 @@ gFormula <- R6::R6Class(
       .formulalist<-jmvcore::decomposeTerms(.formula)
        self$anova_terms<-fromb64(.formulalist)
        self$params_terms<-fromb64(colnames(model.matrix(as.formula(self$fixed_formula64()),data)))
-
-       
-      
-      
     }
 
   ), #end of public
@@ -108,17 +104,8 @@ gFormula <- R6::R6Class(
     fixed=function(alist) {
       if (missing(alist))
          return(private$.fixed)
-      
-      aOne<-which(unlist(alist)=="1")
-      if (is.something(aOne)) {
-        alist[[aOne]]<-NULL
-        self$fixed_intercept<-TRUE
-      } 
-      aZero<-which(unlist(alist)=="0")
-      if (is.something(aZero)) {
-        alist[[aZero]]<-NULL
-        self$fixed_intercept<-FALSE
-      } 
+      if (is.null(self$fixed_intercept)) 
+         stop("Formula$fixed_intercept has not been set")
       alist<-c(as.numeric(self$fixed_intercept),alist)
       self$hasTerms<-length(alist)>1
       self$isProper <-(self$fixed_intercept | self$hasTerms)
@@ -128,18 +115,8 @@ gFormula <- R6::R6Class(
 
       if (missing(alist))
         return(private$.nested_fixed)
-      
-      aOne<-which(unlist(alist)=="1")
-      if (is.something(aOne)) {
-        alist[[aOne]]<-NULL
-        self$nested_intercept<-TRUE
-      } 
-      aZero<-which(unlist(alist)=="0")
-      if (is.something(aZero)) {
-        alist[[aZero]]<-NULL
-        self$nested_intercept<-FALSE
-      } 
       private$.nested_fixed<-c(as.numeric(self$nested_intercept),alist)
+
     },
     random=function(alist) {
       
@@ -224,5 +201,31 @@ gFormula <- R6::R6Class(
   ) #end of private
 ) #end of class
 
+# this does the opposite, from formulas to lists. 
+rFormula <- R6::R6Class(
+  "rFormula",
+  class=TRUE, 
+  cloneable=FALSE, 
+  public=list(
+       intercept=NULL,
+       dep=NULL,
+       factors=NULL,
+       covs=NULL,
+       terms=NULL,
+       initialize=function(aformula,data=NULL) {
+         
+           aformula<-as.formula(aformula)
+           terms<-terms(aformula)
+           if (!is.null(data)) {
+             self$dep     <- jmvcore::marshalFormula(aformula,data,from="lhs",permitted = c("numeric","factor"))
+             self$factors  <- jmvcore::marshalFormula(aformula,data,from="rhs",permitted = "factor")
+             self$covs    <- jmvcore::marshalFormula(aformula,data,from="rhs",permitted = "numeric")
+           }
+           self$intercept <- as.logical(attr(terms(aformula),"intercept"))
+           self$terms<-jmvcore::decomposeTerms(attr(terms(aformula),"term.labels"))
+         }
+         
 
+  ) # end of public
+) # end of class
 

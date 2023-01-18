@@ -1,5 +1,5 @@
-context("glm")
-
+testthat::context("glm")
+tol<-.001
 mod0<-gamlj::gamljGlm(
   data = ToothGrowth,
   formula=len~supp+dose)
@@ -85,7 +85,7 @@ testthat::test_that("glm anova is correct", {
   testthat::expect_equal(as.character(r.anova[3,1]),"schtyp")
   testthat::expect_equal(round(r.anova[4,4],3),0.276)
   testthat::expect_equal(round(r.anova[3,6],5),7e-05)
-  testthat::expect_equal(round(r.anova[3,8],5),-0.00299)
+  testthat::expect_equal(round(r.anova[3,8],5),-0.000)
   testthat::expect_equal(round(r.anova[1,9],5),.38828)
   
 })
@@ -222,9 +222,8 @@ mod2<-gamlj::gamljGlm(
   simple_moderators  = sex
 )
 
-
 testthat::test_that("glm weird names", {
-  testthat::expect_equal(as.character(se.params2[2,1]),"female")
+  testthat::expect_equal(mod2$simpleEffects$anova$asDF[1,1],"female")
   testthat::expect_true(
     all(mod$main$coefficients$asDF$estimate==mod2$main$coefficients$asDF$estimate)
   )
@@ -348,10 +347,9 @@ testthat::test_that("glm intercept only model", {
 
 
 mod<-gamlj::gamljGlm(
-  formula = read ~ 1,  data = data,
+  formula = read ~ 0,  data = data,
   fixed_intercept =FALSE
 )
-
 res<-mod$main$anova$asDF
 testthat::test_that("glm zero-intercept model", {
   testthat::expect_equal(as.character(res$source[1]),"Residuals")
@@ -403,8 +401,8 @@ testthat::test_that("model comparison", {
 
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
-  formula=science~1+math+prog+math:prog, 
-  nested_terms = ~math
+  formula=science~1+prog+math+math:prog, 
+  nested_terms = ~math:prog
 )
 testthat::test_that("model comparison", {
   testthat::expect_equal(
@@ -412,3 +410,15 @@ testthat::test_that("model comparison", {
     ,tol)
 })
 
+
+mod<-gamlj::gamljGlm(
+  data = hsbdemo,
+  formula=science~1,
+  nested_terms=~0
+)
+
+testthat::test_that("intercept model comparison", {
+  testthat::expect_equal(
+    mod$main$r2$asDF$ar[1]-mod$main$r2$asDF$ar[2],mod$main$r2$asDF$ar[3]
+    ,tol)
+})

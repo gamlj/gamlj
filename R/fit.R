@@ -192,9 +192,7 @@ r2.est<- function(model,...) UseMethod(".r2")
   cond<-fit.compare_null_model(model,type="c")
   cond$type<-"Conditional"
   cond$r2<-r2$R2_conditional
-  mark("in r2 lmer")
   marg<-fit.compare_null_model(model,type="m")
-  mark("in r2 after")
   if (is.null(marg))
      marg<-list()   
 

@@ -29,7 +29,6 @@ Syntax <- R6::R6Class(
     tab_randomTests=NULL,
     tab_levene=NULL,
     tab_normtest=NULL,
-    
     datamatic=NULL,
     infomatic=NULL,
     initialize=function(options,dispatcher,datamatic) {
@@ -39,17 +38,15 @@ Syntax <- R6::R6Class(
       
       #### we prepare the model syntax
       self$formulaobj<-gFormula$new()
+      self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
+      self$formulaobj$nested_intercept<-self$optionValue("nested_intercept")
       self$formulaobj$dep<-self$options$dep
       self$formulaobj$fixed<-self$options$model_terms
       self$formulaobj$random<-self$optionValue("re")
-      self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
       self$formulaobj$nested_fixed<-self$optionValue("nested_terms")
       self$formulaobj$nested_random<-self$optionValue("nested_re")
-      self$formulaobj$nested_intercept<-self$optionValue("nested_intercept")
       self$formulaobj$offset<-self$optionValue("offset")
       self$formulaobj$update_terms(self$datamatic$data_structure64)
-
-      
 
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(options,datamatic)
@@ -83,7 +80,7 @@ Syntax <- R6::R6Class(
       tab[["ci"]]<-list(info="C.I. method",value=method,specs=info)
       
       
-      if (self$option("comparison")) {
+      if (self$options$comparison) {
         
          tab[["mc"]]<-list(info="Comparison",
                            value="Nested model",
@@ -114,7 +111,9 @@ Syntax <- R6::R6Class(
       
         if (self$option(".caller",c("lmer","glmer"))) {
           tab<-list(list(type="Marginal"),list(type="Conditional"))
-          if (self$option("comparison")) {
+          
+          if (self$options$comparison) {
+            
             tab<-list(list(type="Conditional",model="Full"),
                       list(type="Marginal",model="Full"),
                       list(type="Conditional",model="Nested"),
@@ -125,7 +124,8 @@ Syntax <- R6::R6Class(
   
         } else {
         tab<-list(model="")
-        if (self$option("comparison"))
+        
+        if (self$options$comparison)
            tab<-list(list(model="Full"),
                      list(model="Nested"),
                      list(model=paste0(greek_vector[["Delta"]],"R\u00B2")))
