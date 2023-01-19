@@ -5,7 +5,7 @@ menuGroup: Linear Models
 version: '3.0.0'
 jas: '1.2'
 completeWhenFilled: true
-export: true
+export: false
 description:
     main: |
           Mixed Linear Model
@@ -17,20 +17,6 @@ description:
                      formula = y ~ 1 + cond+( 1|subj ),
                      data = subjects_by_stimuli)
 
-
-formula:
-   dep:
-     custom: true
-   factors: 
-     custom: true
-   covs: 
-     custom: true
-   cluster: 
-     custom: true
-   re: 
-     custom: true
-   model_terms:
-     custom: true
 
 options:
     - name: data

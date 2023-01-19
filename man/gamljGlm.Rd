@@ -2,68 +2,73 @@
 % Please edit documentation in R/gamljglm.f.R
 \name{gamljGlm}
 \alias{gamljGlm}
-\title{General Linear Model}
+\title{Mixed Linear Model}
 \usage{
 gamljGlm(
-  formula,
+  formula = NULL,
   data,
   dep = NULL,
+  fixed_intercept = TRUE,
   factors = NULL,
   covs = NULL,
   model_terms = NULL,
   nested_terms = NULL,
-  fixed_intercept = TRUE,
-  nested_intercept = TRUE,
+  nested_intercept = NULL,
   omnibus = "F",
-  se_method = "standard",
   estimates_ci = TRUE,
   betas_ci = FALSE,
-  es = list("beta", "etap"),
-  es_info = FALSE,
   ci_width = 95,
   ci_method = "wald",
   boot_r = 1000,
-  dep_scale = "none",
   contrasts = NULL,
   show_contrastnames = TRUE,
   show_contrastcodes = FALSE,
+  vcov = FALSE,
+  plot_x = NULL,
+  plot_z = NULL,
+  plot_by = NULL,
+  plot_raw = FALSE,
+  plot_yscale = FALSE,
+  plot_xoriginal = FALSE,
+  plot_black = FALSE,
+  plot_around = "ci",
+  emmeans = NULL,
+  posthoc = NULL,
+  simple_effects = NULL,
+  simple_moderators = NULL,
+  simple_interactions = FALSE,
   covs_scale = NULL,
   covs_conditioning = "mean_sd",
   ccm_value = 1,
   ccp_value = 25,
   covs_scale_labels = "labels",
-  vcov = FALSE,
-  emmeans = NULL,
-  posthoc = NULL,
-  posthoc_es = list("dm"),
   adjust = list("bonf"),
+  posthoc_es = list("dm"),
   d_ci = FALSE,
-  simple_effects = NULL,
-  simple_moderators = NULL,
-  simple_interactions = FALSE,
+  model_type = "lm",
+  es = list("beta", "etap"),
   homo_test = FALSE,
   qq_plot = FALSE,
   norm_test = FALSE,
   norm_plot = FALSE,
   resid_plot = FALSE,
   intercept_info = FALSE,
-  plotHAxis = NULL,
-  plotSepLines = NULL,
-  plotSepPlots = NULL,
-  plotRaw = FALSE,
-  plotDvScale = FALSE,
-  plotOriginalScale = FALSE,
-  plotLinesTypes = FALSE,
-  plotError = "none"
+  es_info = FALSE,
+  dep_scale = "none",
+  se_method = "standard"
 )
 }
 \arguments{
-\item{formula}{(optional) the formula to use, see the examples}
+\item{formula}{(optional) the formula of the model, see the examples. If not passed
+model terms should be defined as a list in  \code{model_terms} option.}
 
 \item{data}{the data as a data frame}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. Not needed if \code{formula} is used.}
+
+\item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
+fixed intercept. Overridden if \code{formula} is used and contains \code{~1} or \code{~0}.}
 
 \item{factors}{a vector of strings naming the fixed factors from
 \code{data}. Not needed if \code{formula} is used.}
@@ -71,56 +76,30 @@ variable must be numeric. Not needed if \code{formula} is used.}
 \item{covs}{a vector of strings naming the covariates from \code{data}. Not
 needed if \code{formula} is used.}
 
-\item{model_terms}{a right hand formula with the model terms. 
-Alternatively, a list of character vectors describing fixed effects,
-in the form \code{list(aterm1, aterm2, c(aterm1,aterm2))}, where \code{c(aterm1,aterm2)} indicates an interaction.
-Not needed if \code{formula} is used.}
+\item{model_terms}{a list of character vectors describing fixed effects
+terms. Not needed if \code{formula} is used.}
 
-\item{nested_terms}{a right hand formula with the nested model terms. 
-Alternatively, a list of character vectors describing nested effects}
-
-\item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept. Is overridden by \code{formula=0+..} .}
+\item{nested_terms}{A right-hand formula for the nested model. It can be passed as a list of character vectors describing effects terms
+for the nested model.}
 
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept for nested model. Not needed if \code{formula} is used.}
+fixed intercept. Overridden if \code{model_ters} is a formula and contains \code{~1} or \code{~0}..}
 
-\item{omnibus}{R-squared omnibus tests are based on F-test \code{'F'} (default) or 
-loglikelihood ratio test \code{'LRT'}.}
-
-\item{se_method}{standard error computation method. 
-It can be \code{'standard'} for model SE and 
-\code{'robust'} for HC method.}
+\item{omnibus}{Omnibus tests are based on F-test \code{F} (default) or
+loglikelihood ration test \code{LRT}.}
 
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI
-in tables.}
+in table}
 
 \item{betas_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI in
-tables.}
-
-\item{es}{a list of effect sizes to print out. They can be:
-\code{'eta'} for eta-squared, \code{'etap'} for partial eta-squared, 
-\code{'omega'} for omega-squared,
-\code{'omegap'} for partial omega-squared,
-\code{'epsilon'} for epsilon-squared,
-\code{'epsilonp'} for partial epsilon-squared,
-and \code{'beta'} for standardized coefficients (betas).
- Default is  \code{"beta"} and \code{"etap"}.}
-
-\item{es_info}{\code{TRUE} or \code{FALSE} (default), provide ìnformation
-about the effect size indexes}
+table}
 
 \item{ci_width}{a number between 50 and 99.9 (default: 95) specifying the
-confidence interval width for tables or plots.}
+confidence interval width for the plots.}
 
-\item{ci_method}{method to estimate confidence intervals. It can be
-\code{'wald'} (default) for standard method, 
-\code{'quantile'} for bootstrap percent method and
-\code{'bcai'} for bootstrap bias corrected accelerated method.}
+\item{ci_method}{.}
 
 \item{boot_r}{a number bootstrap repetitions.}
-
-\item{dep_scale}{re-scale the dependent variable.}
 
 \item{contrasts}{a named vector of the form \code{c(var1="type",
 var2="type2")} specifying the type of contrast to use, one of
@@ -135,57 +114,90 @@ names of the contrasts variables in tables}
 \item{show_contrastcodes}{\code{TRUE} or \code{FALSE} (default), shows
 contrast coefficients tables}
 
+\item{vcov}{\code{TRUE} or \code{FALSE} (default), shows coefficients
+covariances}
+
+\item{plot_x}{a string naming the variable placed on the horizontal axis of
+the plot}
+
+\item{plot_z}{a string naming the variable represented as separate lines in
+the plot}
+
+\item{plot_by}{a list of variables defining the levels at which a separate
+plot should be produced.}
+
+\item{plot_raw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
+the predicted values}
+
+\item{plot_yscale}{\code{TRUE} or \code{FALSE} (default), set the Y-axis
+range equal to the range of the observed values.}
+
+\item{plot_xoriginal}{\code{TRUE} or \code{FALSE} (default), use original
+scale for covariates.}
+
+\item{plot_black}{\code{TRUE} or \code{FALSE} (default), use different
+linetypes per levels.}
+
+\item{plot_around}{\code{'none'} (default), \code{'ci'}, or \code{'se'}.
+Use no error bars, use confidence intervals, or use standard errors on the
+plots, respectively.}
+
+\item{emmeans}{a rhs formula with the terms specifying the marginal means
+to estimate (of the form \code{'~x+x:z'})}
+
+\item{posthoc}{a rhs formula with the terms specifying the table to apply
+the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
+so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
+passed also as a list of the form '}list("x","z",c("x","z")`'}
+
+\item{simple_effects}{The variable for which the simple effects (slopes)
+are computed}
+
+\item{simple_moderators}{a character vector with the variable(s) providing the levels at which the
+simple effects are computed}
+
+\item{simple_interactions}{should simple Interactions be computed}
+
 \item{covs_scale}{a named vector of the form \code{c(var1='type',
 var2='type2')} specifying the transformation to apply to covariates, one of
 \code{'centered'} to the mean, \code{'standardized'} or  \code{'none'}.
 \code{'none'} leaves the variable as it is.}
 
-\item{covs_conditioning}{\code{'mean_sd'} (default), or
-\code{'percent'}. How to condition covariates in simple effects and plots.
-\code{'mean_sd'} for mean +/- \code{ccp_value} * sd. Default is 1.
-\code{'percent'} for median +/- \code{ccm_value} for percentiles. Default is 25.}
+\item{covs_conditioning}{'\code{mean_sd}' (default), or '\code{percent}'.
+How to condition covariates in simple effects and plots. '\code{mean_sd}'
+for mean +/- '\code{ccp_value}' * sd. '\code{percent}' for median
++/-'\code{ccp_value}' for percentiles.}
 
-\item{ccm_value}{how many std around the means to condition
+\item{ccm_value}{how many st.deviations around the means used to condition
 simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}}
 
-\item{ccp_value}{offset (number of percentiles) around the median used to
+\item{ccp_value}{offsett (number of percentiles) around the median used to
 condition simple effects and plots. Used if
 \code{simpleScale}=\code{'percent'}}
 
 \item{covs_scale_labels}{how the levels of a continuous moderator should
-appear in tables and plots: \code{'labels'}, \code{'values'} and
-\code{'values_labels'}, \code{'ovalues'}, \code{'ovalues_labels'}. The latter two refer
+appear in tables and plots: \code{labels}, \code{values} and
+\code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
 to the variable orginal levels, before scaling.}
 
-\item{vcov}{\code{TRUE} or \code{FALSE} (default), shows coefficients
-covariances}
+\item{adjust}{adjustment method for postho tests. One or more of
+\code{'none'},  \code{'bonf'},\code{'tukey'}  \code{'holm'}; provide no,
+Bonferroni, Tukey and Holm Post Hoc corrections respectively.}
 
-\item{emmeans}{a rhs formula with the terms specifying the marginal means
-to estimate (of the form \code{~x+x:z}). The formula is not expanded,
-so \code{x*z} becomes \code{x+z} and not \code{x+z+x:z}. It can be
-passed also as a list of the form \code{'list("x","z",c("x","z")'}.}
-
-\item{posthoc}{a rhs formula with the terms specifying the table to apply
-the comparisons (of the form \code{~x+x:z}). The formula is not expanded,
-so \code{x*z} becomes \code{x+z} and not \code{x+z+x:z}. It can be
-passed also as a list of the form \code{'list("x","z",c("x","z")'}.}
-
-\item{posthoc_es}{one or more of \code{'dm'},  \code{'ds'},\code{'g'} for
-Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g}
-
-\item{adjust}{one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
-\code{'holm'}, \code{'scheffe'}; provide no,  Bonferroni, Tukey, Holm, Scheffe Post Hoc corrections
-respectively.}
+\item{posthoc_es}{effect size indices for mean comparisons. One or more of
+\code{'dm'},  \code{'ds'},\code{'g'} for Cohen's d (dm=model SD,ds=sample
+SD )  or Hedge's g}
 
 \item{d_ci}{\code{TRUE} or \code{FALSE} (default), d confidence intervals}
 
-\item{simple_effects}{The variable for which the simple effects (slopes)
-are computed}
+\item{model_type}{.}
 
-\item{simple_moderators}{the variable that provides the levels at which the
-simple effects are computed}
-
-\item{simple_interactions}{should simple Interactions be computed}
+\item{es}{a list of effect sizes to print out. They can be:  \code{"eta"}
+for eta-squared, \code{'etap'} for partial eta-squared, \code{'omega'} for
+omega-squared, \code{'omegap'} for partial omega-squared, \code{'epsilon'}
+for epsilon-squared, \code{'epsilonp'} for partial epsilon-squared  and
+\code{'beta'} for standardized  coefficients (betas). Default is
+\code{"beta"} and \code{"parEta"}.}
 
 \item{homo_test}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
 tests}
@@ -205,33 +217,15 @@ scatterplot of the residuals against predicted}
 \item{intercept_info}{\code{TRUE} or \code{FALSE} (default), provide
 ìnformation about the intercept (F test, effect size indexes)}
 
-\item{plotHAxis}{a string naming the variable placed on the horizontal axis
-of the plot}
+\item{es_info}{\code{TRUE} or \code{FALSE} (default), provide ìnformation
+about the effect size indexes}
 
-\item{plotSepLines}{a string naming the variable represented as separate
-lines in the plot}
+\item{dep_scale}{Re-scale the dependent variable.}
 
-\item{plotSepPlots}{a list of string naming the variables defining the
-levels for multiple plots}
-
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
-the predicted values}
-
-\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), set the Y-axis
-range equal to the range of the observed values.}
-
-\item{plotOriginalScale}{\code{TRUE} or \code{FALSE} (default), use
-original scale for covariates.}
-
-\item{plotLinesTypes}{\code{TRUE} or \code{FALSE} (default), use different
-linetypes per levels.}
-
-\item{plotError}{\code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
-no error bars, use confidence intervals, or use standard errors on the
-plots, respectively.}
+\item{se_method}{.}
 }
 \value{
-A 'results' object containing:
+A results object containing:
 \tabular{llllll}{
   \code{results$model} \tab \tab \tab \tab \tab a property \cr
   \code{results$info} \tab \tab \tab \tab \tab a table \cr
@@ -274,5 +268,4 @@ analysis, effect size indexes and visualization of the results.
 \examples{
 data('ToothGrowth')
 gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
-
 }

@@ -470,7 +470,8 @@ Estimate <- R6::R6Class("Estimate",
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
-
+                            
+                              ginfo("MODULE: Estimating the model: checking")
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
                                    stop(unlist(self$datamatic$errors))
@@ -502,7 +503,8 @@ Estimate <- R6::R6Class("Estimate",
                              glmer<-lme4::glmer
                              ###
 
-
+                             ginfo("MODULE: Estimating the model: making options")
+                             
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
 
                               opts[["formula"]]<-self$formulaobj$formula64()
@@ -518,7 +520,9 @@ Estimate <- R6::R6Class("Estimate",
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-
+              
+                              ginfo("MODULE: Estimating the model: running")
+                              
                               results<-try_hard(eval(acall))
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
@@ -536,7 +540,7 @@ Estimate <- R6::R6Class("Estimate",
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
 
                               .model<-mf.fixModel(results$obj,self)
-                            
+                              
                               return(.model)
 
 

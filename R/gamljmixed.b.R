@@ -252,64 +252,12 @@ gamljMixedClass <- R6::R6Class(
 },
 
 
-
-
 .formula=function() {
   
   private$.estimate_machine$formula
   
 },
 
-.marshalFormula= function(formula, data, name) {
-
-  return()
-  fixed<-lme4::nobars(formula)
-  bars<-lme4::findbars(formula)
-  rterms<-lapply(bars,all.vars)
-  rvars<-unlist(sapply(rterms,function(a) if (length(a)>1) a[[length(a)-1]]))
-  if (name=="dep")
-    return(jmvcore::marshalFormula(fixed,data,from = "lhs"))  
-  if (name=="factors") {
-    ffactors<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='factor')
-    rfactors<-unlist(lapply(rvars, function(a) {if (is.factor(data[[a]])) a}))
-    return(c(ffactors,rfactors))
-  }
-  if (name=="covs") {
-    fcovs<-jmvcore::marshalFormula(fixed,data,from='rhs',type='vars',permitted='numeric')
-    rcovs<-unlist(lapply(rvars, function(a) {if (is.numeric(data[[a]])) a}))
-    return(c(fcovs,rcovs))
-  }
-  if (name=="cluster") {
-    return(sapply(rterms,function(a) a[[length(a)]] ))
-  }
-  if (name=="re") {
-    bars<-lme4::findbars(formula)
-    fullist<-list()
-    for (b in seq_along(bars)) {
-      cluster=bars[[b]][[3]]
-      bar<-strsplit(as.character(bars[[b]])[[2]],"+",fixed=T)[[1]]
-      barlist<-list()
-      j<-0
-      for (term in bar) {
-        term<-trimws(jmvcore::decomposeTerm(term))
-        if (length(term)==1 && term=="1")
-          term="Intercept"
-        if (length(term)==1 && term=="0")
-          next()              
-        alist<-c(term,as.character(cluster))
-        j<-j+1
-        barlist[[j]]<-alist
-      }
-      fullist[[b]]<-barlist
-    }
-    return(fullist)
-  }
-  
-  if (name=="model_terms") {
-    return(jmvcore::marshalFormula(fixed,data,from='rhs',type='terms'))
-  }
-  
-},
 .sourcifyOption = function(option) {
 
 

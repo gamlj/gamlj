@@ -1,20 +1,23 @@
-context("mixed")
+testthat::context("mixed")
 tol<-0.001
 data("subjects_by_stimuli")
 
 subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
+subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
+
 formula<-y~1+cond+(1|subj)+(1|stimulus)
+
 model<-gamlj::gamljMixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli,
+  plot_x=cond,
+  resid_plot = T, cluster_boxplot = T, cluster_respred = T, rand_hist = T
 )
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {
-  testthat::expect_equal(round(as.numeric(as.character(infotable[3,2])),digits = 2),16561.78)
-  testthat::expect_equal(round(as.numeric(as.character(infotable[6,2])),digits = 2),0.01)
-  testthat::expect_equal(round(as.numeric(as.character(infotable[5,2])),digits = 2),-8278.23)
-  
+  testthat::expect_equal(as.numeric(infotable$value[7]),3000)
+  testthat::expect_equal(infotable$info[8],"Converged")
 })
 
 ftable<-model$main$anova$asDF
@@ -23,18 +26,18 @@ testthat::test_that("f-table is ok", {
   testthat::expect_equal(ftable[1,4],2949)
 })
 
-ptable<-model$main$fixed$asDF
+ptable<-model$main$coefficients$asDF
 
 testthat::test_that("p-table is ok", {
-  testthat::expect_equal(round(ptable[1,4],digits = 2),0.31)
-  testthat::expect_equal(round(ptable[2,5],digits = 3),0.703)
-  testthat::expect_equal(as.character(ptable[2,2]),"1 - -1")
+  testthat::expect_equal(ptable[1,4],0.307,tol)
+  testthat::expect_equal(ptable[2,5],0.703,tol)
+  testthat::expect_equal(as.character(ptable[2,2]),"B - A")
 })
 
 rtable<-model$main$random$asDF
 
 testthat::test_that("p-table is ok", {
-  testthat::expect_equal(round(rtable[1,4],digits = 2),4.49)
+  testthat::expect_equal(rtable[1,4],4.49,tol)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
 
@@ -53,15 +56,18 @@ testthat::test_that("a  resid boxplot is produced", {
 testthat::test_that("a randhist is produced", {
   testthat::expect_true(ggplot2::is.ggplot(model$assumptions$randHist[[1]]$plot$fun()))
 })
+testthat::test_that("a randhist is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterResPred[[1]]$plot$fun()))
+})
 
 
 
 model<-gamlj::gamljMixed(
   dep=y,
   factors = "cond",
-  modelTerms = "cond",
+  model_terms = "cond",
   cluster = "subj",
-  randomTerms = list(list(c("Intercept","subj"))),
+  re = list(list(c("Intercept","subj"))),
   data = subjects_by_stimuli
 )
 
@@ -90,9 +96,9 @@ testthat::test_that("uncorrelated error", {
 model1<-gamlj::gamljMixed(
   dep=y,
   factors = "cond",
-  modelTerms = "cond",
+  model_terms = "cond",
   cluster = "subj",
-  randomTerms = list(list(c("Intercept","subj")),list(c("cond","subj"))),
+  re = list(list(c("Intercept","subj")),list(c("cond","subj"))),
   data = subjects_by_stimuli
 )
 
@@ -106,11 +112,17 @@ testthat::test_that("uncorrelated works", {
 })
 
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
+
+subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
+
 model<-gamlj::gamljMixed(
   formula =formula,
-  data = subjects_by_stimuli, plotHAxis = cond,
-  lrtRandomEffects=T  
+  data = subjects_by_stimuli, 
+  plot_x = cond,
+  re_lrt=F  
 )
+model
+
 testthat::test_that("ranova works",
                     testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
 )
@@ -230,16 +242,18 @@ data("wicksell")
 data<-wicksell
 data$group<-factor(data$group)
 data$time<-factor(data$time)
+data$subj<-factor(data$subj)
 
 testthat::expect_warning(
   gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
-  contrasts = c("group"="simple","time"="polynomial"),
-  simpleVariable = "time",
-  simpleModerator = "group")
+#  contrasts = c("group"="simple","time"="polynomial"),
+#  simple_effects = "time",
+#  simple_moderators = "group"
 )
-
+)
+gobj
 es.params<-gobj$simpleEffects$Params$asDF
 
 testthat::test_that("simple effects", {

@@ -1,4 +1,4 @@
-context("R interface")
+testthat::context("R interface")
 tol<-0.001
 library(ggplot2)
 data("qsport")
@@ -7,7 +7,6 @@ obj<-gamlj::gamljGlm(
     formula = performance ~ hours+type,
     posthoc = ~type,
     data = qsport)
-
 
 
 preds<-predict(obj)
@@ -19,9 +18,16 @@ testthat::test_that("test glm", {
   testthat::expect_equal(mean(reds),0,tol)
 })
 
+sums<-summary(obj)
+
+testthat::test_that("summary glm", {
+  testthat::expect_equal(sums[[1]]$info[2],"Model")
+  testthat::expect_equal(sums[[2]]$ar2,.408,tol)
+  testthat::expect_equal(sums[[3]]$df[4],97)
+})
 
 
-
+sums[[1]]$info[2]
 
 newopt<-list(var="hours",type="standardized") 
 
@@ -154,7 +160,8 @@ gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = wicksell)
 
-r1<-simpleEffects(gobj)
+r1<-gamlj::simple_effects(gobj)
+
 r2<-simpleEffects(gobj,formula=~group:time,postHocCorr=c("bonf","holm"))
 tab<-r2[[2]]$asDF
 

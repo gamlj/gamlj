@@ -97,13 +97,12 @@ testthat::test_that("glm anova simple effects", {
   testthat::expect_equal(round(se.params[2,5],3),0.574)
 })
 
-#testthat::test_that("glm plot", {
-#  testthat::expect_is(mod$mainPlots[[1]],"Image")
-#})
-
 testthat::test_that("glm CI width", {
   testthat::expect_equal(round(mod$main$coefficients$asDF[2,5],3),0.495)
 })
+
+
+
 
 mod<-gamlj::gamljGlm(
   data = hsbdemo,
@@ -416,7 +415,6 @@ mod<-gamlj::gamljGlm(
   formula=science~1,
   nested_terms=~0
 )
-
 testthat::test_that("intercept model comparison", {
   testthat::expect_equal(
     mod$main$r2$asDF$ar[1]-mod$main$r2$asDF$ar[2],mod$main$r2$asDF$ar[3]

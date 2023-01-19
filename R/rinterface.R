@@ -92,7 +92,7 @@ plot.gamlj <- function(x, formula = NULL, ...) {
                 sepLines <- .call[2] else sepLines <- NULL
             if (!is.na(.call[3])) 
                 sepPlots <- .call[3] else sepPlots <- NULL
-            args <- list(plotHAxis = haxis, plotSepLines = sepLines, plotSepPlots = sepPlots, ...)
+            args <- list(plot_x = haxis, plot_z = sepLines, plot_by = sepPlots, ...)
             object <- stats::update(x, args)
             .extract_plots(object)
         })
@@ -110,17 +110,13 @@ plot.gamlj <- function(x, formula = NULL, ...) {
 
 .extract_plots <- function(object) {
 
-    if (length(object$descPlots) == 0) {
-        return(object$descPlot$plot$fun())
-    } else {
         alist <- list()
-        for (i in 1:length(object$descPlots)) {
-            title <- (object$descPlots[[i]]$title)
-            gplot <- object$descPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
+        for (i in 1:length(object$mainPlots)) {
+            title <- (object$mainPlots[[i]]$title)
+            gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
             alist[[i]] <- gplot
-        }
         return(alist)
-    }
+       }
 }
 
 #' Assumptions checking plots
@@ -385,8 +381,8 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 
 #' @param object a gamlj results object of the class `gamlj`
 #' @param formula a right hand side formula specifying the variables to test, of the form `~x:z`, `~x:z:w` or `~x*z`. 
-#' The formula is not exanded, so the first variable is the simple effect variable, the second is the moderator, 
-#' the third an optional additional moderator
+#' The formula is not expanded, so the first variable is the simple effect variable, the second is the moderator, 
+#' the third an optional additional moderator, an so on
 #' It has prevalence on other options defining a simple effects test via character options.
 #' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
 #'   `simpleVariable` (the simple effect variable), `simpleModerator` (the moderator), and `simple3way` for the second moderator. 
@@ -404,28 +400,23 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 #' @rdname simpleeffects
 #' @export
 
-simpleEffects <- function(object, ...) UseMethod("simpleEffects")
+simpleeffects <- function(object, ...) UseMethod("simpleeffects")
+
 
 #' @rdname simpleeffects
 #' @export
 
-simpleEffects.gamlj <- function(object, formula = NULL, ...) {
+simpleeffects.gamlj <- function(object, simple_effects=NULL,simple_moderators=NULL,...) {
 
-    if (is.something(formula)) {
-        .call <- all.vars(formula)
-        .simpleVariable <- .call[1]
-        .simpleModerator <- .call[2]
-        if (!is.na(.call[3])) 
-            .simple3way <- .call[3] else .simple3way <- NULL
-        args <- list(simpleVariable = .simpleVariable, simpleModerator = .simpleModerator, simple3way = .simple3way, ...)
+    if (is.something(simple_effects) & is.something(simple_moderators)) {
+        args <- list(simple_effects = simple_effects, simple_moderators=simple_moderators, ...)
         object <- stats::update(object, args)
-    } else if (is.something(list(...))) 
-        object <- stats::update(object, ...)
+    }
+    if (dim(object$simpleEffects$anova$asDF)[1] != 0)  
+         return(object$simpleEffects)
+    else
+       stop("Simple effects not available")
 
-    if (dim(object$simpleEffects$Anova$asDF)[1] == 0) 
-        return(FALSE)
-
-    object$simpleEffects
 }
 
 
@@ -487,7 +478,11 @@ summary.ResultsElement<-function(object,...) {
 
 print.jmvrtable<-function(x,...) {
     cat(attr(x,"title"),"\n\n")
-    print.data.frame(x)
+  for (var in names(x)) {
+    if (is.character(x[[var]]))
+      x[is.na(x[[var]]),var]<-""  
+  }
+  print.data.frame(x)
 }
 
 #' Print a jamovi summary of jamovi ResultElement in R style 

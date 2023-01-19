@@ -148,10 +148,10 @@ gFormula <- R6::R6Class(
       
       if (!is.something(terms))
          return()
-      
+
         ## this is for R. It overrides the re_corr option 
         if (length(terms)>1)
-          correl  <-  "block"
+            correl  <-  "block"
         # remove empty sublists
         terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
         
@@ -162,8 +162,8 @@ gFormula <- R6::R6Class(
         }
         
         rterms<-""
-        .intercept<-"Intercept"
         for(i in seq_along(terms)) {
+          .intercept<-"Intercept"
           .one<-terms[[i]]
           if (encoding=="b64") {
              .one<-tob64(.one)
@@ -174,12 +174,10 @@ gFormula <- R6::R6Class(
           ### check blocks coherence
           if (length(unique(res[,2]))>1 && correl=="block")
             stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
-          
-  #        self$clusters<-c(self$clusters,unique(res[,2]))
-          
+
           res<-tapply(res[,1],res[,2],paste)
           res<-sapply(res, function(x) paste(x,collapse = " + "))
-          
+
           ### deal with intercept ###
           for (i in seq_along(res)) {
             test<-grep(.intercept,res[[i]],fixed=TRUE)
@@ -193,7 +191,7 @@ gFormula <- R6::R6Class(
           form<-paste("(",form,")")
           rterms<-paste(rterms,form,sep = "+ ")
         }
-        ## paste and return ``
+        ## paste and return 
         rterms<-trimws(paste(rterms,collapse = ""))
         return(rterms)
       
@@ -212,20 +210,40 @@ rFormula <- R6::R6Class(
        factors=NULL,
        covs=NULL,
        terms=NULL,
+       random=NULL,
+       clusters=list(),
        initialize=function(aformula,data=NULL) {
          
            aformula<-as.formula(aformula)
-           terms<-terms(aformula)
-           if (!is.null(data)) {
-             self$dep     <- jmvcore::marshalFormula(aformula,data,from="lhs",permitted = c("numeric","factor"))
-             self$factors  <- jmvcore::marshalFormula(aformula,data,from="rhs",permitted = "factor")
-             self$covs    <- jmvcore::marshalFormula(aformula,data,from="rhs",permitted = "numeric")
+           bars<-lme4::findbars(aformula)
+           if (!is.null(bars)) {
+                 test<-(length(grep("^1",bars))+length(grep("^0",bars)))==length(bars)
+                 if (!test) stop("The random intercept should be explicitly defined for each component with either `1` (present) or `0` (absent)")
+                 bars<-gsub("^1","Intercept",bars)
+                 bars<-gsub("^0","",bars)
+                 barslist<-lapply(bars,function(b) strsplit(b,"|",fixed = T)[[1]] )
+                 self$random<-lapply(barslist,function(b) {
+                                cluster<-trimws(b[[2]])
+                                self$clusters[[length(self$cluster)+1]]<-cluster
+                                .terms<-unlist(jmvcore::decomposeFormula(b[[1]]))
+                                lapply(.terms,function(t) c(t,cluster))
+                       })
+                 
            }
-           self$intercept <- as.logical(attr(terms(aformula),"intercept"))
-           self$terms<-jmvcore::decomposeTerms(attr(terms(aformula),"term.labels"))
+           fformula<-lme4::nobars(aformula)
+           if (!is.null(data)) {
+             self$dep     <- jmvcore::marshalFormula(fformula,data,from="lhs",permitted = c("numeric","factor"))
+             self$factors  <- jmvcore::marshalFormula(fformula,data,from="rhs",permitted = "factor")
+             self$covs    <- jmvcore::marshalFormula(fformula,data,from="rhs",permitted = "numeric")
+           }
+           self$intercept <- as.logical(attr(terms(fformula),"intercept"))
+           self$terms<-jmvcore::decomposeTerms(attr(terms(fformula),"term.labels"))
          }
          
 
   ) # end of public
 ) # end of class
 
+#aformula<-y~1+x+I(x^2)+(1+x1+x1:x2|cluster2)+(0+k|cluster1)+(1|cluster2)+(x|cluster2)
+#f<-rFormula$new(y~1+x+I(x^2))
+#f$terms

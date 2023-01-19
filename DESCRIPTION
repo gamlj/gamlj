@@ -15,7 +15,7 @@ Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, lmerTest, lme4, lmtest,
          boot, glue, insight,parameters,rlang,sandwich, stringr,
          nnet, MASS, ggplot2, effectsize, performance, ordinal,
          margins
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Suggests: 
     rmarkdown,
     knitr

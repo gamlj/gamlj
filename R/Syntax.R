@@ -40,6 +40,7 @@ Syntax <- R6::R6Class(
       self$formulaobj<-gFormula$new()
       self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
       self$formulaobj$nested_intercept<-self$optionValue("nested_intercept")
+      self$formulaobj$random_corr<-self$optionValue("re_corr")
       self$formulaobj$dep<-self$options$dep
       self$formulaobj$fixed<-self$options$model_terms
       self$formulaobj$random<-self$optionValue("re")
