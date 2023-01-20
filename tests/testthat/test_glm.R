@@ -249,13 +249,24 @@ data<-hsbdemo
 levels(data$ses)<-c("s1","s2","s3")
 levels(data$female)<-c("f1","f2")
 
-ok<-gamlj::gamljGlm(
+mod0<-gamlj::gamljGlm(
   data = data,
   formula=science~math*ses*female,
   posthoc = list(c("ses","female")),
   posthoc_es  = c("dm")
-  
 )
+mod1<-gamlj::gamljGlm(
+  data = data,
+  formula=science~math*ses*female,
+  posthoc = ~ses:female,
+  posthoc_es  = c("dm")
+)
+
+testthat::test_that("glm posthoc interfaces", {
+  testthat::expect_equal(mod0$posthoc[[1]]$asDF[4,5],mod0$posthoc[[1]]$asDF[4,5])
+  testthat::expect_equal(mod1$posthoc[[1]]$asDF[7,14],mod0$posthoc[[1]]$asDF[7,14])
+})
+
 
 data$`weird ?`<-hsbdemo$ses
 data$`weird !`<-hsbdemo$female

@@ -241,9 +241,9 @@ gamljGlm <- function(
   for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
   ##### custom code
   .caller = "lm"
+  model_type="lm"
   .interface = "R"
   donotrun = FALSE
-  model_type = "lm"
   ### model terms
   if (inherits(model_terms, "formula")) {
     f<-rFormula$new(model_terms,data)

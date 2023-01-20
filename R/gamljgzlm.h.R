@@ -1364,7 +1364,7 @@ gamljGzlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 package = "gamlj",
                 name = "gamljGzlm",
-                version = c(2,0,3),
+                version = c(3,0,0),
                 options = options,
                 results = gamljGzlmResults$new(options=options),
                 data = data,

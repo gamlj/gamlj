@@ -245,7 +245,9 @@ procedure.posthoc_effsize <- function(obj) {
     dep <- jmvcore::composeTerm(dep)
     termf <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
     data <- insight::get_data(model)
-    referenceGrid <- emmeans::emmeans(model, termf, transform = "response", data = data)
+    mark(getNamespaceVersion("emmeans"))
+
+    referenceGrid <- emmeans::emmeans(model, termf, data = data)
     terms <- jmvcore::decomposeTerm(term)
     labs <- referenceGrid@grid[terms]
     newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
@@ -283,7 +285,7 @@ procedure.posthoc_effsize <- function(obj) {
     tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
     data <- insight::get_data(model)
     
-      referenceGrid <- emmeans::emmeans(model, tterm, transform = "response", data = data)
+      referenceGrid <- emmeans::emmeans(model, tterm, data = data)
       
       terms <- jmvcore::decomposeTerm(term)
       labs <- referenceGrid@grid[terms]
