@@ -19,6 +19,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             nickname=NULL,
                             expandable=FALSE,
                             expandSuperTitle=NULL,
+                            expandOnData=FALSE,
                             expandFrom=1,
                             activated=NULL,
                             key=NULL,
@@ -57,6 +58,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 self$expandable             <- private$.estimator$expandable
                                 self$expandFrom             <- private$.estimator$expandFrom
                                 self$expandSuperTitle       <- private$.estimator$expandSuperTitle
+                                self$expandOnData         <- private$.estimator$expandOnData
                                 self$ci_info                <- private$.estimator$ci_info
                                 self$keys_sep               <- private$.estimator$keys_sep
                                 self$keys_raise             <- private$.estimator$keys_raise
@@ -67,6 +69,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 self$columnTitles           <- private$.estimator$columnTitles
                                 self$indent                 <- private$.estimator$indent                            
                                 self$activateOnData         <- private$.estimator$activateOnData
+                                
                               }
 
                             },
@@ -121,7 +124,10 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.null(rtable))
                                  return()
                               
+                              if (self$expandOnData) private$.expand(rtable)
+                              
                               private$.fill(self$table,rtable)
+                              private$.spaceBy()
                               self$table$setVisible(TRUE)
                               tinfo("TABLES: table",self$nickname,"run")
                             },
@@ -217,12 +223,12 @@ SmartTable <- R6::R6Class("SmartTable",
                                 
                                 test<-grep("___key___",self$table$title,fixed = TRUE)
                                 if (length(test)>0 & is.something(self$key)) {
+                                  
                                   if (is.something(self$keys_sep))
                                     key<-jmvcore::stringifyTerm(self$key,sep=self$keys_sep,raise=self$keys_raise)
                                   else
                                     key<-jmvcore::stringifyTerm(self$key,raise=self$keys_raise)
-                                  
-                                  
+
                                   aname<-gsub("___key___",key,self$table$title)
                                   self$table$setTitle(aname)
                                   
@@ -439,7 +445,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                   
                                   if (self$spaceMethod=="cb" & length(rows)==length(col)-1)
                                     rows<-NULL
-                                
+
                                   for (j in rows) {
                                     self$table$addFormat(rowNo=j-1,col=k,jmvcore::Cell.END_GROUP)
                                     self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.BEGIN_GROUP)
@@ -494,7 +500,9 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.null(adata)) {
                                 return()
                               }
-                           
+                              if (inherits(adata,"matrix")) 
+                                 adata<-as.data.frame(adata)
+                                
                               .attr<-private$.getAttributes(adata)
                               .res<-NULL
                               if (inherits(adata,"data.frame")) {

@@ -225,6 +225,7 @@ options:
             `TRUE` or `FALSE` (default), shows contrast coefficients tables
 
 
+### PLOT
 
     - name: plot_x
       title: Horizontal axis
@@ -318,6 +319,7 @@ options:
         - name:  full
           title: Full predicted method
 
+###
 
     - name: emmeans
       title: Estimated Marginal Means

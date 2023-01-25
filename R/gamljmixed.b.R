@@ -164,13 +164,10 @@ gamljMixedClass <- R6::R6Class(
       
        #save model preds and resids            
        private$.estimate_machine$savePredRes(self$results) 
-      # 
-      private$.plotter_machine$preparePlots()
+       # plotting if necessary
+       private$.plotter_machine$preparePlots()
       
-#      if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
-#          self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
-#          self$results$plotnotes$setVisible(TRUE)
-#      }  
+
       private$.checkpoint()
       
       ### save the model if we are in R ###

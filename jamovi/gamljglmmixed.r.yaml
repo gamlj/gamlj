@@ -103,6 +103,7 @@ items:
            - name: anova
              title: Fixed Effects Omnibus Tests
              type: Table
+             visible: false
              description: a table of omnibus
              clearWith:
                          - dep
@@ -148,6 +149,10 @@ items:
                     - re_corr
 
              columns:
+                    - name: response
+                      title: Response 
+                      type: text
+                      visible: (model_type:multinomial)
                     - name: source
                       title: "Names"
                       type: text
@@ -181,7 +186,7 @@ items:
                       type: number
                       title: Upper
                       visible: (es:expb & expb_ci)
-                    - name: test
+                    - name: z
                       title: "z"
                       type: number
                     - name: p
@@ -316,6 +321,7 @@ items:
            - name: random
              title: Random Components
              type: Table
+             visible: false
              clearWith:
                     - relm
                     - dep
@@ -387,6 +393,26 @@ items:
                    - name: std
                      title: "Corr."
                      type: number
+
+           - name: multirandom
+             title: Random Parameters covariances
+             type: Array
+             visible: true
+             clearWith:
+                    - dep
+                    - model_terms
+                    - contrasts
+                    - covs_scale
+                    - fixed_intercept
+                    - re
+                    - re_corr
+             template:
+               type: Table
+               title:  "Covariances for:  ___key___"
+               columns:
+                   - name: name
+                     title: "name"
+                     type: text
 
            - name: ranova
              title: Random Effect LRT
@@ -566,6 +592,11 @@ items:
 
                 
               columns:
+                     - name: response
+                       title: "Response"
+                       type: text
+                       combineBelow: true
+                       visible: (model_type:multinomial)
                      - name: contrast
                        title: "Effect"
                        type: text
@@ -669,7 +700,7 @@ items:
                    - name: est.ci.upper
                      title: Upper
                      type: number
-                   - name: t
+                   - name: z
                      title: z
                      type: number
                    - name: p

@@ -113,6 +113,7 @@ children:
             children:
               - type: CheckBox
                 name: comparison
+                enable: (!model_type_multinomial)
                 events:
                   change: './gamlj.events::onEvent_comparison'
       - type: Label
@@ -128,6 +129,7 @@ children:
             type: CheckBox
             optionPart: marginals
             optionName: es
+            enable: (!model_type_multinomial)
           - name: es_RR
             type: CheckBox
             optionPart: RR
@@ -144,6 +146,7 @@ children:
           - name: re_ci
             type: CheckBox
             label: Random variances
+            enable: (!model_type_multinomial)
           - name: expb_ci
             type: CheckBox
             label: Fixed Exp(B)
@@ -461,6 +464,8 @@ children:
                 type: CheckBox
                 optionName: adjust
                 optionPart: sidak
+
+
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -478,19 +483,19 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotHAxis
+                name: plot_x
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepLines
+                name: plot_z
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: plotSepPlots
+                name: plot_by
                 isTarget: true
       - type: LayoutBox
         margin: large
@@ -501,30 +506,52 @@ children:
             children:
               - type: RadioButton
                 name: errBarDef_none
-                optionName: plotError
+                optionName: plot_around
                 optionPart: none
               - type: RadioButton
                 name: errBarDef_ci
-                optionName: plotError
+                optionName: plot_around
                 optionPart: ci
               - name: plotError_se
                 type: RadioButton
-                optionName: plotError
+                optionName: plot_around
                 optionPart: se
           - type: Label
             label: Plot
             children:
               - type: CheckBox
-                name: plotRaw
+                name: plot_raw
               - type: CheckBox
-                name: plotDvScale
+                name: plot_yscale
           - type: Label
             label: Use
             children:
               - type: CheckBox
-                name: plotOriginalScale
+                name: plot_xoriginal
               - type: CheckBox
-                name: plotLinesTypes
+                name: plot_black
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+               - type: Label
+                 label: Random Effects
+                 children:
+                    - type: CheckBox
+                      name: plot_re
+                    - type: RadioButton
+                      name: plot_re_method_average
+                      optionName: plot_re_method
+                      optionPart: average
+                      enable: (plot_re)
+
+                    - type: RadioButton
+                      name: plot_re_method_full
+                      optionName: plot_re_method
+                      optionPart: full
+                      enable: (plot_re)
+
+
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -553,6 +580,7 @@ children:
       - type: CheckBox
         name: simple_interactions
         label: Simple interactions
+        enable: (!model_type_multinomial)
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true

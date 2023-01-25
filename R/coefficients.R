@@ -139,6 +139,41 @@ gparameters<- function(x,...) UseMethod(".parameters")
   params
 }
 
+.parameters.mmblogit<-function(model,obj) {
+  
+      ss<-mclogit::getSummary.mblogit(model)
+     .names<-dimnames(ss$coef)[[3]]
+      alist<-list()
+      for (i in seq_along(.names)) {
+          one<-as.data.frame(ss$coef[,,i])
+          one$response<-as.character(.names[i])
+          ladd(alist)<-one
+      }
+      .coefficients<-as.data.frame(do.call("rbind",alist))
+      .coefficients$source<-gsub("\\).",")",rownames(.coefficients))
+
+      .transnames<-list(estimate="est",
+                        test=c("stat"),
+                        est.ci.lower="lwr",est.ci.upper="upr")
+      names(.coefficients)<-transnames(names(.coefficients),.transnames)
+    
+      if (obj$option("es","expb")) {
+         .coefficients$expb          <- exp(.coefficients$estimate)
+         .coefficients$expb.ci.lower <- exp(.coefficients$est.ci.lower)
+         .coefficients$expb.ci.upper <- exp(.coefficients$est.ci.upper)
+      }
+      ## clean names
+
+      for (var in obj$datamatic$variables) {
+       for (name in var$paramsnames64) {
+            test<-grep(name,.coefficients$source)
+            if (length(test)>0) .coefficients$source[test]<-name
+       }
+      }
+      .coefficients
+      
+}
+
 .parameters.polr<-function(model,obj) {
   params<-.parameters.glm(model,obj)
   params$label<-params$source
@@ -151,6 +186,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   
   params<-.parameters.polr(model,obj)
   params<-params[params$Effects=="fixed",]
+  names(params)[4]<-"z"
   params
   
 }

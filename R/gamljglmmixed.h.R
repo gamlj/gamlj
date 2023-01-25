@@ -27,14 +27,16 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             contrasts = NULL,
             show_contrastnames = TRUE,
             show_contrastcodes = FALSE,
-            plotHAxis = NULL,
-            plotSepLines = NULL,
-            plotSepPlots = NULL,
-            plotRaw = FALSE,
-            plotDvScale = FALSE,
-            plotOriginalScale = FALSE,
-            plotLinesTypes = FALSE,
-            plotError = "none",
+            plot_x = NULL,
+            plot_z = NULL,
+            plot_by = NULL,
+            plot_raw = FALSE,
+            plot_yscale = FALSE,
+            plot_xoriginal = FALSE,
+            plot_black = FALSE,
+            plot_around = "none",
+            plot_re = FALSE,
+            plot_re_method = "average",
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
@@ -201,42 +203,53 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "show_contrastcodes",
                 show_contrastcodes,
                 default=FALSE)
-            private$..plotHAxis <- jmvcore::OptionVariable$new(
-                "plotHAxis",
-                plotHAxis,
+            private$..plot_x <- jmvcore::OptionVariable$new(
+                "plot_x",
+                plot_x,
                 default=NULL)
-            private$..plotSepLines <- jmvcore::OptionVariable$new(
-                "plotSepLines",
-                plotSepLines,
+            private$..plot_z <- jmvcore::OptionVariable$new(
+                "plot_z",
+                plot_z,
                 default=NULL)
-            private$..plotSepPlots <- jmvcore::OptionVariables$new(
-                "plotSepPlots",
-                plotSepPlots,
+            private$..plot_by <- jmvcore::OptionVariables$new(
+                "plot_by",
+                plot_by,
                 default=NULL)
-            private$..plotRaw <- jmvcore::OptionBool$new(
-                "plotRaw",
-                plotRaw,
+            private$..plot_raw <- jmvcore::OptionBool$new(
+                "plot_raw",
+                plot_raw,
                 default=FALSE)
-            private$..plotDvScale <- jmvcore::OptionBool$new(
-                "plotDvScale",
-                plotDvScale,
+            private$..plot_yscale <- jmvcore::OptionBool$new(
+                "plot_yscale",
+                plot_yscale,
                 default=FALSE)
-            private$..plotOriginalScale <- jmvcore::OptionBool$new(
-                "plotOriginalScale",
-                plotOriginalScale,
+            private$..plot_xoriginal <- jmvcore::OptionBool$new(
+                "plot_xoriginal",
+                plot_xoriginal,
                 default=FALSE)
-            private$..plotLinesTypes <- jmvcore::OptionBool$new(
-                "plotLinesTypes",
-                plotLinesTypes,
+            private$..plot_black <- jmvcore::OptionBool$new(
+                "plot_black",
+                plot_black,
                 default=FALSE)
-            private$..plotError <- jmvcore::OptionList$new(
-                "plotError",
-                plotError,
+            private$..plot_around <- jmvcore::OptionList$new(
+                "plot_around",
+                plot_around,
                 options=list(
                     "none",
                     "ci",
                     "se"),
                 default="none")
+            private$..plot_re <- jmvcore::OptionBool$new(
+                "plot_re",
+                plot_re,
+                default=FALSE)
+            private$..plot_re_method <- jmvcore::OptionList$new(
+                "plot_re_method",
+                plot_re_method,
+                default="average",
+                options=list(
+                    "average",
+                    "full"))
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -443,14 +456,16 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
-            self$.addOption(private$..plotHAxis)
-            self$.addOption(private$..plotSepLines)
-            self$.addOption(private$..plotSepPlots)
-            self$.addOption(private$..plotRaw)
-            self$.addOption(private$..plotDvScale)
-            self$.addOption(private$..plotOriginalScale)
-            self$.addOption(private$..plotLinesTypes)
-            self$.addOption(private$..plotError)
+            self$.addOption(private$..plot_x)
+            self$.addOption(private$..plot_z)
+            self$.addOption(private$..plot_by)
+            self$.addOption(private$..plot_raw)
+            self$.addOption(private$..plot_yscale)
+            self$.addOption(private$..plot_xoriginal)
+            self$.addOption(private$..plot_black)
+            self$.addOption(private$..plot_around)
+            self$.addOption(private$..plot_re)
+            self$.addOption(private$..plot_re_method)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simple_effects)
@@ -503,14 +518,16 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
-        plotHAxis = function() private$..plotHAxis$value,
-        plotSepLines = function() private$..plotSepLines$value,
-        plotSepPlots = function() private$..plotSepPlots$value,
-        plotRaw = function() private$..plotRaw$value,
-        plotDvScale = function() private$..plotDvScale$value,
-        plotOriginalScale = function() private$..plotOriginalScale$value,
-        plotLinesTypes = function() private$..plotLinesTypes$value,
-        plotError = function() private$..plotError$value,
+        plot_x = function() private$..plot_x$value,
+        plot_z = function() private$..plot_z$value,
+        plot_by = function() private$..plot_by$value,
+        plot_raw = function() private$..plot_raw$value,
+        plot_yscale = function() private$..plot_yscale$value,
+        plot_xoriginal = function() private$..plot_xoriginal$value,
+        plot_black = function() private$..plot_black$value,
+        plot_around = function() private$..plot_around$value,
+        plot_re = function() private$..plot_re$value,
+        plot_re_method = function() private$..plot_re_method$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simple_effects = function() private$..simple_effects$value,
@@ -562,14 +579,16 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
-        ..plotHAxis = NA,
-        ..plotSepLines = NA,
-        ..plotSepPlots = NA,
-        ..plotRaw = NA,
-        ..plotDvScale = NA,
-        ..plotOriginalScale = NA,
-        ..plotLinesTypes = NA,
-        ..plotError = NA,
+        ..plot_x = NA,
+        ..plot_z = NA,
+        ..plot_by = NA,
+        ..plot_raw = NA,
+        ..plot_yscale = NA,
+        ..plot_xoriginal = NA,
+        ..plot_black = NA,
+        ..plot_around = NA,
+        ..plot_re = NA,
+        ..plot_re_method = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simple_effects = NA,
@@ -656,6 +675,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     relativerisk = function() private$.items[["relativerisk"]],
                     random = function() private$.items[["random"]],
                     randomcov = function() private$.items[["randomcov"]],
+                    multirandom = function() private$.items[["multirandom"]],
                     ranova = function() private$.items[["ranova"]]),
                 private = list(),
                 public=list(
@@ -748,6 +768,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             options=options,
                             name="anova",
                             title="Fixed Effects Omnibus Tests",
+                            visible=FALSE,
                             clearWith=list(
                                 "dep",
                                 "model_terms",
@@ -794,6 +815,11 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "re_corr"),
                             columns=list(
                                 list(
+                                    `name`="response", 
+                                    `title`="Response", 
+                                    `type`="text", 
+                                    `visible`="(model_type:multinomial)"),
+                                list(
                                     `name`="source", 
                                     `title`="Names", 
                                     `type`="text", 
@@ -836,7 +862,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="Upper", 
                                     `visible`="(es:expb & expb_ci)"),
                                 list(
-                                    `name`="test", 
+                                    `name`="z", 
                                     `title`="z", 
                                     `type`="number"),
                                 list(
@@ -988,6 +1014,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             options=options,
                             name="random",
                             title="Random Components",
+                            visible=FALSE,
                             clearWith=list(
                                 "relm",
                                 "dep",
@@ -1069,6 +1096,27 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `name`="std", 
                                     `title`="Corr.", 
                                     `type`="number"))))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="multirandom",
+                            title="Random Parameters covariances",
+                            visible=TRUE,
+                            clearWith=list(
+                                "dep",
+                                "model_terms",
+                                "contrasts",
+                                "covs_scale",
+                                "fixed_intercept",
+                                "re",
+                                "re_corr"),
+                            template=jmvcore::Table$new(
+                                options=options,
+                                title="Covariances for:  ___key___",
+                                columns=list(
+                                    list(
+                                        `name`="name", 
+                                        `title`="name", 
+                                        `type`="text")))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="ranova",
@@ -1268,6 +1316,12 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "boot_r"),
                             columns=list(
                                 list(
+                                    `name`="response", 
+                                    `title`="Response", 
+                                    `type`="text", 
+                                    `combineBelow`=TRUE, 
+                                    `visible`="(model_type:multinomial)"),
+                                list(
                                     `name`="contrast", 
                                     `title`="Effect", 
                                     `type`="text"),
@@ -1392,7 +1446,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                         `title`="Upper", 
                                         `type`="number"),
                                     list(
-                                        `name`="t", 
+                                        `name`="z", 
                                         `title`="z", 
                                         `type`="number"),
                                     list(
@@ -1548,23 +1602,26 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   names of the contrasts variables in tables
 #' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
 #'   contrast coefficients tables
-#' @param plotHAxis a string naming the variable placed on the horizontal axis
-#'   of the plot
-#' @param plotSepLines a string naming the variable represented as separate
-#'   lines in the plot
-#' @param plotSepPlots a list of string naming the variables defining the
-#'   levels for multiple plots
-#' @param plotRaw \code{TRUE} or \code{FALSE} (default), plot raw data along
+#' @param plot_x a string naming the variable placed on the horizontal axis of
+#'   the plot
+#' @param plot_z a string naming the variable represented as separate lines in
+#'   the plot
+#' @param plot_by a list of string naming the variables defining the levels
+#'   for multiple plots
+#' @param plot_raw \code{TRUE} or \code{FALSE} (default), plot raw data along
 #'   the predicted values
-#' @param plotDvScale \code{TRUE} or \code{FALSE} (default), set the Y-axis
+#' @param plot_yscale \code{TRUE} or \code{FALSE} (default), set the Y-axis
 #'   range equal to the range of the observed values.
-#' @param plotOriginalScale \code{TRUE} or \code{FALSE} (default), use
-#'   original scale for covariates.
-#' @param plotLinesTypes \code{TRUE} or \code{FALSE} (default), use different
+#' @param plot_xoriginal \code{TRUE} or \code{FALSE} (default), use original
+#'   scale for covariates.
+#' @param plot_black \code{TRUE} or \code{FALSE} (default), use different
 #'   linetypes per levels.
-#' @param plotError \code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
-#'   no error bars, use confidence intervals, or use standard errors on the
+#' @param plot_around \code{'none'} (default), \code{'ci'}, or \code{'se'}.
+#'   Use no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
+#' @param plot_re \code{TRUE} or \code{FALSE} (default), add predicted values
+#'   based on random effect in plot
+#' @param plot_re_method .
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -1640,6 +1697,7 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$main$relativerisk} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$random} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$main$randomcov} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$main$multirandom} \tab \tab \tab \tab \tab an array \cr
 #'   \code{results$main$ranova} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$posthoc} \tab \tab \tab \tab \tab an array of post-hoc tables \cr
 #'   \code{results$simpleEffects$anova} \tab \tab \tab \tab \tab a table of ANOVA for simple effects \cr
@@ -1682,14 +1740,16 @@ gamljGlmMixed <- function(
     contrasts = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
-    plotHAxis = NULL,
-    plotSepLines = NULL,
-    plotSepPlots = NULL,
-    plotRaw = FALSE,
-    plotDvScale = FALSE,
-    plotOriginalScale = FALSE,
-    plotLinesTypes = FALSE,
-    plotError = "none",
+    plot_x = NULL,
+    plot_z = NULL,
+    plot_by = NULL,
+    plot_raw = FALSE,
+    plot_yscale = FALSE,
+    plot_xoriginal = FALSE,
+    plot_black = FALSE,
+    plot_around = "none",
+    plot_re = FALSE,
+    plot_re_method = "average",
     emmeans = NULL,
     posthoc = NULL,
     simple_effects = NULL,
@@ -1762,9 +1822,9 @@ gamljGlmMixed <- function(
     if ( ! missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
     if ( ! missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
     if ( ! missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
-    if ( ! missing(plotHAxis)) plotHAxis <- jmvcore::resolveQuo(jmvcore::enquo(plotHAxis))
-    if ( ! missing(plotSepLines)) plotSepLines <- jmvcore::resolveQuo(jmvcore::enquo(plotSepLines))
-    if ( ! missing(plotSepPlots)) plotSepPlots <- jmvcore::resolveQuo(jmvcore::enquo(plotSepPlots))
+    if ( ! missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
+    if ( ! missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
+    if ( ! missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
     if ( ! missing(simple_effects)) simple_effects <- jmvcore::resolveQuo(jmvcore::enquo(simple_effects))
     if ( ! missing(simple_moderators)) simple_moderators <- jmvcore::resolveQuo(jmvcore::enquo(simple_moderators))
     if ( ! missing(cluster)) cluster <- jmvcore::resolveQuo(jmvcore::enquo(cluster))
@@ -1774,9 +1834,9 @@ gamljGlmMixed <- function(
             `if`( ! missing(dep), dep, NULL),
             `if`( ! missing(factors), factors, NULL),
             `if`( ! missing(covs), covs, NULL),
-            `if`( ! missing(plotHAxis), plotHAxis, NULL),
-            `if`( ! missing(plotSepLines), plotSepLines, NULL),
-            `if`( ! missing(plotSepPlots), plotSepPlots, NULL),
+            `if`( ! missing(plot_x), plot_x, NULL),
+            `if`( ! missing(plot_z), plot_z, NULL),
+            `if`( ! missing(plot_by), plot_by, NULL),
             `if`( ! missing(simple_effects), simple_effects, NULL),
             `if`( ! missing(simple_moderators), simple_moderators, NULL),
             `if`( ! missing(cluster), cluster, NULL))
@@ -1808,14 +1868,16 @@ gamljGlmMixed <- function(
         contrasts = contrasts,
         show_contrastnames = show_contrastnames,
         show_contrastcodes = show_contrastcodes,
-        plotHAxis = plotHAxis,
-        plotSepLines = plotSepLines,
-        plotSepPlots = plotSepPlots,
-        plotRaw = plotRaw,
-        plotDvScale = plotDvScale,
-        plotOriginalScale = plotOriginalScale,
-        plotLinesTypes = plotLinesTypes,
-        plotError = plotError,
+        plot_x = plot_x,
+        plot_z = plot_z,
+        plot_by = plot_by,
+        plot_raw = plot_raw,
+        plot_yscale = plot_yscale,
+        plot_xoriginal = plot_xoriginal,
+        plot_black = plot_black,
+        plot_around = plot_around,
+        plot_re = plot_re,
+        plot_re_method = plot_re_method,
         emmeans = emmeans,
         posthoc = posthoc,
         simple_effects = simple_effects,

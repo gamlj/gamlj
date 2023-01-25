@@ -216,6 +216,7 @@ Estimate <- R6::R6Class("Estimate",
                             tab
                           },
                           run_main_paralleltest=function() {
+                            
                             tab<-NULL
                             if (self$hasTerms) {
                               obj<-try_hard({
@@ -285,8 +286,19 @@ Estimate <- R6::R6Class("Estimate",
                             if (is.something(self$tab_randomcov))
                                 return(self$tab_randomcov)
                           },
-                          run_main_ranova=function() {
+                          run_main_multirandom=function() {
+
                             
+                            tab<-self$model$VarCov
+                            tab<-lapply(tab,function(x) {
+                               q<-as.data.frame(x)
+                               q$name<-fromb64(rownames(q))
+                               q})
+                            tab
+                            
+                          },
+                          run_main_ranova=function() {
+                              
                             ## for intercept only model, lmerTest::ranova()
                             ## looks for "data" in parent env 
                             data<-self$model@frame
@@ -321,6 +333,9 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_simpleEffects_anova=function() {
+                            
+                            if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") 
+                              return(NULL)
                             
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
@@ -506,23 +521,24 @@ Estimate <- R6::R6Class("Estimate",
                              ginfo("MODULE: Estimating the model: making options")
                              
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
-
-                              opts[["formula"]]<-self$formulaobj$formula64()
+                              
+                              if (!("formula" %in% names(opts)))
+                                          opts[["formula"]]<-self$formulaobj$formula64()
                               
                               if (is.something(self$infomatic$family))
                                           opts[["family"]]<-str2lang(self$infomatic$family)    
                               
                               for (opt in names(self$infomatic$calloptions))
                                         opts[[opt]]<-self$infomatic$calloptions[[opt]]   
-                              
+
+                              ## for some reason, mclogit::mblogit requires the list of random terms
+ 
                               
                               if (self$option("offset"))
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-              
                               ginfo("MODULE: Estimating the model: running")
-                              
                               results<-try_hard(eval(acall))
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
@@ -539,7 +555,7 @@ Estimate <- R6::R6Class("Estimate",
                               if (mf.aliased(results$obj))
                                    self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
 
-                              .model<-mf.fixModel(results$obj,self)
+                              .model<-mf.fixModel(results$obj,self,data)
                               
                               return(.model)
 
@@ -712,3 +728,5 @@ estimate_lmer<-function(...) {
   ### done
   model
 }
+
+

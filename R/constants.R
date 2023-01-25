@@ -11,7 +11,6 @@ LEVEL_SYMBOL = "..l_l_l.."
 INTERACTION_SYMBOL=":"
 B64_SYMBOL="..b_b_b.."
 B64_REGEX="\\.\\.b_b_b\\.\\."
-
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")

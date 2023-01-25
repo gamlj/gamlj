@@ -245,7 +245,7 @@ procedure.posthoc_effsize <- function(obj) {
     dep <- jmvcore::composeTerm(dep)
     termf <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
     data <- insight::get_data(model)
-    mark(getNamespaceVersion("emmeans"))
+
 
     referenceGrid <- emmeans::emmeans(model, termf, data = data)
     terms <- jmvcore::decomposeTerm(term)
@@ -253,6 +253,21 @@ procedure.posthoc_effsize <- function(obj) {
     newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
     referenceGrid@grid[terms] <- newlabs
     
+  return(referenceGrid)
+}
+
+.posthoc.mmblogit <- function(model, term, adjust,ci=FALSE,vfun=NULL,df=NULL) {
+  
+  dep <- names(attr(stats::terms(model), "dataClass"))[1]
+  dep <- jmvcore::composeTerm(dep)
+  termf <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
+  data <- model$data
+  referenceGrid <- emmeans::emmeans(model, termf, data = as.data.frame(data))
+  terms <- jmvcore::decomposeTerm(term)
+  labs <- referenceGrid@grid[terms]
+  newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
+  referenceGrid@grid[terms] <- newlabs
+  
   return(referenceGrid)
 }
 
@@ -637,6 +652,86 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          
          return(list(anovas,parameters))
 }
+
+.simpleEffects.mmblogit<-function(model,obj) {
+  
+  levels <-lapply(obj$options$simple_moderators, function(x) {
+    
+    if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
+      seq_along(obj$datamatic$variables[[tob64(x)]]$levels)
+    else 
+      obj$datamatic$variables[[tob64(x)]]$levels
+  })
+  
+  
+  vars  <- lapply(obj$options$simple_moderators, function(x) obj$datamatic$variables[[tob64(x)]])
+  
+  rows  <- expand.grid(levels)
+  names(rows)  <-  tob64(obj$options$simple_moderators)
+  variable64   <-  tob64(obj$options$simple_effects)
+  varobj       <-  obj$datamatic$variables[[variable64]]
+  
+  .names       <-  names(rows)
+  parameters  <-  data.frame()
+
+  data64      <-  model$data
+  
+  ## here we do the actual simple model for each combination of moderator levels ####
+  for (i in 1:nrow(rows)) {
+
+    .data1<-data64
+    for (.name in .names) {
+      if (is.factor(.data1[[.name]])) {
+        stats::contrasts(.data1[[.name]])<-stats::contr.treatment(nlevels(.data1[[.name]]),base = rows[i,.name])
+      }
+      else
+        .data1[[.name]]<-.data1[[.name]]-rows[i,.name]
+    }
+    .model  <-  stats::update(model,data=.data1)
+     params<-gparameters(.model,obj)
+     params  <-  params[params$source %in% varobj$paramsnames64,]
+     params[,.names]  <-  rows[i,]      
+     parameters  <-  rbind(parameters,params)
+  }
+  
+  ## add exp b
+   parameters$expb<-exp(parameters$estimate)
+   parameters$expb.ci.lower<-exp(parameters$est.ci.lower)
+   parameters$expb.ci.upper<-exp(parameters$est.ci.upper)
+
+  for (.name in .names) {
+    parameters[[.name]]<-factor(parameters[[.name]])
+    levels(parameters[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
+    parameters[[.name]]<-as.character(parameters[[.name]])
+  }
+  ### fix labels for  the response contrasts
+  parameters$response<-factor(parameters$response)
+  levels(parameters$response)<-unlist(obj$datamatic$dep$contrast_labels)
+  parameters$response<-as.character(parameters$response)
+  parameters<-parameters[order(parameters$response),]
+  ### fix labels for the contrast column ###
+  parameters$contrast<-factor(parameters$source)
+  levels(parameters$contrast)<-unlist(varobj$contrast_labels)
+  parameters$contrast<-as.character(parameters$contrast)
+  
+  ## fix names for moderators and tests
+  names(parameters)[names(parameters) %in% .names]<-paste0("mod_",make.names(fromb64(.names),unique = T))
+  
+
+  ### check some stuff 
+  .all <- c(.names,variable64)
+  test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(obj$model,x))))
+  .issues <- .all[test]
+  
+  if (is.something(.issues))
+    obj$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
+  
+  return(list(NULL,parameters))
+}
+
+
+
+
 ## this is humbly supercool ###
 ## we want the simple interactions nested in the highest interaction required
 procedure.simpleInteractions<-function(obj) {

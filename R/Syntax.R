@@ -50,7 +50,7 @@ Syntax <- R6::R6Class(
       self$formulaobj$update_terms(self$datamatic$data_structure64)
 
       ### infomatic class takes care of all info about different models
-      self$infomatic<-Infomatic$new(options,datamatic)
+      self$infomatic<-Infomatic$new(options,datamatic,self$formulaobj)
       
     }, # here initialize ends
     #### init functions #####
@@ -110,27 +110,17 @@ Syntax <- R6::R6Class(
     },
     init_main_r2=function() {
       
-        if (self$option(".caller",c("lmer","glmer"))) {
-          tab<-list(list(type="Marginal"),list(type="Conditional"))
-          
+          tab<-self$infomatic$r2
           if (self$options$comparison) {
-            
-            tab<-list(list(type="Conditional",model="Full"),
-                      list(type="Marginal",model="Full"),
-                      list(type="Conditional",model="Nested"),
-                      list(type="Marginal",model="Nested"),
-                      list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
-                      )
+            for (i in length(tab)) {
+                tab[[i]]$type="Full"
+                one<-tab[[i]]
+                one$type<-"Nested"
+                ladd(tab)<-one
+            }
+            ladd(tab)<-list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
           }
-  
-        } else {
-        tab<-list(model="")
-        
-        if (self$options$comparison)
-           tab<-list(list(model="Full"),
-                     list(model="Nested"),
-                     list(model=paste0(greek_vector[["Delta"]],"R\u00B2")))
-        }
+
       tab
       
     },
@@ -144,6 +134,14 @@ Syntax <- R6::R6Class(
             
     },
     init_main_anova=function() {
+      
+      if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") {
+        self$dispatcher$warnings<-list(topic="main_anova",
+                                       message="Fixed Effects Omnibus Tests not available for this type of model.")
+        
+        return(NULL)
+        
+      }
       
       tab<-list()
       if (self$formulaobj$hasTerms) {
@@ -270,6 +268,13 @@ Syntax <- R6::R6Class(
       return()
 },
 
+init_main_multirandom=function() {
+  
+   random<-self$formulaobj$listify_random()
+   tabs<-lapply(random,function(x) list(name=""))
+   attr(tabs,"keys")<-random
+   tabs
+},
 
     ### posthoc means ###
     
@@ -326,6 +331,9 @@ Syntax <- R6::R6Class(
     },
     
     init_simpleEffects_anova=function() {
+      
+      if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") 
+        return(NULL)
       
         .var64<-tob64(self$options$simple_effects)
         .mods<-rev(self$options$simple_moderators)

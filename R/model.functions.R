@@ -10,13 +10,13 @@ mf.getModelFactors<-function(model) {
 ############# some models are not built in standard way, here we fix them ##########
 mf.fixModel<- function(x,...) UseMethod(".fixModel")
 
-.fixModel.default<-function(model,obj=NULL) {
+.fixModel.default<-function(model,obj=NULL,data=NULL) {
   return(model)
 }
 
 
 
-.fixModel.lmerModLmerTest<-function(model,obj=NULL) {
+.fixModel.lmerModLmerTest<-function(model,obj=NULL,data=NULL) {
   
   if (lme4::isSingular(model))
       obj$dispatcher$warnings<-list(topic="info",message=WARNS[["lmer.singular"]])
@@ -24,11 +24,12 @@ mf.fixModel<- function(x,...) UseMethod(".fixModel")
   return(model)
 }
 
-.fixModel.multinom<-function(model,obj=NULL) {
+.fixModel.multinom<-function(model,obj=NULL,data=NULL) {
   
   model$call$formula <- stats::as.formula(model)
   return(model)
 }
+
 
 
 
@@ -99,6 +100,11 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   return((!is.null(rank)))
 }
 .aliased.multinom<-function(model) {
+  ### to do 
+  FALSE
+  
+}
+.aliased.mmblogit<-function(model) {
   ### to do 
   FALSE
   

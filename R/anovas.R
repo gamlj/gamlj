@@ -164,9 +164,9 @@ ganova<- function(x,...) UseMethod(".anova")
   ## at the moment ordinal::anova.clmm does not work and drop1 tests
   ## only the higher order term. So we go all the way with a custom
   ## drop. We also have to be careful when there is only one predictors,
-  ## because drop1 will not work . This results in Type II testing
+  ## because drop1 will not work . This results is Type II testing
 
-  if (!obj$formulaobj$formulaobj$hasTerms)
+  if (!obj$formulaobj$hasTerms)
     return()
 
   results<-emmeans::joint_tests(model)
@@ -175,6 +175,10 @@ ganova<- function(x,...) UseMethod(".anova")
   results
     
 
+}
+
+.anova.mmblogit<-function(model,obj) {
+  return()
 }
 
 

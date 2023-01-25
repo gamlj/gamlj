@@ -45,6 +45,7 @@ gamljGlmMixedClass <- R6::R6Class(
         
         ### anova table ###
         aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
+        aSmartObj$activated<-(self$options$model_type!="multinomial")
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
         ### estimates table ###
@@ -73,9 +74,19 @@ gamljGlmMixedClass <- R6::R6Class(
         ### random variances table
         aSmartObj<-SmartTable$new(self$results$main$random,estimate_machine)
         aSmartObj$ci("var",self$options$ci_width)
+        aSmartObj$activated<-(self$options$model_type!="multinomial" | self$options$.caller!="glmer")
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
         
-        ### random variances table
+        ### multinomial random variances table
+        aSmartObj<-SmartArray$new(self$results$main$multirandom,estimate_machine)
+        aSmartObj$activated<-(self$options$model_type=="multinomial" & self$options$.caller=="glmer")
+        aSmartObj$expandOnData<-TRUE
+        aSmartObj$expandFrom<-3
+        ladd(private$.smartObjs)<-aSmartObj
+        
+        
+        
+        ### random covariances table
         aSmartObj<-SmartTable$new(self$results$main$randomcov,estimate_machine)
         aSmartObj$activateOnData<-TRUE
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
@@ -111,9 +122,11 @@ gamljGlmMixedClass <- R6::R6Class(
         aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
         aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
         aSmartObj$expandable<-TRUE
+        aSmartObj$expandFrom<-2
         aSmartObj$expandSuperTitle<-"Moderator"
         aSmartObj$key<-self$options$simple_effects
         aSmartObj$ci("est",self$options$ci_width)
+        aSmartObj$ci("expb",width=self$options$ci_width,format="Exp(B) {}% Confidence Intervals")
         aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
         aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
         private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
@@ -165,7 +178,7 @@ gamljGlmMixedClass <- R6::R6Class(
         if (!private$.ready$ready) {
           return()
         }
-        
+
         data<-private$.data_machine$cleandata(self$data)
         private$.estimate_machine$estimate(data)
         

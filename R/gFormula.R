@@ -33,6 +33,27 @@ gFormula <- R6::R6Class(
     random_formula64 = function() {
       private$.buildrandom(self$random, self$random_corr, "b64")
     },
+    listify_random64 = function() {
+      ## there are some functions that require a list of random effect formula
+      res<-lapply(self$random, function(z) { 
+           res<-unlist(lapply(z, function(x) {
+                       astring<-private$.composeRandom64(x)
+                       formula(paste("~",astring))
+           }))
+      })
+      as.list(unlist(res))
+    } ,
+    listify_random = function() {
+      ## there are some functions that require a list of random effect formula
+      res<-lapply(self$random, function(z) { 
+        res<-unlist(lapply(z, function(x) {
+          astring<-private$.composeRandom(x)
+          paste("~",astring)
+        }))
+      })
+      as.list(unlist(res))
+    } ,
+    
     formula = function() {
       paste(self$fixed_formula(), self$random_formula())
     },
@@ -204,6 +225,30 @@ gFormula <- R6::R6Class(
       ## paste and return
       rterms <- trimws(paste(rterms, collapse = ""))
       return(rterms)
+    },
+    .composeRandom=function(term) {
+      w<-which(term=="Intercept")
+      if (length(w)>0) {
+        int<-1
+        term<-term[-w]
+      }  else int<-0
+      term<-c(int,term)
+      astring<-paste(paste(term[-length(term)],sep = "+",collapse = "+"),term[length(term)],sep="|")
+      astring
+      
+    },
+    
+    .composeRandom64=function(term) {
+
+      w<-which(term=="Intercept")
+      if (length(w)>0) {
+         int<-1
+         term<-term[-w]
+         }  else int<-0
+      term<-c(int,tob64(term))
+      astring<-paste(paste(term[-length(term)],sep = "+",collapse = "+"),term[length(term)],sep="|")
+      astring
+      
     }
   ) # end of private
 ) # end of class

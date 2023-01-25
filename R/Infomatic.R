@@ -3,6 +3,7 @@ Infomatic <- R6::R6Class(
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   public=list(
+    operator=NULL,
     caller=NULL,
     model_type=NULL,
     model=NULL,
@@ -23,7 +24,9 @@ Infomatic <- R6::R6Class(
     df          =   NULL,
     comparison  =  "Difference",
     posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
-    initialize=function(options,datamatic) {
+    initialize=function(options,datamatic,formulas) {
+      
+      
       self$model_type<-options$model_type
       self$caller<-options$.caller
       dep<-options$dep
@@ -32,9 +35,11 @@ Infomatic <- R6::R6Class(
       
       if (self$caller=="glm") {
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
+          self$r2 <-list(list(model=""))
       }
       if (self$caller=="glmer") {
         self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
+        self$r2<-list(list(type="Marginal"),list(type="Conditional"))
       }
       
       
@@ -45,6 +50,7 @@ Infomatic <- R6::R6Class(
         self$call         <-  "lm"
         self$rcall        <-   "stats::lm"
         self$deptype      <-  c("numeric","integer")
+        self$r2 <-list(list(model=""))
         
       }
       if (self$model_type=="linear") {
@@ -176,11 +182,26 @@ Infomatic <- R6::R6Class(
       
       if (self$model_type=="multinomial") {
         
+        
         self$model         <-   c("Multinomial Model","Model for categorical y")
         self$distribution  <-    "multinomial"
-        self$call          <-    "multinomial"
-        self$rcall         <-    "nnet::multinom"
-        self$calloptions   <-    list(model=TRUE)
+        if (self$caller=="glm") {
+            self$call          <-    "nnet::multinom"
+            self$rcall         <-    "nnet::multinom"
+            self$calloptions   <-    list(model=TRUE)
+        } 
+        if (self$caller=="glmer") {
+
+          self$call          <-    "mclogit::mblogit"
+          self$rcall         <-    "mclogit::mblogit"
+          self$calloptions   <-    list(formula=as.formula(formulas$fixed_formula64()),
+                                        random=formulas$listify_random64(),
+                                        model=TRUE,
+                                        estimator="REML",
+                                        trace.inner=FALSE)
+          self$r2 <-list(list(type="McFadden"))
+        } 
+        
         self$link          <-    "logit"
         self$emmeans       <-   "probabilities"
         self$predict       <-   "probs"
@@ -192,6 +213,8 @@ Infomatic <- R6::R6Class(
         self$deptype       <-   "factor"
         self$depnlevels    <-   -3
         self$fit           <-   c("lik" , "aic",  "bic",  "dev")
+        if (self$caller=="glmer")         self$fit           <-   c("aic",  "bic",  "dev")
+
         
       }
       
@@ -210,10 +233,8 @@ Infomatic <- R6::R6Class(
         self$df            <-   options$df_method
       }
       
-      
-      
+
     },
-    
     info_table=function() {
       
       alist<-list()
@@ -318,6 +339,7 @@ NB[["glmer"]]<-"lme4::glmer.nb"
 ORDINAL<-list()
 ORDINAL[["glm"]]<-"MASS::polr"
 ORDINAL[["glmer"]]<-"ordinal::clmm"
+
 
 
 FIT<-list()
