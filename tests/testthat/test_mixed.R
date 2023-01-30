@@ -119,12 +119,12 @@ model<-gamlj::gamljMixed(
   formula =formula,
   data = subjects_by_stimuli, 
   plot_x = cond,
-  re_lrt=F  
+  re_lrt=T  
 )
-model
+
 
 testthat::test_that("ranova works",
-                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+                    testthat::expect_equal(model$main$ranova$asDF[2,2],6)
 )
 
 testthat::test_that("mixed plot works",

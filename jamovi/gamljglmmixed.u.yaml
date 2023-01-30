@@ -113,7 +113,6 @@ children:
             children:
               - type: CheckBox
                 name: comparison
-                enable: (!model_type_multinomial)
                 events:
                   change: './gamlj.events::onEvent_comparison'
       - type: Label

@@ -293,10 +293,10 @@ items:
                    - name: LRT
                      title: "LRT"
                      type: number
-                   - name: Df
+                   - name: df
                      title: "df"
                      type: number
-                   - name: Pr(>Chisq)
+                   - name: p
                      title: "p"
                      type: number
                      format: zto,pvalue

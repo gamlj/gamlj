@@ -141,57 +141,6 @@ mf.standardize<- function(x,...) UseMethod(".standardize")
   
 }  
 
-  
-####### model update ##########
-
-
-mf.update<- function(x,...) UseMethod(".update")
-
-.update.default<-function(model,...) {
-
-   data<-insight::get_data(model)
-   stats::update(model,data=data,...)
-}
-
-.update.lmerModLmerTest<-function(model,...) {
-
-  .args<-list(...)
-  data<-insight::get_data(model)
-  
-  if (utils::hasName(.args,"formula")) {
-    .formula<-stats::as.formula(.args$formula)
-     test<-lme4::findbars(.formula)
-    
-     if (!is.something(test)) {
-       warning("No random coefficients specified. A linear model is used instead.")
-       .formula<-lme4::nobars(.formula)
-       return(stats::lm(formula = .formula,data=data))
-     }
-  }
-  
-  stats::update(model,data=data,...)
-}
-
-
-.update.glmerMod<-function(model,...) {
-  
-  .args<-list(...)
-  data<-insight::get_data(model)
-
-  if (utils::hasName(.args,"formula")) {
-    .formula<-stats::as.formula(.args$formula)
-    test<-lme4::findbars(.formula)
-    
-    if (!is.something(test)) {
-      .formula<-lme4::nobars(.formula)
-      warning("No random coefficients specified. A generalized linear model is used instead.")
-      mod<-stats::glm(formula = .formula,data=data,family=family(model))
-      return(mod)
-    }
-  }
-  
-  stats::update(model,data=data,...)
-}
 
 ### model data extraction 
 

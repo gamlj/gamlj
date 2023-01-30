@@ -28,6 +28,7 @@ Estimate <- R6::R6Class("Estimate",
                             self$model<-private$.estimateModel(data)
                             ginfo("ESTIMATE: initial estimation done")
                             if (self$options$comparison) {
+                              
                               obj<-try_hard(mf.update(self$model,formula=self$formulaobj$nested_formula64()))
                               self$nested_model<-obj$obj
                               if (!isFALSE(obj$warning))
@@ -135,9 +136,10 @@ Estimate <- R6::R6Class("Estimate",
                           },
                           
                           run_main_r2=function() {
+                             
+                              obj<-gFit$new(self)
+                              obj$r2table()
 
-                              tab<-fit.R2(self$model,self)
-                              tab
                           },
                           
                           run_main_coefficients=function() {
@@ -298,14 +300,9 @@ Estimate <- R6::R6Class("Estimate",
                             
                           },
                           run_main_ranova=function() {
-                              
-                            ## for intercept only model, lmerTest::ranova()
-                            ## looks for "data" in parent env 
-                            data<-self$model@frame
-                            results  <- try_hard(as.data.frame((lmerTest::ranova(self$model))))
-                            tab      <- results$obj[-1,]
-                            tab$test <- fromb64(rownames(results$obj[-1,]))
-                            tab
+                            
+                            procedure.ranova(self$model,self)
+                            
                           },
                           
                           run_posthoc=function() {
@@ -537,9 +534,12 @@ Estimate <- R6::R6Class("Estimate",
                               if (self$option("offset"))
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
                               opts[["data"]]<-quote(data)
+                              mark(opts[["random"]])
                               acall<-as.call(opts)
+                              
                               ginfo("MODULE: Estimating the model: running")
                               results<-try_hard(eval(acall))
+                              
                               self$dispatcher$warnings<-list(topic="info", message=results$warning)
                               
                               if (!isFALSE(results$error)) {

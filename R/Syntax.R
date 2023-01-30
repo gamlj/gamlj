@@ -48,7 +48,8 @@ Syntax <- R6::R6Class(
       self$formulaobj$nested_random<-self$optionValue("nested_re")
       self$formulaobj$offset<-self$optionValue("offset")
       self$formulaobj$update_terms(self$datamatic$data_structure64)
-
+      
+      
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(options,datamatic,self$formulaobj)
       
@@ -82,20 +83,21 @@ Syntax <- R6::R6Class(
       
       
       if (self$options$comparison) {
-        
-         tab[["mc"]]<-list(info="Comparison",
+         
+
+                 tab[["mc"]]<-list(info="Comparison",
                            value="Nested model",
                            specs=self$formulaobj$nested_formula())
          
-         tab[["mctest"]]<-list(info="Comparison",
+                 tab[["mctest"]]<-list(info="Comparison",
                                value="Tested terms",
                                specs=self$formulaobj$nested_tested_fixed())
          
-         if (self$option("nested_re")) {
-             tab[["mctest1"]]<-list(info="Comparison",
+                 if (self$option("nested_re")) {
+                     tab[["mctest1"]]<-list(info="Comparison",
                                     value="Tested random",
                                     specs=self$formulaobj$nested_tested_random())
-         }
+                  }
       }
         
       if (self$option("offset"))
@@ -120,7 +122,6 @@ Syntax <- R6::R6Class(
             }
             ladd(tab)<-list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
           }
-
       tab
       
     },

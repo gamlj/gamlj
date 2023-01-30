@@ -1,98 +1,188 @@
 ############# produces R2  ##########
+## an object to obtain R2 and fit indices
 
-fit.R2 <- function(model, obj) {
-  # r2 and tests for the model
-  r2list <- r2.est(model, obj)
-  r2list <- lapply(r2list, function(a) {
-    a$note <- "R^2"
-    a
-  })
-  # check if model comparisons are required
-  if (obj$option("comparison")) {
-    r2list <- lapply(r2list, function(a) {
-      a$note <- "R^2 of the full model"
-      a$model <- "Full"
-      a
-    })
-
-    ### r2 for the nested model
-    r2nested <- r2.est(obj$nested_model, obj)
-    r2nested <- lapply(r2nested, function(a) {
-      a$note <- "R^2 of the nested model"
-      a$model <- "Nested"
-      a
-    })
-
-    ### compare the two models
-    if (obj$option(".caller", c("lmer", "glmer")) || obj$option("omnibus", "LRT")) {
-      comp <- try_hard(as.data.frame(performance::test_likelihoodratio(obj$nested_model, model)))
-    } else {
-      comp <- try_hard(stats::anova(obj$nested_model, model, test = obj$options$omnibus))
+gFit <- R6::R6Class(
+  "gFit",
+  class=TRUE, ## this and the next 
+  cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
+  public = list(
+    operator=NULL,
+    initialize=function(operator) {
+      self$operator<-operator 
+    },
+    r2table=function() {
+      
+      tab <- private$.r2list()
+      tab <-c(tab,private$.r2nested())
+      tab <-c(tab,private$.compare())
+      return(tab)
     }
 
-    comp <- comp$obj
-    r2comp <- as.list(comp[2, ])
-    .names <- list(
-      df2 = c("Res.Df", "Resid. Df"),
-      df1 = c("Df", "df_diff"), p = c("Pr(>Chi)", "Pr(>F)"),
-      f = "F",
-      test = c("Deviance", "Chi2")
-    )
-
-    names(r2comp) <- transnames(names(r2comp), .names)
-    r2comp$model <- paste0(greek_vector[["Delta"]], "R", "\u00B2")
-    r2comp$type <- "Comparison"
-    ### give some warning
-
-    if (r2comp$df1 < 0) {
-      obj$dispatcher$warnings <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
-    }
-
-    if (r2comp$df1 == 0) {
-      obj$dispatcher$warnings <- list(topic = "main_r2", message = "Nested and full models are identical, try removing some term from the nested model")
-    }
-
-    r2comp$r2 <- r2list[[1]]$r2 - r2nested[[1]]$r2
-    if (length(r2comp$r2) == 0) {
-      r2comp$r2 <- NA
-    }
-    r2comp$note <- "R^2 difference "
-    if (utils::hasName(r2list[[1]], "ar2")) {
-      r2comp$ar2 <- r2list[[1]]$ar2 - r2nested[[1]]$ar2
-    }
-    r2list <- c(r2list, r2nested, list(r2comp))
-  }
-
-  for (r in r2list) {
-    if (is.na(r$r2)) {
-      token <- r$note
-      if (utils::hasName(r, "type")) {
-        token <- paste(r$type, token)
+  ), ### end of public
+  private=list(
+     .r2=NULL,
+     .ar2=NULL,
+     .r2n=NULL,
+     .ar2n=NULL,
+     
+    .r2list=function() {
+      
+      obj<-try_hard(r2(self$operator$model,self$operator))
+      if (!isFALSE(obj$error)) {
+        self$operator$dispatcher$warnings<-list(topic="main_r2",message="Model R2 cannot be computed.")
+        return(obj$obj)
       }
-      msg <- jmvcore::format("{0}  cannot be computed", token)
-      obj$dispatcher$warnings <- list(topic = "main_r2", message = msg)
+      if (!isFALSE(obj$warning)) {
+        self$operator$dispatcher$warnings<-list(topic="main_r2",message=obj$warning)
+      }
+      
+      if (self$operator$options$comparison) {
+           r2list <- lapply(obj$obj, function(x) {
+                               x$note <- "R^2 of the full model"
+                               x$model <- "Full"
+                               x
+                      })
+        } else {
+           r2list <- lapply(obj$obj, function(a) {
+                           a$note <- "R^2"
+                           a
+                        })
+        }
+      
+      private$.r2<-r2list[[1]]$r2
+      private$.ar2<-r2list[[1]]$ar2
+      
+      return(r2list)
+      
+    }, # end of .r2list
+    .r2nested=function() {
+      
+      if (!self$operator$options$comparison) 
+           return(NULL)
+        
+      obj<-try_hard(r2(self$operator$nested_model,self$operator))
+      if (!isFALSE(obj$error)) {
+        self$operator$dispatcher$warnings<-list(topic="main_r2",message="Nested model R2 cannot be computed.")
+        return(obj$obj)
+      }
+      if (!isFALSE(obj$warning)) {
+        self$operator$dispatcher$warnings<-list(topic="main_r2",message=obj$warning)
+      }
+      
+        r2list <- lapply(obj$obj, function(x) {
+          x$note <- "R^2 of the nested model"
+          x$model <- "Nested"
+          x
+        })
+        
+        private$.r2n<-r2list[[1]]$r2
+        private$.ar2n<-r2list[[1]]$ar2
+        
+        return(r2list)
+        
+    }, # end of .r2list
+    
+    .compare=function() {
+      
+      if (!self$operator$options$comparison)
+          return()
+      
+      if (self$operator$option(".caller", c("glmer")) & self$operator$option("model_type", c("multinomial"))) {
+           self$operator$dispatcher$warnings <- list(topic = "main_r2",
+                                                     message = "Inferential test for multinomial models
+                                                                comparison not available. 
+                                                                Deviances from quasi-likelihoods are not comparable.")
+           return(NULL)
+      }
+      
+      
+      if (self$operator$option(".caller", c("lmer", "glmer")) || self$operator$option("omnibus", "LRT")) {
+         comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model, self$operator$model)))
+      } else {
+         comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = self$operator$options$omnibus))
+      }
+      
+      comp <- comp$obj
+      r2comp <- as.list(comp[2, ])
+      .names <- list(
+                     df2 = c("Res.Df", "Resid. Df"),
+                     df1 = c("Df", "df_diff"), p = c("Pr(>Chi)", "Pr(>F)"),
+                     f = "F",
+                     test = c("Deviance", "Chi2")
+                    )
+      
+      names(r2comp) <- transnames(names(r2comp), .names)
+      r2comp$model <- paste0(greek_vector[["Delta"]], "R", "\u00B2")
+      r2comp$type <- "Comparison"
+      ### give some warning
+      
+      if (r2comp$df1 < 0) 
+        self$operator$dispatcher$warnings <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
+      
+      
+      if (r2comp$df1 == 0) 
+        self$operator$dispatcher$warnings <- list(topic = "main_r2", message = "Nested and full models are identical, try removing some term from the nested model")
+      
+      
+      r2comp$r2 <- private$.r2-private$.r2n
+      if (length(r2comp$r2) == 0)  r2comp$r2 <- NA
+      
+      r2comp$note <- "R^2 difference "
+      if (is.something(private$.ar2)) r2comp$ar2 <- private$.ar2-private$.ar2n
+      if (length(r2comp$ar2) == 0)  r2comp$ar2 <- NA
+      
+
+    return(list(r2comp))
+    } # end of compare
+  ) # end of private
+) ### end of class
+    
+### functions to compute R2
+
+r2 <- function(model, ...) UseMethod(".r2")
+
+.r2.default <- function(model,obj) {
+  
+  performance::r2(model, tolerance = 0)
+
+}
+
+.r2.lm <- function(model,obj) {
+  
+  ss <- summary(model)
+  results <- list()
+  results$df1 <- ss$fstatistic[["numdf"]]
+  results$df2 <- ss$fstatistic[["dendf"]]
+  results$r2 <- ss$r.squared
+  results$ar2 <- ss$adj.r.squared
+  if (utils::hasName(ss, "fstatistic")) {
+    if (obj$option("omnibus", "LRT")) {
+      ssres <- stats::sigma(model)^2 * model$df.residual
+      ### here we estimate the sum of squares of the null model
+      ssnull <- (ss$fstatistic[[1]] * ss$fstatistic[[2]] * ssres / ss$fstatistic[[3]]) + ssres
+      n <- sum(ss$df[1:2])
+      ### compute the loglik of the null model
+      loglik0 <- -0.5 * n * (log(2 * pi) + log(ssnull / n) + 1)
+      loglik1 <- as.numeric(stats::logLik(model))
+      results$lrt <- 2 * (loglik1 - loglik0)
+      results$test <- results$lrt
+      
+      results$p <- stats::pchisq(results$lrt, results$df1, lower.tail = FALSE)
+    } else {
+      results$f <- ss$fstatistic[["value"]]
+      results$test <- results$f
+      results$p <- stats::pf(results$f, results$df1, results$df2, lower.tail = FALSE)
     }
+  } else {
+    results$test <- NA
   }
-
-  r2list
+  
+  list(results)
 }
 
-r2.est <- function(model, ...) UseMethod(".r2")
 
-.r2.default <- function(model, obj) {
-  results <- try_hard(performance::r2(model, tolerance = 0))
-  if (!isFALSE(results$warning)) {
-    mark(results$warning)
-  }
-  if (!isFALSE(results$error)) {
-    warning(results$error)
-  }
-  results <- results$obj
 
-  return(results)
-}
-
-.r2.glm <- function(model, obj) {
+.r2.glm <- function(model) {
   alist <- list()
   # mcFadden and adjusted
   alist$r2 <- 1 - (model$deviance / model$null.deviance)
@@ -124,6 +214,13 @@ r2.est <- function(model, ...) UseMethod(".r2")
   return(list(alist))
 }
 
+.r2.clm <- function(model, obj) {
+  .r2.polr(model,obj)
+}
+
+
+
+
 .r2.multinom <- function(model, obj) {
   llfull <- stats::logLik(model) ### model loglikelihood
   data <- insight::get_data(model)
@@ -145,6 +242,7 @@ r2.est <- function(model, ...) UseMethod(".r2")
 }
 
 .r2.mblogit <- function(model, obj) {
+  ginfo("mblogit R2 is used")
   llfull <- model$deviance
   llnull <- model$null.deviance
   ss <- mclogit::getSummary.mmblogit(model)
@@ -157,42 +255,10 @@ r2.est <- function(model, ...) UseMethod(".r2")
   list(alist)
 }
 
-.r2.lm <- function(model, obj) {
-  ss <- summary(model)
-  results <- list()
-  results$df1 <- ss$fstatistic[["numdf"]]
-  results$df2 <- ss$fstatistic[["dendf"]]
-  results$r2 <- ss$r.squared
-  results$ar2 <- ss$adj.r.squared
-  if (utils::hasName(ss, "fstatistic")) {
-    if (obj$option("omnibus", "LRT")) {
-      ssres <- stats::sigma(model)^2 * model$df.residual
-      ### here we estimate the sum of squares of the null model
-      ssnull <- (ss$fstatistic[[1]] * ss$fstatistic[[2]] * ssres / ss$fstatistic[[3]]) + ssres
-      n <- sum(ss$df[1:2])
-      ### compute the loglik of the null model
-      loglik0 <- -0.5 * n * (log(2 * pi) + log(ssnull / n) + 1)
-      loglik1 <- as.numeric(stats::logLik(model))
-      results$lrt <- 2 * (loglik1 - loglik0)
-      results$test <- results$lrt
-
-      results$p <- stats::pchisq(results$lrt, results$df1, lower.tail = FALSE)
-    } else {
-      results$f <- ss$fstatistic[["value"]]
-      results$test <- results$f
-      results$p <- stats::pf(results$f, results$df1, results$df2, lower.tail = FALSE)
-    }
-  } else {
-    results$test <- NA
-  }
-
-  list(results)
-}
-
 
 .r2.lmerModLmerTest <- function(model, obj) {
-  r2 <- .r2.default(model, obj)
 
+  r2 <- .r2.default(model, obj)
   if (is.null(r2) || is.na(r2)) {
     r2 <- list(R2_conditional = NA, R2_marginal = NA)
   }
@@ -207,7 +273,6 @@ r2.est <- function(model, ...) UseMethod(".r2")
 
   marg$type <- "Marginal"
   marg$r2 <- r2$R2_marginal
-
   list(cond, marg)
 }
 
@@ -230,39 +295,15 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)
   results <- stats::anova(model0, model, test = "LRT")
-  results$test <- results$Deviance
-  results$df1 <- results$Df
-  results$p <- results$`Pr(>Chi)`
+ .names<-c(test=c("Deviance","LR.stat","LR stat."),df1=c("Df","   Df"),p=c("Pr(Chi)","Pr(>Chisq)"))
+  names(results)<-transnames(names(results),.names)
+  results$deviance <- stats::deviance(model)
+  results$null.deviance <- stats::deviance(model0) 
   results[2, ]
 }
 
 
-.compare_null_model.polr <- function(model) {
-  form <- stats::as.formula("~1")
-  data <- insight::get_data(model)
-  model0 <- stats::update(model, form, data = data, evaluate = T)
-  .results <- stats::anova(model0, model)
-  results <- .results[2, ]
-  results$deviance <- -2 * as.numeric(stats::logLik(model))
-  results$null.deviance <- -2 * as.numeric(stats::logLik(model0))
-  results$test <- results$`LR stat.`
-  results$df1 <- results$`   Df`
-  results$p <- results$`Pr(Chi)`
-  results
-}
 
-
-.compare_null_model.negbin <- function(model) {
-  data <- insight::get_data(model)
-  int <- attr(stats::terms(model), "intercept")
-  form <- stats::as.formula(paste("~", int))
-  model0 <- stats::update(model, form, data = data, evaluate = T)
-  results <- stats::anova(model0, model)
-  results$test <- results$`LR stat.`
-  results$df1 <- results$`   df`
-  results$p <- results$`Pr(Chi)`
-  results[2, ]
-}
 
 .compare_null_model.lmerModLmerTest <- function(model, type = "c") {
   data <- insight::get_data(model)

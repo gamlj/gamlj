@@ -1154,11 +1154,11 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     `title`="LRT", 
                                     `type`="number"),
                                 list(
-                                    `name`="Df", 
+                                    `name`="df", 
                                     `title`="df", 
                                     `type`="number"),
                                 list(
-                                    `name`="Pr(>Chisq)", 
+                                    `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))}))$new(options=options))

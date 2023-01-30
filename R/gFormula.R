@@ -125,6 +125,35 @@ gFormula <- R6::R6Class(
       .formulalist <- jmvcore::decomposeTerms(.formula)
       self$anova_terms <- fromb64(.formulalist)
       self$params_terms <- fromb64(colnames(model.matrix(as.formula(self$fixed_formula64()), data)))
+    },
+    reduced_random=function() {
+      
+      re<-self$random
+      termslist<-list()
+      listnames<-list()
+      for (i in seq_along(re)) {
+        re<-self$random
+        l<-sapply(re[[i]],length)
+        l<-which(l==max(l))
+        for (j in l) {
+                     if (length(l)>1 & re[[i]][[j]][[1]]=="Intercept") 
+                        next
+                      re<-self$random
+                      name<-paste(jmvcore::composeTerm(re[[i]][[j]][-length(re[[i]][[j]])]),re[[i]][[j]][length(re[[i]][[j]])],sep = " | ")
+                      listnames[[length(listnames)+1]]<-name
+                      one<-re[[i]]
+                      one<-one[-j]
+                      re[[i]]<-one
+                      termslist[[length(termslist)+1]]<-re
+                     
+        }
+      }
+
+      res<-lapply(termslist, function(x) {
+        private$.buildrandom(x, self$random_corr, "b64")
+      })
+      names(res)<-listnames
+      res
     }
   ), # end of public
   active = list(
@@ -152,6 +181,8 @@ gFormula <- R6::R6Class(
       }
 
       self$clusters <- unique(unlist(lapply(alist, function(z) lapply(z, function(x) x[length(x)]))))
+      ## we want to be sure that the terms are ordered by order
+      alist<-lapply(alist, function(x) x[order(sapply(x,length))])
       private$.random <- alist
     },
     random_corr = function(avalue) {
@@ -173,13 +204,15 @@ gFormula <- R6::R6Class(
       gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(dep, terms)))
     },
     .buildrandom = function(terms, correl, encoding) {
+      
       if (!is.something(terms)) {
         return()
       }
 
       ## this is for R. It overrides the re_corr option
       if (length(terms) > 1) {
-        correl <- "block"
+          if (correl == "none") warning("Option re_corr='none' has been overriden by random effect input structure")
+          correl <- "block"
       }
       # remove empty sublists
       terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
@@ -201,14 +234,16 @@ gFormula <- R6::R6Class(
         flatterms <- lapply(.one, function(x) c(jmvcore::composeTerm(head(x, -1)), tail(x, 1)))
         res <- do.call("rbind", flatterms)
         ### check blocks coherence
-        if (length(unique(res[, 2])) > 1 && correl == "block") {
-          stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
-        }
+#        if (length(unique(res[, 2])) > 1 && correl == "block") {
+#          stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
+#        }
+
 
         res <- tapply(res[, 1], res[, 2], paste)
         res <- sapply(res, function(x) paste(x, collapse = " + "))
 
         ### deal with intercept ###
+        
         for (i in seq_along(res)) {
           test <- grep(.intercept, res[[i]], fixed = TRUE)
           if (is.something(test)) {
@@ -250,6 +285,8 @@ gFormula <- R6::R6Class(
       astring
       
     }
+    
+      
   ) # end of private
 ) # end of class
 
@@ -278,8 +315,8 @@ rFormula <- R6::R6Class(
         self$random <- lapply(barslist, function(b) {
           cluster <- trimws(b[[2]])
           self$clusters[[length(self$cluster) + 1]] <- cluster
-          .terms <- unlist(jmvcore::decomposeFormula(b[[1]]))
-          lapply(.terms, function(t) c(t, cluster))
+          .terms <-jmvcore::decomposeFormula(formula(paste0("~",b[[1]])))
+          lapply(.terms, function(t) c(t,cluster))
         })
       }
       fformula <- lme4::nobars(aformula)
@@ -294,6 +331,13 @@ rFormula <- R6::R6Class(
   ) # end of public
 ) # end of class
 
-# aformula<-y~1+x+I(x^2)+(1+x1+x1:x2|cluster2)+(0+k|cluster1)+(1|cluster2)+(x|cluster2)
-# f<-rFormula$new(y~1+x+I(x^2))
-# f$terms
+
+#  aformula<-y~1+x+I(x^2)+(1+x1+x1:x2|cluster2)+(0+k+x|cluster1)+(1|cluster3)+(1+x|cluster4)
+#  f<-rFormula$new(aformula)
+# f$random
+ # l<-gFormula$new() 
+ # l$random<-f$random
+ # l$random_formula()
+ # lreduced_random() 
+ # 
+ 

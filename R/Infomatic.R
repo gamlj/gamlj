@@ -161,7 +161,7 @@ Infomatic <- R6::R6Class(
 
       if (self$model_type=="ordinal") {
         
-        self$model         <-   c("Ordinal GLM","Proportional odds logistic")
+        self$model         <-   c("Cumlative Link Model","Proportional odds logistic")
         self$distribution  <-    "logistic"
         self$call          <-    "ordinal"
         self$rcall        <-     ORDINAL[[self$caller]]
@@ -229,7 +229,7 @@ Infomatic <- R6::R6Class(
         self$direction     <-   c("y","Dependend variable scores")
         self$deptype       <-   c("numeric","integer")
         self$fit           <-   c("lik" , "aic",  "bic")
-        self$r2            <-   c("Marginal","Conditional")
+        self$r2            <-   list(list(type="Marginal"),list(type="Conditional"))
         self$df            <-   options$df_method
       }
       
