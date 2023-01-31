@@ -113,9 +113,10 @@ ganova<- function(x,...) UseMethod(".anova")
   effss$epsilonSq<-epsilon[-last,2]
   effss$epsilonSqP<-epsilonp[,2]
   reslist<-listify(effss)
-  reslist<-append_list(reslist,reds,"Residuals")
-  reslist<-append_list(reslist,tots,"Total")
-  reslist<-prepend_list(reslist,mods,"Model")
+  ladd(reslist)<-reds
+  ladd(reslist)<-tots
+  padd(reslist)<-mods
+  
   reslist    
 }
 

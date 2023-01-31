@@ -29,12 +29,12 @@ gamljGzlmClass <- R6::R6Class(
       
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### some models do not have adjusted r2 ###
       if (self$options$model_type %in% c("multinomial","ordinal", "custom"))
@@ -43,45 +43,45 @@ gamljGzlmClass <- R6::R6Class(
       
       ### additional fit table ###
       aSmartObj<-SmartTable$new(self$results$main$fit,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### estimates table ###
       aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
       aSmartObj$spaceBy<-"response"
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### contrasts code tables
       aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
       aSmartObj$expandable<-TRUE
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       
       ### relativerisk tables
       aSmartObj<-SmartTable$new(self$results$main$relativerisk,estimate_machine)
       aSmartObj$ci("est",width=self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
       ### marginal effects tables
       aSmartObj<-SmartTable$new(self$results$main$marginals,estimate_machine)
       aSmartObj$ci("est",width=self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### paralleltest tables
       aSmartObj<-SmartTable$new(self$results$main$paralleltest,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
       ### vcov table ###
       
       aSmartObj<-SmartTable$new(self$results$main$vcov,estimate_machine)
       aSmartObj$expandable<-TRUE
       aSmartObj$expandFrom<-2
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ## post hoc #####
       
@@ -92,7 +92,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$combineBelow<-"response"
       aSmartObj$expandFrom<-2
       aSmartObj$setColumnTitle("estimate",estimate_machine$infomatic$comparison)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
 
       ### estimate marginal means
@@ -104,7 +104,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$combineBelow="new!"
       aSmartObj$spaceBy="new!"
       aSmartObj$ci("est",self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### simple effects
       ##### anova
@@ -116,7 +116,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
       aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
       
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ##### coefficients
       aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
@@ -129,7 +129,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$ci("expb",width=self$options$ci_width,format="Exp(B) {}% Confidence Intervals")
       aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
       aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### simple interaction
       aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
@@ -139,7 +139,7 @@ gamljGzlmClass <- R6::R6Class(
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-"new!"
       aSmartObj$spaceBy<-"new!"
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### init all ####
       for (tab in private$.smartObjs) {

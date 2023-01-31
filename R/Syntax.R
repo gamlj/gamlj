@@ -162,9 +162,9 @@ Syntax <- R6::R6Class(
       
       if (self$options$model_type=="lm") {
         if (self$formulaobj$hasTerms)
-          tab<-prepend_list(tab,list(source="Model",f="."))
-        tab<-append_list(tab,list(source="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
-        tab<-append_list(tab,list(source="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP=""))
+          padd(tab)<-list(source="Model",f=".")
+        ladd(tab)<-list(source="Residuals",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP="")
+        ladd(tab)<-list(source="Total",f="",p="",etaSq="",etaSqP="",omegaSq="",omegaSqP="",epsilonSq="",epsilonSqP="")
       }       
       ### we need at least a row otherwise we cannot add notes to the table
       if (!is.something(tab))
@@ -397,7 +397,7 @@ init_main_multirandom=function() {
           ## params are selected moderators
           .params<-setdiff(.term,.mods)
 
-          inter_term <- append_list(inter_term,.inters)
+          ladd(inter_term) <- .inters
           .names<-make.names(paste0("mod_",.params))
           
           .params64<-tob64(.params)

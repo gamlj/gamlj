@@ -165,12 +165,6 @@ sourcifyVars<-function(value) {
   paste0(sourcifyName(value),collapse = ",")
   
 }
-append_list <- function(alist, aelement, name = NULL) {
-  alist[[length(alist) + 1]] <- aelement
-  if (!is.null(name)) 
-    names(alist)[length(alist)] <- name
-  alist
-}
 prepend_list <- function(alist, aelement, name = NULL) {
   alist <- c(0, alist)
   alist[[1]] <- aelement
@@ -240,6 +234,35 @@ ebind_square<-function(...) {
   
 }
 
+append_list <- function(alist, aelement, name = NULL) {
+  alist[[length(alist) + 1]] <- aelement
+  if (!is.null(name)) 
+    names(alist)[length(alist)] <- name
+  alist
+}
 
-#fromb64<-function(x) return(x)
-#to64<-function(x) return(x)
+
+`ladd<-`<-function(x,value) {
+  x[[length(x)+1]]<-value
+  return(x)
+}
+
+`padd<-` <- function(x, value) {
+  x <- c(0, x)
+  x[[1]] <- value
+  x
+}
+
+
+# remove null from list of lists
+clean_lol<-function(alist) {
+  il<-list()
+  for (i in seq_along(alist)) {
+    jl<-list()
+    for (j in seq_along(alist[[i]])) {
+      if (length(alist[[i]][[j]])>0) jl[[length(jl)+1]]<-alist[[i]][[j]]
+    }
+    if (length(jl)>0) il[[length(il)+1]]<-jl
+  }
+  il
+}

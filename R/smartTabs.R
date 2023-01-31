@@ -136,7 +136,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               if (is.null(label)) label="" 
                               alist<-list(root=aroot,label=label,width=width,format=format)
-                              self$ci_info<-append_list(self$ci_info,alist)
+                              ladd(self$ci_info)<-alist
 
                             },
                             
@@ -623,14 +623,14 @@ SmartArray <- R6::R6Class("SmartArray",
                                   aSmartArray<-SmartArray$new(jtable,self)
                                   aSmartArray$initSource(rtables[[i]])
                                   aSmartArray$key<-.keys[[i]]
-                                  self$childrenObjs<-append_list(self$childrenObjs,aSmartArray)
+                                  ladd(self$childrenObjs)<-aSmartArray
                                   
                                 } else { 
                                   
                                   ### if we are here, children are tables
                                   aSmartTable<-SmartTable$new(jtable,self)
                                   aSmartTable$initSource(rtables[[i]])
-                                  self$childrenObjs<-append_list(self$childrenObjs,aSmartTable)
+                                  ladd(self$childrenObjs)<-aSmartTable
                                   
                                 }
                               }

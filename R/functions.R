@@ -106,21 +106,5 @@ is.b64<-function(a) {
 
 ### basic functions ###
 
-`ladd<-`<-function(x,value) {
-  x[[length(x)+1]]<-value
-  return(x)
-}
-# remove null from list of lists
-clean_lol<-function(alist) {
-  il<-list()
-  for (i in seq_along(alist)) {
-    jl<-list()
-    for (j in seq_along(alist[[i]])) {
-      if (length(alist[[i]][[j]])>0) jl[[length(jl)+1]]<-alist[[i]][[j]]
-    }
-    if (length(jl)>0) il[[length(il)+1]]<-jl
-  }
-  il
-}
 
 

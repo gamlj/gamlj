@@ -30,43 +30,43 @@ gamljMixedClass <- R6::R6Class(
       
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
 
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
       aSmartObj$spaceBy<-"model"
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
 
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### estimates table ###
       aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$ci("beta",self$options$ci_width,label=greek_vector[["beta"]])
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### contrasts code tables
       aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
       aSmartObj$expandable<-TRUE
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
       ### random variances table
       aSmartObj<-SmartTable$new(self$results$main$random,estimate_machine)
       aSmartObj$ci("var",self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
       ### random variances table
       aSmartObj<-SmartTable$new(self$results$main$randomcov,estimate_machine)
       aSmartObj$activateOnData<-TRUE
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
       ### random variances lrt table
       aSmartObj<-SmartTable$new(self$results$main$ranova,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       
       ### estimate marginal means
@@ -77,7 +77,7 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj$combineBelow="new!"
       aSmartObj$spaceBy="new!"
       aSmartObj$ci("est",self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### simple effects
       ##### anova
@@ -89,7 +89,7 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
       aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
       
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ##### coefficients
       aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
@@ -100,7 +100,7 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
       aSmartObj$spaceBy<-(length(self$options$simple_moderators)-1)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### simple interaction
       aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
@@ -110,11 +110,11 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-"new!"
       aSmartObj$spaceBy<-"new!"
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### assumptions nromtest
       aSmartObj<-SmartTable$new(self$results$assumptions$normtest,estimate_machine)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
 
       ## post hoc #####
       
@@ -122,7 +122,7 @@ gamljMixedClass <- R6::R6Class(
       aSmartObj$expandable<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("est",self$options$ci_width)
-      private$.smartObjs<-append_list(private$.smartObjs,aSmartObj)
+      ladd(private$.smartObjs)<-aSmartObj
       
       
       ### init all ####
