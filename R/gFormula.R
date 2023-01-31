@@ -70,8 +70,10 @@ gFormula <- R6::R6Class(
           })
         })
         r <- private$.buildrandom(clean_lol(alist), self$random_corr, "b64")
+        r <- paste("(",r,")",collapse = " + ")
+        
       }
-      paste(f, r)
+      paste(f, r,sep=" + ")
     },
     update_terms = function(data) {
       .formulalist <- self$fixed
@@ -232,7 +234,6 @@ gFormula <- R6::R6Class(
         if (length(unique(res[, 2])) > 1 && correl == "block") {
           stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
         }
-mark(res)
         res <- tapply(res[, 1], res[, 2], paste)
         res <- sapply(res, function(x) paste(x, collapse = " + "))
 

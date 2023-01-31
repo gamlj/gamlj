@@ -534,7 +534,7 @@ Estimate <- R6::R6Class("Estimate",
                               if (self$option("offset"))
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
                               opts[["data"]]<-quote(data)
-                              mark(opts[["random"]])
+
                               acall<-as.call(opts)
                               
                               ginfo("MODULE: Estimating the model: running")

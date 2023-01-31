@@ -946,7 +946,6 @@ procedure.ranova<- function(x,...) UseMethod(".ranova")
 .ranova.glmerMod<-function(model,obj) {
   
    models<-obj$formulaobj$reduced_random()
-   mark(models)
    fixed<-obj$formulaobj$fixed_formula64()
   .names<-list(LRT="Chisq", df="Df", p="Pr(>Chisq)")
 

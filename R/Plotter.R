@@ -403,6 +403,7 @@ Plotter <- R6::R6Class(
 
         if (self$option("plot_re_method","average")) {
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
+            mark(formula)
             model<-update(private$.operator$model,formula=formula)
         } else
             model<-private$.operator$model

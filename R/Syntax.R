@@ -47,15 +47,18 @@ Syntax <- R6::R6Class(
       self$formulaobj$offset<-self$optionValue("offset")
       self$formulaobj$update_terms(self$datamatic$data_structure64)
       
-      self$nestedformulaobj<-gFormula$new()
-      self$nestedformulaobj$fixed_intercept<-self$optionValue("nested_intercept")
-      self$nestedformulaobj$random_corr<-"block"
-      self$nestedformulaobj$dep<-self$options$dep
-      self$nestedformulaobj$fixed<-self$optionValue("nested_terms")
-      self$nestedformulaobj$random<-self$optionValue("nested_re")
-      self$nestedformulaobj$offset<-self$optionValue("offset")
-      self$nestedformulaobj$update_terms(self$datamatic$data_structure64)
-      
+      if (self$option("comparison")) {
+        
+            self$nestedformulaobj<-gFormula$new()
+            self$nestedformulaobj$fixed_intercept<-self$optionValue("nested_intercept")
+            self$nestedformulaobj$random_corr<-"block"
+            self$nestedformulaobj$dep<-self$options$dep
+            self$nestedformulaobj$fixed<-self$optionValue("nested_terms")
+            self$nestedformulaobj$random<-self$optionValue("nested_re")
+            self$nestedformulaobj$offset<-self$optionValue("offset")
+            self$nestedformulaobj$update_terms(self$datamatic$data_structure64)
+            
+      }      
       
       
       ### infomatic class takes care of all info about different models
@@ -113,8 +116,8 @@ Syntax <- R6::R6Class(
       
       
       if (self$option("se_method","robust"))
-        warning("All SE are heteroskedasticity-consistent robust SE")
-      mark(tab)
+         tab[["se_method"]]<-list(info="SE method",value="Robust")
+      
       tab
       
     },
