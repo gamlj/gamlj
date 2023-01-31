@@ -8,19 +8,12 @@ gFormula <- R6::R6Class(
     dep = NULL,
     offset = NULL,
     clusters = NULL,
-    nested_intercept = TRUE,
-    nested_random = NULL,
     fixed_intercept = NULL,
     hasTerms = FALSE,
     isProper = FALSE,
     anova_terms = NULL,
     params_terms = NULL,
-    lhs = function() {
-      private$.buildfixed(NULL, private$.fixed)
-    },
-    lhs64 = function() {
-      private$.buildfixed(tob64(private$.fixed))
-    },
+    
     fixed_formula = function() {
       private$.buildfixed(self$dep, self$fixed)
     },
@@ -28,72 +21,37 @@ gFormula <- R6::R6Class(
       private$.buildfixed(tob64(self$dep), tob64(self$fixed))
     },
     random_formula = function() {
-      private$.buildrandom(self$random, self$random_corr, "plain")
+      alist<-private$.buildrandom(self$random, self$random_corr, "plain")
+      if (is.something(alist))
+        paste("(",alist,")",collapse = " + ")
     },
     random_formula64 = function() {
-      private$.buildrandom(self$random, self$random_corr, "b64")
+      alist<-private$.buildrandom(self$random, self$random_corr, "b64")
+      if (is.something(alist))
+         paste("(",alist,")",collapse = " + ")
     },
     listify_random64 = function() {
       ## there are some functions that require a list of random effect formula
-      res<-lapply(self$random, function(z) { 
-           res<-unlist(lapply(z, function(x) {
-                       astring<-private$.composeRandom64(x)
-                       formula(paste("~",astring))
-           }))
-      })
-      as.list(unlist(res))
+      private$.buildrandom(self$random, self$random_corr, "b64")
     } ,
     listify_random = function() {
       ## there are some functions that require a list of random effect formula
-      res<-lapply(self$random, function(z) { 
-        res<-unlist(lapply(z, function(x) {
-          astring<-private$.composeRandom(x)
-          paste("~",astring)
-        }))
-      })
-      as.list(unlist(res))
+      private$.buildrandom(self$random, self$random_corr, "plain")
     } ,
-    
     formula = function() {
-      paste(self$fixed_formula(), self$random_formula())
+      paste(c(self$fixed_formula(), self$random_formula()),collapse = " + ")
     },
     formula64 = function() {
-      paste(self$fixed_formula64(), self$random_formula64())
-    },
-    nested_fixed_formula = function() {
-      if (is.null(self$nested_fixed)) {
-        return(NULL)
-      }
 
-      private$.buildfixed(self$dep, self$nested_fixed)
+      paste(c(self$fixed_formula64(), self$random_formula64()),collapse = " + ")
     },
-    nested_fixed_formula64 = function() {
-      private$.buildfixed(tob64(self$dep), tob64(self$nested_fixed))
-    },
-    nested_random_formula = function() {
-      private$.buildrandom(self$nested_random, "block", "plain")
-    },
-    nested_random_formula64 = function() {
-      private$.buildrandom(self$nested_random, "block", "b64")
-    },
-    nested_formula = function() {
-      if (is.null(self$nested_fixed)) {
-        return(NULL)
-      }
-      paste(self$nested_fixed_formula(), self$nested_random_formula())
-    },
-    nested_formula64 = function() {
-      paste(self$nested_fixed_formula64(), self$nested_random_formula64())
-    },
-    nested_tested_fixed = function() {
-      if (is.something(private$.nested_fixed)) {
-        return(private$.buildfixed(self$dep, setdiff(private$.fixed, private$.nested_fixed)))
+    nested_tested_fixed = function(obj) {
+      if (is.something(obj$fixed)) {
+        return(private$.buildfixed(self$dep, setdiff(self$fixed, obj$fixed)))
       }
     },
-    nested_tested_random = function() {
-      if (is.something(private$.nested_fixed)) {
-        return(private$.buildfixed(NULL, setdiff(unlist(self$random), unlist(self$nested_random))))
-      }
+    nested_tested_random = function(obj) {
+        return(private$.buildfixed(NULL, setdiff(unlist(self$random), unlist(obj$random))))
     },
     keep = function(term) {
       w <- unlist(lapply(private$.fixed, function(x) (all(term == x) || is.numeric(x))))
@@ -132,13 +90,13 @@ gFormula <- R6::R6Class(
       termslist<-list()
       listnames<-list()
       for (i in seq_along(re)) {
-        re<-self$random
         l<-sapply(re[[i]],length)
         l<-which(l==max(l))
         for (j in l) {
+                     re<-self$random
                      if (length(l)>1 & re[[i]][[j]][[1]]=="Intercept") 
                         next
-                      re<-self$random
+        
                       name<-paste(jmvcore::composeTerm(re[[i]][[j]][-length(re[[i]][[j]])]),re[[i]][[j]][length(re[[i]][[j]])],sep = " | ")
                       listnames[[length(listnames)+1]]<-name
                       one<-re[[i]]
@@ -148,9 +106,9 @@ gFormula <- R6::R6Class(
                      
         }
       }
-
       res<-lapply(termslist, function(x) {
-        private$.buildrandom(x, self$random_corr, "b64")
+        alist<-private$.buildrandom(clean_lol(x), self$random_corr, "b64")
+        paste("(",alist,")",collapse = " + ")
       })
       names(res)<-listnames
       res
@@ -169,18 +127,42 @@ gFormula <- R6::R6Class(
       self$isProper <- (self$fixed_intercept | self$hasTerms)
       private$.fixed <- alist
     },
-    nested_fixed = function(alist) {
-      if (missing(alist)) {
-        return(private$.nested_fixed)
-      }
-      private$.nested_fixed <- c(as.numeric(self$nested_intercept), alist)
-    },
     random = function(alist) {
+      
       if (missing(alist)) {
         return(private$.random)
       }
-
+      
+      correl<-self$random_corr
+      # remove empty sublists
+      alist <- alist[sapply(alist, function(a) !is.null(unlist(a)))]
+      # get clusters
       self$clusters <- unique(unlist(lapply(alist, function(z) lapply(z, function(x) x[length(x)]))))
+      
+      ## this is for R. It overrides the re_corr option
+  
+      if (length(alist) > 1) {
+        if (correl == "none") warning("Option re_corr='none' has been overriden by random effect input structure")
+        correl <- "block"
+      }
+      
+      # split in sublists if option re_corr=none
+      if (correl == "none") {
+        alist <- alist[[1]]
+        alist <- lapply(alist, list)
+      }
+      ## we want to be sure that each cluster has its own list
+      if (correl == "all") {
+          r<-list()   
+          for (x in alist) {
+                for (cluster in self$clusters) {
+                                w<-grep(cluster,x)
+                                ladd(r)<-x[w]
+                }
+          }
+      alist<-r
+      }
+    
       ## we want to be sure that the terms are ordered by order
       alist<-lapply(alist, function(x) x[order(sapply(x,length))])
       private$.random <- alist
@@ -198,31 +180,44 @@ gFormula <- R6::R6Class(
   private = list(
     .fixed = NULL,
     .random = NULL,
-    .nested_fixed = NULL,
     .random_corr = "all",
     .buildfixed = function(dep, terms) {
       gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(dep, terms)))
     },
+
     .buildrandom = function(terms, correl, encoding) {
+      
+            .intercept <- "Intercept"
+             if (encoding == "b64") {
+                 terms <- tob64(terms)
+                .intercept <- tob64(.intercept)
+             }
+      
+
+            clusters<-lapply(terms, function(x)  tail(x[[1]], 1))
+
+            alist<-lapply(terms, function(x) 
+                  unlist(lapply(x, function(z) {
+                     jmvcore::composeTerm(head(z, -1))
+                  })))
+            lapply(seq_along(alist), function(i) {
+                 r<-paste(paste(alist[[i]],collapse = " + "),clusters[[i]],sep=" | ")
+                 if (length(grep(.intercept,r))>0)
+                             gsub(.intercept,1,r)
+                 else
+                             paste("0+",r)
+            })
+            
+    },
+    .buildrandomx = function(terms, correl, encoding) {
       
       if (!is.something(terms)) {
         return()
       }
 
-      ## this is for R. It overrides the re_corr option
-      if (length(terms) > 1) {
-          if (correl == "none") warning("Option re_corr='none' has been overriden by random effect input structure")
-          correl <- "block"
-      }
       # remove empty sublists
-      terms <- terms[sapply(terms, function(a) !is.null(unlist(a)))]
-
-      # split in sublists if option re_corr=none
-      if (correl == "none") {
-        termslist <- terms[[1]]
-        terms <- lapply(termslist, list)
-      }
-
+      terms <- alist[sapply(terms, function(a) !is.null(unlist(a)))]
+      
       rterms <- ""
       for (i in seq_along(terms)) {
         .intercept <- "Intercept"
@@ -234,11 +229,10 @@ gFormula <- R6::R6Class(
         flatterms <- lapply(.one, function(x) c(jmvcore::composeTerm(head(x, -1)), tail(x, 1)))
         res <- do.call("rbind", flatterms)
         ### check blocks coherence
-#        if (length(unique(res[, 2])) > 1 && correl == "block") {
-#          stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
-#        }
-
-
+        if (length(unique(res[, 2])) > 1 && correl == "block") {
+          stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
+        }
+mark(res)
         res <- tapply(res[, 1], res[, 2], paste)
         res <- sapply(res, function(x) paste(x, collapse = " + "))
 

@@ -8,6 +8,7 @@ Syntax <- R6::R6Class(
   public=list(
     vars=NULL,
     formulaobj=NULL,
+    nestedformulaobj=NULL,
     hasIntercept=TRUE,
     hasTerms=FALSE,
     isProper=NULL,
@@ -39,15 +40,22 @@ Syntax <- R6::R6Class(
       #### we prepare the model syntax
       self$formulaobj<-gFormula$new()
       self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
-      self$formulaobj$nested_intercept<-self$optionValue("nested_intercept")
       self$formulaobj$random_corr<-self$optionValue("re_corr")
       self$formulaobj$dep<-self$options$dep
       self$formulaobj$fixed<-self$options$model_terms
       self$formulaobj$random<-self$optionValue("re")
-      self$formulaobj$nested_fixed<-self$optionValue("nested_terms")
-      self$formulaobj$nested_random<-self$optionValue("nested_re")
       self$formulaobj$offset<-self$optionValue("offset")
       self$formulaobj$update_terms(self$datamatic$data_structure64)
+      
+      self$nestedformulaobj<-gFormula$new()
+      self$nestedformulaobj$fixed_intercept<-self$optionValue("nested_intercept")
+      self$nestedformulaobj$random_corr<-"block"
+      self$nestedformulaobj$dep<-self$options$dep
+      self$nestedformulaobj$fixed<-self$optionValue("nested_terms")
+      self$nestedformulaobj$random<-self$optionValue("nested_re")
+      self$nestedformulaobj$offset<-self$optionValue("offset")
+      self$nestedformulaobj$update_terms(self$datamatic$data_structure64)
+      
       
       
       ### infomatic class takes care of all info about different models
@@ -87,16 +95,16 @@ Syntax <- R6::R6Class(
 
                  tab[["mc"]]<-list(info="Comparison",
                            value="Nested model",
-                           specs=self$formulaobj$nested_formula())
+                           specs=self$nestedformulaobj$formula())
          
                  tab[["mctest"]]<-list(info="Comparison",
                                value="Tested terms",
-                               specs=self$formulaobj$nested_tested_fixed())
+                               specs=self$formulaobj$nested_tested_fixed(self$nestedformulaobj))
          
                  if (self$option("nested_re")) {
                      tab[["mctest1"]]<-list(info="Comparison",
                                     value="Tested random",
-                                    specs=self$formulaobj$nested_tested_random())
+                                    specs=self$formulaobj$nested_tested_random(self$nestedformulaobj))
                   }
       }
         
@@ -106,7 +114,7 @@ Syntax <- R6::R6Class(
       
       if (self$option("se_method","robust"))
         warning("All SE are heteroskedasticity-consistent robust SE")
-      
+      mark(tab)
       tab
       
     },

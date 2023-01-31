@@ -29,7 +29,7 @@ Estimate <- R6::R6Class("Estimate",
                             ginfo("ESTIMATE: initial estimation done")
                             if (self$options$comparison) {
                               
-                              obj<-try_hard(mf.update(self$model,formula=self$formulaobj$nested_formula64()))
+                              obj<-try_hard(mf.update(self$model,formula=self$nestedformulaobj$formula64()))
                               self$nested_model<-obj$obj
                               if (!isFALSE(obj$warning))
                                     self$dispatcher$warnings<-list(topic="main_r2",

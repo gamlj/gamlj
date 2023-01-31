@@ -946,11 +946,12 @@ procedure.ranova<- function(x,...) UseMethod(".ranova")
 .ranova.glmerMod<-function(model,obj) {
   
    models<-obj$formulaobj$reduced_random()
+   mark(models)
    fixed<-obj$formulaobj$fixed_formula64()
   .names<-list(LRT="Chisq", df="Df", p="Pr(>Chisq)")
 
   tab<-lapply(names(models),function(x) { 
-    .formula<-paste(fixed,models[[x]])
+    .formula<-paste(fixed,models[[x]],sep=" + ")
      model0<-mf.update(model,formula=.formula)
     .anova<-stats::anova(model,model0)[2,]
      names(.anova)<-transnames(names(.anova),.names)
