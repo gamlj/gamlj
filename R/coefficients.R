@@ -18,7 +18,8 @@ gparameters<- function(x,...) UseMethod(".parameters")
     robust=.se_method,
     ci=NULL,
   ),stringAsFactors=FALSE)
-  
+
+
   names(.coefficients) <-  c("source","estimate","se","t","df","p")
   if (obj$option("estimates_ci")) {
     
@@ -76,7 +77,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
       
     }
   }
-  
   .coefficients
   
 }

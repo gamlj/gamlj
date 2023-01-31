@@ -182,7 +182,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 
 
-.r2.glm <- function(model) {
+.r2.glm <- function(model,obj) {
   alist <- list()
   # mcFadden and adjusted
   alist$r2 <- 1 - (model$deviance / model$null.deviance)

@@ -12,7 +12,6 @@ Syntax <- R6::R6Class(
     hasIntercept=TRUE,
     hasTerms=FALSE,
     isProper=NULL,
-    tab_anova=NULL,
     tab_coefficients=NULL,
     tab_intercept=NULL,
     tab_emm=NULL,
@@ -209,12 +208,12 @@ Syntax <- R6::R6Class(
         if (self$option("es_info")) {
           alist<-list()
           for (term in self$options$model_terms) {
-            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_eta2)
-            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_peta2)
-            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_omega2)
-            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_pomega2)
-            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_epsilon2)
-            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term),name=letter_pepsilon2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term,raise = TRUE),name=letter_eta2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term,raise = TRUE),name=letter_peta2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term,raise = TRUE),name=letter_omega2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term,raise = TRUE),name=letter_pomega2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term,raise = TRUE),name=letter_epsilon2)
+            ladd(alist) <-  list(effect=jmvcore::stringifyTerm(term,raise = TRUE),name=letter_pepsilon2)
           }
         }
         alist
@@ -430,94 +429,6 @@ init_main_multirandom=function() {
   ),   # End public
   
   private=list(
-    
-    .make_structure=function() {
-      
-      ## some warnings ###
-      if (self$option("ci_method","boot"))
-        self$dispatcher$warnings<-list(topic="info",message="Bootstrap C.I. are being computed, this may take a while")
-      
-      ### anova table ###
-      
-      
-      #### additional fit indeces ####
-      
-      if (is.something(self$infomatic$fit))
-        self$tab_fit<-self$infomatic$info_fit()
-      
-      
-      
-      ### intercept info table ###
-      
-      #              if (self$option("interceptInfo")) {
-      #               self$tab_intercept<-list(source="(Intercept)") 
-      
-      #              }
-      
-      ### effect sizes table ###
-      
-      
-      
-      
-      ### simple effects ########
-      
-      
-      ##### simple interactions ######
-      
-      if (self$options$simple_interactions) {
-        if (is.something(self$options$simple_effects) & length(self$options$simple_moderators)>1 ) {
-          params<-list()
-          ### moderators should be reverted in order to match emmeans 
-          .term<-rev(self$options$simple_moderators)
-          n<-length(.term)
-          j<-n
-          params<-list()
-          anovas<-list()
-          while(j>1) {
-            mods<-.term[j:n]
-            .names<-setdiff(.term,mods)
-            params[[length(params)+1]]<-.names
-            j<-j-1
-          }
-          ### and the results of the definitions should be revered as well
-          self$tab_simpleInteractionCoefficients<-rev(params)
-          self$tab_simpleInteractionAnova<-rev(params)
-        }
-        
-      }
-      
-      
-      ### Contrast coding explanation ####
-      
-      
-      ### here are specific calls ########
-      
-      ### relative risk
-      if (self$option("es","RR")) {
-        
-        simtab  <-  self$tab_coefficients
-        
-        if (self$hasIntercept)
-          simtab  <-  simtab[-1]
-        
-        self$tab_relativerisk<-simtab
-      }
-      
-      if (self$option("re")) {
-        count<-sum(unlist(sapply(self$options$re, length)))
-        self$tab_random<-rep(list(groups=""),count+1)
-      }
-      
-      if (self$option("norm_test")) {
-        self$tab_normtest<-list(list(name="Kolmogorov-Smirnov"),
-                                list(name="Shapiro-Wilk"))
-        
-      }
-      
-      
-      
-      
-    }
 
   ) # end of private
 ) # End Rclass

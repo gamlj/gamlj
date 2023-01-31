@@ -141,6 +141,7 @@ items:
                          - contrasts
                          - covs_scale
                          - fixed_intercept
+                         - se_method
  
              columns:
                     - name: source
@@ -505,7 +506,7 @@ items:
                  - ccm_value
                  - ccp_value
                  - covs_scale_labels
- 
+                 - se_method
               columns:
                    - name: test
                      title: F

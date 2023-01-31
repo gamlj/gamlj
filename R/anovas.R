@@ -50,7 +50,8 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .anova.lm<-function(model,obj) {
   
-  .anova        <-  car::Anova(model,test="F",type=3,singular.ok=T)
+  opts<-list(mod=model,test="F",type=3,singular.ok=T)
+  .anova        <-  do.call(car::Anova,opts)
   .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)")),]
   anovatab<-.anova
   colnames(anovatab)<-c("ss","df","f","p")
@@ -112,6 +113,23 @@ ganova<- function(x,...) UseMethod(".anova")
   effss$omegaSqP<-omegap[,2]
   effss$epsilonSq<-epsilon[-last,2]
   effss$epsilonSqP<-epsilonp[,2]
+  
+  mark(effss)
+  if (obj$option("se_method","robust")) {
+    mark("adjusting")
+     opts[["white.adjust"]]<-TRUE
+    .anova        <-  do.call(car::Anova,opts)  
+    .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)","Residuals")),]
+    
+    mark(.anova)
+    effss$f<-.anova$F
+    effss$p<-.anova$`Pr(>F)`
+    warning("F-test and p-values are adjusted for heteroschedasticity. SS and effect size indices are not.")
+  }
+  
+  opts<-list(mod=model,test="F",type=3,singular.ok=T)
+  .anova        <-  do.call(car::Anova,opts)
+  
   reslist<-listify(effss)
   ladd(reslist)<-reds
   ladd(reslist)<-tots

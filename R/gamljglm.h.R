@@ -752,7 +752,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "contrasts",
                                 "covs_scale",
-                                "fixed_intercept"),
+                                "fixed_intercept",
+                                "se_method"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1163,7 +1164,8 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "simple_moderators",
                                 "ccm_value",
                                 "ccp_value",
-                                "covs_scale_labels"),
+                                "covs_scale_labels",
+                                "se_method"),
                             columns=list(
                                 list(
                                     `name`="test", 
