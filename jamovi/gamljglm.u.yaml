@@ -536,3 +536,8 @@ children:
                 name: predicted
               - type: Output
                 name: residuals
+          - type: Label
+            label: Table
+            children:
+              - type: CheckBox
+                name: mute

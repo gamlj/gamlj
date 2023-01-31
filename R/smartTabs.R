@@ -32,6 +32,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             combineBelow=0,
                             ci_info=list(),
                             columnTitles=list(),
+                            mute_notes=FALSE,
 
                             initialize=function(table,estimator=NULL) {
 
@@ -47,6 +48,9 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.init_source<-paste0("init_",self$nickname)
                               private$.run_source<-paste0("run_",self$nickname)
                               self$activated<-self$table$visible
+                              
+                              if (utils::hasName(self$table$options,"mute"))
+                                          self$mute_notes<-self$table$options$mute
 
                               if ("key" %in% names(table) ) 
                                 self$key<-table$key
@@ -164,6 +168,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                             },
                             retrieveNotes=function(dispatcher=NULL) {
+                                 
 
                                   notes<-self$table$state$notes
 
@@ -187,6 +192,9 @@ SmartTable <- R6::R6Class("SmartTable",
                             },
                             
                             setNotes=function(dispatcher=NULL) {
+                              
+                                if (self$mute_notes)
+                                   return()
                               
                                 if (is.something(dispatcher)) {
                                     topics<-intersect(dispatcher$warnings_topics,self$topics)
@@ -324,6 +332,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                 rtable<-output$obj
                                 error<-output$error
                                 warning<-output$warning
+                                if (self$mute_notes)
+                                    warning<-FALSE
                                 
                                 if (error!=FALSE) {
                                   ginfo("TABLES: Error in ",fun,error)

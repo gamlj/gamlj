@@ -42,6 +42,10 @@ other effects in the model to the mean"
 WARNS["means.interactions"]<-"Estimated means are estimated averaging across interacting variables"
 WARNS["means.noemms"]<-"Estimated marginal means cannot be estimated. Please try to simplify your model"
 
+### standard error #############
+
+WARNS["stde.robust_test"]<-"Inferential tests and p-values are adjusted for heteroschedasticity."
+
 ### simple effects #############
 WARNS["se.interactions"]<-"Simple effects are estimated setting higher order
  moderator (if any) in covariates to zero and averaging

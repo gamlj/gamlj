@@ -11,10 +11,14 @@ Dispatch <- R6::R6Class(
             class=TRUE, 
             cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
             public=list(
-                        tables=NULL,
+                        tables = NULL,
+                        mute_notes   = FALSE,
                         initialize=function(results) { 
-                          
+                                
                                   self$tables<-results
+                                  if (utils::hasName(results$options,"mute"))
+                                     self$mute_notes<-results$options$mute
+                                  
                                   
                         },
                         print=function() {
@@ -26,6 +30,8 @@ Dispatch <- R6::R6Class(
                         ),
             active=list(
                         warnings=function(obj) {
+                          
+                                if (self$mute_notes) return()
 
                                 if (missing(obj)) return()
                                 if (is.null(obj$message)) return()

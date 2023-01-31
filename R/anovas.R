@@ -114,17 +114,15 @@ ganova<- function(x,...) UseMethod(".anova")
   effss$epsilonSq<-epsilon[-last,2]
   effss$epsilonSqP<-epsilonp[,2]
   
-  mark(effss)
   if (obj$option("se_method","robust")) {
-    mark("adjusting")
+    
      opts[["white.adjust"]]<-TRUE
     .anova        <-  do.call(car::Anova,opts)  
     .anova<-.anova[!(rownames(.anova) %in% c("(Intercept)","Residuals")),]
     
-    mark(.anova)
     effss$f<-.anova$F
     effss$p<-.anova$`Pr(>F)`
-    warning("F-test and p-values are adjusted for heteroschedasticity. SS and effect size indices are not.")
+    warning(WARNS[["stde.robust_test"]])
   }
   
   opts<-list(mod=model,test="F",type=3,singular.ok=T)

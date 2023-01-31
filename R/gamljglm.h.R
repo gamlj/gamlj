@@ -47,6 +47,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale_labels = "labels",
             adjust = list(
                 "bonf"),
+            mute = FALSE,
             posthoc_es = list(
                 "dm"),
             d_ci = FALSE,
@@ -315,6 +316,10 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "sidak"),
                 default=list(
                     "bonf"))
+            private$..mute <- jmvcore::OptionBool$new(
+                "mute",
+                mute,
+                default=FALSE)
             private$..predicted <- jmvcore::OptionOutput$new(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
@@ -437,6 +442,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
             self$.addOption(private$..adjust)
+            self$.addOption(private$..mute)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
             self$.addOption(private$..posthoc_es)
@@ -494,6 +500,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
         adjust = function() private$..adjust$value,
+        mute = function() private$..mute$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
         posthoc_es = function() private$..posthoc_es$value,
@@ -550,6 +557,7 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
         ..adjust = NA,
+        ..mute = NA,
         ..predicted = NA,
         ..residuals = NA,
         ..posthoc_es = NA,

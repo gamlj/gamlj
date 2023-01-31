@@ -446,8 +446,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
                                    datamatic=varobj
                                    )
     } else {
-      alist[["specs"]]<-term64
-      alist[["var"]]<-variable64
+      alist[["specs"]] <-term64
+      alist[["var"]]   <-variable64
       grid <- do.call(emmeans::emtrends, alist)
     }
     grid
@@ -464,9 +464,12 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     if (obj$option("df_method"))
       opts_list[["lmer.df"]]<-tolower(obj$options$df_method)
     
-    if (obj$option("se_method","robust"))
+    if (obj$option("se_method","robust")) {
       opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
-    
+      obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=WARNS[["stde.robust_test"]])
+      obj$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=WARNS[["stde.robust_test"]])
+      
+    }
     
     
     grid<-.get_se(opts_list)
