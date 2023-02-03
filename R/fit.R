@@ -103,7 +103,6 @@ gFit <- R6::R6Class(
       }
       
       comp <- comp$obj
-      mark(comp)
       r2comp <- as.list(comp[2, ])
       .names <- list(
                      df2 = c("Res.Df", "Resid. Df"),
@@ -145,7 +144,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 .r2.default <- function(model,obj) {
   
   performance::r2(model, tolerance = 0)
-
+  
 }
 
 .r2.lm <- function(model,obj) {
@@ -191,7 +190,6 @@ r2 <- function(model, ...) UseMethod(".r2")
   if (alist$ar2 < 0) {
     alist$ar2 <- 0
   }
-
   results <- fit.compare_null_model(model)
   alist$test <- results$test
   alist$df1 <- results$df1
@@ -199,6 +197,9 @@ r2 <- function(model, ...) UseMethod(".r2")
   alist$type <- "R-squared"
   list(alist)
 }
+
+
+
 
 .r2.polr <- function(model, obj) {
   
@@ -301,7 +302,9 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)
   results <- stats::anova(model0, model, test = "LRT")
- .names<-c(test=c("Deviance","LR.stat","LR stat."),df1=c("Df","   Df"),p=c("Pr(Chi)","Pr(>Chisq)"))
+ .names<-c(test=c("Deviance","LR.stat","LR stat.",""),
+           df1=c("Df","   Df"),
+           p=c("Pr(Chi)","Pr(>Chisq)"))
   names(results)<-transnames(names(results),.names)
   results$deviance <- stats::deviance(model)
   results$null.deviance <- stats::deviance(model0) 

@@ -47,6 +47,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             adjust = list(
                 "bonf"),
             covs_scale = NULL,
+            mute = FALSE,
             expb_ci = TRUE,
             es = list(
                 "expb"),
@@ -312,6 +313,10 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "standardized",
                                 "none"),
                             default="centered"))))
+            private$..mute <- jmvcore::OptionBool$new(
+                "mute",
+                mute,
+                default=FALSE)
             private$..expb_ci <- jmvcore::OptionBool$new(
                 "expb_ci",
                 expb_ci,
@@ -415,6 +420,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
             self$.addOption(private$..covs_scale)
+            self$.addOption(private$..mute)
             self$.addOption(private$..expb_ci)
             self$.addOption(private$..es)
             self$.addOption(private$..model_type)
@@ -466,6 +472,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
         covs_scale = function() private$..covs_scale$value,
+        mute = function() private$..mute$value,
         expb_ci = function() private$..expb_ci$value,
         es = function() private$..es$value,
         model_type = function() private$..model_type$value,
@@ -516,6 +523,7 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..predicted = NA,
         ..residuals = NA,
         ..covs_scale = NA,
+        ..mute = NA,
         ..expb_ci = NA,
         ..es = NA,
         ..model_type = NA,

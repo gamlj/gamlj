@@ -717,6 +717,13 @@ options:
 
 
 
+    - name: mute
+      title: Remove notes
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not present in R
 
 
 ...

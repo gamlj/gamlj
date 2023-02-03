@@ -13,7 +13,8 @@ modeloptions:
         - relm
         - contrasts
         - covs_scale
- 
+        - mute
+        
 nestedoptions:
         - nested_terms
         - nested_intercept

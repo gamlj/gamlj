@@ -478,6 +478,13 @@ options:
              one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
 
+    - name: mute
+      title: Remove notes
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not present in R
 
 ######### specs here ##########
 

@@ -662,3 +662,8 @@ children:
               - type: Output
                 name: residuals
                 enable: (!model_type_ordinal)
+          - type: Label
+            label: Table
+            children:
+              - type: CheckBox
+                name: mute

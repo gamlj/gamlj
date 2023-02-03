@@ -51,6 +51,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "bonf"),
             model_type = "logistic",
             covs_scale = NULL,
+            mute = FALSE,
             scale_missing = "complete",
             norm_test = FALSE,
             cluster = NULL,
@@ -351,6 +352,10 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "clusterbasedstandardized",
                                 "none"),
                             default="centered"))))
+            private$..mute <- jmvcore::OptionBool$new(
+                "mute",
+                mute,
+                default=FALSE)
             private$..scale_missing <- jmvcore::OptionList$new(
                 "scale_missing",
                 scale_missing,
@@ -460,6 +465,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..residuals)
             self$.addOption(private$..model_type)
             self$.addOption(private$..covs_scale)
+            self$.addOption(private$..mute)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..norm_test)
             self$.addOption(private$..cluster)
@@ -517,6 +523,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         residuals = function() private$..residuals$value,
         model_type = function() private$..model_type$value,
         covs_scale = function() private$..covs_scale$value,
+        mute = function() private$..mute$value,
         scale_missing = function() private$..scale_missing$value,
         norm_test = function() private$..norm_test$value,
         cluster = function() private$..cluster$value,
@@ -573,6 +580,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..residuals = NA,
         ..model_type = NA,
         ..covs_scale = NA,
+        ..mute = NA,
         ..scale_missing = NA,
         ..norm_test = NA,
         ..cluster = NA,
@@ -667,6 +675,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -717,7 +726,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "df_method",
                                 "relm",
                                 "contrasts",
-                                "covs_scale"),
+                                "covs_scale",
+                                "mute"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -760,7 +770,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "df_method",
                                 "relm",
                                 "contrasts",
-                                "covs_scale"),
+                                "covs_scale",
+                                "mute"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -798,6 +809,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -905,6 +917,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -968,6 +981,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1028,6 +1042,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1082,7 +1097,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "df_method",
                                 "relm",
                                 "contrasts",
-                                "covs_scale"),
+                                "covs_scale",
+                                "mute"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1120,7 +1136,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "df_method",
                                 "relm",
                                 "contrasts",
-                                "covs_scale"),
+                                "covs_scale",
+                                "mute"),
                             template=jmvcore::Table$new(
                                 options=options,
                                 title="Covariances for:  ___key___",
@@ -1148,7 +1165,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "df_method",
                                 "relm",
                                 "contrasts",
-                                "covs_scale"),
+                                "covs_scale",
+                                "mute"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1199,6 +1217,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         "relm",
                         "contrasts",
                         "covs_scale",
+                        "mute",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1300,6 +1319,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1344,6 +1364,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
+                                "mute",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1429,6 +1450,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     "relm",
                                     "contrasts",
                                     "covs_scale",
+                                    "mute",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1476,6 +1498,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     "relm",
                                     "contrasts",
                                     "covs_scale",
+                                    "mute",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1540,6 +1563,7 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         "relm",
                         "contrasts",
                         "covs_scale",
+                        "mute",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1601,7 +1625,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "df_method",
                     "relm",
                     "contrasts",
-                    "covs_scale")))
+                    "covs_scale",
+                    "mute")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1622,7 +1647,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     "df_method",
                     "relm",
                     "contrasts",
-                    "covs_scale")))},
+                    "covs_scale",
+                    "mute")))},
         .setModel=function(x) private$..model <- x))
 
 gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -1748,6 +1774,7 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param covs_scale a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
+#' @param mute Not present in R
 #' @param scale_missing .
 #' @param norm_test \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
@@ -1847,6 +1874,7 @@ gamljGlmMixed <- function(
                 "bonf"),
     model_type = "logistic",
     covs_scale = NULL,
+    mute = FALSE,
     scale_missing = "complete",
     norm_test = FALSE,
     cluster = NULL,
@@ -1969,6 +1997,7 @@ gamljGlmMixed <- function(
         adjust = adjust,
         model_type = model_type,
         covs_scale = covs_scale,
+        mute = mute,
         scale_missing = scale_missing,
         norm_test = norm_test,
         cluster = cluster,

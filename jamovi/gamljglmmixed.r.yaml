@@ -45,6 +45,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
@@ -96,6 +97,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
 
              columns:
@@ -140,6 +142,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                          
              columns:
@@ -177,6 +180,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -278,6 +282,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -337,6 +342,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -393,6 +399,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -445,6 +452,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
 
              columns:
@@ -482,6 +490,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
              template:
                type: Table
@@ -511,6 +520,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
 
              columns:
@@ -559,6 +569,7 @@ items:
                          - relm
                          - contrasts
                          - covs_scale
+                         - mute
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -649,6 +660,7 @@ items:
                               - relm
                               - contrasts
                               - covs_scale
+                              - mute
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -696,6 +708,7 @@ items:
                               - relm
                               - contrasts
                               - covs_scale
+                              - mute
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -774,6 +787,7 @@ items:
                               - relm
                               - contrasts
                               - covs_scale
+                              - mute
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -824,6 +838,7 @@ items:
                               - relm
                               - contrasts
                               - covs_scale
+                              - mute
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -890,6 +905,7 @@ items:
                               - relm
                               - contrasts
                               - covs_scale
+                              - mute
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -961,6 +977,7 @@ items:
              - relm
              - contrasts
              - covs_scale
+             - mute
                ### modeloptions  ends
   - name: residuals
     title: Residuals Vales
@@ -983,5 +1000,6 @@ items:
              - relm
              - contrasts
              - covs_scale
+             - mute
                ### modeloptions  ends
         

@@ -68,7 +68,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             resid_plot = FALSE,
             cluster_boxplot = FALSE,
             cluster_respred = FALSE,
-            rand_hist = FALSE, ...) {
+            rand_hist = FALSE,
+            mute = FALSE, ...) {
 
             super$initialize(
                 package="gamlj",
@@ -449,6 +450,10 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "rand_hist",
                 rand_hist,
                 default=FALSE)
+            private$..mute <- jmvcore::OptionBool$new(
+                "mute",
+                mute,
+                default=FALSE)
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
@@ -512,6 +517,7 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..cluster_boxplot)
             self$.addOption(private$..cluster_respred)
             self$.addOption(private$..rand_hist)
+            self$.addOption(private$..mute)
         }),
     active = list(
         .caller = function() private$...caller$value,
@@ -575,7 +581,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         resid_plot = function() private$..resid_plot$value,
         cluster_boxplot = function() private$..cluster_boxplot$value,
         cluster_respred = function() private$..cluster_respred$value,
-        rand_hist = function() private$..rand_hist$value),
+        rand_hist = function() private$..rand_hist$value,
+        mute = function() private$..mute$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
@@ -638,7 +645,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..resid_plot = NA,
         ..cluster_boxplot = NA,
         ..cluster_respred = NA,
-        ..rand_hist = NA)
+        ..rand_hist = NA,
+        ..mute = NA)
 )
 
 gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
