@@ -62,7 +62,7 @@ Datamatic <- R6::R6Class(
         
         return(term)
       })
-      return(unlist(fromb64(labs,self$vars)))
+      return(unlist(fromb64(labs)))
       
       
     }

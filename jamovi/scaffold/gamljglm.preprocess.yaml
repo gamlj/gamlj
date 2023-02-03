@@ -21,26 +21,9 @@ items:
          title: ""
 
     clearWith:
-           ### modeloptions  begins
-        -  dep
-        -  factors
-        -  covs
-        -  covs_scale
-        -  model_terms
-        -  fixed_intercept
-        -  se_method
-        -  mute
-           ### modeloptions  ends
-           ### nestedoptions  begins
-        -  nested_terms
-        -  nested_intercept
-        -  comparison
-           ### nestedoptions  ends
-           ### cioptions  begins
-        -  ci_width
-        -  ci_method
-        -  boot_r
-           ### cioptions  ends
+        -  __modeloptions__
+        -  __nestedoptions__
+        -  __cioptions__
 
     refs: gamlj
      
@@ -53,21 +36,8 @@ items:
              type: Table
              description: a table of R
              clearWith:
-                            ### modeloptions  begins
-                         -  dep
-                         -  factors
-                         -  covs
-                         -  covs_scale
-                         -  model_terms
-                         -  fixed_intercept
-                         -  se_method
-                         -  mute
-                            ### modeloptions  ends
-                            ### nestedoptions  begins
-                         -  nested_terms
-                         -  nested_intercept
-                         -  comparison
-                            ### nestedoptions  ends
+                         -  __modeloptions__
+                         -  __nestedoptions__
                          - omnibus
              columns:
                     - name: model
@@ -108,21 +78,8 @@ items:
              visible: (intercept_info)
              description: a table of information for the model intercept
              clearWith:
-                            ### modeloptions  begins
-                         -  dep
-                         -  factors
-                         -  covs
-                         -  covs_scale
-                         -  model_terms
-                         -  fixed_intercept
-                         -  se_method
-                         -  mute
-                            ### modeloptions  ends
-                            ### cioptions  begins
-                         -  ci_width
-                         -  ci_method
-                         -  boot_r
-                            ### cioptions  ends
+                         -  __modeloptions__
+                         -  __cioptions__
                          - es
                          - intercept_info
                          
@@ -162,16 +119,7 @@ items:
              type: Table
              description: a table of ANOVA results
              clearWith:
-                            ### modeloptions  begins
-                         -  dep
-                         -  factors
-                         -  covs
-                         -  covs_scale
-                         -  model_terms
-                         -  fixed_intercept
-                         -  se_method
-                         -  mute
-                            ### modeloptions  ends
+                         -  __modeloptions__
 
              columns:
                     - name: source
@@ -231,21 +179,8 @@ items:
              refs: es
 
              clearWith:
-                            ### modeloptions  begins
-                         -  dep
-                         -  factors
-                         -  covs
-                         -  covs_scale
-                         -  model_terms
-                         -  fixed_intercept
-                         -  se_method
-                         -  mute
-                            ### modeloptions  ends
-                            ### cioptions  begins
-                         -  ci_width
-                         -  ci_method
-                         -  boot_r
-                            ### cioptions  ends
+                         -  __modeloptions__
+                         -  __cioptions__
 
              columns:
                     - name: effect
@@ -269,21 +204,8 @@ items:
              title:  Parameter Estimates (Coefficients)
              type: Table
              clearWith:
-                       ### modeloptions  begins
-                    -  dep
-                    -  factors
-                    -  covs
-                    -  covs_scale
-                    -  model_terms
-                    -  fixed_intercept
-                    -  se_method
-                    -  mute
-                       ### modeloptions  ends
-                       ### cioptions  begins
-                    -  ci_width
-                    -  ci_method
-                    -  boot_r
-                       ### cioptions  ends
+                    -  __modeloptions__
+                    -  __cioptions__
                     - betas_ci
  
              columns:
@@ -346,16 +268,7 @@ items:
              type: Table
              visible: (vcov)
              clearWith:
-                       ### modeloptions  begins
-                    -  dep
-                    -  factors
-                    -  covs
-                    -  covs_scale
-                    -  model_terms
-                    -  fixed_intercept
-                    -  se_method
-                    -  mute
-                       ### modeloptions  ends
+                    -  __modeloptions__
              columns:
                     - name: source
                       title: "Coefficient"
@@ -398,21 +311,8 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-                 ### modeloptions  begins
-              -  dep
-              -  factors
-              -  covs
-              -  covs_scale
-              -  model_terms
-              -  fixed_intercept
-              -  se_method
-              -  mute
-                 ### modeloptions  ends
-                 ### cioptions  begins
-              -  ci_width
-              -  ci_method
-              -  boot_r
-                 ### cioptions  ends
+              -  __modeloptions__
+              -  __cioptions__
 
         columns:
         - name: estimate
@@ -480,21 +380,8 @@ items:
         title:  "Comparisons:  ___key___"
         type: Table
         clearWith:
-                 ### modeloptions  begins
-              -  dep
-              -  factors
-              -  covs
-              -  covs_scale
-              -  model_terms
-              -  fixed_intercept
-              -  se_method
-              -  mute
-                 ### modeloptions  ends
-                 ### cioptions  begins
-              -  ci_width
-              -  ci_method
-              -  boot_r
-                 ### cioptions  ends
+              -  __modeloptions__
+              -  __cioptions__
               - posthoc_es
               - d_ci
         columns:
@@ -563,16 +450,7 @@ items:
               description: a table of ANOVA for simple effects
               visible: false
               clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
                  - simple_effects
                  - simple_moderators
                  - ccm_value
@@ -627,21 +505,8 @@ items:
               type: Table
               visible: false
               clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
-                    ### cioptions  begins
-                 -  ci_width
-                 -  ci_method
-                 -  boot_r
-                    ### cioptions  ends
+                 -  __modeloptions__
+                 -  __cioptions__
                  - simple_moderators
                  - covs_conditioning
                  - ccm_value
@@ -703,16 +568,7 @@ items:
              name: anova
              title: ANOVA 
              clearWith:
-                   ### modeloptions  begins
-                -  dep
-                -  factors
-                -  covs
-                -  covs_scale
-                -  model_terms
-                -  fixed_intercept
-                -  se_method
-                -  mute
-                   ### modeloptions  ends
+                -  __modeloptions__
                 - covs_conditioning
                 - covs_scale_labels
                 - simple_effects
@@ -769,21 +625,8 @@ items:
              name: coefficients
              title: Parameter Estimates 
              clearWith:
-                   ### modeloptions  begins
-                -  dep
-                -  factors
-                -  covs
-                -  covs_scale
-                -  model_terms
-                -  fixed_intercept
-                -  se_method
-                -  mute
-                   ### modeloptions  ends
-                   ### cioptions  begins
-                -  ci_width
-                -  ci_method
-                -  boot_r
-                   ### cioptions  ends
+                -  __modeloptions__
+                -  __cioptions__
                 - simple_effects
                 - simple_moderators
                 - covs_conditioning
@@ -832,21 +675,8 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-               ### modeloptions  begins
-            -  dep
-            -  factors
-            -  covs
-            -  covs_scale
-            -  model_terms
-            -  fixed_intercept
-            -  se_method
-            -  mute
-               ### modeloptions  ends
-               ### cioptions  begins
-            -  ci_width
-            -  ci_method
-            -  boot_r
-               ### cioptions  ends
+            -  __modeloptions__
+            -  __cioptions__
             - emmeans
             - covs_conditioning            
             - covs_scale_labels   
@@ -891,21 +721,8 @@ items:
           height: 400
 
           clearWith:
-              ### modeloptions  begins
-           -  dep
-           -  factors
-           -  covs
-           -  covs_scale
-           -  model_terms
-           -  fixed_intercept
-           -  se_method
-           -  mute
-              ### modeloptions  ends
-              ### cioptions  begins
-           -  ci_width
-           -  ci_method
-           -  boot_r
-              ### cioptions  ends
+           -  __modeloptions__
+           -  __cioptions__
            - plot_x
            - plot_z
            - plot_by
@@ -934,16 +751,7 @@ items:
           visible: (homo_test)
           rows: 2
           clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
           columns:
             - name: name
               type: text
@@ -966,16 +774,7 @@ items:
           description: a table of normality tests
           visible: (norm_test)
           clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
           columns:
             - name: name
               title: Test
@@ -998,16 +797,7 @@ items:
           renderFun: .qqPlot
           requiresData: true
           clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
 
         - name: normPlot
           title: Residual histogram
@@ -1019,16 +809,7 @@ items:
           renderFun: .normPlot
           requiresData: true
           clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
                  
         - name: residPlot
           title: Residual-Predicted Scatterplot
@@ -1040,16 +821,7 @@ items:
           renderFun: .residPlot
           requiresData: true
           clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
 
 
 
@@ -1060,16 +832,7 @@ items:
     varTitle: '`GLM_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
         
   - name: residuals
     title: Residuals Vales
@@ -1077,14 +840,5 @@ items:
     varTitle: '`GLM_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
-                    ### modeloptions  begins
-                 -  dep
-                 -  factors
-                 -  covs
-                 -  covs_scale
-                 -  model_terms
-                 -  fixed_intercept
-                 -  se_method
-                 -  mute
-                    ### modeloptions  ends
+                 -  __modeloptions__
         

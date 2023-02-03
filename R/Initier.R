@@ -1,7 +1,7 @@
 
 
-Syntax <- R6::R6Class(
-  "Syntax",
+Initier <- R6::R6Class(
+  "Operator",
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
   inherit = Scaffold,

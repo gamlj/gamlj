@@ -3,8 +3,8 @@
 
 ## Any function that produce a table goes here
 
-Estimate <- R6::R6Class("Estimate",
-                        inherit = Syntax,
+Runner <- R6::R6Class("Runner",
+                        inherit = Initier,
                         cloneable=FALSE,
                         class=TRUE,
                         public=list(
@@ -26,7 +26,7 @@ Estimate <- R6::R6Class("Estimate",
                           estimate = function(data) {
                             
                             self$model<-private$.estimateModel(data)
-                            ginfo("ESTIMATE: initial estimation done")
+                            ginfo("RUNNER: initial estimation done")
                             if (self$options$comparison) {
                               
                               obj<-try_hard(mf.update(self$model,formula=self$nestedformulaobj$formula64()))
@@ -160,7 +160,7 @@ Estimate <- R6::R6Class("Estimate",
                           run_main_effectsizes=function()  {
                             
                             if (!self$option("ci_method","wald")) {
-                              gstart("ESTIMATE: bootstrapping variances")
+                              gstart("RUNNER: bootstrapping variances")
                               self$boot_variances<-boot::boot(self$model$model,
                                                               statistic = es.var_boot_fun,
                                                               R = self$options$boot_r,
@@ -572,7 +572,7 @@ Estimate <- R6::R6Class("Estimate",
                                     opts_list[["parallel"]]<-"multicore"
                                 }
                             
-                                gstart("ESTIMATE: estimating bootstrap model")
+                                gstart("RUNNER: estimating bootstrap model")
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
                                 if (isFALSE(bmodel$error)) {
                                   self$boot_model<-bmodel$obj
@@ -632,9 +632,9 @@ Estimate <- R6::R6Class("Estimate",
                                 if (is.something(covariances)) {
                                   
                                   params<-vc[covariances,]
-                                  params$grp<-fromb64(params$grp,self$vars)
-                                  params$var1<-fromb64(params$var1,self$vars)
-                                  params$var2<-fromb64(params$var2,self$vars)
+                                  params$grp<-fromb64(params$grp)
+                                  params$var1<-fromb64(params$var1)
+                                  params$var2<-fromb64(params$var2)
                                   if (is.something(ci_covariances))
                                      params<-cbind(params,ci_covariances)
                                   

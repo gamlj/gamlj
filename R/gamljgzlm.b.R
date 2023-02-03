@@ -3,7 +3,7 @@ gamljGzlmClass <- R6::R6Class(
   inherit = gamljGzlmBase,
   private=list(
     .data_machine=NULL,
-    .estimate_machine=NULL,
+    .runner_machine=NULL,
     .plotter_machine=NULL,
     .ready=NULL,
     .time=NULL,
@@ -24,16 +24,16 @@ gamljGzlmClass <- R6::R6Class(
       ### set up the R6 workhorse class
       dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
-      estimate_machine<-Estimate$new(self$options,dispatcher,data_machine)
+      runner_machine<-Runner$new(self$options,dispatcher,data_machine)
 
       
       ### info table ###
-      aSmartObj<-SmartTable$new(self$results$info,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$info,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
       
       
       ## R2 table ###
-      aSmartObj<-SmartTable$new(self$results$main$r2,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$r2,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### some models do not have adjusted r2 ###
@@ -42,64 +42,64 @@ gamljGzlmClass <- R6::R6Class(
       
       
       ### additional fit table ###
-      aSmartObj<-SmartTable$new(self$results$main$fit,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$fit,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### anova table ###
-      aSmartObj<-SmartTable$new(self$results$main$anova,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$anova,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### estimates table ###
-      aSmartObj<-SmartTable$new(self$results$main$coefficients,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$coefficients,runner_machine)
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
       aSmartObj$spaceBy<-"response"
       ladd(private$.smartObjs)<-aSmartObj
       
       ### contrasts code tables
-      aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,estimate_machine)
-      aSmartObj$expandable<-TRUE
+      aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,runner_machine)
+      aSmartObj$expandOnInit<-TRUE
       ladd(private$.smartObjs)<-aSmartObj
       
       
       ### relativerisk tables
-      aSmartObj<-SmartTable$new(self$results$main$relativerisk,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$relativerisk,runner_machine)
       aSmartObj$ci("est",width=self$options$ci_width)
       ladd(private$.smartObjs)<-aSmartObj
 
       ### marginal effects tables
-      aSmartObj<-SmartTable$new(self$results$main$marginals,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$marginals,runner_machine)
       aSmartObj$ci("est",width=self$options$ci_width)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### paralleltest tables
-      aSmartObj<-SmartTable$new(self$results$main$paralleltest,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$main$paralleltest,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
 
       ### vcov table ###
       
-      aSmartObj<-SmartTable$new(self$results$main$vcov,estimate_machine)
-      aSmartObj$expandable<-TRUE
+      aSmartObj<-SmartTable$new(self$results$main$vcov,runner_machine)
+      aSmartObj$expandOnInit<-TRUE
       aSmartObj$expandFrom<-2
       ladd(private$.smartObjs)<-aSmartObj
       
       ## post hoc #####
       
-      aSmartObj<-SmartArray$new(self$results$posthoc,estimate_machine)
-      aSmartObj$expandable<-TRUE
+      aSmartObj<-SmartArray$new(self$results$posthoc,runner_machine)
+      aSmartObj$expandOnInit<-TRUE
       aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-"response"
       aSmartObj$expandFrom<-2
-      aSmartObj$setColumnTitle("estimate",estimate_machine$infomatic$comparison)
+      aSmartObj$setColumnTitle("estimate",runner_machine$infomatic$comparison)
       ladd(private$.smartObjs)<-aSmartObj
       
 
       ### estimate marginal means
       
-      aSmartObj<-SmartArray$new(self$results$emmeans,estimate_machine)
+      aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
       aSmartObj$activated<-is.something(self$options$emmeans)
-      aSmartObj$expandable<-TRUE
+      aSmartObj$expandOnInit<-TRUE
       aSmartObj$expandFrom<-2
       aSmartObj$combineBelow="new!"
       aSmartObj$spaceBy="new!"
@@ -108,9 +108,9 @@ gamljGzlmClass <- R6::R6Class(
       
       ### simple effects
       ##### anova
-      aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,runner_machine)
       aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
-      aSmartObj$expandable<-TRUE
+      aSmartObj$expandOnInit<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$key<-self$options$simple_effects
       aSmartObj$combineBelow<-1:(length(self$options$simple_moderators)-1)
@@ -119,9 +119,9 @@ gamljGzlmClass <- R6::R6Class(
       ladd(private$.smartObjs)<-aSmartObj
       
       ##### coefficients
-      aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,estimate_machine)
+      aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,runner_machine)
       aSmartObj$activated<-(is.something(self$options$simple_effects) & is.something(self$options$simple_moderators))
-      aSmartObj$expandable<-TRUE
+      aSmartObj$expandOnInit<-TRUE
       aSmartObj$expandFrom<-2
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$key<-self$options$simple_effects
@@ -132,9 +132,9 @@ gamljGzlmClass <- R6::R6Class(
       ladd(private$.smartObjs)<-aSmartObj
       
       ### simple interaction
-      aSmartObj<-SmartArray$new(self$results$simpleInteractions,estimate_machine)
+      aSmartObj<-SmartArray$new(self$results$simpleInteractions,runner_machine)
       aSmartObj$activated<-(self$options$simple_interactions & is.something(self$options$simple_effects) & length(self$options$simple_moderators)>1)
-      aSmartObj$expandable<-TRUE
+      aSmartObj$expandOnInit<-TRUE
       aSmartObj$expandSuperTitle<-"Moderator"
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$combineBelow<-"new!"
@@ -148,10 +148,10 @@ gamljGzlmClass <- R6::R6Class(
       
       
       private$.data_machine<-data_machine
-      private$.estimate_machine<-estimate_machine
+      private$.runner_machine<-runner_machine
       
       ######## plotting class #######
-      plotter_machine<-Plotter$new(self$options,estimate_machine,self$results)
+      plotter_machine<-Plotter$new(self$options,runner_machine,self$results)
       plotter_machine$initPlots()
       private$.plotter_machine<-plotter_machine
       self$results$plotnotes$setContent("")
@@ -174,7 +174,7 @@ gamljGzlmClass <- R6::R6Class(
       }
       
       data<-private$.data_machine$cleandata(self$data)
-      private$.estimate_machine$estimate(data)
+      private$.runner_machine$estimate(data)
       
       ### run tables ###
       for (smarttab in private$.smartObjs)
@@ -188,7 +188,7 @@ gamljGzlmClass <- R6::R6Class(
       
       
       #save model preds and resids            
-      private$.estimate_machine$savePredRes(self$results) 
+      private$.runner_machine$savePredRes(self$results) 
       
       private$.checkpoint()
       
@@ -203,7 +203,7 @@ gamljGzlmClass <- R6::R6Class(
 
     .mainPlot=function(image, ggtheme, theme, ...) {
       
-      if (is.something(private$.estimate_machine$errors))
+      if (is.something(private$.runner_machine$errors))
           return()
       if (!is.something(image$key))
         return()

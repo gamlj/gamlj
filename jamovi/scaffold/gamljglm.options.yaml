@@ -1,0 +1,18 @@
+modeloptions:
+        - dep
+        - factors
+        - covs
+        - covs_scale
+        - model_terms
+        - fixed_intercept
+        - se_method
+        - mute
+nestedoptions:
+        - nested_terms
+        - nested_intercept
+        - comparison
+        
+cioptions:
+        - ci_width
+        - ci_method
+        - boot_r
