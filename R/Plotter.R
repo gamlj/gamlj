@@ -398,19 +398,22 @@ Plotter <- R6::R6Class(
       
       ### here we deal with plotting random effects, if needed
       randomData<-NULL
-      if (self$option("plot_re")) {
+
+      if (self$option("plot_re") && 
+          !self$option("model_type","ordinal") &&
+          !self$option("model_type","multinomial")) {
         self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
 
         if (self$option("plot_re_method","average")) {
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
-            mark(formula)
-            model<-update(private$.operator$model,formula=formula)
+            model<-mf.update(private$.operator$model,formula=formula)
         } else
             model<-private$.operator$model
         
         y<-stats::predict(model,type="response")
         
         randomData<-as.data.frame(cbind(y,rawData))
+ 
         if (self$scatterX$type=="factor")
              levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
                     
@@ -421,7 +424,7 @@ Plotter <- R6::R6Class(
         nc<-self$scatterCluster$nlevels
         xbetween<-FALSE
         if ((test/nc)>.30) xbetween<-TRUE
-        
+  
       }
       ### end of random ###
       
@@ -658,6 +661,7 @@ Plotter <- R6::R6Class(
       }
 
       ### now we get the estimated means #######
+      
       em_opts<-list(
         private$.operator$model,
         specs=allterm64,
@@ -667,7 +671,11 @@ Plotter <- R6::R6Class(
         nesting = NULL,
         options  = list(level = private$.operator$ciwidth)
       )
-      
+
+      ### mmblogit model data are not recognized by emmeans. We need to pass them explicetely      
+      if (self$option("model_type","multinomial") & self$option(".caller","glmer"))
+           em_opts[["data"]]<-private$.operator$model$data
+
       if (self$option("df_method"))
              em_opts[["lmer.df"]]<-self$options$df_method
 
@@ -678,7 +686,7 @@ Plotter <- R6::R6Class(
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####
       names(tableData)<-c(allterm64,"estimate","se","df","lower","upper")
-      
+
       if (self$options$plot_around=="se") {
            tableData$lower<-tableData$estimate-tableData$se
            tableData$upper<-tableData$estimate+tableData$se

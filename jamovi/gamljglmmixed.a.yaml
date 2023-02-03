@@ -351,6 +351,21 @@ options:
         - name:  full
           title: Full predicted method
 
+    - name: plot_scale
+      title: Y-axis scale
+      type: List
+      options:
+        - name: response
+          title: Response
+        - name:  link
+          title: Linear predictor
+        - name:  mean.class
+          title: Mean class
+          
+      default: response
+      description:
+          R: >
+            Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
 
 
 ### 
@@ -667,55 +682,6 @@ options:
 
 
 
-    - name: norm_plot
-      title: Histogram of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
-
-    - name: qq_plot
-      title: Q-Q plot of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
-
-
-
-    - name: resid_plot
-      title: Residuals-Predicted scatterplot
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
-
-    - name: cluster_boxplot
-      title: Residuals by cluster boxplot
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a boxplot of random effects by the first defined clustering variable
-
-    - name: cluster_respred
-      title: Residuals vs Predicted  
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), residuals vs predicted by the first defined clustering variable
-
-    - name: rand_hist
-      title: Histogram of random Coefficients
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide histogram of random Coefficients
 
 ...
 

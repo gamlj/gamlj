@@ -1,3 +1,4 @@
+#### Helper functions used by Scaffold (not exported)
 
 tinfo <- function(...) {
   if (t_INFO) {
@@ -165,19 +166,6 @@ sourcifyVars<-function(value) {
   paste0(sourcifyName(value),collapse = ",")
   
 }
-append_list <- function(alist, aelement, name = NULL) {
-  alist[[length(alist) + 1]] <- aelement
-  if (!is.null(name)) 
-    names(alist)[length(alist)] <- name
-  alist
-}
-prepend_list <- function(alist, aelement, name = NULL) {
-  alist <- c(0, alist)
-  alist[[1]] <- aelement
-  if (!is.null(name)) 
-    names(alist)[1] <- name
-  alist
-}
 
 listify <- function(adata) {
   res <- lapply(1:dim(adata)[1], function(a) as.list(adata[a, ]))
@@ -325,4 +313,15 @@ sourcifyName<-function(name) {
 
 #########
 
-
+# remove null from list of lists
+clean_lol<-function(alist) {
+  il<-list()
+  for (i in seq_along(alist)) {
+    jl<-list()
+    for (j in seq_along(alist[[i]])) {
+      if (length(alist[[i]][[j]])>0) jl[[length(jl)+1]]<-alist[[i]][[j]]
+    }
+    if (length(jl)>0) il[[length(il)+1]]<-jl
+  }
+  il
+}

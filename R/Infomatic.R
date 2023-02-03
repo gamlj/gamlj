@@ -195,7 +195,7 @@ Infomatic <- R6::R6Class(
           self$call          <-    "mclogit::mblogit"
           self$rcall         <-    "mclogit::mblogit"
           self$calloptions   <-    list(formula=as.formula(formulas$fixed_formula64()),
-                                        random=formulas$listify_random64(),
+                                        random=formulas$listify_random_formulas64(),
                                         model=TRUE,
                                         estimator="REML",
                                         trace.inner=FALSE)

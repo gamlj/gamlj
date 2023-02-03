@@ -608,8 +608,7 @@ options:
       default: response
       description:
           R: >
-            Chi-squared computation method. `'lrt'` (default) gives LogLikelihood ration test, 
-            `'wald'` gives the Wald Chi-squared.
+            Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
 
 ...
 

@@ -30,6 +30,7 @@ gFormula <- R6::R6Class(
       if (is.something(alist))
          paste("(",alist,")",collapse = " + ")
     },
+  
     listify_random64 = function() {
       ## there are some functions that require a list of random effect formula
       private$.buildrandom(self$random, self$random_corr, "b64")
@@ -38,6 +39,13 @@ gFormula <- R6::R6Class(
       ## there are some functions that require a list of random effect formula
       private$.buildrandom(self$random, self$random_corr, "plain")
     } ,
+    listify_random_formulas64 = function() {
+      ## there are some functions that require a list of random effect formula
+      ## in formula types
+      alist<-private$.buildrandom(self$random, self$random_corr, "b64")
+      lapply(alist,function(x) formula(paste("~",x)))
+    } ,
+    
     formula = function() {
       paste(c(self$fixed_formula(), self$random_formula()),collapse = " + ")
     },

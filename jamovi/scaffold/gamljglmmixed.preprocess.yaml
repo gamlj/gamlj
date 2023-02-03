@@ -30,27 +30,8 @@ items:
              type: Table
              description: a table of R
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
-                           ### nestedoptions  begins
-                         - nested_terms
-                         - nested_intercept
-                         - comparison
-                           ### nestedoptions  ends
+                         - __modeloptions__
+                         - __nestedoptions__
                          
 
              rows: 1
@@ -81,22 +62,7 @@ items:
              type: Table
              visible: true
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                     - name: info
@@ -125,22 +91,7 @@ items:
              visible: false
              description: a table of omnibus
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
+                         - __modeloptions__
                          
              columns:
                     - name: source
@@ -162,27 +113,8 @@ items:
              title:  Parameter Estimates (Fixed Coefficients)
              type: Table
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
-                           ### cioptions  begins
-                         - ci_width
-                         - ci_method
-                         - boot_r
-                           ### cioptions  ends
+                         - __modeloptions__
+                         - __cioptions__
  
              columns:
                     - name: response
@@ -263,27 +195,8 @@ items:
              type: Table
              visible: (es:marginals)
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
-                           ### cioptions  begins
-                         - ci_width
-                         - ci_method
-                         - boot_r
-                           ### cioptions  ends
+                         - __modeloptions__
+                         - __cioptions__
               
              columns:
                     - name: response
@@ -322,27 +235,8 @@ items:
              type: Table
              visible: (es:RR)
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
-                           ### cioptions  begins
-                         - ci_width
-                         - ci_method
-                         - boot_r
-                           ### cioptions  ends
+                         - __modeloptions__
+                         - __cioptions__
              columns:
                     - name: source
                       title: "Name"
@@ -378,27 +272,8 @@ items:
              type: Table
              visible: false
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
-                           ### cioptions  begins
-                         - ci_width
-                         - ci_method
-                         - boot_r
-                           ### cioptions  ends
+                         - __modeloptions__
+                         - __cioptions__
              columns:
                     - name: groups
                       title: "Groups"
@@ -430,22 +305,7 @@ items:
              type: Table
              visible: false
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                    - name: groups
@@ -467,22 +327,7 @@ items:
              type: Array
              visible: true
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
+                         - __modeloptions__
              template:
                type: Table
                title:  "Covariances for:  ___key___"
@@ -496,22 +341,7 @@ items:
              type: Table
              visible: (re_lrt)
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                    - name: test
@@ -544,27 +374,8 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - re
-                         - re_corr
-                         - df_method
-                         - relm
-                         - contrasts
-                         - covs_scale
-                           ### modeloptions  ends
-                           ### cioptions  begins
-                         - ci_width
-                         - ci_method
-                         - boot_r
-                           ### cioptions  ends
+                         - __modeloptions__
+                         - __cioptions__
                          - adjust
 
         columns:
@@ -634,36 +445,9 @@ items:
               description: a table of ANOVA for simple effects
               visible: false
               clearWith:
-                                ### modeloptions  begins
-                              - dep
-                              - factors
-                              - covs
-                              - covs_scale
-                              - model_terms
-                              - fixed_intercept
-                              - se_method
-                              - mute
-                              - re
-                              - re_corr
-                              - df_method
-                              - relm
-                              - contrasts
-                              - covs_scale
-                                ### modeloptions  ends
-                                ### cioptions  begins
-                              - ci_width
-                              - ci_method
-                              - boot_r
-                                ### cioptions  ends
-                                ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
-                              - simple_scale
-                              - ccm_value
-                              - ccp_value
-                              - covs_scale_labels
-                              - covs_conditioning
-                                ### simpleeffectsoptions  ends
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
               columns:
                    - name: test
                      title: X²
@@ -681,36 +465,9 @@ items:
               type: Table
               visible: false
               clearWith:
-                                ### modeloptions  begins
-                              - dep
-                              - factors
-                              - covs
-                              - covs_scale
-                              - model_terms
-                              - fixed_intercept
-                              - se_method
-                              - mute
-                              - re
-                              - re_corr
-                              - df_method
-                              - relm
-                              - contrasts
-                              - covs_scale
-                                ### modeloptions  ends
-                                ### cioptions  begins
-                              - ci_width
-                              - ci_method
-                              - boot_r
-                                ### cioptions  ends
-                                ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
-                              - simple_scale
-                              - ccm_value
-                              - ccp_value
-                              - covs_scale_labels
-                              - covs_conditioning
-                                ### simpleeffectsoptions  ends
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
 
                 
               columns:
@@ -759,36 +516,9 @@ items:
              name: anova
              title: ANOVA 
              clearWith:
-                                ### modeloptions  begins
-                              - dep
-                              - factors
-                              - covs
-                              - covs_scale
-                              - model_terms
-                              - fixed_intercept
-                              - se_method
-                              - mute
-                              - re
-                              - re_corr
-                              - df_method
-                              - relm
-                              - contrasts
-                              - covs_scale
-                                ### modeloptions  ends
-                                ### cioptions  begins
-                              - ci_width
-                              - ci_method
-                              - boot_r
-                                ### cioptions  ends
-                                ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
-                              - simple_scale
-                              - ccm_value
-                              - ccp_value
-                              - covs_scale_labels
-                              - covs_conditioning
-                                ### simpleeffectsoptions  ends
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
 
              columns:
                    - name: effect
@@ -809,36 +539,9 @@ items:
              name: coefficients
              title: Parameter Estimates 
              clearWith:
-                                ### modeloptions  begins
-                              - dep
-                              - factors
-                              - covs
-                              - covs_scale
-                              - model_terms
-                              - fixed_intercept
-                              - se_method
-                              - mute
-                              - re
-                              - re_corr
-                              - df_method
-                              - relm
-                              - contrasts
-                              - covs_scale
-                                ### modeloptions  ends
-                                ### cioptions  begins
-                              - ci_width
-                              - ci_method
-                              - boot_r
-                                ### cioptions  ends
-                                ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
-                              - simple_scale
-                              - ccm_value
-                              - ccp_value
-                              - covs_scale_labels
-                              - covs_conditioning
-                                ### simpleeffectsoptions  ends
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
 
              columns:
                    - name: effect
@@ -875,36 +578,9 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-                                ### modeloptions  begins
-                              - dep
-                              - factors
-                              - covs
-                              - covs_scale
-                              - model_terms
-                              - fixed_intercept
-                              - se_method
-                              - mute
-                              - re
-                              - re_corr
-                              - df_method
-                              - relm
-                              - contrasts
-                              - covs_scale
-                                ### modeloptions  ends
-                                ### cioptions  begins
-                              - ci_width
-                              - ci_method
-                              - boot_r
-                                ### cioptions  ends
-                                ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
-                              - simple_scale
-                              - ccm_value
-                              - ccp_value
-                              - covs_scale_labels
-                              - covs_conditioning
-                                ### simpleeffectsoptions  ends
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
             
         columns:
         - name: estimate
@@ -946,42 +622,12 @@ items:
     varTitle: '`GZMIXED_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
-               ### modeloptions  begins
-             - dep
-             - factors
-             - covs
-             - covs_scale
-             - model_terms
-             - fixed_intercept
-             - se_method
-             - mute
-             - re
-             - re_corr
-             - df_method
-             - relm
-             - contrasts
-             - covs_scale
-               ### modeloptions  ends
+             - __modeloptions__
   - name: residuals
     title: Residuals Vales
     type: Output            
     varTitle: '`GZMIXED_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
-               ### modeloptions  begins
-             - dep
-             - factors
-             - covs
-             - covs_scale
-             - model_terms
-             - fixed_intercept
-             - se_method
-             - mute
-             - re
-             - re_corr
-             - df_method
-             - relm
-             - contrasts
-             - covs_scale
-               ### modeloptions  ends
+             - __modeloptions__
         

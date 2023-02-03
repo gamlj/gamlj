@@ -167,9 +167,11 @@ gamljGlmMixedClass <- R6::R6Class(
         private$.runner_machine<-runner_machine
         
         ######## plotting class #######
-        #      plotter_machine<-Plotter$new(self$options,runner_machine,self$results)
-        #      plotter_machine$initPlots()
-        #      private$.plotter_machine<-plotter_machine
+        plotter_machine<-Plotter$new(self$options,runner_machine,self$results)
+        plotter_machine$initPlots()
+        private$.plotter_machine<-plotter_machine
+        self$results$plotnotes$setContent("")
+        
       },
       .run=function() {
         ginfo("MODULE:  #### phase run ####")
@@ -192,13 +194,11 @@ gamljGlmMixedClass <- R6::R6Class(
         
         #save model preds and resids            
         private$.runner_machine$savePredRes(self$results) 
-        # 
-        #      private$.plotter_machine$preparePlots()
         
-        #      if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
-        #          self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
-        #          self$results$plotnotes$setVisible(TRUE)
-        #      }  
+        ### do plots 
+        private$.plotter_machine$preparePlots()
+        
+        
         private$.checkpoint()
         
         ### save the model if we are in R ###
@@ -213,7 +213,6 @@ gamljGlmMixedClass <- R6::R6Class(
         
       },
       
-      
       .mainPlot=function(image, ggtheme, theme, ...) {
         
         plot<-private$.plotter_machine$scatterPlot(image)
@@ -222,37 +221,9 @@ gamljGlmMixedClass <- R6::R6Class(
         return(plot)
         
       },
+
       
-      
-      
-      .qqPlot=function(image, ggtheme, theme, ...) {
-        
-        if (!private$.ready$ready) 
-          return()
-        
-        plot<-private$.plotter_machine$qqplot(theme,ggtheme)
-        return(plot)
-        
-      },
-      .normPlot=function(image, ggtheme, theme, ...) {
-        
-        if (!private$.ready$ready) 
-          return()
-        
-        plot<-private$.plotter_machine$normplot(theme,ggtheme)
-        return(plot)
-      },
-      
-      .residPlot=function(image, ggtheme, theme, ...) {
-        
-        if (!private$.ready$ready) 
-          return()
-        
-        plot<-private$.plotter_machine$residPlot(theme,ggtheme)
-        
-        return(plot)
-      },
-      
+
       .marshalFormula= function(formula, data, name) {
         
         fixed<-lme4::nobars(formula)

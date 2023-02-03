@@ -138,7 +138,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               if (is.null(label)) label="" 
                               alist<-list(root=aroot,label=label,width=width,format=format)
-                              self$ci_info<-append_list(self$ci_info,alist)
+                              ladd(self$ci_info)<-alist
 
                             },
                             

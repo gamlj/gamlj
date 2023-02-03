@@ -410,6 +410,11 @@ children:
                   - type: ComboBox
                     name: scale_missing
                     label: ''
+              - type: LayoutBox
+                margin: large
+                children:
+                  - type: CheckBox
+                    name: norm_test
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -463,8 +468,6 @@ children:
                 type: CheckBox
                 optionName: adjust
                 optionPart: sidak
-
-
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -516,15 +519,31 @@ children:
                 optionName: plot_around
                 optionPart: se
           - type: Label
-            label: Plot
+            label: Plot type
+            children:
+              - type: RadioButton
+                name: plot_scale_response
+                optionName: plot_scale
+                optionPart: response
+              - type: RadioButton
+                name: plot_scale_link
+                optionName: plot_scale
+                optionPart: link
+                enable: (!model_type_multinomial && !model_type_ordinal)
+              - type: RadioButton
+                name: plot_scale_mean.class
+                optionName: plot_scale
+                optionPart: mean.class
+                enable: (model_type_ordinal)
+          - type: Label
+            label: Plot options
             children:
               - type: CheckBox
                 name: plot_raw
+                enable: (!model_type_multinomial && !plot_scale_link)
               - type: CheckBox
                 name: plot_yscale
-          - type: Label
-            label: Use
-            children:
+                enable: (plot_scale_response && !model_type_multinomial && !model_type_logistic && !model_type_probit)
               - type: CheckBox
                 name: plot_xoriginal
               - type: CheckBox
@@ -533,24 +552,23 @@ children:
         margin: large
         style: inline
         children:
-               - type: Label
-                 label: Random Effects
-                 children:
-                    - type: CheckBox
-                      name: plot_re
-                    - type: RadioButton
-                      name: plot_re_method_average
-                      optionName: plot_re_method
-                      optionPart: average
-                      enable: (plot_re)
-
-                    - type: RadioButton
-                      name: plot_re_method_full
-                      optionName: plot_re_method
-                      optionPart: full
-                      enable: (plot_re)
-
-
+          - type: Label
+            label: Random Effects
+            enable: (!model_type_ordinal && !model_type_multinomial)
+            children:
+              - type: CheckBox
+                name: plot_re
+                enable: (!model_type_ordinal && !model_type_multinomial)
+              - type: RadioButton
+                name: plot_re_method_average
+                optionName: plot_re_method
+                optionPart: average
+                enable: (!model_type_ordinal && !model_type_multinomial)
+              - type: RadioButton
+                name: plot_re_method_full
+                optionName: plot_re_method
+                optionPart: full
+                enable: (!model_type_ordinal && !model_type_multinomial)
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -603,41 +621,6 @@ children:
                 template:
                   type: TermLabel
   - type: CollapseBox
-    label: Assumption Checks
-    collapsed: true
-    stretchFactor: 1
-    style: inline
-    children:
-      - type: Label
-        label: Tests
-        children:
-          - type: CheckBox
-            name: norm_test
-      - type: Label
-        label: Residual Plots
-        children:
-          - type: CheckBox
-            name: qq_plot
-            label: QQ plot
-          - type: CheckBox
-            name: norm_plot
-            label: histogram
-          - type: CheckBox
-            name: resid_plot
-            label: Residuals-Predicted
-      - type: Label
-        label: By clusters
-        children:
-          - type: CheckBox
-            name: cluster_boxplot
-            label: Residuals boxplot
-          - type: CheckBox
-            name: cluster_respred
-            label: Residuals-Predicted
-          - type: CheckBox
-            name: rand_hist
-            label: Random coeff. histogram
-  - type: CollapseBox
     label: Options
     style: list
     collapsed: true
@@ -675,5 +658,7 @@ children:
             children:
               - type: Output
                 name: predicted
+                enable: (!model_type_ordinal)
               - type: Output
                 name: residuals
+                enable: (!model_type_ordinal)

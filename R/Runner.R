@@ -534,9 +534,7 @@ Runner <- R6::R6Class("Runner",
                               if (self$option("offset"))
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
                               opts[["data"]]<-quote(data)
-
                               acall<-as.call(opts)
-                              
                               ginfo("MODULE: Estimating the model: running")
                               results<-try_hard(eval(acall))
                               

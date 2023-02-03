@@ -37,6 +37,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             plot_around = "none",
             plot_re = FALSE,
             plot_re_method = "average",
+            plot_scale = "response",
             emmeans = NULL,
             posthoc = NULL,
             simple_effects = NULL,
@@ -61,13 +62,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             re_modelterms = TRUE,
             re_listing = "none",
             re_lrt = FALSE,
-            re_ci = FALSE,
-            norm_plot = FALSE,
-            qq_plot = FALSE,
-            resid_plot = FALSE,
-            cluster_boxplot = FALSE,
-            cluster_respred = FALSE,
-            rand_hist = FALSE, ...) {
+            re_ci = FALSE, ...) {
 
             super$initialize(
                 package="gamlj",
@@ -250,6 +245,14 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 options=list(
                     "average",
                     "full"))
+            private$..plot_scale <- jmvcore::OptionList$new(
+                "plot_scale",
+                plot_scale,
+                options=list(
+                    "response",
+                    "link",
+                    "mean.class"),
+                default="response")
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -411,30 +414,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "re_ci",
                 re_ci,
                 default=FALSE)
-            private$..norm_plot <- jmvcore::OptionBool$new(
-                "norm_plot",
-                norm_plot,
-                default=FALSE)
-            private$..qq_plot <- jmvcore::OptionBool$new(
-                "qq_plot",
-                qq_plot,
-                default=FALSE)
-            private$..resid_plot <- jmvcore::OptionBool$new(
-                "resid_plot",
-                resid_plot,
-                default=FALSE)
-            private$..cluster_boxplot <- jmvcore::OptionBool$new(
-                "cluster_boxplot",
-                cluster_boxplot,
-                default=FALSE)
-            private$..cluster_respred <- jmvcore::OptionBool$new(
-                "cluster_respred",
-                cluster_respred,
-                default=FALSE)
-            private$..rand_hist <- jmvcore::OptionBool$new(
-                "rand_hist",
-                rand_hist,
-                default=FALSE)
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
@@ -466,6 +445,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
+            self$.addOption(private$..plot_scale)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..simple_effects)
@@ -490,12 +470,6 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..re_listing)
             self$.addOption(private$..re_lrt)
             self$.addOption(private$..re_ci)
-            self$.addOption(private$..norm_plot)
-            self$.addOption(private$..qq_plot)
-            self$.addOption(private$..resid_plot)
-            self$.addOption(private$..cluster_boxplot)
-            self$.addOption(private$..cluster_respred)
-            self$.addOption(private$..rand_hist)
         }),
     active = list(
         .caller = function() private$...caller$value,
@@ -528,6 +502,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         plot_around = function() private$..plot_around$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
+        plot_scale = function() private$..plot_scale$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         simple_effects = function() private$..simple_effects$value,
@@ -551,13 +526,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         re_modelterms = function() private$..re_modelterms$value,
         re_listing = function() private$..re_listing$value,
         re_lrt = function() private$..re_lrt$value,
-        re_ci = function() private$..re_ci$value,
-        norm_plot = function() private$..norm_plot$value,
-        qq_plot = function() private$..qq_plot$value,
-        resid_plot = function() private$..resid_plot$value,
-        cluster_boxplot = function() private$..cluster_boxplot$value,
-        cluster_respred = function() private$..cluster_respred$value,
-        rand_hist = function() private$..rand_hist$value),
+        re_ci = function() private$..re_ci$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
@@ -589,6 +558,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..plot_around = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
+        ..plot_scale = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..simple_effects = NA,
@@ -612,13 +582,7 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..re_modelterms = NA,
         ..re_listing = NA,
         ..re_lrt = NA,
-        ..re_ci = NA,
-        ..norm_plot = NA,
-        ..qq_plot = NA,
-        ..resid_plot = NA,
-        ..cluster_boxplot = NA,
-        ..cluster_respred = NA,
-        ..rand_hist = NA)
+        ..re_ci = NA)
 )
 
 gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -690,14 +654,22 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="Model Fit",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
-                                "nested_terms",
                                 "fixed_intercept",
-                                "comparison",
-                                "nested_re",
-                                "nested_intercept",
+                                "se_method",
+                                "mute",
                                 "re",
-                                "re_corr"),
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale",
+                                "nested_terms",
+                                "nested_intercept",
+                                "comparison"),
                             rows=1,
                             columns=list(
                                 list(
@@ -733,14 +705,19 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible=TRUE,
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
                                 "fixed_intercept",
-                                "comparison",
-                                "nested_terms",
-                                "nested_re",
-                                "nested_intercept",
+                                "se_method",
+                                "mute",
                                 "re",
-                                "re_corr"),
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -771,13 +748,19 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
-                                "model_terms",
-                                "contrasts",
+                                "factors",
+                                "covs",
                                 "covs_scale",
+                                "model_terms",
                                 "fixed_intercept",
-                                "df_method",
+                                "se_method",
+                                "mute",
                                 "re",
-                                "re_corr"),
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -802,17 +785,22 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="Parameter Estimates (Fixed Coefficients)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "fixed_intercept",
                                 "ci_width",
                                 "ci_method",
-                                "estimates_ci",
-                                "boot_r",
-                                "df_method",
-                                "re",
-                                "re_corr"),
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -904,17 +892,22 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible="(es:marginals)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "fixed_intercept",
                                 "ci_width",
                                 "ci_method",
-                                "estimates_ci",
-                                "boot_r",
-                                "df_method",
-                                "re",
-                                "re_corr"),
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -962,17 +955,22 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible="(es:RR)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "fixed_intercept",
                                 "ci_width",
                                 "ci_method",
-                                "estimates_ci",
-                                "boot_r",
-                                "df_method",
-                                "re",
-                                "re_corr"),
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1016,19 +1014,23 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="Random Components",
                             visible=FALSE,
                             clearWith=list(
-                                "relm",
                                 "dep",
-                                "model_terms",
-                                "contrasts",
+                                "factors",
+                                "covs",
                                 "covs_scale",
+                                "model_terms",
                                 "fixed_intercept",
-                                "ci_width",
-                                "ci_method",
-                                "boot_r",
-                                "df_method",
+                                "se_method",
+                                "mute",
                                 "re",
                                 "re_corr",
-                                "re_ci"),
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1068,16 +1070,19 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
-                                "model_terms",
-                                "contrasts",
+                                "factors",
+                                "covs",
                                 "covs_scale",
+                                "model_terms",
                                 "fixed_intercept",
-                                "ci_width",
-                                "ci_method",
-                                "boot_r",
-                                "df_method",
+                                "se_method",
+                                "mute",
                                 "re",
-                                "re_corr"),
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1103,12 +1108,19 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible=TRUE,
                             clearWith=list(
                                 "dep",
-                                "model_terms",
-                                "contrasts",
+                                "factors",
+                                "covs",
                                 "covs_scale",
+                                "model_terms",
                                 "fixed_intercept",
+                                "se_method",
+                                "mute",
                                 "re",
-                                "re_corr"),
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale"),
                             template=jmvcore::Table$new(
                                 options=options,
                                 title="Covariances for:  ___key___",
@@ -1123,18 +1135,20 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             title="Random Effect LRT",
                             visible="(re_lrt)",
                             clearWith=list(
-                                "relm",
                                 "dep",
-                                "model_terms",
-                                "contrasts",
+                                "factors",
+                                "covs",
                                 "covs_scale",
+                                "model_terms",
                                 "fixed_intercept",
-                                "ci_width",
-                                "ci_method",
-                                "boot_r",
-                                "df_method",
+                                "se_method",
+                                "mute",
                                 "re",
-                                "re_corr"),
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1172,16 +1186,22 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
                         "dep",
+                        "factors",
+                        "covs",
+                        "covs_scale",
                         "model_terms",
+                        "fixed_intercept",
+                        "se_method",
+                        "mute",
+                        "re",
+                        "re_corr",
+                        "df_method",
+                        "relm",
                         "contrasts",
                         "covs_scale",
-                        "fixed_intercept",
                         "ci_width",
                         "ci_method",
                         "boot_r",
-                        "df_method",
-                        "re",
-                        "re_corr",
                         "adjust"),
                     columns=list(
                         list(
@@ -1267,18 +1287,29 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "fixed_intercept",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r",
                                 "simple_effects",
                                 "simple_moderators",
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
                                 "covs_scale_labels",
-                                "covs_conditioning",
-                                "df_method"),
+                                "covs_conditioning"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1300,20 +1331,29 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "fixed_intercept",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r",
                                 "simple_effects",
                                 "simple_moderators",
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
                                 "covs_scale_labels",
-                                "covs_conditioning",
-                                "df_method",
-                                "ci_method",
-                                "boot_r"),
+                                "covs_conditioning"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -1376,17 +1416,29 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 title="ANOVA",
                                 clearWith=list(
                                     "dep",
-                                    "model_terms",
+                                    "factors",
+                                    "covs",
                                     "covs_scale",
+                                    "model_terms",
                                     "fixed_intercept",
+                                    "se_method",
+                                    "mute",
+                                    "re",
+                                    "re_corr",
+                                    "df_method",
+                                    "relm",
+                                    "contrasts",
+                                    "covs_scale",
+                                    "ci_width",
+                                    "ci_method",
+                                    "boot_r",
                                     "simple_effects",
                                     "simple_moderators",
                                     "simple_scale",
                                     "ccm_value",
                                     "ccp_value",
                                     "covs_scale_labels",
-                                    "covs_conditioning",
-                                    "df_method"),
+                                    "covs_conditioning"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1411,19 +1463,29 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 title="Parameter Estimates",
                                 clearWith=list(
                                     "dep",
-                                    "model_terms",
+                                    "factors",
+                                    "covs",
                                     "covs_scale",
+                                    "model_terms",
                                     "fixed_intercept",
+                                    "se_method",
+                                    "mute",
+                                    "re",
+                                    "re_corr",
+                                    "df_method",
+                                    "relm",
+                                    "contrasts",
+                                    "covs_scale",
+                                    "ci_width",
+                                    "ci_method",
+                                    "boot_r",
                                     "simple_effects",
                                     "simple_moderators",
                                     "simple_scale",
                                     "ccm_value",
                                     "ccp_value",
                                     "covs_scale_labels",
-                                    "covs_conditioning",
-                                    "df_method",
-                                    "ci_method",
-                                    "boot_r"),
+                                    "covs_conditioning"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1464,21 +1526,30 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                     options=options,
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
-                        "emmeans",
-                        "relm",
+                        "dep",
+                        "factors",
+                        "covs",
+                        "covs_scale",
                         "model_terms",
+                        "fixed_intercept",
+                        "se_method",
+                        "mute",
+                        "re",
+                        "re_corr",
+                        "df_method",
+                        "relm",
+                        "contrasts",
+                        "covs_scale",
                         "ci_width",
                         "ci_method",
-                        "se_method",
                         "boot_r",
-                        "covs_scale",
-                        "dep_scale",
-                        "covs_conditioning",
-                        "covs_scale_labels",
-                        "covs_conditioning",
-                        "covs_scale_labels",
+                        "simple_effects",
+                        "simple_moderators",
+                        "simple_scale",
+                        "ccm_value",
                         "ccp_value",
-                        "ccm_value"),
+                        "covs_scale_labels",
+                        "covs_conditioning"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1518,8 +1589,19 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 varDescription="Predicted values",
                 clearWith=list(
                     "dep",
+                    "factors",
+                    "covs",
+                    "covs_scale",
                     "model_terms",
-                    "re")))
+                    "fixed_intercept",
+                    "se_method",
+                    "mute",
+                    "re",
+                    "re_corr",
+                    "df_method",
+                    "relm",
+                    "contrasts",
+                    "covs_scale")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1528,8 +1610,19 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 varDescription="Residuals values",
                 clearWith=list(
                     "dep",
+                    "factors",
+                    "covs",
+                    "covs_scale",
                     "model_terms",
-                    "re")))},
+                    "fixed_intercept",
+                    "se_method",
+                    "mute",
+                    "re",
+                    "re_corr",
+                    "df_method",
+                    "relm",
+                    "contrasts",
+                    "covs_scale")))},
         .setModel=function(x) private$..model <- x))
 
 gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -1622,6 +1715,8 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param plot_re \code{TRUE} or \code{FALSE} (default), add predicted values
 #'   based on random effect in plot
 #' @param plot_re_method .
+#' @param plot_scale Plot ordinal model predicted values in as probabilities
+#'   (\code{response}) or predicted class (\code{mean.class})
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -1671,18 +1766,6 @@ gamljGlmMixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   effects
 #' @param re_ci \code{TRUE} or \code{FALSE} (default), confidence intervals
 #'   for the random effects
-#' @param norm_plot \code{TRUE} or \code{FALSE} (default), provide a histogram
-#'   of residuals superimposed by a normal distribution
-#' @param qq_plot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
-#'   residuals
-#' @param resid_plot \code{TRUE} or \code{FALSE} (default), provide a
-#'   scatterplot of the residuals against predicted
-#' @param cluster_boxplot \code{TRUE} or \code{FALSE} (default), provide a
-#'   boxplot of random effects by the first defined clustering variable
-#' @param cluster_respred \code{TRUE} or \code{FALSE} (default), residuals vs
-#'   predicted by the first defined clustering variable
-#' @param rand_hist \code{TRUE} or \code{FALSE} (default), provide histogram
-#'   of random Coefficients
 #' @param formula (optional) the formula to use, see the examples
 #' @return A results object containing:
 #' \tabular{llllll}{
@@ -1750,6 +1833,7 @@ gamljGlmMixed <- function(
     plot_around = "none",
     plot_re = FALSE,
     plot_re_method = "average",
+    plot_scale = "response",
     emmeans = NULL,
     posthoc = NULL,
     simple_effects = NULL,
@@ -1775,12 +1859,6 @@ gamljGlmMixed <- function(
     re_listing = "none",
     re_lrt = FALSE,
     re_ci = FALSE,
-    norm_plot = FALSE,
-    qq_plot = FALSE,
-    resid_plot = FALSE,
-    cluster_boxplot = FALSE,
-    cluster_respred = FALSE,
-    rand_hist = FALSE,
     formula) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
@@ -1878,6 +1956,7 @@ gamljGlmMixed <- function(
         plot_around = plot_around,
         plot_re = plot_re,
         plot_re_method = plot_re_method,
+        plot_scale = plot_scale,
         emmeans = emmeans,
         posthoc = posthoc,
         simple_effects = simple_effects,
@@ -1899,13 +1978,7 @@ gamljGlmMixed <- function(
         re_modelterms = re_modelterms,
         re_listing = re_listing,
         re_lrt = re_lrt,
-        re_ci = re_ci,
-        norm_plot = norm_plot,
-        qq_plot = qq_plot,
-        resid_plot = resid_plot,
-        cluster_boxplot = cluster_boxplot,
-        cluster_respred = cluster_respred,
-        rand_hist = rand_hist)
+        re_ci = re_ci)
 
     analysis <- gamljGlmMixedClass$new(
         options = options,
