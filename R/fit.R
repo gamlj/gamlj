@@ -201,6 +201,8 @@ r2 <- function(model, ...) UseMethod(".r2")
 }
 
 .r2.polr <- function(model, obj) {
+  
+  ginfo(".polr R2 is used")
   alist <- list()
   results <- fit.compare_null_model(model)
 
@@ -289,7 +291,11 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
+
 .compare_null_model.default <- function(model) {
+  
+  ginfo("Default null model comparison is used for object of class ",paste(class(model),collapse = " "))
+  
   data <- insight::get_data(model)
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
@@ -394,6 +400,22 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   results <- as.data.frame(performance::test_likelihoodratio(model0, model))
   names(results) <- c("nothing1", "nothing2", "nothing3", "df1", "test", "p")
   results[2, c("df1", "test", "p")]
+}
+
+.compare_null_model.polr <- function(model) {
+  
+  ginfo(".polr null model comparison is used")
+  
+  data <- insight::get_data(model)
+  int <- attr(stats::terms(model), "intercept")
+  form <- stats::as.formula(paste("~", int))
+  model0 <- stats::update(model, form, data = data, evaluate = T)
+  results <- stats::anova(model0, model, test = "Chisq")
+  .names<-c(test=c("Deviance","LR.stat","LR stat."),df1=c("Df","   Df"),p=c("Pr(Chi)","Pr(>Chisq)"))
+  names(results)<-transnames(names(results),.names)
+  results$deviance <- stats::deviance(model)
+  results$null.deviance <- stats::deviance(model0) 
+  results[2, ]
 }
 
 
