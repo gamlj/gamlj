@@ -60,7 +60,7 @@ items:
                       title: F
                       type: number
                       visible: (omnibus:F)
-                    - name: lrt
+                    - name: test
                       title: LRT X²
                       type: number
                       visible: (omnibus:LRT)

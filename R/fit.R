@@ -103,6 +103,7 @@ gFit <- R6::R6Class(
       }
       
       comp <- comp$obj
+      mark(comp)
       r2comp <- as.list(comp[2, ])
       .names <- list(
                      df2 = c("Res.Df", "Resid. Df"),
@@ -166,7 +167,6 @@ r2 <- function(model, ...) UseMethod(".r2")
       loglik1 <- as.numeric(stats::logLik(model))
       results$lrt <- 2 * (loglik1 - loglik0)
       results$test <- results$lrt
-      
       results$p <- stats::pchisq(results$lrt, results$df1, lower.tail = FALSE)
     } else {
       results$f <- ss$fstatistic[["value"]]

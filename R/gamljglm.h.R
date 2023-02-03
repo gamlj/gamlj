@@ -696,7 +696,7 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number", 
                                     `visible`="(omnibus:F)"),
                                 list(
-                                    `name`="lrt", 
+                                    `name`="test", 
                                     `title`="LRT X\u00B2", 
                                     `type`="number", 
                                     `visible`="(omnibus:LRT)"),
