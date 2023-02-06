@@ -573,11 +573,15 @@ items:
                  -  se_method
                  -  mute
                     ### modeloptions  ends
-                 - simple_effects
-                 - simple_moderators
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
+                    ### simpleeffectsoptions  begins
+                 -  simple_x
+                 -  simple_mods
+                 -  simple_scale
+                 -  ccm_value
+                 -  ccp_value
+                 -  covs_scale_labels
+                 -  covs_conditioning
+                    ### simpleeffectsoptions  ends
               columns:
                    - name: test
                      title: F
@@ -642,11 +646,15 @@ items:
                  -  ci_method
                  -  boot_r
                     ### cioptions  ends
-                 - simple_moderators
-                 - covs_conditioning
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
+                    ### simpleeffectsoptions  begins
+                 -  simple_x
+                 -  simple_mods
+                 -  simple_scale
+                 -  ccm_value
+                 -  ccp_value
+                 -  covs_scale_labels
+                 -  covs_conditioning
+                    ### simpleeffectsoptions  ends
 
               columns:
                      - name: contrast
@@ -713,10 +721,16 @@ items:
                 -  se_method
                 -  mute
                    ### modeloptions  ends
-                - covs_conditioning
-                - covs_scale_labels
-                - simple_effects
-                - simple_moderators
+                   ### simpleeffectsoptions  begins
+                -  simple_x
+                -  simple_mods
+                -  simple_scale
+                -  ccm_value
+                -  ccp_value
+                -  covs_scale_labels
+                -  covs_conditioning
+                   ### simpleeffectsoptions  ends
+                
              columns:
                    - name: effect
                      title: 'Effect'
@@ -784,10 +798,15 @@ items:
                 -  ci_method
                 -  boot_r
                    ### cioptions  ends
-                - simple_effects
-                - simple_moderators
-                - covs_conditioning
-                - covs_scale_labels
+                   ### simpleeffectsoptions  begins
+                -  simple_x
+                -  simple_mods
+                -  simple_scale
+                -  ccm_value
+                -  ccp_value
+                -  covs_scale_labels
+                -  covs_conditioning
+                   ### simpleeffectsoptions  ends
 
              columns:
                    - name: effect

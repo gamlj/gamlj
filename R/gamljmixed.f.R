@@ -72,9 +72,9 @@
 #'   the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
 #'   so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
 #'   passed also as a list of the form '}list("x","z",c("x","z")`'
-#' @param simple_effects The variable for which the simple effects (slopes)
+#' @param simple_x The variable for which the simple effects (slopes)
 #'   are computed
-#' @param simple_moderators the variable that provides the levels at which the
+#' @param simple_mods the variable that provides the levels at which the
 #'   simple effects are computed
 #' @param simple_interactions should simple Interactions be computed
 #' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
@@ -197,8 +197,8 @@ gamljMixed <- function(
     plot_re_method = "average",
     emmeans = NULL,
     posthoc = NULL,
-    simple_effects = NULL,
-    simple_moderators = NULL,
+    simple_x = NULL,
+    simple_mods = NULL,
     simple_interactions = FALSE,
     covs_conditioning = "mean_sd",
     ccm_value = 1,
@@ -232,8 +232,8 @@ gamljMixed <- function(
   if ( ! missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
   if ( ! missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
   if ( ! missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
-  if ( ! missing(simple_effects)) simple_effects <- jmvcore::resolveQuo(jmvcore::enquo(simple_effects))
-  if ( ! missing(simple_moderators)) simple_moderators <- jmvcore::resolveQuo(jmvcore::enquo(simple_moderators))
+  if ( ! missing(simple_x)) simple_x <- jmvcore::resolveQuo(jmvcore::enquo(simple_x))
+  if ( ! missing(simple_mods)) simple_mods <- jmvcore::resolveQuo(jmvcore::enquo(simple_mods))
   if ( ! missing(cluster)) cluster <- jmvcore::resolveQuo(jmvcore::enquo(cluster))
   if (missing(data))
     data <- jmvcore::marshalData(
@@ -244,8 +244,8 @@ gamljMixed <- function(
       `if`( ! missing(plot_x), plot_x, NULL),
       `if`( ! missing(plot_z), plot_z, NULL),
       `if`( ! missing(plot_by), plot_by, NULL),
-      `if`( ! missing(simple_effects), simple_effects, NULL),
-      `if`( ! missing(simple_moderators), simple_moderators, NULL),
+      `if`( ! missing(simple_x), simple_x, NULL),
+      `if`( ! missing(simple_mods), simple_mods, NULL),
       `if`( ! missing(cluster), cluster, NULL))
   
   ##### custom code
@@ -343,8 +343,8 @@ gamljMixed <- function(
     plot_re_method = plot_re_method,
     emmeans = emmeans,
     posthoc = posthoc,
-    simple_effects = simple_effects,
-    simple_moderators = simple_moderators,
+    simple_x = simple_x,
+    simple_mods = simple_mods,
     simple_interactions = simple_interactions,
     covs_conditioning = covs_conditioning,
     ccm_value = ccm_value,

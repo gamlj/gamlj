@@ -82,8 +82,8 @@ const events = {
     
     onChange_simpleSupplier: function(ui) {
         let values = this.itemsToValues(ui.simpleSupplier.value());
-        this.checkValue(ui.simple_effects, false, values, FormatDef.variable);
-        this.checkValue(ui.simple_moderators, true, values, FormatDef.variable);
+        this.checkValue(ui.simple_x, false, values, FormatDef.variable);
+        this.checkValue(ui.simple_mods, true, values, FormatDef.variable);
     },
 
     onUpdate_simpleSupplier: function(ui) {

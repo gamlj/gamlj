@@ -40,8 +40,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             plot_scale = "response",
             emmeans = NULL,
             posthoc = NULL,
-            simple_effects = NULL,
-            simple_moderators = NULL,
+            simple_x = NULL,
+            simple_mods = NULL,
             simple_interactions = FALSE,
             covs_conditioning = "mean_sd",
             ccm_value = 1,
@@ -262,13 +262,13 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                 "posthoc",
                 posthoc,
                 default=NULL)
-            private$..simple_effects <- jmvcore::OptionVariable$new(
-                "simple_effects",
-                simple_effects,
+            private$..simple_x <- jmvcore::OptionVariable$new(
+                "simple_x",
+                simple_x,
                 default=NULL)
-            private$..simple_moderators <- jmvcore::OptionVariables$new(
-                "simple_moderators",
-                simple_moderators,
+            private$..simple_mods <- jmvcore::OptionVariables$new(
+                "simple_mods",
+                simple_mods,
                 default=NULL)
             private$..simple_interactions <- jmvcore::OptionBool$new(
                 "simple_interactions",
@@ -453,8 +453,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
             self$.addOption(private$..plot_scale)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
-            self$.addOption(private$..simple_effects)
-            self$.addOption(private$..simple_moderators)
+            self$.addOption(private$..simple_x)
+            self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_conditioning)
             self$.addOption(private$..ccm_value)
@@ -511,8 +511,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         plot_scale = function() private$..plot_scale$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
-        simple_effects = function() private$..simple_effects$value,
-        simple_moderators = function() private$..simple_moderators$value,
+        simple_x = function() private$..simple_x$value,
+        simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         covs_conditioning = function() private$..covs_conditioning$value,
         ccm_value = function() private$..ccm_value$value,
@@ -568,8 +568,8 @@ gamljGlmMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
         ..plot_scale = NA,
         ..emmeans = NA,
         ..posthoc = NA,
-        ..simple_effects = NA,
-        ..simple_moderators = NA,
+        ..simple_x = NA,
+        ..simple_mods = NA,
         ..simple_interactions = NA,
         ..covs_conditioning = NA,
         ..ccm_value = NA,
@@ -1323,8 +1323,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
-                                "simple_effects",
-                                "simple_moderators",
+                                "simple_x",
+                                "simple_mods",
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
@@ -1368,8 +1368,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
-                                "simple_effects",
-                                "simple_moderators",
+                                "simple_x",
+                                "simple_mods",
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
@@ -1454,8 +1454,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
-                                    "simple_effects",
-                                    "simple_moderators",
+                                    "simple_x",
+                                    "simple_mods",
                                     "simple_scale",
                                     "ccm_value",
                                     "ccp_value",
@@ -1502,8 +1502,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
-                                    "simple_effects",
-                                    "simple_moderators",
+                                    "simple_x",
+                                    "simple_mods",
                                     "simple_scale",
                                     "ccm_value",
                                     "ccp_value",
@@ -1567,8 +1567,8 @@ gamljGlmMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cla
                         "ci_width",
                         "ci_method",
                         "boot_r",
-                        "simple_effects",
-                        "simple_moderators",
+                        "simple_x",
+                        "simple_mods",
                         "simple_scale",
                         "ccm_value",
                         "ccp_value",

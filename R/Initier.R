@@ -346,8 +346,8 @@ init_main_multirandom=function() {
       if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") 
         return(NULL)
       
-        .var64<-tob64(self$options$simple_effects)
-        .mods<-rev(self$options$simple_moderators)
+        .var64<-tob64(self$options$simple_x)
+        .mods<-rev(self$options$simple_mods)
         .mods64<-tob64(.mods)
         nrow<-prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
@@ -360,10 +360,10 @@ init_main_multirandom=function() {
     
     init_simpleEffects_coefficients=function() {
       
-        .var64<-tob64(self$options$simple_effects)
+        .var64<-tob64(self$options$simple_x)
         focal<-self$datamatic$variables[[.var64]]
         neffects<-focal$neffects
-        .mods<-rev(self$options$simple_moderators)
+        .mods<-rev(self$options$simple_mods)
         .mods64<-tob64(.mods)
         
         nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
@@ -382,8 +382,8 @@ init_main_multirandom=function() {
       
     
         ### moderators should be reverted in order to match emmeans 
-        .term<-rev(self$options$simple_moderators)
-        .simple<-self$options$simple_effects
+        .term<-rev(self$options$simple_mods)
+        .simple<-self$options$simple_x
         n<-length(.term)
         j<-n
         resultsList<-list()

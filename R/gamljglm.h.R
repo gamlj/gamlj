@@ -37,8 +37,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_around = "ci",
             emmeans = NULL,
             posthoc = NULL,
-            simple_effects = NULL,
-            simple_moderators = NULL,
+            simple_x = NULL,
+            simple_mods = NULL,
             simple_interactions = FALSE,
             covs_scale = NULL,
             covs_conditioning = "mean_sd",
@@ -244,13 +244,13 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "posthoc",
                 posthoc,
                 default=NULL)
-            private$..simple_effects <- jmvcore::OptionVariable$new(
-                "simple_effects",
-                simple_effects,
+            private$..simple_x <- jmvcore::OptionVariable$new(
+                "simple_x",
+                simple_x,
                 default=NULL)
-            private$..simple_moderators <- jmvcore::OptionVariables$new(
-                "simple_moderators",
-                simple_moderators,
+            private$..simple_mods <- jmvcore::OptionVariables$new(
+                "simple_mods",
+                simple_mods,
                 default=NULL)
             private$..simple_interactions <- jmvcore::OptionBool$new(
                 "simple_interactions",
@@ -433,8 +433,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_around)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
-            self$.addOption(private$..simple_effects)
-            self$.addOption(private$..simple_moderators)
+            self$.addOption(private$..simple_x)
+            self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..covs_conditioning)
@@ -491,8 +491,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_around = function() private$..plot_around$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
-        simple_effects = function() private$..simple_effects$value,
-        simple_moderators = function() private$..simple_moderators$value,
+        simple_x = function() private$..simple_x$value,
+        simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         covs_scale = function() private$..covs_scale$value,
         covs_conditioning = function() private$..covs_conditioning$value,
@@ -548,8 +548,8 @@ gamljGlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_around = NA,
         ..emmeans = NA,
         ..posthoc = NA,
-        ..simple_effects = NA,
-        ..simple_moderators = NA,
+        ..simple_x = NA,
+        ..simple_mods = NA,
         ..simple_interactions = NA,
         ..covs_scale = NA,
         ..covs_conditioning = NA,
@@ -1203,11 +1203,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "se_method",
                                 "mute",
-                                "simple_effects",
-                                "simple_moderators",
+                                "simple_x",
+                                "simple_mods",
+                                "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
-                                "covs_scale_labels"),
+                                "covs_scale_labels",
+                                "covs_conditioning"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1278,11 +1280,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
-                                "simple_moderators",
-                                "covs_conditioning",
+                                "simple_x",
+                                "simple_mods",
+                                "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
-                                "covs_scale_labels"),
+                                "covs_scale_labels",
+                                "covs_conditioning"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1362,10 +1366,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "fixed_intercept",
                                     "se_method",
                                     "mute",
-                                    "covs_conditioning",
+                                    "simple_x",
+                                    "simple_mods",
+                                    "simple_scale",
+                                    "ccm_value",
+                                    "ccp_value",
                                     "covs_scale_labels",
-                                    "simple_effects",
-                                    "simple_moderators"),
+                                    "covs_conditioning"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1439,10 +1446,13 @@ gamljGlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
-                                    "simple_effects",
-                                    "simple_moderators",
-                                    "covs_conditioning",
-                                    "covs_scale_labels"),
+                                    "simple_x",
+                                    "simple_mods",
+                                    "simple_scale",
+                                    "ccm_value",
+                                    "ccp_value",
+                                    "covs_scale_labels",
+                                    "covs_conditioning"),
                                 columns=list(
                                     list(
                                         `name`="effect", 

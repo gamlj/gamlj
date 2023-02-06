@@ -490,13 +490,13 @@ children:
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simple_effects
+                name: simple_x
                 isTarget: true
                 maxItemCount: 1
           - type: TargetLayoutBox
             children:
               - type: VariablesListBox
-                name: simple_moderators
+                name: simple_mods
                 isTarget: true
       - type: CheckBox
         name: simple_interactions

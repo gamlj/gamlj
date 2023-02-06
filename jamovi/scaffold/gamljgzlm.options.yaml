@@ -7,14 +7,11 @@ modeloptions:
         - fixed_intercept
         - se_method
         - mute
-        - re
-        - re_corr
         - df_method
-        - relm
         - contrasts
         - covs_scale
-        - mute
-        
+        - offset
+
 nestedoptions:
         - nested_terms
         - nested_intercept
@@ -25,6 +22,8 @@ cioptions:
         - ci_method
         - boot_r
         
+effectsizeptions:
+                 - es
 simpleeffectsoptions:
 
                  - simple_x

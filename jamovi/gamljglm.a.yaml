@@ -333,7 +333,7 @@ options:
              also as a list of the form '`list("x","z",c("x","z")`'
 
 
-    - name: simple_effects
+    - name: simple_x
       title: Simple effects variable
       type: Variable
       default:
@@ -341,7 +341,7 @@ options:
           R: >
             The variable for which the simple effects (slopes) are computed
 
-    - name: simple_moderators
+    - name: simple_mods
       title: Moderators
       type: Variables
       default:

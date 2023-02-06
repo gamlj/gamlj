@@ -72,9 +72,9 @@
 #'   the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
 #'   so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
 #'   passed also as a list of the form '}list("x","z",c("x","z")`'
-#' @param simple_effects The variable for which the simple effects (slopes)
+#' @param simple_x The variable for which the simple effects (slopes)
 #'   are computed
-#' @param simple_moderators a character vector with the variable(s) providing the levels at which the
+#' @param simple_mods a character vector with the variable(s) providing the levels at which the
 #'   simple effects are computed
 #' @param simple_interactions should simple Interactions be computed
 #' @param covs_scale a named vector of the form \code{c(var1='type',
@@ -188,8 +188,8 @@ gamljGlm <- function(
     plot_around = "ci",
     emmeans = NULL,
     posthoc = NULL,
-    simple_effects = NULL,
-    simple_moderators = NULL,
+    simple_x = NULL,
+    simple_mods = NULL,
     simple_interactions = FALSE,
     covs_scale = NULL,
     covs_conditioning = "mean_sd",
@@ -223,8 +223,8 @@ gamljGlm <- function(
   if ( ! missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
   if ( ! missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
   if ( ! missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
-  if ( ! missing(simple_effects)) simple_effects <- jmvcore::resolveQuo(jmvcore::enquo(simple_effects))
-  if ( ! missing(simple_moderators)) simple_moderators <- jmvcore::resolveQuo(jmvcore::enquo(simple_moderators))
+  if ( ! missing(simple_x)) simple_x <- jmvcore::resolveQuo(jmvcore::enquo(simple_x))
+  if ( ! missing(simple_mods)) simple_mods <- jmvcore::resolveQuo(jmvcore::enquo(simple_mods))
   if (missing(data))
     data <- jmvcore::marshalData(
       parent.frame(),
@@ -234,8 +234,8 @@ gamljGlm <- function(
       `if`( ! missing(plot_x), plot_x, NULL),
       `if`( ! missing(plot_z), plot_z, NULL),
       `if`( ! missing(plot_by), plot_by, NULL),
-      `if`( ! missing(simple_effects), simple_effects, NULL),
-      `if`( ! missing(simple_moderators), simple_moderators, NULL))
+      `if`( ! missing(simple_x), simple_x, NULL),
+      `if`( ! missing(simple_mods), simple_mods, NULL))
   
 
   for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
@@ -325,8 +325,8 @@ gamljGlm <- function(
     plot_around = plot_around,
     emmeans = emmeans,
     posthoc = posthoc,
-    simple_effects = simple_effects,
-    simple_moderators = simple_moderators,
+    simple_x = simple_x,
+    simple_mods = simple_mods,
     simple_interactions = simple_interactions,
     covs_scale = covs_scale,
     covs_conditioning = covs_conditioning,

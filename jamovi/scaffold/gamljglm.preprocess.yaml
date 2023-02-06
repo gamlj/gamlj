@@ -451,11 +451,7 @@ items:
               visible: false
               clearWith:
                  -  __modeloptions__
-                 - simple_effects
-                 - simple_moderators
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
+                 -  __simpleeffectsoptions__
               columns:
                    - name: test
                      title: F
@@ -507,11 +503,7 @@ items:
               clearWith:
                  -  __modeloptions__
                  -  __cioptions__
-                 - simple_moderators
-                 - covs_conditioning
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
+                 -  __simpleeffectsoptions__
 
               columns:
                      - name: contrast
@@ -569,10 +561,8 @@ items:
              title: ANOVA 
              clearWith:
                 -  __modeloptions__
-                - covs_conditioning
-                - covs_scale_labels
-                - simple_effects
-                - simple_moderators
+                -  __simpleeffectsoptions__
+                
              columns:
                    - name: effect
                      title: 'Effect'
@@ -627,10 +617,7 @@ items:
              clearWith:
                 -  __modeloptions__
                 -  __cioptions__
-                - simple_effects
-                - simple_moderators
-                - covs_conditioning
-                - covs_scale_labels
+                -  __simpleeffectsoptions__
 
              columns:
                    - name: effect

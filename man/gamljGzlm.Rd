@@ -5,55 +5,64 @@
 \title{Generalized Linear Models}
 \usage{
 gamljGzlm(
-  formula,
+  formula = NULL,
   data,
+  model_type = "linear",
   dep = NULL,
   factors = NULL,
   covs = NULL,
+  offset = NULL,
   model_terms = NULL,
-  nested_terms = NULL,
   fixed_intercept = TRUE,
-  nested_intercept = TRUE,
-  omnibus = "LRT",
-  estimates_ci = TRUE,
-  expb_ci = TRUE,
-  es = list("expb"),
-  model_type = "linear",
+  nested_intercept = NULL,
   custom_family = "gaussian",
   custom_link = "identity",
-  propodds_test = FALSE,
-  ci_width = 95,
+  nested_terms = NULL,
+  comparison = FALSE,
+  omnibus = "LRT",
+  estimates_ci = FALSE,
+  donotrun = FALSE,
   ci_method = "wald",
   boot_r = 1000,
+  ci_width = 95,
   contrasts = NULL,
   show_contrastnames = TRUE,
   show_contrastcodes = FALSE,
-  covs_scale = NULL,
+  vcov = FALSE,
+  plot_x = NULL,
+  plot_z = NULL,
+  plot_by = NULL,
+  plot_raw = FALSE,
+  plot_yscale = FALSE,
+  plot_xoriginal = FALSE,
+  plot_black = FALSE,
+  plot_around = "ci",
+  emmeans = NULL,
+  posthoc = NULL,
+  simple_x = NULL,
+  simple_mods = NULL,
+  simple_interactions = FALSE,
   covs_conditioning = "mean_sd",
   ccm_value = 1,
   ccp_value = 25,
   covs_scale_labels = "labels",
-  vcov = FALSE,
-  emmeans = NULL,
-  posthoc = NULL,
   adjust = list("bonf"),
-  simple_effects = NULL,
-  simple_moderators = NULL,
-  simple_interactions = FALSE,
-  plotHAxis = NULL,
-  plotSepLines = NULL,
-  plotSepPlots = NULL,
-  plotRaw = FALSE,
-  plotDvScale = FALSE,
-  plotOriginalScale = FALSE,
-  plotLinesTypes = FALSE,
-  plotError = "none"
+  covs_scale = NULL,
+  expb_ci = TRUE,
+  es = list("expb"),
+  propodds_test = FALSE,
+  plot_scale = "response"
 )
 }
 \arguments{
-\item{formula}{(optional) the formula to use, see the examples}
+\item{formula}{(optional) the formula of the model compatible with \link[stats]{glm}. If not passed,
+model terms should be defined as a list in  \code{model_terms} option.}
 
-\item{data}{the data as a data frame}
+\item{data}{the data as a data.frame}
+
+\item{model_type}{define the type of model (link function and distribution combination) required.
+It can be \code{linear}, \code{poisson}, \code{poiover}, \code{nb},
+\code{logistic}, \code{probit}, \code{custom}, \code{ordinal}, \code{multinomial}}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. Not needed if \code{formula} is used.}
@@ -64,11 +73,10 @@ variable must be numeric. Not needed if \code{formula} is used.}
 \item{covs}{a vector of strings naming the covariates from \code{data}. Not
 needed if \code{formula} is used.}
 
+\item{offset}{a vector of strings naming the offset variables.}
+
 \item{model_terms}{a list of character vectors describing fixed effects
 terms. Not needed if \code{formula} is used.}
-
-\item{nested_terms}{a list of character vectors describing effects terms
-for nestet. It can be passed as right-hand formula.}
 
 \item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
@@ -76,39 +84,33 @@ fixed intercept. Not needed if \code{formula} is used.}
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
 
-\item{omnibus}{Pseudo R-squared omnibus tests are based on
-loglikelihood ratio test \code{'LRT'}  (default) or Wald's Chi-square \code{'wald'}.}
+\item{custom_family}{Distribution family for the custom model, accepts
+\code{gaussian}, \code{binomial}, \code{gamma} and \code{inverse_gaussian}.}
+
+\item{custom_link}{Distribution family for the \code{model_type="custom"}, accepts
+\code{identity}, \code{log} and \code{inverse}. Use \code{onemu2}  for 1/mu^2).}
+
+\item{nested_terms}{a list of character vectors describing effects terms
+for nested model. It can be passed as right-hand formula.}
+
+\item{comparison}{Not present in R}
+
+\item{omnibus}{Whether the omnibus test for the model should be \code{wald} or \code{LRT}.}
 
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , coefficients CI
 in tables}
-
-\item{expb_ci}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in table}
-
-\item{es}{.}
-
-\item{model_type}{Select the generalized linear model:
-\code{linear},\code{poisson},\code{logistic},\code{multinomial}}
-
-\item{custom_family}{Distribution family for the custom model, accepts
-gaussian, binomial, gamma and inverse_gaussian .}
-
-\item{custom_link}{Distribution family for the custom model, accepts
-identity, log and inverse, onemu2 (for 1/mu^2).}
-
-\item{propodds_test}{Test parallel lines assumptions in cumulative link
-model (ordinal regression)}
-
-\item{ci_width}{a number between 50 and 99.9 (default: 95) specifying the
-confidence interval width for the plots.}
 
 \item{ci_method}{.}
 
 \item{boot_r}{a number bootstrap repetitions.}
 
+\item{ci_width}{a number between 50 and 99.9 (default: 95) specifying the
+confidence interval width for the plots.}
+
 \item{contrasts}{a named vector of the form \code{c(var1="type",
 var2="type2")} specifying the type of contrast to use, one of
-\code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-\code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+\code{deviation}, \code{simple}, \code{dummy}, \code{difference},
+\code{helmert}, \code{repeated} or \code{'polynomial'}. If NULL,
 \code{simple} is used. Can also be passed as a list of list of the form
 list(list(var="var1",type="type1")).}
 
@@ -118,75 +120,85 @@ names of the contrasts variables in tables}
 \item{show_contrastcodes}{\code{TRUE} or \code{FALSE} (default), shows
 contrast coefficients tables}
 
-\item{covs_scale}{a named vector of the form \code{c(var1='type',
-var2='type2')} specifying the transformation to apply to covariates, one of
-\code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
-\code{'none'}. \code{'none'} leaves the variable as it is.}
-
-\item{covs_conditioning}{\code{'mean_sd'} (default), or
-\code{'percent'}. How to condition covariates in simple effects and plots.
-\code{'mean_sd'} for mean +/- \code{ccp_value} * sd. Default is 1.
-\code{'percent'} for median +/- \code{ccm_value} for percentiles. Default is 25.}
-
-\item{ccm_value}{how many std around the means to condition
-simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}}
-
-\item{ccp_value}{offsett (number of percentiles) around the median used to
-condition simple effects and plots. Used if
-\code{simpleScale}=\code{'percent'}}
-
-\item{covs_scale_labels}{how the levels of a continuous moderator should
-appear in tables and plots: \code{'labels'}, \code{'values'} and
-\code{'values_labels'}, \code{'ovalues'}, \code{'ovalues_labels'}. The latter two refer
-to the variable orginal levels, before scaling.}
-
 \item{vcov}{\code{TRUE} or \code{FALSE} (default), shows coefficients
 covariances}
+
+\item{plot_x}{a string naming the variable placed on the horizontal axis of
+the plot}
+
+\item{plot_z}{a string naming the variable represented as separate lines in
+the plot}
+
+\item{plot_by}{a list of variables defining the levels at which a separate
+plot should be produced.}
+
+\item{plot_raw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
+the predicted values}
+
+\item{plot_yscale}{\code{TRUE} or \code{FALSE} (default), set the Y-axis
+range equal to the range of the observed values.}
+
+\item{plot_xoriginal}{\code{TRUE} or \code{FALSE} (default), use original
+scale for covariates.}
+
+\item{plot_black}{\code{TRUE} or \code{FALSE} (default), use different
+linetypes per levels.}
+
+\item{plot_around}{\code{'none'} (default), \code{'ci'}, or \code{'se'}.
+Use no error bars, use confidence intervals, or use standard errors on the
+plots, respectively.}
 
 \item{emmeans}{a rhs formula with the terms specifying the marginal means
 to estimate (of the form \code{'~x+x:z'})}
 
 \item{posthoc}{a rhs formula with the terms specifying the table to apply
 the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-passed also as a list of the form '}list("x","z",c("x","z")`'}
+so \code{x*z} becomes \code{x+z} and not \code{x+z+x:z}. It can be
+passed also as a list of the form \code{'list("x","z",c("x","z")'}}
 
-\item{adjust}{one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
-\code{'holm'}, \code{'scheffe'}; provide no,  Bonferroni, Tukey, Holm, Scheffe Post Hoc corrections
-respectively.}
-
-\item{simple_effects}{The variable for which the simple effects (slopes)
+\item{simple_x}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simple_moderators}{the variable that provides the levels at which the
+\item{simple_mods}{the variable that provides the levels at which the
 simple effects are computed}
 
 \item{simple_interactions}{should simple Interactions be computed}
 
-\item{plotHAxis}{a string naming the variable placed on the horizontal axis
-of the plot}
+\item{covs_conditioning}{\code{'mean_sd'} (default), \code{'custom'} , or
+\code{'percent'}. Use to condition the covariates (if any)}
 
-\item{plotSepLines}{a string naming the variable represented as separate
-lines in the plot}
+\item{ccm_value}{how many st.deviations around the means used to condition
+simple effects and plots. Used if \code{simpleScale}=\code{'mean_sd'}}
 
-\item{plotSepPlots}{a list of string naming the variables defining the
-levels for multiple plots}
+\item{ccp_value}{offsett (number of percentiles) around the median used to
+condition simple effects and plots. Used if
+\code{simpleScale}=\code{'percent'}}
 
-\item{plotRaw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
-the predicted values}
+\item{covs_scale_labels}{how the levels of a continuous moderator should
+appear in tables and plots: \code{labels}, \code{values} and
+\code{values_labels}, \code{ovalues}, \code{ovalues_labels}. The latter two refer
+to the variable original levels, before scaling.}
 
-\item{plotDvScale}{\code{TRUE} or \code{FALSE} (default), set the Y-axis
-range equal to the range of the observed values.}
+\item{adjust}{one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
+\code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
+respectively.}
 
-\item{plotOriginalScale}{\code{TRUE} or \code{FALSE} (default), use
-original scale for covariates.}
+\item{covs_scale}{a named vector of the form \code{c(var1='type',
+var2='type2')} specifying the transformation to apply to covariates, one of
+\code{'centered'} to the mean, \code{'standardized'},\code{'log'} or
+\code{'none'}. \code{'none'} leaves the variable as it is.}
 
-\item{plotLinesTypes}{\code{TRUE} or \code{FALSE} (default), use different
-linetypes per levels.}
+\item{expb_ci}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in table}
 
-\item{plotError}{\code{'none'} (default), \code{'ci'}, or \code{'se'}. Use
-no error bars, use confidence intervals, or use standard errors on the
-plots, respectively.}
+\item{es}{Effect size indices. \code{expb} (default) exponentiates the
+coefficients. For dichotomous dependent variables relative risk indices
+(RR) can be obtained. \code{marginals} computes the marginal effects.}
+
+\item{propodds_test}{Test parallel lines assumptions in cumulative link
+model (ordinal regression)}
+
+\item{plot_scale}{Chi-squared computation method. \code{'lrt'} (default)
+gives LogLikelihood ration test,  \code{'wald'} gives the Wald Chi-squared.}
 }
 \value{
 A results object containing:
@@ -220,13 +232,16 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Generalized Linear Model
+Generalized Linear Model with options to estimate logistic, probit, 
+ordinal, multinomial and custum link function models. Provides options
+to estimate posthoc, simple effects and slopes, plots of main effects and
+interaction. Model comparison is also an option.
 }
 \examples{
-data<-emmeans::neuralgia
- gamlj::gamljGzlm(
-           formula = Pain ~ Duration,
-           data = data,
-            model_type = "logistic")
-
+   data <- emmeans::neuralgia
+   gamlj::gamljGzlm(formula = Pain ~ Duration,
+                    data = data,
+                    model_type = "logistic"
+                    )
+     
 }

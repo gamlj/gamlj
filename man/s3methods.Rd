@@ -4,6 +4,9 @@
 \alias{summary.ResultsElement}
 \alias{print.jmvrtable}
 \alias{print.jmvrobj}
+\alias{coef.gamlj}
+\alias{fit}
+\alias{fit.gamlj}
 \title{S3 methods for class jamovi ResultsElement}
 \usage{
 \method{summary}{ResultsElement}(object, ...)
@@ -11,6 +14,12 @@
 \method{print}{jmvrtable}(x, ...)
 
 \method{print}{jmvrobj}(x, ...)
+
+\method{coef}{gamlj}(x, ...)
+
+fit(x, ...)
+
+\method{fit}{gamlj}(x, ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}

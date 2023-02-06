@@ -37,8 +37,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_around = "ci",
             emmeans = NULL,
             posthoc = NULL,
-            simple_effects = NULL,
-            simple_moderators = NULL,
+            simple_x = NULL,
+            simple_mods = NULL,
             simple_interactions = FALSE,
             covs_conditioning = "mean_sd",
             ccm_value = 1,
@@ -237,13 +237,13 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "posthoc",
                 posthoc,
                 default=NULL)
-            private$..simple_effects <- jmvcore::OptionVariable$new(
-                "simple_effects",
-                simple_effects,
+            private$..simple_x <- jmvcore::OptionVariable$new(
+                "simple_x",
+                simple_x,
                 default=NULL)
-            private$..simple_moderators <- jmvcore::OptionVariables$new(
-                "simple_moderators",
-                simple_moderators,
+            private$..simple_mods <- jmvcore::OptionVariables$new(
+                "simple_mods",
+                simple_mods,
                 default=NULL)
             private$..simple_interactions <- jmvcore::OptionBool$new(
                 "simple_interactions",
@@ -409,8 +409,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_around)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
-            self$.addOption(private$..simple_effects)
-            self$.addOption(private$..simple_moderators)
+            self$.addOption(private$..simple_x)
+            self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_conditioning)
             self$.addOption(private$..ccm_value)
@@ -461,8 +461,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_around = function() private$..plot_around$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
-        simple_effects = function() private$..simple_effects$value,
-        simple_moderators = function() private$..simple_moderators$value,
+        simple_x = function() private$..simple_x$value,
+        simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         covs_conditioning = function() private$..covs_conditioning$value,
         ccm_value = function() private$..ccm_value$value,
@@ -512,8 +512,8 @@ gamljGzlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_around = NA,
         ..emmeans = NA,
         ..posthoc = NA,
-        ..simple_effects = NA,
-        ..simple_moderators = NA,
+        ..simple_x = NA,
+        ..simple_mods = NA,
         ..simple_interactions = NA,
         ..covs_conditioning = NA,
         ..ccm_value = NA,
@@ -574,20 +574,6 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `name`="specs", 
                         `type`="text", 
                         `title`="")),
-                clearWith=list(
-                    "dep",
-                    "factors",
-                    "covs",
-                    "model_terms",
-                    "fixed_intercept",
-                    "ci_method",
-                    "se_method",
-                    "d_ci",
-                    "boot_r",
-                    "nested_intercept",
-                    "nested_terms",
-                    "comparison",
-                    "offset"),
                 refs="gamlj"))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -614,13 +600,20 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Model Fit",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
                                 "fixed_intercept",
-                                "nested_intercept",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
+                                "offset",
                                 "nested_terms",
-                                "comparison",
-                                "omnibus",
-                                "offset"),
+                                "nested_intercept",
+                                "comparison"),
                             rows=1,
                             columns=list(
                                 list(
@@ -656,11 +649,16 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible=TRUE,
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
                                 "fixed_intercept",
-                                "nested_intercept",
-                                "nested_terms",
-                                "comparison",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
                                 "offset"),
                             columns=list(
                                 list(
@@ -691,12 +689,16 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Omnibus tests",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
-                                "contrasts",
-                                "covs_conditioning",
-                                "dep_scale",
                                 "fixed_intercept",
-                                "chisq_type",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
                                 "offset"),
                             columns=list(
                                 list(
@@ -722,15 +724,16 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Parameter Estimates (Coefficients)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
-                                "contrasts",
-                                "covs_conditioning",
-                                "dep_scale",
                                 "fixed_intercept",
-                                "ci_width",
-                                "ci_method",
-                                "expb_ci",
-                                "es",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
                                 "offset"),
                             columns=list(
                                 list(
@@ -797,11 +800,16 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible="(vcov)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "df_method",
                                 "contrasts",
                                 "covs_scale",
-                                "dep_scale",
-                                "fixed_intercept",
                                 "offset"),
                             columns=list(
                                 list(
@@ -842,14 +850,24 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible="(es:marginals)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
-                                "contrasts",
-                                "covs_conditioning",
                                 "fixed_intercept",
-                                "es",
-                                "ci_width",
-                                "ci_method",
-                                "offset"),
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
+                                "offset",
+                                "simple_x",
+                                "simple_mods",
+                                "simple_scale",
+                                "ccm_value",
+                                "ccp_value",
+                                "covs_scale_labels",
+                                "covs_conditioning"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -899,14 +917,18 @@ gamljGzlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible="(es:RR)",
                             clearWith=list(
                                 "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
                                 "model_terms",
-                                "contrasts",
-                                "covs_conditioning",
                                 "fixed_intercept",
-                                "es",
-                                "ci_width",
-                                "ci_method",
-                                "offset"),
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
+                                "offset",
+                                "__effectsizeoptions"),
                             columns=list(
                                 list(
                                     `name`="source", 

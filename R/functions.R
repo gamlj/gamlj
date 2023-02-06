@@ -11,7 +11,7 @@ tob64<- function(x,...) UseMethod(".tob64")
         return()
     if (is.numeric(obj))
        return(obj)
-    
+  
     if (is.null(ref)) {
         obj<-jmvcore::toB64(obj)
     } else {
@@ -54,43 +54,10 @@ fromb64<- function(x,...) UseMethod(".fromb64")
   astring
 }
 
+.fromb64.formula<-function(obj)   return(formula(fromb64(deparse(obj))))
 
-.fromb64.old<-function(obj,ref=NULL) {
-    
-    if (!is.something(obj))
-        return(obj)
-    
-    if (length(obj)>1)
-        return(unlist(sapply(obj, bogusfromb64,ref=ref,USE.NAMES = F)))
-  
-    obj<-gsub(LEVEL_SYMBOL,FACTOR_SYMBOL,obj,fixed = T)
-    if (!is.b64(obj))
-          return(obj)
-    
-    int<-strsplit(obj,INTERACTION_SYMBOL,fixed=T)[[1]]
-    if (length(int)>1)
-        return(paste0(unlist(sapply(int,bogusfromb64,ref=ref)),collapse = ":"))
 
-    obj<-gsub(B64_SYMBOL,"",obj,fixed=T)
-    
-    if (is.null(ref)) {
-        fac<-strsplit(obj,FACTOR_SYMBOL,fixed=T)[[1]]
-        obj<-fac[[1]]  
-        obj<-jmvcore::fromB64(obj)
-        if (length(fac)>1) obj<-paste0(obj,fac[[2]])
-    } else {
-        for (r in ref) 
-            obj<-stringr::str_replace_all(obj,paste0("\\b",jmvcore::toB64(r),"\\b"),r)
-        
-    }
-    obj<-gsub(FACTOR_SYMBOL,"",obj,fixed = T)
-#    obj<-gsub(INTERACTION_SYMBOL,":",obj,fixed = T)
-    obj
-}
-
-.fromb64.list<-function(obj,ref=NULL) {
-    lapply(obj,bogusfromb64,ref=ref)
-}
+.fromb64.list<-function(obj,ref=NULL) lapply(obj,bogusfromb64,ref=ref)
 
 
 bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)

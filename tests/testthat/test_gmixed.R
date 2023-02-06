@@ -54,8 +54,8 @@ model <- gamlj::gamljGlmMixed(
   model_type = "logistic"
 )
 testthat::test_that("info is ok", {
-  testthat::expect_equal(as.numeric(infotable$value[7]),3000)
-  testthat::expect_equal(infotable$info[8],"Converged")
+  testthat::expect_equal(as.numeric(model$info$asDF$value[6]),1718)
+  testthat::expect_equal(model$info$asDF$value[7],"yes")
 })
 
 testthat::test_that("R2 is ok", {
@@ -69,3 +69,4 @@ testthat::test_that("fit is ok", {
   testthat::expect_equal(model$main$fit$asDF[4,2],1701.056,tol)
   
 })
+

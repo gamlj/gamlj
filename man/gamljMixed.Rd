@@ -5,20 +5,17 @@
 \title{Mixed Model}
 \usage{
 gamljMixed(
+  formula = NULL,
   data,
-  .caller = "lmer",
-  .interface = "jamovi",
   dep = NULL,
   factors = NULL,
   covs = NULL,
   model_terms = NULL,
   fixed_intercept = TRUE,
   nested_terms = NULL,
-  comparison = FALSE,
-  nested_intercept = TRUE,
+  nested_intercept = NULL,
   omnibus = "LRT",
   estimates_ci = TRUE,
-  donotrun = FALSE,
   ci_method = "wald",
   boot_r = 1000,
   ci_width = 95,
@@ -37,25 +34,21 @@ gamljMixed(
   plot_re_method = "average",
   emmeans = NULL,
   posthoc = NULL,
-  simple_effects = NULL,
-  simple_moderators = NULL,
+  simple_x = NULL,
+  simple_mods = NULL,
   simple_interactions = FALSE,
   covs_conditioning = "mean_sd",
   ccm_value = 1,
   ccp_value = 25,
   covs_scale_labels = "labels",
   adjust = list("bonf"),
-  model_type = "lmer",
   covs_scale = NULL,
   dep_scale = "none",
   scale_missing = "complete",
   norm_test = FALSE,
   cluster = NULL,
-  re = list(list()),
-  nested_re = list(list()),
-  re_corr = "all",
-  re_modelterms = TRUE,
-  re_listing = "none",
+  re = NULL,
+  nested_re = NULL,
   reml = TRUE,
   re_lrt = FALSE,
   re_ci = FALSE,
@@ -69,11 +62,9 @@ gamljMixed(
 )
 }
 \arguments{
+\item{formula}{(optional) the formula of the linear mixed model as defined in \link[lme4]{lmer}.}
+
 \item{data}{the data as a data frame}
-
-\item{.caller}{.}
-
-\item{.interface}{.}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. Not needed if \code{formula} is used.}
@@ -88,12 +79,10 @@ needed if \code{formula} is used.}
 terms. Not needed if \code{formula} is used.}
 
 \item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept. Not needed if \code{formula} is used.}
+fixed intercept. Overridden if \code{formula} is used and contains \code{~1} or \code{~0}.}
 
 \item{nested_terms}{a list of character vectors describing effects terms
 for nestet. It can be passed as right-hand formula.}
-
-\item{comparison}{Not present in R}
 
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
@@ -103,8 +92,6 @@ intercept. Not needed if \code{formula} is used.}
 
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
-
-\item{donotrun}{.}
 
 \item{ci_method}{.}
 
@@ -145,7 +132,7 @@ range equal to the range of the observed values.}
 scale for covariates.}
 
 \item{plot_black}{\code{TRUE} or \code{FALSE} (default), use different
-linetypes per levels.}
+line type per levels.}
 
 \item{plot_around}{\code{'none'} (default), \code{'ci'}, or \code{'se'}.
 Use no error bars, use confidence intervals, or use standard errors on the
@@ -154,7 +141,7 @@ plots, respectively.}
 \item{plot_re}{\code{TRUE} or \code{FALSE} (default), add predicted values
 based on random effect in plot}
 
-\item{plot_re_method}{.}
+\item{plot_re_method}{}
 
 \item{emmeans}{a rhs formula with the terms specifying the marginal means
 to estimate (of the form \code{'~x+x:z'})}
@@ -164,10 +151,10 @@ the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
 so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
 passed also as a list of the form '}list("x","z",c("x","z")`'}
 
-\item{simple_effects}{The variable for which the simple effects (slopes)
+\item{simple_x}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simple_moderators}{the variable that provides the levels at which the
+\item{simple_mods}{the variable that provides the levels at which the
 simple effects are computed}
 
 \item{simple_interactions}{should simple Interactions be computed}
@@ -192,8 +179,6 @@ to the variable orginal levels, before scaling.}
 \code{'holm'},\code{'scheffe'}, \code{'tukey'}; provide no,  Bonferroni,
 Tukey and Holm Post Hoc corrections respectively.}
 
-\item{model_type}{.}
-
 \item{covs_scale}{a list of lists specifying the covariates scaling, one of
 \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
@@ -211,16 +196,6 @@ normality of residuals}
 \item{re}{a list of lists specifying the models random effects.}
 
 \item{nested_re}{a list of lists specifying the models random effects.}
-
-\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
-When random effects are passed as list of length 1, it decides whether the
-effects should be correlated,  non correlated. If \code{'re'} is a list of
-lists of length > 1, the option is automatially set to \code{'block'}. The
-option is ignored if the model is passed using \code{formula}.}
-
-\item{re_modelterms}{Not in R interface}
-
-\item{re_listing}{Not in R interface}
 
 \item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 be used rather than ML}
@@ -254,6 +229,12 @@ predicted by the first defined clustering variable}
 
 \item{rand_hist}{\code{TRUE} or \code{FALSE} (default), provide histogram
 of random Coefficients}
+
+\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
+When random effects are passed as list of length 1, it decides whether the
+effects should be correlated,  non correlated. If \code{'re'} is a list of
+lists of length > 1, the option is automatially set to \code{'block'}. The
+option is ignored if the model is passed using \code{formula}.}
 }
 \value{
 A results object containing:
@@ -302,5 +283,4 @@ data(subjects_by_stimuli)
 gamlj::gamljMixed(
        formula = y ~ 1 + cond+( 1|subj ),
        data = subjects_by_stimuli)
-
 }

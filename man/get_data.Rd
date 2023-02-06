@@ -5,7 +5,7 @@
 \alias{get_data.gamlj}
 \title{Extract data}
 \usage{
-get_data.gamlj(object)
+get_data(object, ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj*Results`}
@@ -24,7 +24,7 @@ gmod<-gamlj::gamljGlm(formula = performance ~ hours,
                 data = qsport,
                 scaling = c(hours='standardized'))
 
-gdata<-gamlj_data(gmod)
+gdata<-get_data(gmod)
 lm(performance ~ hours,data=gdata)
 }
 \author{

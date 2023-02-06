@@ -34,8 +34,8 @@ gamljGlm(
   plot_around = "ci",
   emmeans = NULL,
   posthoc = NULL,
-  simple_effects = NULL,
-  simple_moderators = NULL,
+  simple_x = NULL,
+  simple_mods = NULL,
   simple_interactions = FALSE,
   covs_scale = NULL,
   covs_conditioning = "mean_sd",
@@ -45,7 +45,6 @@ gamljGlm(
   adjust = list("bonf"),
   posthoc_es = list("dm"),
   d_ci = FALSE,
-  model_type = "lm",
   es = list("beta", "etap"),
   homo_test = FALSE,
   qq_plot = FALSE,
@@ -150,10 +149,10 @@ the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
 so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
 passed also as a list of the form '}list("x","z",c("x","z")`'}
 
-\item{simple_effects}{The variable for which the simple effects (slopes)
+\item{simple_x}{The variable for which the simple effects (slopes)
 are computed}
 
-\item{simple_moderators}{a character vector with the variable(s) providing the levels at which the
+\item{simple_mods}{a character vector with the variable(s) providing the levels at which the
 simple effects are computed}
 
 \item{simple_interactions}{should simple Interactions be computed}
@@ -189,8 +188,6 @@ Bonferroni, Tukey and Holm Post Hoc corrections respectively.}
 SD )  or Hedge's g}
 
 \item{d_ci}{\code{TRUE} or \code{FALSE} (default), d confidence intervals}
-
-\item{model_type}{.}
 
 \item{es}{a list of effect sizes to print out. They can be:  \code{"eta"}
 for eta-squared, \code{'etap'} for partial eta-squared, \code{'omega'} for

@@ -32,25 +32,8 @@ items:
              type: Table
              description: a table of R
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
-                           ### nestedoptions  begins
-                         - nested_terms
-                         - nested_intercept
-                         - comparison
-                           ### nestedoptions  ends
+                         - __modeloptions__
+                         - __nestedoptions__
     
              rows: 1
              columns:
@@ -80,20 +63,7 @@ items:
              type: Table
              visible: true
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                     - name: info
@@ -121,20 +91,7 @@ items:
              type: Table
              description: a table of ANOVA results
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                     - name: source
@@ -156,20 +113,7 @@ items:
              title:  Parameter Estimates (Coefficients)
              type: Table
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                     - name: response
@@ -224,20 +168,7 @@ items:
              type: Table
              visible: (vcov)
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
+                         - __modeloptions__
 
              columns:
                     - name: source
@@ -276,29 +207,8 @@ items:
              type: Table
              visible: (es:marginals)
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
-                           ### simpleeffectsoptions  begins
-                         - simple_x
-                         - simple_mods
-                         - simple_scale
-                         - ccm_value
-                         - ccp_value
-                         - covs_scale_labels
-                         - covs_conditioning
-                           ### simpleeffectsoptions  ends
+                         - __modeloptions__
+                         - __simpleeffectsoptions__
                     
              columns:
                     - name: response
@@ -340,20 +250,7 @@ items:
              type: Table
              visible: (es:RR)
              clearWith:
-                           ### modeloptions  begins
-                         - dep
-                         - factors
-                         - covs
-                         - covs_scale
-                         - model_terms
-                         - fixed_intercept
-                         - se_method
-                         - mute
-                         - df_method
-                         - contrasts
-                         - covs_scale
-                         - offset
-                           ### modeloptions  ends
+                         - __modeloptions__
                          - __effectsizeoptions
                     
              columns:

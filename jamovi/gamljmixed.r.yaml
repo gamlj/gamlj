@@ -396,8 +396,8 @@ items:
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
+                 - simple_x
+                 - simple_mods
                  - covs_conditioning
                  - ccm_value
                  - ccp_value
@@ -432,8 +432,8 @@ items:
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
+                 - simple_x
+                 - simple_mods
                  - covs_conditioning
                  - ccm_value
                  - ccp_value
@@ -492,8 +492,8 @@ items:
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
+                 - simple_x
+                 - simple_mods
                  - covs_conditioning
                  - ccm_value
                  - ccp_value
@@ -528,8 +528,8 @@ items:
                  - covs_scale
                  - dep_scale
                  - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
+                 - simple_x
+                 - simple_mods
                  - covs_conditioning
                  - ccm_value
                  - ccp_value

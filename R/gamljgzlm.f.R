@@ -1,26 +1,29 @@
 #' Generalized Linear Models
 #'
-#' Generalized Linear Model
-#'
+#' Generalized Linear Model with options to estimate logistic, probit, 
+#' ordinal, multinomial and custum link function models. Provides options
+#' to estimate posthoc, simple effects and slopes, plots of main effects and
+#' interaction. Model comparison is also an option.
+#' 
 #' @examples
-#' data <- emmeans::neuralgia
-#' gamlj::gamljGzlm(
-#'   formula = Pain ~ Duration,
-#'   data = data,
-#'   model_type = "logistic"
-#' )
+#'    data <- emmeans::neuralgia
+#'    gamlj::gamljGzlm(formula = Pain ~ Duration,
+#'                     data = data,
+#'                     model_type = "logistic"
+#'                     )
+#'      
 #' @param formula (optional) the formula of the model compatible with \link[stats]{glm}. If not passed,
-#'                model terms should be defined as a list in  \code{model_terms} option.
-#' @param data the data as a data frame
+#'                 model terms should be defined as a list in  \code{model_terms} option.
+#' @param data the data as a data.frame
 #' @param dep a string naming the dependent variable from \code{data}; the
-#'   variable must be numeric. Not needed if \code{formula} is used.
+#'            variable must be numeric. Not needed if \code{formula} is used.
 #' @param model_type define the type of model (link function and distribution combination) required.
-#'                   It can be \code{linear'}, \code{poisson'}, \code{poiover'}, \code{nb'},
-#'                   \code{logistic'}, \code{probit'}, \code{'custom}, \code{'ordinal'}, \code{'multinomial'}
+#'                   It can be \code{linear}, \code{poisson}, \code{poiover}, \code{nb},
+#'                   \code{logistic}, \code{probit}, \code{custom}, \code{ordinal}, \code{multinomial}
 #' @param custom_family Distribution family for the custom model, accepts
-#'   gaussian, binomial, gamma and inverse_gaussian .
+#'                        \code{gaussian}, \code{binomial}, \code{gamma} and \code{inverse_gaussian}.
 #' @param custom_link Distribution family for the \code{model_type="custom"}, accepts
-#'   \code{identity, \code{log and \code{inverse}. Use \code{onemu2}  for 1/mu^2).'
+#'   \code{identity}, \code{log} and \code{inverse}. Use \code{onemu2}  for 1/mu^2).
 #' @param factors a vector of strings naming the fixed factors from
 #'   \code{data}. Not needed if \code{formula} is used.
 #' @param covs a vector of strings naming the covariates from \code{data}. Not
@@ -33,9 +36,9 @@
 #' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param nested_terms a list of character vectors describing effects terms
-#'   for nestet. It can be passed as right-hand formula.
+#'   for nested model. It can be passed as right-hand formula.
 #' @param comparison Not present in R
-#' @param omnibus
+#' @param omnibus Whether the omnibus test for the model should be \code{wald} or \code{LRT}.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
 #'   in tables
 #' @param ci_method .
@@ -44,8 +47,8 @@
 #'   confidence interval width for the plots.
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
-#'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+#'   \code{deviation}, \code{simple}, \code{dummy}, \code{difference},
+#'   \code{helmert}, \code{repeated} or \code{'polynomial'}. If NULL,
 #'   \code{simple} is used. Can also be passed as a list of list of the form
 #'   list(list(var="var1",type="type1")).
 #' @param show_contrastnames \code{TRUE} or \code{FALSE} (default), shows raw
@@ -75,11 +78,11 @@
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
 #'   the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-#'   so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-#'   passed also as a list of the form '}list("x","z",c("x","z")`'
-#' @param simple_effects The variable for which the simple effects (slopes)
+#'   so \code{x*z} becomes \code{x+z} and not \code{x+z+x:z}. It can be
+#'   passed also as a list of the form \code{'list("x","z",c("x","z")'}
+#' @param simple_x The variable for which the simple effects (slopes)
 #'   are computed
-#' @param simple_moderators the variable that provides the levels at which the
+#' @param simple_mods the variable that provides the levels at which the
 #'   simple effects are computed
 #' @param simple_interactions should simple Interactions be computed
 #' @param covs_conditioning \code{'mean_sd'} (default), \code{'custom'} , or
@@ -91,8 +94,8 @@
 #'   \code{simpleScale}=\code{'percent'}
 #' @param covs_scale_labels how the levels of a continuous moderator should
 #'   appear in tables and plots: \code{labels}, \code{values} and
-#'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
-#'   to the variable orginal levels, before scaling.
+#'   \code{values_labels}, \code{ovalues}, \code{ovalues_labels}. The latter two refer
+#'   to the variable original levels, before scaling.
 #' @param adjust one or more of \code{'none'},  \code{'bonf'},\code{'tukey'}
 #'   \code{'holm'}; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections
 #'   respectively.
@@ -139,6 +142,7 @@
 #' \code{as.data.frame(results$info)}
 #'
 #' @export
+#' 
 gamljGzlm <- function(
     formula = NULL,
     data,
@@ -174,8 +178,8 @@ gamljGzlm <- function(
     plot_around = "ci",
     emmeans = NULL,
     posthoc = NULL,
-    simple_effects = NULL,
-    simple_moderators = NULL,
+    simple_x = NULL,
+    simple_mods = NULL,
     simple_interactions = FALSE,
     covs_conditioning = "mean_sd",
     ccm_value = 1,
@@ -200,8 +204,8 @@ gamljGzlm <- function(
   if (!missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
   if (!missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
   if (!missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
-  if (!missing(simple_effects)) simple_effects <- jmvcore::resolveQuo(jmvcore::enquo(simple_effects))
-  if (!missing(simple_moderators)) simple_moderators <- jmvcore::resolveQuo(jmvcore::enquo(simple_moderators))
+  if (!missing(simple_x)) simple_x <- jmvcore::resolveQuo(jmvcore::enquo(simple_x))
+  if (!missing(simple_mods)) simple_mods <- jmvcore::resolveQuo(jmvcore::enquo(simple_mods))
   if (missing(data)) {
     data <- jmvcore::marshalData(
       parent.frame(),
@@ -212,8 +216,8 @@ gamljGzlm <- function(
       `if`(!missing(plot_x), plot_x, NULL),
       `if`(!missing(plot_z), plot_z, NULL),
       `if`(!missing(plot_by), plot_by, NULL),
-      `if`(!missing(simple_effects), simple_effects, NULL),
-      `if`(!missing(simple_moderators), simple_moderators, NULL)
+      `if`(!missing(simple_x), simple_x, NULL),
+      `if`(!missing(simple_mods), simple_mods, NULL)
     )
   }
 
@@ -308,8 +312,8 @@ gamljGzlm <- function(
     plot_around = plot_around,
     emmeans = emmeans,
     posthoc = posthoc,
-    simple_effects = simple_effects,
-    simple_moderators = simple_moderators,
+    simple_x = simple_x,
+    simple_mods = simple_mods,
     simple_interactions = simple_interactions,
     covs_conditioning = covs_conditioning,
     ccm_value = ccm_value,

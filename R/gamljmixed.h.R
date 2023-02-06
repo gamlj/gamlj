@@ -37,8 +37,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_re_method = "average",
             emmeans = NULL,
             posthoc = NULL,
-            simple_effects = NULL,
-            simple_moderators = NULL,
+            simple_x = NULL,
+            simple_mods = NULL,
             simple_interactions = FALSE,
             covs_conditioning = "mean_sd",
             ccm_value = 1,
@@ -255,13 +255,13 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "posthoc",
                 posthoc,
                 default=NULL)
-            private$..simple_effects <- jmvcore::OptionVariable$new(
-                "simple_effects",
-                simple_effects,
+            private$..simple_x <- jmvcore::OptionVariable$new(
+                "simple_x",
+                simple_x,
                 default=NULL)
-            private$..simple_moderators <- jmvcore::OptionVariables$new(
-                "simple_moderators",
-                simple_moderators,
+            private$..simple_mods <- jmvcore::OptionVariables$new(
+                "simple_mods",
+                simple_mods,
                 default=NULL)
             private$..simple_interactions <- jmvcore::OptionBool$new(
                 "simple_interactions",
@@ -486,8 +486,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
-            self$.addOption(private$..simple_effects)
-            self$.addOption(private$..simple_moderators)
+            self$.addOption(private$..simple_x)
+            self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_conditioning)
             self$.addOption(private$..ccm_value)
@@ -551,8 +551,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_re_method = function() private$..plot_re_method$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
-        simple_effects = function() private$..simple_effects$value,
-        simple_moderators = function() private$..simple_moderators$value,
+        simple_x = function() private$..simple_x$value,
+        simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         covs_conditioning = function() private$..covs_conditioning$value,
         ccm_value = function() private$..ccm_value$value,
@@ -615,8 +615,8 @@ gamljMixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_re_method = NA,
         ..emmeans = NA,
         ..posthoc = NA,
-        ..simple_effects = NA,
-        ..simple_moderators = NA,
+        ..simple_x = NA,
+        ..simple_mods = NA,
         ..simple_interactions = NA,
         ..covs_conditioning = NA,
         ..ccm_value = NA,
@@ -1121,8 +1121,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "dep_scale",
                                 "fixed_intercept",
-                                "simple_effects",
-                                "simple_moderators",
+                                "simple_x",
+                                "simple_mods",
                                 "covs_conditioning",
                                 "ccm_value",
                                 "ccp_value",
@@ -1160,8 +1160,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "dep_scale",
                                 "fixed_intercept",
-                                "simple_effects",
-                                "simple_moderators",
+                                "simple_x",
+                                "simple_mods",
                                 "covs_conditioning",
                                 "ccm_value",
                                 "ccp_value",
@@ -1234,8 +1234,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale",
                                     "dep_scale",
                                     "fixed_intercept",
-                                    "simple_effects",
-                                    "simple_moderators",
+                                    "simple_x",
+                                    "simple_mods",
                                     "covs_conditioning",
                                     "ccm_value",
                                     "ccp_value",
@@ -1275,8 +1275,8 @@ gamljMixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale",
                                     "dep_scale",
                                     "fixed_intercept",
-                                    "simple_effects",
-                                    "simple_moderators",
+                                    "simple_x",
+                                    "simple_mods",
                                     "covs_conditioning",
                                     "ccm_value",
                                     "ccp_value",

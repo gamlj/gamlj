@@ -668,8 +668,8 @@ items:
                               - boot_r
                                 ### cioptions  ends
                                 ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
+                              - simple_x
+                              - simple_mods
                               - simple_scale
                               - ccm_value
                               - ccp_value
@@ -716,8 +716,8 @@ items:
                               - boot_r
                                 ### cioptions  ends
                                 ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
+                              - simple_x
+                              - simple_mods
                               - simple_scale
                               - ccm_value
                               - ccp_value
@@ -795,8 +795,8 @@ items:
                               - boot_r
                                 ### cioptions  ends
                                 ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
+                              - simple_x
+                              - simple_mods
                               - simple_scale
                               - ccm_value
                               - ccp_value
@@ -846,8 +846,8 @@ items:
                               - boot_r
                                 ### cioptions  ends
                                 ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
+                              - simple_x
+                              - simple_mods
                               - simple_scale
                               - ccm_value
                               - ccp_value
@@ -913,8 +913,8 @@ items:
                               - boot_r
                                 ### cioptions  ends
                                 ### simpleeffectsoptions  begins
-                              - simple_effects
-                              - simple_moderators
+                              - simple_x
+                              - simple_mods
                               - simple_scale
                               - ccm_value
                               - ccp_value

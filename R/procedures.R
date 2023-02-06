@@ -408,11 +408,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 .simpleEffects.default<-function(model,obj) {
 
   gstart("PROCEDURE: Simple Effects estimated")
-  variable<-obj$options$simple_effects
+  variable<-obj$options$simple_x
   variable64<-tob64(variable)
   varobj<-obj$datamatic$variables[[variable64]]
   
-  term<-obj$options$simple_moderators
+  term<-obj$options$simple_mods
 
   term64<-tob64(term)
   results<-list()
@@ -565,7 +565,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 .simpleEffects.multinom<-function(model,obj) {
 
 
-        levels <-lapply(obj$options$simple_moderators, function(x) {
+        levels <-lapply(obj$options$simple_mods, function(x) {
     
                 if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
                         seq_along(obj$datamatic$variables[[tob64(x)]]$levels)
@@ -574,11 +574,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
             })
   
   
-        vars  <- lapply(obj$options$simple_moderators, function(x) obj$datamatic$variables[[tob64(x)]])
+        vars  <- lapply(obj$options$simple_mods, function(x) obj$datamatic$variables[[tob64(x)]])
   
         rows  <- expand.grid(levels)
-        names(rows)  <-  tob64(obj$options$simple_moderators)
-        variable64   <-  tob64(obj$options$simple_effects)
+        names(rows)  <-  tob64(obj$options$simple_mods)
+        variable64   <-  tob64(obj$options$simple_x)
         varobj       <-  obj$datamatic$variables[[variable64]]
   
         .names       <-  names(rows)
@@ -658,7 +658,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
 .simpleEffects.mmblogit<-function(model,obj) {
   
-  levels <-lapply(obj$options$simple_moderators, function(x) {
+  levels <-lapply(obj$options$simple_mods, function(x) {
     
     if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
       seq_along(obj$datamatic$variables[[tob64(x)]]$levels)
@@ -667,11 +667,11 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   })
   
   
-  vars  <- lapply(obj$options$simple_moderators, function(x) obj$datamatic$variables[[tob64(x)]])
+  vars  <- lapply(obj$options$simple_mods, function(x) obj$datamatic$variables[[tob64(x)]])
   
   rows  <- expand.grid(levels)
-  names(rows)  <-  tob64(obj$options$simple_moderators)
-  variable64   <-  tob64(obj$options$simple_effects)
+  names(rows)  <-  tob64(obj$options$simple_mods)
+  variable64   <-  tob64(obj$options$simple_x)
   varobj       <-  obj$datamatic$variables[[variable64]]
   
   .names       <-  names(rows)
@@ -741,9 +741,9 @@ procedure.simpleInteractions<-function(obj) {
   
      gstart("PROCEDURE: simple Interactions")
   
-      variable<-obj$options$simple_effects
+      variable<-obj$options$simple_x
       variable64<-tob64(variable)
-      term<-obj$options$simple_moderators
+      term<-obj$options$simple_mods
       term64<-tob64(term)
       varobj<-obj$datamatic$variables[[variable64]]
       termobj<-sapply(term64,function(term) obj$datamatic$variables[[term]])

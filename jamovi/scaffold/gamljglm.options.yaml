@@ -16,3 +16,12 @@ cioptions:
         - ci_width
         - ci_method
         - boot_r
+
+simpleeffectsoptions:
+                 - simple_x
+                 - simple_mods
+                 - simple_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - covs_conditioning
