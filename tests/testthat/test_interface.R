@@ -27,7 +27,6 @@ testthat::test_that("summary glm", {
 })
 
 
-sums[[1]]$info[2]
 
 newopt<-list(var="hours",type="standardized") 
 
@@ -51,11 +50,6 @@ testthat::test_that("updating", {
   testthat::expect_equal(res1$estimate[2],1.4073,tol)
   testthat::expect_equal(res2$etaSqP[2],0.4147,tol)
 })
-
-#test<-ggplot2::is.ggplot(plot(obj,formula = ~hours))
-#testthat::test_that("glm plot", {
-#  testthat::expect_true(test)
-#})
 
 
 data("hsbdemo")

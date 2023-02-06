@@ -5,7 +5,7 @@ menuGroup: Linear Models
 version: '3.0.0'
 jas: '1.2'
 completeWhenFilled: true
-export: true
+export: false
 description:
     main: |
           Generalized Mixed  Model

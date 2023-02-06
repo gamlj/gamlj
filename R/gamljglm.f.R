@@ -254,7 +254,6 @@ gamljGlm <- function(
          factors<-f$factors
     if (missing(covs))
       factors<-f$covs
-
   }
     
   if (!is.null(formula)) {

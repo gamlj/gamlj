@@ -41,7 +41,7 @@ testthat::test_that("p-table is ok", {
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
 
-testthat::test_that("a descplot is produced", {
+testthat::test_that("a mainplot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 })
 
@@ -128,7 +128,7 @@ testthat::test_that("ranova works",
 )
 
 testthat::test_that("mixed plot works",
-                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+                    testthat::expect_equal(model$main$ranova$asDF[2,2],6)
 )
 
 
@@ -140,7 +140,7 @@ adddata$cond<-factor(adddata$cond)
 model<-gamlj::gamljMixed(
   formula =formula,
   data = adddata, 
-  scaling = c(x="standardized")
+  covs_scale = c(x="standardized")
   
 )
 

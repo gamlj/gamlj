@@ -43,6 +43,7 @@ testthat::test_that("gzlm logistic coherence", {
     model_type = "logistic"
   ))
 })
+
 data("hsbdemo")
 mod <- gamlj::gamljGzlm(
   formula = schtyp ~ write + honors + honors:write,
@@ -221,7 +222,6 @@ mod <- gamlj::gamljGzlm(
   posthoc = ~age,
   emmeans = ~agg_test
 )
-
 testthat::test_that("Custom model works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 2.151, tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1], 168.42, tol)
@@ -314,6 +314,8 @@ mod <- gamlj::gamljGzlm(
 
 testthat::test_that("logistic comparison", {
   testthat::expect_equal(mod$main$r2$asDF[3,2],.0265,tol)
+  testthat::expect_equal(mod$main$r2$asDF[1,6],.0444,tol)
+  
 })
 
 mod <- gamlj::gamljGzlm(
@@ -326,3 +328,4 @@ mod <- gamlj::gamljGzlm(
 testthat::test_that("multinomila comparison", {
   testthat::expect_equal(mod$main$r2$asDF[3,2],.0061,tol)
 })
+

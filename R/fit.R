@@ -182,6 +182,9 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 
 .r2.glm <- function(model,obj) {
+  
+  ginfo(" .glm R2 is used for object of class",paste(class(model)))
+  
   alist <- list()
   # mcFadden and adjusted
   alist$r2 <- 1 - (model$deviance / model$null.deviance)
@@ -302,9 +305,10 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)
   results <- stats::anova(model0, model, test = "LRT")
+
  .names<-c(test=c("Deviance","LR.stat","LR stat.",""),
            df1=c("Df","   Df"),
-           p=c("Pr(Chi)","Pr(>Chisq)"))
+           p=c("Pr(Chi)","Pr(>Chisq)","Pr(>Chi)"))
   names(results)<-transnames(names(results),.names)
   results$deviance <- stats::deviance(model)
   results$null.deviance <- stats::deviance(model0) 
