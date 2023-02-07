@@ -9,47 +9,38 @@ data$w<-factor(data$w)
 data$yord<-factor(data$yord)
 data$ybin<-factor(data$ybin)
 
-options(digits = 3)
 
 mod0 <- gamlj::gamljGlm(
   formula = ycont~x,
   data = data
 )
+
 mod1 <- gamlj::gamljGlm(
   formula = ycont~x*w,
-  simple_x=x,
-  simple_mods=w,
   data = data,
-  plot_x=x,
-  qq_plot = T
-)
-mod1$simpleEffects
-simple_effects(mod1,simple_x = "x",simple_mods = "w")
-simple_effects(mod1)
-anova(mod1,nested_terms=~x)
-anova(mod1)
-
-coef(mod1)
-fit(mod1)
-plot(mod1)
-a<-assumptions(mod1)
-
-mod1 <- gamlj::gamljGzlm(
-  formula = ybin~x*w,
-  simple_x=x,
-  simple_mods=w,
-  data = data,
-  model_type="logistic"
 )
 
-c(mod1$main$fit,mod1$main$r2)
+a<-anova(mod1)
 
-terms(~w*x)
-all.vars(~w*x)
-dd<-gamlj::get_data(mod0)
+testthat::test_that("test glm anova", {
+  testthat::expect_equal(a[[1]]$asDF$r2,.3941,tol)
+  testthat::expect_equal(a[[2]]$asDF$f[3],106.018,tol)
+})
 
-update(mod0,plot_x="x")
-mod0$options$comparison
-get_data(mod0)
-class(mod0)
-anova(mod0)
+a<-anova(mod1,mod0)
+
+testthat::test_that("test glm anova comparison", {
+  testthat::expect_equal(a$asDF$f[3],179.192,tol)
+  testthat::expect_equal(a$asDF$r2[3],.1266,tol)
+})
+
+mod <- gamlj::gamljGlm(
+  formula = ycont~x*w,
+  data = data,
+  nested_terms = ~x
+)
+
+testthat::test_that("test glm anova comparison option", {
+  testthat::expect_true(all(mod$main$r2$asDF$ar2==a$asDF$ar2))
+})
+

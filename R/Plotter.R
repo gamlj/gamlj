@@ -58,14 +58,13 @@ Plotter <- R6::R6Class(
         
         ## collect the data 
         data<-self$plotData[[image$key]]
-        
+
+                
         ### prepare aestetics for one or two way scatterplot
         if (is.null(self$scatterZ)) {
                      names(data)[1]<-"x"
                     .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",group=1)
                     .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper")
-                    
-                    
         } else {
                      names(data)[1:2]<-c("x","z")
                      if (isFALSE(self$options$plot_black)) {
@@ -114,7 +113,7 @@ Plotter <- R6::R6Class(
                       .aesrandom<-ggplot2::aes_string(x = "x", y = "y", group="cluster", colour="z")
                        p <- p + ggplot2::geom_line(data = randomData, 
                                                   .aesrandom, 
-                                                  size = 0.4, 
+                                                  linewidth = 0.4, 
                                                   alpha = .50)
           }
           else { 
@@ -122,13 +121,13 @@ Plotter <- R6::R6Class(
                       p <- p + ggplot2::geom_line(data = randomData, 
                                                   .aesrandom,
                                                   color="gray74",
-                                                  size = 0.4, 
+                                                  linewidth = 0.4, 
                                                   alpha = .80)
                       if (attr(randomData,"xbetween"))
                                   p <- p + ggplot2::geom_point(data = randomData, 
                                                   .aesrandom,
                                                   color="gray4",
-                                                  size = 0.4, 
+                                                  linewidth = 0.4, 
                                                   alpha = .80)
                       
           }
@@ -138,7 +137,7 @@ Plotter <- R6::R6Class(
         ######### fix the bars ##########        
         if (self$scatterBars) {
           if (self$scatterX$type=="factor")
-            p <- p + ggplot2::geom_errorbar(data = data, .aesbar, size = .9, width=.3, position = self$scatterDodge)
+            p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width=.3, position = self$scatterDodge)
           else
             p <- p + ggplot2::geom_ribbon(data = data, .aesbar, linetype = 0, show.legend = F, alpha = 0.2)
         }
@@ -149,7 +148,7 @@ Plotter <- R6::R6Class(
         ### plot the lines 
         p <- p + ggplot2::geom_line(data = data, 
                                     .aestetics,
-                                     size = 1.2, 
+                                     linewidth = 1.2, 
                                      position=self$scatterDodge)
 
 
@@ -188,7 +187,7 @@ Plotter <- R6::R6Class(
               df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
               plot<-ggplot2::ggplot(data=df, ggplot2::aes(y=y, x=x)) +
                 ggplot2::geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
-                ggplot2::geom_point(ggplot2::aes(x=x,y=y), size=2, colour=theme$color[1]) +
+                ggplot2::geom_point(ggplot2::aes(x=x,y=y), linewidth=2, colour=theme$color[1]) +
                 ggplot2::xlab("Theoretical Quantiles") +
                 ggplot2::ylab("Standardized Residuals") 
       
@@ -403,28 +402,27 @@ Plotter <- R6::R6Class(
           !self$option("model_type","ordinal") &&
           !self$option("model_type","multinomial")) {
         self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
-
         if (self$option("plot_re_method","average")) {
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
-            model<-mf.update(private$.operator$model,formula=formula)
+            .model<-mf.update(private$.operator$model,formula=formula)
         } else
-            model<-private$.operator$model
+            .model<-private$.operator$model
         
-        y<-stats::predict(model,type="response")
+        y<-stats::predict(.model,type="response")
         
         randomData<-as.data.frame(cbind(y,rawData))
- 
+
         if (self$scatterX$type=="factor")
              levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
                     
         self$dispatcher$warnings<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
         # prepare a test for between variables to plot dots for random effects
+
         test<-tapply(as.numeric(rawData[[self$scatterX$name64]]),rawData[[self$scatterCluster$name64]],sd)
         test<-sum(sapply(test,function(x) as.numeric(is.na(x) || x==0)))
         nc<-self$scatterCluster$nlevels
         xbetween<-FALSE
         if ((test/nc)>.30) xbetween<-TRUE
-  
       }
       ### end of random ###
       

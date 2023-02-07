@@ -317,8 +317,8 @@ rFormula <- R6::R6Class(
         barslist <- lapply(bars, function(b) strsplit(b, "|", fixed = T)[[1]])
         self$random <- lapply(barslist, function(b) {
           cluster <- trimws(b[[2]])
-          self$clusters[[length(self$cluster) + 1]] <- cluster
-          .terms <-jmvcore::decomposeFormula(formula(paste0("~",b[[1]])))
+          ladd(self$clusters) <- cluster
+         .terms <-jmvcore::decomposeFormula(formula(paste0("~",b[[1]])))
           lapply(.terms, function(t) c(t,cluster))
         })
       }

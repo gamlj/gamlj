@@ -15,11 +15,11 @@ Datamatic <- R6::R6Class(
       super$initialize(options,dispatcher)
       
       self$vars<-unlist(c(options$dep,options$factors,options$covs))
+
       if (utils::hasName(options,"cluster"))
         self$vars<-c(options$cluster,self$vars)
       if (utils::hasName(options,"offset"))
         self$vars<-c(options$offset,self$vars)
-      
       private$.inspect_data(data)
       
     },

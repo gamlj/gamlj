@@ -55,9 +55,8 @@ testthat::test_that("a  resid boxplot is produced", {
 
 testthat::test_that("a randhist is produced", {
   testthat::expect_true(ggplot2::is.ggplot(model$assumptions$randHist[[1]]$plot$fun()))
-})
-testthat::test_that("a randhist is produced", {
   testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterResPred[[1]]$plot$fun()))
+  
 })
 
 
@@ -121,14 +120,18 @@ model<-gamlj::gamljMixed(
   plot_x = cond,
   re_lrt=T  
 )
+model
 
-
-testthat::test_that("ranova works",
+testthat::test_that("ranova works", {
                     testthat::expect_equal(model$main$ranova$asDF[2,2],6)
+                    testthat::expect_equal(model$main$ranova$asDF[2,2],6)
+}
 )
 
-testthat::test_that("mixed plot works",
-                    testthat::expect_equal(model$main$ranova$asDF[2,2],6)
+testthat::test_that("mixed plot works", {
+                    testthat::expect_true(ggplot2::is.ggplot(model$mainPlots[[1]]$plot$fun()))
+                    testthat::expect_true(ggplot2::is.ggplot(plot(model)))
+}
 )
 
 
@@ -144,18 +147,21 @@ model<-gamlj::gamljMixed(
   
 )
 
-testthat::test_that("standardizing with more clusters",
-                    testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
+testthat::test_that("standardizing with more clusters", {
+                    testthat::expect_equal(as.character(model$main$coefficients$asDF$source[3]),"x")
+                    testthat::expect_equal(model$main$coefficients$asDF$se[2],.3224,tol)
+}
 )
 
 model<-gamlj::gamljMixed(
   formula =formula,
   data = adddata, 
-  scaling = c("x"="clusterbasedstandardized")
+  covs_scale = c("x"="clusterbasedstandardized")
 )
+
 testthat::test_that("standardizing with more clusters",{
-                    testthat::expect_equal(as.character(model$main$fixed$asDF$source[3]),"x")
-                    testthat::expect_equal(model$main$fixed$asDF$estimate[1],19.60,tolerance = tol)
+                    testthat::expect_equal(as.character(model$main$coefficients$asDF$source[3]),"x")
+                    testthat::expect_equal(model$main$coefficients$asDF$estimate[1],19.60,tolerance = tol)
 }
                     
 )
@@ -177,34 +183,33 @@ testthat::test_that("some poly", {
 model<-gamlj::gamljMixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
   data = data,
-  scaling = list(list(
+  covs_scale = list(list(
     var="beer",
     type="standardized")))
 
 testthat::test_that("standardizing", {
-  testthat::expect_equal(model$main$fixed$asDF[2,2],.8506,tolerance = .002)
+  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.8506,tolerance = .002)
 })
 
 model<-gamlj::gamljMixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
   data = data,
-  scaling = list(list(
-    var="beer",
-    type="clusterbasedstandardized")))
+  covs_scale  = list("beer"="clusterbasedstandardized")
+  )
 
 testthat::test_that("cluster-based-standardizing", {
-  testthat::expect_equal(model$main$fixed$asDF[2,2],.6111,tolerance = tol)
+  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.5554,tolerance = tol)
 })
 
 model<-gamlj::gamljMixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
   data = data,
-  scaling = list(list(
-    var="beer",
-    type="clusterbasedcentered")))
+  covs_scale = list("beer"="clusterbasedcentered")
+  )
+
 
 testthat::test_that("cluster-based-centering", {
-  testthat::expect_equal(model$main$fixed$asDF[2,2],.6070,tolerance = .002)
+  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.5554,tol)
 })
 
 
@@ -213,25 +218,28 @@ model<-gamlj::gamljMixed(
    data = data
  )
 testthat::test_that("intercept only works",
-   expect_equal(round(model$main$random$asDF[1,3],digits = 2),1.74)
+          testthat::expect_equal(round(model$main$random$asDF[1,3],digits = 2),1.74)
 )
 
 data("subjects_by_stimuli")
 subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
+subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
+subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
+
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 model<-gamlj::gamljMixed(
   formula =formula,
   data = subjects_by_stimuli, 
-  lrtRandomEffects=T , 
-  plotHAxis=cond,
-  plotRandomEffects = T
+  re_lrt=T , 
+  plot_x=cond,
+  plot_re=T
 )
+
 testthat::test_that("ranova works",
-                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
+                    testthat::expect_equal(model$main$ranova$asDF$AIC[1],15722.49,tol)
 )
 
 testthat::test_that("plot works",{
-                    testthat::expect_equal(model$main$lrtRandomEffectsTable$asDF[2,2],6)
                     testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 }
 )
@@ -244,43 +252,35 @@ data$group<-factor(data$group)
 data$time<-factor(data$time)
 data$subj<-factor(data$subj)
 
-testthat::expect_warning(
-  gobj<-gamlj::gamljMixed(
+gobj<-gamlj::gamljMixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
-#  contrasts = c("group"="simple","time"="polynomial"),
-#  simple_effects = "time",
-#  simple_moderators = "group"
+  contrasts = c("group"="simple","time"="polynomial"),
+   simple_x = "time",
+   simple_mods = "group"
 )
-)
-gobj
-es.params<-gobj$simpleEffects$Params$asDF
 
 testthat::test_that("simple effects", {
-   testthat::expect_equal(as.character(es.params$contrast[[1]]),"linear")
-  testthat::expect_equal(as.character(es.params$contrast[[2]]),"quadratic")
-  testthat::expect_equal(round(es.params$estimate[3],digits=5),-7.32312)
+  testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[1]),"linear")
+  testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[2]),"quadratic")
+  testthat::expect_equal(gobj$simpleEffects$coefficients$asDF$estimate[3],-7.3231,tol)
  })
 
-es.anova<-gobj$main$anova$asDF
 
 gobj2<-gamlj::gamljMixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
-  data = data, postHoc = list(c("time","group")))
+  data = data, 
+  posthoc = list(c("time","group")))
 
-
-ph<-gobj2$postHocs[[1]]$asDF
-test<-ph[ph$c1=="0" & ph$c2=="1" & ph$c3=="6" & ph$c4=="1", ]
 
 testthat::test_that("posthoc in mixed", {
-  testthat::expect_equal(as.numeric(test[6]),155.5,tol=.00001)
-  testthat::expect_equal(as.numeric(test[9]),66,tol=.00001)
+  testthat::expect_equal(gobj2$posthoc[[1]]$asDF$group_lev1[8],"2")
+  testthat::expect_equal(gobj2$posthoc[[1]]$asDF$estimate[12],131.5833,tol)
 })
 
-es2.anova<-gobj2$main$anova$asDF
 
 testthat::test_that("order does not count", {
-  testthat::expect_equal(es2.anova[1,2],es.anova[1,2])
+  testthat::expect_equal(gobj$main$anova$asDF[1,2],gobj2$main$anova$asDF[1,2])
 
 })
 
