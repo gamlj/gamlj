@@ -1,5 +1,5 @@
-name: gamljGzlm
-title: Generalized Linear Models
+name: gamljgmixed
+title: Generalized Mixed Model
 jus: '2.0'
 compilerMode: tame
 events:
@@ -13,27 +13,12 @@ children:
         margin: large
         children:
           - type: Label
-            label: Continuous dependent variable
-            children:
-              - type: RadioButton
-                name: model_type_linear
-                optionName: model_type
-                optionPart: linear
-                events:
-                  change: './gamlj.events::onChange_model'
-          - type: Label
             label: Frequencies
             children:
               - type: RadioButton
                 name: model_type_poisson
                 optionName: model_type
                 optionPart: poisson
-                events:
-                  change: './gamlj.events::onChange_model'
-              - name: model_type_poiover
-                type: RadioButton
-                optionName: model_type
-                optionPart: poiover
                 events:
                   change: './gamlj.events::onChange_model'
               - type: RadioButton
@@ -72,23 +57,6 @@ children:
                 optionPart: multinomial
                 events:
                   change: './gamlj.events::onChange_model'
-          - type: Label
-            label: Custom Model
-            children:
-              - type: RadioButton
-                name: model_type_custom
-                optionName: model_type
-                optionPart: custom
-                events:
-                  change: './gamlj.events::onChange_model'
-              - type: ComboBox
-                name: custom_family
-                enable: (model_type_custom)
-              - type: ComboBox
-                name: custom_link
-                enable: (model_type_custom)
-                events:
-                  change: './gamlj.events::onChange_model'
   - type: VariableSupplier
     name: variablesupplier
     suggested:
@@ -122,20 +90,35 @@ children:
       - type: TargetLayoutBox
         children:
           - type: VariablesListBox
-            name: offset
-            maxItemCount: 1
+            name: cluster
+            height: small
             isTarget: true
-            itemDropBehaviour: overwrite
-            enable: '(model_type:logistic)'
-
+            events:
+              change: './gamlj.events::onChange_cluster'
   - type: LayoutBox
     margin: large
-    style: list
+    style: inline
     children:
+      - type: LayoutBox
+        style: list
+        children:
+          - type: Label
+            label: Estimation
+            style: list
+            children:
+              - name: donotrun
+                type: CheckBox
+          - type: Label
+            label: Model comparison
+            children:
+              - type: CheckBox
+                name: comparison
+                events:
+                  change: './gamlj.events::onEvent_comparison'
       - type: Label
         label: Effect Size
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: es_expb
             type: CheckBox
@@ -145,6 +128,7 @@ children:
             type: CheckBox
             optionPart: marginals
             optionName: es
+            enable: (!model_type_multinomial)
           - name: es_RR
             type: CheckBox
             optionPart: RR
@@ -153,27 +137,23 @@ children:
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list-inline
+        style: list
         children:
-          - name: expb_ci
-            type: CheckBox
           - name: estimates_ci
             type: CheckBox
+            label: Fixed parameters
+          - name: re_ci
+            type: CheckBox
+            label: Random variances
+            enable: (!model_type_multinomial)
+          - name: expb_ci
+            type: CheckBox
+            label: Fixed Exp(B)
           - type: TextBox
             name: ci_width
-            label: Interval
-            suffix: '%'
             format: number
-            enable: (estimates_ci || expb_ci)
-      - type: Label
-        label: Estimation
-        margin: large
-        style: list-inline
-        children:
-          - name: donotrun
-            type: CheckBox
   - type: CollapseBox
-    label: Model
+    label: Fixed Effects
     collapsed: true
     stretchFactor: 1
     children:
@@ -202,7 +182,6 @@ children:
                   type: TermLabel
               - type: CheckBox
                 name: fixed_intercept
-
           - type: TargetLayoutBox
             name: nested_layout
             transferAction: interactions
@@ -219,28 +198,122 @@ children:
               - type: CheckBox
                 name: nested_intercept
                 enable: (comparison)
-
+  - type: CollapseBox
+    label: Random Effects
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: Supplier
+        name: randomSupplier
+        label: Components
+        persistentItems: true
+        stretchFactor: 1
+        events:
+          change: './gamlj.events::onChange_randomSupplier'
+          update: './gamlj.events::onUpdate_randomSupplier'
+        children:
+          - type: TargetLayoutBox
+            transferAction: none
+            name: re_layout
+            children:
+              - type: ListBox
+                name: re
+                height: normal
+                addButton: Add correlated effects block
+                events:
+                  change: './gamlj.events::onChange_nested_re_add'
+                selectable: true
+                templateName: linreg-block-template
+                template:
+                  type: LayoutBox
+                  margin: normal
+                  targetArea: true
+                  children:
+                    - type: ListBox
+                      name: randblockList
+                      height: auto
+                      isTarget: true
+                      valueFilter: unique
+                      ghostText: drag term here
+                      events:
+                        change: './gamlj.events::onEvent_addRandomTerm'
+                      template:
+                        type: TermLabel
+                        format: ./rtermFormat
+          - type: TargetLayoutBox
+            transferAction: none
+            name: nested_re_layout
+            children:
+              - type: ListBox
+                name: nested_re
+                height: normal
+                addButton: Add correlated effects block
+                events:
+                  listItemAdded: './gamlj.events::onEvent_nothing'
+                  listItemRemoved: './gamlj.events::onEvent_nothing'
+                selectable: true
+                templateName: linreg-block-template
+                template:
+                  type: LayoutBox
+                  margin: normal
+                  targetArea: true
+                  children:
+                    - type: ListBox
+                      name: re_randblockList
+                      height: auto
+                      isTarget: true
+                      valueFilter: unique
+                      ghostText: drag term here
+                      itemDropBehaviour: emptyspace
+                      events:
+                        change: './gamlj.events::onEvent_addRandomTerm'
+                      template:
+                        type: TermLabel
+                        format: ./rtermFormat
       - type: LayoutBox
+        margin: large
         style: inline
         children:
           - type: Label
-            label: Model comparison
+            label: List components
             children:
               - type: CheckBox
-                name: comparison
+                name: re_modelterms
                 events:
-                  change: './gamlj.events::onEvent_comparison'
+                  change: './gamlj.events::onEvent_re_list'
+              - type: ComboBox
+                name: re_listing
+                events:
+                  change: './gamlj.events::onEvent_re_list'
           - type: Label
-            label: Omnibus test
+            label: Effects correlation
             children:
-              - name: omnibus_X
-                type: RadioButton
-                optionName: omnibus
-                optionPart: wald
-              - name: omnibus_LRT
-                type: RadioButton
-                optionName: omnibus
-                optionPart: LRT
+              - type: LayoutBox
+                margin: large
+                style: list
+                children:
+                  - type: RadioButton
+                    name: re_corr_all
+                    optionName: re_corr
+                    optionPart: all
+                    events:
+                      change: './gamlj.events::onEvent_corr'
+                  - type: RadioButton
+                    name: re_corr_none
+                    optionName: re_corr
+                    optionPart: none
+                  - type: RadioButton
+                    name: re_corr_block
+                    optionName: re_corr
+                    optionPart: block
+          - type: Label
+            label: Tests
+            children:
+              - type: LayoutBox
+                margin: large
+                children:
+                  - type: CheckBox
+                    name: re_lrt
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -295,12 +368,12 @@ children:
         margin: large
         style: inline
         children:
-          - type: Label
-            label: Covariates conditioning
+          - type: LayoutBox
+            margin: small
+            style: list
             children:
-              - type: LayoutBox
-                margin: large
-                style: list
+              - type: Label
+                label: Covariates conditioning
                 children:
                   - type: RadioButton
                     name: covs_conditioning_mean_sd
@@ -310,6 +383,7 @@ children:
                       - type: TextBox
                         name: ccm_value
                         format: number
+                        enable: (covs_conditioning_mean_sd)
                   - name: covs_conditioning_percent
                     type: RadioButton
                     optionName: covs_conditioning
@@ -330,6 +404,17 @@ children:
                 children:
                   - type: ComboBox
                     name: covs_scale_labels
+              - type: Label
+                label: Scaling on
+                children:
+                  - type: ComboBox
+                    name: scale_missing
+                    label: ''
+              - type: LayoutBox
+                margin: large
+                children:
+                  - type: CheckBox
+                    name: norm_test
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -359,40 +444,30 @@ children:
           - type: Label
             label: Correction
             children:
-              - type: LayoutBox
-                margin: small
-                style: list
-                children:
-                  - name: adjust_none
-                    type: CheckBox
-                    optionPart: none
-                    optionName: adjust
-                  - name: adjust_bonf
-                    type: CheckBox
-                    optionPart: bonf
-                    optionName: adjust
-                  - name: adjust_tukey
-                    type: CheckBox
-                    optionPart: tukey
-                    optionName: adjust
-              - type: LayoutBox
-                margin: small
-                style: list
-                children:
-                  - name: adjust_holm
-                    type: CheckBox
-                    optionPart: holm
-                    optionName: adjust
-                  - name: adjust_scheffe
-                    type: CheckBox
-                    optionName: adjust
-                    optionPart: scheffe
-                  - name: adjust_sidak
-                    type: CheckBox
-                    optionName: adjust
-                    optionPart: sidak
-
-
+              - name: adjust_none
+                type: CheckBox
+                optionPart: none
+                optionName: adjust
+              - name: adjust_bonf
+                type: CheckBox
+                optionPart: bonf
+                optionName: adjust
+              - name: adjust_tukey
+                type: CheckBox
+                optionPart: tukey
+                optionName: adjust
+              - name: adjust_holm
+                type: CheckBox
+                optionPart: holm
+                optionName: adjust
+              - name: adjust_scheffe
+                type: CheckBox
+                optionName: adjust
+                optionPart: scheffe
+              - name: adjust_sidak
+                type: CheckBox
+                optionName: adjust
+                optionPart: sidak
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -432,14 +507,14 @@ children:
             label: Display
             children:
               - type: RadioButton
-                name: plot_around_none
+                name: errBarDef_none
                 optionName: plot_around
                 optionPart: none
               - type: RadioButton
-                name: plot_around_ci
+                name: errBarDef_ci
                 optionName: plot_around
                 optionPart: ci
-              - name: plot_around_se
+              - name: plotError_se
                 type: RadioButton
                 optionName: plot_around
                 optionPart: se
@@ -454,7 +529,7 @@ children:
                 name: plot_scale_link
                 optionName: plot_scale
                 optionPart: link
-                enable: (!model_type_multinomial && !model_type_ordinal && !model_type_linear)
+                enable: (!model_type_multinomial && !model_type_ordinal)
               - type: RadioButton
                 name: plot_scale_mean.class
                 optionName: plot_scale
@@ -473,6 +548,27 @@ children:
                 name: plot_xoriginal
               - type: CheckBox
                 name: plot_black
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+          - type: Label
+            label: Random Effects
+            enable: (!model_type_ordinal && !model_type_multinomial)
+            children:
+              - type: CheckBox
+                name: plot_re
+                enable: (!model_type_ordinal && !model_type_multinomial)
+              - type: RadioButton
+                name: plot_re_method_average
+                optionName: plot_re_method
+                optionPart: average
+                enable: (!model_type_ordinal && !model_type_multinomial)
+              - type: RadioButton
+                name: plot_re_method_full
+                optionName: plot_re_method
+                optionPart: full
+                enable: (!model_type_ordinal && !model_type_multinomial)
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -541,16 +637,16 @@ children:
                 name: ci_method_wald
                 optionName: ci_method
                 optionPart: wald
-              - type: RadioButton
-                name: ci_method_profile
+              - name: ci_method_profile
+                type: RadioButton
                 optionName: ci_method
                 optionPart: profile
-              - name: ci_method_quantile
-                type: RadioButton
+              - type: RadioButton
+                name: ci_method_quantile
                 optionName: ci_method
                 optionPart: quantile
-              - name: ci_method_bcai
-                type: RadioButton
+              - type: RadioButton
+                name: ci_method_bcai
                 optionName: ci_method
                 optionPart: bcai
               - type: TextBox
@@ -558,24 +654,14 @@ children:
                 format: number
                 enable: (ci_method_quantile || ci_method_bcai)
           - type: Label
-            name: add_info
-            label: Additional info
-            children:
-              - type: CheckBox
-                name: vcov
-              - type: CheckBox
-                name: propodds_test
-      - type: LayoutBox
-        margin: large
-        style: inline
-        children:
-          - type: Label
             label: Save
             children:
               - type: Output
                 name: predicted
+                enable: (!model_type_ordinal)
               - type: Output
                 name: residuals
+                enable: (!model_type_ordinal)
           - type: Label
             label: Table
             children:

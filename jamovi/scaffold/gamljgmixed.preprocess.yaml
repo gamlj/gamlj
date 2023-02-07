@@ -1,12 +1,11 @@
 ---
-name:  gamljGzlm
-title: Generalized Linear Model
+name:  gamljgmixed
+title: Generalized Mixed Model
 jrs: '1.0'
 items:
   - name: model
     type: Property
-    description: The underlying estimated model
-
+ 
   - name: info
     title: Model Info
     type: Table
@@ -20,7 +19,6 @@ items:
        - name: specs
          type: text
          title: ""
-
     refs: gamlj
      
   - name: main
@@ -34,32 +32,33 @@ items:
              clearWith:
                          - __modeloptions__
                          - __nestedoptions__
-    
+                         
+
              rows: 1
              columns:
                     - name: model
                       title: Model
                       visible: (comparison)
+                    - name: type
+                      type: text
+                      title: Type
                     - name: r2
                       title: R²
-                      type: number
-                    - name: ar2
-                      title: Adj. R²
                       type: number
                     - name:  df1
                       title: df
                       type: integer
                     - name: test
-                      title: X²
+                      title: LRT X²
                       type: number
                     - name: p
                       title: p
                       type: number
                       format: zto,pvalue
              refs: goodness
-                      
+
            - name: fit
-             title: Additional indices
+             title: Additional Indices
              type: Table
              visible: true
              clearWith:
@@ -87,12 +86,13 @@ items:
   
 
            - name: anova
-             title:  Omnibus tests
+             title: Fixed Effects Omnibus Tests
              type: Table
-             description: a table of ANOVA results
+             visible: false
+             description: a table of omnibus
              clearWith:
                          - __modeloptions__
-
+                         
              columns:
                     - name: source
                       title: ""
@@ -102,7 +102,7 @@ items:
                       type: number
                     - name: df
                       title: df
-                      type: integer
+                      type: number
                     - name: p
                       title: p
                       type: number
@@ -110,19 +110,19 @@ items:
 
 
            - name: coefficients
-             title:  Parameter Estimates (Coefficients)
+             title:  Parameter Estimates (Fixed Coefficients)
              type: Table
              clearWith:
                          - __modeloptions__
-
+                         - __cioptions__
+ 
              columns:
                     - name: response
                       title: Response 
                       type: text
                       visible: (model_type:multinomial)
-                      combineBelow: true
                     - name: source
-                      title: "Name"
+                      title: "Names"
                       type: text
                       visible: (show_contrastnames)
                     - name: label
@@ -132,7 +132,7 @@ items:
                       title: "Estimate"
                       type: number
                     - name: se
-                      title: "SE"
+                      title: SE
                       type: number
                     - name: est.ci.lower
                       type: number
@@ -142,7 +142,6 @@ items:
                       type: number
                       title: Upper
                       visible: (estimates_ci)
-                      
                     - name: expb
                       type: number
                       title: Exp(B)
@@ -155,7 +154,7 @@ items:
                       type: number
                       title: Upper
                       visible: (es:expb & expb_ci)
-                    - name: test
+                    - name: z
                       title: "z"
                       type: number
                     - name: p
@@ -163,19 +162,7 @@ items:
                       type: number
                       format: zto,pvalue
 
-           - name: vcov
-             title: Coefficients Covariances
-             type: Table
-             visible: (vcov)
-             clearWith:
-                         - __modeloptions__
-
-             columns:
-                    - name: source
-                      title: "Coefficient"
-                      type: text
-                      visible: (show_contrastnames)
-
+             refs: parameters
 
 
            - name: contrastCodeTables
@@ -187,7 +174,7 @@ items:
              clearWith:
                     - contrasts
              template:
-                   title:  $key
+                   title:  "Factor: ___key___"
                    type: Table
                    columns:
                          - name: cname
@@ -202,14 +189,15 @@ items:
                            type: text
                            visible: false
 
+
            - name:  marginals
              title: Marginal Effects
              type: Table
              visible: (es:marginals)
              clearWith:
                          - __modeloptions__
-                         - __simpleeffectsoptions__
-                    
+                         - __cioptions__
+              
              columns:
                     - name: response
                       title: "Response"
@@ -231,12 +219,9 @@ items:
                     - name: est.ci.lower
                       type: number
                       title: Lower
-                      visible: (expb_ci | estimates_ci)
                     - name: est.ci.upper
                       type: number
                       title: Upper
-                      visible: (expb_ci | estimates_ci)
-                      
                     - name: test
                       title: z
                       type: number
@@ -251,8 +236,7 @@ items:
              visible: (es:RR)
              clearWith:
                          - __modeloptions__
-                         - __effectsizeoptions
-                    
+                         - __cioptions__
              columns:
                     - name: source
                       title: "Name"
@@ -283,69 +267,124 @@ items:
                       type: number
                       format: zto,pvalue
 
-           - name: paralleltest
-             title: Parallel lines test
+           - name: random
+             title: Random Components
              type: Table
-             visible: (propodds_test & model_type:ordinal)
+             visible: false
              clearWith:
-                    - dep
-                    - model_terms
-                    - fixed_intercept
-                    - propodds_test
-                  
+                         - __modeloptions__
+                         - __cioptions__
              columns:
-                    - name: source
-                      title: ""
+                    - name: groups
+                      title: "Groups"
                       type: text
-                      visible: (show_contrastnames)
-                    - name: loglik
-                      title: "Log-Lik."
+                      combineBelow: true
+                    - name: name
+                      title: "Name"
+                      type: text
+                    - name: std
+                      title: "SD"
                       type: number
-                    - name: aic
-                      title: "AIC"
+                    - name: var
+                      title: "Variance"
                       type: number
-                    - name: test
-                      title:  X²
+                    - name: var.ci.lower
                       type: number
-                    - name: df
-                      title: "df"
-                      type: integer
-                    - name: p
-                      title: "p"
+                      title: Lower
+                      visible: (re_ci)
+                    - name: var.ci.upper
                       type: number
-                      format: zto,pvalue
+                      title: Upper
+                      visible: (re_ci)
+                    - name: icc
+                      title: "ICC"
+                      type: number
+
+           - name: randomcov
+             title: Random Parameters correlations
+             type: Table
+             visible: false
+             clearWith:
+                         - __modeloptions__
+
+             columns:
+                   - name: groups
+                     title: "Groups"
+                     combineBelow: true
+                     type: text
+                   - name: name
+                     title: "name"
+                     type: text
+                   - name: name2
+                     title: "name2"
+                     type: text
+                   - name: std
+                     title: "Corr."
+                     type: number
+
+           - name: multirandom
+             title: Random Parameters covariances
+             type: Array
+             visible: true
+             clearWith:
+                         - __modeloptions__
+             template:
+               type: Table
+               title:  "Covariances for:  ___key___"
+               columns:
+                   - name: name
+                     title: "name"
+                     type: text
+
+           - name: ranova
+             title: Random Effect LRT
+             type: Table
+             visible: (re_lrt)
+             clearWith:
+                         - __modeloptions__
+
+             columns:
+                   - name: test
+                     title: "Test"
+                     combineBelow: true
+                     type: text
+                   - name: npar
+                     title: "N. par"
+                     type: number
+                   - name: AIC
+                     title: "AIC"
+                     type: number
+                   - name: LRT
+                     title: "LRT"
+                     type: number
+                   - name: df
+                     title: "df"
+                     type: number
+                   - name: p
+                     title: "p"
+                     type: number
+                     format: zto,pvalue
 
   - name: posthoc
     title: Post Hoc Tests
     type: Array
     description: an array of post-hoc tables
     items: (posthoc)
-    clearWith:
-        - dep
-        - model_terms
-        - contrasts
-        - covs_conditioning
-        - dep_scale
-        - posthoc
-        - adjust
-        - ci_method
-        - boot_r
-        - offset
-        
     template:
-        title:  ""
+        title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-              - posthoc
-              - ci_method
-              - offset
-  
+                         - __modeloptions__
+                         - __cioptions__
+                         - adjust
+
         columns:
         - name: response
           title: Response 
           type: text
           visible: (model_type:multinomial)
           combineBelow: true
+
         - name: estimate
           title: Difference
           type: number
@@ -363,7 +402,7 @@ items:
         - name: test
           title: z
           type: number
-        - name: none
+        - name: p
           title: p
           type: number
           format: zto,pvalue
@@ -383,10 +422,21 @@ items:
           type: number
           format: zto,pvalue
           visible: (adjust:holm)
+        - name: scheffe
+          title: p<sub>scheffe</sub>
+          type: number
+          format: zto,pvalue
+          visible: (adjust:scheffe)
+        - name: sidak
+          title: p<sub>sidak</sub>
+          type: number
+          format: zto,pvalue
+          visible: (adjust:sidak)
+
 
 
   - name: simpleEffects
-    title: Simple Effects
+    title: Simple Effects 
     type: Group
     items:
             - name: anova
@@ -395,55 +445,34 @@ items:
               description: a table of ANOVA for simple effects
               visible: false
               clearWith:
-                 - dep
-                 - model_terms
-                 - contrasts
-                 - covs_conditioning
-                 - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
-                 - covs_scale
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
-                 - offset
-
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
               columns:
-                 - name: test
-                   title: X²
-                   type: number
-                 - name: df1
-                   title: df
-                   type: integer
-                 - name: p
-                   title: p
-                   type: number
-                   format: zto,pvalue
+                   - name: test
+                     title: X²
+                     type: number
+                   - name: df1
+                     title: df
+                     type: number
+                   - name: p
+                     title: p
+                     type: number
+                     format: zto,pvalue
 
             - name: coefficients
               title: Parameter Estimates for simple effects of ___key___
               type: Table
               visible: false
               clearWith:
-                 - dep
-                 - model_terms
-                 - contrasts
-                 - covs_conditioning
-                 - dep_scale
-                 - fixed_intercept
-                 - simple_effects
-                 - simple_moderators
-                 - covs_scale
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
-                 - ci_method
-                 - boot_r
-                 - offset
- 
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
+
+                
               columns:
                      - name: response
-                       title: Response 
+                       title: "Response"
                        type: text
                        combineBelow: true
                        visible: (model_type:multinomial)
@@ -454,7 +483,7 @@ items:
                        title: "Estimate"
                        type: number
                      - name: se
-                       title: "SE"
+                       title: SE
                        type: number
                      - name: est.ci.lower
                        type: number
@@ -464,18 +493,6 @@ items:
                        type: number
                        title: Upper
                        visible: (estimates_ci)
-                     - name: expb
-                       type: number
-                       title: Exp(B)
-                       visible: (es:expb)
-                     - name: expb.ci.lower
-                       type: number
-                       title: Lower
-                       visible: (expb_ci)
-                     - name: expb.ci.upper
-                       type: number
-                       title: Upper
-                       visible: (expb_ci)
                      - name: test
                        title: "z"
                        type: number
@@ -489,19 +506,7 @@ items:
     title: Simple Interactions 
     type: Array
     description: an array of simple interactions tables
-    visible: false
-    clearWith:
-        - dep
-        - model_terms
-        - contrasts
-        - covs_conditioning
-        - dep_scale
-        - fixed_intercept
-        - covs_scale_labels
-        - ci_width
-        - emmeans
-        - offset
-
+    visible: (simple_interactions)
     template:
         title:  "Interaction: ___key___"
         type: Group
@@ -509,7 +514,12 @@ items:
         items:
            - type: Table
              name: anova
-             title: ANOVA test -  $key
+             title: ANOVA 
+             clearWith:
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
+
              columns:
                    - name: effect
                      title: 'Effect'
@@ -518,8 +528,8 @@ items:
                      title: X²
                      type: number
                    - name: df1
-                     title: df
-                     type: integer
+                     title: df1
+                     type: number
                    - name: p
                      title: p
                      type: number
@@ -527,17 +537,16 @@ items:
 
            - type: Table
              name: coefficients
-             title: Parameter Estimates for -  $key
+             title: Parameter Estimates 
+             clearWith:
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
+
              columns:
-             
                    - name: effect
                      title: 'Effect'
                      type: text
-                   - name: response
-                     title: Response 
-                     type: text
-                     visible: (model_type:multinomial)
-                     
                    - name: estimate
                      title: Estimate
                      type: number
@@ -550,7 +559,7 @@ items:
                    - name: est.ci.upper
                      title: Upper
                      type: number
-                   - name: test
+                   - name: z
                      title: z
                      type: number
                    - name: p
@@ -569,28 +578,11 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - emmeans
-            - model_terms
-            - ci_width
-            - ci_method
-            - se_method
-            - boot_r
-            - covs_scale
-            - dep_scale
-            - covs_conditioning            
-            - covs_scale_labels   
-            - covs_conditioning
-            - covs_scale_labels
-            - ccp_value
-            - ccm_value
-
+                              - __modeloptions__
+                              - __cioptions__
+                              - __simpleeffectsoptions__
+            
         columns:
-        - name: response
-          title: Response 
-          type: text
-          visible: (model_type:multinomial)
-          combineBelow: true
-
         - name: estimate
           title: 'Mean'
           type: number
@@ -617,46 +609,25 @@ items:
           width: 600
           height: 400
 
-          clearWith:
-           - dep
-           - plot_x
-           - plot_z
-           - plot_by
-           - plot_raw
-           - plot_yscale
-           - plot_scale
-           - plot_xoriginal
-           - plot_black
-           - plot_around
-           - ci_width
-           - covs_scale
-           - dep_scale
-           - model_terms
-           - fixed_intercept
-           - covs_conditioning
-           - covs_scale_labels
-           - ccp_value
-           - ccm_value
-
 
   - name: plotnotes
     type: Html
     visible: false
 
 
+
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GZLM_PRED_${ dep }`'
+    varTitle: '`GZMIXED_PRED_${ dep }`'
     varDescription: Predicted values
-    initInRun: true
     clearWith:
-        - dep
-        - model_terms
+             - __modeloptions__
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GZLM_RES_${ dep }`'
+    varTitle: '`GZMIXED_RES_${ dep }`'
     varDescription: Residuals values
-
-
+    clearWith:
+             - __modeloptions__
+        

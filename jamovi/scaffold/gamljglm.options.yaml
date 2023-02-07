@@ -7,6 +7,11 @@ modeloptions:
         - fixed_intercept
         - se_method
         - mute
+        - df_method
+        - contrasts
+        - covs_scale
+        - offset
+
 nestedoptions:
         - nested_terms
         - nested_intercept
@@ -16,8 +21,11 @@ cioptions:
         - ci_width
         - ci_method
         - boot_r
-
+        
+effectsizeptions:
+                 - es
 simpleeffectsoptions:
+
                  - simple_x
                  - simple_mods
                  - simple_scale
@@ -25,3 +33,4 @@ simpleeffectsoptions:
                  - ccp_value
                  - covs_scale_labels
                  - covs_conditioning
+

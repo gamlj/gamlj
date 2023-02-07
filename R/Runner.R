@@ -651,7 +651,7 @@ Runner <- R6::R6Class("Runner",
                                      self$errors<-list(topic="tab_randomTests",message=paste("LR tests cannot be computed",results$error))
                                   else {
                                     ranova_test<-results$obj[-1,]
-                                    ranova_test$test<-fromb64(rownames(results$obj[-1,]),self$vars)
+                                    ranova_test$test<-fromb64(rownames(results$obj[-1,]))
                                     self$tab_randomTests<-ranova_test
                                   }
                                 }

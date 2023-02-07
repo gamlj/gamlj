@@ -150,7 +150,7 @@
 #' \code{as.data.frame(results$info)}
 #'
 #' @export
-gamljGlmMixed <- function(
+gamlj_gmixed <- function(
     formula=NULL,  
     data=NULL,
     dep = NULL,
@@ -301,7 +301,7 @@ gamljGlmMixed <- function(
    
    ### fix some options when passed by R ####
    if (is.something(names(covs_scale)))
-     scaling<-lapply(names(covs_scale), function(a) list(var=a,type=covs_scale[[a]]))
+     covs_scale<-lapply(names(covs_scale), function(a) list(var=a,type=covs_scale[[a]]))
    
    if (is.something(names(contrasts)))
      contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
@@ -309,7 +309,7 @@ gamljGlmMixed <- function(
    ## end of custom code
    
     
-  options <- gamljGlmMixedOptions$new(
+  options <- gamljgmixedOptions$new(
     .caller = .caller,
     .interface = .interface,
     dep = dep,
@@ -363,7 +363,7 @@ gamljGlmMixed <- function(
     re_lrt = re_lrt,
     re_ci = re_ci)
   
-  analysis <- gamljGlmMixedClass$new(
+  analysis <- gamljgmixedClass$new(
     options = options,
     data = data)
   

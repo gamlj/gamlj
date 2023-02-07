@@ -1,4 +1,4 @@
-testthat::context("gzlmixed")
+testthat::context("glmixed")
 tol=.001
 data("glmmixeddata")
 data<-glmmixeddata
@@ -10,14 +10,14 @@ data$yord<-factor(data$yord)
 data$ybin<-factor(data$ybin)
 
 
-mod0 <- gamlj::gamljGlmMixed(
+mod0 <- gamlj::gamlj_gmixed(
   formula = ybin~x*w+(1+x|cluster),
   data = data,
   model_type = "logistic"
 )
 
 
-mod1 <- gamlj::gamljGlmMixed(
+mod1 <- gamlj::gamlj_gmixed(
   data=data,
   model_type = "logistic",
   dep = "ybin",
@@ -27,7 +27,7 @@ mod1 <- gamlj::gamljGlmMixed(
   re=list(list(list("Intercept","cluster"),list("x","cluster")))
 )
 
-mod2 <- gamlj::gamljGlmMixed(
+mod2 <- gamlj::gamlj_gmixed(
   data=data,
   model_type = "logistic",
   dep = "ybin",
@@ -48,7 +48,7 @@ testthat::test_that("equivalent model input", {
 
 
 
-model <- gamlj::gamljGlmMixed(
+model <- gamlj::gamlj_gmixed(
   formula = ybin~x*w*z+(1+x|cluster),
   data = data,
   model_type = "logistic"

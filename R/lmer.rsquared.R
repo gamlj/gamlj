@@ -8,6 +8,8 @@
 #'         "Family", "Marginal", "Conditional" and "AIC" columns
 #' @author: Jon Lefcheck
 #' @references  Lefcheck, Jonathan S. (2015) piecewiseSEM: Piecewise structural equation modeling in R for ecology, evolution, and systematics. Methods in Ecology and Evolution. 7(5): 573-579. DOI: 10.1111/2041-210X.12512
+#' 
+#' 
 
 rsquared.glmm <- function(obj) {
   if( class(obj) != "list" ) obj = list(obj) else obj

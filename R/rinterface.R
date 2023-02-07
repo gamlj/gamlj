@@ -4,38 +4,39 @@
 #' Re-estimates a GAMLj model applying new options to the original model
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
+#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljmixed}},  \code{\link{gamljglm}}, or  \code{\link{gamljgmixed}} 
 #' @return an object of class gamlj*Results as the input object
 #' @author Marcello Gallucci
 #' @rdname update
 #' @export 
 
-update.gamljGlmResults <- function(object, ...) {
-    fun <- gamljGlm
+
+update.gamljlmResults <- function(object, ...) {
+    fun <- gamlj_lm
     .gamlj_update(fun, object, ...)
 }
 
 #' @rdname update
 #' @export 
 
-update.gamljGzlmResults <- function(object, ...) {
-    fun <- gamljGzlm
+update.gamljglmResults <- function(object, ...) {
+    fun <- gamlj_glm
     .gamlj_update(fun, object, ...)
 }
 
 #' @rdname update
 #' @export 
 
-update.gamljMixedResults <- function(object, ...) {
-    fun <- gamljMixed
+update.gamljmixedResults <- function(object, ...) {
+    fun <- gamlj_mixed
     .gamlj_update(fun, object, ...)
 }
 
 #' @rdname update
 #' @export 
 
-update.gamljGlmMixedResults <- function(object, ...) {
-    fun <- gamljGlmMixed
+update.gamljgmixedResults <- function(object, ...) {
+    fun <- gamlj_gmixed
     .gamlj_update(fun, object, ...)
 }
 
@@ -175,7 +176,7 @@ assumptions <- function(object) {
 #' Returns the parameters variances and covariances
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
+#' @param  ... any parameter to be passed to \code{\link{gamlj_lm}},  \code{\link{gamljmixed}},  \code{\link{gamljglm}}, or  \code{\link{gamljgmixed}} 
 #' @return an table of class gamlj*Results 
 #' @author Marcello Gallucci
 #' @export 
@@ -239,7 +240,7 @@ get_data.gamlj <- function(object) {
 #' 
 #' @name predict
 #' @rdname predict
-#' @aliases predict.gamljGlmResults
+#' @aliases predict.gamlj_lm_Results
 #' @param object a gamlj results object of the class `gamlj*Results`
 #' @param re.form (formula, NULL, or NA) specify which random effects to condition on when predicting. If NULL, include all random effects; if NA or ~0, include no random effects. Used only for the mixed models.  
 #' @param type the type of prediction required. The default is on the scale of the response variables ('response'); Thus for  binomial models the default is to compute the predicted probabilities.  'link' gives the scale of the linear predictors; 
@@ -257,7 +258,7 @@ get_data.gamlj <- function(object) {
 #'  
 #' @export
 
-predict.gamljGlmResults <- function(object, ...) {
+predict.gamljlmResults <- function(object, ...) {
     stats::predict(object$model, ...)
 }
 
@@ -266,7 +267,7 @@ predict.gamljGlmResults <- function(object, ...) {
 #' @rdname predict  
 #' @export
 
-predict.gamljGzlmResults <- function(object, type = "response", ...) {
+predict.gamljglmResults <- function(object, type = "response", ...) {
     stats::predict(object$model, type = type, ...)
 }
 
@@ -274,14 +275,14 @@ predict.gamljGzlmResults <- function(object, type = "response", ...) {
 #' @export
 
 
-predict.gamljMixedResults <- function(object, re.form = NULL, type = "response", ...) {
+predict.gamljmixedResults <- function(object, re.form = NULL, type = "response", ...) {
     stats::predict(object$model, re.form = re.form, type = type, ...)
 }
 
 #' @rdname predict  
 #' @export
 
-predict.gamljGlmMixedResults <- function(object, re.form = NULL, type = "response", ...) {
+predict.gamljgmixedResults <- function(object, re.form = NULL, type = "response", ...) {
     stats::predict(object$model, re.form = re.form, type = type, ...)
 }
 
@@ -292,7 +293,7 @@ predict.gamljGlmMixedResults <- function(object, re.form = NULL, type = "respons
 #' 
 #' @name residuals
 #' @rdname residuals
-#' @aliases residuals.gamljGlmResults
+#' @aliases residuals.gamlj_lm_Results
 #' @param object a gamlj results object of the class `gamlj*Results`
 #' @param type the type of residuals for generalized models. The alternatives are: 'deviance' (default), 'pearson', 'working', 'response', and 'partial'. Can be abbreviated.  
 #'             Cf. \code{\link[stats:residuals]{stats::residuals()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}}
@@ -308,14 +309,14 @@ predict.gamljGlmMixedResults <- function(object, re.form = NULL, type = "respons
 #'  
 #' @export
 
-residuals.gamljGlmResults <- function(object, ...) {
+residuals.gamljlmResults <- function(object, ...) {
     stats::residuals(object$model, ...)
 }
 
 #' @rdname residuals  
 #' @export
 
-residuals.gamljGzlmResults <- function(object, type = "deviance", ...) {
+residuals.gamljglmResults <- function(object, type = "deviance", ...) {
     stats::residuals(object$model, type = type, ...)
 }
 
@@ -323,14 +324,14 @@ residuals.gamljGzlmResults <- function(object, type = "deviance", ...) {
 #' @export
 
 
-residuals.gamljMixedResults <- function(object, ...) {
+residuals.gamljmixedResults <- function(object, ...) {
     stats::residuals(object$model, ...)
 }
 
 #' @rdname residuals  
 #' @export
 
-residuals.gamljGlmMixedResults <- function(object, type = "deviance", ...) {
+residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
     stats::residuals(object$model, type = type, ...)
 }
 
@@ -448,7 +449,7 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 #' data(winkel)
 #' wicksell$time<-factor(wicksell$time)
 #' wicksell$group<-factor(wicksell$group) 
-#' gmod<-gamlj::gamljMixed(
+#' gmod<-gamlj::gamljmixed(
 #'    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
 #'    data = wicksell)
 #' 

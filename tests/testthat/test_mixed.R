@@ -7,7 +7,7 @@ subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
 
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli,
   plot_x=cond,
@@ -61,7 +61,7 @@ testthat::test_that("a randhist is produced", {
 
 
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   dep=y,
   factors = "cond",
   model_terms = "cond",
@@ -80,7 +80,7 @@ testthat::test_that("list interface is ok", {
 
 testthat::test_that("uncorrelated error", {
   testthat::expect_error(  
-    model<-gamlj::gamljMixed(
+    model<-gamlj::gamlj_mixed(
       dep=y,
       factors = "cond",
       modelTerms = "cond",
@@ -92,7 +92,7 @@ testthat::test_that("uncorrelated error", {
 })
 
 
-model1<-gamlj::gamljMixed(
+model1<-gamlj::gamlj_mixed(
   dep=y,
   factors = "cond",
   model_terms = "cond",
@@ -101,7 +101,7 @@ model1<-gamlj::gamljMixed(
   data = subjects_by_stimuli
 )
 
-model2<-gamlj::gamljMixed(
+model2<-gamlj::gamlj_mixed(
    formula = y ~ 1 + cond+( 1 | subj )+( 0+cond | subj ),
    data = subjects_by_stimuli
  )
@@ -114,7 +114,7 @@ formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 
 subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula =formula,
   data = subjects_by_stimuli, 
   plot_x = cond,
@@ -141,7 +141,7 @@ adddata$x<-rnorm(length(adddata$nrow))
 
 formula<-y~1+cond+x+(1+cond|subj)+(1|stimulus)
 adddata$cond<-factor(adddata$cond)
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula =formula,
   data = adddata, 
   covs_scale = c(x="standardized")
@@ -154,7 +154,7 @@ testthat::test_that("standardizing with more clusters", {
 }
 )
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula =formula,
   data = adddata, 
   covs_scale = c("x"="clusterbasedstandardized")
@@ -171,7 +171,7 @@ testthat::test_that("standardizing with more clusters",{
 data("beers_bars")
 data<-beers_bars
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula = smile ~ 1 + beer + I(beer^2)+( 1 + beer + I(beer^2) | bar ),
   data = data)
 ###### this has changed with lme4 1.1 
@@ -181,7 +181,7 @@ testthat::test_that("some poly", {
 })
 
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
   data = data,
   covs_scale = list(list(
@@ -192,17 +192,17 @@ testthat::test_that("standardizing", {
   testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.8506,tolerance = .002)
 })
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
   data = data,
   covs_scale  = list("beer"="clusterbasedstandardized")
   )
 
 testthat::test_that("cluster-based-standardizing", {
-  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.5554,tolerance = tol)
+  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.6111,tolerance = tol)
 })
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula = smile ~ 1 + beer +( 1 + beer  | bar ),
   data = data,
   covs_scale = list("beer"="clusterbasedcentered")
@@ -210,11 +210,11 @@ model<-gamlj::gamljMixed(
 
 
 testthat::test_that("cluster-based-centering", {
-  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.5554,tol)
+  testthat::expect_equal(model$main$coefficients$asDF$estimate[2],.607,tol)
 })
 
 
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
    formula =smile ~ 1 +(1|bar),
    data = data
  )
@@ -228,7 +228,7 @@ subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
 subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
 
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
-model<-gamlj::gamljMixed(
+model<-gamlj::gamlj_mixed(
   formula =formula,
   data = subjects_by_stimuli, 
   re_lrt=T , 
@@ -253,7 +253,7 @@ data$group<-factor(data$group)
 data$time<-factor(data$time)
 data$subj<-factor(data$subj)
 
-gobj<-gamlj::gamljMixed(
+gobj<-gamlj::gamlj_mixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
   contrasts = c("group"="simple","time"="polynomial"),
@@ -268,7 +268,7 @@ testthat::test_that("simple effects", {
  })
 
 
-gobj2<-gamlj::gamljMixed(
+gobj2<-gamlj::gamlj_mixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = data, 
   posthoc = list(c("time","group")))

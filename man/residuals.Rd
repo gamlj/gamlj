@@ -2,19 +2,20 @@
 % Please edit documentation in R/rinterface.R
 \name{residuals}
 \alias{residuals}
-\alias{residuals.gamljGlmResults}
-\alias{residuals.gamljGzlmResults}
-\alias{residuals.gamljMixedResults}
-\alias{residuals.gamljGlmMixedResults}
+\alias{residuals.gamljlmResults}
+\alias{residuals.gamlj_lm_Results}
+\alias{residuals.gamljglmResults}
+\alias{residuals.gamljmixedResults}
+\alias{residuals.gamljgmixedResults}
 \title{Residuals values from GAMLj models}
 \usage{
-\method{residuals}{gamljGlmResults}(object, ...)
+\method{residuals}{gamljlmResults}(object, ...)
 
-\method{residuals}{gamljGzlmResults}(object, type = "deviance", ...)
+\method{residuals}{gamljglmResults}(object, type = "deviance", ...)
 
-\method{residuals}{gamljMixedResults}(object, ...)
+\method{residuals}{gamljmixedResults}(object, ...)
 
-\method{residuals}{gamljGlmMixedResults}(object, type = "deviance", ...)
+\method{residuals}{gamljgmixedResults}(object, type = "deviance", ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj*Results`}

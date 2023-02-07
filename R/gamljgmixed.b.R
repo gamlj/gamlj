@@ -1,7 +1,7 @@
 
-gamljGlmMixedClass <- R6::R6Class(
-  "gamljGlmMixedClass",
-  inherit=gamljGlmMixedBase,
+gamljgmixedClass <- R6::R6Class(
+  "gamljgmixedClass",
+  inherit=gamljgmixedBase,
   private=list(
       .dispatcher=NULL,
       .data_machine=NULL,

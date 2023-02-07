@@ -11,7 +11,7 @@ modss<-f*sigma(mod)^2*mdf/edf
 .anova<-car::Anova(mod,type=3)
 
 
-gmod<-gamlj::gamljGlm(formula = form,
+gmod<-gamlj::gamlj_lm(formula = form,
                       iris,
                       es = c("eta","etap","omega","omegap","epsilon","epsilonp"))
 

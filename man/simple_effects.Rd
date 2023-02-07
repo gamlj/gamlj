@@ -32,7 +32,7 @@ are returned.
 data(winkel)
 wicksell$time<-factor(wicksell$time)
 wicksell$group<-factor(wicksell$group) 
-gmod<-gamlj::gamljMixed(
+gmod<-gamlj::gamljmixed(
    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
    data = wicksell)
 
