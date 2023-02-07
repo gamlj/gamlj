@@ -63,16 +63,16 @@ Plotter <- R6::R6Class(
         ### prepare aestetics for one or two way scatterplot
         if (is.null(self$scatterZ)) {
                      names(data)[1]<-"x"
-                    .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",group=1)
-                    .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper")
+                    .aestetics<-ggplot2::aes(x = x, y = estimate,group=1)
+                    .aesbar<-ggplot2::aes(x = x, ymin = lower, ymax = upper)
         } else {
                      names(data)[1:2]<-c("x","z")
                      if (isFALSE(self$options$plot_black)) {
-                         .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", colour = "z")
-                         .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",color = "z" ,fill="z")
+                         .aestetics<-ggplot2::aes(x = x, y = estimate,   group = z, colour = z)
+                         .aesbar<-ggplot2::aes(x = x, ymin = lower, ymax = upper, group = z,color = z ,fill=z)
                      } else {
-                         .aestetics<-ggplot2::aes_string(x = "x", y = "estimate",   group = "z", linetype = "z")
-                         .aesbar<-ggplot2::aes_string(x = "x", ymin = "lower", ymax = "upper", group = "z",linetype = "z" )
+                         .aestetics<-ggplot2::aes(x = x, y = estimate,   group = z, linetype = z)
+                         .aesbar<-ggplot2::aes(x = x, ymin = lower, ymax = upper, group = z,linetype = z )
                      }
         }
         
@@ -94,11 +94,11 @@ Plotter <- R6::R6Class(
           x<-self$scatterX$name64
           z<-self$scatterZ$name64
           
-          .aesraw<-ggplot2::aes_string(x = x, y = y)
+          .aesraw<-ggplot2::aes(x = x, y = y)
           
           if (!is.null(self$scatterZ))
               if (self$scatterZ$type=="factor")
-               .aesraw<-ggplot2::aes_string(x = x, y = y, color=z)
+               .aesraw<-ggplot2::aes(x = x, y = y, color=z)
 
 
           p <- p +  ggplot2::geom_point(data = rawdata,
@@ -110,14 +110,14 @@ Plotter <- R6::R6Class(
           
           randomData<-self$randomData[[image$key]]
           if ("z" %in% names(randomData)) {
-                      .aesrandom<-ggplot2::aes_string(x = "x", y = "y", group="cluster", colour="z")
+                      .aesrandom<-ggplot2::aes(x = x, y = y, group=cluster, colour=z)
                        p <- p + ggplot2::geom_line(data = randomData, 
                                                   .aesrandom, 
                                                   linewidth = 0.4, 
                                                   alpha = .50)
           }
           else { 
-                      .aesrandom<-ggplot2::aes_string(x = "x", y = "y", group="cluster")
+                      .aesrandom<-ggplot2::aes(x = x, y = y, group=cluster)
                       p <- p + ggplot2::geom_line(data = randomData, 
                                                   .aesrandom,
                                                   color="gray74",
@@ -148,7 +148,7 @@ Plotter <- R6::R6Class(
         ### plot the lines 
         p <- p + ggplot2::geom_line(data = data, 
                                     .aestetics,
-                                     linewidth = 1.2, 
+                                     size = 1.2, 
                                      position=self$scatterDodge)
 
 
@@ -207,10 +207,10 @@ Plotter <- R6::R6Class(
         data <- as.data.frame(stats::residuals(private$.operator$model))
         names(data) <- "x"
         # library(ggplot2)
-        plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = "x")) +
+        plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = x)) +
           ggplot2::labs(x = "Residuals", y = "density")
         
-        plot <- plot + ggplot2::geom_histogram(ggplot2::aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
+        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = ..density..), position = "identity", stat = "bin", color = color, fill = fill)
         plot <- plot + ggplot2::stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))
         
         themeSpec <- ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
@@ -234,7 +234,7 @@ Plotter <- R6::R6Class(
             data$pred <- stats::predict(private$.operator$model)
       
               # library(ggplot2)
-            plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = "pred", y = "res")) + 
+            plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = pred, y = res)) + 
                        ggplot2::labs(x = "Predicted", y = "Residuals")
       
             plot <- plot + ggplot2::geom_point(shape = 21, color = color, fill = fill)
@@ -256,7 +256,8 @@ Plotter <- R6::R6Class(
         cluster<-image$state$cluster
 
         fmodel<-lme4::fortify.merMod(private$.operator$model)
-        plot<-ggplot2::ggplot(fmodel, ggplot2::aes_string(cluster,".resid")) +
+        fmodel$cluster<-fmodel[[cluster]]
+        plot<-ggplot2::ggplot(fmodel, ggplot2::aes(cluster,.resid)) +
               ggplot2::geom_boxplot() + ggplot2::coord_flip()
         plot<-plot+ggplot2::xlab(fromb64(cluster))+ggplot2::ylab("Residuals")
         plot<-plot+ ggtheme 
@@ -277,7 +278,8 @@ Plotter <- R6::R6Class(
         
         cluster<-image$state$cluster
         data<-lme4::fortify.merMod(private$.operator$model)
-        plot <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = ".fitted", y = ".resid",color=cluster)) 
+        data$cluster<-data[[cluster]]
+        plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid,color=cluster)) 
         plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
         plot <- plot + ggplot2::geom_point(shape = 21)
         plot <- plot + ggtheme

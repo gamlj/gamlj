@@ -68,8 +68,8 @@ mod <- gamlj::gamljGzlm(
   data = hsbdemo,
   model_type = "logistic",
   ci_width = 90,
-  simple_effects = "write",
-  simple_moderators = "honors",
+  simple_x = "write",
+  simple_mods = "honors",
   plot_x = "write",
   show_contrastcodes = T
 )
@@ -190,8 +190,8 @@ mod <- gamlj::gamljGzlm(
   formula = acts ~ agg_test * age,
   data = data,
   model_type = "poisson",
-  simple_effects = agg_test,
-  simple_moderators = age,
+  simple_x = agg_test,
+  simple_mods = age,
   posthoc = ~age,
   emmeans = ~agg_test
 )
@@ -217,8 +217,8 @@ mod <- gamlj::gamljGzlm(
   model_type = "custom",
   custom_family = "Gamma",
   custom_link = "inverse",
-  simple_effects = agg_test,
-  simple_moderators = age,
+  simple_x = agg_test,
+  simple_mods = age,
   posthoc = ~age,
   emmeans = ~agg_test
 )
@@ -244,8 +244,8 @@ testthat::expect_warning({
     formula = q ~ agg_test * age,
     data = data,
     model_type = "nb",
-    simple_effects = agg_test,
-    simple_moderators = age,
+    simple_x = agg_test,
+    simple_mods = age,
     posthoc = ~age,
     emmeans = ~agg_test,
     estimates_ci = TRUE
@@ -273,8 +273,8 @@ mod <- gamlj::gamljGzlm(
   formula = q ~ agg_test * age,
   data = data,
   model_type = "poiover",
-  simple_effects = agg_test,
-  simple_moderators = age,
+  simple_x = agg_test,
+  simple_mods = age,
   posthoc = ~age,
   emmeans = ~agg_test,
   estimates_ci = TRUE

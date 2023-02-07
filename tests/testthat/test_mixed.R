@@ -118,6 +118,7 @@ model<-gamlj::gamljMixed(
   formula =formula,
   data = subjects_by_stimuli, 
   plot_x = cond,
+  plot_re = T,
   re_lrt=T  
 )
 model
