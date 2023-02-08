@@ -391,6 +391,9 @@ Plotter <- R6::R6Class(
         return()
 
       ginfo("PLOTTER: prepare main plot")
+      
+      private$.results$plotnotes$setContent("")
+      
       resultsgroup<-private$.results$get("mainPlots")
 
       ### stop is filled from previous run ###

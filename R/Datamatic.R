@@ -25,9 +25,16 @@ Datamatic <- R6::R6Class(
     },
     
     cleandata=function(data) {
-      
+
       data64          <-   data
       names(data64)   <-   tob64(names(data))
+      
+      if (self$option("scale_missing","complete"))
+                 data64 <- jmvcore::naOmit(data64)
+      
+#      if (self$option("cluster"))
+#           data64<-data64[order(data64[[tob64(self$options$cluster[1])]]),]
+      
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }
@@ -476,7 +483,6 @@ Variable <- R6::R6Class(
     
     .continuous_values=function(data) {
       
-
       if (nrow(data)==0)
            return(jmvcore::toNumeric(data[[self$name64]]))
 
@@ -485,7 +491,7 @@ Variable <- R6::R6Class(
       if (is.factor(vardata)) 
            vardata<-jmvcore::toNumeric(vardata)
            
-      ## we first update levels to same the old levels
+      ## we first update levels to save the old levels
       private$.update_levels(vardata)
       
       
@@ -506,28 +512,35 @@ Variable <- R6::R6Class(
       }
       
       
-      if (method=="clusterbasedcentered") {    
+      if (method=="clusterbasedcentered") {   
+        
         cluster64<-tob64(self$hasCluster[1])
         sdata<-data[,c(cluster64,self$name64)]
+        sdata$..id..<-1:nrow(sdata)
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
+        sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[[self$name64]]
         self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
+
       }
       if (method=="clusterbasedstandardized") {    
         cluster64<-tob64(self$hasCluster[1])
         sdata<-data[,c(cluster64,self$name64)]
+        sdata$..id..<-1:nrow(sdata)
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
+        sdata<-sdata[order(sdata$..id..),]
         ddata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),sd,na.rm=TRUE)
         names(ddata)<-c(cluster64,"sd")
         if (any(ddata[["sd"]]<.0000001))
             stop("Variable ",self$name," has zero variance in at least one cluster defined by",self$hasCluster[1])
           
         sdata<-merge(sdata,ddata,by=cluster64)
+        sdata<-sdata[order(sdata$..id..),]
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
         vardata<-sdata[[self$name64]]
         self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
@@ -535,16 +548,18 @@ Variable <- R6::R6Class(
       }
 
       if (method=="clustermeans") {    
+
         cluster64<-tob64(self$hasCluster[1])
         sdata<-data[,c(cluster64,self$name64)]
+        sdata$..id..<-1:nrow(sdata)
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
         sdata<-merge(sdata,mdata,by=cluster64)
+        sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[["mean"]]
         self$datamatic$dispatcher$warnings<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
         
       }
-      
       ## we then update levels the new levels (mean, sd etc)
       private$.update_levels(vardata)
       as.numeric(vardata)
@@ -565,14 +580,13 @@ Variable <- R6::R6Class(
                               max=max(vardata,na.rm = TRUE),
                               mean=mean(vardata,na.rm = TRUE),
                               sd=sd(vardata,na.rm = TRUE))
-      
-      
+
       if (self$datamatic$options$covs_conditioning=="mean_sd")  {
         
         .span<-ifelse(is.null(self$datamatic$options$ccm_value),1,self$datamatic$options$ccm_value)
         .labs<-c(paste0("Mean-", .span, "\u00B7", "SD"), "Mean", paste0("Mean+", .span, "\u00B7","SD"))
-        .mean <- mean(vardata)
-        .sd <- sd(vardata)
+        .mean <- mean(vardata,na.rm=T)
+        .sd <- sd(vardata,na.rm=T)
         self$levels=round(c(.mean - (.span * .sd), .mean, .mean + (.span * .sd)),digits = 3)
         self$method="mean_sd"
 
@@ -611,7 +625,8 @@ Variable <- R6::R6Class(
                self$datamatic$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
                self$datamatic$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
                
-      }
+            }
+
       
     }
     

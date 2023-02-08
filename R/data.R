@@ -35,17 +35,6 @@ NULL
 #' data(subjects_on_stimuli)
 NULL
 
-#' School data for testing
-#'
-#' Data for different examples
-#'
-#' @docType data
-#' @name hsbdemo
-#' @usage data(hsbdemo)
-#' @keywords datasets
-#' @examples
-#' data(hsbdemo)
-NULL
 
 #' Sport data with curvilinear effects
 #'
@@ -84,31 +73,6 @@ NULL
 #' data(fivegroups)
 NULL
 
-#' Poisson data
-#'
-#'  Simulated data of a Poisson distributed dependent variables with some independent variabes
-#'
-#' @docType data
-#' @name poissonacts
-#' @usage data(poissonacts)
-#' @keywords datasets
-#' @examples
-#' data(poissonacts)
-NULL
-
-
-#' Clustered data for logistic regression
-#'
-#' Simulated data for testing logistic mixed models. 
-#' Simulation of pupils data clustered across schools with a dichotomous outcome  
-#'
-#' @docType data
-#' @name schoolexam
-#' @usage data(schoolexam)
-#' @keywords datasets
-#' @examples
-#' data(schoolexam)
-NULL
 
 #' Clustered data for generalized mixed model
 #'
@@ -117,7 +81,7 @@ NULL
 #' `ybin` as dichotomous dependent variable; `ypoi` as count variable (Poisson);
 #' `cluster` as the clustering variable.
 #' @docType data
-#' @name glmmixeddata
+#' @name gmixeddata
 #' @usage data(glmmixeddata)
 #' @keywords datasets
 #' @examples

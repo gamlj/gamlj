@@ -35,6 +35,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -87,6 +88,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -132,6 +134,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -170,6 +173,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -272,6 +276,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -332,6 +337,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -389,6 +395,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -442,6 +449,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -480,6 +488,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -510,6 +519,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -559,6 +569,7 @@ items:
                          - factors
                          - covs
                          - covs_scale
+                         - scale_missing
                          - model_terms
                          - fixed_intercept
                          - se_method
@@ -650,6 +661,7 @@ items:
                               - factors
                               - covs
                               - covs_scale
+                              - scale_missing
                               - model_terms
                               - fixed_intercept
                               - se_method
@@ -698,6 +710,7 @@ items:
                               - factors
                               - covs
                               - covs_scale
+                              - scale_missing
                               - model_terms
                               - fixed_intercept
                               - se_method
@@ -777,6 +790,7 @@ items:
                               - factors
                               - covs
                               - covs_scale
+                              - scale_missing
                               - model_terms
                               - fixed_intercept
                               - se_method
@@ -828,6 +842,7 @@ items:
                               - factors
                               - covs
                               - covs_scale
+                              - scale_missing
                               - model_terms
                               - fixed_intercept
                               - se_method
@@ -895,6 +910,7 @@ items:
                               - factors
                               - covs
                               - covs_scale
+                              - scale_missing
                               - model_terms
                               - fixed_intercept
                               - se_method
@@ -967,6 +983,7 @@ items:
              - factors
              - covs
              - covs_scale
+             - scale_missing
              - model_terms
              - fixed_intercept
              - se_method
@@ -990,6 +1007,7 @@ items:
              - factors
              - covs
              - covs_scale
+             - scale_missing
              - model_terms
              - fixed_intercept
              - se_method

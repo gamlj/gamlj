@@ -51,8 +51,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "bonf"),
             model_type = "logistic",
             covs_scale = NULL,
-            mute = FALSE,
             scale_missing = "complete",
+            mute = FALSE,
             norm_test = FALSE,
             cluster = NULL,
             re = list(
@@ -352,10 +352,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "clusterbasedstandardized",
                                 "none"),
                             default="centered"))))
-            private$..mute <- jmvcore::OptionBool$new(
-                "mute",
-                mute,
-                default=FALSE)
             private$..scale_missing <- jmvcore::OptionList$new(
                 "scale_missing",
                 scale_missing,
@@ -363,6 +359,10 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "complete",
                     "colwise"),
                 default="complete")
+            private$..mute <- jmvcore::OptionBool$new(
+                "mute",
+                mute,
+                default=FALSE)
             private$..norm_test <- jmvcore::OptionBool$new(
                 "norm_test",
                 norm_test,
@@ -465,8 +465,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..residuals)
             self$.addOption(private$..model_type)
             self$.addOption(private$..covs_scale)
-            self$.addOption(private$..mute)
             self$.addOption(private$..scale_missing)
+            self$.addOption(private$..mute)
             self$.addOption(private$..norm_test)
             self$.addOption(private$..cluster)
             self$.addOption(private$..re)
@@ -523,8 +523,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         residuals = function() private$..residuals$value,
         model_type = function() private$..model_type$value,
         covs_scale = function() private$..covs_scale$value,
-        mute = function() private$..mute$value,
         scale_missing = function() private$..scale_missing$value,
+        mute = function() private$..mute$value,
         norm_test = function() private$..norm_test$value,
         cluster = function() private$..cluster$value,
         re = function() private$..re$value,
@@ -580,8 +580,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..residuals = NA,
         ..model_type = NA,
         ..covs_scale = NA,
-        ..mute = NA,
         ..scale_missing = NA,
+        ..mute = NA,
         ..norm_test = NA,
         ..cluster = NA,
         ..re = NA,
@@ -665,6 +665,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -717,6 +718,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -761,6 +763,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -799,6 +802,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -907,6 +911,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -971,6 +976,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1032,6 +1038,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1088,6 +1095,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1127,6 +1135,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1156,6 +1165,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1207,6 +1217,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "factors",
                         "covs",
                         "covs_scale",
+                        "scale_missing",
                         "model_terms",
                         "fixed_intercept",
                         "se_method",
@@ -1309,6 +1320,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1354,6 +1366,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -1440,6 +1453,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "factors",
                                     "covs",
                                     "covs_scale",
+                                    "scale_missing",
                                     "model_terms",
                                     "fixed_intercept",
                                     "se_method",
@@ -1488,6 +1502,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "factors",
                                     "covs",
                                     "covs_scale",
+                                    "scale_missing",
                                     "model_terms",
                                     "fixed_intercept",
                                     "se_method",
@@ -1553,6 +1568,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "factors",
                         "covs",
                         "covs_scale",
+                        "scale_missing",
                         "model_terms",
                         "fixed_intercept",
                         "se_method",
@@ -1616,6 +1632,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "factors",
                     "covs",
                     "covs_scale",
+                    "scale_missing",
                     "model_terms",
                     "fixed_intercept",
                     "se_method",
@@ -1638,6 +1655,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "factors",
                     "covs",
                     "covs_scale",
+                    "scale_missing",
                     "model_terms",
                     "fixed_intercept",
                     "se_method",

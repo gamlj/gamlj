@@ -330,6 +330,13 @@ children:
                 children:
                   - type: ComboBox
                     name: covs_scale_labels
+              - type: Label
+                label: Scaling on
+                children:
+                  - type: ComboBox
+                    name: scale_missing
+                    label: ''
+                    
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true

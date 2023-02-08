@@ -557,6 +557,15 @@ options:
             a list of lists specifying the covariates scaling,
             one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
 
+    - name: scale_missing
+      title: Scale on 
+      type: List
+      options:
+          - title: Complete cases
+            name: 'complete'
+          - title: Columnwise 
+            name: colwise
+      default: 'complete'
       
     - name: mute
       title: Remove notes
@@ -569,16 +578,6 @@ options:
 
 #!#!# #### specs here #####
 
-
-    - name: scale_missing
-      title: Scale on 
-      type: List
-      options:
-                    - title: Complete cases
-                      name: 'complete'
-                    - title: Columnwise 
-                      name: colwise
-      default: complete
 
 
     - name: norm_test

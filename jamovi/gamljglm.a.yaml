@@ -477,6 +477,15 @@ options:
              a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
              one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
 
+    - name: scale_missing
+      title: Scale on 
+      type: List
+      options:
+          - title: Complete cases
+            name: 'complete'
+          - title: Columnwise 
+            name: colwise
+      default: 'complete'
 
     - name: mute
       title: Remove notes

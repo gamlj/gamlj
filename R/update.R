@@ -82,8 +82,6 @@ mf.update<- function(x,...) UseMethod(".update")
   .fixed  <- lme4::nobars(stats::formula(formula))
   .random <- lme4::findbars(stats::formula(formula))
   .data   <- model$data
-  mark(class(.data))
-  mark(head(.data))
   .random<-(lapply(.random,function(x) formula(paste("~",deparse(x)))))
 
    

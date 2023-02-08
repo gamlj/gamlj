@@ -47,6 +47,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             adjust = list(
                 "bonf"),
             covs_scale = NULL,
+            scale_missing = "complete",
             mute = FALSE,
             expb_ci = TRUE,
             es = list(
@@ -313,6 +314,13 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "standardized",
                                 "none"),
                             default="centered"))))
+            private$..scale_missing <- jmvcore::OptionList$new(
+                "scale_missing",
+                scale_missing,
+                options=list(
+                    "complete",
+                    "colwise"),
+                default="complete")
             private$..mute <- jmvcore::OptionBool$new(
                 "mute",
                 mute,
@@ -420,6 +428,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
             self$.addOption(private$..covs_scale)
+            self$.addOption(private$..scale_missing)
             self$.addOption(private$..mute)
             self$.addOption(private$..expb_ci)
             self$.addOption(private$..es)
@@ -472,6 +481,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
         covs_scale = function() private$..covs_scale$value,
+        scale_missing = function() private$..scale_missing$value,
         mute = function() private$..mute$value,
         expb_ci = function() private$..expb_ci$value,
         es = function() private$..es$value,
@@ -523,6 +533,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..predicted = NA,
         ..residuals = NA,
         ..covs_scale = NA,
+        ..scale_missing = NA,
         ..mute = NA,
         ..expb_ci = NA,
         ..es = NA,
@@ -603,6 +614,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -652,6 +664,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -692,6 +705,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -727,6 +741,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -806,6 +821,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -856,6 +872,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
@@ -923,6 +940,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "factors",
                                 "covs",
                                 "covs_scale",
+                                "scale_missing",
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
