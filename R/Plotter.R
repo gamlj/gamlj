@@ -481,9 +481,19 @@ Plotter <- R6::R6Class(
 
       #### deal with rescaling
       if (self$scatterXscale) {
+        
+        if (self$scatterX$covs_scale=="clusterbasedcentered")
+          self$dispatcher$warnings<-list(topic="plotnotes",
+                                         message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
+
+        if (self$scatterX$covs_scale=="clusterbasedstandardized")
+          self$dispatcher$warnings<-list(topic="plotnotes",
+                                         message="Rescaling cluster-wise standardized variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
+        
         data[[self$scatterX$name64]]<-private$.rescale(self$scatterX,data[[self$scatterX$name64]])
-      if (is.something(rawData))
-          rawData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,rawData[[self$scatterX$name64]])
+        
+        if (is.something(rawData))
+            rawData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,rawData[[self$scatterX$name64]])
         if (is.something(randomData))
           randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
       }
@@ -718,8 +728,6 @@ Plotter <- R6::R6Class(
     },
     .rescale=function(varobj,values) {
 
-      if (varobj$covs_scale=="clusterbasedcentered")
-          self$dispatcher$warnings<-list(topic="plotnotes",message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
 
 #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
 #      len <- max(min(len,na.rm = T),0)
