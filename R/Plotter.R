@@ -210,7 +210,8 @@ Plotter <- R6::R6Class(
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = x)) +
           ggplot2::labs(x = "Residuals", y = "density")
         
-        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = after_stat(density)), position = "identity", stat = "bin", color = color, fill = fill)
+#        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = after_stat(density)), position = "identity", stat = "bin", color = color, fill = fill)
+        plot <- plot + ggplot2::geom_histogram(ggplot2::aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
         plot <- plot + ggplot2::stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))
         
         themeSpec <- ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
@@ -220,9 +221,10 @@ Plotter <- R6::R6Class(
 
       },
       residPlot=function(theme,ggtheme)  {
-        
+
 #        if (!self$option("resid_plot") && !self$option("cluster_respred") )
 #          return()
+        
         if (!self$option("resid_plot"))
           return()        
         
@@ -230,12 +232,13 @@ Plotter <- R6::R6Class(
         if (!is.something(private$.operator$model))
           return()
         
+        
             fill <- theme$fill[2]
             color <- theme$color[1]
             data <- as.data.frame(stats::residuals(private$.operator$model))
             names(data) <- "res"
             data$pred <- stats::predict(private$.operator$model)
-      
+
               # library(ggplot2)
             plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = pred, y = res)) + 
                        ggplot2::labs(x = "Predicted", y = "Residuals")

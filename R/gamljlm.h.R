@@ -24,7 +24,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ci_method = "wald",
             boot_r = 1000,
             contrasts = NULL,
-            show_contrastnames = TRUE,
+            show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
             vcov = FALSE,
             plot_x = NULL,
@@ -191,7 +191,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..show_contrastnames <- jmvcore::OptionBool$new(
                 "show_contrastnames",
                 show_contrastnames,
-                default=TRUE)
+                default=FALSE)
             private$..show_contrastcodes <- jmvcore::OptionBool$new(
                 "show_contrastcodes",
                 show_contrastcodes,
@@ -895,12 +895,12 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="source", 
                                     `title`="Names", 
-                                    `type`="text", 
-                                    `visible`="(show_contrastnames)"),
+                                    `type`="text"),
                                 list(
                                     `name`="label", 
                                     `title`="Effect", 
-                                    `type`="text"),
+                                    `type`="text", 
+                                    `visible`="(show_contrastnames)"),
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 

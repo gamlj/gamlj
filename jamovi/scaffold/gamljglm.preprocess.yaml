@@ -114,6 +114,7 @@ items:
              type: Table
              clearWith:
                          - __modeloptions__
+                         - __cioptions__
 
              columns:
                     - name: response
@@ -124,10 +125,10 @@ items:
                     - name: source
                       title: "Name"
                       type: text
-                      visible: (show_contrastnames)
                     - name: label
                       title: "Effect"
                       type: text
+                      visible: (show_contrastnames)
                     - name: estimate
                       title: "Estimate"
                       type: number

@@ -837,7 +837,7 @@ procedure.simpleInteractions<-function(obj) {
             
             
             ##
-            names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","t","p","est.ci.lower","est.ci.upper")
+            names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","test","p","est.ci.lower","est.ci.upper")
             names(res)[1:length(.names)]<-.names
             
             if (varobj$type=="numeric") {

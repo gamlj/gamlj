@@ -53,6 +53,8 @@ gamljglmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$main$coefficients,runner_machine)
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
+      if (is.something(self$options$factors))
+         aSmartObj$setColumnVisible<-"label"
       aSmartObj$spaceBy<-"response"
       ladd(private$.smartObjs)<-aSmartObj
       

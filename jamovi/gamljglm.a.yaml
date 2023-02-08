@@ -208,7 +208,7 @@ options:
     - name: show_contrastnames
       title: Names in estimates table
       type: Bool
-      default: true
+      default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), shows raw names of the contrasts variables in tables

@@ -25,7 +25,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             boot_r = 1000,
             ci_width = 95,
             contrasts = NULL,
-            show_contrastnames = TRUE,
+            show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
             plot_x = NULL,
             plot_z = NULL,
@@ -194,7 +194,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             private$..show_contrastnames <- jmvcore::OptionBool$new(
                 "show_contrastnames",
                 show_contrastnames,
-                default=TRUE)
+                default=FALSE)
             private$..show_contrastcodes <- jmvcore::OptionBool$new(
                 "show_contrastcodes",
                 show_contrastcodes,
@@ -822,12 +822,12 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 list(
                                     `name`="source", 
                                     `title`="Names", 
-                                    `type`="text", 
-                                    `visible`="(show_contrastnames)"),
+                                    `type`="text"),
                                 list(
                                     `name`="label", 
                                     `title`="Effect", 
-                                    `type`="text"),
+                                    `type`="text", 
+                                    `visible`="(show_contrastnames)"),
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 
@@ -1531,7 +1531,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                         `title`="Upper", 
                                         `type`="number"),
                                     list(
-                                        `name`="z", 
+                                        `name`="test", 
                                         `title`="z", 
                                         `type`="number"),
                                     list(

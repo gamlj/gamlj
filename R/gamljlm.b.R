@@ -26,7 +26,7 @@ gamljlmClass <- R6::R6Class(
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
       runner_machine<-Runner$new(self$options,dispatcher,data_machine)
      
-      
+
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
@@ -42,10 +42,13 @@ gamljlmClass <- R6::R6Class(
       aSmartObj$spaceAt<-c(1,-2)
       ladd(private$.smartObjs)<-aSmartObj
       
-      ### estimates table ###
+      ### coefficents table ###
       aSmartObj<-SmartTable$new(self$results$main$coefficients,runner_machine)
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$ci("beta",self$options$ci_width,label=greek_vector[["beta"]])
+      if (is.something(self$options$factors))
+            aSmartObj$setColumnVisible<-"label"
+      
       ladd(private$.smartObjs)<-aSmartObj
       
       ### contrasts code tables

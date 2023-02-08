@@ -124,10 +124,10 @@ items:
                     - name: source
                       title: "Names"
                       type: text
-                      visible: (show_contrastnames)
                     - name: label
                       title: "Effect"
                       type: text
+                      visible: (show_contrastnames)
                     - name: estimate
                       title: "Estimate"
                       type: number
@@ -559,7 +559,7 @@ items:
                    - name: est.ci.upper
                      title: Upper
                      type: number
-                   - name: z
+                   - name: test
                      title: z
                      type: number
                    - name: p
