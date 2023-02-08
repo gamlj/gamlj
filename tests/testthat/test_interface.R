@@ -73,7 +73,7 @@ testthat::test_that("plot ok", {
 )
 
 data("subjects_by_stimuli")
-names(subjects_by_stimuli)
+
 subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
 mod<-gamlj::gamlj_mixed(
   formula = y ~ cond+( 1 | subj ),

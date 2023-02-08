@@ -1,6 +1,6 @@
 
-j_DEBUG=T
-j_INFO=T
+j_DEBUG=F
+j_INFO=F
 t_INFO=F
 
 IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"

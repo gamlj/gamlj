@@ -2,8 +2,6 @@ testthat::context("mixed")
 tol<-0.001
 data("subjects_by_stimuli")
 
-subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
-subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
 
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 
@@ -112,7 +110,6 @@ testthat::test_that("uncorrelated works", {
 
 formula<-y~1+cond+(1+cond|subj)+(1|stimulus)
 
-subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
 
 model<-gamlj::gamlj_mixed(
   formula =formula,
@@ -121,7 +118,7 @@ model<-gamlj::gamlj_mixed(
   plot_re = T,
   re_lrt=T  
 )
-model
+
 
 testthat::test_that("ranova works", {
                     testthat::expect_equal(model$main$ranova$asDF[2,2],6)
