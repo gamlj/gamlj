@@ -563,12 +563,12 @@ children:
                 name: plot_re_method_average
                 optionName: plot_re_method
                 optionPart: average
-                enable: (!model_type_ordinal && !model_type_multinomial)
+                enable: (!model_type_ordinal && !model_type_multinomial && plot_re)
               - type: RadioButton
                 name: plot_re_method_full
                 optionName: plot_re_method
                 optionPart: full
-                enable: (!model_type_ordinal && !model_type_multinomial)
+                enable: (!model_type_ordinal && !model_type_multinomial && plot_re)
   - type: CollapseBox
     label: Simple Effects
     collapsed: true

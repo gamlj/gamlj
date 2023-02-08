@@ -511,7 +511,6 @@ Variable <- R6::R6Class(
           self$datamatic$dispatcher$errors<-list(topic="info",message=paste("Negative values found in variable",self$name,". Log transform not applicable."))
       }
       
-      
       if (method=="clusterbasedcentered") {   
         
         cluster64<-tob64(self$hasCluster[1])

@@ -568,6 +568,7 @@ Runner <- R6::R6Class("Runner",
                                     ginfo("we go in parallel")
                                     opts_list[["n_cpus"]]<-parallel::detectCores()
                                     opts_list[["parallel"]]<-"multicore"
+                                    
                                 }
                             
                                 gstart("RUNNER: estimating bootstrap model")
@@ -646,9 +647,9 @@ Runner <- R6::R6Class("Runner",
                                   ## this is required by lmerTest::ranova() which looks in the parent for "data"
                                   data<-self$model@frame
                                   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
-                                  self$dispatcher$warnings<-list(topic="tab_randomTests",message=results$warning)
+                                  self$dispatcher$warnings<-list(topic="main_ranova",message=results$warning)
                                   if (!isFALSE(results$error))
-                                     self$errors<-list(topic="tab_randomTests",message=paste("LR tests cannot be computed",results$error))
+                                     self$errors<-list(topic="main_ranova",message=paste("LR tests cannot be computed",results$error))
                                   else {
                                     ranova_test<-results$obj[-1,]
                                     ranova_test$test<-fromb64(rownames(results$obj[-1,]))

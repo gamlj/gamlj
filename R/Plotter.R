@@ -94,11 +94,11 @@ Plotter <- R6::R6Class(
           x<-self$scatterX$name64
           z<-self$scatterZ$name64
           
-          .aesraw<-ggplot2::aes(x = x, y = y)
+          .aesraw<-ggplot2::aes_string(x = x, y = y)
           
           if (!is.null(self$scatterZ))
               if (self$scatterZ$type=="factor")
-               .aesraw<-ggplot2::aes(x = x, y = y, color=z)
+               .aesraw<-ggplot2::aes_string(x = x, y = y, color=z)
 
 
           p <- p +  ggplot2::geom_point(data = rawdata,
