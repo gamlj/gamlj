@@ -85,7 +85,7 @@ gFormula <- R6::R6Class(
     },
     update_terms = function(data) {
       .formulalist <- self$fixed
-      ## we want to be sure that the order of terms is the same used by the emator
+      ## we want to be sure that the order of terms is the same used by the estimator
       ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
       ## lm() (or other estimator) in different order
       .formula <- jmvcore::composeFormula(NULL, .formulalist)
@@ -93,6 +93,7 @@ gFormula <- R6::R6Class(
       .formulalist <- jmvcore::decomposeTerms(.formula)
       self$anova_terms <- fromb64(.formulalist)
       self$params_terms <- fromb64(colnames(model.matrix(as.formula(self$fixed_formula64()), data)))
+      
     },
     reduced_random=function() {
       

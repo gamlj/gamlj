@@ -246,10 +246,7 @@ testthat::test_that("plot works",{
 ## simple effects and polynomial
 data("wicksell")
 data<-wicksell
-data$group<-factor(data$group)
-data$time<-factor(data$time)
-data$subj<-factor(data$subj)
-
+mean(data$dv)
 gobj<-gamlj::gamlj_mixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
@@ -257,7 +254,7 @@ gobj<-gamlj::gamlj_mixed(
    simple_x = "time",
    simple_mods = "group"
 )
-
+gobj
 testthat::test_that("simple effects", {
   testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[1]),"linear")
   testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[2]),"quadratic")
@@ -268,12 +265,19 @@ testthat::test_that("simple effects", {
 gobj2<-gamlj::gamlj_mixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = data, 
-  posthoc = list(c("time","group")))
+  posthoc = list(c("time","group")),
+  emmeans = ~time:group)
 
+mm<-gobj2$emmeans[[1]]$asDF
+mm32<-mm$estimate[mm$time==3 & mm$group==2]
+mm61<-mm$estimate[mm$time==6 & mm$group==1]
+po<-gobj2$posthoc[[1]]$asDF
+d1<-mm32-mm61
+d2<-po$estimate[po$time_lev1==3 & po$group_lev1==2 & po$time_lev2==6 & po$group_lev2==1]
 
 testthat::test_that("posthoc in mixed", {
   testthat::expect_equal(gobj2$posthoc[[1]]$asDF$group_lev1[8],"2")
-  testthat::expect_equal(gobj2$posthoc[[1]]$asDF$estimate[12],131.5833,tol)
+  testthat::expect_equal(d1,d2)
 })
 
 

@@ -615,10 +615,7 @@ Runner <- R6::R6Class("Runner",
                                   result <- value/stats::df.residual(self$model)
                                   self$tab_fit[["over"]]$value<-result
                               }
-                        
                             }
-                            
-                            
                           },
                           .estimateRandom=function() {
                             

@@ -11,11 +11,10 @@ Datamatic <- R6::R6Class(
     labels=NULL,
     N=NULL,
     initialize=function(options,dispatcher,data) {
-      
+
       super$initialize(options,dispatcher)
       
       self$vars<-unlist(c(options$dep,options$factors,options$covs))
-
       if (utils::hasName(options,"cluster"))
         self$vars<-c(options$cluster,self$vars)
       if (utils::hasName(options,"offset"))
@@ -31,9 +30,6 @@ Datamatic <- R6::R6Class(
       
       if (self$option("scale_missing","complete"))
                  data64 <- jmvcore::naOmit(data64)
-      
-#      if (self$option("cluster"))
-#           data64<-data64[order(data64[[tob64(self$options$cluster[1])]]),]
       
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
@@ -80,7 +76,7 @@ Datamatic <- R6::R6Class(
       
       self$variables<-lapply(self$vars,function(var) Variable$new(var,self)$checkVariable(data))
       names(self$variables)<-unlist(lapply(self$variables,function(var) var$name64))
-      
+
       labels<-list()
       for (var in self$variables) 
         for (i in seq_along(var$paramsnames64)) {
@@ -90,6 +86,7 @@ Datamatic <- R6::R6Class(
         }
       self$labels<-labels
       self$data_structure64<-self$cleandata(data)
+
       self$dep<-self$variables[[tob64(self$options$dep)]]
     }
 
@@ -162,6 +159,9 @@ Variable <- R6::R6Class(
       ### check dependent variables ###
       if (var %in% self$datamatic$options$dep) {
            self$type=class(vardata)
+           
+           if (self$type=="character") stop("Character type not allowed. Please set variables as.numeric or as.factor")
+           
            if (self$type=="factor") {
                  self$descriptive=list(min=0,max=1)
                  self$levels<-levels(vardata)
@@ -177,7 +177,6 @@ Variable <- R6::R6Class(
              if (self$datamatic$option("dep_scale")) 
                  self$covs_scale<-self$datamatic$options$dep_scale
                  self$contrast_labels<-self$name
-
            }
 
 
@@ -482,7 +481,7 @@ Variable <- R6::R6Class(
     },
     
     .continuous_values=function(data) {
-      
+
       if (nrow(data)==0)
            return(jmvcore::toNumeric(data[[self$name64]]))
 
