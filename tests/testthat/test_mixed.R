@@ -11,6 +11,7 @@ model<-gamlj::gamlj_mixed(
   plot_x=cond,
   resid_plot = T, cluster_boxplot = T, cluster_respred = T, rand_hist = T
 )
+
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {

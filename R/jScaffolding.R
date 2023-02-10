@@ -34,9 +34,19 @@ Scaffold <- R6::R6Class("Scaffold",
                               else
                                 return(NULL)
                             }
+                          ), ## end of public
+                          active=list(
                             
-                            
-                            
-                            
-                          )
+                            storage=function(obj) {
+
+                              if (missing(obj))
+                                 return(private$.storage)
+                              
+                              private$.storage<-obj
+                              
+                            }
+                          ), #end of active
+                          private=list(
+                            .storage=NULL
+                          ) #end of private
 ) ## end of class

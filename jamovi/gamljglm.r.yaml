@@ -7,6 +7,29 @@ items:
     type: Property
     description: The underlying estimated model
 
+  - name: storage
+    type: Table
+    visible: false
+    clearWith:
+        ### modeloptions  begins
+      - dep
+      - factors
+      - covs
+      - covs_scale
+      - scale_missing
+      - model_terms
+      - fixed_intercept
+      - se_method
+      - mute
+      - df_method
+      - contrasts
+      - covs_scale
+      - offset
+        ### modeloptions  ends
+    columns:
+       - name: info
+         type: text
+
   - name: info
     title: Model Info
     type: Table

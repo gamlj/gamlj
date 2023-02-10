@@ -648,8 +648,21 @@ options:
         - name:  standard
           title: Standard 
         - name:  robust
-          title: Robust (HC)
+          title: Robust
 
+    - name: robust_method
+      title: Method
+      type: List
+      default: HC3
+      options:
+        - name:  HC3
+          title: HC3 
+        - name:  HC2
+          title: HC2
+        - name:  HC1
+          title: HC1
+        - name:  HC0
+          title: HC0 
 
 
 ...

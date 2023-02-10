@@ -27,6 +27,7 @@ Runner <- R6::R6Class("Runner",
                             
                             self$model<-private$.estimateModel(data)
                             ginfo("RUNNER: initial estimation done")
+                            
                             if (self$options$comparison) {
                               
                               obj<-try_hard(mf.update(self$model,formula=self$nestedformulaobj$formula64()))
@@ -456,28 +457,7 @@ Runner <- R6::R6Class("Runner",
                           
                           
                           ),# end of public
-                        active=list(
-                          
-                          
-                          storage=function(anobj) {
-                            
-                            if (missing(anobj)) {
-                              ginfo("retreiving the model")
-                              return(private$.storageTable$state)
-                            }
-                            else {
-                              ginfo("setting the model")
-                              
-                              private$.storageTable$setState(anobj)
-                              private$.hasStorage<-TRUE
-                              ginfo("done")
-                            }
-                            
-                            
-                            
-                          }
 
-                        ), #end of active
                         privat=list(
                           .data64=NULL,
                           .contr_index=0,
@@ -560,22 +540,39 @@ Runner <- R6::R6Class("Runner",
 
                           },
                           .bootstrap_model=function() {
-                                
-                                opts_list<-list(model=self$model,iterations=self$options$boot_r)
-                                ### check if we can go in paraller ###
-                                test<-try_hard(find.package("parallel"))
-                                if (isFALSE(test$error)) {
-                                    ginfo("we go in parallel")
-                                    opts_list[["n_cpus"]]<-parallel::detectCores()
-                                    opts_list[["parallel"]]<-"multicore"
-                                    
-                                }
+
                             
+                            if (is.something(self$storage) && is.something(self$storage$state)) {
+                              
+                              id<-self$storage$state
+                              load(id)
+                              self$boot_model<-boot_model
+                              
+                            } else {
+                            
+                                   opts_list<-list(model=self$model,iterations=self$options$boot_r)
+                                   ### check if we can go in paraller ###
+                                     test<-try_hard(find.package("parallel"))
+                                     if (isFALSE(test$error)) {
+                                         ginfo("we go in parallel")
+                                         opts_list[["n_cpus"]]<-parallel::detectCores()
+                                         opts_list[["parallel"]]<-"multicore"
+                                    
+                                      }
+                             
                                 gstart("RUNNER: estimating bootstrap model")
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
+                                gend()
                                 if (isFALSE(bmodel$error)) {
                                   self$boot_model<-bmodel$obj
+                                  ginfo("storing results")
+                                  id<-tempfile()
+                                  self$storage$setState(id)
+                                  boot_model<-self$boot_model
+                                  save(boot_model,file = id)
+                                  ginfo("....done")
                                 }
+                            }
                           },
                           .estimateTests=function() {
                             

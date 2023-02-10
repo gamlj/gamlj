@@ -42,7 +42,8 @@ procedure.posthoc <- function(obj) {
   ### check if we need robust standard error  
   vfun<-NULL
   if (obj$option("se_method","robust")) {
-       vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+       type<-obj$options$robust_method
+       vfun<-function(x,...) sandwich::vcovHC(x,type=type,...)
   }
   
   lmer.df = NULL
@@ -54,7 +55,7 @@ procedure.posthoc <- function(obj) {
   postHocTables <- list()
   
   for (.vars in terms) {
-    
+    mark("doing",.vars)
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
     .revvars<-rev(.vars)
@@ -82,10 +83,11 @@ procedure.posthoc <- function(obj) {
      )
      names(tableData)<-transnames(names(tableData),.transnames)  
      ## confidence intervals
+     .model<-model
      if (obj$option("ci_method",c("quantile","bcai"))) 
-       model<-obj$boot_model
-     
-     cidata<-.posthoc_ci(model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
+       .model<-obj$boot_model
+
+     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
      tableData$est.ci.lower<-cidata$est.ci.lower       
      tableData$est.ci.upper<-cidata$est.ci.upper       
 
@@ -134,7 +136,8 @@ procedure.posthoc_effsize <- function(obj) {
   ### check if we need robust standard error  
   vfun<-NULL
   if (obj$option("se_method","robust")) {
-    vfun<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+    type<-obj$options$robust_method
+    vfun<-function(x,...) sandwich::vcovHC(x,type=type,...)
   }
   
   
@@ -357,9 +360,10 @@ procedure.emmeans<-function(obj) {
     if (obj$option("df_method"))
        opts_list[["lmer.df"]]<-tolower(obj$options$df_method)
     
-    if (obj$option("se_method","robust")) 
-      opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
-
+    if (obj$option("se_method","robust")) {
+      type <- obj$options$robust_method
+      opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type=type,...)
+     }
     if (obj$option("model_type","ordinal"))
       opts_list[["mode"]]<-"mean.class"
 
@@ -465,7 +469,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       opts_list[["lmer.df"]]<-tolower(obj$options$df_method)
     
     if (obj$option("se_method","robust")) {
-      opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+      type<-obj$options$robust_method
+      opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type=type,...)
       obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=WARNS[["stde.robust_test"]])
       obj$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=WARNS[["stde.robust_test"]])
       
@@ -787,8 +792,10 @@ procedure.simpleInteractions<-function(obj) {
             if (obj$option("df_method"))
               grid_list[["lmer.df"]]<-tolower(obj$options$df_method)
             
-            if (obj$option("se_method","robust"))
-              grid_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type="HC3",...)
+            if (obj$option("se_method","robust")) {
+              type<-obj$options$robust_method
+              grid_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type=type,...)
+            }
             
             if (varobj$type=="numeric") {
                 grid_list[["specs"]]<-term64

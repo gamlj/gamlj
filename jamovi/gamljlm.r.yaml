@@ -5,7 +5,29 @@ jrs: '1.0'
 items:
   - name: model
     type: Property
- 
+
+  - name: storage
+    type: Table
+    visible: false
+    clearWith:
+        ### modeloptions  begins
+      - dep
+      - factors
+      - covs
+      - covs_scale
+      - dep_scale
+      - scale_missing
+      - contrasts
+      - model_terms
+      - fixed_intercept
+      - se_method
+      - mute
+        ### modeloptions  ends
+    columns:
+       - name: info
+         type: text
+
+
   - name: info
     title: Model Info
     type: Table

@@ -9,13 +9,17 @@ gparameters<- function(x,...) UseMethod(".parameters")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method
   .ci_width            <-  obj$ciwidth
-  .se_method           <-  obj$option("se_method","robust")
+  
+  .se_method           <-  obj$options$se_method
+   if (obj$option("se_method","robust")) 
+         .se_method   <-  obj$options$robust_method
+   
   
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
   
   .coefficients        <-  as.data.frame(parameters::parameters(
     model,
-    robust=.se_method,
+    vcov=.se_method,
     ci=NULL,
   ),stringAsFactors=FALSE)
 

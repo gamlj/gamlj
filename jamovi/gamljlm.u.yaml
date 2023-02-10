@@ -522,6 +522,10 @@ children:
                 name: se_method_robust
                 optionName: se_method
                 optionPart: robust
+              - type: ComboBox
+                name: robust_method
+                enable: (se_method_robust)
+
           - type: Label
             label: Additional Info
             children:
