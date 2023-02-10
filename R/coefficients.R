@@ -11,9 +11,12 @@ gparameters<- function(x,...) UseMethod(".parameters")
   .ci_width            <-  obj$ciwidth
   
   .se_method           <-  obj$options$se_method
+  
+  if (obj$option("se_method","standard")) 
+    .se_method   <-  NULL
+  
    if (obj$option("se_method","robust")) 
          .se_method   <-  obj$options$robust_method
-   
   
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
   

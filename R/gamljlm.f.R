@@ -122,7 +122,10 @@
 #' @param es_info \code{TRUE} or \code{FALSE} (default), provide ìnformation
 #'   about the effect size indexes
 #' @param dep_scale Re-scale the dependent variable.
-#' @param se_method .
+#' @param se_method Method to compute the standard error. Classical standard errors is the default (\code{standard}). 
+#'                  Four methods for  heteroschedasticy-consistent standard errors are available: 
+#'                  \code{HC0},\code{HC1},\code{HC2},\code{HC3}, from package  \link[sandwich]. 
+#'                  See \link[sandwich]{vcovHC} for details.  
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab a property \cr
@@ -292,6 +295,10 @@ gamlj_lm <- function(
   
   ## end of custom code
   
+  if (se_method!="standard") {
+    se_method<-"robust"
+    robust_method<-se_method
+  }
 
   options <- gamljlmOptions$new(
     .caller = .caller,
