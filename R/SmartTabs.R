@@ -72,6 +72,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                 self$columnTitles           <- private$.estimator$columnTitles
                                 self$indent                 <- private$.estimator$indent                            
                                 self$activateOnData         <- private$.estimator$activateOnData
+                                self$hideOn                 <- private$.estimator$hideOn
+                                
                               }
                               
 
@@ -127,9 +129,18 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.null(rtable))
                                 return()
                               
+                              ### check if new column titles are passed
+                              .attr <- private$.getAttributes(rtable)
+                              if (utils::hasName(.attr,"titles"))
+                                  for (.name in names(.attr$titles)) {
+                                         self$setColumnTitle(.name,.attr$titles[[.name]])
+                                  }
+
                               if (self$expandOnRun) private$.expand(rtable)
+                              
                               private$.fill(self$table,rtable)
-                              self$table$setVisible(TRUE)
+                              private$.finalize()
+                              
                               tinfo("TABLES: table",self$nickname,"run")
                               
                             },
@@ -274,7 +285,14 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               for (name in varnames)
                                 self$table$getColumn(name)$setVisible(TRUE)
-                            }
+                            },
+                            hideOn=function(alist) {
+                              
+                              if (missing(alist))
+                                 private$.hideOn
+                              else
+                                private$.hideOn<-alist
+                            } 
                             
                           ), #end of active
                           private=list(
@@ -286,7 +304,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             .new_columns=NULL,
                             .activateOnData=FALSE,
                             .column_title=list(),
-                            
+                            .hideOn=NULL,
                             .stop=function() {
                               
                               if (private$.phase=="init") {
@@ -361,6 +379,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                             },
                             .fill=function(jtable,rtable) {
+                              
                               maxrow<-jtable$rowCount
                               
                               .insert<-function(i,w) {
@@ -377,8 +396,28 @@ SmartTable <- R6::R6Class("SmartTable",
                                 t[which(t==".")]<-NA
                                 .insert(i,t)
                               }
+                            },
+                            .finalize=function() {
                               
+                              private$.setColumnTitle()
+                              private$.setHideOn()
+                              self$table$setVisible(TRUE)
 
+                            },
+                            .setHideOn=function() {
+                              
+                              if (is.something(private$.hideOn)) {
+                                rtable<-self$table$asDF
+                                what<-names(rtable)
+                                for (col in names(private$.hideOn))
+                                  if (col %in% what) {
+                                    test<-all(rtable[[col]] %in% private$.hideOn[[col]])
+                                    if (test) 
+                                      self$table$getColumn(col)$setVisible(FALSE)
+                                    else
+                                      self$table$getColumn(col)$setVisible(TRUE)
+                                  }
+                              }
                             },
                             .expand=function(rtable) {
                               
@@ -392,7 +431,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               .present<-names(self$table$columns)
                               .ncols<-length(.present)
                               .names<-setdiff(.names,.present)
-                              
                               if (is.something(attr(rtable,"titles")))
                                 .titles<-attr(rtable,"titles")
                               else 
@@ -426,6 +464,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 
                             },
                             .setColumnTitle=function() {
+                              
                               what<-names(self$table$columns)
                               
                               for (col in names(self$columnTitles))

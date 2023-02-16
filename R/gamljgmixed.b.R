@@ -111,12 +111,13 @@ gamljgmixedClass <- R6::R6Class(
         ### simple effects
         ##### anova
         aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,runner_machine)
-        aSmartObj$activated<-(is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-        aSmartObj$expandOnInit<-TRUE
-        aSmartObj$expandSuperTitle<-"Moderator"
-        aSmartObj$key<-self$options$simple_x
-        aSmartObj$combineBelow<-1:(length(self$options$simple_mods)-1)
-        aSmartObj$spaceBy<-(length(self$options$simple_mods)-1)
+        aSmartObj$activated         <- (is.something(self$options$simple_x) & is.something(self$options$simple_mods))
+        aSmartObj$expandOnInit      <- TRUE
+        aSmartObj$expandSuperTitle  <- "Moderator"
+        aSmartObj$key               <- self$options$simple_x
+        aSmartObj$combineBelow      <- 1:(length(self$options$simple_mods)-1)
+        aSmartObj$spaceBy           <- (length(self$options$simple_mods)-1)
+        aSmartObj$hideOn            <- list(df2=Inf)
         
         ladd(private$.smartObjs)<- aSmartObj        
         

@@ -123,6 +123,7 @@ greek_vector <- c( # lowercase Greek letters
   logicalAnd='\u2227', logicalOr='\u2228', intersection='\u2229', union='\u222a')
 
 
+letter_chi2<-paste(greek_vector["chi"],'\u00B2',sep="")
 letter_eta2<-paste(greek_vector["eta"],'\u00B2',sep="")
 letter_peta2<-paste(greek_vector["eta"],'\u00B2',"p",sep="")
 letter_omega2<-paste(greek_vector["omega"],'\u00B2',sep="")

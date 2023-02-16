@@ -22,7 +22,7 @@ gamljmixedClass <- R6::R6Class(
         return()
       }
       
-      emmeans::emm_options(lmerTest.limit = 25000)  
+      emmeans::emm_options(lmerTest.limit = 20000)  
       ### set up the R6 workhorse class
       dispatcher<-Dispatch$new(self$results)
       data_machine<-Datamatic$new(self$options,dispatcher,self$data)
@@ -51,6 +51,8 @@ gamljmixedClass <- R6::R6Class(
         aSmartObj$setColumnVisible<-"label"
       ladd(private$.smartObjs)<-aSmartObj
       
+
+      
       ### contrasts code tables
       aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,runner_machine)
       aSmartObj$expandOnInit<-TRUE
@@ -74,34 +76,37 @@ gamljmixedClass <- R6::R6Class(
       ### estimate marginal means
       
       aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
-      aSmartObj$activated<-is.something(self$options$emmeans)
-      aSmartObj$expandOnInit<-TRUE
-      aSmartObj$combineBelow="new!"
-      aSmartObj$spaceBy="new!"
       aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$activated          <- is.something(self$options$emmeans)
+      aSmartObj$expandOnInit       <- TRUE
+      aSmartObj$combineBelow       <- "new!"
+      aSmartObj$spaceBy            <- "new!"
+      aSmartObj$hideOn             <- list(df=Inf)
+      
       ladd(private$.smartObjs)<-aSmartObj
       
       ### simple effects
       ##### anova
       aSmartObj<-SmartTable$new(self$results$simpleEffects$anova,runner_machine)
-      aSmartObj$activated<-(is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-      aSmartObj$expandOnInit<-TRUE
-      aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$key<-self$options$simple_x
-      aSmartObj$combineBelow<-1:(length(self$options$simple_mods)-1)
-      aSmartObj$spaceBy<-(length(self$options$simple_mods)-1)
-      
+      aSmartObj$activated         <- (is.something(self$options$simple_x) & is.something(self$options$simple_mods))
+      aSmartObj$expandOnInit      <- TRUE
+      aSmartObj$expandSuperTitle  <- "Moderator"
+      aSmartObj$key               <- self$options$simple_x
+      aSmartObj$combineBelow      <- 1:(length(self$options$simple_mods)-1)
+      aSmartObj$spaceBy           <- (length(self$options$simple_mods)-1)
+      aSmartObj$hideOn            <- list(df2=Inf)
       ladd(private$.smartObjs)<-aSmartObj
       
       ##### coefficients
       aSmartObj<-SmartTable$new(self$results$simpleEffects$coefficients,runner_machine)
       aSmartObj$activated<-(is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-      aSmartObj$expandOnInit<-TRUE
-      aSmartObj$expandSuperTitle<-"Moderator"
-      aSmartObj$key<-self$options$simple_x
+      aSmartObj$expandOnInit      <- TRUE
+      aSmartObj$expandSuperTitle  <- "Moderator"
+      aSmartObj$key               <- self$options$simple_x
       aSmartObj$ci("est",self$options$ci_width)
-      aSmartObj$combineBelow<-1:(length(self$options$simple_mods)-1)
-      aSmartObj$spaceBy<-(length(self$options$simple_mods)-1)
+      aSmartObj$combineBelow      <-1:(length(self$options$simple_mods)-1)
+      aSmartObj$spaceBy           <-(length(self$options$simple_mods)-1)
+      aSmartObj$hideOn            <- list(df=Inf)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### simple interaction
@@ -121,9 +126,11 @@ gamljmixedClass <- R6::R6Class(
       ## post hoc #####
       
       aSmartObj<-SmartArray$new(self$results$posthoc,runner_machine)
-      aSmartObj$expandOnInit<-TRUE
-      aSmartObj$expandSuperTitle<-"Comparison"
       aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$expandOnInit       <-TRUE
+      aSmartObj$expandSuperTitle   <-"Comparison"
+      aSmartObj$hideOn             <- list(df=Inf)
+      
       ladd(private$.smartObjs)<-aSmartObj
       
       

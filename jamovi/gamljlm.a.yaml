@@ -92,7 +92,7 @@ options:
       default: false
       description:
           R: >
-             Not present in R
+             Activates models comparison
 
     - name: fixed_intercept
       title: Intercept
@@ -101,6 +101,8 @@ options:
       description:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+          ui: >
+            Estimates fixed intercept if flagged
 
     - name: nested_intercept
       title: Nested intercept
@@ -122,7 +124,9 @@ options:
 
       description:
           R: >
-             Omnibus tests are based on F-test `F` (default) or loglikelihood ration test `LRT`.
+             Omnibus test of the model is based on F-test `F` (default) or loglikelihood ration test `LRT`.
+          ui: >
+             Omnibus test of the model is based on F-test  (default) or loglikelihood ration test `LRT`.
 
     - name: estimates_ci
       title: Estimates C.I.
@@ -131,6 +135,8 @@ options:
       description:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
+          ui: >
+             Non standardized coefficients (estimastes) CI in tables if flagged
 
     - name: betas_ci
       title: β C.I.
@@ -139,6 +145,8 @@ options:
       description:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
+          ui: >
+             Standardized coefficients CI in tables if flagged
 
     - name: ci_width
       title: Confidence level
@@ -156,6 +164,13 @@ options:
       title: Do not run
       type: Bool
       default: false
+      description:
+         R:  > 
+             not present in R
+         ui: >
+             If flagged, the results are not updated each time an option is changed. 
+             This allows settings complex model options without waiting for the results
+             to update every time.
 
 
     - name: ci_method
@@ -169,7 +184,16 @@ options:
           title: Bootstrap (Percent)
         - name:  bcai
           title: Bootstrap (BCa)
-          
+      description:
+         R: >
+            The method to estimate the confidence intervals. Standard method (`wald`) or bootstrap methods. For
+            bootstrap, `quantile` compute the confidence intervals based on the bootstrap distribution, whereas
+            `bcai` computes the bootstrap bias corrected accelerated intervals.
+         ui: >
+            The method to estimate the confidence intervals. Standard method (`Wald`) or bootstrap methods. For
+            bootstrap, `Quantile` computes the confidence intervals based on the bootstrap distribution, whereas
+            `BCAi` computes the bootstrap bias corrected accelerated intervals.
+           
     - name: boot_r
       title: Bootstrap rep.
       type: Number
@@ -177,7 +201,7 @@ options:
       default: 1000
       description:
           R: >
-            a number bootstrap repetitions.
+            The number bootstrap repetitions.
 
 
 
@@ -289,6 +313,9 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), use original scale for covariates.
+          ui: >
+            If selected, the X-axis variable is scaled with the orginal scale of the variable,
+            independently to the scaling set is the `Covariates Scaling`.
 
     - name: plot_black
       title: Varying line types 
@@ -297,9 +324,12 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), use different linetypes per levels.
+          ui: >
+            If selected, a black and white theme is set for the plot, with multiple lines (if present)
+            drawn in different styles.
 
     - name: plot_around
-      title: Error Bar Definition
+      title: Display
       type: List
       options:
         - name: 'none'
@@ -312,6 +342,10 @@ options:
       description:
           R: >
             `'none'` (default), `'ci'`, or `'se'`. Use no error
+            bars, use confidence intervals, or use standard errors on the
+            plots, respectively.
+          ui: >
+            `'None'` (default), `Confidence Intervals`, or `Standard Error`. Display on plots no error
             bars, use confidence intervals, or use standard errors on the
             plots, respectively.
 
@@ -424,8 +458,11 @@ options:
       max: 50
       description:
           R: >
-            offsett (number of percentiles) around the median used to condition simple effects and plots.
-            Used if `simpleScale`=`'percent'`
+            Offset (number of percentiles) around the median used to condition simple effects and plots.
+            Used if `covs_conditioning='percent'`. 
+          ui: >
+            Offset (number of percentiles) around the median used to condition simple effects and plots.
+            Used if `covs_conditioning='percent'`. 
 
 
     - name: covs_scale_labels
@@ -472,9 +509,12 @@ options:
           - bonf
       description:
           R: >
-            adjustment method for postho tests. One or more of `'none'`,  `'bonf'`,`'tukey'` 
-            `'holm'`; provide no,  Bonferroni, Tukey and
-            Holm Post Hoc corrections respectively.
+            Adjustment method for posthoc tests. One or more of `'none'`,  `'bonf'`,`'tukey'` 
+            `'holm'`, `'scheffe'` and `'sidak'`; provide no,  Bonferroni, Tukey and
+            Holm Scheffé and Sidak Post Hoc corrections, respectively. See \[emmeans]{summary.emmGrid} for details.
+          ui: >
+            Adjustment method for posthoc tests. One or more of `'None'`,  `'Bonferroni'`,`'Tukey'` 
+            `'Holm'` `'Scheffe'` and `'Sidak'` Post Hoc corrections. See \[emmeans](https://cran.r-project.org/web/packages/emmeans/emmeans.pdf) for details.
 
 
     - name: mute
@@ -483,17 +523,27 @@ options:
       default: false
       description:
           R: >
-            Not present in R
-
+            `TRUE` does not print footnotes under the output tables. Default is `FALSE`.
+          ui: >
+            If selected, does not print footnotes under the output tables. Default is selected.
+          
 
     - name: predicted
       title: Predicted
       type: Output            
       initInRun: true
-
+      description:
+        R: not present
+        ui: >
+            Saves in the dataset the predicted values of the model
+            
     - name: residuals
       title: Residuals
       type: Output            
+      description:
+        R: not present
+        ui: >
+            Saves in the dataset the residual values of the model
 
 
 
@@ -560,20 +610,29 @@ options:
           - etap
       description:
           R: >
-             a list of effect sizes to print out. They can be:
+              a list of effect sizes to print out. They can be:
               `"eta"` for eta-squared, `'etap'` for partial eta-squared,
-             `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
-             `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
+              `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
+              `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
+          ui: >
+              The effect size to show in tables. They can be:
+              `"eta"` for eta-squared, `'etap'` for partial eta-squared,
+              `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
+              `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
+               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
           
     - name: homo_test
-      title: Residual Variances Homogeneity tests
+      title: Homogeneity tests
       type: Bool
       default: false
       description:
           R: >
-            `TRUE` or `FALSE` (default), perform homogeneity tests
-    
+            `TRUE` or `FALSE` (default), performs Levene's homogeneity tests on residuals for categorical independent variables
+          ui: >
+            Provides [Levene's test](https://biostats.w.uib.no/test-for-homogeneity-of-variances-levenes-test/){target="_blank"} 
+            for equal variances across groups defined by factors  (homoschedasticity).
+
     - name: qq_plot
       title: Q-Q plot of residuals
       type: Bool
@@ -581,6 +640,8 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+          ui: >
+            Outputs a Q-Q plot (observed residual quantiles on expected residual quantiles). More general info [here](https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot){target="_blank"}
 
     - name: norm_test
       title: Normality of residuals
@@ -589,30 +650,38 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a test for normality of residuals
+          ui: >
+            Provides [Kolmogorov-Smirnov](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test){target="_blank"} and [Shapiro-Wilk](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test#Interpretation){target="_blank"} tests for normality of residuals.
 
     - name: norm_plot
-      title: Histogram of residuals
+      title: Residuals Histogram
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+          ui: > 
+            Outputs the histogram of the distribution of the residuals, with an overlaying ideal normal distribution with mean and variance equal to the residuals distribution parameters.
 
     - name: resid_plot
-      title: Residuals-Predicted scatterplot
+      title: Residuals-Predicted plot
       type: Bool
       default: false
       description:
           R: >
             `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
-            
+          ui: >
+            Produces a scatterplot with the residuals on the Y-axis and the predicted in the X-axis. It can be usufull to assess heteroschdasticity.
+
     - name: intercept_info
       title: On intercept
       type: Bool
       default: false
       description:
           R: >
-            `TRUE` or `FALSE` (default), provide ìnformation about the intercept (F test, effect size indexes)
+            `TRUE` or `FALSE` (default), provides ìnformation about the intercept (F test, effect size indexes)
+          ui: >
+            If selected provides ìnformation about the intercept (F test, effect size indexes)
 
     - name: es_info
       title: On Effect sizes
@@ -621,6 +690,8 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
+          ui: >
+            If selected, provides ìnformation about the effect size indexes
 
 
     - name: dep_scale
@@ -649,7 +720,15 @@ options:
           title: Standard 
         - name:  robust
           title: Robust
-
+      description:
+         R: >
+           The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3`
+           sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC}
+           for deatils.
+         ui: >
+           The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for
+           robust method.
+           
     - name: robust_method
       title: Method
       type: List
@@ -663,7 +742,12 @@ options:
           title: HC1
         - name:  HC0
           title: HC0 
-
+      description:
+         R: not present in T
+         ui: >
+           `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. 
+           See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf)
+           for deatils.
 
 ...
 

@@ -36,6 +36,7 @@ children:
             events:
               change: './gamlj.events::onChange_covariates'
   - type: LayoutBox
+    name: panel_input
     margin: large
     style: list
     children:
@@ -96,6 +97,7 @@ children:
             name: donotrun
   - type: CollapseBox
     label: Model
+    name: panel_model
     collapsed: true
     stretchFactor: 1
     children:
@@ -343,6 +345,7 @@ children:
 
   - type: CollapseBox
     label: Plots
+    name: panel_plots
     collapsed: true
     stretchFactor: 1
     children:
@@ -457,6 +460,7 @@ children:
                   type: TermLabel
   - type: CollapseBox
     label: Assumption Checks
+    name: panel_assumptions
     collapsed: true
     stretchFactor: 1
     style: inline
@@ -484,6 +488,7 @@ children:
             label: Residuals-Predicted plot
   - type: CollapseBox
     label: Options
+    name: panel_options
     style: list
     collapsed: true
     stretchFactor: 1

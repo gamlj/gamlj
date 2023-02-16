@@ -55,7 +55,7 @@ procedure.posthoc <- function(obj) {
   postHocTables <- list()
   
   for (.vars in terms) {
-    mark("doing",.vars)
+
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
     ## so the final table will look sorted in a more sensible way
     .revvars<-rev(.vars)
@@ -116,6 +116,8 @@ procedure.posthoc <- function(obj) {
     if (dep %in% names(tableData))
         tableData$response<-fromb64(as.character(tableData[[dep]]))
 
+    if (tableData$df[1]==Inf) attr(tableData,"titles")<-list(test="z")
+    
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
     gend()
@@ -186,7 +188,6 @@ procedure.posthoc_effsize <- function(obj) {
          tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
 
       d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
-      tableData$ds<-d$d
       tableData$ds.ci.lower<-d$CI_low
       tableData$ds.ci.upper<-d$CI_high
     
@@ -204,7 +205,6 @@ procedure.posthoc_effsize <- function(obj) {
     tableData$dm<-d$d
     tableData$dm.ci.lower<-d$CI_low
     tableData$dm.ci.upper<-d$CI_high
-
     dTables[[length(dTables)+1]]<-tableData
   }
   
@@ -235,7 +235,6 @@ procedure.posthoc_effsize <- function(obj) {
       labs <- referenceGrid@grid[terms]
       newlabs <- sapply(labs, function(a) sapply(a, function(b) as.character(b)))
       referenceGrid@grid[terms] <- newlabs
-      
       return(referenceGrid)
 }
 
@@ -544,7 +543,12 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
     if (is.something(.issues))
       obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
-
+    
+    if (.anova$df2==Inf) {
+        attr(.anova,"titles")<-list(test=letter_chi2,df1="df")
+        attr(.params,"titles")<-list(test="z")
+        
+    }
   gend()    
   return(list(.anova,.params))
 
