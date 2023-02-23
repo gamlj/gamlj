@@ -10,6 +10,18 @@ mod1<-gamlj::gamlj_lm(
   factors = "supp",
   covs="dose")
 
+model<-lm(len~supp+dose,data = ToothGrowth)
+
+eps<-effectsize::epsilon_squared(model)
+eps_df<-data.frame(var=eps$Parameter,index="Epsilon^2",value=eps$Epsilon2_partial)
+eta<-effectsize::eta_squared(model)
+eta_df<-data.frame(var=eta$Parameter,index="pEta^2",value=eta$Eta2_partial)
+omega<-effectsize::omega_squared(model)
+omega_df<-data.frame(var=eta$Parameter,index="pOmega^2",value=omega$Omega2_partial)
+
+rbind(eta_df,omega_df,beta_df)
+
+mod$df.residual
 
 testthat::test_that("equivalent model input (1)", {
   testthat::expect_equal(mod0$info$asDF$specs[2],mod1$info$asDF$specs[2])

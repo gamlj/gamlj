@@ -105,7 +105,7 @@ options:
       default:
       description:
           R: >
-            a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+            a list of character vectors describing effects terms for nested. It can be passed as right-hand formula.
 
     - name: comparison
       title: Activate
@@ -322,9 +322,9 @@ options:
       type: Terms
       default:
       description:
-          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
-             The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
-             also as a list of the form '`list("x","z",c("x","z")`'
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form '~x+x:z').
+             The formula is not expanded, so 'x*z' becomes 'x+z' and not 'x+z+x:z'. It can be passed
+             also as a list of the form 'list("x","z",c("x","z")'
 
 
     - name: simple_x
