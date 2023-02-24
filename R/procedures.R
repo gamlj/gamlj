@@ -27,7 +27,7 @@ procedure.posthoc <- function(obj) {
   if (length(terms) == 0) 
     return()
 
-  gstart("PROCEDURE: Posthoc")
+  jinfo("PROCEDURE: Posthoc")
   
   terms <- obj$options$posthoc
   dep <- tob64(obj$options$dep)
@@ -120,7 +120,7 @@ procedure.posthoc <- function(obj) {
     
     postHocTables[[length(postHocTables)+1]]<-tableData
   }
-    gend()
+    jinfo("PROCEDURE: done")
   
 
     postHocTables
@@ -322,7 +322,7 @@ return(results)
 
 procedure.emmeans<-function(obj) {
   
-  gstart("PROCEDURE: Estimated Marginal Means")
+  ginfo("PROCEDURE: Estimated Marginal Means")
   terms<-obj$options$emmeans
   
   type<-"response"
@@ -400,7 +400,7 @@ procedure.emmeans<-function(obj) {
     names(tableData)<-fromb64(names(tableData))
     results[[length(results)+1]]<-tableData
   }
-  gend()
+  jinfo("PROCEDURE: done")
   results
 }  
   
@@ -410,7 +410,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
 .simpleEffects.default<-function(model,obj) {
 
-  gstart("PROCEDURE: Simple Effects estimated")
+  jinfo("PROCEDURE: Simple Effects estimated")
   variable<-obj$options$simple_x
   variable64<-tob64(variable)
   varobj<-obj$datamatic$variables[[variable64]]
@@ -549,7 +549,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
         attr(.params,"titles")<-list(test="z")
         
     }
-  gend()    
+  jinfo("PROCEDURE: done")    
   return(list(.anova,.params))
 
 }  
@@ -748,7 +748,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 ## we want the simple interactions nested in the highest interaction required
 procedure.simpleInteractions<-function(obj) {
   
-     gstart("PROCEDURE: simple Interactions")
+     jinfo("PROCEDURE: simple Interactions")
   
       variable<-obj$options$simple_x
       variable64<-tob64(variable)
@@ -915,7 +915,7 @@ procedure.simpleInteractions<-function(obj) {
       
 
 
-      gend()
+      jinfo("PROCEDURE: done")
  
       return(resultsList)
 }

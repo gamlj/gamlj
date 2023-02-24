@@ -2,8 +2,8 @@
 #### warnings can be sent to tables or array. The table needs not to be created (like a keyed table within an array)
 #### to receive a warning. The warning is stored in the parent and then passed to the tabe
 #### Errors must be sent to existing (already defined) objects
-#### warnings can be transient (ggt remove after init) when init=TRUE is passed
-#### warnings and errors are passed only to visible tables.
+#### warnings can be transient (get remove after init) when init=TRUE is passed
+#### warnings and error are passed only to visible tables.
 #### errors are passed directly to the jamovi object. If option final=TRUE, a `stop()` is issued
 
 Dispatch <- R6::R6Class(
@@ -11,14 +11,10 @@ Dispatch <- R6::R6Class(
             class=TRUE, 
             cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
             public=list(
-                        tables = NULL,
-                        mute_notes   = FALSE,
+                        tables=NULL,
                         initialize=function(results) { 
-                                
+                          
                                   self$tables<-results
-                                  if (utils::hasName(results$options,"mute"))
-                                     self$mute_notes<-results$options$mute
-                                  
                                   
                         },
                         print=function() {
@@ -30,8 +26,6 @@ Dispatch <- R6::R6Class(
                         ),
             active=list(
                         warnings=function(obj) {
-                          
-                                if (self$mute_notes) return()
 
                                 if (missing(obj)) return()
                                 if (is.null(obj$message)) return()
@@ -43,12 +37,9 @@ Dispatch <- R6::R6Class(
                                 
                                 if (!is.something(table)) stop("SCAFFOLD: a message was sent to a non-existing result object: ",obj$topic)
                                 state<-as.list(table$state)
-                                if (!utils::hasName(obj,"id")) obj$id<-jmvcore::toB64(obj$message)
-
+                                if (!hasName(obj,"key")) obj$key<-jmvcore::toB64(obj$message)
+                                
                                 obj$message<-private$.translate(obj$message)
-
-                                if (is.null(obj$message))
-                                  return()
                                 
                                 if (inherits(table,"Html")) {
                                   content<-table$content
@@ -56,15 +47,12 @@ Dispatch <- R6::R6Class(
                                   table$setVisible(TRUE)
                                   return()
                                 }
-                                     
-                                
-                                if (!inherits(table,"Table")) 
-                                     what<-obj$id
-                                else
-                                     what<-length(state$notes)+1
-                                
-                               state$notes[[what]]<-obj
-                               table$setState(state)
+                          
+                               init<-(hasName(obj,"initOnly") && obj[["initOnly"]]) 
+                               table$setNote(obj$key,obj$message,init=init)
+                              
+                               
+                               
                                
                         },
                         errors=function(obj) {
@@ -75,18 +63,16 @@ Dispatch <- R6::R6Class(
                                if (!is.list(obj))
                                      stop("SCAFFOLD: Error requires a named list with `topic` and `message`")
           
-                               if (!utils::hasName(obj,"topic") | !utils::hasName(obj,"message"))
+                               if (!hasName(obj,"topic") | !hasName(obj,"message"))
                                     stop("SCAFFOLD:: Error requires a named list with `topic` and `message`")
   
 
                                if (is.null(obj$message) || obj$message==FALSE)
                                     return()
+          
                                obj$message<-private$.translate(obj$message)
-                               
-                               if (is.null(obj$message))
-                                 return()
-                               
-                               if (utils::hasName(obj,"final") && (obj$final))
+                          
+                               if (hasName(obj,"final") && (obj$final))
                                    stop(obj$message)
                           
                                path<-stringr::str_split(obj$topic,"_")[[1]]
@@ -107,7 +93,7 @@ Dispatch <- R6::R6Class(
                         tableobj<-self$tables
                         found<-FALSE
                         for (aname in path)
-                          if (utils::hasName(tableobj,aname)) {
+                          if (hasName(tableobj,aname)) {
                             found<-TRUE
                             tableobj<-tableobj[[aname]]
                           }
@@ -117,17 +103,12 @@ Dispatch <- R6::R6Class(
                              return(NULL)
                         
                       },
-                      
                       .translate=function(msg) {
+      
                             for (w in TRANS_WARNS) {
-                                 test<-grep(w$original,msg,fixed=T)
-                                 if (length(test)>0) {
-                                   if (is.null(w$new))
-                                      return(NULL)
-                                   msg<-jmvcore::format(w$new,msg)
-                                 }
+                                 msg<-gsub(w$original,w$new,msg,fixed=T)
                             }
-                           return(fromb64(msg))
+                           return(msg)
 
                        }
                        

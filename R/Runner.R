@@ -8,8 +8,6 @@ Runner <- R6::R6Class("Runner",
                         cloneable=FALSE,
                         class=TRUE,
                         public=list(
-                          subclass=NULL,
-                          ciwidth=NULL,
                           model=NULL,
                           boot_model=NULL,
                           nested_model=NULL,
@@ -17,12 +15,6 @@ Runner <- R6::R6Class("Runner",
                           tab_simpleCoefficients=NULL,
                           tab_randomcov=NULL,
                           boot_variances=NULL,
-                          
-                          initialize=function(options,dispatcher,datamatic) {
-                            super$initialize(options,dispatcher,datamatic)
-                            self$ciwidth <- options$ci_width/100
-                            self$subclass<-paste0("model_",options$model_type)
-                          },
                           estimate = function(data) {
                             
                             self$model<-private$.estimateModel(data)
@@ -33,10 +25,10 @@ Runner <- R6::R6Class("Runner",
                               obj<-try_hard(mf.update(self$model,formula=self$nestedformulaobj$formula64()))
                               self$nested_model<-obj$obj
                               if (!isFALSE(obj$warning))
-                                    self$dispatcher$warnings<-list(topic="main_r2",
+                                    self$warning<-list(topic="main_r2",
                                                              message=paste("Nested model:",obj$warning))
                               if (!isFALSE(obj$error))
-                                    self$dispatcher$warnings<-list(topic="main_r2",
+                                    self$warning<-list(topic="main_r2",
                                                              message=paste("Nested model:",obj$error))
                               
                             }
@@ -57,7 +49,7 @@ Runner <- R6::R6Class("Runner",
                                 
                                 ### issue some notes ###
                                 if (self$option("ci_method",c("quantile","bcai")) & self$option("posthoc") & self$option("posthoc_es") & self$option("d_ci")) 
-                                  self$dispatcher$warnings<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
+                                  self$warning<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
                                 tab
                           },                    
                           run_main_fit=function() {
@@ -126,10 +118,10 @@ Runner <- R6::R6Class("Runner",
                             if (!self$formulaobj$isProper) {
 
                                 if (self$infomatic$caller=="lm") {
-                                    self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
+                                    self$warning<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
                                     return(ganova(self$model,self))
                                 }   else { 
-                                    self$dispatcher$warnings<-list(topic="main_anova",message=WARNS["error.zeromodel"])
+                                    self$warning<-list(topic="main_anova",message=WARNS["error.zeromodel"])
                                     return(NULL)
                                 }
                             }
@@ -276,7 +268,7 @@ Runner <- R6::R6Class("Runner",
                               }
                                 
                               
-                              self$dispatcher$warnings<-list(topic="main_random",message=attr(vc,"info"))
+                              self$warning<-list(topic="main_random",message=attr(vc,"info"))
                               
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {
@@ -325,7 +317,7 @@ Runner <- R6::R6Class("Runner",
                               private$.bootstrap_model()
                             if (self$option("model_type","ordinal")) {
                                  msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                 self$dispatcher$warnings<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
+                                 self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
                             }
                             procedure.emmeans(self)
                           },
@@ -518,7 +510,7 @@ Runner <- R6::R6Class("Runner",
                               ginfo("MODULE: Estimating the model: running")
                               results<-try_hard(eval(acall))
                               
-                              self$dispatcher$warnings<-list(topic="info", message=results$warning)
+                              self$warning<-list(topic="info", message=results$warning)
                               
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom"))
@@ -531,7 +523,7 @@ Runner <- R6::R6Class("Runner",
                                 warning(results$warning)
                               
                               if (mf.aliased(results$obj))
-                                   self$dispatcher$warnings<-list(topic="info",message=WARNS["aliased"])
+                                   self$warning<-list(topic="info",message=WARNS["aliased"])
 
                               .model<-mf.fixModel(results$obj,self,data)
                               
@@ -560,17 +552,17 @@ Runner <- R6::R6Class("Runner",
                                     
                                       }
                              
-                                gstart("RUNNER: estimating bootstrap model")
+                                jinfo("RUNNER: estimating bootstrap model")
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
-                                gend()
+                                jinfo("RUNNER: done")
                                 if (isFALSE(bmodel$error)) {
                                   self$boot_model<-bmodel$obj
-                                  ginfo("storing results")
+                                  ginfo("RUNNER: storing results")
                                   id<-tempfile()
                                   self$storage$setState(id)
                                   boot_model<-self$boot_model
                                   save(boot_model,file = id)
-                                  ginfo("....done")
+                                  jinfo("RUNNER: done")
                                 }
                             }
                           },
@@ -589,7 +581,7 @@ Runner <- R6::R6Class("Runner",
                                 
                                 ########## fill basic tables #########
                                 if (!self$hasIntercept & is.something(self$options$factors)) 
-                                  self$dispatcher$warnings<-list(topic="main_coefficients",message=WARNS["nointercept"])
+                                  self$warning<-list(topic="main_coefficients",message=WARNS["nointercept"])
 
                                 
                           },
@@ -641,7 +633,7 @@ Runner <- R6::R6Class("Runner",
                                   ## this is required by lmerTest::ranova() which looks in the parent for "data"
                                   data<-self$model@frame
                                   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
-                                  self$dispatcher$warnings<-list(topic="main_ranova",message=results$warning)
+                                  self$warning<-list(topic="main_ranova",message=results$warning)
                                   if (!isFALSE(results$error))
                                      self$errors<-list(topic="main_ranova",message=paste("LR tests cannot be computed",results$error))
                                   else {

@@ -12,29 +12,17 @@ Initier <- R6::R6Class(
     hasIntercept=TRUE,
     hasTerms=FALSE,
     isProper=NULL,
-    tab_coefficients=NULL,
-    tab_intercept=NULL,
-    tab_emm=NULL,
-    tab_effectsizes=NULL,
-    tab_emmeans=NULL,
-    tab_simpleInteractionCoefficients=NULL,
-    tab_simpleInteractionAnova=NULL,
-    tab_posthoc=NULL,
-    tab_contrastcodes=NULL,
-    tab_r2=NULL,
-    tab_fit=NULL,
-    tab_relativerisk=NULL,
-    tab_random=NULL,
-    tab_randomCov=NULL,
-    tab_randomTests=NULL,
-    tab_levene=NULL,
-    tab_normtest=NULL,
     datamatic=NULL,
     infomatic=NULL,
-    initialize=function(options,dispatcher,datamatic) {
+    self$ciwidth=NULL,
+    self$subclass=NULL,
+    initialize=function(jmvobj,datamatic) {
       
-      super$initialize(options,dispatcher)
+      super$initialize(jmvobj)
       self$datamatic<-datamatic
+      self$ciwidth <- self$options$ci_width/100
+      self$subclass<-paste0("model_",options$model_type)
+      
       
       #### we prepare the model syntax
       self$formulaobj<-gFormula$new()
@@ -61,7 +49,7 @@ Initier <- R6::R6Class(
       
       
       ### infomatic class takes care of all info about different models
-      self$infomatic<-Infomatic$new(options,datamatic,self$formulaobj)
+      self$infomatic<-Infomatic$new(self$options,datamatic,self$formulaobj)
       
     }, # here initialize ends
     #### init functions #####
@@ -147,7 +135,7 @@ Initier <- R6::R6Class(
     init_main_anova=function() {
       
       if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") {
-        self$dispatcher$warnings<-list(topic="main_anova",
+        self$warning<-list(topic="main_anova",
                                        message="Fixed Effects Omnibus Tests not available for this type of model.")
         
         return(NULL)
@@ -267,7 +255,7 @@ Initier <- R6::R6Class(
     init_main_random=function() {
       
       if (self$option("re_ci")) 
-            self$dispatcher$warnings<-list(topic="main_random",
+            self$warning<-list(topic="main_random",
                                            message="Computation of C.I. may take a while. Please be patient.",
                                            init=TRUE)
       
@@ -336,7 +324,7 @@ init_main_multirandom=function() {
           
           emm<-self$infomatic$emmeans
           if (!is.null(emm))
-            self$dispatcher$warnings<-list(topic="emmeans",message=paste("Expected means are expressed as",emm))
+            self$warning<-list(topic="emmeans",message=paste("Expected means are expressed as",emm))
         }
         alist
     },
