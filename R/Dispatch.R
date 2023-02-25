@@ -11,9 +11,13 @@ Dispatch <- R6::R6Class(
             class=TRUE, 
             cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
             public=list(
+                        mute=FALSE, 
                         tables=NULL,
                         initialize=function(results) { 
                           
+                                  if (utils::hasName(results[[1]]$options,"mute"))
+                                      self$mute=results[[1]]$options$mute
+                                  
                                   self$tables<-results
                                   
                         },
@@ -40,6 +44,7 @@ Dispatch <- R6::R6Class(
                                 if (!hasName(obj,"key")) obj$key<-jmvcore::toB64(obj$message)
                                 
                                 obj$message<-private$.translate(obj$message)
+                                init<-(hasName(obj,"initOnly") && obj[["initOnly"]]) 
                                 
                                 if (inherits(table,"Html")) {
                                   content<-table$content
@@ -47,8 +52,12 @@ Dispatch <- R6::R6Class(
                                   table$setVisible(TRUE)
                                   return()
                                 }
-                          
-                               init<-(hasName(obj,"initOnly") && obj[["initOnly"]]) 
+                                if (inherits(table,"Array")) {
+                                  for (one in table$items)
+                                    one$setNote(obj$key,obj$message,init=init)
+                                  return()
+                                }
+                                
                                table$setNote(obj$key,obj$message,init=init)
                               
                                

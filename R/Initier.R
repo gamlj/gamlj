@@ -14,16 +14,15 @@ Initier <- R6::R6Class(
     isProper=NULL,
     datamatic=NULL,
     infomatic=NULL,
-    self$ciwidth=NULL,
-    self$subclass=NULL,
+    ciwidth=NULL,
+    subclass=NULL,
     initialize=function(jmvobj,datamatic) {
       
       super$initialize(jmvobj)
       self$datamatic<-datamatic
       self$ciwidth <- self$options$ci_width/100
-      self$subclass<-paste0("model_",options$model_type)
-      
-      
+      self$subclass<-paste0("model_",self$options$model_type)
+
       #### we prepare the model syntax
       self$formulaobj<-gFormula$new()
       self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")

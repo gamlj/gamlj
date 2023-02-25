@@ -2,7 +2,6 @@ gamljlmClass <- R6::R6Class(
   "gamlj_lm_Class",
   inherit = gamljlmBase,
   private=list(
-    .dispatcher=NULL,
     .data_machine=NULL,
     .runner_machine=NULL,
     .plotter_machine=NULL,
@@ -10,7 +9,8 @@ gamljlmClass <- R6::R6Class(
     .time=NULL,
     .smartObjs=list(),
     .init=function() {
-      ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
+      
+      jinfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
 
       private$.time<-Sys.time()
@@ -22,10 +22,8 @@ gamljlmClass <- R6::R6Class(
       }
       
       ### set up the R6 workhorse class
-      dispatcher              <-  Dispatch$new(self$results)
-      data_machine            <-  Datamatic$new(self$options,dispatcher,self$data)
-      runner_machine          <-  Runner$new(self$options,dispatcher,data_machine)
-     
+      data_machine            <-  Datamatic$new(self)
+      runner_machine          <-  Runner$new(self,data_machine)
       runner_machine$storage  <-  self$results$storage      
 
       ### info table ###
@@ -163,11 +161,11 @@ gamljlmClass <- R6::R6Class(
       self$results$plotnotes$setContent("")
       
       now<-Sys.time()
-      ginfo("INIT TIME:",now-private$.time," secs")
+      jinfo("INIT TIME:",now-private$.time," secs")
       
     },
     .run=function() {
-      ginfo("MODULE:  #### phase run ####")
+      jinfo("MODULE:  #### phase run ####")
       
       if (self$options$donotrun) return()
       
@@ -191,8 +189,8 @@ gamljlmClass <- R6::R6Class(
       # 
       private$.plotter_machine$preparePlots()
       # 
-      # if ("plot" %in% private$.plotter_machine$dispatcher$warnings_topics) {
-      #     self$results$plotnotes$setContent(paste(private$.plotter_machine$dispatcher$warnings[["plot"]],collapse = "; "))
+      # if ("plot" %in% private$.plotter_machine$warning_topics) {
+      #     self$results$plotnotes$setContent(paste(private$.plotter_machine$warning[["plot"]],collapse = "; "))
       #     self$results$plotnotes$setVisible(TRUE)
       # }  
       
@@ -200,11 +198,11 @@ gamljlmClass <- R6::R6Class(
      if (self$options$.interface=="R") 
        self$results$.setModel(private$.runner_machine$model)
       
-      ginfo("MODULE:  #### phase end ####")
+      jinfo("MODULE:  #### phase end ####")
       
-      ginfo("RUN TIME:",Sys.time()-runnow," secs")
+      jinfo("RUN TIME:",Sys.time()-runnow," secs")
       
-      ginfo("TIME:",Sys.time()-private$.time," secs")
+      jinfo("TIME:",Sys.time()-private$.time," secs")
       
       return()
           

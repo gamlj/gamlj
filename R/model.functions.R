@@ -19,7 +19,7 @@ mf.fixModel<- function(x,...) UseMethod(".fixModel")
 .fixModel.lmerModLmerTest<-function(model,obj=NULL,data=NULL) {
   
   if (lme4::isSingular(model))
-      obj$dispatcher$warnings<-list(topic="info",message=WARNS[["lmer.singular"]])
+      obj$warning<-list(topic="info",message=WARNS[["lmer.singular"]])
 
   return(model)
 }

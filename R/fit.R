@@ -29,11 +29,11 @@ gFit <- R6::R6Class(
       
       obj<-try_hard(r2(self$operator$model,self$operator))
       if (!isFALSE(obj$error)) {
-        self$operator$dispatcher$warnings<-list(topic="main_r2",message="Model R2 cannot be computed.")
+        self$operator$warning<-list(topic="main_r2",message="Model R2 cannot be computed.")
         return(obj$obj)
       }
       if (!isFALSE(obj$warning)) {
-        self$operator$dispatcher$warnings<-list(topic="main_r2",message=obj$warning)
+        self$operator$warning<-list(topic="main_r2",message=obj$warning)
       }
       
       if (self$operator$options$comparison) {
@@ -62,11 +62,11 @@ gFit <- R6::R6Class(
         
       obj<-try_hard(r2(self$operator$nested_model,self$operator))
       if (!isFALSE(obj$error)) {
-        self$operator$dispatcher$warnings<-list(topic="main_r2",message="Nested model R2 cannot be computed.")
+        self$operator$warning<-list(topic="main_r2",message="Nested model R2 cannot be computed.")
         return(obj$obj)
       }
       if (!isFALSE(obj$warning)) {
-        self$operator$dispatcher$warnings<-list(topic="main_r2",message=obj$warning)
+        self$operator$warning<-list(topic="main_r2",message=obj$warning)
       }
       
         r2list <- lapply(obj$obj, function(x) {
@@ -88,7 +88,7 @@ gFit <- R6::R6Class(
           return()
       
       if (self$operator$option(".caller", c("glmer")) & self$operator$option("model_type", c("multinomial"))) {
-           self$operator$dispatcher$warnings <- list(topic = "main_r2",
+           self$operator$warning <- list(topic = "main_r2",
                                                      message = "Inferential test for multinomial models
                                                                 comparison not available. 
                                                                 Deviances from quasi-likelihoods are not comparable.")
@@ -117,11 +117,11 @@ gFit <- R6::R6Class(
       ### give some warning
       
       if (r2comp$df1 < 0) 
-        self$operator$dispatcher$warnings <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
+        self$operator$warning <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
       
       
       if (r2comp$df1 == 0) 
-        self$operator$dispatcher$warnings <- list(topic = "main_r2", message = "Nested and full models are identical, try removing some term from the nested model")
+        self$operator$warning <- list(topic = "main_r2", message = "Nested and full models are identical, try removing some term from the nested model")
       
       
       r2comp$r2 <- private$.r2-private$.r2n
@@ -183,7 +183,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.glm <- function(model,obj) {
   
-  ginfo(" .glm R2 is used for object of class",paste(class(model)))
+  jinfo(" .glm R2 is used for object of class",paste(class(model)))
   
   alist <- list()
   # mcFadden and adjusted
@@ -206,7 +206,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.polr <- function(model, obj) {
   
-  ginfo(".polr R2 is used")
+  jinfo(".polr R2 is used")
   alist <- list()
   results <- fit.compare_null_model(model)
 
@@ -248,7 +248,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 }
 
 .r2.mblogit <- function(model, obj) {
-  ginfo("mblogit R2 is used")
+  jinfo("mblogit R2 is used")
   llfull <- model$deviance
   llnull <- model$null.deviance
   ss <- mclogit::getSummary.mmblogit(model)
@@ -298,7 +298,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.default <- function(model) {
   
-  ginfo("Default null model comparison is used for object of class ",paste(class(model),collapse = " "))
+  jinfo("Default null model comparison is used for object of class ",paste(class(model),collapse = " "))
   
   data <- insight::get_data(model)
   int <- attr(stats::terms(model), "intercept")
@@ -411,7 +411,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.polr <- function(model) {
   
-  ginfo(".polr null model comparison is used")
+  jinfo(".polr null model comparison is used")
   
   data <- insight::get_data(model)
   int <- attr(stats::terms(model), "intercept")

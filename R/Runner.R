@@ -18,7 +18,7 @@ Runner <- R6::R6Class("Runner",
                           estimate = function(data) {
                             
                             self$model<-private$.estimateModel(data)
-                            ginfo("RUNNER: initial estimation done")
+                            jinfo("RUNNER: initial estimation done")
                             
                             if (self$options$comparison) {
                               
@@ -46,10 +46,9 @@ Runner <- R6::R6Class("Runner",
                                     tab[["optim"]]$value<-self$model@optinfo$optimizer
                           
                                 tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
-                                
                                 ### issue some notes ###
                                 if (self$option("ci_method",c("quantile","bcai")) & self$option("posthoc") & self$option("posthoc_es") & self$option("d_ci")) 
-                                  self$warning<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available. They are computed based on t-distribution")
+                                  self$warning<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available for effect sizes. They are computed based on t-distribution")
                                 tab
                           },                    
                           run_main_fit=function() {
@@ -153,12 +152,12 @@ Runner <- R6::R6Class("Runner",
                           run_main_effectsizes=function()  {
                             
                             if (!self$option("ci_method","wald")) {
-                              gstart("RUNNER: bootstrapping variances")
+                              jinfo("RUNNER: bootstrapping variances")
                               self$boot_variances<-boot::boot(self$model$model,
                                                               statistic = es.var_boot_fun,
                                                               R = self$options$boot_r,
                                                               model=self$model)
-                              gend()
+                              jinfo("RUNNER: bootstrapping done")
                             }
                             es.glm_variances(self$model,self)
                             
@@ -402,7 +401,7 @@ Runner <- R6::R6Class("Runner",
                             
                             
                             if (self$options$predicted && results$predicted$isNotFilled()) {
-                                ginfo("Saving predicted")
+                                jinfo("Saving predicted")
 
                                 
                                 pdf <- predicted(self$model,self)
@@ -414,7 +413,7 @@ Runner <- R6::R6Class("Runner",
                                 results$predicted$setValues(pdf)
                             }
                             if (self$options$residuals && results$residuals$isNotFilled()) {
-                                ginfo("Saving residuals")
+                                jinfo("Saving residuals")
                                 p<-stats::resid(self$model)
                               # we need the rownames in case there are missing in the datasheet
                               pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model)))
@@ -455,7 +454,7 @@ Runner <- R6::R6Class("Runner",
                           .contr_index=0,
                           .estimateModel=function(data) {
                             
-                              ginfo("MODULE: Estimating the model: checking")
+                              jinfo("MODULE: Estimating the model: checking")
                               ### check the dependent variable ####
                               if (is.something(self$datamatic$errors))
                                    stop(unlist(self$datamatic$errors))
@@ -487,7 +486,7 @@ Runner <- R6::R6Class("Runner",
                              glmer<-lme4::glmer
                              ###
 
-                             ginfo("MODULE: Estimating the model: making options")
+                             jinfo("MODULE: Estimating the model: making options")
                              
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
                               
@@ -507,7 +506,7 @@ Runner <- R6::R6Class("Runner",
                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-                              ginfo("MODULE: Estimating the model: running")
+                              jinfo("MODULE: Estimating the model: running")
                               results<-try_hard(eval(acall))
                               
                               self$warning<-list(topic="info", message=results$warning)
@@ -546,7 +545,7 @@ Runner <- R6::R6Class("Runner",
                                    ### check if we can go in paraller ###
                                      test<-try_hard(find.package("parallel"))
                                      if (isFALSE(test$error)) {
-                                         ginfo("we go in parallel")
+                                         jinfo("we go in parallel")
                                          opts_list[["n_cpus"]]<-parallel::detectCores()
                                          opts_list[["parallel"]]<-"multicore"
                                     
@@ -557,7 +556,7 @@ Runner <- R6::R6Class("Runner",
                                 jinfo("RUNNER: done")
                                 if (isFALSE(bmodel$error)) {
                                   self$boot_model<-bmodel$obj
-                                  ginfo("RUNNER: storing results")
+                                  jinfo("RUNNER: storing results")
                                   id<-tempfile()
                                   self$storage$setState(id)
                                   boot_model<-self$boot_model
@@ -568,7 +567,7 @@ Runner <- R6::R6Class("Runner",
                           },
                           .estimateTests=function() {
                             
-                                ginfo("Estimating Info")
+                                jinfo("Estimating Info")
 
                                 ### update info table
                                 self$tab_info[["sample"]]$value<-self$datamatic$N

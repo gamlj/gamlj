@@ -60,7 +60,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
       )
       
       if (..bootstrap) {
-        ginfo("ESTIMATE: we need to reboostrap for betas CI")
+        jinfo("ESTIMATE: we need to reboostrap for betas CI")
         
         ### check if we can go in paraller ###
         test<-try_hard(find.package("parallel"))

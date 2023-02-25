@@ -8,7 +8,7 @@ ganova<- function(x,...) UseMethod(".anova")
 .anova.glm<-function(model,obj) {
   
   if (!obj$formulaobj$hasTerms) {
-    obj$dispatcher$warnings  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
+    obj$warning  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
     return(NULL)
   }
   
@@ -21,10 +21,10 @@ ganova<- function(x,...) UseMethod(".anova")
   ### LR is less lenient than Wald
   if (test=="LR" & !isFALSE(anoobj$error)) {
     anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))
-    obj$dispatcher$warnings  <-  list(topic="main_anova",message="Wald test was used because LR failed")
+    obj$warning  <-  list(topic="main_anova",message="Wald test was used because LR failed")
   }
-  obj$dispatcher$errors    <-  list(topic="main_anova",message=anoobj$error)
-  obj$dispatcher$warnings  <-  list(topic="main_anova",message=anoobj$warning)
+  obj$error    <-  list(topic="main_anova",message=anoobj$error)
+  obj$warning  <-  list(topic="main_anova",message=anoobj$warning)
   
   
   if (!isFALSE(anoobj$error))
@@ -137,7 +137,7 @@ ganova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.glmerMod<-function(model,obj) {
-  ginfo("using .anova.glmerMod")
+  jinfo("using .anova.glmerMod")
   ano<-.car.anova(model)
   names(ano)<-c("test","df","p")
   if (nrow(ano)==0) ano<-NULL
@@ -151,20 +151,20 @@ ganova<- function(x,...) UseMethod(".anova")
   
   df<-obj$options$df_method
   results        <-  try_hard(stats::anova(model,type="3",ddf=df))
-  obj$dispatcher$errors    <-  list(topic="main_anova",message=results$error)
-  obj$dispatcher$warnings  <-  list(topic="main_anova",message=results$warning)
+  obj$error    <-  list(topic="main_anova",message=results$error)
+  obj$warning  <-  list(topic="main_anova",message=results$warning)
   
   if (!isFALSE(results$error))
     return()
   
   .anova<-results$obj
   if (dim(.anova)[1]==0) {
-    obj$dispatcher$warnings<-list(topic="main_anova",message="F-Tests cannot be computed without fixed effects")
+    obj$warning<-list(topic="main_anova",message="F-Tests cannot be computed without fixed effects")
     return(.anova)
   }
   if (dim(.anova)[2]==4) {
     .anova<-.car.anova(model,df)
-    obj$dispatcher$warnings<-list(topic="main_anova",message="Degrees of freedom computed with method Kenward-Roger")
+    obj$warning<-list(topic="main_anova",message="Degrees of freedom computed with method Kenward-Roger")
     
   } 
   
@@ -177,7 +177,7 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .anova.clmm<-function(model,obj) {
 
-  ginfo("anova for clmm")
+  jinfo("anova for clmm")
   ## at the moment ordinal::anova.clmm does not work and drop1 tests
   ## only the higher order term. So we go all the way with a custom
   ## drop. We also have to be careful when there is only one predictors,
@@ -201,7 +201,7 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .car.anova<-function(model,df) {
   
-  ginfo("ganova uses car::Anova")
+  jinfo("ganova uses car::Anova")
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"

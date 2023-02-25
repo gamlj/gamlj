@@ -188,6 +188,7 @@ procedure.posthoc_effsize <- function(obj) {
          tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
 
       d<-effectsize::t_to_d(tableData$test,df_error = obj$model$df.residual,ci = obj$ciwidth)
+      tableData$ds<-d$d
       tableData$ds.ci.lower<-d$CI_low
       tableData$ds.ci.upper<-d$CI_high
     
@@ -322,7 +323,7 @@ return(results)
 
 procedure.emmeans<-function(obj) {
   
-  ginfo("PROCEDURE: Estimated Marginal Means")
+  jinfo("PROCEDURE: Estimated Marginal Means")
   terms<-obj$options$emmeans
   
   type<-"response"
@@ -470,8 +471,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     if (obj$option("se_method","robust")) {
       type<-obj$options$robust_method
       opts_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type=type,...)
-      obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=WARNS[["stde.robust_test"]])
-      obj$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=WARNS[["stde.robust_test"]])
+      obj$warning<-list(topic="simpleEffects_anova",message=WARNS[["stde.robust_test"]])
+      obj$warning<-list(topic="simpleEffects_coefficients",message=WARNS[["stde.robust_test"]])
       
     }
     
@@ -542,7 +543,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     .issues <- .all[test]
 
     if (is.something(.issues))
-      obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
+      obj$warning<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
     
     if (.anova$df2==Inf) {
         attr(.anova,"titles")<-list(test=letter_chi2,df1="df")
@@ -660,7 +661,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          .issues <- .all[test]
          
          if (is.something(.issues))
-           obj$dispatcher$warnings<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
+           obj$warning<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
          
          return(list(anovas,parameters))
 }
@@ -736,7 +737,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   .issues <- .all[test]
   
   if (is.something(.issues))
-    obj$dispatcher$warnings<-list(topic="simpleEffects_coefficients",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
+    obj$warning<-list(topic="simpleEffects_coefficients",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
   
   return(list(NULL,parameters))
 }
@@ -785,7 +786,7 @@ procedure.simpleInteractions<-function(obj) {
             test<-any(jmvcore::composeTerm(sort(.key)) %in% jmvcore::composeTerms(lapply(obj$options$model_terms,sort)))
             if (!test) {
               msg<-paste("Interaction",jmvcore::composeTerm(.key),"is not in the model, results may be misleading.")
-              obj$dispatcher$warnings<-list(topic="simpleInteractions",message=msg)
+              obj$warning<-list(topic="simpleInteractions",message=msg)
             }
             
             grid_list<-list(object=obj$model,
@@ -873,7 +874,7 @@ procedure.simpleInteractions<-function(obj) {
       if (!isFALSE(results$error)) 
           obj$dispatcher$error<-list(topic=key,message=results$error)
       if (!isFALSE(results$warning)) 
-          obj$dispatcher$warnings<-list(topic=key,message=results$warning)
+          obj$warning<-list(topic=key,message=results$warning)
             
       params<-results$obj            
 
@@ -904,7 +905,7 @@ procedure.simpleInteractions<-function(obj) {
       if (!isFALSE(results$error)) 
               obj$dispatcher$error<-list(topic=key,message=results$error)
       if (!isFALSE(results$warning)) 
-              obj$dispatcher$warnings<-list(topic=key,message=results$warning)
+              obj$warning<-list(topic=key,message=results$warning)
       anova<-results$obj      
                           
       resultsList[[length(resultsList)+1]]<-list(anova,params)

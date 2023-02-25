@@ -335,7 +335,7 @@ Plotter <- R6::R6Class(
             if (!is.something(self$options$plot_x)) 
                    return()
             
-            ginfo("PLOTTER: init main plot")
+            jinfo("PLOTTER: init main plot")
       
             resultsgroup<-private$.results$get("mainPlots")
             y<-self$options$dep
@@ -390,7 +390,7 @@ Plotter <- R6::R6Class(
       if (!is.something(self$options$plot_x)) 
         return()
 
-      ginfo("PLOTTER: prepare main plot")
+      jinfo("PLOTTER: prepare main plot")
       
       private$.results$plotnotes$setContent("")
       

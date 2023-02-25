@@ -10,7 +10,7 @@ gamljglmClass <- R6::R6Class(
     .smartObjs=list(),
     .init=function() {
       
-      ginfo(paste("MODULE:",self$options$.caller,self$options$model_type,"  #### phase init  ####"))
+      jinfo(paste("MODULE:",self$options$.caller,self$options$model_type,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
 
@@ -160,14 +160,14 @@ gamljglmClass <- R6::R6Class(
       self$results$plotnotes$setContent("")
       
       now<-Sys.time()
-      ginfo("INIT TIME:",now-private$.time," secs")
+      jinfo("INIT TIME:",now-private$.time," secs")
       
     },
     .run=function() {
       
       runnow<-Sys.time()
       
-      ginfo("MODULE:  #### phase run ####")
+      jinfo("MODULE:  #### phase run ####")
       
       if (self$options$donotrun) return()
         
@@ -199,11 +199,11 @@ gamljglmClass <- R6::R6Class(
         self$results$.setModel(private$.runner_machine$model)
       
       
-      ginfo("MODULE:  #### phase end ####")
+      jinfo("MODULE:  #### phase end ####")
       
-      ginfo("RUN TIME:",Sys.time()-runnow," secs")
+      jinfo("RUN TIME:",Sys.time()-runnow," secs")
       
-      ginfo("TIME:",Sys.time()-private$.time," secs")
+      jinfo("TIME:",Sys.time()-private$.time," secs")
       
 
     },

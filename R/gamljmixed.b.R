@@ -11,7 +11,7 @@ gamljmixedClass <- R6::R6Class(
     .smartObjs=list(),
     .init=function() {
       
-      ginfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
+      jinfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
       private$.time<-Sys.time()
       
@@ -154,7 +154,7 @@ gamljmixedClass <- R6::R6Class(
       
     },
     .run=function() {
-      ginfo("MODULE:",self$options$.caller,"  #### phase run ####")
+      jinfo("MODULE:",self$options$.caller,"  #### phase run ####")
       
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
@@ -183,9 +183,9 @@ gamljmixedClass <- R6::R6Class(
       if (self$options$.interface=="R")
               self$results$.setModel(private$.runner_machine$model)
       
-      ginfo("MODULE:  #### phase end ####")
+      jinfo("MODULE:  #### phase end ####")
       now<-Sys.time()
-      ginfo("TIME:",now-private$.time," secs")
+      jinfo("TIME:",now-private$.time," secs")
       
       return()
           

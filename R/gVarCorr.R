@@ -11,12 +11,12 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   if (obj$option("re_ci")) {
     method     <-  ifelse(obj$options$ci_method=="wald","Wald",obj$options$ci_method)
     results    <-  try_hard(stats::profile(obj$model,which="theta_",optimizer=obj$model@optinfo$optimizer,prof.scale=c("varcov")))
-    obj$dispatcher$warnings<-list(topic="main_random",message=results$warning)
+    obj$warning<-list(topic="main_random",message=results$warning)
     if (isFALSE(results$error)) {
       cidata         <-  as.data.frame(confint(results$obj,parm = "theta_",level = obj$ciwidth, method=method))
       names(cidata)  <-  c("var.ci.lower","var.ci.upper")
       vc<-cbind(vc,cidata)
-      obj$dispatcher$warnings<-list(topic="main_random",message="C.I. are computed with the profile method")
+      obj$warning<-list(topic="main_random",message="C.I. are computed with the profile method")
     }
   }
   .transnames<-c(var="vcov",std="sdcor")
@@ -47,7 +47,7 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   vc<-as.data.frame(vc)
   .transnames<-c(var="vcov",std="sdcor")
   names(vc)<-transnames(names(vc),.transnames)
-  if (obj$option("re_ci"))  obj$dispatcher$warnings<-list(topic="main_random",message="C.I. not available for ordinal mixed models")
+  if (obj$option("re_ci"))  obj$warning<-list(topic="main_random",message="C.I. not available for ordinal mixed models")
 
   .names <-names(model$dims$nlev.re)
   ngrp   <- as.numeric(model$dims$nlev.re)

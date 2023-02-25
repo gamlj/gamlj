@@ -2,13 +2,13 @@ Scaffold <- R6::R6Class("Scaffold",
                           cloneable=FALSE,
                           class=FALSE,
                           public=list(
+                            analysis=NULL,  
                             options=NULL,
-                            dispatcher=NULL,
-                            initialize=function(options,dispatcher) {
-                              
-                              self$options<-options
-                              self$dispatcher<-dispatcher
-                              
+                            initialize=function(object) {
+                                 
+                              self$analysis<-object
+                              self$options<-object$options
+
                             },
                             option=function(val,spec=NULL) {
                               
@@ -44,9 +44,24 @@ Scaffold <- R6::R6Class("Scaffold",
                               
                               private$.storage<-obj
                               
+                            },
+                            warning=function(alist) {
+                                if (is.null(private$.dispatcher))
+                                    private$.create_dispatcher()
+                                private$.dispatcher$warnings<-alist
+                            },
+                            error=function(alist) {
+                                if (is.null(private$.dispatcher))
+                                    private$.create_dispatcher()
+                                private$.dispatcher$errors<-alist
                             }
+                            
                           ), #end of active
                           private=list(
-                            .storage=NULL
+                            .storage=NULL,
+                            .dispatcher=NULL,
+                            .create_dispatcher=function() {
+                                private$.dispatcher<-Dispatch$new(self$analysis$results)
+                            }
                           ) #end of private
 ) ## end of class

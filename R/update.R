@@ -6,7 +6,7 @@ mf.update<- function(x,...) UseMethod(".update")
 
 .update.default<-function(model,...) {
   
-  ginfo("default update is used")
+  jinfo("default update is used")
   data<-insight::get_data(model)
   stats::update(model,data=data,...)
   
@@ -76,7 +76,7 @@ mf.update<- function(x,...) UseMethod(".update")
 
 .update.mmblogit<-function(model,formula) {
   
-  ginfo("mmblogit update is used")
+  jinfo("mmblogit update is used")
   ### mclogit is quite unflexible with the class of formulas. 
   ### we should deparse them and reset as formulas
   .fixed  <- lme4::nobars(stats::formula(formula))

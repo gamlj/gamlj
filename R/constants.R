@@ -1,7 +1,4 @@
 
-j_DEBUG=T
-j_INFO=T
-t_INFO=F
 
 IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"
 
