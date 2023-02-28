@@ -86,7 +86,7 @@ gFit <- R6::R6Class(
       
       if (!self$operator$options$comparison)
           return()
-      
+
       if (self$operator$option(".caller", c("glmer")) & self$operator$option("model_type", c("multinomial"))) {
            self$operator$warning <- list(topic = "main_r2",
                                                      message = "Inferential test for multinomial models
@@ -95,27 +95,28 @@ gFit <- R6::R6Class(
            return(NULL)
       }
       
-      
+      omnibus<-self$operator$optionValue("omnibus")
+      if (omnibus=="wald") omnibus<-"Chisq"
       if (self$operator$option(".caller", c("lmer", "glmer")) || self$operator$option("omnibus", "LRT")) {
          comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model, self$operator$model)))
       } else {
-         comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = self$operator$options$omnibus))
+         comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
       }
       
       comp <- comp$obj
       r2comp <- as.list(comp[2, ])
       .names <- list(
                      df2 = c("Res.Df", "Resid. Df"),
-                     df1 = c("Df", "df_diff"), p = c("Pr(>Chi)", "Pr(>F)"),
+                     df1 = c("Df", "df_diff"), p = c("Pr(>Chi)", "Pr(>F)","Pr(Chi)"),
                      f = "F",
-                     test = c("Deviance", "Chi2")
+                     test = c("Deviance", "Chi2","LR stat.")
                     )
       
       names(r2comp) <- transnames(names(r2comp), .names)
+
       r2comp$model <- paste0(greek_vector[["Delta"]], "R", "\u00B2")
       r2comp$type <- "Comparison"
       ### give some warning
-      
       if (r2comp$df1 < 0) 
         self$operator$warning <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
       
@@ -235,8 +236,6 @@ r2 <- function(model, ...) UseMethod(".r2")
   llnull <- stats::logLik(nullmodel)
   r2 <- as.numeric(1 - (llfull / llnull))
   compare <- stats::anova(nullmodel, model)
-
-
   alist <- list()
   # mcFadden
   alist$r2 <- as.numeric(1 - (llfull / llnull))

@@ -209,7 +209,7 @@ Initier <- R6::R6Class(
     
     init_main_intercept=function() {
       
-      self$tab_intercept<-list(source="(Intercept)")
+      list(source="(Intercept)")
       
     },
 ### vcov more info ###

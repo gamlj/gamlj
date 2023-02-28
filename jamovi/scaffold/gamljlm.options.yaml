@@ -9,6 +9,7 @@ modeloptions:
         - model_terms
         - fixed_intercept
         - se_method
+        - robust_method
         - mute
 nestedoptions:
         - nested_terms

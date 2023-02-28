@@ -78,7 +78,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               }
                               ## some coherence setting
                               if (isTRUE(self$activateOnData)) self$activated<-TRUE
-
                             },
                             initTable=function() {
 
@@ -144,6 +143,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               private$.fill(self$table,rtable)
                               private$.finalize()
+                              self$retrieveNotes() ## check if some work is needed on the notes
                               
                               private$.debug_msg("run")
                               self$table$setState(list(status="complete"))
@@ -157,11 +157,14 @@ SmartTable <- R6::R6Class("SmartTable",
                               ladd(self$ci_info)<-alist
 
                             },
-                            retrieveNotes=function(dispatcher=NULL) {
+                            retrieveNotes=function() {
 
+                                  mute<-FALSE
+                                  if (!is.null(self$table$options$mute))
+                                      mute<-self$table$options$mute
                                   notes<-self$table$notes
                                   lapply(notes,function(x) {
-                                    if (isTRUE(x$init))
+                                    if (isTRUE(x$init) || mute)
                                        self$table$setNote(x$key,NULL)
                                   })
 
@@ -699,6 +702,8 @@ SmartArray <- R6::R6Class("SmartArray",
                                  } else {
                                    obj$table$setVisible(FALSE)
                                  }
+                                 self$retrieveNotes() ## check if some work is needed on the notes
+                                 
                              }
                               private$.debug_msg("run")
                               self$table$setState(list(status="complete"))

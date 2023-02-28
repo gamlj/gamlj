@@ -120,7 +120,7 @@ options:
       type: List
       default: LRT
       options:
-        - name:  wald
+        - name:  Chisq
           title: Wald Chi²
         - name: LRT
           title: LRT

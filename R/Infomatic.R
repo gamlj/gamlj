@@ -24,14 +24,16 @@ Infomatic <- R6::R6Class(
     df          =   NULL,
     comparison  =  "Difference",
     posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
+    omnibus_test=  NULL,
     initialize=function(options,datamatic,formulas) {
       
       
-      self$model_type<-options$model_type
-      self$caller<-options$.caller
-      dep<-options$dep
-      dlevs<-datamatic$variables[[tob64(dep)]]$levels_labels
+      self$model_type        <- options$model_type
+      self$caller            <- options$.caller
+      dep                    <- options$dep
+      dlevs                  <- datamatic$variables[[tob64(dep)]]$levels_labels
       
+      self$omnibus_test<- ifelse(utils::hasName(options,"omnibus"),stringr::str_to_title(options$omnibus),NULL)
       
       if (self$caller=="glm") {
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
@@ -251,6 +253,9 @@ Infomatic <- R6::R6Class(
        if (self$optimized)
              alist[["optim"]]<-list(info="Optimizer",value="",specs="") 
 
+      if (is.something(self$omnibus_test))
+        alist[["omnibus"]]<-list(info="Omnibus Tests",value=self$omnibus_test,specs="") 
+      
       if (is.something(self$df))
         alist[["df"]]<-list(info="DF method",value=self$df,specs="") 
       

@@ -27,7 +27,16 @@ const events = {
               ui.propodds_test.$el.hide();
             }
         }
-
+        
+        if (typeof ui.omnibus_wald !== 'undefined') {
+          
+           ui.omnibus_wald.setEnabled(true);
+           if (ui.model_type.getValue() === 'multinomial') {
+              ui.omnibus.setValue("LRT");
+              ui.omnibus_wald.setEnabled(false);
+          }
+          
+        }
 
     },
 
@@ -123,6 +132,16 @@ const events = {
               ui.ci_method_bcai.setEnabled(false);
         }
   
+        if (typeof ui.omnibus_wald !== 'undefined') {
+          
+           ui.omnibus_wald.setEnabled(true);
+           if (ui.model_type.getValue() === 'multinomial') {
+              ui.omnibus.setValue("LRT");
+              ui.omnibus_wald.setEnabled(false);
+          }
+          
+        }
+        
         ui.dep.setValue(null);
       },
 

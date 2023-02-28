@@ -127,7 +127,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 omnibus,
                 default="LRT",
                 options=list(
-                    "wald",
+                    "Chisq",
                     "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
@@ -586,7 +586,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "df_method",
                     "contrasts",
                     "covs_scale",
-                    "offset"),
+                    "offset",
+                    "omnibus"),
                 columns=list(
                     list(
                         `name`="info", 
@@ -646,6 +647,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "offset",
+                                "omnibus",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -695,7 +697,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "df_method",
                                 "contrasts",
                                 "covs_scale",
-                                "offset"),
+                                "offset",
+                                "omnibus"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -736,7 +739,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "df_method",
                                 "contrasts",
                                 "covs_scale",
-                                "offset"),
+                                "offset",
+                                "omnibus"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -773,6 +777,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "offset",
+                                "omnibus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -852,7 +857,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "df_method",
                                 "contrasts",
                                 "covs_scale",
-                                "offset"),
+                                "offset",
+                                "omnibus"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -904,6 +910,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "offset",
+                                "omnibus",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -972,6 +979,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "offset",
+                                "omnibus",
                                 "__effectsizeoptions"),
                             columns=list(
                                 list(

@@ -12,6 +12,7 @@ modeloptions:
         - contrasts
         - covs_scale
         - offset
+        - omnibus
 
 nestedoptions:
         - nested_terms

@@ -15,9 +15,10 @@ gparameters<- function(x,...) UseMethod(".parameters")
   if (obj$option("se_method","standard")) 
     .se_method   <-  NULL
   
-   if (obj$option("se_method","robust")) 
+   if (obj$option("se_method","robust"))  {
          .se_method   <-  obj$options$robust_method
-  
+         warning(WARNS[["stde.robust_test"]])
+   }
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
   
   .coefficients        <-  as.data.frame(parameters::parameters(

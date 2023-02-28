@@ -641,6 +641,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "model_terms",
                     "fixed_intercept",
                     "se_method",
+                    "robust_method",
                     "mute"),
                 columns=list(
                     list(
@@ -674,6 +675,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "model_terms",
                     "fixed_intercept",
                     "se_method",
+                    "robust_method",
                     "mute",
                     "nested_terms",
                     "nested_intercept",
@@ -714,6 +716,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute",
                                 "nested_terms",
                                 "nested_intercept",
@@ -773,6 +776,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute",
                                 "ci_width",
                                 "ci_method",
@@ -831,6 +835,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute"),
                             columns=list(
                                 list(
@@ -908,6 +913,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute",
                                 "ci_width",
                                 "ci_method",
@@ -949,6 +955,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute",
                                 "ci_width",
                                 "ci_method",
@@ -1035,6 +1042,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute"),
                             columns=list(
                                 list(
@@ -1087,6 +1095,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "model_terms",
                         "fixed_intercept",
                         "se_method",
+                        "robust_method",
                         "mute",
                         "ci_width",
                         "ci_method",
@@ -1178,6 +1187,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "model_terms",
                         "fixed_intercept",
                         "se_method",
+                        "robust_method",
                         "mute",
                         "ci_width",
                         "ci_method",
@@ -1277,6 +1287,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute",
                                 "simple_x",
                                 "simple_mods",
@@ -1354,6 +1365,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute",
                                 "ci_width",
                                 "ci_method",
@@ -1446,6 +1458,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "model_terms",
                                     "fixed_intercept",
                                     "se_method",
+                                    "robust_method",
                                     "mute",
                                     "simple_x",
                                     "simple_mods",
@@ -1526,6 +1539,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "model_terms",
                                     "fixed_intercept",
                                     "se_method",
+                                    "robust_method",
                                     "mute",
                                     "ci_width",
                                     "ci_method",
@@ -1596,6 +1610,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "model_terms",
                         "fixed_intercept",
                         "se_method",
+                        "robust_method",
                         "mute",
                         "ci_width",
                         "ci_method",
@@ -1653,6 +1668,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "model_terms",
                         "fixed_intercept",
                         "se_method",
+                        "robust_method",
                         "mute",
                         "ci_width",
                         "ci_method",
@@ -1705,6 +1721,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute"),
                             columns=list(
                                 list(
@@ -1741,6 +1758,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute"),
                             columns=list(
                                 list(
@@ -1775,6 +1793,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute")))
                         self$add(jmvcore::Image$new(
                             options=options,
@@ -1796,6 +1815,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute")))
                         self$add(jmvcore::Image$new(
                             options=options,
@@ -1817,6 +1837,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_terms",
                                 "fixed_intercept",
                                 "se_method",
+                                "robust_method",
                                 "mute")))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
@@ -1835,6 +1856,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "model_terms",
                     "fixed_intercept",
                     "se_method",
+                    "robust_method",
                     "mute")))
             self$add(jmvcore::Output$new(
                 options=options,
@@ -1853,6 +1875,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "model_terms",
                     "fixed_intercept",
                     "se_method",
+                    "robust_method",
                     "mute")))},
         .setModel=function(x) private$..model <- x))
 
