@@ -1,8 +1,16 @@
 testthat::context("glm")
 tol<-.001
+
+library(lineprof)
+
+
+
 mod0<-gamlj::gamlj_lm(
   data = ToothGrowth,
   formula=len~supp+dose)
+
+
+as.numeric(pryr::object_size(mod0))/10e5
 
 mod1<-gamlj::gamlj_lm(
   data = ToothGrowth,

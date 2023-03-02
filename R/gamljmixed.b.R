@@ -2,7 +2,6 @@ gamljmixedClass <- R6::R6Class(
   "gamljmixedClass",
   inherit = gamljmixedBase,
   private=list(
-    .dispatcher=NULL,
     .data_machine=NULL,
     .runner_machine=NULL,
     .plotter_machine=NULL,
@@ -24,11 +23,9 @@ gamljmixedClass <- R6::R6Class(
       
       emmeans::emm_options(lmerTest.limit = 20000)  
       ### set up the R6 workhorse class
-      dispatcher<-Dispatch$new(self$results)
-      data_machine<-Datamatic$new(self$options,dispatcher,self$data)
-      runner_machine<-Runner$new(self$options,dispatcher,data_machine)
+      data_machine<-Datamatic$new(self)
+      runner_machine<-Runner$new(self,data_machine)
       
-      ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
 
@@ -147,7 +144,7 @@ gamljmixedClass <- R6::R6Class(
       private$.runner_machine<-runner_machine
       
       ######## plotting class #######
-      plotter_machine<-Plotter$new(self$options,runner_machine,self$results)
+      plotter_machine<-Plotter$new(self,runner_machine,self$results)
       plotter_machine$initPlots()
       private$.plotter_machine<-plotter_machine
       self$results$plotnotes$setContent("")

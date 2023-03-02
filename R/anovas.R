@@ -151,11 +151,12 @@ ganova<- function(x,...) UseMethod(".anova")
   
   df<-obj$options$df_method
   results        <-  try_hard(stats::anova(model,type="3",ddf=df))
-  obj$error    <-  list(topic="main_anova",message=results$error)
-  obj$warning  <-  list(topic="main_anova",message=results$warning)
-  
-  if (!isFALSE(results$error))
-    return()
+  if (!isFALSE(results$warning))
+           lapply(results$warning,function(x) obj$warning<-list(topic="main_anova",message=x))
+  if (!isFALSE(results$error)) {
+    obj$error    <-  list(topic="main_anova",message=results$error)
+  }
+
   
   .anova<-results$obj
   if (dim(.anova)[1]==0) {

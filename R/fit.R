@@ -28,6 +28,7 @@ gFit <- R6::R6Class(
     .r2list=function() {
       
       obj<-try_hard(r2(self$operator$model,self$operator))
+      
       if (!isFALSE(obj$error)) {
         self$operator$warning<-list(topic="main_r2",message="Model R2 cannot be computed.")
         return(obj$obj)
@@ -35,7 +36,7 @@ gFit <- R6::R6Class(
       if (!isFALSE(obj$warning)) {
         self$operator$warning<-list(topic="main_r2",message=obj$warning)
       }
-      
+
       if (self$operator$options$comparison) {
            r2list <- lapply(obj$obj, function(x) {
                                x$note <- "R^2 of the full model"
@@ -49,9 +50,9 @@ gFit <- R6::R6Class(
                         })
         }
       
+      
       private$.r2<-r2list[[1]]$r2
       private$.ar2<-r2list[[1]]$ar2
-      
       return(r2list)
       
     }, # end of .r2list

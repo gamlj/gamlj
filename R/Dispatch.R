@@ -11,13 +11,9 @@ Dispatch <- R6::R6Class(
             class=TRUE, 
             cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
             public=list(
-                        mute=FALSE, 
                         tables=NULL,
                         initialize=function(results) { 
                           
-                                  if (utils::hasName(results[[1]]$options,"mute"))
-                                      self$mute=results[[1]]$options$mute
-                                  
                                   self$tables<-results
                                   
                         },
@@ -46,9 +42,9 @@ Dispatch <- R6::R6Class(
                                 obj$message<-private$.translate(obj$message)
                                 
                                 if (is.null(obj$message))
-                                     return()
+                                  return()
                                 
-                                init<-(hasName(obj,"initOnly") && obj[["initOnly"]]) 
+                                if (exists("fromb64")) obj$message<-fromb64(obj$message)
                                 
                                 if (inherits(table,"Html")) {
                                   content<-table$content
@@ -56,14 +52,16 @@ Dispatch <- R6::R6Class(
                                   table$setVisible(TRUE)
                                   return()
                                 }
+                                init<-(hasName(obj,"initOnly") && obj[["initOnly"]]) 
+                                
                                 if (inherits(table,"Array")) {
                                   for (one in table$items)
                                     one$setNote(obj$key,obj$message,init=init)
                                   return()
                                 }
                                 
-                               table$setNote(obj$key,obj$message,init=init)
-                              
+                                table$setNote(obj$key,obj$message,init=init)
+                                
                                
                                
                                
@@ -117,20 +115,20 @@ Dispatch <- R6::R6Class(
                         
                       },
                       .translate=function(msg) {
-                            
-                            if (!exists("TRANS_WARNS")) return(msg)
-                        
-                            where<-unlist(lapply(TRANS_WARNS,function(x) length(grep(x$original,msg))>0))
-                            where<-which(where)
-                            
-                            if (is.something(where))
-                                 if (is.something(TRANS_WARNS[[where]]$new))
-                                    msg<-gsub(TRANS_WARNS[[where]]$original,TRANS_WARNS[[where]]$new,msg,fixed=T)
-                                 else
-                                    msg<-NULL
-                            
-                           return(msg)
-
+                          
+                          if (!exists("TRANS_WARNS")) return(msg)
+                          
+                          where<-unlist(lapply(TRANS_WARNS,function(x) length(grep(x$original,msg))>0))
+                          where<-which(where)
+                          
+                          if (is.something(where))
+                            if (is.something(TRANS_WARNS[[where]]$new))
+                              msg<-gsub(TRANS_WARNS[[where]]$original,TRANS_WARNS[[where]]$new,msg,fixed=T)
+                          else
+                            msg<-NULL
+                          
+                          return(msg)
+                          
                        }
                        
             ) #end of private
