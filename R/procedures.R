@@ -901,11 +901,13 @@ procedure.simpleInteractions<-function(obj) {
       
       key<-smartTableName("simpleInteractions",.key,"anova")
       
-            
+
       if (!isFALSE(results$error)) 
               obj$dispatcher$error<-list(topic=key,message=results$error)
       if (!isFALSE(results$warning)) 
               obj$warning<-list(topic=key,message=results$warning)
+#      if (is.something(attr(obj$obj,"mesg")))
+#           for ()
       anova<-results$obj      
                           
       resultsList[[length(resultsList)+1]]<-list(anova,params)
@@ -914,7 +916,6 @@ procedure.simpleInteractions<-function(obj) {
       
 #      key<-"simpleInteractions_.._anova"
       
-
 
       jinfo("PROCEDURE: done")
  

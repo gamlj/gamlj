@@ -53,18 +53,18 @@ Dispatch <- R6::R6Class(
                                   return()
                                 }
                                 init<-(hasName(obj,"initOnly") && obj[["initOnly"]]) 
+                              
+                                .fun<-function(table,id,msg,init) {
+                                  
+                                   if (table$.has("items"))
+                                      for (x in table$items)
+                                             .fun(x,id,msg,init)
+                                      else
+                                        table$setNote(obj$key,obj$message,init=init)
+                                  
+                                }  
+                                .fun(table,obj$id,obj$message,init)
                                 
-                                if (inherits(table,"Array")) {
-                                  for (one in table$items)
-                                    one$setNote(obj$key,obj$message,init=init)
-                                  return()
-                                }
-                                
-                                table$setNote(obj$key,obj$message,init=init)
-                                
-                               
-                               
-                               
                         },
                         errors=function(obj) {
           

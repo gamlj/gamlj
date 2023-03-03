@@ -430,7 +430,7 @@ items:
                    - name: est.ci.upper
                      title: Upper
                      type: number
-                   - name: t
+                   - name: test
                      title: t
                      type: number
                    - name: p

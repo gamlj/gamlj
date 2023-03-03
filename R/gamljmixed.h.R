@@ -1399,7 +1399,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `title`="Upper", 
                                         `type`="number"),
                                     list(
-                                        `name`="t", 
+                                        `name`="test", 
                                         `title`="t", 
                                         `type`="number"),
                                     list(
