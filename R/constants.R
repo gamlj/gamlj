@@ -96,9 +96,10 @@ WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 
 TRANS_WARNS<-list()
 TRANS_WARNS[[1]]<-list(original="Respecify random",new="Random component variances may be to small to compute R-squares")
-TRANS_WARNS[[2]]<-list(original="odel failed to converge with",new="There were problems in model convergence. Results may be biased. Try to specify a different random component.")
+TRANS_WARNS[[2]]<-list(original="Model failed to converge with",new="There were problems in model convergence. Results may be biased. Try to specify a different random component.")
 TRANS_WARNS[[3]]<-list(original="emmeans() results may be corrupted by removal",new=NULL)
 TRANS_WARNS[[4]]<-list(original="Could not recover model data from",new=NULL)
+TRANS_WARNS[[5]]<-list(original="Random slopes not present",new=NULL)
 
 ########### Greek Letters  ###############
 

@@ -1,5 +1,6 @@
 modeloptions:
         - dep
+        - reml
         - factors
         - covs
         - covs_scale
@@ -16,7 +17,7 @@ modeloptions:
         - contrasts
         - covs_scale
         - mute
-        
+        - donotrun
 nestedoptions:
         - nested_terms
         - nested_intercept
@@ -26,6 +27,7 @@ cioptions:
         - ci_width
         - ci_method
         - boot_r
+        - re_ci
         
 simpleeffectsoptions:
 

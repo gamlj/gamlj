@@ -5,7 +5,6 @@ Plotter <- R6::R6Class(
   inherit = Scaffold,
   public=list(
       options=NULL,
-      dispatcher=NULL,
       plotData=list(),
       rawData=list(),
       randomData=list(),
@@ -21,9 +20,10 @@ Plotter <- R6::R6Class(
       scatterBars=FALSE,
       scatterRaw=FALSE,
       scatterType=NULL,
-      initialize=function(options,operator,results) {
-            self$options<-options
-            private$.results<-results
+      initialize=function(jmvobj,operator) {
+        
+            super$initialize(jmvobj)
+            private$.results<-jmvobj$results
             private$.operator<-operator
             private$.datamatic<-operator$datamatic
             self$scatterRaw<-self$options$plot_raw
@@ -31,7 +31,6 @@ Plotter <- R6::R6Class(
                     self$scatterType<-self$options$plot_scale
             else 
                     self$scatterType<-"response"
-            self$dispatcher<-operator$dispatcher
       },
 
       initPlots=function() {
@@ -426,7 +425,7 @@ Plotter <- R6::R6Class(
         if (self$scatterX$type=="factor")
              levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
                     
-        self$dispatcher$warnings<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
+        self$warning<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
         # prepare a test for between variables to plot dots for random effects
 
         test<-tapply(as.numeric(rawData[[self$scatterX$name64]]),rawData[[self$scatterCluster$name64]],sd)
@@ -483,11 +482,11 @@ Plotter <- R6::R6Class(
       if (self$scatterXscale) {
         
         if (self$scatterX$covs_scale=="clusterbasedcentered")
-          self$dispatcher$warnings<-list(topic="plotnotes",
+          self$warning<-list(topic="plotnotes",
                                          message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
 
         if (self$scatterX$covs_scale=="clusterbasedstandardized")
-          self$dispatcher$warnings<-list(topic="plotnotes",
+          self$warning<-list(topic="plotnotes",
                                          message="Rescaling cluster-wise standardized variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
         
         data[[self$scatterX$name64]]<-private$.rescale(self$scatterX,data[[self$scatterX$name64]])
@@ -662,7 +661,7 @@ Plotter <- R6::R6Class(
            conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
            if (self$option("plot_xoriginal")) {
                  self$scatterXscale<-TRUE
-                 self$dispatcher$warnings<-list(topic="plotnotes",message="Note: The X-axis is in the X-variable original scale")
+                 self$warning<-list(topic="plotnotes",message="Note: The X-axis is in the X-variable original scale")
            }
       }
       allterm64<-c(x64,term64)
@@ -699,8 +698,8 @@ Plotter <- R6::R6Class(
              em_opts[["lmer.df"]]<-self$options$df_method
 
       results<-try_hard(do.call(emmeans::emmeans,em_opts))
-      self$dispatcher$warnings<-list("topic"="plotnotes",message=results$warning)
-      self$dispatcher$errors<-list("topic"="plotnotes",message=results$error)
+      self$warning<-list("topic"="plotnotes",message=results$warning)
+      self$error<-list("topic"="plotnotes",message=results$error)
       referenceGrid<-results$obj
       tableData<-as.data.frame(referenceGrid)
       ### rename the columns ####

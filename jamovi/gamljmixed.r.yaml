@@ -32,6 +32,7 @@ items:
              clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -48,8 +49,13 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
-                                             
+                          ### nestedoptions  begins
+                        - nested_terms                     
+                        - nested_intercept                     
+                        - comparison                     
+                          ### nestedoptions  ends
 
              rows: 1
              columns:
@@ -82,6 +88,7 @@ items:
              clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -98,6 +105,7 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
                          
              columns:
@@ -127,6 +135,7 @@ items:
              clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -143,11 +152,13 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
                         - ci_method
                         - boot_r
+                        - re_ci
                           ### cioptions  ends
              columns:
                     - name: source
@@ -215,6 +226,7 @@ items:
              clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -231,11 +243,13 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
                         - ci_method
                         - boot_r
+                        - re_ci
                           ### cioptions  ends
              columns:
                     - name: groups
@@ -270,6 +284,7 @@ items:
              clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -286,8 +301,14 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
-
+                          ### cioptions  begins
+                        - ci_width
+                        - ci_method
+                        - boot_r
+                        - re_ci
+                          ### cioptions  ends
              columns:
                    - name: groups
                      title: "Groups"
@@ -310,6 +331,7 @@ items:
              clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -326,6 +348,7 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
 
              columns:
@@ -361,6 +384,7 @@ items:
         clearWith:
                           ### modeloptions  begins
                         - dep
+                        - reml
                         - factors
                         - covs
                         - covs_scale
@@ -377,11 +401,13 @@ items:
                         - contrasts
                         - covs_scale
                         - mute
+                        - donotrun
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
                         - ci_method
                         - boot_r
+                        - re_ci
                           ### cioptions  ends
                         - adjust
 
@@ -451,6 +477,7 @@ items:
               clearWith:
                               ### modeloptions  begins
                             - dep
+                            - reml
                             - factors
                             - covs
                             - covs_scale
@@ -467,11 +494,13 @@ items:
                             - contrasts
                             - covs_scale
                             - mute
+                            - donotrun
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
                             - ci_method
                             - boot_r
+                            - re_ci
                               ### cioptions  ends
                               ### simpleeffectsoptions  begins
                             - simple_x
@@ -505,6 +534,7 @@ items:
               clearWith:
                               ### modeloptions  begins
                             - dep
+                            - reml
                             - factors
                             - covs
                             - covs_scale
@@ -521,11 +551,13 @@ items:
                             - contrasts
                             - covs_scale
                             - mute
+                            - donotrun
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
                             - ci_method
                             - boot_r
+                            - re_ci
                               ### cioptions  ends
                               ### simpleeffectsoptions  begins
                             - simple_x
@@ -582,6 +614,7 @@ items:
              clearWith:
                               ### modeloptions  begins
                             - dep
+                            - reml
                             - factors
                             - covs
                             - covs_scale
@@ -598,11 +631,13 @@ items:
                             - contrasts
                             - covs_scale
                             - mute
+                            - donotrun
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
                             - ci_method
                             - boot_r
+                            - re_ci
                               ### cioptions  ends
                               ### simpleeffectsoptions  begins
                             - simple_x
@@ -637,6 +672,7 @@ items:
              clearWith:
                               ### modeloptions  begins
                             - dep
+                            - reml
                             - factors
                             - covs
                             - covs_scale
@@ -653,11 +689,13 @@ items:
                             - contrasts
                             - covs_scale
                             - mute
+                            - donotrun
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
                             - ci_method
                             - boot_r
+                            - re_ci
                               ### cioptions  ends
                               ### simpleeffectsoptions  begins
                             - simple_x
@@ -709,6 +747,7 @@ items:
         clearWith:
                               ### modeloptions  begins
                             - dep
+                            - reml
                             - factors
                             - covs
                             - covs_scale
@@ -725,11 +764,13 @@ items:
                             - contrasts
                             - covs_scale
                             - mute
+                            - donotrun
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
                             - ci_method
                             - boot_r
+                            - re_ci
                               ### cioptions  ends
                               ### simpleeffectsoptions  begins
                             - simple_x

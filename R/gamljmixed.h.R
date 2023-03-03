@@ -715,6 +715,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Model Fit",
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -730,7 +731,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "donotrun",
+                                "nested_terms",
+                                "nested_intercept",
+                                "comparison"),
                             rows=1,
                             columns=list(
                                 list(
@@ -765,6 +770,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Fixed Effects Omnibus Tests",
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -780,7 +786,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "donotrun"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -809,6 +816,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Parameter Estimates (Fixed coefficients)",
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -825,9 +833,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "donotrun",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "re_ci"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -902,6 +912,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             title="Random Components",
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -918,9 +929,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "donotrun",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "re_ci"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -960,6 +973,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -975,7 +989,12 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "donotrun",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r",
+                                "re_ci"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1001,6 +1020,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible="(re_lrt)",
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1016,7 +1036,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "donotrun"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1054,6 +1075,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="Post Hoc comparison:  ___key___",
                     clearWith=list(
                         "dep",
+                        "reml",
                         "factors",
                         "covs",
                         "covs_scale",
@@ -1070,9 +1092,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "contrasts",
                         "covs_scale",
                         "mute",
+                        "donotrun",
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "re_ci",
                         "adjust"),
                     columns=list(
                         list(
@@ -1156,6 +1180,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1172,9 +1197,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "donotrun",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "re_ci",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1207,6 +1234,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             visible=FALSE,
                             clearWith=list(
                                 "dep",
+                                "reml",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1223,9 +1251,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "donotrun",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "re_ci",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1293,6 +1323,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 title="ANOVA",
                                 clearWith=list(
                                     "dep",
+                                    "reml",
                                     "factors",
                                     "covs",
                                     "covs_scale",
@@ -1309,9 +1340,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "contrasts",
                                     "covs_scale",
                                     "mute",
+                                    "donotrun",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
+                                    "re_ci",
                                     "simple_x",
                                     "simple_mods",
                                     "simple_scale",
@@ -1347,6 +1380,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 title="Parameter Estimates",
                                 clearWith=list(
                                     "dep",
+                                    "reml",
                                     "factors",
                                     "covs",
                                     "covs_scale",
@@ -1363,9 +1397,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "contrasts",
                                     "covs_scale",
                                     "mute",
+                                    "donotrun",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
+                                    "re_ci",
                                     "simple_x",
                                     "simple_mods",
                                     "simple_scale",
@@ -1418,6 +1454,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     title="Estimate Marginal Means - ___key___",
                     clearWith=list(
                         "dep",
+                        "reml",
                         "factors",
                         "covs",
                         "covs_scale",
@@ -1434,9 +1471,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "contrasts",
                         "covs_scale",
                         "mute",
+                        "donotrun",
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "re_ci",
                         "simple_x",
                         "simple_mods",
                         "simple_scale",
@@ -1643,7 +1682,7 @@ gamljmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 analysisId = analysisId,
                 revision = revision,
                 pause = NULL,
-                completeWhenFilled = TRUE,
+                completeWhenFilled = FALSE,
                 requiresMissings = FALSE)
         }))
 

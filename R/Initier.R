@@ -256,7 +256,7 @@ Initier <- R6::R6Class(
       if (self$option("re_ci")) 
             self$warning<-list(topic="main_random",
                                            message="Computation of C.I. may take a while. Please be patient.",
-                                           init=TRUE)
+                                           initOnly=TRUE)
       
       rows<-sum(length(unlist(self$options$re)))
       data.frame(group=rep("",(rows/2)+1))

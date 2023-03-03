@@ -144,7 +144,7 @@ gamljmixedClass <- R6::R6Class(
       private$.runner_machine<-runner_machine
       
       ######## plotting class #######
-      plotter_machine<-Plotter$new(self,runner_machine,self$results)
+      plotter_machine<-Plotter$new(self,runner_machine)
       plotter_machine$initPlots()
       private$.plotter_machine<-plotter_machine
       self$results$plotnotes$setContent("")

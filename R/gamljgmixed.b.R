@@ -3,7 +3,6 @@ gamljgmixedClass <- R6::R6Class(
   "gamljgmixedClass",
   inherit=gamljgmixedBase,
   private=list(
-      .dispatcher=NULL,
       .data_machine=NULL,
       .runner_machine=NULL,
       .plotter_machine=NULL,
@@ -21,12 +20,11 @@ gamljgmixedClass <- R6::R6Class(
             self$results$info$addRow("info",list(info="Setup",specs=private$.ready$reason))
           return()
         }
-        emmeans::emm_options(lmerTest.limit = 25000)  
-        
         ### set up the R6 workhorse class
-        dispatcher<-Dispatch$new(self$results)
-        data_machine<-Datamatic$new(self$options,dispatcher,self$data)
-        runner_machine<-Runner$new(self$options,dispatcher,data_machine)
+        emmeans::emm_options(lmerTest.limit = 20000)  
+        ### set up the R6 workhorse class
+        data_machine<-Datamatic$new(self)
+        runner_machine<-Runner$new(self,data_machine)
         
         
         ### info table ###
@@ -170,7 +168,7 @@ gamljgmixedClass <- R6::R6Class(
         private$.runner_machine<-runner_machine
         
         ######## plotting class #######
-        plotter_machine<-Plotter$new(self$options,runner_machine,self$results)
+        plotter_machine<-Plotter$new(self,runner_machine)
         plotter_machine$initPlots()
         private$.plotter_machine<-plotter_machine
         self$results$plotnotes$setContent("")
@@ -201,8 +199,6 @@ gamljgmixedClass <- R6::R6Class(
         ### do plots 
         private$.plotter_machine$preparePlots()
         
-        
-        private$.checkpoint()
         
         ### save the model if we are in R ###
         if (self$options$.interface=="r")

@@ -33,7 +33,8 @@ Infomatic <- R6::R6Class(
       dep                    <- options$dep
       dlevs                  <- datamatic$variables[[tob64(dep)]]$levels_labels
       
-      self$omnibus_test<- ifelse(utils::hasName(options,"omnibus"),stringr::str_to_title(options$omnibus),NULL)
+      if (utils::hasName(options,"omnibus"))
+          self$omnibus_test<-toupper(options$omnibus)
       
       if (self$caller=="glm") {
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")

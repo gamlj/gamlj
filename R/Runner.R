@@ -237,6 +237,7 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_random=function() {
                             
+                              jinfo("RUNNER: estimating variance components.")
                               vc<-gVarCorr(self$model,self)
                               grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
                               ### if the model has no intercept or intercept and 
@@ -268,6 +269,35 @@ Runner <- R6::R6Class("Runner",
                                 
                               
                               self$warning<-list(topic="main_random",message=attr(vc,"info"))
+                              
+                              ### confidence intervals
+                              
+                              if (self$options$re_ci==TRUE) {
+                                jinfo("RUNNER: Estimating CI for RE")
+                                method<-self$options$ci_method
+                                if (method=="wald") method="profile"
+                                results<-try_hard({
+                                            ci<-stats::confint(self$model,parm = "theta_",
+                                                              level = self$options$ci_width/100, 
+                                                              oldNames=FALSE,
+                                                              method=method)
+                                  ci[,1]<-ci[,1]^2
+                                  ci[,2]<-ci[,2]^2
+                                  mark(ci)
+                                  if (any(is.na(ci[,1]))) {
+                                        rnames<-rownames(ci)
+                                        pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
+                                        ci<-stats::confint(pp,parm = "theta_",level = self$options$ci_width/100)
+                                        rownames(ci)<-rnames
+                                        }
+                                  colnames(ci)<-c("var.ci.lower","var.ci.upper")
+                                  where<-grep("cor_",rownames(ci),fixed = T,invert = T)
+                                  civars<-ci[where,]
+                                  params<-cbind(params,civars)
+                                })
+                              #if (!isFALSE(results$error))
+                              #    warning("Random effect C.I. cannot be computed")
+                              }
                               
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {
@@ -510,7 +540,7 @@ Runner <- R6::R6Class("Runner",
                               results<-try_hard(eval(acall))
                               
                               self$warning<-list(topic="info", message=results$warning)
-                              
+
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom"))
                                   stop("No solution has been found for the combination of link function and distribution")
