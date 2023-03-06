@@ -6,7 +6,10 @@ es.marginals<-function(obj) {
       model          <-  obj$model
 
       params<-.margins(model,obj)
-
+      
+      if (is.null(params))
+          return(list(list(name=NA)))
+      
       names(params)<-transnames(names(params),
                             list("level"="group",
                                  "source"="factor",
@@ -41,15 +44,23 @@ es.marginals<-function(obj) {
 
 ..margins.default<-function(model,obj) {
   
+  if (obj$option("offset")) {
+     obj$warning<-list(topic="main_marginals",message="Marginal effects cannot be computed for models with an offest")
+     return()
+  }    
+  
   ciWidth        <-  obj$ciwidth
+  variables      <-  tob64(c(obj$options$covs,obj$options$factors))
   data           <-  insight::get_data(model)
-  results<-try_hard(summary(margins::margins(model),level=ciWidth,by_factor=FALSE))
+  m              <-  margins::margins(model,variables=variables)
+  results        <-  try_hard(summary(m,level=ciWidth,by_factor=FALSE))
   results$obj
 
 }
 
 ..margins.multinom<-function(model,obj) {
-  
+
+  offset         <- stats::offset
   ciWidth        <-  obj$ciwidth
   data           <-  insight::get_data(model)
   groups         <-  model$lev[-1]

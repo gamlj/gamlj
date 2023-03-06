@@ -108,7 +108,7 @@ gFit <- R6::R6Class(
       r2comp <- as.list(comp[2, ])
       .names <- list(
                      df2 = c("Res.Df", "Resid. Df"),
-                     df1 = c("Df", "df_diff"), p = c("Pr(>Chi)", "Pr(>F)","Pr(Chi)"),
+                     df1 = c("Df", "df_diff","df"), p = c("Pr(>Chi)", "Pr(>F)","Pr(Chi)"),
                      f = "F",
                      test = c("Deviance", "Chi2","LR stat.")
                     )
@@ -304,10 +304,11 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)
-  results <- stats::anova(model0, model, test = "LRT")
+  results <- try_hard(stats::anova(model0, model, test = "LRT"))
+  results <- results$obj
 
  .names<-c(test=c("Deviance","LR.stat","LR stat.",""),
-           df1=c("Df","   Df"),
+           df1=c("Df","   Df","df"),
            p=c("Pr(Chi)","Pr(>Chisq)","Pr(>Chi)"))
   names(results)<-transnames(names(results),.names)
   results$deviance <- stats::deviance(model)
