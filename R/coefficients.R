@@ -3,7 +3,7 @@
 gparameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
-  
+  mark("gparameters uses default")
   
   .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
   .iterations          <-  obj$options$boot_r
@@ -91,7 +91,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
 
 .parameters.glm<-function(model,obj) {
-  
+
   .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method
@@ -121,12 +121,12 @@ gparameters<- function(x,...) UseMethod(".parameters")
                                                               iterations=.iterations,
                                                               ci=.ci_width,
                                                               ci_method=.ci_method))
-    
+
     .coefficients$expb          <-  estim$Coefficient
     .coefficients$expb.ci.lower <-  estim$CI_low
     .coefficients$expb.ci.upper <-  estim$CI_high
   }
-
+  
   if (obj$option("estimates_ci")) {
     
     cidata            <-  as.data.frame(parameters::ci(.model,
@@ -243,14 +243,16 @@ gparameters<- function(x,...) UseMethod(".parameters")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method
   .ci_width            <-  obj$ciwidth
-  
+mark("a")  
   .coefficients        <-  as.data.frame(parameters::parameters(
     model,
     ci=NULL,
     effects="fixed",
   ),stringAsFactors=FALSE)
+  mark("b")  
   
   names(.coefficients) <-  c("source","estimate","se","z","df","p")
+  
 
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
   
@@ -279,7 +281,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
     
     .coefficients$est.ci.lower<-cidata$CI_low
     .coefficients$est.ci.upper<-cidata$CI_high
-    
+
   }
   
   return(.coefficients)

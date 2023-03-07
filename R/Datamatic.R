@@ -190,7 +190,7 @@ Variable <- R6::R6Class(
         self$covs_scale<-ifelse(var %in% names(covs_scale),covs_scale[[var]],"centered")
         
         if (is.factor(vardata)) {
-          self$warning<-list(topic="info",message=paste("Variable",var,"has been coerced to numeric"))
+          self$datamatic$warning<-list(topic="info",message=paste("Variable",var,"has been coerced to numeric"))
         }
         self$contrast_labels<-self$name
         self$paramsnames<-var
@@ -239,7 +239,7 @@ Variable <- R6::R6Class(
        if (self$type=="cluster") {
          if (!is.factor(vardata)) {
            vardata<-factor(vardata)
-           self$warning<-list(topic="info",message=paste("Variable",self$name,"has been coerced to nominal"),id="clcoe")
+           self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been coerced to nominal"),id="clcoe")
          }
          return(vardata)
          
@@ -521,7 +521,7 @@ Variable <- R6::R6Class(
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[[self$name64]]
-        self$warning<-list(topic="info",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
+        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
 
       }
       if (method=="clusterbasedstandardized") {    
@@ -541,7 +541,7 @@ Variable <- R6::R6Class(
         sdata<-sdata[order(sdata$..id..),]
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
         vardata<-sdata[[self$name64]]
-        self$warning<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
+        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
         
       }
 
@@ -555,7 +555,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[["mean"]]
-        self$warning<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
+        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
         
       }
       ## we then update levels the new levels (mean, sd etc)
@@ -620,8 +620,8 @@ Variable <- R6::R6Class(
       if (all(!is.nan(self$levels)) &  all(!is.na(self$levels)))
             if(any(duplicated(self$levels))) {
                self$levels<-unique(self$levels)
-               self$warning<-list(topic="simpleEffects_anova",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
-               self$warning<-list(topic="simpleEffects_coefficients",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
+               self$datamatic$warning<-list(topic="simpleEffects_anova",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
+               self$datamatic$warning<-list(topic="simpleEffects_coefficients",message=paste0("Problems in covariates conditioning for variable ",self$name,". Values are not differentiable, results may be misleading. Please enlarge the offset or change the conditioning method."))
                
             }
 

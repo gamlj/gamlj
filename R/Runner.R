@@ -135,7 +135,7 @@ Runner <- R6::R6Class("Runner",
                           },
                           
                           run_main_coefficients=function() {
-                            
+
                             if (is.null(self$boot_model) & self$option("ci_method",c("quantile","bcai"))) 
                               private$.bootstrap_model()
 
@@ -191,7 +191,9 @@ Runner <- R6::R6Class("Runner",
                             tab
                           },
                           run_main_marginals=function() {
+                            
                             tab<-NULL
+
                             if (self$formulaobj$isProper) {
                               tab       <-  es.marginals(self)
                             }
@@ -294,12 +296,10 @@ Runner <- R6::R6Class("Runner",
                                   where<-grep("cor_",rownames(ci),fixed = T,invert = T)
                                   civars<-ci[where,]
                                   civars<-rbind(civars,c(NA,NA))
-                                  mark(params)
-                                  mark(civars)
                                   params<-cbind(params,civars)
                                 })
-                              #if (!isFALSE(results$error))
-                              #    warning("Random effect C.I. cannot be computed")
+                              if (!isFALSE(results$error))
+                                   warning("Random effect C.I. issues: ",results$error)
                               }
                               
                               covariances<-which(!is.na(vc$var2))

@@ -96,8 +96,9 @@ gFit <- R6::R6Class(
            return(NULL)
       }
       
-      omnibus<-self$operator$optionValue("omnibus")
-      if (omnibus=="wald") omnibus<-"Chisq"
+      omnibus<-"Chisq"
+      if (self$operator$option("omnibus")) omnibus<-self$operator$obtionValue("omnibus")
+      
       if (self$operator$option(".caller", c("lmer", "glmer")) || self$operator$option("omnibus", "LRT")) {
          comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model, self$operator$model)))
       } else {

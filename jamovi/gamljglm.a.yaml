@@ -115,15 +115,6 @@ options:
           R: >
              Not present in R
 
-    - name: omnibus
-      title: Test
-      type: List
-      default: LRT
-      options:
-        - name:  Chisq
-          title: Wald Chi²
-        - name: LRT
-          title: LRT
 
     - name: estimates_ci
       title: For estimates

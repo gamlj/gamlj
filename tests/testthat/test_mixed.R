@@ -15,8 +15,8 @@ model<-gamlj::gamlj_mixed(
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {
-  testthat::expect_equal(as.numeric(infotable$value[7]),3000)
-  testthat::expect_equal(infotable$info[8],"Converged")
+  testthat::expect_equal(as.numeric(infotable$value[8]),3000)
+  testthat::expect_equal(infotable$info[9],"Converged")
 })
 
 ftable<-model$main$anova$asDF

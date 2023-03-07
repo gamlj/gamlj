@@ -45,14 +45,13 @@ es.marginals<-function(obj) {
 ..margins.default<-function(model,obj) {
   
   if (obj$option("offset")) {
-     obj$warning<-list(topic="main_marginals",message="Marginal effects cannot be computed for models with an offest")
+     obj$warning<-list(topic="main_marginals",message="A the moment, marginal effects cannot be computed for models with an offest")
      return()
   }    
   
   ciWidth        <-  obj$ciwidth
-  variables      <-  tob64(c(obj$options$covs,obj$options$factors))
   data           <-  insight::get_data(model)
-  m              <-  margins::margins(model,variables=variables)
+  m              <-  margins::margins(model,data=data)
   results        <-  try_hard(summary(m,level=ciWidth,by_factor=FALSE))
   results$obj
 
@@ -60,7 +59,7 @@ es.marginals<-function(obj) {
 
 ..margins.multinom<-function(model,obj) {
 
-  offset         <- stats::offset
+  offset         <-  stats::offset
   ciWidth        <-  obj$ciwidth
   data           <-  insight::get_data(model)
   groups         <-  model$lev[-1]
@@ -84,6 +83,12 @@ es.marginals<-function(obj) {
   results<-results[order(results$or),]
   results
 }
+
+..margins.clmm<-function(model,obj) {
+  return(NULL)
+}
+
+
 #### Relative risk ######
 
 

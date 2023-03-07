@@ -112,20 +112,6 @@ options:
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
-    - name: omnibus
-      title: Test
-      type: List
-      hidden: true
-      default: LRT
-      options:
-        - name: LRT
-          title: LRT
-
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
-
-
 
     - name: estimates_ci
       title: Coefficients

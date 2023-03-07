@@ -17,7 +17,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             nested_intercept = TRUE,
             nested_terms = NULL,
             comparison = FALSE,
-            omnibus = "LRT",
             estimates_ci = FALSE,
             donotrun = FALSE,
             ci_method = "wald",
@@ -122,13 +121,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "comparison",
                 comparison,
                 default=FALSE)
-            private$..omnibus <- jmvcore::OptionList$new(
-                "omnibus",
-                omnibus,
-                default="LRT",
-                options=list(
-                    "Chisq",
-                    "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
@@ -397,7 +389,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..nested_intercept)
             self$.addOption(private$..nested_terms)
             self$.addOption(private$..comparison)
-            self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
@@ -450,7 +441,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         nested_intercept = function() private$..nested_intercept$value,
         nested_terms = function() private$..nested_terms$value,
         comparison = function() private$..comparison$value,
-        omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
@@ -502,7 +492,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..nested_intercept = NA,
         ..nested_terms = NA,
         ..comparison = NA,
-        ..omnibus = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,

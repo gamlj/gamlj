@@ -244,11 +244,11 @@ procedure.ranova<- function(x,...) UseMethod(".ranova")
   
   tab<-lapply(names(models),function(x) { 
     .formula<-fixed
-    if (is.something(models[[x]]))
+     if (is.something(models[[x]]))
          .formula<-paste(fixed,models[[x]],sep=" + ")
-    model0<-mf.update(model,formula=.formula)
+     model0<-mf.update(model,formula=.formula)
     .anova<-stats::anova(model,model0)[2,]
-    names(.anova)<-transnames(names(.anova),.names)
+     names(.anova)<-transnames(names(.anova),.names)
     .anova$test=x
     .anova
   })
@@ -256,20 +256,23 @@ procedure.ranova<- function(x,...) UseMethod(".ranova")
 }
 
 .ranova.clmm<-function(model,obj) {
-  
-  models<-obj$formulaobj$reduced_random()
-  fixed<-obj$formulaobj$fixed_formula64()
-  .names<-list(LRT="Chisq", df="Df", p="Pr(>Chisq)")
+
+   models   <-  obj$formulaobj$reduced_random()
+   fixed    <-  obj$formulaobj$fixed_formula64()
+  .names    <-  list(LRT="Chisq", df="Df", p="Pr(>Chisq)")
   
   tab<-lapply(names(models),function(x) { 
-    .formula<-paste(fixed,models[[x]])
-    model0<-mf.update(model,formula=.formula)
-    aic <- (-2 * model0$logLik + 2 * model$edf)
-    .anova<-as.data.frame(performance::test_likelihoodratio(model0, model))[2,]
-    names(.anova)<-c("name","model", "npar", "df","LRT", "p")
-    .anova$AIC<-aic
-    .anova$test=x
-    .anova
+
+      .formula  <-  fixed
+       if (is.something(models[[x]]))
+         .formula<-paste(fixed,models[[x]],sep=" + ")
+       model0   <-  mf.update(model,formula=.formula)
+       aic      <-  (-2 * model0$logLik + 2 * model$edf)
+      .anova    <-  as.data.frame(performance::test_likelihoodratio(model0, model))[2,]
+       names(.anova)<-c("name","model", "npar", "df","LRT", "p")
+      .anova$AIC  <-  aic
+      .anova$test <-  x
+      .anova
   })
   tab
 }

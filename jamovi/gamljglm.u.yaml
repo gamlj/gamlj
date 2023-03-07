@@ -230,18 +230,7 @@ children:
                 name: comparison
                 events:
                   change: './gamlj.events::onEvent_comparison'
-          - type: Label
-            label: Omnibus test
-            children:
-              - name: omnibus_LRT
-                type: RadioButton
-                optionName: omnibus
-                optionPart: LRT
-              - name: omnibus_wald
-                type: RadioButton
-                optionName: omnibus
-                optionPart: Chisq
-                
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

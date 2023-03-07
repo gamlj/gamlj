@@ -16,7 +16,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             nested_terms = NULL,
             comparison = FALSE,
             nested_intercept = TRUE,
-            omnibus = "LRT",
             estimates_ci = TRUE,
             donotrun = FALSE,
             ci_method = "wald",
@@ -133,13 +132,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "nested_intercept",
                 nested_intercept,
                 default=TRUE)
-            private$..omnibus <- jmvcore::OptionList$new(
-                "omnibus",
-                omnibus,
-                hidden=TRUE,
-                default="LRT",
-                options=list(
-                    "LRT"))
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
@@ -465,7 +457,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..nested_terms)
             self$.addOption(private$..comparison)
             self$.addOption(private$..nested_intercept)
-            self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
@@ -530,7 +521,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         nested_terms = function() private$..nested_terms$value,
         comparison = function() private$..comparison$value,
         nested_intercept = function() private$..nested_intercept$value,
-        omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
@@ -594,7 +584,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..nested_terms = NA,
         ..comparison = NA,
         ..nested_intercept = NA,
-        ..omnibus = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,
