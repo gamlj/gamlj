@@ -1052,7 +1052,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "re_ci"),
                             columns=list(
                                 list(
                                     `name`="groups", 

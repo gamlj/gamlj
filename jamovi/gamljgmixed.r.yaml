@@ -413,6 +413,7 @@ items:
                          - ci_method
                          - boot_r
                            ### cioptions  ends
+                         - re_ci
              columns:
                     - name: groups
                       title: "Groups"

@@ -590,7 +590,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 else
                                   msg<-NULL
                               }
-                              if (exists("fromb64")) obj$message<-fromb64(obj$message)
+                              if (exists("fromb64")) msg<-fromb64(msg)
                               
                               return(msg)
                             }

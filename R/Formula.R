@@ -119,6 +119,8 @@ gFormula <- R6::R6Class(
       }
       res<-lapply(termslist, function(x) {
         alist<-private$.buildrandom(clean_lol(x), self$random_corr, "b64")
+        if (!is.something(alist))
+          return()
         paste("(",alist,")",collapse = " + ")
       })
       names(res)<-listnames

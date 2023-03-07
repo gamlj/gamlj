@@ -272,7 +272,7 @@ Runner <- R6::R6Class("Runner",
                               
                               ### confidence intervals
                               
-                              if (self$options$re_ci==TRUE) {
+                              if (self$option("re_ci")) {
                                 jinfo("RUNNER: Estimating CI for RE")
                                 method<-self$options$ci_method
                                 if (method=="wald") method="profile"
@@ -293,6 +293,9 @@ Runner <- R6::R6Class("Runner",
                                   colnames(ci)<-c("var.ci.lower","var.ci.upper")
                                   where<-grep("cor_",rownames(ci),fixed = T,invert = T)
                                   civars<-ci[where,]
+                                  civars<-rbind(civars,c(NA,NA))
+                                  mark(params)
+                                  mark(civars)
                                   params<-cbind(params,civars)
                                 })
                               #if (!isFALSE(results$error))

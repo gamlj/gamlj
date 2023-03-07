@@ -274,6 +274,7 @@ items:
              clearWith:
                          - __modeloptions__
                          - __cioptions__
+                         - re_ci
              columns:
                     - name: groups
                       title: "Groups"
