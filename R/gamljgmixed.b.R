@@ -25,6 +25,7 @@ gamljgmixedClass <- R6::R6Class(
         ### set up the R6 workhorse class
         data_machine<-Datamatic$new(self)
         runner_machine<-Runner$new(self,data_machine)
+        runner_machine$storage  <-  self$results$info      
         
         
         ### info table ###
@@ -72,9 +73,9 @@ gamljgmixedClass <- R6::R6Class(
         
         
         ### random variances table
-        aSmartObj<-SmartTable$new(self$results$main$random,runner_machine)
-        aSmartObj$ci("var",self$options$ci_width)
-        aSmartObj$activated<-(self$options$model_type!="multinomial" | self$options$.caller!="glmer")
+        aSmartObj             <- SmartTable$new(self$results$main$random,runner_machine)
+        aSmartObj$activated   <- (self$options$model_type!="multinomial" | self$options$.caller!="glmer")
+        aSmartObj$hideOn      <- list("sd.ci.upper"=NA,"sd.ci.lower"=NA) 
         ladd(private$.smartObjs)<- aSmartObj        
         
         ### multinomial random variances table
@@ -89,6 +90,7 @@ gamljgmixedClass <- R6::R6Class(
         ### random covariances table
         aSmartObj<-SmartTable$new(self$results$main$randomcov,runner_machine)
         aSmartObj$activateOnData<-TRUE
+        aSmartObj$hideOn      <- list("sd.ci.upper"=NA,"sd.ci.lower"=NA) 
         ladd(private$.smartObjs)<- aSmartObj        
         
         ### random variances lrt table

@@ -100,6 +100,7 @@ TRANS_WARNS[[2]]<-list(original="Model failed to converge with",new="There were 
 TRANS_WARNS[[3]]<-list(original="emmeans() results may be corrupted by removal",new=NULL)
 TRANS_WARNS[[4]]<-list(original="Could not recover model data from",new=NULL)
 TRANS_WARNS[[5]]<-list(original="Random slopes not present",new=NULL)
+TRANS_WARNS[[5]]<-list(original="too close to zero",new=NULL)
 
 ########### Greek Letters  ###############
 

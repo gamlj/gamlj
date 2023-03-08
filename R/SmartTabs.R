@@ -5,7 +5,7 @@
 ###  arrayname
 ###  arrayname_tablename
 ###  arrayname_tablename_[n] n is the index of the table in the array
-
+###  This is version 0.9.1
 
 
 
@@ -92,7 +92,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.setColumnTitle()
                               private$.ci()
                               self$title
-                              self$table$setState(list(status="checked"))
 
                               ### fill with initial values###
 
@@ -101,9 +100,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               if (is.null(rtable))
                                   return()
 
-                              ### this should go after the data
-                              self$retrieveNotes()
-                              
                               ### expand it if needed
                               if (self$expandOnInit) private$.expand(rtable)
                               private$.fill(self$table,rtable)
@@ -111,27 +107,31 @@ SmartTable <- R6::R6Class("SmartTable",
                               private$.spaceBy()
                               ## in case is a go, the table may be invisible (if activatedOnData). turn visibility on
                               self$table$setVisible(TRUE)
-                              self$table$setState(list(status="inited"))
                               private$.debug_msg("inited")
                             },
                             
                             runTable=function() {
                             
-                              private$.debug_msg("checked for run: state",self$table$state)
+                              private$.debug_msg("checked for run")
 
-                              private$.clean
-                              
-                              if (!self$activated)
+                              if (!self$activated) {
+                                private$.debug_msg("Not run Not activated")
                                 return()
+                              }
+                              
+                              if (self$table$isFilled() && self$table$rowCount>0) {
+                                  private$.debug_msg("Not run: protBuff available")
+                                  self$cleanNotes()
+                                  return()
+                              }
 
-                              if (utils::hasName(self$table$state,"status") && self$table$state[["status"]]=="complete")
-                                return()
-                              
                               private$.phase<-"run"
                               rtable<-private$.getData()
-                              
-                              if (is.null(rtable))
-                                return()
+                              self$cleanNotes()
+                              if (is.null(rtable)) {
+                                  private$.debug_msg("Not run: not filling data")
+                                  return()
+                              }
                               
                               ### check if new column titles are passed
                               .attr <- private$.getAttributes(rtable)
@@ -144,11 +144,8 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               private$.fill(self$table,rtable)
                               private$.finalize()
-                              
                               private$.debug_msg("run")
-                              if (utils::hasName(self$table$state,"status") && self$table$state[["status"]]=="inited")
-                                          self$table$setState(list(status="complete"))
-                              
+
                             },
                             
                             ci=function(aroot,width=95,label=NULL,format="{}% Confidence Intervals"){
@@ -158,7 +155,7 @@ SmartTable <- R6::R6Class("SmartTable",
                               ladd(self$ci_info)<-alist
 
                             },
-                            retrieveNotes=function(dispatcher=NULL) {
+                            cleanNotes=function(dispatcher=NULL) {
 
                                   notes<-self$table$notes
                                   lapply(notes,function(x) {
@@ -298,22 +295,18 @@ SmartTable <- R6::R6Class("SmartTable",
                                   return()
                                 }
                                 if (!isFALSE(warning)) {
-                                  
-                                  if (inherits(self$table,"Table")) 
-                                    for (w in warning) {
-                                      w<-private$.translate_notes(w)
-                                      if (is.something(w))
-                                        self$table$setNote(jmvcore::toB64(w),w,init=FALSE)
-                                    }
-                                  
-                                  if (inherits(self$table,"Array"))
-                                    for (obj in self$table$items)
-                                      for (w in warning) {
-                                        w<-private$.translate_notes(w)
-                                        if (is.something(w))
-                                          obj$setNote(jmvcore::toB64(w),w,init=FALSE)
-                                      }
-                                  
+                                    l<-length(warning)
+                                    if (l>5) warning<-warning[(l-4):l]
+                                    
+                                    if (inherits(self$table,"Table")) 
+                                      for (w in warning)
+                                         self$table$setNote(jmvcore::toB64(w),w,init=FALSE)
+                                      
+                                    if (inherits(self$table,"Array"))
+                                      for (obj in self$table$items)
+                                          for (w in warning)
+                                              obj$setNote(jmvcore::toB64(w),w,init=FALSE)
+
                                 }
                                 return(rtable) 
                               }
@@ -577,24 +570,7 @@ SmartTable <- R6::R6Class("SmartTable",
                                 cat(paste0("(",class(self)[1],")"),self$nickname,":",msg)
                                 cat("\n")
                               }
-                            },
-                            .translate_notes=function(msg) {
-                              
-                              if (!exists("TRANS_WARNS")) return(msg)
-                              where<-unlist(lapply(TRANS_WARNS,function(x) length(grep(x$original,msg))>0))
-                              where<-which(where)
-                              if (is.something(where)) {
-                                if (length(where)>1) where<-where[[1]]
-                                if (is.something(TRANS_WARNS[[where]]$new))
-                                  msg<-gsub(TRANS_WARNS[[where]]$original,TRANS_WARNS[[where]]$new,msg,fixed=T)
-                                else
-                                  msg<-NULL
-                              }
-                              if (exists("fromb64")) msg<-fromb64(msg)
-                              
-                              return(msg)
                             }
-                            
 
                             
                           ) #end of private
@@ -632,8 +608,6 @@ SmartArray <- R6::R6Class("SmartArray",
                               self$table$setVisible(TRUE)
                               self$title
 
-                              self$table$setState(list(status="inited"))
-                              
                               rtables<-private$.getData()
                               if (is.null(rtables))
                                 return()
@@ -683,7 +657,6 @@ SmartArray <- R6::R6Class("SmartArray",
                               for (obj in self$childrenObjs)
                                 obj$initTable()
 
-                              self$table$setState(list(status="mother"))
                               private$.debug_msg("inited")
                               
                             },
@@ -691,15 +664,18 @@ SmartArray <- R6::R6Class("SmartArray",
                             runTable=function() {
 
                               private$.phase<-"run"
-                              private$.debug_msg("checked for run: status",self$table$state)
-                              self$retrieveNotes()
-                              
-                              if (private$.stop()) 
-                                return()
+                              private$.debug_msg("checked for run")
+
+                              if (private$.stop()) {
+                                  private$.debug_msg("not run: filled or empty")
+                                  self$cleanNotes()
+                                  return()
+                              }
                               
                               
                               rtables<-private$.getData()
-
+                              self$cleanNotes()
+                              
                               if (!is.something(self$childrenObjs))
                                    self$initTable()
 
@@ -714,14 +690,11 @@ SmartArray <- R6::R6Class("SmartArray",
                                  }
                              }
                               private$.debug_msg("run")
-
-                              self$table$setState(list(status="complete"))
                             },
-                            retrieveNotes=function() {
+                            cleanNotes=function() {
                               
                               for (child in self$childrenObjs) {
-                                    child$table$setState(self$table$state)
-                                    child$retrieveNotes()
+                                    child$cleanNotes()
                               }
                               
                             }
@@ -745,7 +718,7 @@ SmartArray <- R6::R6Class("SmartArray",
                               } else {
                                 
                                 fun<-private$.run_source
-                                filled<-!self$table$isNotFilled()
+                                filled<-(self$table$isFilled() && is.something(self$table$items))
                               }
                               
                               if (is.null(fun)) 
@@ -755,14 +728,9 @@ SmartArray <- R6::R6Class("SmartArray",
                                 if (!(fun %in% names(private$.estimator))) 
                                   return(TRUE)
                               
-                              if (is.something(self$table$state) && self$table$state[["status"]]!="mother")
-                                   return(FALSE)
-                              
                               return(filled)
                               
                             }
-                            
-                            
                             
                             
                             

@@ -102,29 +102,41 @@ gparameters<- function(x,...) UseMethod(".parameters")
   .coefficients        <-  as.data.frame(parameters::parameters(
     model,
     ci=NULL,
+    effects="fixed"
   ),stringAsFactors=FALSE)
-  
 
   .transnames<-list(source="Parameter",
     estimate="Coefficient",
     se="SE",
     test=c("z","t"),
-    df="df_error",
-    est.ci.lower="CI_low",est.ci.upper="CI_high")
+    df="df_error"
+    )
   names(.coefficients)<-transnames(names(.coefficients),.transnames)
+
+     
+  cidata<-parameters::ci(.model,method=.ci_method,ci=.ci_width)   
+  .coefficients$est.ci.lower<-cidata$CI_low
+  .coefficients$est.ci.upper<-cidata$CI_high
+  .coefficients$expb          <-  exp(.coefficients$estimate)
   
     
-  if (obj$option("es","expb")) {
-    estim            <-  as.data.frame(parameters::parameters(model,
-                                                              exponentiate=TRUE,
-                                                              bootstrap=.bootstrap,
-                                                              iterations=.iterations,
-                                                              ci=.ci_width,
-                                                              ci_method=.ci_method))
+  if (obj$option("expb_ci") & obj$option("es","expb")) {
+    if (inherits(.model,"bootstrap_model")) {
+        .classes<-class(.model)
+        .names<-names(.model)
+        .attributes<-attributes(.model)
+         x<-as.data.frame(exp(as.matrix(.model)))
+         names(x)<-.names
+         attributes(x)<-.attributes
+         class(x)<-.classes
+         cidata<-parameters::ci(x,method=.ci_method,ci=.ci_width)   
+        .coefficients$expb.ci.lower<-cidata$CI_low
+        .coefficients$expb.ci.upper<-cidata$CI_high
 
-    .coefficients$expb          <-  estim$Coefficient
-    .coefficients$expb.ci.lower <-  estim$CI_low
-    .coefficients$expb.ci.upper <-  estim$CI_high
+    } else {
+      .coefficients$expb.ci.lower <-  exp(.coefficients$est.ci.lower)
+      .coefficients$expb.ci.upper <-  exp(.coefficients$est.ci.upper)
+    }
   }
   
   if (obj$option("estimates_ci")) {
@@ -243,14 +255,12 @@ gparameters<- function(x,...) UseMethod(".parameters")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method
   .ci_width            <-  obj$ciwidth
-mark("a")  
   .coefficients        <-  as.data.frame(parameters::parameters(
     model,
     ci=NULL,
     effects="fixed",
   ),stringAsFactors=FALSE)
-  mark("b")  
-  
+
   names(.coefficients) <-  c("source","estimate","se","z","df","p")
   
 

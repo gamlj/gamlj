@@ -15,10 +15,14 @@ Runner <- R6::R6Class("Runner",
                           tab_simpleCoefficients=NULL,
                           tab_randomcov=NULL,
                           boot_variances=NULL,
+                          etime=0,
                           estimate = function(data) {
                             
+                            t<-Sys.time()
                             self$model<-private$.estimateModel(data)
-                            jinfo("RUNNER: initial estimation done")
+                            self$etime<-as.numeric(Sys.time()-t)
+                            
+                            jinfo("RUNNER: initial estimation done, ",self$etime," secs")
                             
                             if (self$options$comparison) {
                               
@@ -240,7 +244,10 @@ Runner <- R6::R6Class("Runner",
                           run_main_random=function() {
                             
                               jinfo("RUNNER: estimating variance components.")
-                              vc<-gVarCorr(self$model,self)
+                              results<-gVarCorr(self$model,self)
+                              self$tab_randomcov<-results[[2]]
+                              return(results[[1]])
+                              
                               grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
                               ### if the model has no intercept or intercept and 
                               ### effects of factors are set as uncorrelated
@@ -269,39 +276,9 @@ Runner <- R6::R6Class("Runner",
                                   params[nr,"std"]   <- sqrt(params[nr,"var"]) 
                               }
                                 
-                              
                               self$warning<-list(topic="main_random",message=attr(vc,"info"))
                               
-                              ### confidence intervals
-                              
-                              if (self$option("re_ci")) {
-                                jinfo("RUNNER: Estimating CI for RE")
-                                method<-self$options$ci_method
-                                if (method=="wald") method="profile"
-                                results<-try_hard({
-                                            ci<-stats::confint(self$model,parm = "theta_",
-                                                              level = self$options$ci_width/100, 
-                                                              oldNames=FALSE,
-                                                              method=method)
-                                  ci[,1]<-ci[,1]^2
-                                  ci[,2]<-ci[,2]^2
-                                  mark(ci)
-                                  if (any(is.na(ci[,1]))) {
-                                        rnames<-rownames(ci)
-                                        pp<-stats::profile(model,which="theta_",optimizer=model@optinfo$optimizer,prof.scale="varcov")
-                                        ci<-stats::confint(pp,parm = "theta_",level = self$options$ci_width/100)
-                                        rownames(ci)<-rnames
-                                        }
-                                  colnames(ci)<-c("var.ci.lower","var.ci.upper")
-                                  where<-grep("cor_",rownames(ci),fixed = T,invert = T)
-                                  civars<-ci[where,]
-                                  civars<-rbind(civars,c(NA,NA))
-                                  params<-cbind(params,civars)
-                                })
-                              if (!isFALSE(results$error))
-                                   warning("Random effect C.I. issues: ",results$error)
-                              }
-                              
+
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {
                                 self$tab_randomcov<-vc[covariances,]
@@ -584,10 +561,12 @@ Runner <- R6::R6Class("Runner",
                                          opts_list[["parallel"]]<-"multicore"
                                     
                                       }
-                             
+                                
                                 jinfo("RUNNER: estimating bootstrap model")
+                                t<-Sys.time()
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
-                                jinfo("RUNNER: done")
+                                etime<-as.numeric(Sys.time()-t)
+                                jinfo("RUNNER: done ",etime," secs")
                                 if (isFALSE(bmodel$error)) {
                                   self$boot_model<-bmodel$obj
                                   jinfo("RUNNER: storing results")

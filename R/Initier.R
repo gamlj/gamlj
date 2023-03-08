@@ -67,8 +67,10 @@ Initier <- R6::R6Class(
                      profile="Profile",
                      quantile="Bootstrap percent",
                      bcai="Bootstrap BCa"
+                    )
+      if (method != "Wald") 
+          self$warning=list(topic="info",message=paste(method," method for C.I. may take a while, please be patient."),initOnly=TRUE)
       
-                                    )
       info<-switch(self$options$ci_method,
                      wald="",
                      profile="",

@@ -1061,27 +1061,29 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `type`="text", 
                                     `combineBelow`=TRUE),
                                 list(
-                                    `name`="name", 
+                                    `name`="var1", 
                                     `title`="Name", 
                                     `type`="text"),
                                 list(
-                                    `name`="std", 
-                                    `title`="SD", 
-                                    `type`="number"),
-                                list(
-                                    `name`="var", 
+                                    `name`="vcov", 
                                     `title`="Variance", 
                                     `type`="number"),
                                 list(
-                                    `name`="var.ci.lower", 
+                                    `name`="sdcor", 
+                                    `title`="SD", 
+                                    `type`="number"),
+                                list(
+                                    `name`="sd.ci.lower", 
                                     `type`="number", 
                                     `title`="Lower", 
-                                    `visible`="(re_ci)"),
+                                    `visible`="(re_ci)", 
+                                    `superTitle`="SD Confidence Intervals"),
                                 list(
-                                    `name`="var.ci.upper", 
+                                    `name`="sd.ci.upper", 
                                     `type`="number", 
                                     `title`="Upper", 
-                                    `visible`="(re_ci)"),
+                                    `visible`="(re_ci)", 
+                                    `superTitle`="SD Confidence Intervals"),
                                 list(
                                     `name`="icc", 
                                     `title`="ICC", 
@@ -1115,17 +1117,33 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `combineBelow`=TRUE, 
                                     `type`="text"),
                                 list(
-                                    `name`="name", 
+                                    `name`="var1", 
                                     `title`="name", 
                                     `type`="text"),
                                 list(
-                                    `name`="name2", 
+                                    `name`="var2", 
                                     `title`="name2", 
                                     `type`="text"),
                                 list(
-                                    `name`="std", 
+                                    `name`="vcov", 
+                                    `title`="Cov.", 
+                                    `type`="number"),
+                                list(
+                                    `name`="sdcor", 
                                     `title`="Corr.", 
-                                    `type`="number"))))
+                                    `type`="number"),
+                                list(
+                                    `name`="sd.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(re_ci)", 
+                                    `superTitle`="Corr. Confidence Intervals"),
+                                list(
+                                    `name`="sd.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(re_ci)", 
+                                    `superTitle`="Corr. Confidence Intervals"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="multirandom",

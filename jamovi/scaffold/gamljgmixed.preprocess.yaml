@@ -280,23 +280,25 @@ items:
                       title: "Groups"
                       type: text
                       combineBelow: true
-                    - name: name
+                    - name: var1
                       title: "Name"
                       type: text
-                    - name: std
-                      title: "SD"
-                      type: number
-                    - name: var
+                    - name: vcov
                       title: "Variance"
                       type: number
-                    - name: var.ci.lower
+                    - name: sdcor
+                      title: "SD"
+                      type: number
+                    - name: sd.ci.lower
                       type: number
                       title: Lower
                       visible: (re_ci)
-                    - name: var.ci.upper
+                      superTitle: SD Confidence Intervals
+                    - name: sd.ci.upper
                       type: number
                       title: Upper
                       visible: (re_ci)
+                      superTitle: SD Confidence Intervals
                     - name: icc
                       title: "ICC"
                       type: number
@@ -313,15 +315,28 @@ items:
                      title: "Groups"
                      combineBelow: true
                      type: text
-                   - name: name
+                   - name: var1
                      title: "name"
                      type: text
-                   - name: name2
+                   - name: var2
                      title: "name2"
                      type: text
-                   - name: std
+                   - name: vcov
+                     title: "Cov."
+                     type: number
+                   - name: sdcor
                      title: "Corr."
                      type: number
+                   - name: sd.ci.lower
+                     type: number
+                     title: Lower
+                     visible: (re_ci)
+                     superTitle: Corr. Confidence Intervals
+                   - name: sd.ci.upper
+                     type: number
+                     title: Upper
+                     visible: (re_ci)
+                     superTitle: Corr. Confidence Intervals
 
            - name: multirandom
              title: Random Parameters covariances
