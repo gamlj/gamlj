@@ -24,7 +24,7 @@ gamljglmClass <- R6::R6Class(
       ### set up the R6 workhorse class
       data_machine            <-  Datamatic$new(self)
       runner_machine          <-  Runner$new(self,data_machine)
-      runner_machine$storage  <-  self$results$storage      
+      runner_machine$storage  <-  self$results$main$coefficients      
       
       
       ### info table ###

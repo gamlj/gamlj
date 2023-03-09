@@ -139,7 +139,7 @@ options:
           title: Standard 
         - name:  profile
           title: Profile 
-        - name: quantile
+        - name:  quantile
           title: Bootstrap Percent 
         - name:  bcai
           title: Bootstrap BCa

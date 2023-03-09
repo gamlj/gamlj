@@ -15,11 +15,11 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             fixed_intercept = TRUE,
             es = list(
                 "expb"),
-            expb_ci = FALSE,
+            expb_ci = TRUE,
             nested_terms = NULL,
             comparison = FALSE,
             nested_intercept = TRUE,
-            estimates_ci = TRUE,
+            estimates_ci = FALSE,
             donotrun = FALSE,
             ci_method = "wald",
             boot_r = 1000,
@@ -125,7 +125,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             private$..expb_ci <- jmvcore::OptionBool$new(
                 "expb_ci",
                 expb_ci,
-                default=FALSE)
+                default=TRUE)
             private$..nested_terms <- jmvcore::OptionTerms$new(
                 "nested_terms",
                 nested_terms,
@@ -141,7 +141,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
-                default=TRUE)
+                default=FALSE)
             private$..donotrun <- jmvcore::OptionBool$new(
                 "donotrun",
                 donotrun,

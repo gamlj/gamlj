@@ -343,7 +343,7 @@ NB[["glm"]]<-"MASS::glm.nb"
 NB[["glmer"]]<-"lme4::glmer.nb"
 
 ORDINAL<-list()
-ORDINAL[["glm"]]<-"MASS::polr"
+ORDINAL[["glm"]]<-"ordinal::clm"
 ORDINAL[["glmer"]]<-"ordinal::clmm"
 
 

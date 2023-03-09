@@ -194,7 +194,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
       
 }
 
-.parameters.polr<-function(model,obj) {
+.parameters.clm<-function(model,obj) {
   params<-.parameters.glm(model,obj)
   params$label<-params$source
   check<-grep(LEVEL_SYMBOL,params$source,fixed=TRUE)

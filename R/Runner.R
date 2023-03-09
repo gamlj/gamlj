@@ -543,7 +543,6 @@ Runner <- R6::R6Class("Runner",
                           },
                           .bootstrap_model=function() {
 
-                            
                             if (is.something(self$storage) && is.something(self$storage$state)) {
                               
                               id<-self$storage$state

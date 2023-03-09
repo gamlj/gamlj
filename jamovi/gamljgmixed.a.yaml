@@ -126,7 +126,7 @@ options:
     - name: expb_ci
       title: For exp(B)
       type: Bool
-      default: false
+      default: true
       description:
           R: >
             `TRUE` (default) or `FALSE` , exp(B) CI in table
@@ -163,7 +163,7 @@ options:
     - name: estimates_ci
       title: Coefficients
       type: Bool
-      default: true
+      default: false
       description:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table

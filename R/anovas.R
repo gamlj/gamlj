@@ -5,23 +5,20 @@ ganova<- function(x,...) UseMethod(".anova")
   stop(".anova: no suitable model found") 
 }
 
-.anova.glm<-function(model,obj) {
+.anova.glm<-function(model,obj,test="LR") {
   
   if (!obj$formulaobj$hasTerms) {
     obj$warning  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
     return(NULL)
   }
   
-  test<-switch (obj$options$omnibus,
-                LRT = "LR",
-                Chisq= "Wald")
-  
+
   anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))
   
   ### LR is less lenient than Wald
-  if (test=="LR" & !isFALSE(anoobj$error)) {
-    anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))
-    obj$warning  <-  list(topic="main_anova",message="Wald test was used because LR failed")
+  if (!isFALSE(anoobj$error)) {
+    anoobj        <-  try_hard(car::Anova(model,test="Chisq",type=3,singular.ok=T))
+    obj$warning  <-  list(topic="main_anova",message="Wald test was used because LRT failed")
   }
   obj$error    <-  list(topic="main_anova",message=anoobj$error)
   obj$warning  <-  list(topic="main_anova",message=anoobj$warning)
@@ -45,8 +42,8 @@ ganova<- function(x,...) UseMethod(".anova")
 .anova.multinom<-function(model,obj)
   .anova.glm(model,obj)
 
-.anova.polr<-function(model,obj) 
-  .anova.glm(model,obj)
+.anova.clm<-function(model,obj) 
+  .anova.glm(model,obj,"Chisq")
 
 
 .anova.lm<-function(model,obj) {

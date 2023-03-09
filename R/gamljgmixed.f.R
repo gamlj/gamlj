@@ -32,7 +32,7 @@
 #'   for the nested model. It can be passed as right-hand formula.
 #' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Not needed if \code{formula} is used.
-#' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
+#' @param estimates_ci \code{TRUE}  or \code{FALSE} (default), parameters CI
 #'   in table
 #' @param ci_method .
 #' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
@@ -159,10 +159,10 @@ gamlj_gmixed <- function(
     model_terms = NULL,
     fixed_intercept = TRUE,
     es = list("expb"),
-    expb_ci = FALSE,
+    expb_ci = TRUE,
     nested_terms = NULL,
     nested_intercept = NULL,
-    estimates_ci = TRUE,
+    estimates_ci = FALSE,
     ci_method = "wald",
     boot_r = 1000,
     ci_width = 95,

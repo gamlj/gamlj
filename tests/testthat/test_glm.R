@@ -181,6 +181,7 @@ testthat::test_that("glm order does not count", {
   testthat::expect_equal(as.character(res[1, 1]), as.character(res2[3, 1]))
 })
 
+## testing options for all models
 
 data("poissonacts")
 data <- poissonacts
@@ -193,7 +194,8 @@ mod <- gamlj::gamlj_glm(
   simple_x = agg_test,
   simple_mods = age,
   posthoc = ~age,
-  emmeans = ~agg_test
+  emmeans = ~agg_test,
+  es=c("expb","marginals")
 )
 
 testthat::test_that("Poisson works", {
@@ -207,6 +209,8 @@ testthat::test_that("Poisson works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0428, tol)
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .630, tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],.2769,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[3,5],.0666,tol)
 })
 
 data$q <- data$acts + 1
@@ -220,7 +224,9 @@ mod <- gamlj::gamlj_glm(
   simple_x = agg_test,
   simple_mods = age,
   posthoc = ~age,
-  emmeans = ~agg_test
+  emmeans = ~agg_test,
+  es=c("expb","marginals")
+  
 )
 testthat::test_that("Custom model works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 2.151, tol)
@@ -234,6 +240,8 @@ testthat::test_that("Custom model works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .010, tol)
   testthat::expect_equal(mod$posthoc[[1]]$asDF$age_lev1[2], "1")
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],.255,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[3,5],.073,tol)
 })
 
 
@@ -248,7 +256,8 @@ testthat::expect_warning({
     simple_mods = age,
     posthoc = ~age,
     emmeans = ~agg_test,
-    estimates_ci = TRUE
+    estimates_ci = TRUE,
+    es=c("expb","marginals")
   )
 })
 
@@ -264,6 +273,9 @@ testthat::test_that("negative binomial model works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 1.056, tol)
   testthat::expect_equal(mod$posthoc[[1]]$asDF$age_lev1[2], "1")
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],.254,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[3,5],.0409,tol)
+  
 })
 
 
@@ -277,7 +289,8 @@ mod <- gamlj::gamlj_glm(
   simple_mods = age,
   posthoc = ~age,
   emmeans = ~agg_test,
-  estimates_ci = TRUE
+  estimates_ci = TRUE,
+  es=c("expb","marginals")
 )
 
 testthat::test_that("quasi poisson binomial works", {
@@ -291,6 +304,9 @@ testthat::test_that("quasi poisson binomial works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .00475, tol)
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 1.056, tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],.254,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[3,5],.0591,tol)
+  
 })
 
 

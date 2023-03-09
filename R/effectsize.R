@@ -48,10 +48,12 @@ es.marginals<-function(obj) {
      obj$warning<-list(topic="main_marginals",message="A the moment, marginal effects cannot be computed for models with an offest")
      return()
   }    
-  
+  vce<- "delta"
+  if (obj$option("ci_method",c("quantile","bcai")))
+    vce <- "bootstrap"
   ciWidth        <-  obj$ciwidth
   data           <-  insight::get_data(model)
-  m              <-  margins::margins(model,data=data)
+  m              <-  margins::margins(model,data=data,vce=vce)
   results        <-  try_hard(summary(m,level=ciWidth,by_factor=FALSE))
   results$obj
 
@@ -68,6 +70,8 @@ es.marginals<-function(obj) {
   dep            <-  all.vars(form)[1]
   results        <-  list()
 
+  if (obj$option("ci_method",c("quantile","bcai")))
+        obj$warning<-list(topic="main_marginals",message="C.I for multinomial margins are available only with the delta method.")    
   for (g in groups) {
     
     .data<-data[data[[dep]]==g | data[[dep]]==ref_lev,]
@@ -83,6 +87,16 @@ es.marginals<-function(obj) {
   results<-results[order(results$or),]
   results
 }
+
+# at the moment, ordinal::clm does not give confidence intervals or inferential tests
+# in margings. So, we re-estimaste the model with MASS::polr (we do not use MASS::polr)
+# for other estimation because it does not work well with parameters::bootstrap_model() emmeans
+
+..margins.clm<-function(model,obj) {
+  .model<-MASS::polr(a1$call$formula,data=model$model)
+  ..margins.default(.model,obj)
+}
+
 
 ..margins.clmm<-function(model,obj) {
   return(NULL)
