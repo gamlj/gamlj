@@ -3,8 +3,7 @@
 gparameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
-  mark("gparameters uses default")
-  
+
   .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method

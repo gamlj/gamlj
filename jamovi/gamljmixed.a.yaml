@@ -39,7 +39,6 @@ options:
       default:
       suggested:
         - continuous
-        - ordinal
       permitted:
         - numeric
       description:

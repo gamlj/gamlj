@@ -76,6 +76,7 @@ gamljgmixedClass <- R6::R6Class(
         aSmartObj             <- SmartTable$new(self$results$main$random,runner_machine)
         aSmartObj$activated   <- (self$options$model_type!="multinomial" | self$options$.caller!="glmer")
         aSmartObj$hideOn      <- list("sd.ci.upper"=NA,"sd.ci.lower"=NA) 
+        aSmartObj$ci("sd",width=self$options$ci_width)
         ladd(private$.smartObjs)<- aSmartObj        
         
         ### multinomial random variances table
@@ -90,6 +91,7 @@ gamljgmixedClass <- R6::R6Class(
         ### random covariances table
         aSmartObj<-SmartTable$new(self$results$main$randomcov,runner_machine)
         aSmartObj$activateOnData<-TRUE
+        aSmartObj$ci("sd",width=self$options$ci_width)
         aSmartObj$hideOn      <- list("sd.ci.upper"=NA,"sd.ci.lower"=NA) 
         ladd(private$.smartObjs)<- aSmartObj        
         

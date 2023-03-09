@@ -118,6 +118,7 @@ Variable <- R6::R6Class(
     hasCluster=NULL,
     nClusters=0,
     isBetween=FALSE,
+    isDependent=FALSE,
     initialize=function(var,datamatic) {
       self$name<-var
       self$datamatic<-datamatic
@@ -157,6 +158,8 @@ Variable <- R6::R6Class(
 
       ### check dependent variables ###
       if (var %in% self$datamatic$options$dep) {
+        
+           self$isDependent<-TRUE
            self$type=class(vardata)
            if (self$type=="character") stop("Character type not allowed. Please set variables as.numeric or as.factor")
 
@@ -539,9 +542,14 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,ddata,by=cluster64)
         sdata<-sdata[order(sdata$..id..),]
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
+        ## this is the beatifull clusterwise standardization for dep vars
+        if (self$isDependent) {
+          sdata$mean<-as.numeric(scale(sdata$mean))
+          sdata[[self$name64]] <- sdata[[self$name64]]+sdata$mean 
+        }
+            
         vardata<-sdata[[self$name64]]
         self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
-        
       }
 
       if (method=="clustermeans") {    

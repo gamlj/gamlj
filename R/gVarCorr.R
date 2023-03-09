@@ -10,9 +10,6 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   attr(varcov,"useSc")<-TRUE
   attr(varcov,"sc")<-sqrt(insight::get_variance_residual(model,tolerance=0))
   varcov<-as.data.frame(varcov)
-  varcov$groups<-fromb64(varcov$grp)
-  varcov$var1<-fromb64(varcov$var1)
-  varcov$var2<-fromb64(varcov$var2)
   
   vmat<-varcov[is.na(varcov$var2),]
   cmat<-varcov[!is.na(varcov$var2),]
@@ -53,15 +50,20 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
     if (!isFALSE(results$error)) 
        obj$warning<-list(topic="main_random",message="C.I cannot be computed.")
     else {   
-          cidata<-as.data.frame(results$obj)
-          names(cidata)  <-  c("sd.ci.lower","sd.ci.upper")
-          varci<-rbind(cidata[grep("sd_",rownames(cidata)),],c(NA,NA))
-          vmat<-cbind(vmat,varci)
+          x<-try_hard(
+            { cidata<-as.data.frame(results$obj)
+              names(cidata)  <-  c("sd.ci.lower","sd.ci.upper")
+              varci<-rbind(cidata[grep("sd_",rownames(cidata)),],c(NA,NA))
+              covci<-cidata[grep("cor_",rownames(cidata)),]
+              vmat<-cbind(vmat,varci)
     
-          covci<-cidata[grep("sd_",rownames(cidata),invert = T),]
-          if (is.something(cmat))
-             cmat<-cbind(cmat,covci)
-    }
+              if (is.something(cmat)) {
+                mark(covci)
+                cmat$sd.ci.lower<-covci$sd.ci.lower
+                cmat$sd.ci.upper<-covci$sd.ci.upper
+              }
+            })
+      }
     }
   ### variances
 
@@ -81,7 +83,16 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
               collapse="; ")
   obj$warning<-list(topic="main_random",message=info)
   
-
+  vmat$groups  <- fromb64(vmat$grp)
+  vmat$var1    <- fromb64(vmat$var1)
+  vmat$var2    <- fromb64(vmat$var2)
+  
+  if (is.something(cmat)) {
+    cmat$groups <-fromb64(cmat$grp)
+    cmat$var1   <-fromb64(cmat$var1)
+    cmat$var2   <-fromb64(cmat$var2)
+  }
+     
   list(vmat,cmat)  
 }
 

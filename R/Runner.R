@@ -246,6 +246,7 @@ Runner <- R6::R6Class("Runner",
                               jinfo("RUNNER: estimating variance components.")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
+                              mark(results[[2]])
                               return(results[[1]])
                               
                               grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
@@ -667,7 +668,7 @@ Runner <- R6::R6Class("Runner",
                                   self$tab_simpleAnova         <-  results$obj[[1]]
                                   self$tab_simpleCoefficients  <-  results$obj[[2]]
                             }
-                          mark(self$tab_simpleCoefficients)  
+
                         },
 
                           .fix_names=function(atable) {
