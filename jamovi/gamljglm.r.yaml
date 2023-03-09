@@ -703,6 +703,20 @@ items:
                      title: p
                      type: number
                      format: zto,pvalue
+                   - name: expb
+                     type: number
+                     title: Exp(B)
+                     visible: (es:expb)
+                   - name: expb.ci.lower
+                     type: number
+                     title: Lower
+                     visible: (expb_ci)
+                     superTitle: Exp(B) Confidence Intervals
+                   - name: expb.ci.upper
+                     type: number
+                     title: Upper
+                     visible: (expb_ci)
+                     superTitle: Exp(B) Confidence Intervals
 
 
   - name: emmeans

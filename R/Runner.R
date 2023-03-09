@@ -466,10 +466,10 @@ Runner <- R6::R6Class("Runner",
                             
                               jinfo("MODULE: Estimating the model: checking")
                               ### check the dependent variable ####
-                              if (is.something(self$datamatic$errors))
-                                   stop(unlist(self$datamatic$errors))
+
                             
                               if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
+
                                     t2  <-  paste(self$infomatic$deptype,collapse = " or ")
                                     t1  <-  self$datamatic$dep$type
                                     m   <-   self$infomatic$model[1]
@@ -667,7 +667,7 @@ Runner <- R6::R6Class("Runner",
                                   self$tab_simpleAnova         <-  results$obj[[1]]
                                   self$tab_simpleCoefficients  <-  results$obj[[2]]
                             }
-                            
+                          mark(self$tab_simpleCoefficients)  
                         },
 
                           .fix_names=function(atable) {

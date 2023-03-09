@@ -126,7 +126,6 @@ Variable <- R6::R6Class(
     },
     checkVariable=function(data) { 
       var<-self$name
-      
       if (inherits(data,"data.frame"))
              vardata<-data[[var]]
       else 
@@ -159,9 +158,14 @@ Variable <- R6::R6Class(
       ### check dependent variables ###
       if (var %in% self$datamatic$options$dep) {
            self$type=class(vardata)
-           
            if (self$type=="character") stop("Character type not allowed. Please set variables as.numeric or as.factor")
+
+
+           if ("ordered" %in% self$type) {
+                 self$type="factor"
+           }
            
+
            if (self$type=="factor") {
                  self$descriptive=list(min=0,max=1)
                  self$levels<-levels(vardata)
@@ -172,16 +176,14 @@ Variable <- R6::R6Class(
                  self$contrast_labels<-private$.contrast_labels(self$levels,  "dummy")
                  self$method="dummy"
                  
-           } else {
-             
-             if (self$datamatic$option("dep_scale")) 
+           }
+           if (self$type %in% c("numeric","integer")) {
+               if (self$datamatic$option("dep_scale")) 
                  self$covs_scale<-self$datamatic$options$dep_scale
                  self$contrast_labels<-self$name
-           }
+             }
+            }
 
-
-      }
-        
             
       if (var %in% self$datamatic$options$covs) {
         self$type="numeric"
@@ -227,7 +229,9 @@ Variable <- R6::R6Class(
     },
     get_values=function(data) {
 
+
        vardata<-data[[self$name64]]
+
        if (self$type=="numeric" || self$type=="integer") {
           if (is.factor(vardata)) {
            vardata<-as.numeric(vardata)
@@ -239,28 +243,23 @@ Variable <- R6::R6Class(
        if (self$type=="cluster") {
          if (!is.factor(vardata)) {
            vardata<-factor(vardata)
-           self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been coerced to nominal"),id="clcoe")
+           self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been coerced to nominal"))
          }
          return(vardata)
-         
        }
-       
        
        
        if (self$type=="factor") {
           if (!is.factor(vardata)) {
             self$datamatic$error<-list(topic="info",message=paste("Variable",self$name,"is not a factor"))
-              return()
+            return()
           }
-       
+       }
 
         contrasts(vardata)<-self$contrast_values
         ### fix levels ####
         levels(vardata)<-paste0(LEVEL_SYMBOL,tob64(levels(vardata)))
-        
         return(vardata)
-
-      }
     
       },
       

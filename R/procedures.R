@@ -878,6 +878,9 @@ procedure.simpleInteractions<-function(obj) {
             
       params<-results$obj            
 
+      class(params)<-c(paste0("simple_params_",obj$options$.caller),class(params))
+      params<-add_effect_size(params,model,variable64)
+      
 ###### now we build the anova table ##########      
       results<-try_hard({ 
               res<-emmeans::test(resgrid,by=mods,join=T)

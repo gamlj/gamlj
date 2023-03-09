@@ -188,9 +188,12 @@ es.glm_variances<-function(model,obj) {
 ### ES estimates ###
 add_effect_size<- function(x,...) UseMethod(".add_es")
 
-.add_es.default<-function(atable,model,variable)
-      return(atable)
-
+.add_es.default<-function(atable,model,variable) {
+  mark("SIMPLE EFFECT: no effect size for class",class(atable),class(model))
+  return(atable)
+  
+}
+  
 .add_es.simple_params_lm<-function(atable,model,variable) {
 
   xstd<-1
@@ -208,6 +211,10 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
   atable$expb.ci.upper<-exp(atable$est.ci.upper)
   atable
 }
+
+.add_es.simple_params_glmer<-function(atable,model,variable=NULL) 
+                     .add_es.simple_params_glm(atable,model,variable) 
+  
 
 
 .add_es.simple_anova_lm<-function(atable,model) {

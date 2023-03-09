@@ -204,7 +204,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.clmm<-function(model,obj) {
   
-  params<-.parameters.polr(model,obj)
+  params<-.parameters.clm(model,obj)
   params<-params[params$Effects=="fixed",]
   names(params)[4]<-"z"
   params

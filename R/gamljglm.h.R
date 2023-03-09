@@ -1327,7 +1327,24 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="p", 
                                         `title`="p", 
                                         `type`="number", 
-                                        `format`="zto,pvalue"))))}))$new(options=options)))
+                                        `format`="zto,pvalue"),
+                                    list(
+                                        `name`="expb", 
+                                        `type`="number", 
+                                        `title`="Exp(B)", 
+                                        `visible`="(es:expb)"),
+                                    list(
+                                        `name`="expb.ci.lower", 
+                                        `type`="number", 
+                                        `title`="Lower", 
+                                        `visible`="(expb_ci)", 
+                                        `superTitle`="Exp(B) Confidence Intervals"),
+                                    list(
+                                        `name`="expb.ci.upper", 
+                                        `type`="number", 
+                                        `title`="Upper", 
+                                        `visible`="(expb_ci)", 
+                                        `superTitle`="Exp(B) Confidence Intervals"))))}))$new(options=options)))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="emmeans",

@@ -1437,6 +1437,21 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `title`="Upper", 
                                     `visible`="(estimates_ci)"),
                                 list(
+                                    `name`="expb", 
+                                    `type`="number", 
+                                    `title`="Exp(B)", 
+                                    `visible`="(es:expb)"),
+                                list(
+                                    `name`="expb.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(es:expb & expb_ci)"),
+                                list(
+                                    `name`="expb.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(es:expb & expb_ci)"),
+                                list(
                                     `name`="test", 
                                     `title`="z", 
                                     `type`="number"),
@@ -1559,11 +1574,30 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     list(
                                         `name`="est.ci.lower", 
                                         `title`="Lower", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `visible`="(estimates_ci)"),
                                     list(
                                         `name`="est.ci.upper", 
                                         `title`="Upper", 
-                                        `type`="number"),
+                                        `type`="number", 
+                                        `visible`="(estimates_ci)"),
+                                    list(
+                                        `name`="expb", 
+                                        `type`="number", 
+                                        `title`="Exp(B)", 
+                                        `visible`="(es:expb)"),
+                                    list(
+                                        `name`="expb.ci.lower", 
+                                        `type`="number", 
+                                        `title`="Lower", 
+                                        `visible`="(es:expb & expb_ci)", 
+                                        `superTitle`="Exp(B) Confidence Intervals"),
+                                    list(
+                                        `name`="expb.ci.upper", 
+                                        `type`="number", 
+                                        `title`="Upper", 
+                                        `visible`="(es:expb & expb_ci)", 
+                                        `superTitle`="Exp(B) Confidence Intervals"),
                                     list(
                                         `name`="test", 
                                         `title`="z", 

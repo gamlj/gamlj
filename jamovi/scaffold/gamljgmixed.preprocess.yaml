@@ -509,6 +509,19 @@ items:
                        type: number
                        title: Upper
                        visible: (estimates_ci)
+                     - name: expb
+                       type: number
+                       title: Exp(B)
+                       visible: (es:expb)
+                     - name: expb.ci.lower
+                       type: number
+                       title: Lower
+                       visible: (es:expb & expb_ci)
+                     - name: expb.ci.upper
+                       type: number
+                       title: Upper
+                       visible: (es:expb & expb_ci)
+
                      - name: test
                        title: "z"
                        type: number
@@ -572,9 +585,25 @@ items:
                    - name: est.ci.lower
                      title: Lower 
                      type: number
+                     visible: (estimates_ci)
                    - name: est.ci.upper
                      title: Upper
                      type: number
+                     visible: (estimates_ci)
+                   - name: expb
+                     type: number
+                     title: Exp(B)
+                     visible: (es:expb)
+                   - name: expb.ci.lower
+                     type: number
+                     title: Lower
+                     visible: (es:expb & expb_ci)
+                     superTitle: Exp(B) Confidence Intervals
+                   - name: expb.ci.upper
+                     type: number
+                     title: Upper
+                     visible: (es:expb & expb_ci)
+                     superTitle: Exp(B) Confidence Intervals
                    - name: test
                      title: z
                      type: number

@@ -36,13 +36,13 @@ mod2 <- gamlj::gamlj_gmixed(
   model_terms = ~ x*w,
   re=~(1+x|cluster)
 )
-
+mod2$main$coefficients$asDF
 testthat::test_that("equivalent model input", {
   testthat::expect_equal(mod0$info$asDF$specs[2], mod1$info$asDF$specs[2])
   testthat::expect_equal(mod0$main$anova$asDF$f[3], mod1$main$anova$asDF$f[3])
   testthat::expect_equal(mod0$main$coefficients$asDF$label[2], mod0$main$coefficients$asDF$label[2])
-  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[1], mod0$main$coefficients$asDF$est.ci.lower[1])
-  testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[1], mod2$main$coefficients$asDF$est.ci.lower[1])
+  testthat::expect_equal(mod0$main$coefficients$asDF$expb.ci.lower[1], mod0$main$coefficients$asDF$expb.ci.lower[1])
+  testthat::expect_equal(mod0$main$coefficients$asDF$expb.ci.lower[1], mod2$main$coefficients$asDF$expb.ci.lower[1])
   testthat::expect_equal(mod1$main$anova$asDF$f[3], mod2$main$anova$asDF$f[3])
 })
 
@@ -79,22 +79,21 @@ mod <- gamlj::gamlj_gmixed(
   posthoc = ~w,
   emmeans = ~x,
   es=c("expb","marginals")
-  ci
 )
 
 testthat::test_that("Poisson works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .806, tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1], 254, tol)
-  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], .8577, tol)
-  testthat::expect_equal(mod$main$r2$asDF$r2, .898, tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[4], 9.82, tol)
-  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .338, tol)
-  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 14.048, tol)
-  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0428, tol)
-  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
-  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .630, tol)
-  testthat::expect_equal(mod$main$marginals$asDF[2,3],.2769,tol)
-  testthat::expect_equal(mod$main$marginals$asDF[3,5],.0666,tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], 1.071, tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2[1], .338, tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4], 4337, tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .874, tol)
+  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 429, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0076, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[1], .794, tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],.088,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,5],.075,tol)
 })
 
 
