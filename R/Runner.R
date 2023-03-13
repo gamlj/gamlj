@@ -425,7 +425,7 @@ Runner <- R6::R6Class("Runner",
                             }
                             if (self$options$residuals && results$residuals$isNotFilled()) {
                                 jinfo("Saving residuals")
-                                p<-stats::resid(self$model)
+                                p<-stats::residuals(self$model,type="response")
                               # we need the rownames in case there are missing in the datasheet
                               pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model)))
                               results$residuals$setValues(pdf)

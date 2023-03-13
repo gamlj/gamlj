@@ -131,6 +131,7 @@ children:
   - type: LayoutBox
     margin: large
     style: list
+    name: panel_input
     children:
       - type: Label
         label: Effect Size
@@ -174,6 +175,7 @@ children:
             type: CheckBox
   - type: CollapseBox
     label: Model
+    name: panel_model
     collapsed: true
     stretchFactor: 1
     children:
@@ -392,6 +394,7 @@ children:
 
   - type: CollapseBox
     label: Plots
+    name: panel_plots
     collapsed: true
     stretchFactor: 1
     children:
@@ -524,6 +527,7 @@ children:
   - type: CollapseBox
     label: Options
     style: list
+    name: panel_options
     collapsed: true
     stretchFactor: 1
     children:

@@ -577,6 +577,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             .clean_message=function(msg) {
                               
                               if (!exists("TRANS_WARNS")) return(msg)
+                              if (exists("fromb64")) msg<-fromb64(msg)
                               
                               where<-unlist(lapply(TRANS_WARNS,function(x) length(grep(x$original,msg))>0))
                               where<-which(where)
@@ -590,8 +591,6 @@ SmartTable <- R6::R6Class("SmartTable",
                               }                  
                               return(msg)                          
                             }
-                            
-
                             
                           ) #end of private
                           

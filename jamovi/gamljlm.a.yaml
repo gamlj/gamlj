@@ -170,7 +170,7 @@ options:
          ui: >
              If flagged, the results are not updated each time an option is changed. 
              This allows settings complex model options without waiting for the results
-             to update every time.
+             to update every time. Unflag it when ready to go.
 
 
     - name: ci_method
@@ -180,7 +180,7 @@ options:
       options:
         - name:  wald
           title: Standard (fast)
-        - name: quantile
+        - name:  quantile
           title: Bootstrap (Percent)
         - name:  bcai
           title: Bootstrap (BCa)
@@ -523,9 +523,10 @@ options:
       default: false
       description:
           R: >
-            `TRUE` does not print footnotes under the output tables. Default is `FALSE`.
+            Not present in R
           ui: >
-            If selected, does not print footnotes under the output tables. Default is selected.
+              Removes all notes and warnings from the Tables. Useful to produce pubblication quality
+              tables.
           
 
     - name: predicted
@@ -617,10 +618,10 @@ options:
               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
           ui: >
               The effect size to show in tables. They can be:
-              `"eta"` for eta-squared, `'etap'` for partial eta-squared,
-              `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
-              `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
-               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
+              `"eta"` for eta-squared, ` partial eta'` for partial eta-squared,
+              `'omega'` for omega-squared, `'omega partial'` for partial omega-squared,
+              `'epsilon'` for epsilon-squared, `'epsilon partial'` for partial epsilon-squared
+               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"eta partial"`.
           
     - name: homo_test
       title: Homogeneity tests

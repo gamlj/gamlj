@@ -108,19 +108,28 @@ datasets:
       - Logistic mixed models
   - name: glmmixeddata
     path: glmmixeddata.csv
-    description: >
-      Generated data to test generalized mixed models. The variables can be used
-
-      `x` and `z` as two continuous independent variables; `w` as categorical
-      independent variable;
-
-      `ybin` as dichotomous dependent variable; `ypoi` as count variable
-      (Poisson);
-
-      `cluster` as the clustering variable.
+    description: |
+      Generated data to test generalized mixed models
     tags:
-      - Generalized Mixed models
-      - Negative Binomial mixed models
+      - GMixed
+      - GLM
+      - GZLM
+      - Mixed
+  - name: manymodels
+    path: manymodels.csv
+    description: |
+      Generated data to test different types of linear models. 
+    tags:
+      - GLM
+      - GZLM
+  - name: clustermanymodels
+    path: clustermanymodels.csv
+    description: >
+      Generated data to test different types of linear models with clustered
+      data 
+    tags:
+      - GMixed
+      - Mixed
 usesNative: true
 minApp: 2.3.1
 

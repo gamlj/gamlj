@@ -88,4 +88,42 @@ NULL
 #' data(glmmixeddata)
 NULL
 
+#'       Generated data to test different types of linear models. The variables can be used as:
+#'       
+#'       `x` and `z` as two continuous independent variables; 
+#'       
+#'       `cat2` and `cat3`  as categorical independent variables, with two and three groups respectively;
+#'       
+#'       `ycont` is a continuous variable, suitable as dependent variable. 
+#'       `ybin` is dichotomous dependent variable; `ypoi` a count variable (Poisson),
+#'       `yord` and ordinal dependent variable with 5 levels, and `ycat` a categorical dependent variable with three groups.
+
+#' @docType data
+#' @name manymodels
+#' @usage data(manymodels)
+#' @keywords datasets
+#' @examples
+#' data(manymodels)
+NULL
+
+
+#'       Generated data to test different types of linear models with clustered data. 
+#'       The variables can be used as:
+#'       
+#'       `x` and `z` as two continuous independent variables; 
+#'       
+#'       `cat2` and `cat3`  as categorical independent variables, with two and three groups respectively;
+#'       
+#'       `ycont` is a continuous variable, suitable as dependent variable. 
+#'       `ybin` is dichotomous dependent variable; `ypoi` a count variable (Poisson),
+#'       `yord` and ordinal dependent variable with 5 levels, and `ycat` a categorical dependent variable with three groups.
+
+#'       `cluster` as the clustering variable.
+#' @docType data
+#' @name clustermanymodels
+#' @usage data(clustermanymodels)
+#' @keywords datasets
+#' @examples
+#' data(clustermanymodels)
+NULL
 

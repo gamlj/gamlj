@@ -41,7 +41,12 @@
 #' @param omnibus Whether the omnibus test for the model should be \code{wald} or \code{LRT}.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
 #'   in tables
-#' @param ci_method .
+#' @param ci_method   The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
+#'    errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+#'    the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
+#'    estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
+#'    the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
+
 #' @param boot_r a number bootstrap repetitions.
 #' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width for the plots.
