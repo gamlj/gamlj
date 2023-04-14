@@ -291,24 +291,24 @@ SmartTable <- R6::R6Class("SmartTable",
                                 
                                 if (!isFALSE(error)) {
                                   private$.debug_msg("ERROR",fun,error)
+                                  if (exists("fromb64")) error<-fromb64(error)
                                   self$table$setError(error)
                                   return()
                                 }
                                 if (!isFALSE(warning)) {
-                                    
+                                  
+                                    if (exists("fromb64")) 
+                                        for (i in seq_along(warning))
+                                             warning[[i]]<-fromb64(warning[[i]])
+
                                     if (inherits(self$table,"Table")) 
-                                      for (w in warning) {
-                                         w<-private$.clean_message(w)
-                                         if (is.something(w))
-                                              self$table$setNote(jmvcore::toB64(w),w,init=FALSE)
-                                      }
+                                      for (w in warning)
+                                         self$table$setNote(jmvcore::toB64(w),w,init=FALSE)
+                                      
                                     if (inherits(self$table,"Array"))
                                       for (obj in self$table$items)
-                                          for (w in warning) {
-                                              w<-private$.clean_message(w)
-                                              if (is.something(w))
-                                                  obj$setNote(jmvcore::toB64(w),w,init=FALSE)
-                                          }
+                                          for (w in warning)
+                                              obj$setNote(jmvcore::toB64(w),w,init=FALSE)
 
                                 }
                                 return(rtable) 
@@ -424,6 +424,9 @@ SmartTable <- R6::R6Class("SmartTable",
                               try_hard({
                               for (j in self$spaceAt) {
                                 if (j<0) j<-self$table$rowCount+j
+                                if (j==0 || j>self$table$rowCount)
+                                  next
+                                
                                 self$table$addFormat(rowNo=j,col=k,jmvcore::Cell.END_GROUP)
                                 self$table$addFormat(rowNo=j+1,col=k,jmvcore::Cell.BEGIN_GROUP)
                               }})
@@ -573,24 +576,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                 cat(paste0("(",class(self)[1],")"),self$nickname,":",msg)
                                 cat("\n")
                               }
-                            },
-                            .clean_message=function(msg) {
-                              
-                              if (!exists("TRANS_WARNS")) return(msg)
-                              if (exists("fromb64")) msg<-fromb64(msg)
-                              
-                              where<-unlist(lapply(TRANS_WARNS,function(x) length(grep(x$original,msg))>0))
-                              where<-which(where)
-                              
-                              if (is.something(where)) {
-                                if (length(where)>1) where<-where[[1]]
-                                if (is.something(TRANS_WARNS[[where]]$new))
-                                  msg<-gsub(TRANS_WARNS[[where]]$original,TRANS_WARNS[[where]]$new,msg,fixed=T)
-                                else
-                                  msg<-NULL
-                              }                  
-                              return(msg)                          
                             }
+
                             
                           ) #end of private
                           

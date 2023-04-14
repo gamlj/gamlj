@@ -100,7 +100,11 @@ for nested model. It can be passed as right-hand formula.}
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , coefficients CI
 in tables}
 
-\item{ci_method}{.}
+\item{ci_method}{The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
+errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
+estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
+the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.}
 
 \item{boot_r}{a number bootstrap repetitions.}
 

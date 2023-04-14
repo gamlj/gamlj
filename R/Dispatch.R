@@ -39,7 +39,7 @@ Dispatch <- R6::R6Class(
                                 state<-as.list(table$state)
                                 if (!hasName(obj,"key")) obj$key<-jmvcore::toB64(obj$message)
                                 
-                                obj$message<-private$.clean_message(obj$message)
+                                obj$message<-private$.translate(obj$message)
                                 
                                 if (is.null(obj$message))
                                   return()
@@ -82,7 +82,7 @@ Dispatch <- R6::R6Class(
                                if (is.null(obj$message) || obj$message==FALSE)
                                     return()
           
-                               obj$message<-private$.clean_message(obj$message)
+                               obj$message<-private$.translate(obj$message)
                           
                                if (hasName(obj,"final") && (obj$final))
                                    stop(obj$message)
@@ -115,7 +115,7 @@ Dispatch <- R6::R6Class(
                              return(NULL)
                         
                       },
-                      .clean_message=function(msg) {
+                      .translate=function(msg) {
                           
                         if (!exists("TRANS_WARNS")) return(msg)
                         

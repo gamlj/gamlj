@@ -24,7 +24,6 @@ Initier <- R6::R6Class(
       self$subclass<-paste0("model_",self$options$model_type)
       x<-self$datamatic$data_structure64
       names(x)<-fromb64(names(x))
-      mark(x)
       #### we prepare the model syntax
       self$formulaobj<-gFormula$new()
       self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
@@ -412,7 +411,16 @@ init_main_multirandom=function() {
         attr(resultsList,"keys")<-inter_term
         resultsList
       
-    }
+    },
+
+   
+   run_assumptions_homotest=function() {
+     alist<-list(list(name="Breusch-Pagan Test"))
+     if (is.something(self$options$factors))
+       ladd(alist)<-list(name="Levene's Test")
+     return(alist)
+     
+   }
     
     
     

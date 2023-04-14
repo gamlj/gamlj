@@ -138,6 +138,7 @@ gamljlmClass <- R6::R6Class(
       
       ### assumptions hometest
       aSmartObj<-SmartTable$new(self$results$assumptions$homotest,runner_machine)
+      aSmartObj$hideOn<-list(df2=NA)
       ladd(private$.smartObjs)<-aSmartObj
       ### assumptions nromtest
       aSmartObj<-SmartTable$new(self$results$assumptions$normtest,runner_machine)

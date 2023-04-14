@@ -53,8 +53,10 @@ es.marginals<-function(obj) {
     vce <- "bootstrap"
   ciWidth        <-  obj$ciwidth
   data           <-  insight::get_data(model)
-  m              <-  margins::margins(model,data=data,vce=vce)
-  results        <-  try_hard(summary(m,level=ciWidth,by_factor=FALSE))
+  m              <-  try_hard(margins::margins(model,data=data,vce=vce))
+  mark(m)
+  results        <-  try_hard(summary(m$obj,level=ciWidth,by_factor=FALSE))
+
   results$obj
 
 }

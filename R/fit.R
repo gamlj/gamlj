@@ -87,7 +87,6 @@ gFit <- R6::R6Class(
       
       if (!self$operator$options$comparison)
           return()
-
       if (self$operator$option(".caller", c("glmer")) & self$operator$option("model_type", c("multinomial"))) {
            self$operator$warning <- list(topic = "main_r2",
                                                      message = "Inferential test for multinomial models
@@ -95,9 +94,9 @@ gFit <- R6::R6Class(
                                                                 Deviances from quasi-likelihoods are not comparable.")
            return(NULL)
       }
-      
+
       omnibus<-"Chisq"
-      if (self$operator$option("omnibus")) omnibus<-self$operator$obtionValue("omnibus")
+      if (self$operator$option("omnibus")) omnibus<-self$operator$optionValue("omnibus")
       
       if (self$operator$option(".caller", c("lmer", "glmer")) || self$operator$option("omnibus", "LRT")) {
          comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model, self$operator$model)))

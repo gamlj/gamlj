@@ -746,7 +746,6 @@ items:
           type: Table
           description: a table of homogeneity tests
           visible: (homo_test)
-          rows: 2
           clearWith:
                  -  __modeloptions__
           columns:

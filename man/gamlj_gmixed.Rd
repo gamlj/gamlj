@@ -13,10 +13,10 @@ gamlj_gmixed(
   model_terms = NULL,
   fixed_intercept = TRUE,
   es = list("expb"),
-  expb_ci = FALSE,
+  expb_ci = TRUE,
   nested_terms = NULL,
   nested_intercept = NULL,
-  estimates_ci = TRUE,
+  estimates_ci = FALSE,
   ci_method = "wald",
   boot_r = 1000,
   ci_width = 95,
@@ -88,7 +88,7 @@ for the nested model. It can be passed as right-hand formula.}
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
 
-\item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI
+\item{estimates_ci}{\code{TRUE}  or \code{FALSE} (default), parameters CI
 in table}
 
 \item{ci_method}{.}

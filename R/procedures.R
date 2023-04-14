@@ -38,7 +38,6 @@ procedure.posthoc <- function(obj) {
   
    model<-obj$model
 
-
   ### check if we need robust standard error  
   vfun<-NULL
   if (obj$option("se_method","robust")) {
@@ -53,7 +52,6 @@ procedure.posthoc <- function(obj) {
   
     
   postHocTables <- list()
-  
   for (.vars in terms) {
 
     ## emmeans list comparison levels with a strange order. So we pass the inverted order of the term
@@ -61,20 +59,19 @@ procedure.posthoc <- function(obj) {
     .revvars<-rev(.vars)
     .term64<-jmvcore::composeTerm(tob64(.revvars))
      referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df)
-     
      if (obj$option("model_type","multinomial"))
             .pairs<-graphics::pairs(referenceGrid,by=dep)
      else
             .pairs<-graphics::pairs(referenceGrid)
-     
      none <- summary(.pairs, adjust = "none",infer = c(FALSE,TRUE))
      tableData <- as.data.frame(none, stringAsFactors = FALSE)
+
      
      for (adj in obj$options$adjust) {
        arow <- summary(.pairs, adjust = adj,infer = c(FALSE,TRUE))
        tableData[[adj]]<- arow$p.value
      }
-
+     
      .transnames<-list(estimate=c("odds.ratio","ratio"),
                        test=c("z.ratio","t.ratio"),
                        p="p.value",
@@ -83,6 +80,7 @@ procedure.posthoc <- function(obj) {
      )
      names(tableData)<-transnames(names(tableData),.transnames)  
      ## confidence intervals
+     
      .model<-model
      if (obj$option("ci_method",c("quantile","bcai"))) 
        .model<-obj$boot_model
@@ -90,24 +88,25 @@ procedure.posthoc <- function(obj) {
      cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
      tableData$est.ci.lower<-cidata$est.ci.lower       
      tableData$est.ci.upper<-cidata$est.ci.upper       
-
      ## we create one column for each contrast level
      tableData$contrast <- as.character(tableData$contrast)
 
     .cont <- tableData$contrast
     .cont <- gsub("[-,/]","", .cont)
 
-
+mark(.cont)
     .labs <- lapply(.cont, function(a) {
       lapply(strsplit(as.character(a), LEVEL_SYMBOL)[[1]], trimws)[-1]
     })
 
     labs <- do.call("rbind", .labs)
+    mark(labs)
     .vars  <- make.names(.revvars,unique = T)
     .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
 
     colnames(labs) <- .names
     tableData <- cbind(labs, tableData)
+
     
     for (.name in .names)
       tableData[,.name]<-as.character(obj$datamatic$get_params_labels(tableData[,.name]))
@@ -879,7 +878,7 @@ procedure.simpleInteractions<-function(obj) {
       params<-results$obj            
 
       class(params)<-c(paste0("simple_params_",obj$options$.caller),class(params))
-      params<-add_effect_size(params,model,variable64)
+      params<-add_effect_size(params,obj$model,variable64)
       
 ###### now we build the anova table ##########      
       results<-try_hard({ 

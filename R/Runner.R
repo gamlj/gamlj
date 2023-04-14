@@ -198,7 +198,7 @@ Runner <- R6::R6Class("Runner",
                             
                             tab<-NULL
 
-                            if (self$formulaobj$isProper) {
+                            if (self$formulaobj$hasTerms) {
                               tab       <-  es.marginals(self)
                             }
                             tab
@@ -246,7 +246,6 @@ Runner <- R6::R6Class("Runner",
                               jinfo("RUNNER: estimating variance components.")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
-                              mark(results[[2]])
                               return(results[[1]])
                               
                               grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
@@ -368,25 +367,28 @@ Runner <- R6::R6Class("Runner",
                           run_assumptions_homotest=function() {
 
                                 data<-self$model$model
-                                data$res<-residuals(self$model)
+                                ## Breusch-Pagan ##
+                                bptable<-list(name=c("Breusch-Pagan Test"))
+                                test<-lmtest::bptest(self$model)
+                                bptable[["test"]] <- test$statistic
+                                bptable[["df1"]]  <- test$parameter
+                                bptable[["df2"]]  <- ""
+                                bptable[["p"]]    <- test$p.value
+                                
                                 factors <-   names(attr(stats::model.matrix(self$model),"contrasts"))
                                 if (is.null(factors))
-                                  return()
+                                  return(list(bptable))
+                                data$res<-residuals(self$model)
                                 rhs <- paste0('`', factors, '`', collapse=':')
                                 formula <- as.formula(paste0('`res`~', rhs))
                                 result <- car::leveneTest(formula, data, center="mean")
-                                table<-data.frame(name=c("Levene's Test","Breusch-Pagan Test"))
-                                table$test[1]=result[1,'F value']
-                                table$df1[1]=result[1,'Df']
-                                table$df2[1]=result[2,'Df']
-                                table$p[1]=result[1,'Pr(>F)']
-                                ## Breusch-Pagan ##
-                                test<-lmtest::bptest(self$model)
-                                table$test[2]<-test$statistic
-                                table$df1[2]<-test$parameter
-                                table$df2[2]<-""
-                                table$p[2]<-test$p.value
-                               table
+                                ltable<-list(name=c("Levene's Test"))
+                                ltable[["test"]] <- result[1,'F value']
+                                ltable[["df1"]]  <- result[1,'Df']
+                                ltable[["df2"]]  <- result[2,'Df']
+                                ltable[["p"]]    <- result[1,'Pr(>F)']
+                                warning("Levene's test is done only for factors.")
+                                return(list(bptable,ltable))
                           },
                           run_assumptions_normtest=function() {
                            

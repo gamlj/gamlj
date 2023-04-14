@@ -58,7 +58,6 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
               vmat<-cbind(vmat,varci)
     
               if (is.something(cmat)) {
-                mark(covci)
                 cmat$sd.ci.lower<-covci$sd.ci.lower
                 cmat$sd.ci.upper<-covci$sd.ci.upper
               }

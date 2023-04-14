@@ -1709,7 +1709,6 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="homotest",
                             title="Test for Homogeneity of Residual Variance",
                             visible="(homo_test)",
-                            rows=2,
                             clearWith=list(
                                 "dep",
                                 "factors",
