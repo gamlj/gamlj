@@ -146,8 +146,8 @@ to estimate (of the form \code{'~x+x:z'})}
 
 \item{posthoc}{a rhs formula with the terms specifying the table to apply
 the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-passed also as a list of the form '}list("x","z",c("x","z")`'}
+so \code{'x*z'} becomes \code{'x+z'} and not \code{'x+z+x:z'}. It can be
+passed also as a list of the form \code{list("x","z",c("x","z")}}
 
 \item{simple_x}{The variable for which the simple effects (slopes)
 are computed}
@@ -223,7 +223,8 @@ about the effect size indexes}
 Classical standard errors is the default \code{standard}. 
 Four methods for  heteroschedasticy-consistent 
 standard errors are available: \code{HC0},
-\code{HC1},\code{HC2},\code{HC3}.}
+\code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
+See \code{\link[sandwich]{vcovHC}} for details.}
 }
 \value{
 A results object containing:

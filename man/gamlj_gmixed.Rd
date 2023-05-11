@@ -91,7 +91,13 @@ fixed intercept. Not needed if \code{formula} is used.}
 \item{estimates_ci}{\code{TRUE}  or \code{FALSE} (default), parameters CI
 in table}
 
-\item{ci_method}{.}
+\item{ci_method}{The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
+errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
+estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
+the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.}
+
+\item{boot_r}{a number bootstrap repetitions.}
 
 \item{ci_width}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width for the plots.}
@@ -207,14 +213,8 @@ effects}
 \item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
 for the random effects}
 
-\item{mute}{Not present in R}
-
 \item{cluster}{a vector of strings naming the clustering variables from
-\code{data}}
-
-\item{re_modelterms}{Not in R interface}
-
-\item{re_listing}{Not in R interface}
+\code{data}, not necessary if \code{formula} is defined.}
 }
 \value{
 A results object containing:

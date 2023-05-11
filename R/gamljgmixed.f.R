@@ -34,7 +34,13 @@
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE}  or \code{FALSE} (default), parameters CI
 #'   in table
-#' @param ci_method .
+#' @param ci_method   The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
+#'    errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+#'    the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
+#'    estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
+#'    the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
+
+#' @param boot_r a number bootstrap repetitions.
 #' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width for the plots.
 #' @param contrasts a named vector of the form \code{c(var1="type",
@@ -98,12 +104,11 @@
 #' @param covs_scale a list of lists specifying the covariates scaling, one of
 #'   \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 #'   \code{'none'} leaves the variable as it is
-#' @param mute Not present in R
 #' @param scale_missing .
 #' @param norm_test \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
 #' @param cluster a vector of strings naming the clustering variables from
-#'   \code{data}
+#'   \code{data}, not necessary if \code{formula} is defined.
 #' @param re a list of lists specifying the models random effects.
 #' @param nested_re a list of lists specifying the models random effects.
 #' @param re_corr \code{'all'}, \code{'none'} (default), or \code{'block'}.
@@ -111,8 +116,6 @@
 #'   effects should be correlated,  non correlated. If \code{'re'} is a list of
 #'   lists of length > 1, the option is automatially set to \code{'block'}. The
 #'   option is ignored if the model is passed using \code{formula}.
-#' @param re_modelterms Not in R interface
-#' @param re_listing Not in R interface
 #' @param re_lrt \code{TRUE} or \code{FALSE} (default), LRT for the random
 #'   effects
 #' @param re_ci \code{TRUE} or \code{FALSE} (default), confidence intervals

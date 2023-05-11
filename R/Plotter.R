@@ -148,6 +148,7 @@ Plotter <- R6::R6Class(
         p <- p + ggplot2::geom_line(data = data, 
                                     .aestetics,
                                      linewidth = 1.2, 
+                                     size=1.2,
                                      position=self$scatterDodge)
 
 
@@ -477,9 +478,10 @@ Plotter <- R6::R6Class(
           if (self$option("plot_scale","mean.class"))
                     self$scatterRange<-c(1,self$scatterY$nlevels)
         }
-      if (self$option("model_type","logistic")) {
+      if (self$option("model_type",c("logistic","multinomial"))) {
           self$scatterRange<-c(0,1)
       }
+
       
       #### deal with rescaling
       if (self$scatterXscale) {

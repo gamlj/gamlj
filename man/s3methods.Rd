@@ -15,7 +15,7 @@
 
 \method{print}{jmvrobj}(x, ...)
 
-\method{coef}{gamlj}(x, ...)
+\method{coef}{gamlj}(object, ...)
 
 fit(x, ...)
 
@@ -36,7 +36,7 @@ and print them in R style.
 \examples{
 data(fivegroups)
 fivegroups$Group<-factor(fivegroups$Group)
-gmod<-gamlj::gamljGlm(
+gmod<-gamlj::gamlj_lm(
   formula = Score ~Group,
   data = fivegroups)
 

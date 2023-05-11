@@ -1,4 +1,3 @@
-#' Generalized Linear Models
 #'
 #' Generalized Linear Model with options to estimate logistic, probit, 
 #' ordinal, multinomial and custum link function models. Provides options
@@ -165,7 +164,6 @@ gamlj_glm <- function(
     comparison = FALSE,
     omnibus = "LRT",
     estimates_ci = FALSE,
-    donotrun = FALSE,
     ci_method = "wald",
     boot_r = 1000,
     ci_width = 95,
@@ -299,7 +297,6 @@ gamlj_glm <- function(
     comparison = comparison,
     omnibus = omnibus,
     estimates_ci = estimates_ci,
-    donotrun = donotrun,
     ci_method = ci_method,
     boot_r = boot_r,
     ci_width = ci_width,

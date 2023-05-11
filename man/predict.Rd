@@ -36,7 +36,7 @@ Returns predicted values from the estimated model
 }
 \examples{
 data('qsport')
-gmod<-gamlj::gamljGlm(
+gmod<-gamlj::gamlj_lm(
    formula = performance ~ hours,
    data = qsport)
  preds<-predict(gmod)

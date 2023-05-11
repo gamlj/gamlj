@@ -4,7 +4,7 @@
 #' Re-estimates a GAMLj model applying new options to the original model
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljmixed}},  \code{\link{gamljglm}}, or  \code{\link{gamljgmixed}} 
+#' @param  ... any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link{gamlj_gmixed}} 
 #' @return an object of class gamlj*Results as the input object
 #' @author Marcello Gallucci
 #' @rdname update
@@ -75,7 +75,7 @@ update.gamljgmixedResults <- function(object, ...) {
 #' @author Marcello Gallucci
 #' @examples
 #' data(qsport)
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'   formula = performance ~ hours,
 #'   data = qsport)
 #' 
@@ -176,7 +176,7 @@ assumptions <- function(object) {
 #' Returns the parameters variances and covariances
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link{gamlj_lm}},  \code{\link{gamljmixed}},  \code{\link{gamljglm}}, or  \code{\link{gamljgmixed}} 
+#' @param  ... any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link[gamlj]{gamlj_gmixed}} 
 #' @return an table of class gamlj*Results 
 #' @author Marcello Gallucci
 #' @export 
@@ -203,7 +203,7 @@ vcov.gamlj <- function(object, ...) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamljGlm(formula = performance ~ hours,
+#' gmod<-gamlj::gamlj_lm(formula = performance ~ hours,
 #'                 data = qsport,
 #'                 scaling = c(hours='standardized'))
 #' 
@@ -214,7 +214,7 @@ vcov.gamlj <- function(object, ...) {
 get_data <- function(object, ...) UseMethod("get_data")
 
 #' @export
-get_data.gamlj <- function(object) {
+get_data.gamlj <- function(object,...) {
     
     if (isS4(object$model)) 
         .data <- object$model@frame 
@@ -251,7 +251,7 @@ get_data.gamlj <- function(object) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-predict(gmod)
@@ -302,7 +302,7 @@ predict.gamljgmixedResults <- function(object, re.form = NULL, type = "response"
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-residuals(gmod)
@@ -345,15 +345,14 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 
 #' @param object a gamlj results object of the class `gamlj`
 #' @param object2 a gamlj results object of the class `gamlj` representing the nested model. Overiddes \code{nested_terms}.
-#' @param nested_terms a gamlj results object of the class `gamlj` representing the nested model formula. 
-#'                 It can be passed also as a a right-hand side formula specifying terms of the nested model. Not necessary if \code{object2} is passed.
+#'                 It can be passed also as a a right-hand side formula specifying terms of the nested model.
 #' @param ... all options accepted by a gamlj model function.  
 #' @return an object of class ggplot or a list of ggplot objects
 #' @author Marcello Gallucci
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -370,7 +369,7 @@ anova.gamlj <- function(object, object2,...) {
   args<-list(...)
   if (!missing(object2)) {
      if (inherits(object2,"gamlj"))
-        args$nested_terms<-fromb64(formula(object2$model))
+        args$nested_terms<-fromb64(stats::formula(object2$model))
   object <- stats::update(object, args)
   res<-object$main$r2
   if (utils::hasName(object$main,"fit"))
@@ -402,7 +401,7 @@ anova.gamlj <- function(object, object2,...) {
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -492,7 +491,7 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -566,8 +565,8 @@ print.jmvrobj<-function(x,...) {
 #' 
 #' @export
 
-coef.gamlj<-function(x,...) {
-  return(x$main$coefficients)
+coef.gamlj<-function(object,...) {
+  return(object$main$coefficients)
 }
 
 #' Extract model R2 (r-squared) from a GAMLj results object 
@@ -584,7 +583,7 @@ fit <- function(x, ...) UseMethod("fit")
 fit.gamlj<-function(x,...) {
   
   res<-x$main$r2
-  if (hasName(x$main,"fit"))
+  if (utils::hasName(x$main,"fit"))
      res<-c(x$main$r2,x$main$fit)
   
   return(res)

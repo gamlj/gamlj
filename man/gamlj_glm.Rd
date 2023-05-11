@@ -2,7 +2,10 @@
 % Please edit documentation in R/gamljglm.f.R
 \name{gamlj_glm}
 \alias{gamlj_glm}
-\title{Generalized Linear Models}
+\title{Generalized Linear Model with options to estimate logistic, probit, 
+ordinal, multinomial and custum link function models. Provides options
+to estimate posthoc, simple effects and slopes, plots of main effects and
+interaction. Model comparison is also an option.}
 \usage{
 gamlj_glm(
   formula = NULL,
@@ -21,7 +24,6 @@ gamlj_glm(
   comparison = FALSE,
   omnibus = "LRT",
   estimates_ci = FALSE,
-  donotrun = FALSE,
   ci_method = "wald",
   boot_r = 1000,
   ci_width = 95,

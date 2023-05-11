@@ -70,8 +70,9 @@
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
 #'   the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-#'   so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-#'   passed also as a list of the form '}list("x","z",c("x","z")`'
+#'   so \code{'x*z'} becomes \code{'x+z'} and not \code{'x+z+x:z'}. It can be
+#'   passed also as a list of the form \code{list("x","z",c("x","z")}
+#'   
 #' @param simple_x The variable for which the simple effects (slopes)
 #'   are computed
 #' @param simple_mods a character vector with the variable(s) providing the levels at which the
@@ -126,7 +127,7 @@
 #'                  Classical standard errors is the default \code{standard}. 
 #'                  Four methods for  heteroschedasticy-consistent 
 #'                  standard errors are available: \code{HC0},
-#'                  \code{HC1},\code{HC2},\code{HC3}, from package  \code{\link[sandwich]}.                   
+#'                  \code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
 #'                  See \code{\link[sandwich]{vcovHC}} for details.  
 #'                  
 #' @return A results object containing:
@@ -318,7 +319,6 @@ gamlj_lm <- function(
     estimates_ci = estimates_ci,
     betas_ci = betas_ci,
     ci_width = ci_width,
-    donotrun = donotrun,
     ci_method = ci_method,
     boot_r = boot_r,
     contrasts = contrasts,

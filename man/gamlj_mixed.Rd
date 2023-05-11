@@ -191,7 +191,7 @@ Tukey and Holm Post Hoc corrections respectively.}
 normality of residuals}
 
 \item{cluster}{a vector of strings naming the clustering variables from
-\code{data}}
+\code{data}. Not necessary if \code{formula} is defined.}
 
 \item{re}{a list of lists specifying the models random effects.}
 
@@ -273,7 +273,7 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTests]{merTest-package} functions and 
+Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTest]{merTest-package} functions and 
 provides options to facilitate estimation of 
 interactions, simple slopes, simple effects, post-hoc tests, contrast 
 analysis, effect size indexes and visualization of the results.

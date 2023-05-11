@@ -296,11 +296,14 @@ SmartTable <- R6::R6Class("SmartTable",
                                   return()
                                 }
                                 if (!isFALSE(warning)) {
-                                  
-                                    if (exists("fromb64")) 
-                                        for (i in seq_along(warning))
-                                             warning[[i]]<-fromb64(warning[[i]])
-
+                                    dispatch<-Dispatch$new(self)
+                                    warning<-lapply(warning, function(x) {
+                                        if (exists("fromb64")) 
+                                             x<-fromb64(x)
+                                        dispatch$translate(x)
+                                    })
+                                    warning<-warning[sapply(warning,is.something)]
+                                    
                                     if (inherits(self$table,"Table")) 
                                       for (w in warning)
                                          self$table$setNote(jmvcore::toB64(w),w,init=FALSE)

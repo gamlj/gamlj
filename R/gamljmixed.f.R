@@ -1,7 +1,7 @@
 
 #' Mixed Model
 #'
-#' Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTests]{merTest-package} functions and 
+#' Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTest]{merTest-package} functions and 
 #' provides options to facilitate estimation of 
 #' interactions, simple slopes, simple effects, post-hoc tests, contrast 
 #' analysis, effect size indexes and visualization of the results.
@@ -9,11 +9,13 @@
 #'
 #' @examples
 #' data(subjects_by_stimuli)
-#' gamlj::gamljMixed(
+#' gamlj::gamlj_mixed(
 #'        formula = y ~ 1 + cond+( 1|subj ),
 #'        data = subjects_by_stimuli)
 #' @param formula (optional) the formula of the linear mixed model as defined in \link[lme4]{lmer}.
 #' @param data the data as a data frame
+ #' @param cluster a vector of strings naming the clustering variables from
+#'   \code{data}. Not necessary if \code{formula} is defined.
 #' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
 #'   fixed intercept. Overridden if \code{formula} is used and contains \code{~1} or \code{~0}.
 #' @param dep a string naming the dependent variable from \code{data}; the
@@ -99,8 +101,6 @@
 #' @param scale_missing .
 #' @param norm_test \code{TRUE} or \code{FALSE} (default), provide a test for
 #'   normality of residuals
-#' @param cluster a vector of strings naming the clustering variables from
-#'   \code{data}
 #' @param re a list of lists specifying the models random effects.
 #' @param nested_re a list of lists specifying the models random effects.
 #' @param re_corr \code{'all'}, \code{'none'} (default), or \code{'block'}.
@@ -324,7 +324,6 @@ gamlj_mixed <- function(
     nested_intercept = nested_intercept,
     omnibus = omnibus,
     estimates_ci = estimates_ci,
-    donotrun = donotrun,
     ci_method = ci_method,
     boot_r = boot_r,
     ci_width = ci_width,
@@ -360,8 +359,6 @@ gamlj_mixed <- function(
     re = re,
     nested_re = nested_re,
     re_corr = re_corr,
-    re_modelterms = re_modelterms,
-    re_listing = re_listing,
     reml = reml,
     re_lrt = re_lrt,
     re_ci = re_ci,

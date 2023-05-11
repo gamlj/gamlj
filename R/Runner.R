@@ -380,7 +380,7 @@ Runner <- R6::R6Class("Runner",
                                   return(list(bptable))
                                 data$res<-residuals(self$model)
                                 rhs <- paste0('`', factors, '`', collapse=':')
-                                formula <- as.formula(paste0('`res`~', rhs))
+                                formula <- stats::as.formula(paste0('`res`~', rhs))
                                 result <- car::leveneTest(formula, data, center="mean")
                                 ltable<-list(name=c("Levene's Test"))
                                 ltable[["test"]] <- result[1,'F value']

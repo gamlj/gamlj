@@ -54,7 +54,6 @@ es.marginals<-function(obj) {
   ciWidth        <-  obj$ciwidth
   data           <-  insight::get_data(model)
   m              <-  try_hard(margins::margins(model,data=data,vce=vce))
-  mark(m)
   results        <-  try_hard(summary(m$obj,level=ciWidth,by_factor=FALSE))
 
   results$obj
@@ -75,7 +74,6 @@ es.marginals<-function(obj) {
   if (obj$option("ci_method",c("quantile","bcai")))
         obj$warning<-list(topic="main_marginals",message="C.I for multinomial margins are available only with the delta method.")    
   for (g in groups) {
-    
     .data<-data[data[[dep]]==g | data[[dep]]==ref_lev,]
     try_hard( {
       .model<-stats::glm(form,.data,family=stats::binomial())
@@ -86,7 +84,7 @@ es.marginals<-function(obj) {
   }
   results<-as.data.frame(do.call("rbind",results))
   results$response<-fromb64(paste(groups,"-",ref_lev))
-  results<-results[order(results$or),]
+  results<-results[order(results$response,results$or),]
   results
 }
 
@@ -95,7 +93,7 @@ es.marginals<-function(obj) {
 # for other estimation because it does not work well with parameters::bootstrap_model() emmeans
 
 ..margins.clm<-function(model,obj) {
-  .model<-MASS::polr(a1$call$formula,data=model$model)
+  .model<-MASS::polr(model$call$formula,data=model$model)
   ..margins.default(.model,obj)
 }
 
@@ -154,7 +152,7 @@ es.glm_variances<-function(model,obj) {
      SS            <-  df*atable$test*ssres/dfres
      
      es            <-  SS/(ssmod+ssres)
-     etaSq         <-ci_effectsize(es,df,dfres,obj,"eta")
+     etaSq         <-  ci_effectsize(es,df,dfres,obj,"eta")
      
      es            <- SS/(SS+ssres)
      etaSqP        <- ci_effectsize(es,df,dfres,obj,"etap")
@@ -269,6 +267,7 @@ ci_effectsize<-function(es,df,dfres,obj,what="any") {
         res
   } else {
     terms<-seq_along(es)  
+    N<-df+dfres+1
     get_boot_ci(what,terms,obj$boot_variances,type=obj$options$ci_method,width=obj$ciwidth,df = df,dfres=dfres,N=N)
     
     }

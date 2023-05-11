@@ -5,7 +5,6 @@ mod0<-gamlj::gamlj_lm(
   data = ToothGrowth,
   formula=len~supp+dose)
 
-
 mod1<-gamlj::gamlj_lm(
   data = ToothGrowth,
   dep = "len",
@@ -257,6 +256,7 @@ mod0<-gamlj::gamlj_lm(
   posthoc = list(c("ses","female")),
   posthoc_es  = c("dm")
 )
+
 mod1<-gamlj::gamlj_lm(
   data = data,
   formula=science~math*ses*female,

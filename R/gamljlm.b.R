@@ -12,8 +12,7 @@ gamljlmClass <- R6::R6Class(
       
       jinfo(paste("MODULE:",self$options$.caller,"  #### phase init  ####"))
       class(private$.results) <- c('gamlj', class(private$.results))
-      jinfo("MEM: (before table init)",pryr::mem_used()/10e5)
-      
+
       private$.time<-Sys.time()
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
@@ -163,14 +162,11 @@ gamljlmClass <- R6::R6Class(
       self$results$plotnotes$setContent("")
       
       now<-Sys.time()
-      jinfo("MEM: (after table init)",pryr::mem_used()/10e5)
       jinfo("INIT TIME:",now-private$.time," secs")
       
     },
     .run=function() {
       jinfo("MODULE:  #### phase run ####")
-      
-      if (self$options$donotrun) return()
       
       private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
@@ -206,8 +202,7 @@ gamljlmClass <- R6::R6Class(
       jinfo("RUN TIME:",Sys.time()-runnow," secs")
       
       jinfo("TIME:",Sys.time()-private$.time," secs")
-      jinfo("MEM: (after table init)",pryr::mem_used()/10e5)
-      
+
       return()
           
     },

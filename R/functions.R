@@ -54,7 +54,7 @@ fromb64<- function(x,...) UseMethod(".fromb64")
   astring
 }
 
-.fromb64.formula<-function(obj)   return(formula(fromb64(deparse(obj))))
+.fromb64.formula<-function(obj)   return(stats::formula(fromb64(deparse(obj))))
 
 
 .fromb64.list<-function(obj,ref=NULL) lapply(obj,bogusfromb64,ref=ref)

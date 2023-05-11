@@ -44,7 +44,7 @@ mf.update<- function(x,...) UseMethod(".update")
     if (!is.something(test)) {
       .formula<-lme4::nobars(.formula)
       warning("No random coefficients specified. A generalized linear model is used for comparison.")
-      mod<-stats::glm(formula = .formula,data=data,family=family(model))
+      mod<-stats::glm(formula = .formula,data=data,family=stats::family(model))
       return(mod)
     }
   }

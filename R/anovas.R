@@ -17,7 +17,7 @@ ganova<- function(x,...) UseMethod(".anova")
   
   ### LR is less lenient than Wald
   if (!isFALSE(anoobj$error)) {
-    anoobj        <-  try_hard(car::Anova(model,test="Chisq",type=3,singular.ok=T))
+    anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))
     obj$warning  <-  list(topic="main_anova",message="Wald test was used because LRT failed")
   }
   obj$error    <-  list(topic="main_anova",message=anoobj$error)
@@ -28,7 +28,6 @@ ganova<- function(x,...) UseMethod(".anova")
     return(NULL)
   
   .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
-  
   .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
   names(.anova)<-transnames(names(.anova),.transnames)
   

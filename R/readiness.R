@@ -3,10 +3,10 @@ readiness <- function(options) {
   
   result <- list(reason = NULL, ready = TRUE, report = FALSE)
 
-  if(options$donotrun) {
+  if(isTRUE(options$donotrun)) {
     result$ready <- FALSE
     result$report <- TRUE
-    result$reason <- glue::glue("Do not run option activated")
+    result$reason <- "Do not run option activated"
     return(result)
   } 
   

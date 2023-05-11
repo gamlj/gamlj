@@ -20,7 +20,7 @@ models with other R packages with the same setup used by GAMLj
 }
 \examples{
 data('qsport')
-gmod<-gamlj::gamljGlm(formula = performance ~ hours,
+gmod<-gamlj::gamlj_lm(formula = performance ~ hours,
                 data = qsport,
                 scaling = c(hours='standardized'))
 

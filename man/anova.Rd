@@ -14,10 +14,8 @@ anova(object, ...)
 
 \item{...}{all options accepted by a gamlj model function.}
 
-\item{object2}{a gamlj results object of the class `gamlj` representing the nested model. Overiddes \code{nested_terms}.}
-
-\item{nested_terms}{a gamlj results object of the class `gamlj` representing the nested model formula. 
-It can be passed also as a a right-hand side formula specifying terms of the nested model. Not necessary if \code{object2} is passed.}
+\item{object2}{a gamlj results object of the class `gamlj` representing the nested model. Overiddes \code{nested_terms}.
+It can be passed also as a a right-hand side formula specifying terms of the nested model.}
 }
 \value{
 an object of class ggplot or a list of ggplot objects
@@ -31,7 +29,7 @@ are returned.
 \examples{
 data(fivegroups)
 fivegroups$Group<-factor(fivegroups$Group)
-gmod<-gamlj::gamljGlm(
+gmod<-gamlj::gamlj_lm(
   formula = Score ~Group,
   data = fivegroups)
 

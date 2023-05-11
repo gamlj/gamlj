@@ -257,7 +257,7 @@ r2 <- function(model, ...) UseMethod(".r2")
   alist$r2 <- as.numeric(1 - (llfull / llnull))
   alist$test <- ss$sumstat[1]
   alist$df1 <- ss$sumstat[2]
-  alist$p <- pchisq(alist$test, df = alist$df1, lower.tail = FALSE)
+  alist$p <- stats::pchisq(alist$test, df = alist$df1, lower.tail = FALSE)
   list(alist)
 }
 
@@ -397,7 +397,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
     re <- lme4::findbars(stats::formula(model))
     re <- paste("(", re, ")", collapse = "+")
-    form <- as.formula(paste(dep, "~", int, " + ", re))
+    form <- stats::as.formula(paste(dep, "~", int, " + ", re))
     model0 <- ordinal::clmm(formula = form, data = data)
   }
   ### here we use performance::test_likelihoodratio, which compute the LRT

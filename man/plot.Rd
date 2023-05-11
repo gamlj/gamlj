@@ -25,7 +25,7 @@ plots present in the `gamlj*Results` object. If one plot is present, it is retur
 }
 \examples{
 data(qsport)
-gmod<-gamlj::gamljGlm(
+gmod<-gamlj::gamlj_lm(
   formula = performance ~ hours,
   data = qsport)
 
