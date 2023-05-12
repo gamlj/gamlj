@@ -302,7 +302,9 @@ SmartTable <- R6::R6Class("SmartTable",
                                              x<-fromb64(x)
                                         dispatch$translate(x)
                                     })
-                                    warning<-warning[sapply(warning,is.something)]
+                                    
+                                    mark(self$nickname,warning)
+                                    warning<-warning[sapply(warning,function(x) is.something(x))]
                                     
                                     if (inherits(self$table,"Table")) 
                                       for (w in warning)

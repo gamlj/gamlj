@@ -243,7 +243,7 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_random=function() {
                             
-                              jinfo("RUNNER: estimating variance components.")
+                              jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
                               return(results[[1]])
@@ -282,7 +282,7 @@ Runner <- R6::R6Class("Runner",
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {
                                 self$tab_randomcov<-vc[covariances,]
-                              }
+                            }
                               params
                           },
                           run_main_randomcov=function() {
@@ -302,12 +302,14 @@ Runner <- R6::R6Class("Runner",
                             
                           },
                           run_main_ranova=function() {
-                            
-                            procedure.ranova(self$model,self)
-                            
+                            jinfo("RUNNER: ranova")
+                            anovas.ranova(self$model,self)
                           },
                           
                           run_posthoc=function() {
+                            
+                            if (length(self$options$posthoc)==0)
+                               return()
 
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
@@ -642,20 +644,20 @@ Runner <- R6::R6Class("Runner",
                                 }
                           
 
-                                #### LRT for random effects ####
-                                if (self$option("re_lrt")) {
-                                  ## this is required by lmerTest::ranova() which looks in the parent for "data"
-                                  data<-self$model@frame
-                                  results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
-                                  self$warning<-list(topic="main_ranova",message=results$warning)
-                                  if (!isFALSE(results$error))
-                                     self$errors<-list(topic="main_ranova",message=paste("LR tests cannot be computed",results$error))
-                                  else {
-                                    ranova_test<-results$obj[-1,]
-                                    ranova_test$test<-fromb64(rownames(results$obj[-1,]))
-                                    self$tab_randomTests<-ranova_test
-                                  }
-                                }
+                                # #### LRT for random effects ####
+                                # if (self$option("re_lrt") & 1==0)  {
+                                #   ## this is required by lmerTest::ranova() which looks in the parent for "data"
+                                #   data<-self$model@frame
+                                #   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
+                                #   self$warning<-list(topic="main_ranova",message=results$warning)
+                                #   if (!isFALSE(results$error))
+                                #      self$errors<-list(topic="main_ranova",message=paste("LR tests cannot be computed",results$error))
+                                #   else {
+                                #     ranova_test<-results$obj[-1,]
+                                #     ranova_test$test<-fromb64(rownames(results$obj[-1,]))
+                                #     self$tab_randomTests<-ranova_test
+                                #   }
+                                # }
                                 
 
                             },

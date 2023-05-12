@@ -24,9 +24,6 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 procedure.posthoc <- function(obj) {
   
   
-  if (length(terms) == 0) 
-    return()
-
   jinfo("PROCEDURE: Posthoc")
   
   terms <- obj$options$posthoc

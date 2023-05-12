@@ -214,7 +214,7 @@ ganova<- function(x,...) UseMethod(".anova")
 
 ## test for random variances
 
-procedure.ranova<- function(x,...) UseMethod(".ranova")
+anovas.ranova<- function(x,...) UseMethod(".ranova")
 
 .ranova.default<-function(model,obj) {
   warning("Random coefficients LRT not available for model:",obj$infomatic$model[1]) 
@@ -233,11 +233,12 @@ procedure.ranova<- function(x,...) UseMethod(".ranova")
 }
 
 .ranova.glmerMod<-function(model,obj) {
-  
+
+  jinfo("ranova for glmerMod")  
   models<-obj$formulaobj$reduced_random()
   fixed<-obj$formulaobj$fixed_formula64()
   .names<-list(LRT="Chisq", df="Df", p="Pr(>Chisq)")
-  
+
   tab<-lapply(names(models),function(x) { 
     .formula<-fixed
      if (is.something(models[[x]]))
@@ -253,10 +254,11 @@ procedure.ranova<- function(x,...) UseMethod(".ranova")
 
 .ranova.clmm<-function(model,obj) {
 
+   jinfo("ranova for clmm")  
+  
    models   <-  obj$formulaobj$reduced_random()
    fixed    <-  obj$formulaobj$fixed_formula64()
   .names    <-  list(LRT="Chisq", df="Df", p="Pr(>Chisq)")
-  
   tab<-lapply(names(models),function(x) { 
 
       .formula  <-  fixed
