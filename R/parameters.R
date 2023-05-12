@@ -4,6 +4,8 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.default<-function(model,obj) {
 
+  jinfo("GPARAMETERS: default .parameters for class",class(model))
+  
   .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
   .iterations          <-  obj$options$boot_r
   .ci_method           <-  obj$options$ci_method
@@ -249,6 +251,8 @@ gparameters<- function(x,...) UseMethod(".parameters")
 }
 
 .parameters.glmerMod<-function(model,obj) {
+  
+  jinfo("GPARAMETERS: glmerMod .parameters for class",class(model))
   
   .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
   .iterations          <-  obj$options$boot_r

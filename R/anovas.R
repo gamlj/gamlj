@@ -2,7 +2,7 @@
 ganova<- function(x,...) UseMethod(".anova")
 
 .anova.default<-function(model,obj) {
-  stop(".anova: no suitable model found") 
+  stop("GANOVA: no suitable model found") 
 }
 
 .anova.glm<-function(model,obj,test="LR") {
@@ -134,7 +134,9 @@ ganova<- function(x,...) UseMethod(".anova")
 }
 
 .anova.glmerMod<-function(model,obj) {
-  jinfo("using .anova.glmerMod")
+
+  jinfo("GANOVA: glmerMod for class",class(model))
+
   ano<-.car.anova(model)
   names(ano)<-c("test","df","p")
   if (nrow(ano)==0) ano<-NULL
@@ -199,7 +201,8 @@ ganova<- function(x,...) UseMethod(".anova")
 
 .car.anova<-function(model,df) {
   
-  jinfo("ganova uses car::Anova")
+  jinfo("GANOVA: car::Anova is used")
+  
   if (model@devcomp$dims["REML"]==0) 
     test<-"Chisq"
   else test<-"F"
