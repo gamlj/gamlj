@@ -1021,8 +1021,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="source", 
                                     `title`="", 
-                                    `type`="text", 
-                                    `visible`="(show_contrastnames)"),
+                                    `type`="text"),
                                 list(
                                     `name`="loglik", 
                                     `title`="Log-Lik.", 

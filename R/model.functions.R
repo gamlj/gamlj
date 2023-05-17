@@ -115,6 +115,12 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   FALSE
 }
 
+.aliased.clm<-function(model) {
+  ### to do 
+  FALSE
+  
+}
+
 .aliased.clmm<-function(model) {
   ### to do 
   FALSE

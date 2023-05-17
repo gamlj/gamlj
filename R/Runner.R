@@ -218,12 +218,14 @@ Runner <- R6::R6Class("Runner",
                           run_main_paralleltest=function() {
                             
                             tab<-NULL
-                            if (self$hasTerms) {
+                            if (self$formulaobj$hasTerms) {
+        
+                              ## for reasons beyond my comprehension, the clm model must be 
+                              ## estimate there, otherwise nominal test cannot be computed
                               obj<-try_hard({
                                 form<-formula(paste(self$formulaobj$formula64(),collapse = ""))
-                                mod<-do.call(ordinal::clm,list(formula=form,data=self$model$model))
+                                mod<-do.call(ordinal::clm,list(formula=form,data=self$model$model)) 
                                 ordinal::nominal_test(mod)
-                                
                                 })
                               if (!isFALSE(obj$error))
                                     warnings(obj$error)
@@ -236,7 +238,7 @@ Runner <- R6::R6Class("Runner",
                               tab<-as.data.frame(obj$obj)
                               tab<-tab[rownames(tab)!="<none>",]
                               names(tab)<-c("df","loglik","aic", "test","p")
-                              
+                              tab$source<-fromb64(rownames(tab))
                             } else
                                warning("Parallel test cannot be computed")
                             tab

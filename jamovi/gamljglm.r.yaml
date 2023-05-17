@@ -443,7 +443,6 @@ items:
                     - name: source
                       title: ""
                       type: text
-                      visible: (show_contrastnames)
                     - name: loglik
                       title: "Log-Lik."
                       type: number

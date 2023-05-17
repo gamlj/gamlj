@@ -166,7 +166,7 @@ Infomatic <- R6::R6Class(
         
         self$model         <-   c("Cumlative Link Model","Proportional odds logistic")
         self$distribution  <-    "logistic"
-        self$call          <-    "ordinal"
+        self$call          <-    ORDINAL[[self$caller]]
         self$rcall        <-     ORDINAL[[self$caller]]
         self$calloptions   <-    list(model=TRUE, Hess=TRUE)
         self$link          <-    "logit"
