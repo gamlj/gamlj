@@ -99,7 +99,13 @@ procedure.posthoc <- function(obj) {
 
     .vars  <- make.names(.revvars,unique = T)
     .names <- c(paste0(.vars,"_lev1"),paste0(.vars,"_lev2"))
-
+     # emmeans inverts the order for clm, so we should fix it
+    
+     if (obj$option("model_type","ordinal"))
+       .names <- c(paste0(.vars,"_lev2"),paste0(.vars,"_lev1"))
+    
+      
+    
     colnames(labs) <- .names
     tableData <- cbind(labs, tableData)
 
@@ -213,13 +219,16 @@ procedure.posthoc_effsize <- function(obj) {
 ###### post hoc ##########
 .posthoc <- function(x, ...) UseMethod(".posthoc")
 
-.posthoc.default <- function(model, term, vfun=NULL,df=NULL) {
+.posthoc.default <- function(model, term, vfun=NULL,df=NULL,mode=NULL) {
 
     termf <- stats::as.formula(paste("~", term))
     
     data <- insight::get_data(model)
     opts_list<-list(object=model,specs=termf,adjust="none", type = "response", data = data)
 
+    if (is.something(mode)) 
+         opts_list[["mode"]]<-mode
+    
     if (is.something(vfun))
          opts_list[["vcov."]]<-vfun    
 
@@ -234,7 +243,13 @@ procedure.posthoc_effsize <- function(obj) {
       return(referenceGrid)
 }
 
-.posthoc.multinom <- function(model, term, adjust,ci=FALSE,vfun=NULL,df=NULL) {
+.posthoc.clm <- function(model, term, vfun=NULL,df=NULL) {
+  
+  .posthoc.default(model,term,vfun=vfun,df=df,mode="linear.predictor")
+  
+}
+
+.posthoc.multinom <- function(model, term, vfun=NULL,df=NULL) {
 
   if (inherits(model,"bootstrap_model") )
        model<-attr(model,"original_model")
