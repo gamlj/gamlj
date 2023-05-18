@@ -127,6 +127,7 @@ SmartTable <- R6::R6Class("SmartTable",
 
                               private$.phase<-"run"
                               rtable<-private$.getData()
+                         
                               self$cleanNotes()
                               if (is.null(rtable)) {
                                   private$.debug_msg("Not run: not filling data")
@@ -260,6 +261,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             
                           ), #end of active
                           private=list(
+                            .error=NULL,
                             .estimator=NULL,
                             .init_source=NULL,
                             .run_source=NULL,
@@ -293,7 +295,8 @@ SmartTable <- R6::R6Class("SmartTable",
                                   private$.debug_msg("ERROR",fun,error)
                                   if (exists("fromb64")) error<-fromb64(error)
                                   self$table$setError(error)
-                                  return()
+                                  private$.error<-TRUE
+                                   return()
                                 }
                                 if (!isFALSE(warning)) {
                                     dispatch<-Dispatch$new(self)
@@ -303,7 +306,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                         dispatch$translate(x)
                                     })
                                     
-                                    mark(self$nickname,warning)
                                     warning<-warning[sapply(warning,function(x) is.something(x))]
                                     
                                     if (inherits(self$table,"Table")) 
@@ -683,13 +685,11 @@ SmartArray <- R6::R6Class("SmartArray",
                                   return()
                               }
                               
+                              if (!is.something(self$childrenObjs))
+                                self$initTable()
                               
                               rtables<-private$.getData()
                               self$cleanNotes()
-                              
-                              if (!is.something(self$childrenObjs))
-                                   self$initTable()
-
                               nfound<-length(rtables)
                               for (i in seq_along(self$childrenObjs)) {
                                  obj<-self$childrenObjs[[i]]
@@ -697,7 +697,8 @@ SmartArray <- R6::R6Class("SmartArray",
                                      obj$runSource<-rtables[[i]]
                                      obj$runTable()
                                  } else {
-                                   obj$table$setVisible(FALSE)
+                                   if (!private$.error)
+                                         obj$table$setVisible(FALSE)
                                  }
                              }
                               private$.debug_msg("run")
