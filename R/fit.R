@@ -103,14 +103,14 @@ gFit <- R6::R6Class(
       } else {
          comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
       }
-      
+
       comp <- comp$obj
       r2comp <- as.list(comp[2, ])
       .names <- list(
                      df2 = c("Res.Df", "Resid. Df"),
-                     df1 = c("Df", "df_diff","df"), p = c("Pr(>Chi)", "Pr(>F)","Pr(Chi)"),
+                     df1 = c("Df", "df_diff","df"), p = c("Pr(>Chi)", "Pr(>F)","Pr(Chi)","Pr(>Chisq)"),
                      f = "F",
-                     test = c("Deviance", "Chi2","LR stat.")
+                     test = c("Deviance", "Chi2","LR stat.","LR.stat")
                     )
       
       names(r2comp) <- transnames(names(r2comp), .names)

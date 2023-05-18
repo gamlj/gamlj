@@ -298,9 +298,7 @@ items:
              type: Table
              visible: (propodds_test & model_type:ordinal)
              clearWith:
-                    - dep
-                    - model_terms
-                    - fixed_intercept
+                    - __modeloptions__
                     - propodds_test
                   
              columns:
@@ -330,24 +328,19 @@ items:
     description: an array of post-hoc tables
     items: (posthoc)
     clearWith:
-        - dep
-        - model_terms
-        - contrasts
-        - covs_conditioning
-        - dep_scale
+        - __modeloptions__
         - posthoc
         - adjust
-        - ci_method
-        - boot_r
-        - offset
+        - __cioptions__        
         
     template:
         title:  ""
         type: Table
         clearWith:
-              - posthoc
-              - ci_method
-              - offset
+            - __modeloptions__
+            - posthoc
+            - adjust
+            - __cioptions__        
   
         columns:
         - name: response
@@ -592,21 +585,8 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - emmeans
-            - model_terms
-            - ci_width
-            - ci_method
-            - se_method
-            - boot_r
-            - covs_scale
-            - dep_scale
-            - covs_conditioning            
-            - covs_scale_labels   
-            - covs_conditioning
-            - covs_scale_labels
-            - ccp_value
-            - ccm_value
-
+              - __modeloptions__
+              - __cioptions__        
         columns:
         - name: response
           title: Response 

@@ -1,4 +1,5 @@
 modeloptions:
+        - model_type
         - dep
         - factors
         - covs

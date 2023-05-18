@@ -12,6 +12,7 @@ items:
     visible: false
     clearWith:
         ### modeloptions  begins
+      - model_type
       - dep
       - factors
       - covs
@@ -57,6 +58,7 @@ items:
              description: a table of R
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -107,6 +109,7 @@ items:
              visible: true
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -150,6 +153,7 @@ items:
              description: a table of ANOVA results
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -187,6 +191,7 @@ items:
              type: Table
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -262,6 +267,7 @@ items:
              visible: (vcov)
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -316,6 +322,7 @@ items:
              visible: (es:marginals)
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -382,6 +389,7 @@ items:
              visible: (es:RR)
              clearWith:
                            ### modeloptions  begins
+                         - model_type
                          - dep
                          - factors
                          - covs
@@ -434,9 +442,23 @@ items:
              type: Table
              visible: (propodds_test & model_type:ordinal)
              clearWith:
+                      ### modeloptions  begins
+                    - model_type
                     - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
                     - model_terms
                     - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - covs_scale
+                    - offset
+                    - omnibus
+                      ### modeloptions  ends
                     - propodds_test
                   
              columns:
@@ -466,24 +488,59 @@ items:
     description: an array of post-hoc tables
     items: (posthoc)
     clearWith:
+          ### modeloptions  begins
+        - model_type
         - dep
+        - factors
+        - covs
+        - covs_scale
+        - scale_missing
         - model_terms
+        - fixed_intercept
+        - se_method
+        - mute
+        - df_method
         - contrasts
-        - covs_conditioning
-        - dep_scale
+        - covs_scale
+        - offset
+        - omnibus
+          ### modeloptions  ends
         - posthoc
         - adjust
-        - ci_method
-        - boot_r
-        - offset
+          ### cioptions  begins
+        - ci_width        
+        - ci_method        
+        - boot_r        
+          ### cioptions  ends
         
     template:
         title:  ""
         type: Table
         clearWith:
-              - posthoc
-              - ci_method
-              - offset
+              ### modeloptions  begins
+            - model_type
+            - dep
+            - factors
+            - covs
+            - covs_scale
+            - scale_missing
+            - model_terms
+            - fixed_intercept
+            - se_method
+            - mute
+            - df_method
+            - contrasts
+            - covs_scale
+            - offset
+            - omnibus
+              ### modeloptions  ends
+            - posthoc
+            - adjust
+              ### cioptions  begins
+            - ci_width        
+            - ci_method        
+            - boot_r        
+              ### cioptions  ends
   
         columns:
         - name: response
@@ -728,21 +785,28 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            - emmeans
-            - model_terms
-            - ci_width
-            - ci_method
-            - se_method
-            - boot_r
-            - covs_scale
-            - dep_scale
-            - covs_conditioning            
-            - covs_scale_labels   
-            - covs_conditioning
-            - covs_scale_labels
-            - ccp_value
-            - ccm_value
-
+                ### modeloptions  begins
+              - model_type
+              - dep
+              - factors
+              - covs
+              - covs_scale
+              - scale_missing
+              - model_terms
+              - fixed_intercept
+              - se_method
+              - mute
+              - df_method
+              - contrasts
+              - covs_scale
+              - offset
+              - omnibus
+                ### modeloptions  ends
+                ### cioptions  begins
+              - ci_width        
+              - ci_method        
+              - boot_r        
+                ### cioptions  ends
         columns:
         - name: response
           title: Response 
