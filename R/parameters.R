@@ -29,7 +29,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   ),stringAsFactors=FALSE)
 
 
-  names(.coefficients) <-  c("source","estimate","se","t","df","p")
+  names(.coefficients) <-  c("source","estimate","se","test","df","p")
   if (obj$option("estimates_ci")) {
     
     cidata            <-  as.data.frame(parameters::ci(.model,
@@ -156,6 +156,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.multinom<-function(model,obj) {
   params<-.parameters.glm(model,obj)
+  mark(params)
   names(params)<-tolower(names(params))
   params
 }
@@ -172,12 +173,10 @@ gparameters<- function(x,...) UseMethod(".parameters")
       }
       .coefficients<-as.data.frame(do.call("rbind",alist))
       .coefficients$source<-gsub("\\).",")",rownames(.coefficients))
-
       .transnames<-list(estimate="est",
                         test=c("stat"),
                         est.ci.lower="lwr",est.ci.upper="upr")
       names(.coefficients)<-transnames(names(.coefficients),.transnames)
-    
       if (obj$option("es","expb")) {
          .coefficients$expb          <- exp(.coefficients$estimate)
          .coefficients$expb.ci.lower <- exp(.coefficients$est.ci.lower)
@@ -200,6 +199,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   params$label<-params$source
   check<-grep(LEVEL_SYMBOL,params$source,fixed=TRUE)
   params$source[check]<-"(Threshold)"
+  mark("clm",params)
   params
 }
 
@@ -207,7 +207,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   
   params<-.parameters.clm(model,obj)
   params<-params[params$Effects=="fixed",]
-  names(params)[4]<-"z"
+  mark("clmm",params)
   params
   
 }

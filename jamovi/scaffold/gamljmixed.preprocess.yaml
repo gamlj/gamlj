@@ -116,7 +116,7 @@ items:
                     - name: df
                       title: "df"
                       type: number
-                    - name: t
+                    - name: test
                       title: "t"
                       type: number
                     - name: p

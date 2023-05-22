@@ -874,7 +874,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `title`="Upper", 
                                     `visible`="(es:expb & expb_ci)"),
                                 list(
-                                    `name`="z", 
+                                    `name`="test", 
                                     `title`="z", 
                                     `type`="number"),
                                 list(

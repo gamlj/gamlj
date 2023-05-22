@@ -262,7 +262,7 @@ items:
                     - name: df
                       title: "df"
                       type: integer
-                    - name: t
+                    - name: test
                       title: "t"
                       type: number
                       format: zto

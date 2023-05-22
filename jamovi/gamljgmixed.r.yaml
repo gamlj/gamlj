@@ -230,7 +230,7 @@ items:
                       type: number
                       title: Upper
                       visible: (es:expb & expb_ci)
-                    - name: z
+                    - name: test
                       title: "z"
                       type: number
                     - name: p
@@ -790,7 +790,6 @@ items:
                        type: number
                        title: Upper
                        visible: (es:expb & expb_ci)
-
                      - name: test
                        title: "z"
                        type: number
