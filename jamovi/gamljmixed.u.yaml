@@ -393,6 +393,12 @@ children:
                 type: CheckBox
                 optionName: adjust
                 optionPart: sidak
+          - type: Label
+            label: Info
+            children:
+              - name: posthoc_ci
+                type: CheckBox
+
   - type: CollapseBox
     label: Plots
     collapsed: true

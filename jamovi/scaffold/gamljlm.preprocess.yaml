@@ -337,12 +337,12 @@ items:
           type: number
           title: Lower
           format: zto          
-          visible: (estimates_ci)
+          visible: (posthoc_ci)
         - name: est.ci.upper
           type: number
           title: Upper
           format: zto       
-          visible: (estimates_ci)
+          visible: (posthoc_ci)
         - name: test
           title: t
           type: number

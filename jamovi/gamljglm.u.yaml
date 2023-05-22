@@ -374,10 +374,6 @@ children:
                     type: CheckBox
                     optionPart: tukey
                     optionName: adjust
-              - type: LayoutBox
-                margin: small
-                style: list
-                children:
                   - name: adjust_holm
                     type: CheckBox
                     optionPart: holm
@@ -390,6 +386,12 @@ children:
                     type: CheckBox
                     optionName: adjust
                     optionPart: sidak
+          - type: Label
+            label: Info
+            children:
+                   - name: posthoc_ci
+                     type: CheckBox
+
 
 
   - type: CollapseBox

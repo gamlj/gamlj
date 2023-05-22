@@ -249,6 +249,12 @@ procedure.posthoc_effsize <- function(obj) {
   
 }
 
+.posthoc.clmm <- function(model, term, vfun=NULL,df=NULL) {
+  
+  .posthoc.default(model,term,vfun=vfun,df=df,mode="linear.predictor")
+  
+}
+
 .posthoc.multinom <- function(model, term, vfun=NULL,df=NULL) {
 
   if (inherits(model,"bootstrap_model") )
@@ -287,11 +293,14 @@ procedure.posthoc_effsize <- function(obj) {
 
 .posthoc_ci <- function(x, ...) UseMethod(".posthoc_ci")
 
-.posthoc_ci.default=function(model,term,width,method,vfun=NULL) {
+.posthoc_ci.default=function(model,term,width,method,vfun=NULL,mode=NULL) {
   
   termf <- stats::as.formula(paste("pairwise ~", term))
 
   opts_list<-list(object=model,specs=termf, type = "response")
+  
+  if (is.something(mode))
+     opts_list[["mode"]]<-mode
   
   if (is.something(vfun))
     opts_list[["vcov."]]<-vfun   
@@ -303,6 +312,19 @@ procedure.posthoc_effsize <- function(obj) {
   results
   
 }
+
+.posthoc_ci.clm=function(model,term,width,method,vfun=NULL) {
+  
+  .posthoc_ci.default(model,term,width,method,vfun=vfun,mode="linear.predictor")
+    
+}
+
+.posthoc_ci.clmm=function(model,term,width,method,vfun=NULL) {
+    
+    .posthoc_ci.default(model,term,width,method,vfun=vfun,mode="linear.predictor") 
+      
+    }
+    
 .posthoc_ci.multinom=function(model,term,width,method,vfun=NULL) {
 
   if (inherits(model,"bootstrap_model") )

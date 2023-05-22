@@ -269,11 +269,11 @@ items:
         - name: est.ci.lower
           type: number
           title: Lower
-          visible: (estimates_ci)
+          visible: (posthoc_ci)
         - name: est.ci.upper
           type: number
           title: Upper
-          visible: (estimates_ci)
+          visible: (posthoc_ci)
         - name: test
           title: t
           type: number

@@ -279,7 +279,6 @@ Runner <- R6::R6Class("Runner",
                               }
                                 
                               self$warning<-list(topic="main_random",message=attr(vc,"info"))
-                              
 
                               covariances<-which(!is.na(vc$var2))
                             if (nrow(vc[covariances,])>0) {

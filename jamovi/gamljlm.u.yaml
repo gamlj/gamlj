@@ -341,6 +341,11 @@ children:
                 optionName: posthoc_es
               - type: CheckBox
                 name: d_ci
+          - type: Label
+            label: Info
+            children:
+              - name: posthoc_ci
+                type: CheckBox
 
 
   - type: CollapseBox

@@ -386,6 +386,13 @@ options:
              The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
              also as a list of the form '`list("x","z",c("x","z")`'
 
+    - name: posthoc_ci
+      title: Confidence Intervals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE`  or `FALSE` (default), coefficients CI in tables
 
     - name: simple_x
       title: Simple effects variable

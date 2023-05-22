@@ -36,6 +36,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_re_method = "average",
             emmeans = NULL,
             posthoc = NULL,
+            posthoc_ci = FALSE,
             simple_x = NULL,
             simple_mods = NULL,
             simple_interactions = FALSE,
@@ -246,6 +247,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "posthoc",
                 posthoc,
                 default=NULL)
+            private$..posthoc_ci <- jmvcore::OptionBool$new(
+                "posthoc_ci",
+                posthoc_ci,
+                default=FALSE)
             private$..simple_x <- jmvcore::OptionVariable$new(
                 "simple_x",
                 simple_x,
@@ -476,6 +481,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
+            self$.addOption(private$..posthoc_ci)
             self$.addOption(private$..simple_x)
             self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
@@ -540,6 +546,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_re_method = function() private$..plot_re_method$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
+        posthoc_ci = function() private$..posthoc_ci$value,
         simple_x = function() private$..simple_x$value,
         simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
@@ -603,6 +610,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_re_method = NA,
         ..emmeans = NA,
         ..posthoc = NA,
+        ..posthoc_ci = NA,
         ..simple_x = NA,
         ..simple_mods = NA,
         ..simple_interactions = NA,
@@ -1115,12 +1123,12 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="est.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(estimates_ci)"),
+                            `visible`="(posthoc_ci)"),
                         list(
                             `name`="est.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(estimates_ci)"),
+                            `visible`="(posthoc_ci)"),
                         list(
                             `name`="test", 
                             `title`="t", 
