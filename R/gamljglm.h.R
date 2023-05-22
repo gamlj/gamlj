@@ -1132,12 +1132,12 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="est.ci.lower", 
                             `type`="number", 
                             `title`="Lower", 
-                            `visible`="(estimates_ci)"),
+                            `visible`="(posthoc_ci)"),
                         list(
                             `name`="est.ci.upper", 
                             `type`="number", 
                             `title`="Upper", 
-                            `visible`="(estimates_ci)"),
+                            `visible`="(posthoc_ci)"),
                         list(
                             `name`="test", 
                             `title`="z", 

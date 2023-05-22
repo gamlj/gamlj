@@ -377,18 +377,18 @@ procedure.emmeans<-function(obj) {
     if (obj$option("model_type","ordinal"))
       opts_list[["mode"]]<-"mean.class"
 
-
     ### now we get the estimated means #######
     referenceGrid<-do.call(emmeans::emmeans,opts_list)
     tableData<-as.data.frame(referenceGrid)
 
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
-    
-    if (!obj$option("ci_method","wald")) {
-      
-      opts_list$object<-obj$boot_model
-      referenceGrid<-do.call(emmeans::emmeans,opts_list)
+
+
+    if (obj$options$ci_method %in% c("quantile","bcai")) {
+
+      referenceGrid@post.beta<-as.matrix(obj$boot_model)
+      mark(referenceGrid@post.beta,referenceGrid@linfct)
       cidata<-as.data.frame(parameters::parameters(referenceGrid,ci_method=obj$options$ci_method,ci=obj$ciwidth))
       tableData$est.ci.lower<-cidata$CI_low
       tableData$est.ci.upper<-cidata$CI_high
