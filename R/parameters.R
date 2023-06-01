@@ -156,7 +156,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
 .parameters.multinom<-function(model,obj) {
   params<-.parameters.glm(model,obj)
-  mark(params)
   names(params)<-tolower(names(params))
   params
 }
@@ -199,7 +198,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
   params$label<-params$source
   check<-grep(LEVEL_SYMBOL,params$source,fixed=TRUE)
   params$source[check]<-"(Threshold)"
-  mark("clm",params)
   params
 }
 
@@ -207,7 +205,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
   
   params<-.parameters.clm(model,obj)
   params<-params[params$Effects=="fixed",]
-  mark("clmm",params)
   params
   
 }
@@ -264,7 +261,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
     effects="fixed",
   ),stringAsFactors=FALSE)
 
-  names(.coefficients) <-  c("source","estimate","se","z","df","p")
+  names(.coefficients) <-  c("source","estimate","se","test","df","p")
   
 
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model

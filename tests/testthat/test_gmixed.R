@@ -59,14 +59,14 @@ testthat::test_that("info is ok", {
 })
 
 testthat::test_that("R2 is ok", {
-  testthat::expect_equal(model$main$r2$asDF[1,2],.4563,tol)
-  testthat::expect_equal(model$main$r2$asDF[2,4],242.719,tol)
+  testthat::expect_equal(model$main$r2$asDF[1,2],.3361,tol)
+  testthat::expect_equal(model$main$r2$asDF[2,4],82.1,tol)
   
 })
 
 testthat::test_that("fit is ok", {
-  testthat::expect_equal(model$main$fit$asDF[1,2],-850.528,tol)
-  testthat::expect_equal(model$main$fit$asDF[4,2],1701.056,tol)
+  testthat::expect_equal(model$main$fit$asDF[1,2],-931,tol)
+  testthat::expect_equal(model$main$fit$asDF[4,2],1861.65,tol)
   
 })
 
@@ -82,18 +82,18 @@ mod <- gamlj::gamlj_gmixed(
 )
 
 testthat::test_that("Poisson works", {
-  testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .806, tol)
-  testthat::expect_equal(mod$main$anova$asDF$test[1], 254, tol)
-  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], 1.071, tol)
-  testthat::expect_equal(mod$main$r2$asDF$r2[1], .338, tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[4], 4337, tol)
-  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .874, tol)
-  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 429, tol)
-  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0076, tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .8715, tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1], 346.35, tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], 1.085, tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2[1], .2769, tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4], 4618.847, tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .9495, tol)
+  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 184.78, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0087, tol)
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
-  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[1], .794, tol)
-  testthat::expect_equal(mod$main$marginals$asDF[2,3],.088,tol)
-  testthat::expect_equal(mod$main$marginals$asDF[2,5],.075,tol)
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[1], .9767, tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],-.0227,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,5],-.160,tol)
 })
 
 

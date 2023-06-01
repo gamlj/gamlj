@@ -15,8 +15,8 @@ model<-gamlj::gamlj_mixed(
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {
-  testthat::expect_equal(as.numeric(infotable$value[8]),3000)
-  testthat::expect_equal(infotable$info[9],"Converged")
+  testthat::expect_equal(as.numeric(infotable$value[7]),3000)
+  testthat::expect_equal(infotable$info[8],"Converged")
 })
 
 ftable<-model$main$anova$asDF
@@ -36,7 +36,7 @@ testthat::test_that("p-table is ok", {
 rtable<-model$main$random$asDF
 
 testthat::test_that("p-table is ok", {
-  testthat::expect_equal(rtable[1,4],4.49,tol)
+  testthat::expect_equal(rtable[1,3],4.49,tol)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
 
@@ -217,7 +217,7 @@ model<-gamlj::gamlj_mixed(
    data = data
  )
 testthat::test_that("intercept only works",
-          testthat::expect_equal(round(model$main$random$asDF[1,3],digits = 2),1.74)
+          testthat::expect_equal(round(model$main$random$asDF[1,4],digits = 2),1.74)
 )
 
 data("subjects_by_stimuli")

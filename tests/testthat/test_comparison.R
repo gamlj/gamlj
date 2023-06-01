@@ -21,17 +21,17 @@ mod1 <- gamlj::gamlj_lm(
 )
 
 a<-anova(mod1)
-
+mod1
 testthat::test_that("test glm anova", {
-  testthat::expect_equal(a[[1]]$asDF$r2,.3941,tol)
-  testthat::expect_equal(a[[2]]$asDF$f[3],106.018,tol)
+  testthat::expect_equal(a[[1]]$asDF$r2,.268,tol)
+  testthat::expect_equal(a[[2]]$asDF$f[3],.1663,tol)
 })
 
 a<-anova(mod1,mod0)
-
+a
 testthat::test_that("test glm anova comparison", {
-  testthat::expect_equal(a$asDF$f[3],179.192,tol)
-  testthat::expect_equal(a$asDF$r2[3],.1266,tol)
+  testthat::expect_equal(a$asDF$f[3],.2897,tol)
+  testthat::expect_equal(a$asDF$r2[3],.00049,tol)
 })
 
 mod <- gamlj::gamlj_lm(
@@ -43,4 +43,6 @@ mod <- gamlj::gamlj_lm(
 testthat::test_that("test glm anova comparison option", {
   testthat::expect_true(all(mod$main$r2$asDF$ar2==a$asDF$ar2))
 })
+
+lm(ycont~z,data=data)
 

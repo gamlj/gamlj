@@ -190,7 +190,7 @@ r2 <- function(model, ...) UseMethod(".r2")
   alist <- list()
   # mcFadden and adjusted
   alist$r2 <- 1 - (model$deviance / model$null.deviance)
-  alist$ar2 <- 1 - ((model$deviance + 2 * length(model$coefficients)) / model$null.deviance)
+  alist$ar2 <- 1 - ((model$deviance +  length(model$coefficients)) / model$null.deviance)
 
   if (alist$ar2 < 0) {
     alist$ar2 <- 0
