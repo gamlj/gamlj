@@ -17,6 +17,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             comparison = FALSE,
             nested_intercept = TRUE,
             estimates_ci = TRUE,
+            re_ci = FALSE,
             donotrun = FALSE,
             ci_method = "wald",
             boot_r = 1000,
@@ -61,7 +62,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
-            re_ci = FALSE,
             df_method = "Satterthwaite",
             norm_plot = FALSE,
             qq_plot = FALSE,
@@ -136,6 +136,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "estimates_ci",
                 estimates_ci,
                 default=TRUE)
+            private$..re_ci <- jmvcore::OptionBool$new(
+                "re_ci",
+                re_ci,
+                default=FALSE)
             private$..donotrun <- jmvcore::OptionBool$new(
                 "donotrun",
                 donotrun,
@@ -146,8 +150,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default="wald",
                 options=list(
                     "wald",
-                    "quantile",
-                    "bcai"))
+                    "quantile"))
             private$..boot_r <- jmvcore::OptionNumber$new(
                 "boot_r",
                 boot_r,
@@ -411,10 +414,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "re_lrt",
                 re_lrt,
                 default=FALSE)
-            private$..re_ci <- jmvcore::OptionBool$new(
-                "re_ci",
-                re_ci,
-                default=FALSE)
             private$..df_method <- jmvcore::OptionList$new(
                 "df_method",
                 df_method,
@@ -462,6 +461,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..comparison)
             self$.addOption(private$..nested_intercept)
             self$.addOption(private$..estimates_ci)
+            self$.addOption(private$..re_ci)
             self$.addOption(private$..donotrun)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
@@ -505,7 +505,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
-            self$.addOption(private$..re_ci)
             self$.addOption(private$..df_method)
             self$.addOption(private$..norm_plot)
             self$.addOption(private$..qq_plot)
@@ -527,6 +526,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         comparison = function() private$..comparison$value,
         nested_intercept = function() private$..nested_intercept$value,
         estimates_ci = function() private$..estimates_ci$value,
+        re_ci = function() private$..re_ci$value,
         donotrun = function() private$..donotrun$value,
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
@@ -570,7 +570,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
-        re_ci = function() private$..re_ci$value,
         df_method = function() private$..df_method$value,
         norm_plot = function() private$..norm_plot$value,
         qq_plot = function() private$..qq_plot$value,
@@ -591,6 +590,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..comparison = NA,
         ..nested_intercept = NA,
         ..estimates_ci = NA,
+        ..re_ci = NA,
         ..donotrun = NA,
         ..ci_method = NA,
         ..boot_r = NA,
@@ -634,7 +634,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..re_listing = NA,
         ..reml = NA,
         ..re_lrt = NA,
-        ..re_ci = NA,
         ..df_method = NA,
         ..norm_plot = NA,
         ..qq_plot = NA,

@@ -247,6 +247,7 @@ Runner <- R6::R6Class("Runner",
                             
                               jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
+                              
                               self$tab_randomcov<-results[[2]]
                               return(results[[1]])
                               
@@ -269,7 +270,6 @@ Runner <- R6::R6Class("Runner",
                               int<-which(params$name %in% "(Intercept)")
                               for (i in int)
                                   params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model,verbose = FALSE))
-
                               nr<-nrow(params)+1
                               if (params$grp[nrow(params)]!="Residual"){
                                   params[nr,"groups"] <- "Residual"

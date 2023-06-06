@@ -168,6 +168,15 @@ options:
           R: >
             `TRUE` (default) or `FALSE` , parameters CI in table
 
+    - name: re_ci
+      title: Random Variances C.I.
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE`  or `FALSE` (default), random effects CI in table. It could be
+            very slow.
+
     - name: donotrun
       title: Do not run
       type: Bool
@@ -184,9 +193,7 @@ options:
         - name:  profile
           title: Profile 
         - name: quantile
-          title: Bootstrap Percent 
-        - name:  bcai
-          title: Bootstrap BCa
+          title: Bootstrap (Parametric)
     - name: boot_r
       title: Bootstrap rep.
       type: Number
@@ -683,14 +690,6 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), LRT for the random effects
-
-    - name: re_ci
-      title: Random Effect C.I. (slow)
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), confidence intervals for the random effects
 
 
 

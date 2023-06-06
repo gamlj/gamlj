@@ -30,6 +30,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
 
   names(.coefficients) <-  c("source","estimate","se","test","df","p")
+  
   if (obj$option("estimates_ci")) {
     
     cidata            <-  as.data.frame(parameters::ci(.model,
@@ -115,7 +116,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
   names(.coefficients)<-transnames(names(.coefficients),.transnames)
 
      
-  cidata<-parameters::ci(.model,method=.ci_method,ci=.ci_width)   
+   cidata<-parameters::ci(.model,method=.ci_method,ci=.ci_width)   
   .coefficients$est.ci.lower<-cidata$CI_low
   .coefficients$est.ci.upper<-cidata$CI_high
   .coefficients$expb          <-  exp(.coefficients$estimate)
@@ -244,7 +245,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
     .coefficients$est.ci.upper<-cidata$CI_high
     
   }
-  mark(.coefficients)
   return(.coefficients)
 }
 
@@ -267,34 +267,17 @@ gparameters<- function(x,...) UseMethod(".parameters")
 
   if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
   
-  if (obj$option("es","expb")) {
-    estim            <-  as.data.frame(parameters::parameters(model,
-                                                              effects="fixed",
-                                                              exponentiate=TRUE,
-                                                              bootstrap=.bootstrap,
-                                                              iterations=.iterations,
-                                                              ci=.ci_width,
-                                                              ci_method=.ci_method))
+  if (obj$option("expb_ci") | obj$option("estimates_ci")) {
+     ci<-as.data.frame(parameters::ci(.model,effects))
+    .coefficients$expb          <-  exp(.coefficients$estimate)
+    .coefficients$expb.ci.lower <-  exp(ci$CI_low)
+    .coefficients$expb.ci.upper <-  exp(ci$CI_high)
+    .coefficients$est.ci.lower  <-  cidata$CI_low
+    .coefficients$est.ci.upper  <-  cidata$CI_high
     
-    .coefficients$expb          <-  estim$Coefficient
-    .coefficients$expb.ci.lower <-  estim$CI_low
-    .coefficients$expb.ci.upper <-  estim$CI_high
   }
   
-  
-  
-  if (obj$option("estimates_ci")) {
-    
-    cidata            <-  as.data.frame(parameters::ci(.model,
-                                                       effects="fixed",
-                                                       ci=.ci_width,
-                                                       ci_method=.ci_method))
-    
-    .coefficients$est.ci.lower<-cidata$CI_low
-    .coefficients$est.ci.upper<-cidata$CI_high
 
-  }
-  
   return(.coefficients)
 }
 

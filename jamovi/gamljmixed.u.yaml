@@ -578,47 +578,51 @@ children:
     children:
       - type: LayoutBox
         margin: large
-        style: inline
-        children:
-          - type: Label
-            label: CI Method
-            children:
-              - type: RadioButton
-                name: ci_method_wald
-                optionName: ci_method
-                optionPart: wald
-              - type: RadioButton
-                name: ci_method_quantile
-                optionName: ci_method
-                optionPart: quantile
-              - type: RadioButton
-                name: ci_method_bcai
-                optionName: ci_method
-                optionPart: bcai
-              - type: TextBox
-                name: boot_r
-                format: number
-                enable: (ci_method_quantile || ci_method_bcai)
-          - type: Label
-            label: DF Method
-            children:
-              - type: RadioButton
-                name: df_method_satterthwaite
-                optionName: df_method
-                optionPart: Satterthwaite
-              - name: df_method_kenward_roger
-                type: RadioButton
-                optionName: df_method
-                optionPart: Kenward-Roger
-          - type: Label
-            label: Save
-            children:
-              - type: Output
-                name: predicted
-              - type: Output
-                name: residuals
-          - type: Label
-            label: Table
-            children:
-              - type: CheckBox
-                name: mute
+        style: list
+        children: 
+            - type: LayoutBox
+              margin: large
+              style: inline
+              children:
+                    - type: Label
+                      label: CI Method
+                      children:
+                            - type: RadioButton
+                              name: ci_method_wald
+                              optionName: ci_method
+                              optionPart: wald
+                            - type: RadioButton
+                              name: ci_method_quantile
+                              optionName: ci_method
+                              optionPart: quantile
+                            - type: TextBox
+                              name: boot_r
+                              format: number
+                              enable: (ci_method_quantile)
+                    - type: Label
+                      label: DF Method
+                      children:
+                            - type: RadioButton
+                              name: df_method_satterthwaite
+                              optionName: df_method
+                              optionPart: Satterthwaite
+                            - name: df_method_kenward_roger
+                              type: RadioButton
+                              optionName: df_method
+                              optionPart: Kenward-Roger
+            - type: LayoutBox
+              margin: large
+              style: inline
+              children:
+                    - type: Label
+                      label: Save
+                      children:
+                           - type: Output
+                             name: predicted
+                           - type: Output
+                             name: residuals
+                    - type: Label
+                      label: Table
+                      children:
+                           - type: CheckBox
+                             name: mute
