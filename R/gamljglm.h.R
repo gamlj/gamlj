@@ -546,7 +546,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
         model = function() private$..model,
-        storage = function() private$.items[["storage"]],
         info = function() private$.items[["info"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
@@ -566,30 +565,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="",
                 title="Generalized Linear Model")
             private$..model <- NULL
-            self$add(jmvcore::Table$new(
-                options=options,
-                name="storage",
-                visible=FALSE,
-                clearWith=list(
-                    "model_type",
-                    "dep",
-                    "factors",
-                    "covs",
-                    "covs_scale",
-                    "scale_missing",
-                    "model_terms",
-                    "fixed_intercept",
-                    "se_method",
-                    "mute",
-                    "df_method",
-                    "contrasts",
-                    "covs_scale",
-                    "offset",
-                    "omnibus"),
-                columns=list(
-                    list(
-                        `name`="info", 
-                        `type`="text"))))
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -1519,6 +1494,7 @@ gamljglmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 revision = revision,
                 pause = NULL,
                 completeWhenFilled = FALSE,
-                requiresMissings = FALSE)
+                requiresMissings = FALSE,
+                weightsSupport = 'none')
         }))
 

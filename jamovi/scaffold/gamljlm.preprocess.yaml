@@ -6,14 +6,6 @@ items:
   - name: model
     type: Property
 
-  - name: storage
-    type: Table
-    visible: false
-    clearWith:
-      - __modeloptions__
-    columns:
-       - name: info
-         type: text
 
 
   - name: info

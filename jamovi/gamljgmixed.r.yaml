@@ -5,6 +5,7 @@ jrs: '1.0'
 items:
   - name: model
     type: Property
+
  
   - name: info
     title: Model Info

@@ -548,6 +548,13 @@ Runner <- R6::R6Class("Runner",
 
                           },
                           .bootstrap_model=function() {
+                            
+                            ### Here is how the storage mecanism works:
+                            ### In the .b.R file we assign a table to be the runner storage.
+                            ### When the model is estimated we save it as a Rdata file named with a random sequence and
+                            ### save in the storage table name the file namet. When results update, if self$storage$state
+                            ### is not null, the Rdata file is load retrieving its name from the storage$state
+                            ### if storage$state is null, the model is bootstrapped
 
                             if (is.something(self$storage) && is.something(self$storage$state)) {
                               

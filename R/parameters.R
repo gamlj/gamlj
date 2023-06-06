@@ -228,7 +228,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
     ci_method=.df_method
   ),stringAsFactors=FALSE)
   
-  names(.coefficients) <-  c("source","estimate","se","t","df","p")
+  names(.coefficients) <-  c("source","estimate","se","test","df","p")
   
   if (obj$option("estimates_ci")) {
     
@@ -244,6 +244,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
     .coefficients$est.ci.upper<-cidata$CI_high
     
   }
+  mark(.coefficients)
   return(.coefficients)
 }
 
