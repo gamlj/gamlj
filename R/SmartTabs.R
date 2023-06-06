@@ -5,7 +5,7 @@
 ###  arrayname
 ###  arrayname_tablename
 ###  arrayname_tablename_[n] n is the index of the table in the array
-###  This is version 0.9.1
+###  This is version 0.9.2
 
 
 
@@ -32,6 +32,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             combineBelow=0,
                             ci_info=list(),
                             columnTitles=list(),
+                            mutenotes=FALSE,
                             initialize=function(table,estimator=NULL) {
 
                               if (exists("t_INFO")) private$.debug<-t_INFO
@@ -160,8 +161,11 @@ SmartTable <- R6::R6Class("SmartTable",
 
                                   notes<-self$table$notes
                                   lapply(notes,function(x) {
-                                    if (isTRUE(x$init))
+                                    if (self$mutenotes)
                                        self$table$setNote(x$key,NULL)
+                                    else
+                                       if (isTRUE(x$init))
+                                          self$table$setNote(x$key,NULL)
                                   })
 
                             },

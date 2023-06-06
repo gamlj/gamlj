@@ -716,11 +716,13 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="r2", 
                                     `title`="R\u00B2", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="ar2", 
                                     `title`="Adj. R\u00B2", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="df1", 
                                     `title`="df", 

@@ -570,9 +570,12 @@ Runner <- R6::R6Class("Runner",
                                      if (isFALSE(test$error)) {
                                          jinfo("we go in parallel")
                                          opts_list[["n_cpus"]]<-parallel::detectCores()
-                                         opts_list[["parallel"]]<-"multicore"
-                                    
-                                      }
+                                         if (Sys.info()['sysname']!="Windows")
+                                                  opts_list[["parallel"]]<-"multicore"
+                                         else
+                                                  opts_list[["parallel"]]<-"snow"
+                                     }
+                                      
                                 
                                 jinfo("RUNNER: estimating bootstrap model")
                                 t<-Sys.time()

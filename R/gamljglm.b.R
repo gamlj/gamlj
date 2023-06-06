@@ -146,6 +146,8 @@ gamljglmClass <- R6::R6Class(
       ### init all ####
       for (tab in private$.smartObjs) {
         tab$initTable()
+        tab$mutenotes<-self$options$mute
+        
       }
       
       
