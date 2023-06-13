@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models in jamovi
-name: gamlj
-version: 2.9.9
+name: GAMLj3
+version: 3.0.0
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -18,9 +18,9 @@ description: >-
 analyses:
   - title: General Linear Model
     name: gamljlm
-    ns: gamlj
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: General Linear Model
     description: >
       General Linear Model. Estimates models using `lm()` function and provides
@@ -30,24 +30,24 @@ analyses:
       analysis, effect size indexes and visualization of the results.
   - title: Mixed Model
     name: gamljmixed
-    ns: gamlj
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: Mixed Model
     description: |
       Mixed Linear Model
   - title: Generalized Linear Models
     name: gamljglm
-    ns: gamlj
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
   - title: Generalized Mixed Model
     name: gamljgmixed
-    ns: gamlj
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: Generalized Mixed Model
     description: |
       Generalized Mixed  Model

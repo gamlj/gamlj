@@ -59,7 +59,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_scale = "response", ...) {
 
             super$initialize(
-                package="gamlj",
+                package="GAMLj3",
                 name="gamljglm",
                 requiresData=TRUE,
                 ...)
@@ -1483,7 +1483,7 @@ gamljglmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     public = list(
         initialize = function(options, data=NULL, datasetId="", analysisId="", revision=0) {
             super$initialize(
-                package = "gamlj",
+                package = "GAMLj3",
                 name = "gamljglm",
                 version = c(3,0,0),
                 options = options,

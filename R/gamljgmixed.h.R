@@ -66,7 +66,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             re_lrt = FALSE, ...) {
 
             super$initialize(
-                package="gamlj",
+                package="GAMLj3",
                 name="gamljgmixed",
                 requiresData=TRUE,
                 ...)
@@ -1727,7 +1727,7 @@ gamljgmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     public = list(
         initialize = function(options, data=NULL, datasetId="", analysisId="", revision=0) {
             super$initialize(
-                package = "gamlj",
+                package = "GAMLj3",
                 name = "gamljgmixed",
                 version = c(3,0,0),
                 options = options,
