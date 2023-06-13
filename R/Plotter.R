@@ -148,7 +148,6 @@ Plotter <- R6::R6Class(
         p <- p + ggplot2::geom_line(data = data, 
                                     .aestetics,
                                      linewidth = 1.2, 
-                                     size=1.2,
                                      position=self$scatterDodge)
 
 

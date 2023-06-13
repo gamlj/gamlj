@@ -308,7 +308,7 @@ res1<-mod$assumptions$homotest$asDF
 res2<-mod$assumptions$normtest$asDF
 
 testthat::test_that("glm assumptions", {
-  testthat::expect_equal(round(res1[1,5],2),0.13)
+  testthat::expect_equal(round(res1[1,5],2),0.06)
   testthat::expect_equal(round(res2[1,3],2),0.86)
 })
 

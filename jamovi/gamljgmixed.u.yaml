@@ -409,11 +409,6 @@ children:
                   - type: ComboBox
                     name: scale_missing
                     label: ''
-              - type: LayoutBox
-                margin: large
-                children:
-                  - type: CheckBox
-                    name: norm_test
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true

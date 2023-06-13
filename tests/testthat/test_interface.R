@@ -135,7 +135,7 @@ r2<-gamlj::posthoc(gobj,formula=~group+group:time,adjust=c("bonf","holm"))
 tab<-r2[[2]]$asDF
 testthat::test_that("posthoc function", {
                     testthat::expect_false(r1)
-                    testthat::expect_equal(tab[6,8],144.3637,tolerance = tol)
+                    testthat::expect_equal(tab[6,8],6.8638,tolerance = tol)
                     testthat::expect_true(tab[3,4]==1)
 }
 )

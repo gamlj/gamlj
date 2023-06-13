@@ -55,7 +55,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             covs_scale = NULL,
             scale_missing = "complete",
             mute = FALSE,
-            norm_test = FALSE,
             cluster = NULL,
             re = list(
                 list()),
@@ -371,10 +370,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "mute",
                 mute,
                 default=FALSE)
-            private$..norm_test <- jmvcore::OptionBool$new(
-                "norm_test",
-                norm_test,
-                default=FALSE)
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
                 cluster,
@@ -473,7 +468,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..mute)
-            self$.addOption(private$..norm_test)
             self$.addOption(private$..cluster)
             self$.addOption(private$..re)
             self$.addOption(private$..nested_re)
@@ -532,7 +526,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         mute = function() private$..mute$value,
-        norm_test = function() private$..norm_test$value,
         cluster = function() private$..cluster$value,
         re = function() private$..re$value,
         nested_re = function() private$..nested_re$value,
@@ -590,7 +583,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..mute = NA,
-        ..norm_test = NA,
         ..cluster = NA,
         ..re = NA,
         ..nested_re = NA,

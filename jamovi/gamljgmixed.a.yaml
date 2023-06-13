@@ -594,14 +594,6 @@ options:
 
 
 
-    - name: norm_test
-      title: Normality of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a test for normality of residuals
-
 
     - name: cluster
       title: Cluster variables
