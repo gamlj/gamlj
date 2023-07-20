@@ -418,7 +418,7 @@ Plotter <- R6::R6Class(
         } else
             .model<-private$.operator$model
         
-        y<-stats::predict(.model,type="response")
+        y<-stats::predict(.model,type=self$scatterType)
         
         randomData<-as.data.frame(cbind(y,rawData))
 

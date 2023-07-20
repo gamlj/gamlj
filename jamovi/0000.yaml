@@ -1,5 +1,5 @@
 ---
-title: General Analyses for Linear Models in jamovi
+title: General Analyses for Linear Models (v3)
 name: GAMLj3
 version: 3.0.0
 jms: '1.0'
@@ -9,12 +9,12 @@ maintainer: Marcello Gallucci <mcfanda@gmail.com>
 date: 2022-1-1
 type: R
 description: >-
-  A suite for estimation of linear models, such as the general linear model,
-  linear mixed model, generalized linear models and generalized mixed models.
-  For ech family, models can be estimated with categorical and/or continuous
-  variables, with options to facilitate estimation of  interactions, simple
-  slopes, simple effects, post-hoc tests, contrast analysis and visualization of
-  the results.
+  (Experimental) A suite for estimation of linear models, such as the general
+  linear model, linear mixed model, generalized linear models and generalized
+  mixed models. For ech family, models can be estimated with categorical and/or
+  continuous variables, with options to facilitate estimation of  interactions,
+  simple slopes, simple effects, post-hoc tests, contrast analysis and
+  visualization of the results.
 analyses:
   - title: General Linear Model
     name: gamljlm

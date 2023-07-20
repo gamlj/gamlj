@@ -326,6 +326,7 @@ Runner <- R6::R6Class("Runner",
                             
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
+                            
                             if (self$option("model_type","ordinal")) {
                                  msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
                                  self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")

@@ -25,7 +25,6 @@ Initier <- R6::R6Class(
       x<-self$datamatic$data_structure64
       names(x)<-fromb64(names(x))
       #### we prepare the model syntax
-      mark("standard formula")
       self$formulaobj<-gFormula$new()
       self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
       self$formulaobj$random_corr<-self$optionValue("re_corr")
@@ -34,10 +33,10 @@ Initier <- R6::R6Class(
       self$formulaobj$random<-self$optionValue("re")
       self$formulaobj$offset<-self$optionValue("offset")
       self$formulaobj$update_terms(self$datamatic$data_structure64)
+
+      #### we prepare the nested model syntax, if necessary
       
       if (self$option("comparison")) {
-            mark("nested formula")
-        
             self$nestedformulaobj<-gFormula$new()
             self$nestedformulaobj$fixed_intercept<-self$optionValue("nested_intercept")
             self$nestedformulaobj$random_corr<-"block"
