@@ -665,7 +665,7 @@ Plotter <- R6::R6Class(
            conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
            if (self$option("plot_xoriginal")) {
                  self$scatterXscale<-TRUE
-                 self$warning<-list(topic="plotnotes",message="Note: The X-axis is in the X-variable original scale")
+                 self$warning<-list(topic="plotnotes",message="The X-axis is in the X-variable original scale")
            }
       }
       allterm64<-c(x64,term64)

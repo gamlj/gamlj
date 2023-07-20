@@ -327,10 +327,10 @@ Runner <- R6::R6Class("Runner",
                             if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
                               private$.bootstrap_model()
                             
-                            if (self$option("model_type","ordinal")) {
-                                 msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                 self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
-                            }
+#                            if (self$option("model_type","ordinal")) {
+#                                 msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
+#                                 self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
+#                            }
                             procedure.emmeans(self)
                           },
                           
@@ -543,6 +543,13 @@ Runner <- R6::R6Class("Runner",
 
                               .model<-mf.fixModel(results$obj,self,data)
                               
+                              ### add custom info to the model
+                              if (self$option("model_type","ordinal")) {
+                                      msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
+                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
+                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg))
+                                     }                              
+                              
                               return(.model)
 
 
@@ -633,46 +640,6 @@ Runner <- R6::R6Class("Runner",
                               }
                             }
                           },
-                          .estimateRandom=function() {
-                            
-                                ### random components data frame ######
-                                  if (is.null(self$tab_random))
-                                      return()
-                            
-
-                                covariances<-which(!is.na(vc$var2))
-                                if (is.something(covariances)) {
-                                  
-                                  params<-vc[covariances,]
-                                  params$grp<-fromb64(params$grp)
-                                  params$var1<-fromb64(params$var1)
-                                  params$var2<-fromb64(params$var2)
-                                  if (is.something(ci_covariances))
-                                     params<-cbind(params,ci_covariances)
-                                  
-                                  self$tab_randomCov<-params
-
-                                }
-                          
-
-                                # #### LRT for random effects ####
-                                # if (self$option("re_lrt") & 1==0)  {
-                                #   ## this is required by lmerTest::ranova() which looks in the parent for "data"
-                                #   data<-self$model@frame
-                                #   results<-try_hard(as.data.frame((lmerTest::ranova(self$model))))
-                                #   self$warning<-list(topic="main_ranova",message=results$warning)
-                                #   if (!isFALSE(results$error))
-                                #      self$errors<-list(topic="main_ranova",message=paste("LR tests cannot be computed",results$error))
-                                #   else {
-                                #     ranova_test<-results$obj[-1,]
-                                #     ranova_test$test<-fromb64(rownames(results$obj[-1,]))
-                                #     self$tab_randomTests<-ranova_test
-                                #   }
-                                # }
-                                
-
-                            },
-
                           .estimateSimpleEffects=function() {
                             
                             results<-try_hard(procedure.simpleEffects(self$model,self))

@@ -1013,7 +1013,7 @@ items:
 
   - name: plotnotes
     type: Html
-    visible: false
+    visible: (plot_x)
 
 
 

@@ -1672,7 +1672,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
-                visible=FALSE))
+                visible="(plot_x)"))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",
