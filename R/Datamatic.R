@@ -30,7 +30,6 @@ Datamatic <- R6::R6Class(
       
       if (self$option("scale_missing","complete"))
                  data64 <- jmvcore::naOmit(data64)
-      
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }
@@ -536,9 +535,12 @@ Variable <- R6::R6Class(
         sdata<-sdata[order(sdata$..id..),]
         ddata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),sd,na.rm=TRUE)
         names(ddata)<-c(cluster64,"sd")
-        if (any(ddata[["sd"]]<.0000001))
-            stop("Variable ",self$name," has zero variance in at least one cluster defined by",self$hasCluster[1])
-          
+        ddata$sd[is.na(ddata$sd)]<-0
+        if (any(ddata[["sd"]]<.0000001)) {
+            self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has zero variance in at least one cluster defined by ",self$hasCluster[[1]]))
+            self$datamatic$warning<-list(topic="info",message=paste("Cluster-standardized value with zero variance have been set to zero"))
+        }
+        ddata$sd[ddata$sd==0]<-1
         sdata<-merge(sdata,ddata,by=cluster64)
         sdata<-sdata[order(sdata$..id..),]
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]

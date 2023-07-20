@@ -5,7 +5,7 @@ data("subjects_by_stimuli")
 
 formula<-y~1+cond+(1|subj)+(1|stimulus)
 
-model<-gamlj::gamlj_mixed(
+model<-GAMLj3::gamlj_mixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli,
   plot_x=cond,

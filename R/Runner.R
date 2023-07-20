@@ -25,7 +25,6 @@ Runner <- R6::R6Class("Runner",
                             jinfo("RUNNER: initial estimation done, ",self$etime," secs")
                             
                             if (self$options$comparison) {
-                              
                               obj<-try_hard(mf.update(self$model,formula=self$nestedformulaobj$formula64()))
                               self$nested_model<-obj$obj
                               if (!isFALSE(obj$warning))
@@ -549,10 +548,10 @@ Runner <- R6::R6Class("Runner",
                           },
                           .bootstrap_model=function() {
                             
-                            ### Here is how the storage mecanism works:
+                            ### Here is how the storage mechanism works:
                             ### In the .b.R file we assign a table to be the runner storage.
                             ### When the model is estimated we save it as a Rdata file named with a random sequence and
-                            ### save in the storage table name the file namet. When results update, if self$storage$state
+                            ### save in the storage table name the file name. When results update, if self$storage$state
                             ### is not null, the Rdata file is load retrieving its name from the storage$state
                             ### if storage$state is null, the model is bootstrapped
 

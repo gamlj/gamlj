@@ -3,6 +3,7 @@ modeloptions:
         - reml
         - factors
         - covs
+        - cluster
         - covs_scale
         - dep_scale
         - scale_missing

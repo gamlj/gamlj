@@ -410,7 +410,6 @@ procedure.emmeans<-function(obj) {
     if (obj$options$ci_method %in% c("quantile","bcai")) {
 
       referenceGrid@post.beta<-as.matrix(obj$boot_model)
-      mark(referenceGrid@post.beta,referenceGrid@linfct)
       cidata<-as.data.frame(parameters::parameters(referenceGrid,ci_method=obj$options$ci_method,ci=obj$ciwidth))
       tableData$est.ci.lower<-cidata$CI_low
       tableData$est.ci.upper<-cidata$CI_high

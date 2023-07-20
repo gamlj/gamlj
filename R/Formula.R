@@ -145,13 +145,11 @@ gFormula <- R6::R6Class(
       if (missing(alist)) {
         return(private$.random)
       }
-      
       correl<-self$random_corr
       # remove empty sublists
       alist <- alist[sapply(alist, function(a) !is.null(unlist(a)))]
       # get clusters
       self$clusters <- unique(unlist(lapply(alist, function(z) lapply(z, function(x) x[length(x)]))))
-      
       ## this is for R. It overrides the re_corr option
   
       if (length(alist) > 1) {
@@ -165,17 +163,16 @@ gFormula <- R6::R6Class(
         alist <- lapply(alist, list)
       }
       ## we want to be sure that each cluster has its own list
-      if (correl == "all") {
           r<-list()   
           for (x in alist) {
                 for (cluster in self$clusters) {
                                 w<-grep(cluster,x)
-                                ladd(r)<-x[w]
+                                if (length(w)>0)
+                                     ladd(r)<-x[w]
                 }
           }
-      alist<-r
-      }
-    
+          alist<-r
+
       ## we want to be sure that the terms are ordered by order
       alist<-lapply(alist, function(x) x[order(sapply(x,length))])
       private$.random <- alist
@@ -209,17 +206,17 @@ gFormula <- R6::R6Class(
 
             clusters<-lapply(terms, function(x)  tail(x[[1]], 1))
 
-            alist<-lapply(terms, function(x) 
-                  unlist(lapply(x, function(z) {
-                     jmvcore::composeTerm(head(z, -1))
-                  })))
-            lapply(seq_along(alist), function(i) {
+            alist<-lapply(terms, function(x)  unlist(lapply(x, function(z) {
+                                                      jmvcore::composeTerm(head(z, -1))
+                          })))
+            alist<-lapply(seq_along(alist), function(i) {
                  r<-paste(paste(alist[[i]],collapse = " + "),clusters[[i]],sep=" | ")
                  if (length(grep(.intercept,r))>0)
                              gsub(.intercept,1,r)
                  else
                              paste("0+",r)
             })
+            return(alist)
             
     },
     .buildrandomx = function(terms, correl, encoding) {

@@ -575,11 +575,11 @@ options:
       title: Scale on 
       type: List
       options:
-          - title: Complete cases
-            name: 'complete'
           - title: Columnwise 
             name: colwise
-      default: 'complete'
+          - title: Complete cases
+            name: 'complete'
+      default: 'colwise'
       
     - name: mute
       title: Remove notes

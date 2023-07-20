@@ -338,8 +338,8 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 
 #'  anova test on GAMLj results 
 #'
-#' This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no options is passed, extracts the 
-#' ANOVA tests table already in the model results (if any). If two GAMLj models are provided, a model comparison si produces. Any option
+#' This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no option is passed, extracts the 
+#' ANOVA tests table already in the model results (if any). If two GAMLj models are provided, a model comparison is produces. Any option
 #' accepted by gamlj model can be passed.
 #' are returned.
 
@@ -360,10 +360,6 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 #' @rdname anova
 #' @export
 
-anova <- function(object, ...) UseMethod("anova")
-
-#' @rdname anova
-#' @export
 
 anova.gamlj <- function(object, object2,...) {
   args<-list(...)

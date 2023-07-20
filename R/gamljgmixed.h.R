@@ -53,7 +53,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "bonf"),
             model_type = "logistic",
             covs_scale = NULL,
-            scale_missing = "complete",
+            scale_missing = "colwise",
             mute = FALSE,
             cluster = NULL,
             re = list(
@@ -363,9 +363,9 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "scale_missing",
                 scale_missing,
                 options=list(
-                    "complete",
-                    "colwise"),
-                default="complete")
+                    "colwise",
+                    "complete"),
+                default="colwise")
             private$..mute <- jmvcore::OptionBool$new(
                 "mute",
                 mute,
