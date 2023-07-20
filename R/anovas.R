@@ -187,7 +187,15 @@ ganova<- function(x,...) UseMethod(".anova")
     return()
 
   results<-emmeans::joint_tests(model)
-  names(results)<-c("source","df","df2","test","p")
+
+  .names <- list(
+    df   = c("df1"),
+    test = c("Chisq"),
+    p    = c("p.value")
+  )
+  names(results) <- transnames(names(results), .names)
+  
+
   results$source<-fromb64(results$source)
   results
     
