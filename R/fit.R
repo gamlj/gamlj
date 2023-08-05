@@ -28,7 +28,7 @@ gFit <- R6::R6Class(
     .r2list=function() {
       
       obj<-try_hard(r2(self$operator$model,self$operator))
-      
+
       if (!isFALSE(obj$error)) {
         self$operator$warning<-list(topic="main_r2",message="Model R2 cannot be computed.")
         return(obj$obj)
@@ -53,6 +53,7 @@ gFit <- R6::R6Class(
       
       private$.r2<-r2list[[1]]$r2
       private$.ar2<-r2list[[1]]$ar2
+    
       return(r2list)
       
     }, # end of .r2list
@@ -97,9 +98,8 @@ gFit <- R6::R6Class(
 
       omnibus<-"Chisq"
       if (self$operator$option("omnibus")) omnibus<-self$operator$optionValue("omnibus")
-      
       if (self$operator$option(".caller", c("lmer", "glmer")) || self$operator$option("omnibus", "LRT")) {
-         comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model, self$operator$model)))
+         comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model,self$operator$model)))
       } else {
          comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
       }
@@ -288,6 +288,10 @@ r2 <- function(model, ...) UseMethod(".r2")
   .r2.lmerModLmerTest(model, obj)
 }
 
+.r2.lme <- function(model, obj) {
+  .r2.lmerModLmerTest(model, obj)
+}
+
 .r2.clmm <- function(model, obj) {
   .r2.lmerModLmerTest(model, obj)
 }
@@ -322,7 +326,6 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.lmerModLmerTest <- function(model, type = "c") {
   data <- insight::get_data(model)
-
   int <- attr(stats::terms(model), "intercept")
 
 
@@ -378,6 +381,31 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   results <- as.data.frame(performance::test_likelihoodratio(model0, model))
   names(results) <- c("nothing1", "nothing2", "nothing3", "df1", "test", "p")
   results[2, c("df1", "test", "p")]
+}
+
+.compare_null_model.lme <- function(model, type = "c") {
+
+  data <- model$data
+  
+  int <- attr(stats::terms(model), "intercept")
+  form <- stats::as.formula(paste(stats::formula(model)[[2]], "~", int))
+  
+  if (type == "c") {
+    model0 <- stats::lm(form, data = data)
+  } else {
+    if (int == 0) {
+      return(NULL)
+    }
+    model0 <- stats::update(model, fixed = form)
+  }
+  
+  ### please note that here we compute the LRT
+  ### on the estimated models, no matter what REML is. If one compares the results with
+  ### lmerTest::anova() they are slightly different because the latter re-estimate the models
+  ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
+  results <- fit.lrt(model, model0)
+  results
+  
 }
 
 
@@ -469,4 +497,16 @@ fit.indices <- function(model, ...) UseMethod(".fit")
   alist[[length(alist) + 1]] <- list(value = stats::BIC(model))
   alist[[length(alist) + 1]] <- list(value = model$deviance)
   alist
+}
+
+fit.lrt <- function(model,model0, ...) UseMethod(".lrt")
+
+.lrt.default<-function(model,model0,...) {
+
+  l0<-logLik(model0)
+  l1<-logLik(model)
+  test<--2*(l0-l1)
+  df1<-attr(l1,"df")-attr(l0,"df")  
+  p<-as.numeric(pchisq(test,df = df1,lower.tail = F))
+  data.frame(test,df1,p)
 }

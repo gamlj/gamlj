@@ -272,10 +272,14 @@ Initier <- R6::R6Class(
 
 init_main_multirandom=function() {
   
-   random<-self$formulaobj$listify_random()
-   tabs<-lapply(random,function(x) list(name=""))
-   attr(tabs,"keys")<-random
-   tabs
+  random<-self$formulaobj$listify_random()
+  tabs<-lapply(random,function(x) list(name=""))
+  attr(tabs,"keys")<-random
+  tabs
+},
+
+init_main_res_corr=function() {
+   list(list(var="."))
 },
 
     ### posthoc means ###

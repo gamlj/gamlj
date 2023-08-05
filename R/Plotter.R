@@ -410,18 +410,15 @@ Plotter <- R6::R6Class(
 
       if (self$option("plot_re") && 
           !self$option("model_type","ordinal") &&
-          !self$option("model_type","multinomial")) {
+          !self$option("model_type","multinomial"))     {
         self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
         if (self$option("plot_re_method","average")) {
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
             .model<-mf.update(private$.operator$model,formula=formula)
         } else
             .model<-private$.operator$model
-        
         y<-stats::predict(.model,type=self$scatterType)
-        
         randomData<-as.data.frame(cbind(y,rawData))
-
         if (self$scatterX$type=="factor")
              levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
                     
@@ -500,7 +497,6 @@ Plotter <- R6::R6Class(
         if (is.something(randomData))
           randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
       }
-      
       
       #### compute the levels combinations
       #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
@@ -691,7 +687,9 @@ Plotter <- R6::R6Class(
         type=self$scatterType,
         mode=mode,
         nesting = NULL,
-        options  = list(level = private$.operator$ciwidth)
+        options  = list(level = private$.operator$ciwidth),
+        data =  insight::get_data(private$.operator$model)
+
       )
 
       ### mmblogit model data are not recognized by emmeans. We need to pass them explicetely      

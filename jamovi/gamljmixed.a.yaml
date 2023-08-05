@@ -636,6 +636,21 @@ options:
           R: >
             `TRUE` or `FALSE` (default), LRT for the random effects
 
+#### residual variance structure
+
+    - name: res_struct
+      title: Structure
+      type: List
+      default: cs
+      options:
+        - name: cs
+          title: Compound Symmetry 
+        - name:  un
+          title: Unstructured
+        - name:  ar1
+          title: Autoregressive
+
+
 
 ####### options ########
     - name: df_method

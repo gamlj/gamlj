@@ -19,6 +19,7 @@ modeloptions:
         - covs_scale
         - mute
         - donotrun
+        - res_struct
 nestedoptions:
         - nested_terms
         - nested_intercept

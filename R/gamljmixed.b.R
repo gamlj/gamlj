@@ -71,6 +71,11 @@ gamljmixedClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$main$ranova,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
       
+      ### residual correlations for res_struct=un
+      aSmartObj<-SmartTable$new(self$results$main$res_corr,runner_machine)
+      aSmartObj$expandOnRun<-TRUE
+      aSmartObj$expandFrom<-2
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### estimate marginal means
       

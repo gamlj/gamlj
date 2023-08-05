@@ -301,6 +301,16 @@ Runner <- R6::R6Class("Runner",
                             tab
                             
                           },
+                          run_main_res_corr=function() {
+                            
+                            tab<-as.matrix(self$model$modelStruct$corStruct)[[1]]
+                            tab[!lower.tri(tab)]<-NA
+                            tab[col(tab)==row(tab)]<-1
+                            tab<-as.data.frame(tab)
+                            tab$index<-names(tab)
+                            tab
+
+                          },
                           run_main_ranova=function() {
                             jinfo("RUNNER: ranova")
                             anovas.ranova(self$model,self)
@@ -506,8 +516,9 @@ Runner <- R6::R6Class("Runner",
                              
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
                               
-                              if (!("formula" %in% names(opts)))
-                                          opts[["formula"]]<-self$formulaobj$formula64()
+                              if (is.something(self$infomatic$formula))
+                                          opts[["formula"]]<-self$infomatic$formula
+
                               
                               if (is.something(self$infomatic$family))
                                           opts[["family"]]<-str2lang(self$infomatic$family)    
@@ -694,9 +705,11 @@ Runner <- R6::R6Class("Runner",
 ### additional functions useful for estimation of some model ###
 
 estimate_lmer<-function(...) {
+  
   opts<-list(...)
   data<-opts$data
   reml<-opts$reml
+
   for (opt in opts$optimizers) {
             model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
             if (mf.converged(model))
@@ -705,7 +718,26 @@ estimate_lmer<-function(...) {
 #  this is required for lmerTest::ranova to work
   model@call$control<-lme4::lmerControl(optimizer=opt)
   ### done
-  model
+  return(model)
 }
+
+estimate_lme<-function(...) {
+  
+  opts<-list(...)
+  data<-opts$data
+    model = nlme::lme(fixed=opts$fixed, 
+                      random=opts$random,
+                      data=data,method=opts$method,
+                      correlation=do.call(opts$cor,list(form=formula(opts$form)))
+                      )
+   model$call$correlation<-do.call(opts$cor,list(form=formula(opts$form)))  
+   model$call$fixed<-opts$fixed
+   model$call$random<-opts$random
+   model$call$method<-opts$method
+   model$call[[1]]<-quote(nlme::lme.formula)
+   
+  return(model)
+}
+
 
 

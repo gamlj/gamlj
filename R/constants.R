@@ -101,6 +101,7 @@ TRANS_WARNS[[3]]<-list(original="emmeans() results may be corrupted by removal",
 TRANS_WARNS[[4]]<-list(original="Could not recover model data from",new=NULL)
 TRANS_WARNS[[5]]<-list(original="Random slopes not present",new=NULL)
 TRANS_WARNS[[6]]<-list(original="too close to zero",new=NULL)
+TRANS_WARNS[[7]]<-list(original="contrasts dropped",new=NULL)
 
 ########### Greek Letters  ###############
 

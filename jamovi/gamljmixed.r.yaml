@@ -52,6 +52,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
                           ### nestedoptions  begins
                         - nested_terms                     
@@ -109,6 +110,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
                          
              columns:
@@ -157,6 +159,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -249,6 +252,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -281,7 +285,11 @@ items:
                     - name: icc
                       title: "ICC"
                       type: number
- 
+                    - name: phi
+                      title: "Phi"
+                      type: number
+                      visible: (res_struct:ar1)
+
            - name: randomcov
              title: Random Parameters correlations
              type: Table
@@ -308,6 +316,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -368,6 +377,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
 
              columns:
@@ -391,6 +401,41 @@ items:
                      title: "p"
                      type: number
                      format: zto,pvalue
+
+           - name: res_corr
+             title: Residual correlations
+             type: Table
+             visible: (res_struct:un)
+             clearWith:
+                          ### modeloptions  begins
+                        - dep
+                        - reml
+                        - factors
+                        - covs
+                        - cluster
+                        - covs_scale
+                        - dep_scale
+                        - scale_missing
+                        - model_terms
+                        - fixed_intercept
+                        - se_method
+                        - mute
+                        - re
+                        - re_corr
+                        - df_method
+                        - relm
+                        - contrasts
+                        - covs_scale
+                        - mute
+                        - donotrun
+                        - res_struct
+                          ### modeloptions  ends
+                        - res_struct
+             columns:
+                   - name: index
+                     title: "Index"
+                     type: text
+
 
   - name: posthoc
     title: Post Hoc Tests
@@ -422,6 +467,7 @@ items:
                         - covs_scale
                         - mute
                         - donotrun
+                        - res_struct
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -516,6 +562,7 @@ items:
                             - covs_scale
                             - mute
                             - donotrun
+                            - res_struct
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -574,6 +621,7 @@ items:
                             - covs_scale
                             - mute
                             - donotrun
+                            - res_struct
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -655,6 +703,7 @@ items:
                             - covs_scale
                             - mute
                             - donotrun
+                            - res_struct
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -714,6 +763,7 @@ items:
                             - covs_scale
                             - mute
                             - donotrun
+                            - res_struct
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -790,6 +840,7 @@ items:
                             - covs_scale
                             - mute
                             - donotrun
+                            - res_struct
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width

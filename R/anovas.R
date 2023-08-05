@@ -143,6 +143,7 @@ ganova<- function(x,...) UseMethod(".anova")
   ano  
 }
 
+
 .anova.lmerModLmerTest<-function(model,obj) {
   
   if (!obj$formulaobj$hasTerms)
@@ -174,6 +175,17 @@ ganova<- function(x,...) UseMethod(".anova")
   return(.anova)
   
 }
+
+.anova.lme<-function(model,obj) {
+  
+  jinfo("GANOVA: lme for class",class(model))
+  ano<-stats::anova(model,type="marginal")
+  names(ano)<-c("df1","df2","f", "p")
+  if (nrow(ano)==0) ano<-NULL
+  ano[-1,]
+}
+
+
 
 .anova.clmm<-function(model,obj) {
 

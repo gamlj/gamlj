@@ -281,4 +281,38 @@ gparameters<- function(x,...) UseMethod(".parameters")
   return(.coefficients)
 }
 
+.parameters.lme<-function(model,obj) {
+  
+  jinfo("GPARAMETERS: lme .parameters for class",class(model))
+  
+  .bootstrap           <-  obj$options$ci_method %in% c("quantile","bcai")
+  .iterations          <-  obj$options$boot_r
+  .ci_method           <-  obj$options$ci_method
+  .ci_width            <-  obj$ciwidth
+  .coefficients        <-  as.data.frame(parameters::parameters(
+    model,
+    ci=NULL,
+    effects="fixed",
+  ),stringAsFactors=FALSE)
+  
+  names(.coefficients) <-  c("source","estimate","se","test","df","p")
+  
+  
+  if (obj$option("estimates_ci")) {
+    
+    if (is.something(obj$boot_model)) .model<-obj$boot_model else .model<-model
+    
+    
+    cidata            <-  as.data.frame(parameters::ci(.model,
+                                                       ci=.ci_width,
+                                                       ci_method=.ci_method))
+
+    .coefficients$est.ci.lower<-cidata$CI_low
+    .coefficients$est.ci.upper<-cidata$CI_high
+    
+  }
+  return(.coefficients)
+  
+}
+
 

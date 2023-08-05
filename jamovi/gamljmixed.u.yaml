@@ -234,11 +234,34 @@ children:
           - type: Label
             label: Tests
             children:
-              - type: LayoutBox
-                margin: large
-                children:
-                  - type: CheckBox
-                    name: re_lrt
+                      - type: CheckBox
+                        name: re_lrt
+
+  - type: CollapseBox
+    label: Residuals Structure
+    style: list
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        style: list
+        children:
+          - type: Label
+            label: Repeated Measures
+            children:
+              - type: RadioButton
+                name: res_struct_cs
+                optionName: res_struct
+                optionPart: cs
+              - type: RadioButton
+                name: res_struct_un
+                optionName: res_struct
+                optionPart: un
+              - type: RadioButton
+                name: res_struct_ar1
+                optionName: res_struct
+                optionPart: ar1
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -398,7 +421,6 @@ children:
             children:
               - name: posthoc_ci
                 type: CheckBox
-
   - type: CollapseBox
     label: Plots
     collapsed: true
@@ -467,23 +489,21 @@ children:
         margin: large
         style: inline
         children:
-               - type: Label
-                 label: Random Effects
-                 children:
-                    - type: CheckBox
-                      name: plot_re
-                    - type: RadioButton
-                      name: plot_re_method_average
-                      optionName: plot_re_method
-                      optionPart: average
-                      enable: (plot_re)
-
-                    - type: RadioButton
-                      name: plot_re_method_full
-                      optionName: plot_re_method
-                      optionPart: full
-                      enable: (plot_re)
-                      
+          - type: Label
+            label: Random Effects
+            children:
+              - type: CheckBox
+                name: plot_re
+              - type: RadioButton
+                name: plot_re_method_average
+                optionName: plot_re_method
+                optionPart: average
+                enable: (plot_re)
+              - type: RadioButton
+                name: plot_re_method_full
+                optionName: plot_re_method
+                optionPart: full
+                enable: (plot_re)
   - type: CollapseBox
     label: Simple Effects
     collapsed: true
@@ -512,7 +532,6 @@ children:
       - type: CheckBox
         name: simple_interactions
         label: Simple interactions
-        
   - type: CollapseBox
     label: Estimated Marginal Means
     collapsed: true
@@ -579,50 +598,50 @@ children:
       - type: LayoutBox
         margin: large
         style: list
-        children: 
-            - type: LayoutBox
-              margin: large
-              style: inline
-              children:
-                    - type: Label
-                      label: CI Method
-                      children:
-                            - type: RadioButton
-                              name: ci_method_wald
-                              optionName: ci_method
-                              optionPart: wald
-                            - type: RadioButton
-                              name: ci_method_quantile
-                              optionName: ci_method
-                              optionPart: quantile
-                            - type: TextBox
-                              name: boot_r
-                              format: number
-                              enable: (ci_method_quantile)
-                    - type: Label
-                      label: DF Method
-                      children:
-                            - type: RadioButton
-                              name: df_method_satterthwaite
-                              optionName: df_method
-                              optionPart: Satterthwaite
-                            - name: df_method_kenward_roger
-                              type: RadioButton
-                              optionName: df_method
-                              optionPart: Kenward-Roger
-            - type: LayoutBox
-              margin: large
-              style: inline
-              children:
-                    - type: Label
-                      label: Save
-                      children:
-                           - type: Output
-                             name: predicted
-                           - type: Output
-                             name: residuals
-                    - type: Label
-                      label: Table
-                      children:
-                           - type: CheckBox
-                             name: mute
+        children:
+          - type: LayoutBox
+            margin: large
+            style: inline
+            children:
+              - type: Label
+                label: CI Method
+                children:
+                  - type: RadioButton
+                    name: ci_method_wald
+                    optionName: ci_method
+                    optionPart: wald
+                  - type: RadioButton
+                    name: ci_method_quantile
+                    optionName: ci_method
+                    optionPart: quantile
+                  - type: TextBox
+                    name: boot_r
+                    format: number
+                    enable: (ci_method_quantile)
+              - type: Label
+                label: DF Method
+                children:
+                  - type: RadioButton
+                    name: df_method_satterthwaite
+                    optionName: df_method
+                    optionPart: Satterthwaite
+                  - name: df_method_kenward_roger
+                    type: RadioButton
+                    optionName: df_method
+                    optionPart: Kenward-Roger
+          - type: LayoutBox
+            margin: large
+            style: inline
+            children:
+              - type: Label
+                label: Save
+                children:
+                  - type: Output
+                    name: predicted
+                  - type: Output
+                    name: residuals
+              - type: Label
+                label: Table
+                children:
+                  - type: CheckBox
+                    name: mute

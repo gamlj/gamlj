@@ -62,6 +62,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
+            res_struct = "cs",
             df_method = "Satterthwaite",
             norm_plot = FALSE,
             qq_plot = FALSE,
@@ -414,6 +415,14 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "re_lrt",
                 re_lrt,
                 default=FALSE)
+            private$..res_struct <- jmvcore::OptionList$new(
+                "res_struct",
+                res_struct,
+                default="cs",
+                options=list(
+                    "cs",
+                    "un",
+                    "ar1"))
             private$..df_method <- jmvcore::OptionList$new(
                 "df_method",
                 df_method,
@@ -505,6 +514,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
+            self$.addOption(private$..res_struct)
             self$.addOption(private$..df_method)
             self$.addOption(private$..norm_plot)
             self$.addOption(private$..qq_plot)
@@ -570,6 +580,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
+        res_struct = function() private$..res_struct$value,
         df_method = function() private$..df_method$value,
         norm_plot = function() private$..norm_plot$value,
         qq_plot = function() private$..qq_plot$value,
@@ -634,6 +645,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..re_listing = NA,
         ..reml = NA,
         ..re_lrt = NA,
+        ..res_struct = NA,
         ..df_method = NA,
         ..norm_plot = NA,
         ..qq_plot = NA,
@@ -696,7 +708,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
                     random = function() private$.items[["random"]],
                     randomcov = function() private$.items[["randomcov"]],
-                    ranova = function() private$.items[["ranova"]]),
+                    ranova = function() private$.items[["ranova"]],
+                    res_corr = function() private$.items[["res_corr"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -729,6 +742,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
+                                "res_struct",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -784,7 +798,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
-                                "donotrun"),
+                                "donotrun",
+                                "res_struct"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -832,6 +847,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
+                                "res_struct",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -929,6 +945,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
+                                "res_struct",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -964,7 +981,12 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="icc", 
                                     `title`="ICC", 
-                                    `type`="number"))))
+                                    `type`="number"),
+                                list(
+                                    `name`="phi", 
+                                    `title`="Phi", 
+                                    `type`="number", 
+                                    `visible`="(res_struct:ar1)"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="randomcov",
@@ -991,6 +1013,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
+                                "res_struct",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1054,7 +1077,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
-                                "donotrun"),
+                                "donotrun",
+                                "res_struct"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1081,7 +1105,40 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))}))$new(options=options))
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="res_corr",
+                            title="Residual correlations",
+                            visible="(res_struct:un)",
+                            clearWith=list(
+                                "dep",
+                                "reml",
+                                "factors",
+                                "covs",
+                                "cluster",
+                                "covs_scale",
+                                "dep_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale",
+                                "mute",
+                                "donotrun",
+                                "res_struct",
+                                "res_struct"),
+                            columns=list(
+                                list(
+                                    `name`="index", 
+                                    `title`="Index", 
+                                    `type`="text"))))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="posthoc",
@@ -1111,6 +1168,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "covs_scale",
                         "mute",
                         "donotrun",
+                        "res_struct",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1217,6 +1275,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
+                                "res_struct",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1272,6 +1331,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
+                                "res_struct",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1362,6 +1422,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale",
                                     "mute",
                                     "donotrun",
+                                    "res_struct",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1420,6 +1481,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale",
                                     "mute",
                                     "donotrun",
+                                    "res_struct",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1495,6 +1557,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "covs_scale",
                         "mute",
                         "donotrun",
+                        "res_struct",
                         "ci_width",
                         "ci_method",
                         "boot_r",

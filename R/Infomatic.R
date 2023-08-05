@@ -7,6 +7,7 @@ Infomatic <- R6::R6Class(
     caller=NULL,
     model_type=NULL,
     model=NULL,
+    formula=NULL,
     distribution=NULL,
     family=NULL,
     link=NULL,
@@ -25,10 +26,15 @@ Infomatic <- R6::R6Class(
     comparison  =  "Difference",
     posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
     omnibus_test=  NULL,
+    extra_info  = NULL,
     initialize=function(options,datamatic,formulas) {
       
       
       self$model_type        <- options$model_type
+      if (options$model_type=="lmer" && options$res_struct!="cs")
+                    self$model_type<-"lme"
+
+      self$formula           <- formulas$formula64()
       self$caller            <- options$.caller
       dep                    <- options$dep
       dlevs                  <- datamatic$variables[[tob64(dep)]]$levels_labels
@@ -197,6 +203,7 @@ Infomatic <- R6::R6Class(
 
           self$call          <-    "mclogit::mblogit"
           self$rcall         <-    "mclogit::mblogit"
+          self$formula       <-    NULL
           self$calloptions   <-    list(formula=as.formula(formulas$fixed_formula64()),
                                         random=formulas$listify_random_formulas64(),
                                         model=TRUE,
@@ -237,6 +244,35 @@ Infomatic <- R6::R6Class(
       }
       
 
+      if (self$model_type=="lme") {
+        
+        self$formula       <-   NULL
+        self$model         <-   c("Mixed Model","Linear Mixed model for continuous y")
+        self$distribution  <-    "gaussian"
+        self$call          <-    "lme"
+        self$rcall         <-    "estimate_lme"
+        form               <-    paste("~1|",tob64(options$cluster[1]))
+
+        if (options$res_struct=="un")  cor<-nlme::corSymm 
+        if (options$res_struct=="ar1") cor<-nlme::corAR1
+        if (options$reml) method="REML" else method="ML"
+        self$calloptions   <-    list(fixed=as.formula(formulas$fixed_formula64()),
+                                      random=formulas$listify_random_formulas64(),
+#                                      cor=do.call(cor,list(form=formula(form))),
+                                      cor=cor,
+                                      form=form,
+                                      method=method
+        )
+        self$optimized     <-   FALSE
+        self$direction     <-   c("y","Dependend variable scores")
+        self$deptype       <-   c("numeric","integer")
+        self$fit           <-   c("lik" , "aic",  "bic")
+        self$r2            <-   list(list(type="Marginal"),list(type="Conditional"))
+        if (options$res_struct=="un") res<-"Unstructured" else res<-"AutoRegressive 1"
+        self$extra_info    <-   list(info="Residuals",value=res,specs=paste("within cluster",options$cluster[1]))
+      }
+      
+      
     },
     info_table=function() {
       
@@ -259,6 +295,9 @@ Infomatic <- R6::R6Class(
       
       if (is.something(self$df))
         alist[["df"]]<-list(info="DF method",value=self$df,specs="") 
+
+      if (is.something(self$extra_info))
+        alist[["extra_info"]]<-self$extra_info 
       
       alist[["sample"]]   <-  list(info="Sample size",value=".",specs="")
       alist[["conv"]]     <-  list(info="Converged",value="no yet", specs="")

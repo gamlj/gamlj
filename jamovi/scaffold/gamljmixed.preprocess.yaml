@@ -183,7 +183,11 @@ items:
                     - name: icc
                       title: "ICC"
                       type: number
- 
+                    - name: phi
+                      title: "Phi"
+                      type: number
+                      visible: (res_struct:ar1)
+
            - name: randomcov
              title: Random Parameters correlations
              type: Table
@@ -246,6 +250,19 @@ items:
                      title: "p"
                      type: number
                      format: zto,pvalue
+
+           - name: res_corr
+             title: Residual correlations
+             type: Table
+             visible: (res_struct:un)
+             clearWith:
+                        - __modeloptions__
+                        - res_struct
+             columns:
+                   - name: index
+                     title: "Index"
+                     type: text
+
 
   - name: posthoc
     title: Post Hoc Tests

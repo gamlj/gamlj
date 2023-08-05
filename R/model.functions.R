@@ -99,6 +99,12 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   rank<-attr(model@pp$X,"msgRankdrop")
   return((!is.null(rank)))
 }
+.aliased.lme<-function(model) {
+  ### to do 
+  FALSE
+  
+}
+
 .aliased.multinom<-function(model) {
   ### to do 
   FALSE
@@ -158,3 +164,4 @@ mf.data<- function(x,...) UseMethod(".data")
 
 .data.lmerModLmerTest<-function(model) model@frame
 
+.data.lme<-function(model) model$data

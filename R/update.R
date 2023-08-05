@@ -101,3 +101,18 @@ mf.update<- function(x,...) UseMethod(".update")
 }
 
 
+.update.lme<-function(model,formula) {
+
+  jinfo("lme update is used")
+  form<-formula(formula)
+  fixed<-lme4::nobars(form)
+  .random<-lme4::findbars(form)
+  random<-lapply(.random, function(x) formula(paste("~",as.character(x)[2],"|",as.character(x)[3])))
+  data<-model$data
+  umodel<-stats::update(model,fixed = fixed,random=random,data=data)
+  umodel$call$fixed<-fixed
+  umodel$call$random<-random
+  umodel$call[[1]]<-quote(nlme::lme.formula)
+  umodel
+}
+

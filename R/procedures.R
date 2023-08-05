@@ -46,8 +46,8 @@ procedure.posthoc <- function(obj) {
   if (obj$option("df_method",c("Satterthwaite","Kenward-Roger"))) {
     lmer.df=obj$options$df_method
   }
-  
-    
+  mode = NULL
+
   postHocTables <- list()
   for (.vars in terms) {
 
@@ -55,7 +55,9 @@ procedure.posthoc <- function(obj) {
     ## so the final table will look sorted in a more sensible way
     .revvars<-rev(.vars)
     .term64<-jmvcore::composeTerm(tob64(.revvars))
-     referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df)
+     
+     referenceGrid <- .posthoc(model, .term64, vfun=vfun,df=lmer.df,mode=mode)
+
      if (obj$option("model_type","multinomial"))
             .pairs<-graphics::pairs(referenceGrid,by=dep)
      else
@@ -63,7 +65,6 @@ procedure.posthoc <- function(obj) {
      none <- summary(.pairs, adjust = "none",infer = c(FALSE,TRUE))
      tableData <- as.data.frame(none, stringAsFactors = FALSE)
 
-     
      for (adj in obj$options$adjust) {
        arow <- summary(.pairs, adjust = adj,infer = c(FALSE,TRUE))
        tableData[[adj]]<- arow$p.value
@@ -77,14 +78,13 @@ procedure.posthoc <- function(obj) {
      )
      names(tableData)<-transnames(names(tableData),.transnames)  
      ## confidence intervals
-     
      .model<-model
      if (obj$option("ci_method",c("quantile","bcai"))) 
        .model<-obj$boot_model
 
-     cidata<-.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun)
-     tableData$est.ci.lower<-cidata$est.ci.lower       
-     tableData$est.ci.upper<-cidata$est.ci.upper       
+     cidata<-try_hard(.posthoc_ci(.model,.term64,obj$ciwidth,obj$options$ci_method,vfun=vfun))
+     tableData$est.ci.lower<-cidata$obj$est.ci.lower       
+     tableData$est.ci.upper<-cidata$obj$est.ci.upper       
      ## we create one column for each contrast level
      tableData$contrast <- as.character(tableData$contrast)
 
@@ -224,6 +224,7 @@ procedure.posthoc_effsize <- function(obj) {
     termf <- stats::as.formula(paste("~", term))
     
     data <- insight::get_data(model)
+   
     opts_list<-list(object=model,specs=termf,adjust="none", type = "response", data = data)
 
     if (is.something(mode)) 
@@ -297,7 +298,9 @@ procedure.posthoc_effsize <- function(obj) {
   
   termf <- stats::as.formula(paste("pairwise ~", term))
 
-  opts_list<-list(object=model,specs=termf, type = "response")
+  data <- insight::get_data(model)
+  
+  opts_list<-list(object=model,specs=termf, type = "response",data=data)
   
   if (is.something(mode))
      opts_list[["mode"]]<-mode
@@ -382,12 +385,15 @@ procedure.emmeans<-function(obj) {
       }
     }
     ### prepare the options ###
+    data <- insight::get_data(obj$model)
+    
     opts_list<-list(object=obj$model,
                     specs=term64,
                     at=conditions,
                     type=type,
                     nesting = NULL,
-                    options = c(level=obj$ciwidth)
+                    options = c(level=obj$ciwidth),
+                    data=data
     )
     if (obj$option("df_method"))
        opts_list[["lmer.df"]]<-tolower(obj$options$df_method)
@@ -488,12 +494,13 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     grid
     }
     ##
-    
+    data <- insight::get_data(model)
     opts_list<-list(object=model,
                     at=conditions,
                     nesting = NULL,
                     infer=c(TRUE,TRUE),
-                    estName="estimate"
+                    estName="estimate",
+                    data=data
     )
     
     if (obj$option("df_method"))
@@ -849,7 +856,9 @@ procedure.simpleInteractions<-function(obj) {
             ## it is called to know which variable should be contrasted
             .datamatic<-rev(sapply(.names, function(.name) obj$datamatic$variables[[.name]]))
             
-            opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
+            data <- insight::get_data(model)
+            
+            opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic,data=data)
             resgrid<-do.call(emmeans::contrast,opts_list)
             res<-as.data.frame(resgrid)
             
