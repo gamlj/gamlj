@@ -155,6 +155,19 @@ Infomatic <- R6::R6Class(
         self$comparison    <-    "Ratio"
       }
       
+      if (self$model_type=="beta") {
+        
+        self$model         <-   c("Beta regression","Model for proportions")
+        self$call          <-   "betareg"
+        self$distribution  <-   "beta"
+        self$rcall         <-   "betareg::betareg"
+        self$link          <-   "logit"
+        self$emmeans       <-   "prop."
+        self$direction     <-   c("y","Dependent variable proportion")
+        self$deptype       <-   "numeric"
+      }
+      
+      
       if (self$model_type=="custom") {
        
         self$model         <-   c("User Model","Generalized model")
@@ -361,7 +374,7 @@ DINFO[["logistic"]]<-c("Logistic","")
 LINFO<-list()
 LINFO[["identity"]]   <-  c("Identity","Coefficients in the same scale of y")
 LINFO[["log"]]        <-  c("log","Coefficients are in the log(y) scale")
-LINFO[["logit"]]      <-  c("Logit","Log of the odd of y=1 over y=0")
+LINFO[["logit"]]      <-  c("Logit","Log of the odd of y")
 LINFO[["slogit"]]     <-  c("Logit","Log of the odd of each level of y over y=0")
 LINFO[["probit"]]     <-  c("Probit","Inverse of normal CDF for P(y=1)")
 LINFO[["1/mu^2"]]     <-  c("1/mu^2","Inverse of y squared")

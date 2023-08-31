@@ -98,7 +98,9 @@ gFit <- R6::R6Class(
 
       omnibus<-"Chisq"
       if (self$operator$option("omnibus")) omnibus<-self$operator$optionValue("omnibus")
-      if (self$operator$option(".caller", c("lmer", "glmer")) || self$operator$option("omnibus", "LRT")) {
+      if (self$operator$option(".caller", c("lmer", "glmer")) 
+                               || self$operator$option("omnibus", "LRT")
+                               || self$operator$option("model_type","beta")) {
          comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model,self$operator$model)))
       } else {
          comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
@@ -295,6 +297,32 @@ r2 <- function(model, ...) UseMethod(".r2")
 .r2.clmm <- function(model, obj) {
   .r2.lmerModLmerTest(model, obj)
 }
+
+.r2.betareg <- function(model, obj) {
+
+  alist <- list()
+  
+  l1<-stats::logLik(model)
+  df1<-attr(l1,"df")
+  
+  dep <- insight::find_response(model)
+  form<- as.formula(paste(dep,"~ 1"))
+  mod0<- betareg::betareg(form,data=model$model)
+  
+  l0<-stats::logLik(mod0)
+  df0<-attr(l0,"df")
+
+  alist$r2 <- model$pseudo.r.squared
+  alist$test <- as.numeric(2*(l1-l0))
+  alist$df1 <- df1-df0
+  alist$p <-   as.numeric(pchisq(q = 2*(l1-l0),df = 1,lower.tail = F))
+
+  return(list(alist))
+  
+    
+}
+
+
 
 ######### model comparisons for one model ########
 

@@ -5,6 +5,7 @@ ganova<- function(x,...) UseMethod(".anova")
   stop("GANOVA: no suitable model found") 
 }
 
+
 .anova.glm<-function(model,obj,test="LR") {
   
   if (!obj$formulaobj$hasTerms) {
@@ -44,6 +45,8 @@ ganova<- function(x,...) UseMethod(".anova")
 .anova.clm<-function(model,obj) 
   .anova.glm(model,obj,"Chisq")
 
+.anova.betareg<-function(model,obj) 
+  .anova.glm(model,obj,"Chisq")
 
 .anova.lm<-function(model,obj) {
   

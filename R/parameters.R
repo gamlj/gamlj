@@ -115,13 +115,14 @@ gparameters<- function(x,...) UseMethod(".parameters")
     )
   names(.coefficients)<-transnames(names(.coefficients),.transnames)
 
-     
    cidata<-parameters::ci(.model,method=.ci_method,ci=.ci_width)   
+   cidata<-cidata[1:nrow(.coefficients),]
   .coefficients$est.ci.lower<-cidata$CI_low
   .coefficients$est.ci.upper<-cidata$CI_high
+  
   .coefficients$expb          <-  exp(.coefficients$estimate)
   
-    
+
   if (obj$option("expb_ci") & obj$option("es","expb")) {
     if (inherits(.model,"bootstrap_model")) {
         .classes<-class(.model)
@@ -132,6 +133,7 @@ gparameters<- function(x,...) UseMethod(".parameters")
          attributes(x)<-.attributes
          class(x)<-.classes
          cidata<-parameters::ci(x,method=.ci_method,ci=.ci_width)   
+         cidata<-cidata[1:nrow(.coefficients),]
         .coefficients$expb.ci.lower<-cidata$CI_low
         .coefficients$expb.ci.upper<-cidata$CI_high
 
@@ -160,6 +162,13 @@ gparameters<- function(x,...) UseMethod(".parameters")
   names(params)<-tolower(names(params))
   params
 }
+
+.parameters.betareg<-function(model,obj) {
+  params<-.parameters.glm(model,obj)
+  params
+}
+
+
 
 .parameters.mmblogit<-function(model,obj) {
   

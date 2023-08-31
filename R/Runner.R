@@ -25,7 +25,7 @@ Runner <- R6::R6Class("Runner",
                             jinfo("RUNNER: initial estimation done, ",self$etime," secs")
                             
                             if (self$options$comparison) {
-                              obj<-try_hard(mf.update(self$model,formula=self$nestedformulaobj$formula64()))
+                              obj<-try_hard(mf.update(self$model,formula=as.formula(self$nestedformulaobj$formula64())))
                               self$nested_model<-obj$obj
                               if (!isFALSE(obj$warning))
                                     self$warning<-list(topic="main_r2",

@@ -8,6 +8,7 @@ mf.update<- function(x,...) UseMethod(".update")
   
   jinfo("default update is used")
   data<-insight::get_data(model)
+
   stats::update(model,data=data,...)
   
 }

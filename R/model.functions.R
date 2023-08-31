@@ -133,6 +133,13 @@ mf.aliased<- function(x,...) UseMethod(".aliased")
   
 }
 
+.aliased.betareg<-function(model) {
+  ### to do 
+  FALSE
+  
+}
+
+
 ##### standardize a model #########
 
 mf.standardize<- function(x,...) UseMethod(".standardize")

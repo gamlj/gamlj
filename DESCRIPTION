@@ -14,7 +14,7 @@ LazyData: true
 Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, lme4, lmerTest, lmtest,
          boot ,rlang,sandwich, stringr,
          MASS, ggplot2, effectsize, 
-         ordinal, mclogit (>= 0.9.6), margins, nnet
+         ordinal, mclogit (>= 0.9.6), margins, nnet, betareg
 RoxygenNote: 7.2.3
 Suggests: 
     rmarkdown,

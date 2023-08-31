@@ -34,6 +34,7 @@ gamljglmClass <- R6::R6Class(
       
       ## R2 table ###
       aSmartObj<-SmartTable$new(self$results$main$r2,runner_machine)
+      aSmartObj$hideOn<-list(ar2=NA)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### some models do not have adjusted r2 ###

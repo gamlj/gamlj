@@ -42,6 +42,15 @@ children:
                 optionPart: nb
                 events:
                   change: './gamlj.events::onChange_model'
+          - type: Label
+            label: Proportions
+            children:
+              - type: RadioButton
+                name: model_type_beta
+                optionName: model_type
+                optionPart: beta
+                events:
+                  change: './gamlj.events::onChange_model'
       - type: LayoutBox
         margin: large
         children:
@@ -126,8 +135,7 @@ children:
             maxItemCount: 1
             isTarget: true
             itemDropBehaviour: overwrite
-            enable: '(model_type:logistic)'
-
+            enable: (model_type:logistic)
   - type: LayoutBox
     margin: large
     style: list
@@ -204,7 +212,6 @@ children:
                   type: TermLabel
               - type: CheckBox
                 name: fixed_intercept
-
           - type: TargetLayoutBox
             name: nested_layout
             transferAction: interactions
@@ -221,7 +228,6 @@ children:
               - type: CheckBox
                 name: nested_intercept
                 enable: (comparison)
-
       - type: LayoutBox
         style: inline
         children:
@@ -232,7 +238,6 @@ children:
                 name: comparison
                 events:
                   change: './gamlj.events::onEvent_comparison'
-
   - type: CollapseBox
     label: Factors Coding
     collapsed: true
@@ -328,7 +333,6 @@ children:
                   - type: ComboBox
                     name: scale_missing
                     label: ''
-                    
   - type: CollapseBox
     label: Post Hoc Tests
     collapsed: true
@@ -389,11 +393,8 @@ children:
           - type: Label
             label: Info
             children:
-                   - name: posthoc_ci
-                     type: CheckBox
-
-
-
+              - name: posthoc_ci
+                type: CheckBox
   - type: CollapseBox
     label: Plots
     name: panel_plots
@@ -456,7 +457,9 @@ children:
                 name: plot_scale_link
                 optionName: plot_scale
                 optionPart: link
-                enable: (!model_type_multinomial && !model_type_ordinal && !model_type_linear)
+                enable: >-
+                  (!model_type_multinomial && !model_type_ordinal &&
+                  !model_type_linear && !model_type_beta)
               - type: RadioButton
                 name: plot_scale_mean.class
                 optionName: plot_scale
@@ -470,7 +473,9 @@ children:
                 enable: (!model_type_multinomial && !plot_scale_link)
               - type: CheckBox
                 name: plot_yscale
-                enable: (plot_scale_response && !model_type_multinomial && !model_type_logistic && !model_type_probit)
+                enable: >-
+                  (plot_scale_response && !model_type_multinomial &&
+                  !model_type_logistic && !model_type_probit)
               - type: CheckBox
                 name: plot_xoriginal
               - type: CheckBox

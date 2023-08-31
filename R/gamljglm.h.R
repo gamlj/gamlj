@@ -345,9 +345,11 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "nb",
                     "logistic",
                     "probit",
-                    "custom",
+                    "probit",
+                    "beta",
                     "ordinal",
-                    "multinomial"),
+                    "multinomial",
+                    "custom"),
                 default="linear")
             private$..custom_family <- jmvcore::OptionList$new(
                 "custom_family",

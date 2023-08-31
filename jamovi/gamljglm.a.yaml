@@ -578,13 +578,17 @@ options:
           title: Logistic
         - name: probit
           title: Probit
-        - name: custom
-          title: Custom
+        - name: probit
+          title: Probit 
+        - name: beta
+          title: Beta
         - name: ordinal
           title: Ordinal (proportional odds)
-
         - name: multinomial
           title: Multinomial
+        - name: custom
+          title: Custom
+
       default: linear
       description:
           R: >
