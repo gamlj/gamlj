@@ -237,6 +237,63 @@ items:
                       type: number
                       format: zto,pvalue
 
+
+           - name: phi
+             title:  Precision Parameter Estimates (phi)
+             type: Table
+             visible: (model_type:beta)
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+                           ### cioptions  begins
+                         - ci_width
+                         - ci_method
+                         - boot_r
+                           ### cioptions  ends
+
+             columns:
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                      visible: (show_contrastnames)
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
            - name: vcov
              title: Coefficients Covariances
              type: Table

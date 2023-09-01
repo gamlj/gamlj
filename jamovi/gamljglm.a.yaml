@@ -638,7 +638,7 @@ options:
            Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
            
 
-
+### this is only for ordinal models
     - name: propodds_test
       title: Parallel lines test
       type: Bool
@@ -646,6 +646,18 @@ options:
       description:
           R: >
              Test parallel lines assumptions in cumulative link model (ordinal regression)
+###
+
+
+### this is only for beta models
+    - name: preds_phi
+      title: Predictors for precision
+      type: Bool
+      default: false
+      description:
+          R: >
+             Include the predictors also for the precision phi (beta regression)
+###
 
 
     - name: plot_scale

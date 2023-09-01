@@ -145,11 +145,27 @@ Runner <- R6::R6Class("Runner",
                             tab<-NULL
                             if (self$formulaobj$isProper) {
                               tab       <-  gparameters(self$model,self)
+                              mark(tab)
                               tab       <-  private$.fix_names(tab)
                             }
                             tab
                             
                           },
+                          ### this is for beta regression
+                          run_main_phi=function() {
+                            
+
+                            ss  <- summary(self$model)
+                            tab <- ss$coefficients$precision
+                            tab<-as.data.frame(parameters::parameters(self$model,component="precision"))
+                            names(tab)<-c("source","estimate","se","none","est.ci.lower","est.ci.upper","test","df_error","p")
+                            mark(tab)
+                            tab       <-  private$.fix_names(tab)
+                            mark(tab)
+                            tab
+                            
+                          },
+                          
                           ### anova effect sizes ####
                           
                           run_main_effectsizes=function()  {
@@ -165,6 +181,7 @@ Runner <- R6::R6Class("Runner",
                             es.glm_variances(self$model,self)
                             
                           },
+                          
                           
                           run_main_intercept=function() {
                             

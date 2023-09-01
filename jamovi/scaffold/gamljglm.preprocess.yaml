@@ -165,6 +165,43 @@ items:
                       type: number
                       format: zto,pvalue
 
+
+           - name: phi
+             title:  Precision Parameter Estimates (phi)
+             type: Table
+             visible: (model_type:beta)
+             clearWith:
+                         - __modeloptions__
+                         - __cioptions__
+
+             columns:
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                      visible: (show_contrastnames)
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
            - name: vcov
              title: Coefficients Covariances
              type: Table

@@ -238,6 +238,13 @@ children:
                 name: comparison
                 events:
                   change: './gamlj.events::onEvent_comparison'
+          - type: Label
+            name: precision
+            label: Precision model
+            children:
+              - type: CheckBox
+                name: preds_phi
+
   - type: CollapseBox
     label: Factors Coding
     collapsed: true

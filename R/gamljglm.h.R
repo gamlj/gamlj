@@ -56,6 +56,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             custom_family = "gaussian",
             custom_link = "identity",
             propodds_test = FALSE,
+            preds_phi = FALSE,
             plot_scale = "response", ...) {
 
             super$initialize(
@@ -376,6 +377,10 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "propodds_test",
                 propodds_test,
                 default=FALSE)
+            private$..preds_phi <- jmvcore::OptionBool$new(
+                "preds_phi",
+                preds_phi,
+                default=FALSE)
             private$..plot_scale <- jmvcore::OptionList$new(
                 "plot_scale",
                 plot_scale,
@@ -435,6 +440,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..custom_family)
             self$.addOption(private$..custom_link)
             self$.addOption(private$..propodds_test)
+            self$.addOption(private$..preds_phi)
             self$.addOption(private$..plot_scale)
         }),
     active = list(
@@ -488,6 +494,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         custom_family = function() private$..custom_family$value,
         custom_link = function() private$..custom_link$value,
         propodds_test = function() private$..propodds_test$value,
+        preds_phi = function() private$..preds_phi$value,
         plot_scale = function() private$..plot_scale$value),
     private = list(
         ...caller = NA,
@@ -540,6 +547,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..custom_family = NA,
         ..custom_link = NA,
         ..propodds_test = NA,
+        ..preds_phi = NA,
         ..plot_scale = NA)
 )
 
@@ -592,6 +600,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     fit = function() private$.items[["fit"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
+                    phi = function() private$.items[["phi"]],
                     vcov = function() private$.items[["vcov"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
                     marginals = function() private$.items[["marginals"]],
@@ -809,6 +818,65 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number", 
                                     `title`="Upper", 
                                     `visible`="(es:expb & expb_ci)"),
+                                list(
+                                    `name`="test", 
+                                    `title`="z", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="phi",
+                            title="Precision Parameter Estimates (phi)",
+                            visible="(model_type:beta)",
+                            clearWith=list(
+                                "model_type",
+                                "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
+                                "offset",
+                                "omnibus",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="Name", 
+                                    `type`="text"),
+                                list(
+                                    `name`="label", 
+                                    `title`="Effect", 
+                                    `type`="text", 
+                                    `visible`="(show_contrastnames)"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="Estimate", 
+                                    `type`="number"),
+                                list(
+                                    `name`="se", 
+                                    `title`="SE", 
+                                    `type`="number"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper"),
                                 list(
                                     `name`="test", 
                                     `title`="z", 

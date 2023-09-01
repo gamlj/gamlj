@@ -27,7 +27,14 @@ const events = {
               ui.propodds_test.$el.hide();
             }
         }
-        
+        if (typeof ui.preds_phi !== 'undefined' ) {
+          
+            if (ui.model_type.getValue()==="beta") {
+              ui.precision.$el.show();
+            } else {
+              ui.precision.$el.hide();
+            }
+        }
 
     },
 
@@ -124,6 +131,16 @@ const events = {
               ui.es_marginals.setValue(false);
 
         }
+        
+        if (typeof ui.preds_phi !== 'undefined' ) {
+          
+            if (ui.model_type.getValue()==="beta") {
+              ui.precision.$el.show();
+            } else {
+              ui.precision.$el.hide();
+            }
+        }
+
         
         ui.dep.setValue(null);
       },

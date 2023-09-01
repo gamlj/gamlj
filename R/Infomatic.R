@@ -165,8 +165,10 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "prop."
         self$direction     <-   c("y","Dependent variable proportion")
         self$deptype       <-   "numeric"
+        if (options$preds_phi)
+              self$formula <-   paste(formulas$fixed_formula64(),strsplit(formulas$fixed_formula64(),"~")[[1]][[2]],sep = "|")
       }
-      
+mark(self$formula)      
       
       if (self$model_type=="custom") {
        
