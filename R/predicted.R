@@ -4,7 +4,7 @@ predicted<- function(model,...) UseMethod(".predicted")
 
   root<-toupper(abbreviate(obj$options$model_type))
   preds<-stats::predict(model,type=obj$infomatic$predict)
-  pdf <- data.frame(PRED=preds, row.names=rownames(insight::get_data(model)))
+  pdf <- data.frame(PRED=preds, row.names=rownames(insight::get_data(model, source="frame")))
   
   for (p in seq_len(ncol(pdf)))
     if (is.factor(pdf[[p]]))
@@ -19,7 +19,7 @@ predicted<- function(model,...) UseMethod(".predicted")
   root<-toupper(abbreviate(obj$options$model_type))
   rpreds<-stats::predict(obj$model)
   fpreds<-stats::predict(obj$model,re.form=NA)
-  pdf <- data.frame(RPRED=rpreds,FPRED=fpreds, row.names=rownames(insight::get_data(model)))
+  pdf <- data.frame(RPRED=rpreds,FPRED=fpreds, row.names=rownames(insight::get_data(model, source="frame")))
   
   for (p in seq_len(ncol(pdf)))
     if (is.factor(pdf[[p]]))

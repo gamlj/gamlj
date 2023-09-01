@@ -7,7 +7,7 @@ mf.update<- function(x,...) UseMethod(".update")
 .update.default<-function(model,...) {
   
   jinfo("default update is used")
-  data<-insight::get_data(model)
+  data<-insight::get_data(model,source="frame")
 
   stats::update(model,data=data,...)
   
@@ -16,7 +16,7 @@ mf.update<- function(x,...) UseMethod(".update")
 .update.lmerModLmerTest<-function(model,...) {
   
   .args<-list(...)
-  data<-insight::get_data(model)
+  data<-insight::get_data(model,source="frame")
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)
@@ -36,7 +36,7 @@ mf.update<- function(x,...) UseMethod(".update")
 .update.glmerMod<-function(model,...) {
   
   .args<-list(...)
-  data<-insight::get_data(model)
+  data<-insight::get_data(model,source="frame")
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)
@@ -57,7 +57,7 @@ mf.update<- function(x,...) UseMethod(".update")
   
   
   .args<-list(...)
-  data<-insight::get_data(model)
+  data<-insight::get_data(model,source="frame")
   
   if (!utils::hasName(.args,"formula")) stop("clmm model update requires a formula")
   

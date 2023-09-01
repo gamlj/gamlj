@@ -145,7 +145,6 @@ Runner <- R6::R6Class("Runner",
                             tab<-NULL
                             if (self$formulaobj$isProper) {
                               tab       <-  gparameters(self$model,self)
-                              mark(tab)
                               tab       <-  private$.fix_names(tab)
                             }
                             tab
@@ -159,9 +158,7 @@ Runner <- R6::R6Class("Runner",
                             tab <- ss$coefficients$precision
                             tab<-as.data.frame(parameters::parameters(self$model,component="precision"))
                             names(tab)<-c("source","estimate","se","none","est.ci.lower","est.ci.upper","test","df_error","p")
-                            mark(tab)
                             tab       <-  private$.fix_names(tab)
-                            mark(tab)
                             tab
                             
                           },
@@ -459,7 +456,7 @@ Runner <- R6::R6Class("Runner",
                                 jinfo("Saving residuals")
                                 p<-stats::residuals(self$model,type="response")
                               # we need the rownames in case there are missing in the datasheet
-                              pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model)))
+                              pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model, source="frame")))
                               results$residuals$setValues(pdf)
                             }
                           },

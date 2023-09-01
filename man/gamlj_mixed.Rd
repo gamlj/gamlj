@@ -280,7 +280,7 @@ analysis, effect size indexes and visualization of the results.
 }
 \examples{
 data(subjects_by_stimuli)
-gamlj::gamljMixed(
+gamlj::gamlj_mixed(
        formula = y ~ 1 + cond+( 1|subj ),
        data = subjects_by_stimuli)
 }

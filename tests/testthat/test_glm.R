@@ -2,14 +2,14 @@ testthat::context("glm")
 data("hsbdemo")
 tol <- 0.001
 
-mod0 <- gamlj::gamlj_glm(
+mod0 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "logistic"
 )
 
 
-mod1 <- gamlj::gamlj_glm(
+mod1 <- GAMLj3::gamlj_glm(
   data = hsbdemo,
   model_type = "logistic",
   dep = "schtyp",
@@ -18,7 +18,7 @@ mod1 <- gamlj::gamlj_glm(
   model_terms = ~ write + honors + honors:write
 )
 
-mod2 <- gamlj::gamlj_glm(
+mod2 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write * honors,
   data = hsbdemo,
   model_type = "logistic"
@@ -37,7 +37,7 @@ testthat::test_that("equivalent model input (1)", {
 
 
 testthat::test_that("gzlm logistic coherence", {
-  testthat::expect_error(gamlj::gamlj_glm(
+  testthat::expect_error(GAMLj3::gamlj_glm(
     formula = ses ~ 1,
     data = hsbdemo,
     model_type = "logistic"
@@ -45,7 +45,7 @@ testthat::test_that("gzlm logistic coherence", {
 })
 
 data("hsbdemo")
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   estimates_ci = TRUE,
@@ -63,7 +63,7 @@ testthat::test_that("glm estimates are correct", {
 
 data <- hsbdemo
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "logistic",
@@ -85,7 +85,7 @@ testthat::test_that("contrasts are correct", {
 })
 
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "logistic",
@@ -115,7 +115,7 @@ testthat::test_that("gzlm CI width", {
 })
 
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = schtyp ~ 1,
   data = hsbdemo,
   model_type = "logistic"
@@ -130,7 +130,7 @@ testthat::test_that(
 
 data <- hsbdemo
 names(data)[3] <- c("Gender (test ?)")
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = schtyp ~ math + `Gender (test ?)` + math:`Gender (test ?)`,
   data = data,
   model_type = "logistic",
@@ -147,13 +147,14 @@ testthat::test_that("glm EMM", {
   testthat::expect_equal(round(res[1, 2], 2), 0.84)
 })
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = prog ~ math + ses * female,
   data = hsbdemo,
   model_type = "multinomial",
   posthoc = ~ ses:female
 )
 
+mod$posthoc[[1]]$asDF
 testthat::test_that("Multinomial posthoc works", {
   testthat::expect_equal(mod$posthoc[[1]]$asDF$response[[1]], "academic")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[8], .2101, tol)
@@ -164,7 +165,7 @@ testthat::test_that("Multinomial posthoc works", {
 })
 
 
-mod2 <- gamlj::gamlj_glm(
+mod2 <- GAMLj3::gamlj_glm(
   formula = prog ~ ses * female + math,
   data = hsbdemo,
   model_type = "multinomial"
@@ -187,7 +188,7 @@ data("poissonacts")
 data <- poissonacts
 data$age <- factor(data$age)
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = acts ~ agg_test * age,
   data = data,
   model_type = "poisson",
@@ -215,7 +216,7 @@ testthat::test_that("Poisson works", {
 
 data$q <- data$acts + 1
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = q ~ agg_test * age,
   data = data,
   model_type = "custom",
@@ -248,7 +249,7 @@ testthat::test_that("Custom model works", {
 ### negative binomial
 data$q <- as.integer(data$q)
 testthat::expect_warning({
-  mod <- gamlj::gamlj_glm(
+  mod <- GAMLj3::gamlj_glm(
     formula = q ~ agg_test * age,
     data = data,
     model_type = "nb",
@@ -281,7 +282,7 @@ testthat::test_that("negative binomial model works", {
 
 ### quasi poisson
 data$q <- as.integer(data$q)
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = q ~ agg_test * age,
   data = data,
   model_type = "poiover",
@@ -312,7 +313,7 @@ testthat::test_that("quasi poisson binomial works", {
 
 ### model comparison 
 
-mod0 <- gamlj::gamlj_glm(
+mod0 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "logistic"
@@ -321,7 +322,7 @@ testthat::test_that("no comparison", {
   testthat::expect_equal(nrow(mod0$main$r2$asDF),1)
 })
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "logistic",
@@ -334,7 +335,7 @@ testthat::test_that("logistic comparison", {
   
 })
 
-mod <- gamlj::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
   formula = prog ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "multinomial",

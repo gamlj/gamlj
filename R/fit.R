@@ -234,7 +234,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.multinom <- function(model, obj) {
   llfull <- stats::logLik(model) ### model loglikelihood
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
   nullmodel <- stats::update(model, ~1, data = data, evaluate = T)
   #  nullmodel <- eval.parent(nullmodel)
   llnull <- stats::logLik(nullmodel)
@@ -333,7 +333,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   
   jinfo("Default null model comparison is used for object of class ",paste(class(model),collapse = " "))
   
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)
@@ -353,7 +353,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 
 .compare_null_model.lmerModLmerTest <- function(model, type = "c") {
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
 
 
@@ -382,7 +382,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 }
 
 .compare_null_model.glmerMod <- function(model, type = "c") {
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
 
   int <- attr(stats::terms(model), "intercept")
 
@@ -438,7 +438,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 
 .compare_null_model.clmm <- function(model, type = "c") {
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
 
   int <- attr(stats::terms(model), "intercept")
   dep <- insight::find_response(model)
@@ -471,7 +471,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   
   jinfo(".polr null model comparison is used")
   
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)

@@ -8,7 +8,7 @@ procedure.beta<- function(x,...) UseMethod(".beta")
 
 .beta.default<-function(model) {
   
-  data<-insight::get_data(model)
+  data<-insight::get_data(model,source="frame")
   for (var in names(data)) {
     if (!is.factor(data[[var]]))
         data[[var]]<-as.numeric(scale(data[[var]]))
@@ -223,7 +223,7 @@ procedure.posthoc_effsize <- function(obj) {
 
     termf <- stats::as.formula(paste("~", term))
     
-    data <- insight::get_data(model)
+    data <- insight::get_data(model,source="frame")
    
     opts_list<-list(object=model,specs=termf,adjust="none", type = "response", data = data)
 
@@ -256,7 +256,7 @@ procedure.posthoc_effsize <- function(obj) {
   
 }
 
-.posthoc.multinom <- function(model, term, vfun=NULL,df=NULL) {
+.posthoc.multinom <- function(model, term, vfun=NULL,df=NULL, mode=NULL) {
 
   if (inherits(model,"bootstrap_model") )
        model<-attr(model,"original_model")
@@ -264,7 +264,7 @@ procedure.posthoc_effsize <- function(obj) {
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)
     termf <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
-    data <- insight::get_data(model)
+    data <- insight::get_data(model,source="frame")
 
 
     referenceGrid <- emmeans::emmeans(model, termf, data = data)
@@ -298,7 +298,7 @@ procedure.posthoc_effsize <- function(obj) {
   
   termf <- stats::as.formula(paste("pairwise ~", term))
 
-  data <- insight::get_data(model)
+  data <- insight::get_data(model,source="frame")
   
   opts_list<-list(object=model,specs=termf, type = "response",data=data)
   
@@ -336,7 +336,7 @@ procedure.posthoc_effsize <- function(obj) {
     dep <- names(attr(stats::terms(model), "dataClass"))[1]
     dep <- jmvcore::composeTerm(dep)
     tterm <- stats::as.formula(paste("~", paste(dep, term, sep = "|")))
-    data <- insight::get_data(model)
+    data <- insight::get_data(model,source="frame")
     
       referenceGrid <- emmeans::emmeans(model, tterm, data = data)
       
@@ -385,7 +385,7 @@ procedure.emmeans<-function(obj) {
       }
     }
     ### prepare the options ###
-    data <- insight::get_data(obj$model)
+    data <- insight::get_data(obj$model,source="frame")
     
     opts_list<-list(object=obj$model,
                     specs=term64,
@@ -494,7 +494,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     grid
     }
     ##
-    data <- insight::get_data(model)
+    data <- insight::get_data(model,source="frame")
     opts_list<-list(object=model,
                     at=conditions,
                     nesting = NULL,
@@ -633,7 +633,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
          parameters  <-  data.frame()
          anovas      <-  data.frame()
          
-         data64      <-  insight::get_data(model)
+         data64      <-  insight::get_data(model,source="frame")
          
          ## here we do the actual simple model for each combination of moderator levels ####
          for (i in 1:nrow(rows)) {
@@ -831,7 +831,6 @@ procedure.simpleInteractions<-function(obj) {
                             at = conditions,
                             estName="estimate"
                             )
-            
             if (obj$option("df_method"))
               grid_list[["lmer.df"]]<-tolower(obj$options$df_method)
             
@@ -856,10 +855,10 @@ procedure.simpleInteractions<-function(obj) {
             ## it is called to know which variable should be contrasted
             .datamatic<-rev(sapply(.names, function(.name) obj$datamatic$variables[[.name]]))
             
-            data <- insight::get_data(model)
-            
-            opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic,data=data)
+            data <- insight::get_data(obj$model,source="frame")
+            opts_list<-list(object=emgrid,by=mods,interaction=list(obj$interaction_contrast),datamatic=.datamatic)
             resgrid<-do.call(emmeans::contrast,opts_list)
+
             res<-as.data.frame(resgrid)
             
             ### deal with confidence intervals ###
@@ -886,7 +885,6 @@ procedure.simpleInteractions<-function(obj) {
               res<-cbind(res,ci[,c(ncol(ci)-1,ncol(ci))])
               
             }
-            
             
             ##
             names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","test","p","est.ci.lower","est.ci.upper")

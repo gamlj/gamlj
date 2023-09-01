@@ -1,11 +1,11 @@
 testthat::context("glm")
 tol<-.001
 
-mod0<-gamlj::gamlj_lm(
+mod0<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
   formula=len~supp+dose)
 
-mod1<-gamlj::gamlj_lm(
+mod1<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
   dep = "len",
   factors = "supp",
@@ -19,14 +19,14 @@ testthat::test_that("equivalent model input (1)", {
   })
 
 
-mod0<-gamlj::gamlj_lm(
+mod0<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
   dep = "len",
   factors = "supp",
   covs="dose",
   model_terms = list("dose","supp",c("dose","supp")))
 
-mod1<-gamlj::gamlj_lm(
+mod1<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
   dep = "len",
   factors = "supp",
@@ -61,7 +61,7 @@ testthat::test_that("glm p eta2 are correct", {
 
 data("hsbdemo")
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~1
 )
@@ -70,7 +70,7 @@ testthat::test_that("intercept only works",
                     testthat::expect_equal(round(mod$main$coefficients$asDF[1,3],digits=2),51.85)
           )
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   ci_width = 90,
@@ -105,7 +105,7 @@ testthat::test_that("glm CI width", {
 
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math*schtyp*write,
   ci_width=90,
@@ -119,7 +119,7 @@ testthat::test_that("SE names are fine",{
 }
 )
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math*schtyp*write,
   ci_width=90,
@@ -127,7 +127,7 @@ mod<-gamlj::gamlj_lm(
   simple_mods  = list("math","write"),
   simple_interactions  = T
 )
-
+mod
 testthat::test_that("SE multiple moderators iv=categorical",{
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1],"public - private")
   testthat::expect_equal(mod$simpleEffects$anova$asDF$test[1],1.469,tol)
@@ -146,7 +146,7 @@ testthat::test_that("simple interaction",{
 hsbdemo$c1<-factor(rep(c(1,0),length(hsbdemo$id)/2))
 hsbdemo$c2<-factor(rep(c(1,0),each=length(hsbdemo$id)/2))
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~c1*c2,
   posthoc =  list("c1",c("c1","c2")),
@@ -170,7 +170,7 @@ testthat::test_that("postoh in glm", {
 })
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   posthoc  = list("schtyp")
@@ -182,7 +182,7 @@ testthat::test_that("glm posthoc", {
 })
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   es_info =  T
@@ -198,7 +198,7 @@ testthat::test_that("glm effectsize", {
 data<-hsbdemo
 
 names(data)[3]<-c("Gender (test ?)")
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = data,
   formula=science~math+`Gender (test ?)`+math:`Gender (test ?)`,
   simple_x = `Gender (test ?)`,
@@ -215,7 +215,7 @@ testthat::test_that("glm weird names", {
 
 data$sex<-factor(data$`Gender (test ?)`,levels=c("female","male"))
 
-mod2<-gamlj::gamlj_lm(
+mod2<-GAMLj3::gamlj_lm(
   data = data,
   formula=science~math+sex+math:sex,
   simple_x  = math,
@@ -229,7 +229,7 @@ testthat::test_that("glm weird names", {
   )
 })
 
-mod3<-gamlj::gamlj_lm(
+mod3<-GAMLj3::gamlj_lm(
   data = data,
   formula=science~math+math:`Gender (test ?)`+`Gender (test ?)`,
   simple_x  = `Gender (test ?)`,
@@ -250,14 +250,14 @@ data<-hsbdemo
 levels(data$ses)<-c("s1","s2","s3")
 levels(data$female)<-c("f1","f2")
 
-mod0<-gamlj::gamlj_lm(
+mod0<-GAMLj3::gamlj_lm(
   data = data,
   formula=science~math*ses*female,
   posthoc = list(c("ses","female")),
   posthoc_es  = c("dm")
 )
 
-mod1<-gamlj::gamlj_lm(
+mod1<-GAMLj3::gamlj_lm(
   data = data,
   formula=science~math*ses*female,
   posthoc = ~ses:female,
@@ -275,7 +275,7 @@ data$`weird !`<-hsbdemo$female
 levels(data$`weird !`)<-c("a!","b!")
 levels(data$`weird ?`)<-c("a?","b?","c?")
 
-weird<-gamlj::gamlj_lm(
+weird<-GAMLj3::gamlj_lm(
   data = data,
   formula=science~math*`weird !`*`weird ?`,
   simple_mods  = list("weird !","weird ?"),
@@ -292,7 +292,7 @@ testthat::test_that("weird posthoc", {
 
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp, 
   emmeans = ~schtyp,
@@ -313,7 +313,7 @@ testthat::test_that("glm assumptions", {
 })
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   formula = science ~ math + schtyp + schtyp:math,
   data = hsbdemo,
   contrasts = list(list(
@@ -334,7 +334,7 @@ testthat::test_that("glm contrasts", {
 
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   formula = science ~ math + I(math^2),
   data = data
 )
@@ -347,7 +347,7 @@ testthat::test_that("glm contrasts", {
 })
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   formula = read ~ 1,  data = data
 )
 res<-mod$main$anova$asDF
@@ -358,7 +358,7 @@ testthat::test_that("glm intercept only model", {
 
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   formula = read ~ 0,  data = data,
   fixed_intercept =FALSE
 )
@@ -370,7 +370,7 @@ testthat::test_that("glm zero-intercept model", {
 
 
 ### bootstrap
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math+prog+math:prog, 
   emmeans = ~prog,
@@ -387,7 +387,7 @@ testthat::test_that("bootstrap ci make sense", {
 })
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~0+math+prog+math:prog, 
   emmeans = ~prog
@@ -397,7 +397,7 @@ testthat::test_that("glm zero-intercept model", {
   testthat::expect_equal(mod$main$coefficients$asDF$se[4],1.3814,tol)
 })
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~1+math+prog+math:prog, 
   omnibus = "LRT"
@@ -411,7 +411,7 @@ testthat::test_that("model comparison", {
 
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~1+prog+math+math:prog, 
   nested_terms = ~math:prog
@@ -423,7 +423,7 @@ testthat::test_that("model comparison", {
 })
 
 
-mod<-gamlj::gamlj_lm(
+mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~1,
   nested_terms=~0

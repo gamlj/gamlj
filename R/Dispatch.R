@@ -65,7 +65,6 @@ Dispatch <- R6::R6Class(
                                 
                                 if (inherits(table,"Html")) {
                                   content<-table$content
-                                  mark(table$content)
                                   state<-table$state
                                   table$setState(c(state,obj$message))
                                   table$setContent(paste("<div><i>Note:</i>",table$state,"</div>"))

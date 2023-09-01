@@ -651,7 +651,7 @@ options:
 
 ### this is only for beta models
     - name: preds_phi
-      title: Predictors for precision
+      title: Predictors in precision model
       type: Bool
       default: false
       description:

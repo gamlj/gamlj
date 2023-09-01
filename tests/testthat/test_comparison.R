@@ -10,12 +10,12 @@ data$yord<-factor(data$yord)
 data$ybin<-factor(data$ybin)
 
 
-mod0 <- gamlj::gamlj_lm(
+mod0 <- GAMLj3::gamlj_lm(
   formula = ycont~x,
   data = data
 )
 
-mod1 <- gamlj::gamlj_lm(
+mod1 <- GAMLj3::gamlj_lm(
   formula = ycont~x*w,
   data = data,
 )
@@ -34,7 +34,7 @@ testthat::test_that("test glm anova comparison", {
   testthat::expect_equal(a$asDF$r2[3],.00049,tol)
 })
 
-mod <- gamlj::gamlj_lm(
+mod <- GAMLj3::gamlj_lm(
   formula = ycont~x*w,
   data = data,
   nested_terms = ~x

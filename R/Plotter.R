@@ -688,7 +688,7 @@ Plotter <- R6::R6Class(
         mode=mode,
         nesting = NULL,
         options  = list(level = private$.operator$ciwidth),
-        data =  insight::get_data(private$.operator$model)
+        data =  insight::get_data(private$.operator$model, source="frame")
 
       )
 

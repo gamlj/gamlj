@@ -51,7 +51,7 @@ es.marginals<-function(obj) {
   if (obj$option("ci_method",c("quantile","bcai")))
     vce <- "bootstrap"
   ciWidth        <-  obj$ciwidth
-  data           <-  insight::get_data(model)
+  data           <-  insight::get_data(model,source="frame")
   .model         <-  model
   m              <-  try_hard(margins::margins(.model,data=data,vce=vce))
   results        <-  try_hard(summary(m$obj,level=ciWidth,by_factor=FALSE))
@@ -66,7 +66,7 @@ es.marginals<-function(obj) {
   
   offset         <-  stats::offset
   ciWidth        <-  obj$ciwidth
-  data           <-  insight::get_data(model)
+  data           <-  insight::get_data(model,source="frame")
   groups         <-  model$lev[-1]
   ref_lev        <-  model$lev[1]
   form           <-  stats::formula(model$terms)
@@ -122,7 +122,7 @@ es.marginals<-function(obj) {
 es.relativerisk<-function(obj) {
   
       model          <-  obj$model
-      data           <-  insight::get_data(model)
+      data           <-  insight::get_data(model,source="frame")
       ciWidth        <-  obj$ciwidth
       depobj         <-  obj$datamatic$variables[[tob64(obj$options$dep)]]
       levs           <-  levels(data[[depobj$name64]])
@@ -202,7 +202,6 @@ es.glm_variances<-function(model,obj) {
 add_effect_size<- function(x,...) UseMethod(".add_es")
 
 .add_es.default<-function(atable,model,variable) {
-  mark("SIMPLE EFFECT: no effect size for class",class(atable),class(model))
   return(atable)
   
 }

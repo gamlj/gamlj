@@ -2,7 +2,7 @@ testthat::context("R interface")
 tol<-0.001
 data("qsport")
 
-obj<-gamlj::gamlj_lm(
+obj<-GAMLj3::gamlj_lm(
     formula = performance ~ hours+type,
     posthoc = ~type,
     data = qsport)
@@ -31,7 +31,7 @@ newopt<-list(var="hours",type="standardized")
 
 
 qsport$z<-as.numeric(scale(qsport$performance))
-zobj<-gamlj::gamlj_lm(
+zobj<-GAMLj3::gamlj_lm(
   formula = z ~ hours,
   data = qsport,
   covs_scale =newopt)
@@ -53,7 +53,7 @@ testthat::test_that("updating", {
 
 data("hsbdemo")
 
-mod<-gamlj::gamlj_glm(
+mod<-GAMLj3::gamlj_glm(
   formula = prog ~ write +  ses*female,
   data = hsbdemo,
   estimates_ci = TRUE,
@@ -75,7 +75,7 @@ testthat::test_that("plot ok", {
 data("subjects_by_stimuli")
 
 subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
-mod<-gamlj::gamlj_mixed(
+mod<-GAMLj3::gamlj_mixed(
   formula = y ~ cond+( 1 | subj ),
   data = subjects_by_stimuli)
 
@@ -92,14 +92,14 @@ testthat::test_that("Mixed dots work", {
 
 data("schoolexam")
 schoolexam$school<-factor(schoolexam$school)
-mod<-gamlj::gamlj_mixed(
+mod<-GAMLj3::gamlj_mixed(
   formula = pass ~ 1 + math+( 1 | school ),
   data = schoolexam,
   plot_x = math,
   ci_method = "wald")
 
 preds<-predict(mod)
-n<-dim(gamlj::get_data(mod))[1]
+n<-dim(GAMLj3::get_data(mod))[1]
 testthat::test_that("glmixed predict", {
   testthat::expect_equal(round(mean(preds),2),0.51)
   testthat::expect_equal(n,5041)
@@ -109,7 +109,7 @@ testthat::test_that("glmixed predict", {
 
 
 
-mod1<-gamlj::gamlj_mixed(
+mod1<-GAMLj3::gamlj_mixed(
   formula = formula("pass ~ 1 + math+( 1 | school )"),
   data = schoolexam,
   plot_x = math,
@@ -126,12 +126,12 @@ wicksell$time<-factor(wicksell$time)
 wicksell$group<-factor(wicksell$group)
 wicksell$subj<-factor(wicksell$subj)
 
-gobj<-gamlj::gamlj_mixed(
+gobj<-GAMLj3::gamlj_mixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = wicksell)
 
-r1<-gamlj::posthoc(gobj)
-r2<-gamlj::posthoc(gobj,formula=~group+group:time,adjust=c("bonf","holm"))
+r1<-GAMLj3::posthoc(gobj)
+r2<-GAMLj3::posthoc(gobj,formula=~group+group:time,adjust=c("bonf","holm"))
 tab<-r2[[2]]$asDF
 testthat::test_that("posthoc function", {
                     testthat::expect_false(r1)
@@ -140,7 +140,7 @@ testthat::test_that("posthoc function", {
 }
 )
 
-gobj<-gamlj::gamlj_mixed(
+gobj<-GAMLj3::gamlj_mixed(
   formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
   data = wicksell)
 
@@ -162,13 +162,13 @@ subjects_by_stimuli$subj<-factor(subjects_by_stimuli$subj)
 subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 contrasts(subjects_by_stimuli$cond)<-contr.sum(2)/2
 
-mod1<-gamlj::gamlj_mixed(
+mod1<-GAMLj3::gamlj_mixed(
   formula =y ~ 1 + cond+( 1+cond|subj ),
   data = subjects_by_stimuli,
   rand_hist=T
 )
 
-res<-gamlj::assumptions(mod1)
+res<-GAMLj3::assumptions(mod1)
 
 testthat::test_that("assumptions plots are there", {
   testthat::expect_equal(length(res),2)
@@ -178,13 +178,13 @@ testthat::test_that("assumptions plots are there", {
 
 
 
-mod<-gamlj::gamlj_mixed(
+mod<-GAMLj3::gamlj_mixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli
 )
 
 preds<-predict(mod)
-n1<-dim(gamlj::get_data(mod))[1]
+n1<-dim(GAMLj3::get_data(mod))[1]
 n2<-length(preds)
 testthat::test_that("mixed predict", {
   testthat::expect_equal(mean(preds),19.6,tol)
@@ -197,7 +197,7 @@ rmod0<-mod$model
 
 rmod1<-lme4::lmer(
   formula =y ~ 1 + cond+( 1|subj ),
-  data = gamlj::get_data(mod),
+  data = GAMLj3::get_data(mod),
   REML = TRUE
 )
 
@@ -207,7 +207,7 @@ testthat::test_that("mixed get model", {
 })
 
 
-mod<-gamlj::gamlj_mixed(
+mod<-GAMLj3::gamlj_mixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli,
   contrasts = c(cond="deviation")
@@ -226,7 +226,7 @@ data("hsbdemo")
 mod0<-stats::glm(schtyp ~ write + honors + honors:write,data=hsbdemo,family = binomial())
 preds0<-predict(mod0,type = "response")
 
-mod1<-gamlj::gamlj_glm(
+mod1<-GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   expb_ci = T,
@@ -256,7 +256,7 @@ testthat::test_that("simple effects ", {
 })
 
 
-mod<-gamlj::gamlj_glm(
+mod<-GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   estimates_ci = TRUE,

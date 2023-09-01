@@ -10,14 +10,14 @@ data$yord<-factor(data$yord)
 data$ybin<-factor(data$ybin)
 
 
-mod0 <- gamlj::gamlj_gmixed(
+mod0 <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*w+(1+x|cluster),
   data = data,
   model_type = "logistic"
 )
 
 
-mod1 <- gamlj::gamlj_gmixed(
+mod1 <- GAMLj3::gamlj_gmixed(
   data=data,
   model_type = "logistic",
   dep = "ybin",
@@ -27,7 +27,7 @@ mod1 <- gamlj::gamlj_gmixed(
   re=list(list(list("Intercept","cluster"),list("x","cluster")))
 )
 
-mod2 <- gamlj::gamlj_gmixed(
+mod2 <- GAMLj3::gamlj_gmixed(
   data=data,
   model_type = "logistic",
   dep = "ybin",
@@ -48,7 +48,7 @@ testthat::test_that("equivalent model input", {
 
 
 
-model <- gamlj::gamlj_gmixed(
+model <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*w*z+(1+x|cluster),
   data = data,
   model_type = "logistic"
@@ -70,7 +70,7 @@ testthat::test_that("fit is ok", {
   
 })
 
-mod <- gamlj::gamlj_gmixed(
+mod <- GAMLj3::gamlj_gmixed(
   formula = ypoi ~ x * w +(1+w|cluster),
   data = data,
   model_type = "poisson",
