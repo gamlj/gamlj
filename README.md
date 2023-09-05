@@ -2,7 +2,7 @@
 
 General, Mixed, Generalized, and Generalized Mixed Models 
 
-version 2.6.*
+version 2.4.*
 
 <center>
 <img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
