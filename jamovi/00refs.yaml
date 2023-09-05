@@ -13,3 +13,18 @@ refs:
       title: "Compute and interpret indices of effect size"
       publisher: 'CRAN'
       url: https://github.com/easystats/effectsize
+   parameters:
+      type: 'software'
+      author: Lüdecke, Ben-Shachar, Patil &  Makowski
+      year: 2020
+      title: "Extracting, Computing and Exploring the Parameters of Statistical Models using R"
+      publisher: 'CRAN'
+      url: https://github.com/easystats/parameters
+      
+   goodness:
+      type: 'software'
+      author: Gallucci, M.
+      year: 2020
+      title: "Model goodness of fit in GAMLj"
+      url: https://gamlj.github.io/details_goodness.html
+      

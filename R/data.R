@@ -1,6 +1,6 @@
 #' Beers at bars
 #'
-#' Data for random coefficients regression, with smiles as dependent
+#' Simulated data testing random coefficients regression, with smiles as dependent
 #' variable, beers as independent variable, and bars as cluster
 #'
 #' @docType data
@@ -13,7 +13,7 @@ NULL
 
 #' Subjects by stimuli cross-classification dataset
 #'
-#' Data for Subjects by stimuli cross-classification examples
+#' Simulated data for subjects by stimuli cross-classification examples
 #'
 #' @docType data
 #' @name subjects_by_stimuli
@@ -25,7 +25,7 @@ NULL
 
 #' Subjects by stimuli nested classification dataset
 #'
-#' Data for stimuli nested in subjects classification examples
+#' Simulated data for stimuli nested in subjects classification examples
 #'
 #' @docType data
 #' @name subjects_on_stimuli
@@ -35,21 +35,10 @@ NULL
 #' data(subjects_on_stimuli)
 NULL
 
-#' School data for testing
-#'
-#' Data for different examples
-#'
-#' @docType data
-#' @name hsbdemo
-#' @usage data(hsbdemo)
-#' @keywords datasets
-#' @examples
-#' data(hsbdemo)
-NULL
 
 #' Sport data with curvilinear effects
 #'
-#' Data for curvilinear effects
+#' Simulated data for curvilinear effects examples
 #'
 #' @docType data
 #' @name qsport
@@ -74,7 +63,7 @@ NULL
 
 #' Five groups for contrasts
 #'
-#' Data with five groups and a continuous dependent variable for checking contrasts results
+#' Simulated data with five groups and a continuous dependent variable for checking contrasts results
 #'
 #' @docType data
 #' @name fivegroups
@@ -84,40 +73,57 @@ NULL
 #' data(fivegroups)
 NULL
 
-#' Poisson data
+
+#' Clustered data for generalized mixed model
 #'
-#'  Simulated data of a poisson distributed dependent variables with some independent variabes
-#'
+#' Generated data to test generalized mixed models. The variables can be used:
+#'  `x` and `z` as two continuous independent variables; `w` as categorical independent variable;
+#' `ybin` as dichotomous dependent variable; `ypoi` as count variable (Poisson);
+#' `cluster` as the clustering variable.
 #' @docType data
-#' @name poissonacts
-#' @usage data(poissonacts)
+#' @name gmixeddata
+#' @usage data(glmmixeddata)
 #' @keywords datasets
 #' @examples
-#' data(poissonacts)
+#' data(glmmixeddata)
+NULL
+
+#'       Generated data to test different types of linear models. The variables can be used as:
+#'       
+#'       `x` and `z` as two continuous independent variables; 
+#'       
+#'       `cat2` and `cat3`  as categorical independent variables, with two and three groups respectively;
+#'       
+#'       `ycont` is a continuous variable, suitable as dependent variable. 
+#'       `ybin` is dichotomous dependent variable; `ypoi` a count variable (Poisson),
+#'       `yord` and ordinal dependent variable with 5 levels, and `ycat` a categorical dependent variable with three groups.
+
+#' @docType data
+#' @name manymodels
+#' @usage data(manymodels)
+#' @keywords datasets
+#' @examples
+#' data(manymodels)
 NULL
 
 
-#' Clustered data for logistic regression
-#'
-#' Simulated data for testing logistic mixed models. 
-#' Simulation of pupils data clustered across schools with a dichotomous outcome  
-#'
+#'       Generated data to test different types of linear models with clustered data. 
+#'       The variables can be used as:
+#'       
+#'       `x` and `z` as two continuous independent variables; 
+#'       
+#'       `cat2` and `cat3`  as categorical independent variables, with two and three groups respectively;
+#'       
+#'       `ycont` is a continuous variable, suitable as dependent variable. 
+#'       `ybin` is dichotomous dependent variable; `ypoi` a count variable (Poisson),
+#'       `yord` and ordinal dependent variable with 5 levels, and `ycat` a categorical dependent variable with three groups.
+
+#'       `cluster` as the clustering variable.
 #' @docType data
-#' @name schoolexam
-#' @usage data(schoolexam)
+#' @name clustermanymodels
+#' @usage data(clustermanymodels)
 #' @keywords datasets
 #' @examples
-#' data(schoolexam)
+#' data(clustermanymodels)
 NULL
 
-#' Clustered data for Negative Binomial model
-#'
-#' Modified version of a dataset in Long, J. S., & Freese, J. (2006). Regression models for categorical dependent variables using Stata. Stata press.
-#' Data present number of articles published by PhD students in a three year period with some predictors. Data are clustered by program.
-#' @docType data
-#' @name phdpubs
-#' @usage data(phdpubs)
-#' @keywords datasets
-#' @examples
-#' data(phdpubs)
-NULL

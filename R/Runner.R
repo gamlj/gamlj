@@ -1,0 +1,757 @@
+## This class takes care of estimating the model and returns the results. It inherits from Syntax, and defines the same tables
+## defined by Syntax, but it fill them with the results. It also adds a few tables not defined in Syntax
+
+## Any function that produce a table goes here
+
+Runner <- R6::R6Class("Runner",
+                        inherit = Initier,
+                        cloneable=FALSE,
+                        class=TRUE,
+                        public=list(
+                          model=NULL,
+                          boot_model=NULL,
+                          nested_model=NULL,
+                          tab_simpleAnova=NULL,
+                          tab_simpleCoefficients=NULL,
+                          tab_randomcov=NULL,
+                          boot_variances=NULL,
+                          etime=0,
+                          estimate = function(data) {
+                            
+                            t<-Sys.time()
+                            self$model<-private$.estimateModel(data)
+                            self$etime<-as.numeric(Sys.time()-t)
+                            
+                            jinfo("RUNNER: initial estimation done, ",self$etime," secs")
+                            
+                            if (self$options$comparison) {
+                              obj<-try_hard(mf.update(self$model,formula=as.formula(self$nestedformulaobj$formula64())))
+                              self$nested_model<-obj$obj
+                              if (!isFALSE(obj$warning))
+                                    self$warning<-list(topic="main_r2",
+                                                             message=paste("Nested model:",obj$warning))
+                              if (!isFALSE(obj$error))
+                                    self$warning<-list(topic="main_r2",
+                                                             message=paste("Nested model:",obj$error))
+                              
+                            }
+                          }, # end of public function estimate
+
+                          ##### fill the tables #####
+                          
+                          run_info=function() {
+                               
+                                tab<-self$init_info()
+                                tab[["sample"]]$value<-self$datamatic$N
+                            
+                          ## TODO: generalize if other models need an optimizer other than lmer
+                                if (isTRUE(self$infomatic$optimized))
+                                    tab[["optim"]]$value<-self$model@optinfo$optimizer
+                          
+                                tab[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
+                                ### issue some notes ###
+                                if (self$option("ci_method",c("quantile","bcai")) & self$option("posthoc") & self$option("posthoc_es") & self$option("d_ci")) 
+                                  self$warning<-list(topic="posthocEffectSize",message="Bootstrap confidence intervals not available for effect sizes. They are computed based on t-distribution")
+                                tab
+                          },                    
+                          run_main_fit=function() {
+                            
+                            tab<-self$init_main_fit()
+                            for (name in names(tab)) {
+                              
+                              if (name=="lik")
+                                tab[["lik"]]$value<-as.numeric(stats::logLik(self$model))
+                              if (name=="aic")
+                                tab[["aic"]]$value<-stats::AIC(self$model)
+                              if (name=="bic")
+                                tab[["bic"]]$value<-stats::BIC(self$model)
+                              if (name=="dev")
+                                tab[["dev"]]$value<-insight::get_deviance(self$model)
+                              if (name=="dfr")
+                                tab[["dfr"]]$value<-stats::df.residual(self$model)
+                              if (name=="over") {
+                                value <- sum(stats::residuals(self$model, type = "pearson")^2)
+                                result <- value/stats::df.residual(self$model)
+                                tab[["over"]]$value<-result
+                              }
+                            }
+                            
+                            #### model comparison #####
+                            if (!is.null(self$nested_model)) {
+                              
+                             for (name in names(tab)) {
+                              if (name=="lik") {
+                                tab[["lik"]]$nested<-as.numeric(stats::logLik(self$nested_model))
+                                tab[["lik"]]$diff<-tab[["lik"]]$value-tab[["lik"]]$nested
+                              }
+                              if (name=="aic") {
+                                tab[["aic"]]$nested<-stats::AIC(self$nested_model)
+                                tab[["aic"]]$diff<-tab[["aic"]]$value-tab[["aic"]]$nested
+                              }
+                              if (name=="bic") {
+                                tab[["bic"]]$nested<-stats::BIC(self$nested_model)
+                                tab[["bic"]]$diff<-tab[["bic"]]$value-tab[["bic"]]$nested
+                                
+                              }
+                              if (name=="dev") {
+                                tab[["dev"]]$nested<-insight::get_deviance(self$nested_model)
+                                tab[["dev"]]$diff<-tab[["dev"]]$value-tab[["dev"]]$nested
+                              }
+                              if (name=="dfr") {
+                                tab[["dfr"]]$nested<-stats::df.residual(self$nested_model)
+                                tab[["dfr"]]$diff<-tab[["dfr"]]$nested-tab[["dfr"]]$value
+                                
+                              }
+                              if (name=="over") {
+                                value <- sum(stats::residuals(self$nested_model, type = "pearson")^2)
+                                result <- value/stats::df.residual(self$nested_model)
+                                tab[["over"]]$nested<-result
+                                tab[["over"]]$diff<-""
+                                
+                              }
+                            }
+                            }
+                            
+                            
+                            tab
+                          },
+                          run_main_anova=function() {
+
+                            if (!self$formulaobj$isProper) {
+
+                                if (self$infomatic$caller=="lm") {
+                                    self$warning<-list(topic="main_anova",message=WARNS["lm.zeromodel"])
+                                    return(ganova(self$model,self))
+                                }   else { 
+                                    self$warning<-list(topic="main_anova",message=WARNS["error.zeromodel"])
+                                    return(NULL)
+                                }
+                            }
+                            ganova(self$model,self)
+                          },
+                          
+                          run_main_r2=function() {
+                             
+                              obj<-gFit$new(self)
+                              obj$r2table()
+
+                          },
+                          
+                          run_main_coefficients=function() {
+
+                            if (is.null(self$boot_model) & self$option("ci_method",c("quantile","bcai"))) 
+                              private$.bootstrap_model()
+
+                            tab<-NULL
+                            if (self$formulaobj$isProper) {
+                              tab       <-  gparameters(self$model,self)
+                              tab       <-  private$.fix_names(tab)
+                            }
+                            tab
+                            
+                          },
+                          ### this is for beta regression
+                          run_main_phi=function() {
+                            
+
+                            ss  <- summary(self$model)
+                            tab <- ss$coefficients$precision
+                            tab<-as.data.frame(parameters::parameters(self$model,component="precision"))
+                            names(tab)<-c("source","estimate","se","none","est.ci.lower","est.ci.upper","test","df_error","p")
+                            tab       <-  private$.fix_names(tab)
+                            tab
+                            
+                          },
+                          
+                          ### anova effect sizes ####
+                          
+                          run_main_effectsizes=function()  {
+                            
+                            if (!self$option("ci_method","wald")) {
+                              jinfo("RUNNER: bootstrapping variances")
+                              self$boot_variances<-boot::boot(self$model$model,
+                                                              statistic = es.var_boot_fun,
+                                                              R = self$options$boot_r,
+                                                              model=self$model)
+                              jinfo("RUNNER: bootstrapping done")
+                            }
+                            es.glm_variances(self$model,self)
+                            
+                          },
+                          
+                          
+                          run_main_intercept=function() {
+                            
+                              ss<-summary(self$model)
+                              tt<-ss$coefficients[1,3]
+                              f<-tt^2
+                              df<-stats::df.residual(self$model)
+                              p<-ss$coefficients[1,4]
+                              etap<-effectsize::t_to_eta2(tt,df_error = df)
+                              omegap<-effectsize::t_to_omega2(tt,df_error = df)
+                              epsilonp<-effectsize::t_to_epsilon2(tt,df_error = df)
+                              tab<-list(list(source="(Intercept)",
+                                             df=df,
+                                             f=f,
+                                             etaSqP=etap[1,1],
+                                             omegaSqP=omegap[1,1],
+                                             epsilonSqP=epsilonp[1,1],
+                                             p=p))
+                               tab
+                          },
+                          run_main_vcov=function() {
+                            
+                            tab<-as.data.frame(stats::vcov(self$model))
+                            names(tab)<-paste0("c",1:dim(tab)[2])
+                            tab$source<-rownames(tab)
+                            tab<-private$.fix_names(tab)
+                            tab
+                          },
+                          run_main_marginals=function() {
+                            
+                            tab<-NULL
+
+                            if (self$formulaobj$hasTerms) {
+                              tab       <-  es.marginals(self)
+                            }
+                            tab
+                          },
+                          
+                          run_main_relativerisk=function() {
+                            tab<-NULL
+                            if (self$formulaobj$isProper) {
+                              tab       <-  es.relativerisk(self)
+                              tab       <-  private$.fix_names(tab)
+                            }
+                            if (self$hasIntercept)
+                                 tab$label[tab$source=="(Intercept)"]<-"Probability"
+                            
+                            tab
+                          },
+                          run_main_paralleltest=function() {
+                            
+                            tab<-NULL
+                            if (self$formulaobj$hasTerms) {
+        
+                              ## for reasons beyond my comprehension, the clm model must be 
+                              ## estimate there, otherwise nominal test cannot be computed
+                              obj<-try_hard({
+                                form<-formula(paste(self$formulaobj$formula64(),collapse = ""))
+                                mod<-do.call(ordinal::clm,list(formula=form,data=self$model$model)) 
+                                ordinal::nominal_test(mod)
+                                })
+                              if (!isFALSE(obj$error))
+                                    warnings(obj$error)
+                              
+                              if (!isFALSE(obj$warning)) {
+                                  if (length(grep("deprecated",obj$warning,fixed=T ))==0)
+                                        warnings(obj$warning)
+                              }
+                              
+                              tab<-as.data.frame(obj$obj)
+                              tab<-tab[rownames(tab)!="<none>",]
+                              names(tab)<-c("df","loglik","aic", "test","p")
+                              tab$source<-fromb64(rownames(tab))
+                            } else
+                               warning("Parallel test cannot be computed")
+                            tab
+                          },
+                          run_main_random=function() {
+                            
+                              jinfo("RUNNER: estimating variance components")
+                              results<-gVarCorr(self$model,self)
+                              
+                              self$tab_randomcov<-results[[2]]
+                              return(results[[1]])
+                              
+                              grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
+                              ### if the model has no intercept or intercept and 
+                              ### effects of factors are set as uncorrelated
+                              ### lmer() estimate random means, and name them
+                              ### factornamefactorlevel. We fix this make the 
+                              ### labels more intuitive
+                              vc$groups <- fromb64(grp)
+                              var1<-gsub(LEVEL_SYMBOL," = ",vc$var1,fixed = T)
+                              vc$name   <- fromb64(var1)
+                              var2<-gsub(LEVEL_SYMBOL," = ",vc$var2,fixed = T)
+                              vc$name2  <- fromb64(var2)
+                              
+                              variances<-which(is.na(vc$var2))
+                              params<-vc[variances,]
+                              params$icc<-NA
+                              
+                              int<-which(params$name %in% "(Intercept)")
+                              for (i in int)
+                                  params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model,verbose = FALSE))
+                              nr<-nrow(params)+1
+                              if (params$grp[nrow(params)]!="Residual"){
+                                  params[nr,"groups"] <- "Residual"
+                                  params[nr,"name"]  <- ""
+                                  params[nr,"var"]   <- insight::get_variance_residual(self$model,verbose = FALSE)
+                                  params[nr,"std"]   <- sqrt(params[nr,"var"]) 
+                              }
+                                
+                              self$warning<-list(topic="main_random",message=attr(vc,"info"))
+
+                              covariances<-which(!is.na(vc$var2))
+                            if (nrow(vc[covariances,])>0) {
+                                self$tab_randomcov<-vc[covariances,]
+                            }
+                              params
+                          },
+                          run_main_randomcov=function() {
+
+                            if (is.something(self$tab_randomcov))
+                                return(self$tab_randomcov)
+                          },
+                          run_main_multirandom=function() {
+
+                            
+                            tab<-self$model$VarCov
+                            tab<-lapply(tab,function(x) {
+                               q<-as.data.frame(x)
+                               q$name<-fromb64(rownames(q))
+                               q})
+                            tab
+                            
+                          },
+                          run_main_res_corr=function() {
+                            
+                            tab<-as.matrix(self$model$modelStruct$corStruct)[[1]]
+                            tab[!lower.tri(tab)]<-NA
+                            tab[col(tab)==row(tab)]<-1
+                            tab<-as.data.frame(tab)
+                            tab$index<-names(tab)
+                            tab
+
+                          },
+                          run_main_ranova=function() {
+                            jinfo("RUNNER: ranova")
+                            anovas.ranova(self$model,self)
+                          },
+                          
+                          run_posthoc=function() {
+                            
+                            if (length(self$options$posthoc)==0)
+                               return()
+
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
+                              private$.bootstrap_model()
+                            
+                            tab<-procedure.posthoc(self)
+                            tab
+                          },
+                          
+                          run_posthocEffectSize=function() {
+                            procedure.posthoc_effsize(self)
+                          },
+                          
+                          run_emmeans=function() {
+                            
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
+                              private$.bootstrap_model()
+                            
+#                            if (self$option("model_type","ordinal")) {
+#                                 msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
+#                                 self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
+#                            }
+                            procedure.emmeans(self)
+                          },
+                          
+                          run_simpleEffects_anova=function() {
+                            
+                            if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") 
+                              return(NULL)
+                            
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
+                              private$.bootstrap_model()
+                            
+                            if (is.null(self$tab_simpleAnova))
+                                private$.estimateSimpleEffects()
+                            self$tab_simpleAnova
+                          },
+                          
+                          run_simpleEffects_coefficients=function() {
+                            
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
+                              private$.bootstrap_model()
+                            
+                            if (is.null(self$tab_simpleCoefficients))
+                               private$.estimateSimpleEffects()
+                            
+                            self$tab_simpleCoefficients
+                          },
+                          
+                          run_simpleInteractions=function() {
+                            
+                            if (is.null(self$boot_model) & !self$option("ci_method","wald")) 
+                              private$.bootstrap_model()
+                            
+                            
+                            procedure.simpleInteractions(self)
+                          },
+                          
+                          run_assumptions_homotest=function() {
+
+                                data<-self$model$model
+                                ## Breusch-Pagan ##
+                                bptable<-list(name=c("Breusch-Pagan Test"))
+                                test<-lmtest::bptest(self$model)
+                                bptable[["test"]] <- test$statistic
+                                bptable[["df1"]]  <- test$parameter
+                                bptable[["df2"]]  <- ""
+                                bptable[["p"]]    <- test$p.value
+                                
+                                factors <-   names(attr(stats::model.matrix(self$model),"contrasts"))
+                                if (is.null(factors))
+                                  return(list(bptable))
+                                data$res<-residuals(self$model)
+                                rhs <- paste0('`', factors, '`', collapse=':')
+                                formula <- stats::as.formula(paste0('`res`~', rhs))
+                                result <- car::leveneTest(formula, data, center="mean")
+                                ltable<-list(name=c("Levene's Test"))
+                                ltable[["test"]] <- result[1,'F value']
+                                ltable[["df1"]]  <- result[1,'Df']
+                                ltable[["df2"]]  <- result[2,'Df']
+                                ltable[["p"]]    <- result[1,'Pr(>F)']
+                                warning("Levene's test is done only for factors.")
+                                return(list(bptable,ltable))
+                          },
+                          run_assumptions_normtest=function() {
+                           
+                            table<-data.frame(name=c("Kolmogorov-Smirnov","Shapiro-Wilk"),test=c(NaN,NaN),p=c(NaN,NaN))
+                            rr<-residuals(self$model)
+                            ks<-ks.test(rr,"pnorm",mean(rr),sd(rr))
+                            table$test[1]=ks$statistic
+                            table$p[1]=ks$p.value
+                            
+                            st<-try_hard(shapiro.test(rr))
+                            if (!isFALSE(st$error)) {
+                              warning("Shapiro-Wilk not available due to too large number of cases")
+                            }
+                            else {
+                              table$test[2]=st$obj$statistic
+                              table$p[2]=st$obj$p.value 
+                            }
+                            table
+                          },
+                          
+                          
+                          savePredRes=function(results) {
+                            
+                            
+                            if (self$options$predicted && results$predicted$isNotFilled()) {
+                                jinfo("Saving predicted")
+
+                                
+                                pdf <- predicted(self$model,self)
+                                
+                                results$predicted$set(1:ncol(pdf),
+                                                      names(pdf),
+                                                      rep("Predicted",ncol(pdf)),
+                                                      rep("continuous",ncol(pdf)))
+                                results$predicted$setValues(pdf)
+                            }
+                            if (self$options$residuals && results$residuals$isNotFilled()) {
+                                jinfo("Saving residuals")
+                                p<-stats::residuals(self$model,type="response")
+                              # we need the rownames in case there are missing in the datasheet
+                              pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model, source="frame")))
+                              results$residuals$setValues(pdf)
+                            }
+                          },
+                          #### we need this here because emmeans needs a contrast that
+                          ###  we can control in terms of variable type
+                          
+                          interaction_contrast=function(levels,datamatic=NULL) {
+                            
+                            nvar<-length(datamatic)
+                            private$.contr_index<-private$.contr_index+1
+                            i<-private$.contr_index
+                            var <-datamatic[[i]]
+                            if (var$type=="factor")
+                                contrast<-var$contrast_values
+                            else 
+                                contrast<-c(-.5,.5)
+                            contrast<-as.data.frame(MASS::ginv(t(contrast)))
+                            if (private$.contr_index==nvar)
+                                  private$.contr_index<-0
+
+                            if (var$type=="factor")
+                                      names(contrast)<-paste0("(",gsub(" ","",var$contrast_labels),")")
+
+                            else
+                              names(contrast)<-var$name
+
+                            return(contrast)
+                          }
+                          
+                          
+                          ),# end of public
+
+                        privat=list(
+                          .data64=NULL,
+                          .contr_index=0,
+                          .estimateModel=function(data) {
+                            
+                              jinfo("MODULE: Estimating the model: checking")
+                              ### check the dependent variable ####
+
+                            
+                              if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
+
+                                    t2  <-  paste(self$infomatic$deptype,collapse = " or ")
+                                    t1  <-  self$datamatic$dep$type
+                                    m   <-   self$infomatic$model[1]
+                                    msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type",t2)
+                                    stop(msg)
+                              }
+
+                            ### when necessary, check the number of levels
+                            if (is.something(self$infomatic$depnlevels)) {
+                                 nvar  <-  self$datamatic$dep$nlevels
+                                 nreq  <-  self$infomatic$depnlevels
+                                 if ( nreq > 0 ) {
+                                       if ( nreq !=  nvar)
+                                            stop(paste(self$infomatic$model[1],"requires exactly",nreq,"levels"))
+                                 } else {                               
+                                        if (nvar < abs(nreq) )
+                                               stop(paste(self$infomatic$model[1],"requires a minimum of",abs(nreq),"levels"))
+                                 }
+                            }
+                             ### Some functions, such as lme4::glmer.nb 
+                             ### require a package to be loaded 
+                             ### in the function parent environment.
+                             ### we give the required functions to them
+                             glmer<-lme4::glmer
+                             ###
+
+                             jinfo("MODULE: Estimating the model: making options")
+                             
+                              opts    <-  opts<-list(str2lang(self$infomatic$rcall))
+                              
+                              if (is.something(self$infomatic$formula))
+                                          opts[["formula"]]<-self$infomatic$formula
+
+                              
+                              if (is.something(self$infomatic$family))
+                                          opts[["family"]]<-str2lang(self$infomatic$family)    
+                              
+                              for (opt in names(self$infomatic$calloptions))
+                                        opts[[opt]]<-self$infomatic$calloptions[[opt]]   
+
+                              ## for some reason, mclogit::mblogit requires the list of random terms
+ 
+                              
+                              if (self$option("offset"))
+                                 opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
+
+                              opts[["data"]]<-quote(data)
+                              acall<-as.call(opts)
+                              jinfo("MODULE: Estimating the model: running")
+                              results<-try_hard(eval(acall))
+                              
+                              self$warning<-list(topic="info", message=results$warning)
+
+                              if (!isFALSE(results$error)) {
+                                if (self$option("model_type","custom"))
+                                  stop("No solution has been found for the combination of link function and distribution")
+                                else
+                                  stop(results$error)
+                              }
+                              
+                              if (!isFALSE(results$warning))
+                                warning(results$warning)
+                              
+                              if (mf.aliased(results$obj))
+                                   self$warning<-list(topic="info",message=WARNS["aliased"])
+
+                              .model<-mf.fixModel(results$obj,self,data)
+                              
+                              ### add custom info to the model
+                              if (self$option("model_type","ordinal")) {
+                                      msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
+                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
+                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg))
+                                     }                              
+                              
+                              return(.model)
+
+
+                          },
+                          .bootstrap_model=function() {
+                            
+                            ### Here is how the storage mechanism works:
+                            ### In the .b.R file we assign a table to be the runner storage.
+                            ### When the model is estimated we save it as a Rdata file named with a random sequence and
+                            ### save in the storage table name the file name. When results update, if self$storage$state
+                            ### is not null, the Rdata file is load retrieving its name from the storage$state
+                            ### if storage$state is null, the model is bootstrapped
+
+                            if (is.something(self$storage) && is.something(self$storage$state)) {
+                              
+                              id<-self$storage$state
+                              load(id)
+                              self$boot_model<-boot_model
+                              
+                            } else {
+                            
+                                   opts_list<-list(model=self$model,iterations=self$options$boot_r)
+                                   ### check if we can go in paraller ###
+                                     test<-try_hard(find.package("parallel"))
+                                     if (isFALSE(test$error)) {
+                                         jinfo("we go in parallel")
+                                         opts_list[["n_cpus"]]<-parallel::detectCores()
+                                         if (Sys.info()['sysname']!="Windows")
+                                                  opts_list[["parallel"]]<-"multicore"
+                                         else
+                                                  opts_list[["parallel"]]<-"snow"
+                                     }
+                                      
+                                
+                                jinfo("RUNNER: estimating bootstrap model")
+                                t<-Sys.time()
+                                bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
+                                etime<-as.numeric(Sys.time()-t)
+                                jinfo("RUNNER: done ",etime," secs")
+                                if (isFALSE(bmodel$error)) {
+                                  self$boot_model<-bmodel$obj
+                                  jinfo("RUNNER: storing results")
+                                  id<-tempfile()
+                                  self$storage$setState(id)
+                                  boot_model<-self$boot_model
+                                  save(boot_model,file = id)
+                                  jinfo("RUNNER: done")
+                                }
+                            }
+                          },
+                          .estimateTests=function() {
+                            
+                                jinfo("Estimating Info")
+
+                                ### update info table
+                                self$tab_info[["sample"]]$value<-self$datamatic$N
+                                
+                                ## TODO: generalize if other models need an optimizer other than lmer
+                                if (isTRUE(self$infomatic$optimized))
+                                     self$tab_info[["optim"]]$value<-self$model@optinfo$optimizer
+                                
+                                self$tab_info[["conv"]]$value<-ifelse(mf.converged(self$model),"yes","no")
+                                
+                                ########## fill basic tables #########
+                                if (!self$hasIntercept & is.something(self$options$factors)) 
+                                  self$warning<-list(topic="main_coefficients",message=WARNS["nointercept"])
+
+                                
+                          },
+                          .estimateFitIndices=function() {
+                            
+                            for (name in names(self$tab_fit)) {
+                              
+                              if (name=="lik")
+                                  self$tab_fit[["lik"]]$value<-as.numeric(stats::logLik(self$model))
+                              if (name=="aic")
+                                  self$tab_fit[["aic"]]$value<-stats::AIC(self$model)
+                              if (name=="bic")
+                                  self$tab_fit[["bic"]]$value<-stats::BIC(self$model)
+                              if (name=="dev")
+                                  self$tab_fit[["dev"]]$value<-insight::get_deviance(self$model)
+                              if (name=="dfr")
+                                  self$tab_fit[["dfr"]]$value<-stats::df.residual(self$model)
+                              if (name=="over") {
+                                  value <- sum(stats::residuals(self$model, type = "pearson")^2)
+                                  result <- value/stats::df.residual(self$model)
+                                  self$tab_fit[["over"]]$value<-result
+                              }
+                            }
+                          },
+                          .estimateSimpleEffects=function() {
+                            
+                            results<-try_hard(procedure.simpleEffects(self$model,self))
+                            
+                            if (!isFALSE(results$error)) {
+                               stop(results$error)
+                            }  else {
+                                  self$tab_simpleAnova         <-  results$obj[[1]]
+                                  self$tab_simpleCoefficients  <-  results$obj[[2]]
+                            }
+
+                        },
+
+                          .fix_names=function(atable) {
+                            
+                            .terms64         <-  jmvcore::decomposeTerms(atable$source)
+                            .rownames        <-  unlist(lapply(fromb64(.terms64),jmvcore::stringifyTerm,raise=T))
+                            atable$source    <-  .rownames
+                            
+                            if (!("label" %in% names(atable)))
+                                atable$label     <-  self$datamatic$get_params_labels(.terms64)
+                            else 
+                              atable$label     <-  self$datamatic$get_params_labels(atable$label)
+                            
+                            if ("response" %in% names(atable)) {
+                                   atable$response          <-  factor(atable$response)
+                                   levels(atable$response)  <-  unlist(self$datamatic$dep$contrast_labels)
+                                   atable$response          <-  as.character(atable$response)
+                            }
+                            if ("level" %in% names(atable)) {
+                              atable$level          <-  factor(atable$level)
+                              levels(atable$level)  <-  unlist(self$datamatic$dep$levels_labels)
+                              atable$level          <-  as.character(atable$level)
+                            }
+                            
+                            if ("Component" %in% names(atable))
+                                               atable$source[atable$Component=="alpha"]<-"Threshold"
+
+                            if ("contrast" %in% names(atable)) {
+                              atable$contrast<-fromb64(atable$contrast)
+                              atable$contrast[atable$contrast==""]<-atable$source[atable$contrast==""]
+                            }
+                            return(atable)
+
+                          }
+                          
+                          
+                        ) #end of private
+)  # end of class
+
+
+### additional functions useful for estimation of some model ###
+
+estimate_lmer<-function(...) {
+  
+  opts<-list(...)
+  data<-opts$data
+  reml<-opts$reml
+
+  for (opt in opts$optimizers) {
+            model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
+            if (mf.converged(model))
+            break()
+  }
+#  this is required for lmerTest::ranova to work
+  model@call$control<-lme4::lmerControl(optimizer=opt)
+  ### done
+  return(model)
+}
+
+estimate_lme<-function(...) {
+  
+  opts<-list(...)
+  data<-opts$data
+    model = nlme::lme(fixed=opts$fixed, 
+                      random=opts$random,
+                      data=data,method=opts$method,
+                      correlation=do.call(opts$cor,list(form=formula(opts$form)))
+                      )
+   model$call$correlation<-do.call(opts$cor,list(form=formula(opts$form)))  
+   model$call$fixed<-opts$fixed
+   model$call$random<-opts$random
+   model$call$method<-opts$method
+   model$call[[1]]<-quote(nlme::lme.formula)
+   
+  return(model)
+}
+
+
+

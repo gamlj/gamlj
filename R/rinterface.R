@@ -4,38 +4,39 @@
 #' Re-estimates a GAMLj model applying new options to the original model
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link{gamljGlm}},  \code{\link{gamljMixed}},  \code{\link{gamljGzlm}}, or  \code{\link{gamljGlmMixed}} 
+#' @param  ... any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link{gamlj_gmixed}} 
 #' @return an object of class gamlj*Results as the input object
 #' @author Marcello Gallucci
 #' @rdname update
 #' @export 
 
-update.gamljGlmResults <- function(object, ...) {
-    fun <- gamljGlm
+
+update.gamljlmResults <- function(object, ...) {
+    fun <- gamlj_lm
     .gamlj_update(fun, object, ...)
 }
 
 #' @rdname update
 #' @export 
 
-update.gamljGzlmResults <- function(object, ...) {
-    fun <- gamljGzlm
+update.gamljglmResults <- function(object, ...) {
+    fun <- gamlj_glm
     .gamlj_update(fun, object, ...)
 }
 
 #' @rdname update
 #' @export 
 
-update.gamljMixedResults <- function(object, ...) {
-    fun <- gamljMixed
+update.gamljmixedResults <- function(object, ...) {
+    fun <- gamlj_mixed
     .gamlj_update(fun, object, ...)
 }
 
 #' @rdname update
 #' @export 
 
-update.gamljGlmMixedResults <- function(object, ...) {
-    fun <- gamljGlmMixed
+update.gamljgmixedResults <- function(object, ...) {
+    fun <- gamlj_gmixed
     .gamlj_update(fun, object, ...)
 }
 
@@ -68,16 +69,17 @@ update.gamljGlmMixedResults <- function(object, ...) {
 #' @param x a gamlj results object of the class `gamlj`
 #' @param formula a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
 #' It has prevalence on other options defining a plot.
-#' @param ... all options accepted by a gamlj model function. Relevant for new plots are `plotHAxis`, `plotSepLines` and `plotSepPlots`
+#' @param ... all options accepted by a gamlj model function. 
+#'            Relevant for new plots are \code{plot_x}, \code{plot_z} and \code{plot_by}
 #' @return an object of class ggplot or a list of ggplot objects
 #' @author Marcello Gallucci
 #' @examples
 #' data(qsport)
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'   formula = performance ~ hours,
 #'   data = qsport)
 #' 
-#' plot(gmod,plotHAxis = 'hours')
+#' plot(gmod,plot_x = 'hours')
 #' plot(gmod,formula=~hours)
 #' @rdname plot
 #' @export
@@ -92,7 +94,7 @@ plot.gamlj <- function(x, formula = NULL, ...) {
                 sepLines <- .call[2] else sepLines <- NULL
             if (!is.na(.call[3])) 
                 sepPlots <- .call[3] else sepPlots <- NULL
-            args <- list(plotHAxis = haxis, plotSepLines = sepLines, plotSepPlots = sepPlots, ...)
+            args <- list(plot_x = haxis, plot_z = sepLines, plot_by = sepPlots, ...)
             object <- stats::update(x, args)
             .extract_plots(object)
         })
@@ -110,29 +112,26 @@ plot.gamlj <- function(x, formula = NULL, ...) {
 
 .extract_plots <- function(object) {
 
-    if (length(object$descPlots) == 0) {
-        return(object$descPlot$plot$fun())
-    } else {
         alist <- list()
-        for (i in 1:length(object$descPlots)) {
-            title <- (object$descPlots[[i]]$title)
-            gplot <- object$descPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
+        for (i in 1:length(object$mainPlots)) {
+            title <- (object$mainPlots[[i]]$title)
+            gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
             alist[[i]] <- gplot
-        }
         return(alist)
-    }
+       }
 }
 
 #' Assumptions checking plots
 #' 
 #' This function returns a list of plots as a ggplot objects produced by the assumptions checking options, such
-#' as `residPlot`, `normPlot` (for continuous dependent variable models), `randHist` and `clusterBoxplot` (for mixed models).
+#' as `qq_plot`, `resid_plot` and `norm_plot` for continuous dependent variable models, 
+#'`cluster_boxplot`, `cluster_respred` and `rand_hist` for mixed models.
 #' @param object a gamlj results object of the class `gamlj*Results``
 #' @return a list of lists with titles and ggplot objects
 #' @author Marcello Gallucci
 #' @export
 
-gamlj_assumptionsPlots <- function(object) {
+assumptions <- function(object) {
 
     if (!("assumptions" %in% names(object))) 
         stop("No assumptions checking plot is contained in the GAMLj model")
@@ -171,25 +170,24 @@ gamlj_assumptionsPlots <- function(object) {
 
 }
 
-#' Deprecated simple effects
-#'
-#' Deprecated, please use `simpleffects`
-#' #'
-#' @param object a gamlj results object of the class `gamlj*Results`
-#' @param variable the independent variable name
-#' @param moderator the moderator variable name 
-#' @param threeway the name of the additional moderator for three way interactions 
-#' @param ... any other options accepted by the gamlj_* function  
 
-#' @return Two tables with simple effects parameters estimates and ANOVA tables 
+#' Coefficients covariances for a GAMLj model 
+#'
+#' Returns the parameters variances and covariances
+#'
+#' @param  object of class `gamlj*Results` 
+#' @param  ... any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link[gamlj]{gamlj_gmixed}} 
+#' @return an table of class gamlj*Results 
 #' @author Marcello Gallucci
 #' @export 
 
-gamlj_simpleEffects <- function(object, variable = NULL, moderator = NULL, threeway = NULL, ...) {
-    mod <- stats::update(object, simpleVariable = variable, simpleModerator = moderator, simple3way = threeway, ...)
-    mod$simpleEffects
+vcov.gamlj <- function(object, ...) {
+    
+    if(utils::hasName(object,"main") && utils::hasName(object$main,"vcov"))
+       return(object$main$vcov)
+    mod<-gamlj_update(object, vcov=T,...)
+    mod$main$vcov
 }
-
 
 
 #' Extract data 
@@ -198,25 +196,42 @@ gamlj_simpleEffects <- function(object, variable = NULL, moderator = NULL, three
 #' transformed according to GAMLj options. It is usefull to run additional 
 #' models with other R packages with the same setup used by GAMLj
 #'
+#'@name   get_data
 #' @param object a gamlj results object of the class `gamlj*Results`
-#'  
+#' @aliases get_data.gamlj
 #' @return a dataset
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamljGlm(formula = performance ~ hours,
+#' gmod<-gamlj::gamlj_lm(formula = performance ~ hours,
 #'                 data = qsport,
 #'                 scaling = c(hours='standardized'))
 #' 
-#' gdata<-gamlj_data(gmod)
+#' gdata<-get_data(gmod)
 #' lm(performance ~ hours,data=gdata)
 #' @export
 
-gamlj_data <- function(object) {
+get_data <- function(object, ...) UseMethod("get_data")
+
+#' @export
+get_data.gamlj <- function(object,...) {
+    
     if (isS4(object$model)) 
-        data <- object$model@frame else data <- object$model$model
-    names(data) <- jmvcore::fromB64(names(data))
-    data
+        .data <- object$model@frame 
+    else 
+        .data <- object$model$model
+    
+    .names<-names(.data)
+     good<-grep("I(",.names,fixed=T,invert = T)
+    .data<-.data[,good]
+    .names<-fromb64(.names[good])
+     names(.data)<-.names
+    .factors<-.names[sapply(.data,is.factor)]
+     for (f in .factors) {
+        levels(.data[[f]])<-fromb64(levels(.data[[f]]))
+        colnames(stats::contrasts(.data[[f]]))<-gsub(FACTOR_SYMBOL,"",colnames(stats::contrasts(.data[[f]])))
+     }
+    .data
 }
 
 #' Predicted values from GAMLj models 
@@ -225,7 +240,7 @@ gamlj_data <- function(object) {
 #' 
 #' @name predict
 #' @rdname predict
-#' @aliases predict.gamljGlmResults
+#' @aliases predict.gamlj_lm_Results
 #' @param object a gamlj results object of the class `gamlj*Results`
 #' @param re.form (formula, NULL, or NA) specify which random effects to condition on when predicting. If NULL, include all random effects; if NA or ~0, include no random effects. Used only for the mixed models.  
 #' @param type the type of prediction required. The default is on the scale of the response variables ('response'); Thus for  binomial models the default is to compute the predicted probabilities.  'link' gives the scale of the linear predictors; 
@@ -236,14 +251,14 @@ gamlj_data <- function(object) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-predict(gmod)
 #'  
 #' @export
 
-predict.gamljGlmResults <- function(object, ...) {
+predict.gamljlmResults <- function(object, ...) {
     stats::predict(object$model, ...)
 }
 
@@ -252,7 +267,7 @@ predict.gamljGlmResults <- function(object, ...) {
 #' @rdname predict  
 #' @export
 
-predict.gamljGzlmResults <- function(object, type = "response", ...) {
+predict.gamljglmResults <- function(object, type = "response", ...) {
     stats::predict(object$model, type = type, ...)
 }
 
@@ -260,67 +275,15 @@ predict.gamljGzlmResults <- function(object, type = "response", ...) {
 #' @export
 
 
-predict.gamljMixedResults <- function(object, re.form = NULL, type = "response", ...) {
+predict.gamljmixedResults <- function(object, re.form = NULL, type = "response", ...) {
     stats::predict(object$model, re.form = re.form, type = type, ...)
 }
 
 #' @rdname predict  
 #' @export
 
-predict.gamljGlmMixedResults <- function(object, re.form = NULL, type = "response", ...) {
+predict.gamljgmixedResults <- function(object, re.form = NULL, type = "response", ...) {
     stats::predict(object$model, re.form = re.form, type = type, ...)
-}
-
-#' Predicted values from GAMLj models 
-#'
-#' Deprecated. Please use `predict()`
-
-#' @param gobj a gamlj results object of the class `gamlj*Results`
-#' @param re.form if not NULL, specifies the random effect to be included in the computation of the predicted values. Used only for the mixed models.  
-#' @param type the type of prediction required. The default is on the scale of the response variables ('response'); Thus for  binomial models the default is to compute the predicted probabilities.  'link' gives the scale of the linear predictors; 
-#'             is on the scale of the linear predictors;  The 'terms' option returns a matrix giving the fitted values of each term in the model formula on the linear predictor scale. 
-#'             Cf. \code{\link[stats:predict]{stats::predict()}}, \code{\link[stats:predict.lm]{stats::predict.lm()}}
-#' @return a R object of the class of the estimated model
-#' @author Marcello Gallucci
-#' @examples 
-#' data('qsport')
-#' gmod<-gamlj::gamljGlm(
-#'    formula = performance ~ hours,
-#'    data = qsport)
-#'  preds<-gamlj_predict(gmod)
-#'  
-#' @export
-
-gamlj_predict <- function(gobj, re.form = NULL, type = "response") {
-    warning("Deprecated. Please use `predict()`")
-    if (!is.null(re.form)) 
-        stats::predict(gobj$model, re.form = re.form, type = type) else stats::predict(gobj$model, type = type)
-}
-
-
-
-#' Residuals values of a GAMLj model 
-#'
-#' Deprecated. Please use `residuals()`
-#' 
-#' \code{\link[stats:residuals]{stats::predict()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}} 
-#'
-#' @param gobj a gamlj results object of the class `gamlj*Results`
-#' @param type the type of the residuals for generalized models. The alternatives are: 'deviance' (default), 'pearson', 'working', 'response', and 'partial'. Can be abbreviated., 
-#' cf.  \code{\link[stats:residuals.lm]{stats::residuals.lm()}}
-#' @return a list of value
-#' @author Marcello Gallucci
-#' @examples 
-#' data('qsport')
-#' gmod<-gamlj::gamljGlm(
-#'    formula = performance ~ hours,
-#'    data = qsport)
-#'  preds<-gamlj_residuals(gmod)
-#'  
-#' @export
-
-gamlj_residuals <- function(gobj, type = "response") {
-    stats::residuals(gobj$model, type = type)
 }
 
 
@@ -330,7 +293,7 @@ gamlj_residuals <- function(gobj, type = "response") {
 #' 
 #' @name residuals
 #' @rdname residuals
-#' @aliases residuals.gamljGlmResults
+#' @aliases residuals.gamlj_lm_Results
 #' @param object a gamlj results object of the class `gamlj*Results`
 #' @param type the type of residuals for generalized models. The alternatives are: 'deviance' (default), 'pearson', 'working', 'response', and 'partial'. Can be abbreviated.  
 #'             Cf. \code{\link[stats:residuals]{stats::residuals()}}, \code{\link[stats:residuals.lm]{stats::residuals.lm()}}, \code{\link[stats:residuals.glm]{stats::residuals.glm()}}
@@ -339,21 +302,21 @@ gamlj_residuals <- function(gobj, type = "response") {
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-residuals(gmod)
 #'  
 #' @export
 
-residuals.gamljGlmResults <- function(object, ...) {
+residuals.gamljlmResults <- function(object, ...) {
     stats::residuals(object$model, ...)
 }
 
 #' @rdname residuals  
 #' @export
 
-residuals.gamljGzlmResults <- function(object, type = "deviance", ...) {
+residuals.gamljglmResults <- function(object, type = "deviance", ...) {
     stats::residuals(object$model, type = type, ...)
 }
 
@@ -361,49 +324,60 @@ residuals.gamljGzlmResults <- function(object, type = "deviance", ...) {
 #' @export
 
 
-residuals.gamljMixedResults <- function(object, ...) {
+residuals.gamljmixedResults <- function(object, ...) {
     stats::residuals(object$model, ...)
 }
 
 #' @rdname residuals  
 #' @export
 
-residuals.gamljGlmMixedResults <- function(object, type = "deviance", ...) {
+residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
     stats::residuals(object$model, type = type, ...)
 }
 
 
-
-
-#' Extract the R model  
+#'  anova test on GAMLj results 
 #'
-#' Return the estimated model object of the class lm, lmer, glm depending on the model.
-#'
-#' @param object a gamlj results object of the class `gamlj*Results`
-#' @return a R object from lm(), glm(), lmer() or glmer()
+#' This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no option is passed, extracts the 
+#' ANOVA tests table already in the model results (if any). If two GAMLj models are provided, a model comparison is produces. Any option
+#' accepted by gamlj model can be passed.
+#' are returned.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @param object2 a gamlj results object of the class `gamlj` representing the nested model. Overiddes \code{nested_terms}.
+#'                 It can be passed also as a a right-hand side formula specifying terms of the nested model.
+#' @param ... all options accepted by a gamlj model function.  
+#' @return an object of class ggplot or a list of ggplot objects
 #' @author Marcello Gallucci
-#' @examples 
-#' data('qsport')
-#' obj<-gamlj::gamljGlm(
-#'    formula = performance ~ hours,
-#'    data = qsport)
-#'  model<-gamlj_model(obj)
-#'  
+#' @examples
+#' data(fivegroups)
+#' fivegroups$Group<-factor(fivegroups$Group)
+#' gmod<-gamlj::gamlj_lm(
+#'   formula = Score ~Group,
+#'   data = fivegroups)
+#' 
+#' posthoc(gmod,formula =~Group)
+#' @rdname anova
 #' @export
 
-gamlj_model <- function(object) {
 
-    rf <- attr(object$model, "refit")
-    command <- rf$command
-    if (!is.null(rf$lib)) 
-        command <- paste0(rf$lib, "::", rf$command)
-    rf$eoptions[["data"]] <- gamlj_data(object)
-    fun <- getfun(command)
-    model <- do.call(fun, rf$eoptions)
-    model <- mf.setModelCall(model, rf)
-    model
+anova.gamlj <- function(object, object2,...) {
+  args<-list(...)
+  if (!missing(object2)) {
+     if (inherits(object2,"gamlj"))
+        args$nested_terms<-fromb64(stats::formula(object2$model))
+  object <- stats::update(object, args)
+  res<-object$main$r2
+  if (utils::hasName(object$main,"fit"))
+           res<-c(object$main$r2,object$main$fit)
+  } else {
+    res<-object$main$r2
+    if (utils::hasName(object$main,"fit"))
+      res<-c(object$main$r2,object$main$fit)
+    res<-c(res,object$main$anova)
+  }
+  res
 }
-
 
 
 #'  Post-hoc test on GAMLj results 
@@ -416,14 +390,14 @@ gamlj_model <- function(object) {
 #' @param formula a right hand side formula specifying the factors or factors combinations to test, of the form `~x+z`, `~x:z` or `~x*z`. 
 #' It has prevalence on other options defining a post-hoc test via character options.
 #' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
-#'   `postHoc` (a list of list of terms), `postHocCorr`, a list of correction to apply:
-#'    one or more of 'none', 'bonf', or 'holm'; provide no, Bonferroni, and Holm Post Hoc corrections respectively. 
-#' @return an object of class ggplot or a list of ggplot objects
+#'   `post_hoc` (a list of list of terms), `adjust`, a list of correction to apply:
+#'    one or more of \code{none}, \code{bonf},  \code{holm}, \code{scheffe} or \code{sidak}. 
+#' @return an object of class 
 #' @author Marcello Gallucci
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamljGlm(
+#' gmod<-gamlj::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -439,13 +413,16 @@ posthoc <- function(object, ...) UseMethod("posthoc")
 posthoc.gamlj <- function(object, formula = NULL, ...) {
 
     if (is.something(formula)) 
-        object <- stats::update(object, postHoc = formula, ...) else if (is.something(list(...))) 
-        object <- stats::update(object, ...)
-    if (length(object$postHocs) == 0) 
+        object <- stats::update(object, posthoc = formula, ...) 
+    else if (is.something(list(...))) 
+           object <- stats::update(object, ...)
+    if (length(object$posthoc) == 0) 
         return(FALSE)
 
-    object$postHocs
+    object$posthoc
 }
+
+
 
 
 #'  Simple Effects on GAMLj results 
@@ -456,47 +433,155 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 
 #' @param object a gamlj results object of the class `gamlj`
 #' @param formula a right hand side formula specifying the variables to test, of the form `~x:z`, `~x:z:w` or `~x*z`. 
-#' The formula is not exanded, so the first variable is the simple effect variable, the second is the moderator, 
-#' the third an optional additional moderator
+#' The formula is not expanded, so the first variable is the simple effect variable, the second is the moderator, 
+#' the third an optional additional moderator, an so on.
 #' It has prevalence on other options defining a simple effects test via character options.
 #' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
-#'   `simpleVariable` (the simple effect variable), `simpleModerator` (the moderator), and `simple3way` for the second moderator. 
+#'   `simple_x` (the simple effect variable), \code{`simple_mods`}, the moderator(s). Both are overriden by the formula option. 
 #' @return an object of class gamlj results
 #' @author Marcello Gallucci
 #' @examples
 #' data(winkel)
 #' wicksell$time<-factor(wicksell$time)
 #' wicksell$group<-factor(wicksell$group) 
-#' gmod<-gamlj::gamljMixed(
+#' gmod<-gamlj::gamljmixed(
 #'    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
 #'    data = wicksell)
 #' 
 #' simpleEffects(gmod,formula =~time:group)
-#' @rdname simpleeffects
+#' @rdname simple_effects
 #' @export
 
-simpleEffects <- function(object, ...) UseMethod("simpleEffects")
+simple_effects <- function(object, ...) UseMethod("simple_effects")
 
-#' @rdname simpleeffects
+
+#' @rdname simple_effects
 #' @export
 
-simpleEffects.gamlj <- function(object, formula = NULL, ...) {
+simple_effects.gamlj <- function(object, formula=NULL,...) {
 
+    args<-list(...)
     if (is.something(formula)) {
-        .call <- all.vars(formula)
-        .simpleVariable <- .call[1]
-        .simpleModerator <- .call[2]
-        if (!is.na(.call[3])) 
-            .simple3way <- .call[3] else .simple3way <- NULL
-        args <- list(simpleVariable = .simpleVariable, simpleModerator = .simpleModerator, simple3way = .simple3way, ...)
-        object <- stats::update(object, args)
-    } else if (is.something(list(...))) 
-        object <- stats::update(object, ...)
+      v<-all.vars(formula)
+      if (length(v)<2) stop("Specify a simple effect formula with at least two variables in the model.")
+      args$simple_x<-v[[1]]
+      args$simple_mods<-v[-1]
+    }
+    object <- stats::update(object, args)
+    if (dim(object$simpleEffects$anova$asDF)[1] != 0)  
+         return(object$simpleEffects)
+    else
+       stop("Simple effects not available")
 
-    if (dim(object$simpleEffects$Anova$asDF)[1] == 0) 
-        return(FALSE)
-
-    object$simpleEffects
 }
 
+
+#'  S3 methods for class jamovi ResultsElement 
+#'
+#' These functions extract all visible tables from a ResultsElement produced by gamlj
+#' and print them in R style.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @return a list of table as data.frame
+#' @author Marcello Gallucci
+#' @examples
+#' data(fivegroups)
+#' fivegroups$Group<-factor(fivegroups$Group)
+#' gmod<-gamlj::gamlj_lm(
+#'   formula = Score ~Group,
+#'   data = fivegroups)
+#' 
+#' summary(gmod)
+#' @rdname s3methods
+#' 
+#' @export
+
+
+summary.ResultsElement<-function(object,...) {
+    
+    .get_table<-function(obj) {
+        
+        if ("Table" %in% class(obj) && obj$visible) {
+            if(nrow(obj$asDF)>0) {
+                atab<-obj$asDF
+                attr(atab,"name")<-obj$name
+                attr(atab,"title")<-obj$title
+                class(atab)<-c("jmvrtable","data.frame")
+                tables[[length(tables)+1]]<<-atab
+            }
+            return()
+        }      
+        
+        if (obj$.has("items")) {
+            for (item in obj$items)
+                .get_table(item)
+        }
+        
+    }
+    
+    tables<-list()
+    .get_table(object)
+    class(tables)<-c("jmvrobj","list")
+    tables
+}
+
+#' Print a jamovi Table in R style 
+#'
+#' @param x a gamlj results object of the class `gamlj`
+#' @rdname s3methods
+#' 
+#' @export
+
+print.jmvrtable<-function(x,...) {
+    cat(attr(x,"title"),"\n\n")
+  for (var in names(x)) {
+    if (is.character(x[[var]]))
+      x[is.na(x[[var]]),var]<-""  
+  }
+  print.data.frame(x)
+}
+
+#' Print a jamovi summary of jamovi ResultElement in R style 
+#'
+#' @param x a gamlj results object of the class `gamlj`
+#' @rdname s3methods
+#' @export
+
+print.jmvrobj<-function(x,...) {
+    for (t in x){
+        print(t)
+        cat("\n\n")
+    }
+}
+
+#' Extract coefficients from a GAMLj result object 
+#'
+#' @param x a gamlj results object of the class `gamlj`
+#' @rdname s3methods
+#' 
+#' @export
+
+coef.gamlj<-function(object,...) {
+  return(object$main$coefficients)
+}
+
+#' Extract model R2 (r-squared) from a GAMLj results object 
+#'
+#' @param x a gamlj results object of the class `gamlj`
+#' @rdname s3methods
+#' @export
+#' 
+fit <- function(x, ...) UseMethod("fit")
+
+#' @rdname s3methods
+#' @export
+
+fit.gamlj<-function(x,...) {
+  
+  res<-x$main$r2
+  if (utils::hasName(x$main,"fit"))
+     res<-c(x$main$r2,x$main$fit)
+  
+  return(res)
+}
 

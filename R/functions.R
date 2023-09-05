@@ -1,97 +1,77 @@
 
 
-ginfo <- function(what = NULL, obj = NULL) {
-    if (j_INFO) {
-        if (!is.null(what)) 
-            print(what)
-        if (!is.null(obj)) {
-            print(obj)
-            cat("------------\n")
-        }
-    }
-}
+########### names ###########
 
-mark <- function(what = NULL, obj = NULL) {
-    if (j_DEBUG) {
-        if (!is.null(what)) 
-            print(what) else print("you got here")
+tob64<- function(x,...) UseMethod(".tob64")
 
-        if (!is.null(obj)) {
-            print(obj)
-            print("#### end ###")
-        }
-    }
-}
-
-.listdeep <- function(aList, n = 0) {
-    if (!inherits(aList, "list")) 
-        return(n)
-    max(sapply(aList, .listdeep, n + 1))
-}
-
-.keepShape <- function(mat) {
-    if (is.null(dim(mat))) 
-        mat <- t(as.matrix(mat))
-    mat
-}
-
-
-
-is.something <- function(x, ...) UseMethod(".is.something")
-
-.is.something.default <- function(obj) (!is.null(obj))
-
-.is.something.list <- function(obj) (length(obj) > 0)
-
-.is.something.numeric <- function(obj) (length(obj) > 0)
-
-.is.something.character <- function(obj) (length(obj) > 0)
-
-.is.something.logical <- function(obj) !is.na(obj)
-
-
-
-append_list <- function(alist, aelement, name = NULL) {
-    alist[[length(alist) + 1]] <- aelement
-    if (!is.null(name)) 
-        names(alist)[length(alist)] <- name
-    alist
-}
-prepend_list <- function(alist, aelement, name = NULL) {
-    alist <- c(0, alist)
-    alist[[1]] <- aelement
-    if (!is.null(name)) 
-        names(alist)[1] <- name
-    alist
-}
-
-listify <- function(adata) {
-    res <- lapply(1:dim(adata)[1], function(a) as.list(adata[a, ]))
-    names(res) <- rownames(adata)
-    res
-}
-
-
-sourcifyList <- function(option, def) {
-    alist <- option$value
-    test <- all(sapply(alist, function(a) a$type) == def)
-    if (test) 
-        return("")
-    paste0(option$name, "=c(", paste(sapply(alist, function(a) paste0(a$var, " = \"", a$type, "\"")), collapse = ", "), ")")
-}
-
-getfun <- function(x) {
-    if (length(grep("::", x)) > 0) {
-        parts <- strsplit(x, "::")[[1]]
-        getExportedValue(parts[1], parts[2])
+.tob64.default<-function(obj,ref=NULL) {
+    
+    
+    if (is.null(obj))
+        return()
+    if (is.numeric(obj))
+       return(obj)
+  
+    if (is.null(ref)) {
+        obj<-jmvcore::toB64(obj)
     } else {
-        x
+        for (r in ref) {
+            reg<-paste0("(?<=[\\s*~=]|^)",r,"(?=[\\s*~=]|$)")
+            obj<-stringr::str_replace_all(obj,reg,jmvcore::toB64(r))
+        }
     }
+    paste0(B64_SYMBOL,obj)
 }
 
-transnames<-function(original,ref) {
-    unlist(lapply(original,function(x) {
-        i<-names(ref)[sapply(ref,function(y) any(y %in% x))]
-        ifelse(length(i)>0,i,x)
-    }))
+.tob64.list<-function(obj,ref=NULL) {
+    lapply(obj,bogustob64,ref)
 }
+
+bogustob64<-function(obj,ref) tob64(obj,ref)
+
+fromb64<- function(x,...) UseMethod(".fromb64")
+
+.fromb64.default<-function(obj,ref=NULL) {
+
+  if (!is.something(obj))
+    return(obj)
+  
+  if (length(obj)>1)
+    return(unlist(sapply(obj, bogusfromb64,ref=ref,USE.NAMES = F)))
+  
+  bregex<-paste0("(?<=",B64_REGEX,")\\w+")
+  matches64<-stringr::str_extract_all(obj,bregex)[[1]]
+  matches<-jmvcore::fromB64(matches64)
+  astring<-obj
+  for (i in seq_along(matches64)) {
+      if (!is.na(matches64[i]))
+         astring<-stringr::str_replace_all(astring,matches64[i],matches[i])
+  }
+  astring<-stringr::str_replace_all(astring,B64_SYMBOL,"")
+  astring<-stringr::str_replace_all(astring,FACTOR_SYMBOL,"")
+  astring<-stringr::str_replace_all(astring,LEVEL_SYMBOL,"")
+  astring<-stringr::str_replace_all(astring,INTERACTION_SYMBOL,":")
+  astring
+}
+
+.fromb64.formula<-function(obj)   return(stats::formula(fromb64(deparse(obj))))
+
+
+.fromb64.list<-function(obj,ref=NULL) lapply(obj,bogusfromb64,ref=ref)
+
+
+bogusfromb64<-function(obj,ref=NULL) fromb64(obj,ref=ref)
+
+
+is.b64<-function(a) { 
+    test1  <-  is.there(B64_SYMBOL,a)
+    test2  <-  is.there(LEVEL_SYMBOL,a)
+    test3  <-  is.there(FACTOR_SYMBOL,a)
+    test4  <-  is.there(INTERACTION_SYMBOL,a) 
+    any(test1,test2,test3,test4)
+}
+
+### basic functions ###
+
+
+

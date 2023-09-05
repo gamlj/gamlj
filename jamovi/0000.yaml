@@ -1,26 +1,26 @@
 ---
-title: General Analyses for Linear Models in jamovi
-name: gamlj
-version: 2.6.6
+title: General Analyses for Linear Models (v3)
+name: GAMLj3
+version: 3.0.4
 jms: '1.0'
 authors:
   - Marcello Gallucci
 maintainer: Marcello Gallucci <mcfanda@gmail.com>
-date: '2021-09-20'
+date: 2022-1-1
 type: R
 description: >-
-  A suite for estimation of linear models, such as the general linear model,
-  linear mixed model, generalized linear models and generalized mixed models.
-  For ech family, models can be estimated with categorical and/or continuous
-  variables, with options to facilitate estimation of  interactions, simple
-  slopes, simple effects, post-hoc tests, contrast analysis and visualization of
-  the results.
+  (Experimental) A suite for estimation of linear models, such as the general
+  linear model, linear mixed model, generalized linear models and generalized
+  mixed models. For ech family, models can be estimated with categorical and/or
+  continuous variables, with options to facilitate estimation of  interactions,
+  simple slopes, simple effects, post-hoc tests, contrast analysis and
+  visualization of the results.
 analyses:
   - title: General Linear Model
-    name: gamljGlm
-    ns: gamlj
+    name: gamljlm
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: General Linear Model
     description: >
       General Linear Model. Estimates models using `lm()` function and provides
@@ -29,26 +29,28 @@ analyses:
       interactions, simple slopes, simple effects, post-hoc tests, contrast
       analysis, effect size indexes and visualization of the results.
   - title: Mixed Model
-    name: gamljMixed
-    ns: gamlj
+    name: gamljmixed
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: Mixed Model
-    description: Mixed Linear Model
+    description: |
+      Mixed Linear Model
   - title: Generalized Linear Models
-    name: gamljGzlm
-    ns: gamlj
+    name: gamljglm
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
+    menuSubgroup: GAMLj3
     menuTitle: Generalized Linear Models
     description: Generalized Linear Model
-  - title: Generalized Mixed Models
-    name: gamljGlmMixed
-    ns: gamlj
+  - title: Generalized Mixed Model
+    name: gamljgmixed
+    ns: GAMLj3
     menuGroup: Linear Models
-    menuSubgroup: GAMLj
-    menuTitle: Generalized Mixed Models
-    description: Generalized Mixed Linear Model
+    menuSubgroup: GAMLj3
+    menuTitle: Generalized Mixed Model
+    description: |
+      Generalized Mixed  Model
 datasets:
   - name: qsport
     path: qsport.csv
@@ -104,19 +106,31 @@ datasets:
     tags:
       - Mixed models
       - Logistic mixed models
-  - name: phdpubs
-    path: phdpubs.csv
-    description: >
-      Modified version of dataset in Long, J. S., & Freese, J. (2006).
-      Regression models for categorical dependent variables using Stata. Stata
-      press.
-
-      Data present number of articles published by PhD students in a three year
-      period with some predictors. Data are clustered by program.
+  - name: glmmixeddata
+    path: glmmixeddata.csv
+    description: |
+      Generated data to test generalized mixed models
     tags:
-      - Generalized Mixed models
-      - Negative Binomial mixed models
+      - GMixed
+      - GLM
+      - GZLM
+      - Mixed
+  - name: manymodels
+    path: manymodels.csv
+    description: |
+      Generated data to test different types of linear models. 
+    tags:
+      - GLM
+      - GZLM
+  - name: clustermanymodels
+    path: clustermanymodels.csv
+    description: >
+      Generated data to test different types of linear models with clustered
+      data 
+    tags:
+      - GMixed
+      - Mixed
 usesNative: true
-minApp: 1.8.0
+minApp: 2.3.1
 
 ...

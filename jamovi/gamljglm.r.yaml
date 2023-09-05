@@ -1,11 +1,12 @@
 ---
-name:  gamljGlm
-title: General Linear Model
+name:  gamljglm
+title: Generalized Linear Model
 jrs: '1.0'
 items:
   - name: model
     type: Property
-    description: The underlying `lm` object
+    description: The underlying estimated model
+
 
   - name: info
     title: Model Info
@@ -17,209 +18,219 @@ items:
        - name: value
          type: text
          title: ""
-    clearWith:
-        - dep
-        - factors
-        - cov
-        - modelTerms
-        - fixedIntercept
+       - name: specs
+         type: text
+         title: ""
+
     refs: gamlj
      
   - name: main
     type: Group
     title: Model Results
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - fixedIntercept
     items:
-           - name: interceptTable
-             title: Intercept Information
+           - name: r2
+             title: Model Fit
              type: Table
-             visible: (interceptInfo)
-             description: a table of information for the model intercept
+             description: a table of R
              clearWith:
+                           ### modeloptions  begins
+                         - model_type
                          - dep
-                         - modelTerms
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
                          - contrasts
-                         - scaling
-                         - dep_scale
-                         - fixedIntercept
-                         - effectSize
-                         - interceptInfo
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+                           ### nestedoptions  begins
+                         - nested_terms
+                         - nested_intercept
+                         - comparison
+                           ### nestedoptions  ends
+    
+             rows: 1
              columns:
-                    - name: name
-                      title: ""
-                      type: text
-                    - name:  df
+                    - name: model
+                      title: Model
+                      visible: (comparison)
+                    - name: r2
+                      title: R²
+                      type: number
+                    - name: ar2
+                      title: Adj. R²
+                      type: number
+                    - name:  df1
                       title: df
                       type: integer
-                    - name: f
-                      title: F
+                    - name: test
+                      title: X²
                       type: number
                     - name: p
                       title: p
                       type: number
                       format: zto,pvalue
-                    - name: etap
-                      title: η²p
-                      type: number
-                      visible: (effectSize:etap)
-                      format: zto
-                    - name: omegap
-                      title: ω²p
-                      type: number
-                      visible: (effectSize:omegap)
-                      format: zto
-                    - name: epsilonp
-                      title: ε²p
-                      type: number
-                      visible: (effectSize:epsilonp)
-                      format: zto
+             refs: goodness
+                      
+           - name: fit
+             title: Additional indices
+             type: Table
+             visible: true
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+
+             columns:
+                    - name: info
+                      type: text
+                      title: "Info"
+                    - name: value
+                      type: text
+                      title: "Model Value"
+                    - name: nested
+                      type: text
+                      title: "Nested Model"
+                      visible: (comparison)
+                    - name: diff
+                      type: text
+                      title: Δ 
+                      visible: (comparison)
+
+                    - name: specs
+                      type: text
+                      title: "Comment"
+  
 
            - name: anova
-             title: ANOVA Omnibus tests
+             title:  Omnibus tests
              type: Table
              description: a table of ANOVA results
              clearWith:
+                           ### modeloptions  begins
+                         - model_type
                          - dep
-                         - modelTerms
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
                          - contrasts
-                         - scaling
-                         - dep_scale
-                         - fixedIntercept
-                         - effectSize
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+
              columns:
-                    - name: name
+                    - name: source
                       title: ""
                       type: text
-                    - name: ss
-                      title: SS
+                    - name: test
+                      title: X²
                       type: number
                     - name: df
                       title: df
                       type: integer
-                    - name: f
-                      title: F
-                      type: number
                     - name: p
                       title: p
                       type: number
                       format: zto,pvalue
-                    - name: etaSq
-                      title: η²
-                      type: number
-                      visible: (effectSize:eta)
-                      format: zto
-                    - name: etaSqP
-                      title: η²p
-                      type: number
-                      visible: (effectSize:etap)
-                      format: zto
-                    - name: omegaSq
-                      title: ω²
-                      type: number
-                      visible: (effectSize:omega)
-                      format: zto
-                    - name: omegaSqP
-                      title: ω²p
-                      type: number
-                      visible: (effectSize:omegap)
-                      format: zto
 
-                    - name: epsilonSq
-                      title: ε²
-                      type: number
-                      visible: (effectSize:epsilon)
-                      format: zto
 
-                    - name: epsilonSqP
-                      title: ε²p
-                      type: number
-                      visible: (effectSize:epsilonp)
-                      format: zto
-
-           - name: effectSizeTable
-             title: Effect Size Indices
+           - name: coefficients
+             title:  Parameter Estimates (Coefficients)
              type: Table
-             visible: (effectSizeInfo)
-             description: a table of effect size indeces
-            
              clearWith:
+                           ### modeloptions  begins
+                         - model_type
                          - dep
-                         - modelTerms
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
                          - contrasts
-                         - scaling
-                         - fixedIntercept
-                         - effectSize
-                         - dep_scale
-                         
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+                           ### cioptions  begins
+                         - ci_width
+                         - ci_method
+                         - boot_r
+                           ### cioptions  ends
+
              columns:
-                    - name: effect
-                      title: Effect
+                    - name: response
+                      title: Response 
+                      type: text
+                      visible: (model_type:multinomial)
                       combineBelow: true
-                      type: text
-                    - name: name
-                      title: Statistics
-                      type: text
-                    - name: estimate
-                      title: Estimate
-                      type: number
-                    - name: lower.CL
-                      title: Lower
-                      type: number
-                    - name: upper.CL
-                      title: Higher
-                      type: number
-             refs: effectsize
-
-           - name: fixed
-             title: Fixed Effects Parameter Estimates
-             type: Table
-             clearWith:
-                    - dep
-                    - modelTerms
-                    - contrasts
-                    - scaling
-                    - dep_scale
-                    - fixedIntercept
-                    - effectSize
-                    - paramCIWidth
-
-             columns:
                     - name: source
-                      title: "Names"
+                      title: "Name"
                       type: text
-                      visible: (showRealNames)
                     - name: label
                       title: "Effect"
                       type: text
+                      visible: (show_contrastnames)
                     - name: estimate
                       title: "Estimate"
                       type: number
                     - name: se
                       title: "SE"
                       type: number
-                    - name: lower.CL
+                    - name: est.ci.lower
                       type: number
                       title: Lower
-                      visible: (showParamsCI)
-                    - name: upper.CL
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
                       type: number
                       title: Upper
-                      visible: (showParamsCI)
-                    - name: beta
+                      visible: (estimates_ci)
+                      
+                    - name: expb
                       type: number
-                      title: β
-                      visible: (effectSize:beta)
-                    - name: df
-                      title: "df"
+                      title: Exp(B)
+                      visible: (es:expb)
+                    - name: expb.ci.lower
                       type: number
-                    - name: t
-                      title: "t"
+                      title: Lower
+                      visible: (es:expb & expb_ci)
+                    - name: expb.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (es:expb & expb_ci)
+                    - name: test
+                      title: "z"
                       type: number
                     - name: p
                       title: "p"
@@ -227,399 +238,681 @@ items:
                       format: zto,pvalue
 
 
+           - name: phi
+             title:  Precision Parameter Estimates (phi)
+             type: Table
+             visible: (model_type:beta)
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+                           ### cioptions  begins
+                         - ci_width
+                         - ci_method
+                         - boot_r
+                           ### cioptions  ends
+
+             columns:
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                      visible: (show_contrastnames)
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+           - name: vcov
+             title: Coefficients Covariances
+             type: Table
+             visible: (vcov)
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+
+             columns:
+                    - name: source
+                      title: "Coefficient"
+                      type: text
+                      visible: (show_contrastnames)
+
 
 
            - name: contrastCodeTables
              title: Contrast Coefficients 
              type: Array
              description: an array of contrast coefficients tables
-             visible: (showContrastCode)
+             visible: (show_contrastcodes)
+             items: (factors)
              clearWith:
                     - contrasts
              template:
                    title:  $key
                    type: Table
                    columns:
-                         - name: rnames
+                         - name: cname
                            title: 'Name'
                            type: text
-                           visible: (showRealNames)
-                         - name: clabs
+                           visible: (show_contrastnames)
+                         - name: clab
                            title: 'Contrast'
                            type: text
+                         - name: bogus
+                           title: 'bogus'
+                           type: text
+                           visible: false
 
+           - name:  marginals
+             title: Marginal Effects
+             type: Table
+             visible: (es:marginals)
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+                           ### simpleeffectsoptions  begins
+                         - simple_x
+                         - simple_mods
+                         - simple_scale
+                         - ccm_value
+                         - ccp_value
+                         - covs_scale_labels
+                         - covs_conditioning
+                           ### simpleeffectsoptions  ends
+                    
+             columns:
+                    - name: response
+                      title: "Response"
+                      type: text
+                      combineBelow: true
+                      visible: (model_type:multinomial)
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: contrast
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "AME"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (expb_ci | estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (expb_ci | estimates_ci)
+                      
+                    - name: test
+                      title: z
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
-  - name: postHocs
+           - name: relativerisk
+             title: Relative risk
+             type: Table
+             visible: (es:RR)
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                           ### modeloptions  ends
+                         - __effectsizeoptions
+                    
+             columns:
+                    - name: source
+                      title: "Name"
+                      type: text
+                      visible: (show_contrastnames)
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "RR"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (expb_ci | estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (expb_ci | estimates_ci)
+                    - name: test
+                      title: z
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+           - name: paralleltest
+             title: Parallel lines test
+             type: Table
+             visible: (propodds_test & model_type:ordinal)
+             clearWith:
+                      ### modeloptions  begins
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - covs_scale
+                    - offset
+                    - omnibus
+                      ### modeloptions  ends
+                    - propodds_test
+                  
+             columns:
+                    - name: source
+                      title: ""
+                      type: text
+                    - name: loglik
+                      title: "Log-Lik."
+                      type: number
+                    - name: aic
+                      title: "AIC"
+                      type: number
+                    - name: test
+                      title:  X²
+                      type: number
+                    - name: df
+                      title: "df"
+                      type: integer
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+  - name: posthoc
     title: Post Hoc Tests
     type: Array
     description: an array of post-hoc tables
-    items: (postHoc)
+    items: (posthoc)
     clearWith:
+          ### modeloptions  begins
+        - model_type
         - dep
-        - modelTerms
+        - factors
+        - covs
+        - covs_scale
+        - scale_missing
+        - model_terms
+        - fixed_intercept
+        - se_method
+        - mute
+        - df_method
         - contrasts
-        - scaling
-        - dep_scale
-        - postHocCorr
+        - covs_scale
+        - offset
+        - omnibus
+          ### modeloptions  ends
+        - posthoc
+        - adjust
+          ### cioptions  begins
+        - ci_width        
+        - ci_method        
+        - boot_r        
+          ### cioptions  ends
+        
     template:
-        clearWith: []
         title:  ""
         type: Table
+        clearWith:
+              ### modeloptions  begins
+            - model_type
+            - dep
+            - factors
+            - covs
+            - covs_scale
+            - scale_missing
+            - model_terms
+            - fixed_intercept
+            - se_method
+            - mute
+            - df_method
+            - contrasts
+            - covs_scale
+            - offset
+            - omnibus
+              ### modeloptions  ends
+            - posthoc
+            - adjust
+              ### cioptions  begins
+            - ci_width        
+            - ci_method        
+            - boot_r        
+              ### cioptions  ends
+  
         columns:
-        - name: contrast
-          title: ""
-          type: number
-          visible: false
+        - name: response
+          title: Response 
+          type: text
+          visible: (model_type:multinomial)
+          combineBelow: true
         - name: estimate
           title: Difference
           type: number
         - name: se
           title: SE
           type: number
+        - name: est.ci.lower
+          type: number
+          title: Lower
+          visible: (posthoc_ci)
+        - name: est.ci.upper
+          type: number
+          title: Upper
+          visible: (posthoc_ci)
         - name: test
-          title: t
+          title: z
           type: number
-        - name: df
-          title: df
-          type: number
-        - name: p
+        - name: none
           title: p
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:none)
-        - name: pbonf
+          visible: (adjust:none)
+        - name: bonf
           title: p<sub>bonferroni</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:bonf)
-        - name: ptukey
+          visible: (adjust:bonf)
+        - name: tukey
           title: p<sub>tukey</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:tukey)
-        - name: pholm
+          visible: (adjust:tukey)
+        - name: holm
           title: p<sub>holm</sub>
           type: number
           format: zto,pvalue
-          visible: (postHocCorr:holm)
+          visible: (adjust:holm)
 
 
   - name: simpleEffects
     title: Simple Effects
     type: Group
-    clearWith:
-                 - dep
-                 - modelTerms
-                 - contrasts
-                 - scaling
-                 - dep_scale
-                 - fixedIntercept
-                 - simpleVariable
-                 - simpleModerator
-                 - simple3way
-                 - simpleScale
-                 - cvalue
-                 - percvalue
-                 - simpleScaleLabels
-
     items:
-            - name: Anova
-              title: Simple Effects ANOVA
+            - name: anova
+              title: ANOVA for Simple Effects  of ___key___
               type: Table
               description: a table of ANOVA for simple effects
               visible: false
+              clearWith:
+                 - dep
+                 - model_terms
+                 - contrasts
+                 - covs_conditioning
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - covs_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - offset
+
               columns:
-                 - name: threeway
-                   title: ""
-                   visible: (simple3way)
-                   combineBelow: true
-                 - name: moderator
-                   title: ""
-                   combineBelow: true
-                 - name: F.ratio
-                   title: F
+                 - name: test
+                   title: X²
                    type: number
                  - name: df1
-                   title: Num df
-                   type: number
-                 - name: df2
-                   title: Den df
-                   type: number
-                 - name: p.value
+                   title: df
+                   type: integer
+                 - name: p
                    title: p
                    type: number
                    format: zto,pvalue
-                 - name: etaSq
-                   title: η²
-                   type: number
-                   visible: (effectSize:eta)
-                 - name: etaSqP
-                   title: η²p
-                   type: number
-                   visible: (effectSize:etap)
-                   format: zto
-                 - name: omegaSq
-                   title: ω²
-                   type: number
-                   visible: (effectSize:omega)
-                   format: zto
 
-                 - name: omegaSqP
-                   title: ω²p
-                   type: number
-                   visible: (effectSize:omegap)
-                   format: zto
-                 - name: epsilonSq
-                   title: ε²
-                   type: number
-                   visible: (effectSize:epsilon)
-                   format: zto
-
-                 - name: epsilonSqP
-                   title: ε²p
-                   type: number
-                   visible: (effectSize:epsilonp)
-                   format: zto
-
-            - name: Params
-              title: Parameter Estimates for simple effects
+            - name: coefficients
+              title: Parameter Estimates for simple effects of ___key___
               type: Table
               visible: false
+              clearWith:
+                 - dep
+                 - model_terms
+                 - contrasts
+                 - covs_conditioning
+                 - dep_scale
+                 - fixed_intercept
+                 - simple_effects
+                 - simple_moderators
+                 - covs_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - ci_method
+                 - boot_r
+                 - offset
+ 
               columns:
-                     - name: threeway
-                       title: " "
-                       visible: (simple3way)
+                     - name: response
+                       title: Response 
+                       type: text
                        combineBelow: true
-                     - name: moderator
-                       title: " "
-                       combineBelow: true
+                       visible: (model_type:multinomial)
                      - name: contrast
-                       title: "contrast"
+                       title: "Effect"
                        type: text
                      - name: estimate
                        title: "Estimate"
                        type: number
-                     - name: SE
+                     - name: se
                        title: "SE"
                        type: number
-                     - name: lower.CL
+                     - name: est.ci.lower
                        type: number
                        title: Lower
-                       visible: (showParamsCI)
-                     - name: upper.CL
+                       visible: (estimates_ci)
+                     - name: est.ci.upper
                        type: number
                        title: Upper
-                       visible: (showParamsCI)
-                     - name: beta
+                       visible: (estimates_ci)
+                     - name: expb
                        type: number
-                       title: β
-                       visible: (effectSize:beta)
-                     - name: df
-                       title: "df"
+                       title: Exp(B)
+                       visible: (es:expb)
+                     - name: expb.ci.lower
                        type: number
-                     - name: t.ratio
-                       title: "t"
+                       title: Lower
+                       visible: (expb_ci)
+                     - name: expb.ci.upper
                        type: number
-                     - name: z.ratio
+                       title: Upper
+                       visible: (expb_ci)
+                     - name: test
                        title: "z"
                        type: number
-                       visible: false
-                     - name: p.value
+                     - name: p
                        title: "p"
                        type: number
                        format: zto,pvalue
 
 
+  - name: simpleInteractions
+    title: Simple Interactions 
+    type: Array
+    description: an array of simple interactions tables
+    visible: false
+    clearWith:
+        - dep
+        - model_terms
+        - contrasts
+        - covs_conditioning
+        - dep_scale
+        - fixed_intercept
+        - covs_scale_labels
+        - ci_width
+        - emmeans
+        - offset
 
-  - name: emeansTables
+    template:
+        title:  "Interaction: ___key___"
+        type: Group
+        clearWith: []
+        items:
+           - type: Table
+             name: anova
+             title: ANOVA test -  $key
+             columns:
+                   - name: effect
+                     title: 'Effect'
+                     type: text
+                   - name: test
+                     title: X²
+                     type: number
+                   - name: df1
+                     title: df
+                     type: integer
+                   - name: p
+                     title: p
+                     type: number
+                     format: zto,pvalue
+
+           - type: Table
+             name: coefficients
+             title: Parameter Estimates for -  $key
+             columns:
+             
+                   - name: effect
+                     title: 'Effect'
+                     type: text
+                   - name: response
+                     title: Response 
+                     type: text
+                     visible: (model_type:multinomial)
+                     
+                   - name: estimate
+                     title: Estimate
+                     type: number
+                   - name: se
+                     title: SE
+                     type: number
+                   - name: est.ci.lower
+                     title: Lower 
+                     type: number
+                   - name: est.ci.upper
+                     title: Upper
+                     type: number
+                   - name: test
+                     title: z
+                     type: number
+                   - name: p
+                     title: p
+                     type: number
+                     format: zto,pvalue
+                   - name: expb
+                     type: number
+                     title: Exp(B)
+                     visible: (es:expb)
+                   - name: expb.ci.lower
+                     type: number
+                     title: Lower
+                     visible: (expb_ci)
+                     superTitle: Exp(B) Confidence Intervals
+                   - name: expb.ci.upper
+                     type: number
+                     title: Upper
+                     visible: (expb_ci)
+                     superTitle: Exp(B) Confidence Intervals
+
+
+  - name: emmeans
     title: Estimated Marginal Means 
     type: Array
     description: an array of predicted means tables
-    visible: (eDesc)
-    clearWith:
-        - dep
-        - modelTerms
-        - contrasts
-        - scaling
-        - dep_scale
-        - fixedIntercept
-        - simpleScaleLabels
-        - ciWidth
-
+    visible: false
+    items: (emmeans)
     template:
-        title:  $key
+        title:  Estimate Marginal Means - ___key___
         type: Table
-        clearWith: []
+        clearWith:
+                ### modeloptions  begins
+              - model_type
+              - dep
+              - factors
+              - covs
+              - covs_scale
+              - scale_missing
+              - model_terms
+              - fixed_intercept
+              - se_method
+              - mute
+              - df_method
+              - contrasts
+              - covs_scale
+              - offset
+              - omnibus
+                ### modeloptions  ends
+                ### cioptions  begins
+              - ci_width        
+              - ci_method        
+              - boot_r        
+                ### cioptions  ends
         columns:
-        - name: emmean
+        - name: response
+          title: Response 
+          type: text
+          visible: (model_type:multinomial)
+          combineBelow: true
+
+        - name: estimate
           title: 'Mean'
           type: number
-        - name: SE
+        - name: se
           title: SE
           type: number
-        - name: df
-          title: df
-          type: number
-        - name: lower.CL
+        - name: est.ci.lower
           title: Lower 
           type: number
-        - name: upper.CL
+        - name: est.ci.upper
           title: Upper
           type: number
 
 
-  - name: descPlot
-    title: Plots
-    visible: (plotHAxis)
-    type: Image
-    description: a descriptives plot
-    width: 500
-    height: 300
-    renderFun: .descPlot
-    clearWith:
-        - dep
-        - plotHAxis
-        - plotSepLines
-        - plotSepPlots
-        - plotError
-        - ciWidth
-        - scaling
-        - dep_scale
-        - plotRaw
-        - plotDvScale
-        - fixedIntercept
-        - simpleScale
-        - simpleScaleLabels
-        - modelTerms
-        - percvalue
-        - cvalue
 
-
-  - name: descPlots
+  - name: mainPlots
     title: Results Plots
     type: Array
     description: an array of results plots
-    visible: (plotSepPlots)
     template:
-          title: $key
+          title: ""
           type: Image
-          renderFun: .descPlot
-          width: 500
-          height: 300
+          renderFun: .mainPlot
+          width: 600
+          height: 400
 
           clearWith:
            - dep
-           - plotHAxis
-           - plotSepLines
-           - plotSepPlots
-           - plotError
-           - ciWidth
-           - scaling
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_scale
+           - plot_xoriginal
+           - plot_black
+           - plot_around
+           - ci_width
+           - covs_scale
            - dep_scale
-           - modelTerms
-           - fixedIntercept
-           - simpleScale
-           - simpleScaleLabels
-           - plotDvScale
-           - plotRaw
-           - percvalue
-           - cvalue
-  - name: assumptions
-    title: Assumption Checks
-    type: Group
-    items:
-        - name: homoTest
-          title: Test for Homogeneity of Residual Variances (Levene's)
-          type: Table
-          description: a table of homogeneity tests
-          visible: (homoTest)
-          rows: 1
-          columns:
-            - name: F
-              type: number
+           - model_terms
+           - fixed_intercept
+           - covs_conditioning
+           - covs_scale_labels
+           - ccp_value
+           - ccm_value
 
-            - name: df1
-              type: integer
 
-            - name: df2
-              type: integer
+  - name: plotnotes
+    type: Html
+    visible: false
 
-            - name: p
-              type: number
-              format: zto,pvalue
-        - name: normTest
-          title: Test for Normality of residuals
-          type: Table
-          description: a table of normality tests
-          visible: (normTest)
-          rows: 2
-          columns:
-            - name: test
-              title: Test
-              type: number
 
-            - name: stat
-              title: Statistics
-              type: number
-            - name: p
-              type: number
-              format: zto,pvalue
-
-        - name: qq
-          title: Q-Q Plot
-          visible: (qq)
-          type: Image
-          description: a q-q plot
-          width: 450
-          height: 400
-          renderFun: .qqPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - modelTerms
-            - dep_scale
-
-        - name: normPlot
-          title: Residual histogram
-          visible: (normPlot)
-          type: Image
-          description: Residual histogram
-          width: 450
-          height: 400
-          renderFun: .normPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - dep_scale
-            - modelTerms
-        - name: residPlot
-          title: Residual-Predicted Scatterplot
-          visible: (residPlot)
-          type: Image
-          description: Residual Predicted plot
-          width: 450
-          height: 400
-          renderFun: .residPlot
-          requiresData: true
-          clearWith:
-            - dep
-            - modelTerms
-            - dep_scale
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GLM_PRED_${ dep }`'
+    varTitle: '`GZLM_PRED_${ dep }`'
     varDescription: Predicted values
+    initInRun: true
     clearWith:
         - dep
-        - factors
-        - covs
+        - model_terms
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GLM_RES_${ dep }`'
+    varTitle: '`GZLM_RES_${ dep }`'
     varDescription: Residuals values
-    clearWith:
-        - dep
-        - factors
-        - covs
+
+

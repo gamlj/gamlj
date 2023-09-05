@@ -1,0 +1,31 @@
+modeloptions:
+        - dep
+        - factors
+        - covs
+        - covs_scale
+        - dep_scale
+        - scale_missing
+        - contrasts
+        - model_terms
+        - fixed_intercept
+        - se_method
+        - robust_method
+        - mute
+nestedoptions:
+        - nested_terms
+        - nested_intercept
+        - comparison
+        
+cioptions:
+        - ci_width
+        - ci_method
+        - boot_r
+
+simpleeffectsoptions:
+                 - simple_x
+                 - simple_mods
+                 - simple_scale
+                 - ccm_value
+                 - ccp_value
+                 - covs_scale_labels
+                 - covs_conditioning

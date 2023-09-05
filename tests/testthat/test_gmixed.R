@@ -1,167 +1,99 @@
-context("gzlmixed")
-data("schoolexam")
-mod<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math*activity+( 1 +math| school ),
-  data = schoolexam,
-  plotHAxis = math,
-  correlatedEffects = "nocorr",
-  cimethod = "wald")
+testthat::context("glmixed")
+tol=.001
+data("glmmixeddata")
+data<-glmmixeddata
+
+names(data)
+data$cluster<-factor(data$cluster)
+data$w<-factor(data$w)
+data$yord<-factor(data$yord)
+data$ybin<-factor(data$ybin)
 
 
-model<-gamlj_model(mod)
-
-val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)
-val2<-round(as.numeric(as.character(mod$info$asDF$value[9])),digits = 3)
-val3<-as.numeric(as.character(mod$info$asDF$value[7]))
-val4<-as.numeric(as.character(mod$info$asDF$value[14]))
-
-testthat::test_that("info table is fine",{
-                    testthat::expect_equal(val1,-2785.064)
-                    testthat::expect_equal(val2, 0.039)
-                    testthat::expect_equal(val3, 5570.128,tolerance = .001)
-                    testthat::expect_equal(val4, 0.9566,tolerance = .001)
-                    
-                    })
-
-val1<-round(as.numeric(as.character(mod$main$anova$asDF$test[[1]])),digits = 3)
-val2<-round(as.numeric(as.character(mod$main$anova$asDF$p[[2]])),digits = 5)
-val3<-as.character(mod$main$anova$asDF$name[1])
-
-testthat::test_that("anova table is fine",{
-  testthat::expect_equal(val1,95.125)
-  testthat::expect_equal(val2, 0)
-  testthat::expect_equal(val3, "math")
-  
-})
-
-val1<-round(as.numeric(as.character(mod$main$fixed$asDF[1,5])),digits = 4)
-val2<-round(as.numeric(as.character(mod$main$fixed$asDF[2,7])),digits = 4)
-val3<-as.character(mod$main$fixed$asDF[2,1])
-
-testthat::test_that("params table is fine",{
-  testthat::expect_equal(val1,0.7104)
-  testthat::expect_equal(val2, 9.7532)
-  testthat::expect_equal(val3, "math")
-  
-})
-
-val1<-round(as.numeric(as.character(mod$main$random$asDF[1,3])),digits = 3)
-
-testthat::test_that("vars table is fine",{
-  testthat::expect_equal(val1,1.34)
-
-})
-
-
-mod<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math*activity+( 1 | school ),
-  data = schoolexam,
-  plotHAxis = math,
-  correlatedEffects = "nocorr",
-  cimethod = "wald",
-  scaling=c(math="clusterbasedcentered")
-  )
-mod
-
-
-val1<-round(as.numeric(as.character(mod$info$asDF$value[6])),digits = 3)
-val2<-round(as.numeric(as.character(mod$info$asDF$value[9])),digits = 3)
-val3<-as.numeric(as.character(mod$info$asDF$value[7]))
-val4<-as.numeric(as.character(mod$info$asDF$value[14]))
-
-testthat::test_that("info table is fine",{
-  testthat::expect_equal(val1,-2785.625)
-  testthat::expect_equal(val2, 0.039)
-  testthat::expect_equal(val3, 5571.25,tolerance = .001)
-  testthat::expect_equal(val4, 0.9564,tolerance = .001)
-  
-})
-
-schoolexam$school<-factor(schoolexam$school)
-mod0<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math*activity+( 1 | school ),
-  data = schoolexam,
-  plotHAxis = math,
-  correlatedEffects = "nocorr",
-  cimethod = "wald",
-  scaling=c(math="clusterbasedcentered")
+mod0 <- GAMLj3::gamlj_gmixed(
+  formula = ybin~x*w+(1+x|cluster),
+  data = data,
+  model_type = "logistic"
 )
 
-testthat::test_that("info factoring clustes is equivalent",{
-  testthat::expect_equal(mod$main$fixed$asDF[3,3],mod0$main$fixed$asDF[3,3])
-  testthat::expect_equal(mod$main$fixed$asDF[4,2],mod0$main$fixed$asDF[4,2])
-  testthat::expect_equal(mod$main$anova$asDF[2,2],mod0$main$anova$asDF[2,2])
-})
 
-
-testthat::expect_warning(
-mod<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 + math+I(math^2)+( 1 | school ),
-  data = schoolexam,
-  plotHAxis = math,
-  correlatedEffects = "nocorr",
-  cimethod = "wald")
-  )
-
-val1<-as.character(mod$info$asDF$value[15])
-
-testthat::test_that("fail",{
-  testthat::expect_equal(val1,"no")
-  
-})
-val1<-round(as.numeric(as.character(mod$main$fixed$asDF[1,5])),digits = 3)
-val2<-round(as.numeric(as.character(mod$main$fixed$asDF[2,7])),digits = 3)
-val3<-as.character(mod$main$fixed$asDF[3,1])
-
-testthat::test_that("params table is fine",{
-  testthat::expect_equal(val1, 0.708)
-  testthat::expect_equal(val2, 9.521)
-  testthat::expect_equal(val3, "math²")
-  
-})
-
-mplot<-mod$descPlot$plot$fun()
-val1<-"ggplot" %in% class(mplot)
-
-val2<-mplot$labels$y
-val3<-mplot$theme$line$linetype
-testthat::test_that("plot is there",{
-  testthat::expect_equal(val1, TRUE)
-  testthat::expect_equal(val2, "pass")
-  testthat::expect_equal(val3, 1)
-  
-})
-
-
-mod<-gamlj::gamljGlmMixed(
-  formula = pass ~ 1 +( 1 | school ),
-  data = schoolexam,
-  correlatedEffects = "nocorr",
-  cimethod = "wald")
-
-val1<-round(mod$main$fixed$asDF[[4]],2)
-testthat::test_that("intercept only",{
-  testthat::expect_equal(val1, 0.98)
-
-})
-
-
-data("phdpubs")
-phdpubs$q<-phdpubs$art
-mod<-gamlj::gamljGlmMixed(
-  formula = art ~ 1 + fem*mar +( 1 | program ),
-  data = phdpubs,
-  modelSelection = "nb",
-  cimethod = "wald",
-  postHoc = ~fem:mar)
-
-
-testthat::test_that("negative binomial", {
-    testthat::expect_equal(as.character(mod$info$asDF$value[4]),"Negative binomial")
-    testthat::expect_equal(as.numeric(as.character(mod$info$asDF$value[10])),3201.73)
-    testthat::expect_equal(as.character(mod$postHocs[[1]]$asDF[1,1]),"Men")
-    testthat::expect_equal(mod$postHocs[[1]]$asDF[1,6],0.9350,tol=.0001)
-    testthat::expect_equal(mod$postHocs[[1]]$asDF[2,9],0.16831,tol=.0001)
-    }
+mod1 <- GAMLj3::gamlj_gmixed(
+  data=data,
+  model_type = "logistic",
+  dep = "ybin",
+  factors = "w",
+  covs = "x",
+  model_terms = ~ x*w,
+  re=list(list(list("Intercept","cluster"),list("x","cluster")))
 )
+
+mod2 <- GAMLj3::gamlj_gmixed(
+  data=data,
+  model_type = "logistic",
+  dep = "ybin",
+  factors = "w",
+  covs = "x",
+  model_terms = ~ x*w,
+  re=~(1+x|cluster)
+)
+mod2$main$coefficients$asDF
+testthat::test_that("equivalent model input", {
+  testthat::expect_equal(mod0$info$asDF$specs[2], mod1$info$asDF$specs[2])
+  testthat::expect_equal(mod0$main$anova$asDF$f[3], mod1$main$anova$asDF$f[3])
+  testthat::expect_equal(mod0$main$coefficients$asDF$label[2], mod0$main$coefficients$asDF$label[2])
+  testthat::expect_equal(mod0$main$coefficients$asDF$expb.ci.lower[1], mod0$main$coefficients$asDF$expb.ci.lower[1])
+  testthat::expect_equal(mod0$main$coefficients$asDF$expb.ci.lower[1], mod2$main$coefficients$asDF$expb.ci.lower[1])
+  testthat::expect_equal(mod1$main$anova$asDF$f[3], mod2$main$anova$asDF$f[3])
+})
+
+
+
+model <- GAMLj3::gamlj_gmixed(
+  formula = ybin~x*w*z+(1+x|cluster),
+  data = data,
+  model_type = "logistic"
+)
+testthat::test_that("info is ok", {
+  testthat::expect_equal(as.numeric(model$info$asDF$value[6]),1718)
+  testthat::expect_equal(model$info$asDF$value[7],"yes")
+})
+
+testthat::test_that("R2 is ok", {
+  testthat::expect_equal(model$main$r2$asDF[1,2],.3361,tol)
+  testthat::expect_equal(model$main$r2$asDF[2,4],82.1,tol)
+  
+})
+
+testthat::test_that("fit is ok", {
+  testthat::expect_equal(model$main$fit$asDF[1,2],-931,tol)
+  testthat::expect_equal(model$main$fit$asDF[4,2],1861.65,tol)
+  
+})
+
+mod <- GAMLj3::gamlj_gmixed(
+  formula = ypoi ~ x * w +(1+w|cluster),
+  data = data,
+  model_type = "poisson",
+  simple_x = x,
+  simple_mods = w,
+  posthoc = ~w,
+  emmeans = ~x,
+  es=c("expb","marginals")
+)
+
+testthat::test_that("Poisson works", {
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .8715, tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1], 346.35, tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], 1.085, tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2[1], .2769, tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4], 4618.847, tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .9495, tol)
+  testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 184.78, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0087, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[1], .9767, tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,3],-.0227,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[2,5],-.160,tol)
+})
+
 

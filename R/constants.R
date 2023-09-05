@@ -1,60 +1,31 @@
 
-j_DEBUG=F
-j_INFO=F
 
-IMPROBABLE_SEQ<-";._.Xd2ludGVyaXNjb21pbmc._.;"
-DUMMY_TAIL<-"_._._"
+IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"
 
+
+FACTOR_SYMBOL= "..f_f_f.."
+LEVEL_SYMBOL = "..l_l_l.."
+INTERACTION_SYMBOL=":"
+B64_SYMBOL="..b_b_b.."
+B64_REGEX="\\.\\.b_b_b\\.\\."
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
-################ model info for gzlm ###############
+######## options not in the R syntax #####
+NO_R_OPTS<-c(
+            "model_terms",
+            "factors",
+            "covs",
+            "dep",
+            "re",
+            "cluster",
+            "donotrun",
+            "comparison",
+            "re_modelterms",
+            "re_listing"
+           )
 
-DINFO<-list()
-DINFO[["gaussian"]]<-c("Gaussian","Normal distribution of residual")
-DINFO[["poisson"]]<-c("Poisson","Model for count data")
-DINFO[["binomial"]]<-c("Binomial","Dichotomous event distribution of y")
-DINFO[["multinomial"]]<-c("Multinomial","Multi-event distribution of y")
-DINFO[["nb"]]<-c("Negative binomial","Rare event with overdispersion")
-DINFO[["poiover"]]<-c("Quasi-Poisson","Rare event with overdispersion")
-DINFO[["Gamma"]]<-c("Gamma","Skewed continuous distribution")
-
-LINFO<-list()
-LINFO[["identity"]]<-c("Identity","Coefficients in the same scale of y")
-LINFO[["log"]]<-c("log","Coefficients are in the log(y) scale")
-LINFO[["logit"]]<-c("Logit","Log of the odd of y=1 over y=0")
-LINFO[["slogit"]]<-c("Logit","Log of the odd of each level of y over y=0")
-LINFO[["probit"]]<-c("Probit","Inverse of normal CDF for P(y=1)")
-LINFO[["1/mu^2"]]<-c("1/mu^2","Inverse of y squared")
-LINFO[["inverse"]]<-c("1/mu","Inverse of y")
-LINFO[["sqrt"]]<-c("Square root","Square root of y")
-
-MINFO<-list()
-MINFO[["linear"]]<-list("name"=c("Linear","Classical Regression/ANOVA"),
-                        "call"="glm",emmeanTitle="Mean")
-MINFO[["poisson"]]<-list("name"=c("Poisson","Model for count data"),
-                         "call"="glm",emmeanTitle="Mean Count")
-MINFO[["logistic"]]<-list("name"=c("Logistic","Model for binary y"),
-                          "call"="glm",emmeanTitle="Prob.")
-MINFO[["probit"]]<-list("name"=c("Probit","Model for binary y"),
-                        "call"="glm",emmeanTitle="Prob.")
-
-MINFO[["multinomial"]]<-list("name"=c("Multinomial","Model for categorical y"),
-                             "call"="multinom",emmeanTitle="Prob.")
-
-MINFO[["nb"]]<-list("name"=c("Negative binomial","Model for count data"),
-                    "call"="glm(er).nb",emmeanTitle="Mean Count")
-
-
-MINFO[["poiover"]]<-list("name"=c("Quasi-Poisson","Model for count data"),
-                         "call"="glm",emmeanTitle="Mean Count")
-
-MINFO[["custom"]]<-list("name"=c("Custom","Model with custom family"),
-                         "call"="glm",emmeanTitle="Mean")
-
-
-###############################################################
 
 ######### warning ######################
 
@@ -67,6 +38,10 @@ WARNS["means.covariates"]<-"Estimated means are estimated keeping constant
 other effects in the model to the mean"
 WARNS["means.interactions"]<-"Estimated means are estimated averaging across interacting variables"
 WARNS["means.noemms"]<-"Estimated marginal means cannot be estimated. Please try to simplify your model"
+
+### standard error #############
+
+WARNS["stde.robust_test"]<-"Inferential tests and p-values are adjusted for heteroschedasticity."
 
 ### simple effects #############
 WARNS["se.interactions"]<-"Simple effects are estimated setting higher order
@@ -87,7 +62,7 @@ WARNS["se.largen"]<-"z-tests are computed because the number of observations exc
 
 #### anova #########
 
-WARNS["ano.aliased"]<-"WARNING: Some of the coefficients cannot be estimated because
+WARNS["aliased"]<-"WARNING: Some of the coefficients cannot be estimated because
 they are perfectly correlated with other coefficients in the model.
 This can be due to empty cells in the design or perfectly correlated covariates.
 The results may be uninterpretable."
@@ -100,6 +75,7 @@ will be estimated"
 WARNS["lmer.nogood"]<-"Results may be uninterpretable or misleading. Try to refine your model."
 WARNS["lmer.chisq"]<-"ML estimation of F-Tests failed. Chi-squared tests were performed."
 WARNS["lmer.singular"]<-"(Almost) singular fit. Maybe random coefficients variances are too small or correlations among them too large."
+WARNS["r2.nogood"]<-"R-squared cannot be computed for this model"
 
 ######### posst hoc ###################
 WARNS["ph.nojoy"]<-"Post-hoc tests cannot be estimated. Try simplifying your model removing interactions or covariates"
@@ -109,26 +85,23 @@ WARNS["ph.interactions"]<-"Post-hocs means are estimated averaging across intera
 
 #### GLM Specifics ##########
 
-WARNS["glm.zeromodel"]<-"SS are computed for predicted values equal to zero"
-
+WARNS["lm.zeromodel"]<-"SS are computed for predicted values equal to zero"
+WARNS["error.zeromodel"]<-"Tests not available for zero intercept only models"
+WARNS["nointercept"]<-"With zero intercept, the first factor coefficients are the estimated means of the factor levels"
 
 ### end of warnings ###
 WARNS<-sapply(WARNS,function(a) gsub("\n"," ",a,fixed=T))
 
 ###############################################################
 
-
-########## contrast definition info ################
-
-CONTR<-list()
-
-
-######## lme4 optimizers #########
-
-OPTIMIZERS<-c("bobyqa","Nelder_Mead","nloptwrap")
-
-
-
+TRANS_WARNS<-list()
+TRANS_WARNS[[1]]<-list(original="Respecify random",new="Random component variances may be to small to compute R-squares")
+TRANS_WARNS[[2]]<-list(original="Model failed to converge with",new="There were problems in model convergence. Results may be biased. Try to specify a different random component.")
+TRANS_WARNS[[3]]<-list(original="emmeans() results may be corrupted by removal",new=NULL)
+TRANS_WARNS[[4]]<-list(original="Could not recover model data from",new=NULL)
+TRANS_WARNS[[5]]<-list(original="Random slopes not present",new=NULL)
+TRANS_WARNS[[6]]<-list(original="too close to zero",new=NULL)
+TRANS_WARNS[[7]]<-list(original="contrasts dropped",new=NULL)
 
 ########### Greek Letters  ###############
 
@@ -146,11 +119,12 @@ greek_vector <- c( # lowercase Greek letters
   infinity ='\u221e', leftrightarrow ='\u21d4', forall='\u2200', exist ='\u2203', notexist ='\u2204',
   emptyset ='\u2205', elementof='\u2208', notelementof='\u2209', proportional='\u221d',
   asymptoticallyEqual='\u2243', notasymptoticallyEqual='\u2244', approxEqual='\u2245', almostEqual='\u2248',
-  leq='\u2264', geq='\u2265', muchless='\u226a', muchgreater='\u226b', leftarrow='\u21d0', rightarrow='\u21d2',
+  leq='\u2264', lt="\u003c",gt="\u003e", geq='\u2265', muchless='\u226a', muchgreater='\u226b', leftarrow='\u21d0', rightarrow='\u21d2',
   equal='\uff1d', notEqual='\u2260', integral='\u222b', doubleintegral='\u222c', tripleintegral='\u222d',
   logicalAnd='\u2227', logicalOr='\u2228', intersection='\u2229', union='\u222a')
 
 
+letter_chi2<-paste(greek_vector["chi"],'\u00B2',sep="")
 letter_eta2<-paste(greek_vector["eta"],'\u00B2',sep="")
 letter_peta2<-paste(greek_vector["eta"],'\u00B2',"p",sep="")
 letter_omega2<-paste(greek_vector["omega"],'\u00B2',sep="")
