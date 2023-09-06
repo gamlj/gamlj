@@ -296,8 +296,10 @@ SmartTable <- R6::R6Class("SmartTable",
                                 warning<-output$warning
                                 
                                 if (!isFALSE(error)) {
+                                  dispatch<-Dispatch$new(self)
                                   private$.debug_msg("ERROR",fun,error)
                                   if (exists("fromb64")) error<-fromb64(error)
+                                  error<-dispatch$translate(error)
                                   self$table$setError(error)
                                   private$.error<-TRUE
                                    return()

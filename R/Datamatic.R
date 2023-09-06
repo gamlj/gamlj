@@ -130,7 +130,7 @@ Variable <- R6::R6Class(
              vardata<-data[[var]]
       else 
         vardata<-data
-           
+      
       if (is.null(vardata)) {
           self$datamatic$error<-list(topic="info",message=paste("Variable",var,"not in the data"))
           return(self)
@@ -141,6 +141,8 @@ Variable <- R6::R6Class(
         self$levels<-levels(vardata)
         self$levels_labels<-levels(vardata)
         self$nlevels<-length(self$levels)
+        if (self$nlevels==0)
+            stop("Variable ", var," has no valid level.")
         self$neffects<-self$nlevels-1
         self$paramsnames<-paste0(var,1:(self$neffects))
         self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$neffects))
@@ -233,7 +235,10 @@ Variable <- R6::R6Class(
 
 
        vardata<-data[[self$name64]]
-
+       
+       if (nrow(data)>0 && all(is.na(vardata)))
+           stop("Variable ",self$name," has no valid case.")
+       
        if (self$type=="numeric" || self$type=="integer") {
           if (is.factor(vardata)) {
            vardata<-as.numeric(vardata)
@@ -567,6 +572,11 @@ Variable <- R6::R6Class(
         self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
         
       }
+      cluster64<-tob64(self$hasCluster[1])
+      
+      mark(tapply(vardata,data[[cluster64]],mean))
+      mark(tapply(vardata,data[[cluster64]],sd))
+      
       ## we then update levels the new levels (mean, sd etc)
       private$.update_levels(vardata)
       as.numeric(vardata)
