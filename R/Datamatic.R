@@ -549,7 +549,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,ddata,by=cluster64)
         sdata<-sdata[order(sdata$..id..),]
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
-        ## this is the beatifull clusterwise standardization for dep vars
+        ## this is the beautiful clusterwise standardization for dep vars
         if (self$isDependent) {
           sdata$mean<-as.numeric(scale(sdata$mean))
           sdata[[self$name64]] <- sdata[[self$name64]]+sdata$mean 
