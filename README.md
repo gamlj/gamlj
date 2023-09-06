@@ -55,12 +55,10 @@ Once download, go to jamovi library within jamovi and activate sideload
 GAMLj3 should now be available within jamovi.
 
 
-
 ## From source
 
 
 You will first need to download [jamovi](https://www.jamovi.org/download.html). 
-
 
 You can clone this repository and compile the module within R with 
 
