@@ -508,7 +508,7 @@ options:
                       name:  clusterbasedcentered
                     - title: Clusters means
                       name:  clustermeans
-                    - title: z-scores clusterwise
+                    - title: multilevel z-scores
                       name:  clusterbasedstandardized
       default: 'none'
       description:

@@ -572,6 +572,11 @@ Variable <- R6::R6Class(
         self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
         
       }
+      cluster64<-tob64(self$hasCluster[1])
+      
+      mark(tapply(vardata,data[[cluster64]],mean))
+      mark(tapply(vardata,data[[cluster64]],sd))
+      
       ## we then update levels the new levels (mean, sd etc)
       private$.update_levels(vardata)
       as.numeric(vardata)

@@ -52,8 +52,8 @@ gamljgmixedClass <- R6::R6Class(
         aSmartObj$ci("est",self$options$ci_width)
         aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
         aSmartObj$spaceBy<-"response"
-        if (is.something(self$options$factors))
-          aSmartObj$setColumnVisible<-"label"
+        if (is.something(self$options$factors) || self$options$model_type=="ordinal")
+            aSmartObj$setColumnVisible<-"label"
         ladd(private$.smartObjs)<- aSmartObj        
         
         ### contrasts code tables

@@ -642,6 +642,10 @@ children:
                     name: ci_method_wald
                     optionName: ci_method
                     optionPart: wald
+                  - name: ci_method_profile
+                    type: RadioButton
+                    optionName: ci_method
+                    optionPart: profile
                   - type: RadioButton
                     name: ci_method_quantile
                     optionName: ci_method
@@ -650,16 +654,6 @@ children:
                     name: boot_r
                     format: number
                     enable: (ci_method_quantile)
-              - type: Label
-                label: DF Method
-                children: []
-              - type: LayoutBox
-                margin: large
-                children:
-                  - name: ci_method_profile
-                    type: RadioButton
-                    optionName: ci_method
-                    optionPart: profile
           - type: LayoutBox
             margin: large
             style: inline
