@@ -42,9 +42,9 @@ that analyses that are done with previous versions cannot be opened with version
 
 So, to try out version 3, please download it:
 
-* [GAMLj for Windows](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.5.jmo)
-* [GAMLj for MacOS](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.5.jmo) 
-* [GAMLj for Linux](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.5.jmo).
+* [GAMLj for Windows](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.6.jmo)
+* [GAMLj for MacOS](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.6.jmo) 
+* [GAMLj for Linux](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.6.jmo).
 
 Once download, go to jamovi library within jamovi and activate sideload 
 
