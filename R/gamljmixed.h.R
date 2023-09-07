@@ -62,7 +62,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
-            res_struct = "cs",
+            res_struct = "id",
             df_method = "Satterthwaite",
             norm_plot = FALSE,
             qq_plot = FALSE,
@@ -419,8 +419,9 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..res_struct <- jmvcore::OptionList$new(
                 "res_struct",
                 res_struct,
-                default="cs",
+                default="id",
                 options=list(
+                    "id",
                     "cs",
                     "un",
                     "ar1"))
@@ -994,7 +995,12 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="phi", 
                                     `title`="Phi", 
                                     `type`="number", 
-                                    `visible`="(res_struct:ar1)"))))
+                                    `visible`="(res_struct:ar1)"),
+                                list(
+                                    `name`="rho", 
+                                    `title`="rho", 
+                                    `type`="number", 
+                                    `visible`="(res_struct:cs)"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="randomcov",
@@ -1710,7 +1716,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPred",
-                            title="Residual by cluster",
+                            title="Residuals-Predicted by cluster",
                             visible="(cluster_respred)",
                             clearWith=list(
                                 "dep",
@@ -1725,7 +1731,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPredGrid",
-                            title="Residual each cluster",
+                            title="Residuals-Predicted Grid",
                             visible="(cluster_respred_grid)",
                             clearWith=list(
                                 "dep",

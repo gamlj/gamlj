@@ -295,6 +295,7 @@ Plotter <- R6::R6Class(
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid,color=cluster)) 
         plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
         plot <- plot + ggplot2::geom_point(shape = 21)
+        plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
         plot <- plot + ggtheme
         plot <- plot + ggplot2::theme(legend.position="bottom")
         return(plot)

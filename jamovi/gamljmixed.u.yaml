@@ -251,6 +251,10 @@ children:
             label: Repeated Measures
             children:
               - type: RadioButton
+                name: res_struct_id
+                optionName: res_struct
+                optionPart: id
+              - type: RadioButton
                 name: res_struct_cs
                 optionName: res_struct
                 optionPart: cs

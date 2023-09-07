@@ -31,7 +31,7 @@ Infomatic <- R6::R6Class(
       
       
       self$model_type        <- options$model_type
-      if (options$model_type=="lmer" && options$res_struct!="cs")
+      if (options$model_type=="lmer" && options$res_struct!="id")
                     self$model_type<-"lme"
 
       self$formula           <- formulas$formula64()
@@ -266,7 +266,7 @@ Infomatic <- R6::R6Class(
         self$call          <-    "lme"
         self$rcall         <-    "estimate_lme"
         form               <-    paste("~1|",tob64(options$cluster[1]))
-
+        if (options$res_struct=="cs")  cor<-nlme::corCompSymm 
         if (options$res_struct=="un")  cor<-nlme::corSymm 
         if (options$res_struct=="ar1") cor<-nlme::corAR1
         if (options$reml) method="REML" else method="ML"

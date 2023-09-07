@@ -289,6 +289,10 @@ items:
                       title: "Phi"
                       type: number
                       visible: (res_struct:ar1)
+                    - name: rho
+                      title: "rho"
+                      type: number
+                      visible: (res_struct:cs)
 
            - name: randomcov
              title: Random Parameters correlations
@@ -976,7 +980,7 @@ items:
              height: 400
 
         - name: clusterResPred
-          title: Residual by cluster
+          title: Residuals-Predicted by cluster
           type: Array
           description: an array of random coefficients histograms
           visible: (cluster_respred)
@@ -992,7 +996,7 @@ items:
              height: 900
 
         - name: clusterResPredGrid
-          title: Residual each cluster
+          title: Residuals-Predicted Grid
           type: Array
           description: an grid of PredRes plots
           visible: (cluster_respred_grid)

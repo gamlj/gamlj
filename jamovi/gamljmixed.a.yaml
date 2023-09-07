@@ -641,10 +641,12 @@ options:
     - name: res_struct
       title: Structure
       type: List
-      default: cs
+      default: id
       options:
-        - name: cs
-          title: Compound Symmetry 
+        - name: id
+          title: Identity
+        - name:  cs
+          title: Compound Symmetry
         - name:  un
           title: Unstructured
         - name:  ar1

@@ -260,44 +260,9 @@ Runner <- R6::R6Class("Runner",
                             
                               jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
-                              
                               self$tab_randomcov<-results[[2]]
                               return(results[[1]])
                               
-                              grp<-unlist(lapply(vc$grp, function(a) gsub("\\.[0-9]$","",a)))
-                              ### if the model has no intercept or intercept and 
-                              ### effects of factors are set as uncorrelated
-                              ### lmer() estimate random means, and name them
-                              ### factornamefactorlevel. We fix this make the 
-                              ### labels more intuitive
-                              vc$groups <- fromb64(grp)
-                              var1<-gsub(LEVEL_SYMBOL," = ",vc$var1,fixed = T)
-                              vc$name   <- fromb64(var1)
-                              var2<-gsub(LEVEL_SYMBOL," = ",vc$var2,fixed = T)
-                              vc$name2  <- fromb64(var2)
-                              
-                              variances<-which(is.na(vc$var2))
-                              params<-vc[variances,]
-                              params$icc<-NA
-                              
-                              int<-which(params$name %in% "(Intercept)")
-                              for (i in int)
-                                  params$icc[i]<-params$var[i]/(params$var[i]+insight::get_variance_distribution(self$model,verbose = FALSE))
-                              nr<-nrow(params)+1
-                              if (params$grp[nrow(params)]!="Residual"){
-                                  params[nr,"groups"] <- "Residual"
-                                  params[nr,"name"]  <- ""
-                                  params[nr,"var"]   <- insight::get_variance_residual(self$model,verbose = FALSE)
-                                  params[nr,"std"]   <- sqrt(params[nr,"var"]) 
-                              }
-                                
-                              self$warning<-list(topic="main_random",message=attr(vc,"info"))
-
-                              covariances<-which(!is.na(vc$var2))
-                            if (nrow(vc[covariances,])>0) {
-                                self$tab_randomcov<-vc[covariances,]
-                            }
-                              params
                           },
                           run_main_randomcov=function() {
 
@@ -739,7 +704,7 @@ estimate_lme<-function(...) {
   
   opts<-list(...)
   data<-opts$data
-    model = nlme::lme(fixed=opts$fixed, 
+  model = nlme::lme(fixed=opts$fixed, 
                       random=opts$random,
                       data=data,method=opts$method,
                       correlation=do.call(opts$cor,list(form=formula(opts$form)))
@@ -749,7 +714,7 @@ estimate_lme<-function(...) {
    model$call$random<-opts$random
    model$call$method<-opts$method
    model$call[[1]]<-quote(nlme::lme.formula)
-   
+   mark(summary(model))
   return(model)
 }
 
