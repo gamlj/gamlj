@@ -62,13 +62,14 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
-            res_struct = "cs",
+            res_struct = "id",
             df_method = "Satterthwaite",
             norm_plot = FALSE,
             qq_plot = FALSE,
             resid_plot = FALSE,
             cluster_boxplot = FALSE,
             cluster_respred = FALSE,
+            cluster_respred_grid = FALSE,
             rand_hist = FALSE,
             mute = FALSE, ...) {
 
@@ -418,8 +419,9 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..res_struct <- jmvcore::OptionList$new(
                 "res_struct",
                 res_struct,
-                default="cs",
+                default="id",
                 options=list(
+                    "id",
                     "cs",
                     "un",
                     "ar1"))
@@ -449,6 +451,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..cluster_respred <- jmvcore::OptionBool$new(
                 "cluster_respred",
                 cluster_respred,
+                default=FALSE)
+            private$..cluster_respred_grid <- jmvcore::OptionBool$new(
+                "cluster_respred_grid",
+                cluster_respred_grid,
                 default=FALSE)
             private$..rand_hist <- jmvcore::OptionBool$new(
                 "rand_hist",
@@ -521,6 +527,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..resid_plot)
             self$.addOption(private$..cluster_boxplot)
             self$.addOption(private$..cluster_respred)
+            self$.addOption(private$..cluster_respred_grid)
             self$.addOption(private$..rand_hist)
             self$.addOption(private$..mute)
         }),
@@ -587,6 +594,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         resid_plot = function() private$..resid_plot$value,
         cluster_boxplot = function() private$..cluster_boxplot$value,
         cluster_respred = function() private$..cluster_respred$value,
+        cluster_respred_grid = function() private$..cluster_respred_grid$value,
         rand_hist = function() private$..rand_hist$value,
         mute = function() private$..mute$value),
     private = list(
@@ -652,6 +660,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..resid_plot = NA,
         ..cluster_boxplot = NA,
         ..cluster_respred = NA,
+        ..cluster_respred_grid = NA,
         ..rand_hist = NA,
         ..mute = NA)
 )
@@ -986,7 +995,12 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="phi", 
                                     `title`="Phi", 
                                     `type`="number", 
-                                    `visible`="(res_struct:ar1)"))))
+                                    `visible`="(res_struct:ar1)"),
+                                list(
+                                    `name`="rho", 
+                                    `title`="rho", 
+                                    `type`="number", 
+                                    `visible`="(res_struct:cs)"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="randomcov",
@@ -1613,6 +1627,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     residPlot = function() private$.items[["residPlot"]],
                     clusterBoxplot = function() private$.items[["clusterBoxplot"]],
                     clusterResPred = function() private$.items[["clusterResPred"]],
+                    clusterResPredGrid = function() private$.items[["clusterResPredGrid"]],
                     randHist = function() private$.items[["randHist"]]),
                 private = list(),
                 public=list(
@@ -1701,7 +1716,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPred",
-                            title="Residual by cluster",
+                            title="Residuals-Predicted by cluster",
                             visible="(cluster_respred)",
                             clearWith=list(
                                 "dep",
@@ -1711,8 +1726,23 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 options=options,
                                 title="$key",
                                 renderFun=".clusterResPred",
-                                width=500,
-                                height=800)))
+                                width=700,
+                                height=900)))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="clusterResPredGrid",
+                            title="Residuals-Predicted Grid",
+                            visible="(cluster_respred_grid)",
+                            clearWith=list(
+                                "dep",
+                                "dep_scale",
+                                "model_terms"),
+                            template=jmvcore::Image$new(
+                                options=options,
+                                title="$key",
+                                renderFun=".clusterResPredGrid",
+                                width=700,
+                                height=900)))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="randHist",

@@ -251,6 +251,10 @@ children:
             label: Repeated Measures
             children:
               - type: RadioButton
+                name: res_struct_id
+                optionName: res_struct
+                optionPart: id
+              - type: RadioButton
                 name: res_struct_cs
                 optionName: res_struct
                 optionPart: cs
@@ -586,6 +590,10 @@ children:
           - type: CheckBox
             name: cluster_respred
             label: Residuals-Predicted
+          - type: CheckBox
+            name: cluster_respred_grid
+            label: Residuals-Predicted (grid)
+
           - type: CheckBox
             name: rand_hist
             label: Random coeff. histogram

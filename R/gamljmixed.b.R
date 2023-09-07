@@ -251,6 +251,15 @@ gamljmixedClass <- R6::R6Class(
   
   return(plot)
 },
+.clusterResPredGrid=function(image, ggtheme, theme, ...) {
+  
+  if (!private$.ready$ready) 
+    return()
+  
+  plot<-private$.plotter_machine$clusterResPredGrid(image,ggtheme,theme)
+  
+  return(plot)
+},
 
 .randHist=function(image, ggtheme, theme, ...) {
   

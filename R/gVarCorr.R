@@ -156,18 +156,20 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
     }
   }
   ### variances
-
   
-  ngrp<-model$dims$ngrps[model$dims$qvec==1]
-  .names<-names(ngrp)
+  .names<-names(model$groups)
+  ngrp<-model$dims$ngrps[.names]
   ## icc
   int<-which(vmat$var1 %in% "(Intercept)")
   vmat$icc<-NA
   for (i in int)
     vmat$icc[i]<-vmat$vcov[i]/(vmat$vcov[i]+sigma(model)^2)
   if (obj$options$res_struct=="ar1")
-                vmat$phi<-as.numeric(coef(model$modelStruct$corStruct,unconstrained = FALSE))
+                vmat$phi<-c(as.numeric(coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))
+  if (obj$options$res_struct=="cs")
+                vmat$rho<-c(as.numeric(coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))
 
+  mark(.names,ngrp)  
   info<-paste("Number of Obs:", 
               model$dims$N,
               ", Number of groups:",

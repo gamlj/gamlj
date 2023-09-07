@@ -44,6 +44,7 @@ Plotter <- R6::R6Class(
         private$.prepareMainPlot()
         private$.prepareClusterBoxplot()
         private$.prepareClusterResPred()
+        private$.prepareClusterResPredGrid()
         private$.prepareRandHist()
         
       },
@@ -261,6 +262,10 @@ Plotter <- R6::R6Class(
         cluster<-image$state$cluster
 
         fmodel<-lme4::fortify.merMod(private$.operator$model)
+        
+        if (inherits(private$.operator$model,"lme"))
+          fmodel$.resid<-stats::resid(private$.operator$model,type="normalized")
+
         fmodel$cluster<-fmodel[[cluster]]
         plot<-ggplot2::ggplot(fmodel, ggplot2::aes(cluster,.resid)) +
               ggplot2::geom_boxplot() + ggplot2::coord_flip()
@@ -283,16 +288,45 @@ Plotter <- R6::R6Class(
         
         cluster<-image$state$cluster
         data<-lme4::fortify.merMod(private$.operator$model)
+        if (inherits(private$.operator$model,"lme"))
+          data$.resid<-stats::resid(private$.operator$model,type="normalized")
+        
         data$cluster<-data[[cluster]]
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid,color=cluster)) 
         plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
         plot <- plot + ggplot2::geom_point(shape = 21)
+        plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
         plot <- plot + ggtheme
         plot <- plot + ggplot2::theme(legend.position="bottom")
         return(plot)
         
       },
+      clusterResPredGrid=function(image,ggtheme,theme)  {
+  
       
+          if (!self$option("cluster_respred"))
+             return()
+  
+  
+          if (!is.something(private$.operator$model) )
+            return(FALSE)
+  
+          cluster<-image$state$cluster
+          data<-lme4::fortify.merMod(private$.operator$model)
+          if (inherits(private$.operator$model,"lme"))
+                   data$.resid<-stats::resid(private$.operator$model,type="normalized")
+  
+          data$cluster<-data[[cluster]]
+          plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid)) 
+          plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals")
+          plot <- plot + ggplot2::geom_point(shape = 21)
+          plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
+          plot <- plot + ggtheme 
+          plot <- plot + ggplot2::theme(legend.position="bottom")
+          plot <- plot + ggplot2::facet_wrap(cluster)
+          return(plot)
+       },
+
         randHist=function(image,ggtheme,theme)  {
   
   
@@ -577,7 +611,10 @@ Plotter <- R6::R6Class(
         return()
       
       ### we get the clusters from the model because the model may contain less cluster variables than selected
-      clusters<-names(private$.operator$model@cnms)
+      if (inherits(private$.operator$model,"lme"))
+        clusters<-names(private$.operator$model$groups)
+      else
+        clusters<-names(private$.operator$model@cnms)
       
       resultsgroup<-private$.results$assumptions$clusterBoxplot
 
@@ -596,9 +633,34 @@ Plotter <- R6::R6Class(
         return()
       
       ### we get the clusters from the model because the model may contain less cluster variables than selected
-      clusters<-names(private$.operator$model@cnms)
-      
+      if (inherits(private$.operator$model,"lme"))
+        clusters<-names(private$.operator$model$groups)
+      else
+        clusters<-names(private$.operator$model@cnms)
+
       resultsgroup<-private$.results$assumptions$clusterResPred
+      
+      for (cluster in clusters) {
+        title<-paste("Clustering variable:", fromb64(cluster))
+        id<-cluster
+        resultsgroup$addItem(id)
+        resultsgroup$get(key=id)$setTitle(title)
+        resultsgroup$get(key=id)$setState(list(cluster=cluster,label=fromb64(cluster)))
+        
+      }
+    },
+    .prepareClusterResPredGrid=function() {
+      
+      if (!self$option("cluster_respred_grid"))
+        return()
+      
+      ### we get the clusters from the model because the model may contain less cluster variables than selected
+      if (inherits(private$.operator$model,"lme"))
+        clusters<-names(private$.operator$model$groups)
+      else
+        clusters<-names(private$.operator$model@cnms)
+      
+      resultsgroup<-private$.results$assumptions$clusterResPredGrid
       
       for (cluster in clusters) {
         title<-paste("Clustering variable:", fromb64(cluster))
