@@ -587,6 +587,10 @@ children:
             name: cluster_respred
             label: Residuals-Predicted
           - type: CheckBox
+            name: cluster_respred_grid
+            label: Residuals-Predicted (grid)
+
+          - type: CheckBox
             name: rand_hist
             label: Random coeff. histogram
   - type: CollapseBox

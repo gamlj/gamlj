@@ -272,7 +272,6 @@ Infomatic <- R6::R6Class(
         if (options$reml) method="REML" else method="ML"
         self$calloptions   <-    list(fixed=as.formula(formulas$fixed_formula64()),
                                       random=formulas$listify_random_formulas64(),
-#                                      cor=do.call(cor,list(form=formula(form))),
                                       cor=cor,
                                       form=form,
                                       method=method
