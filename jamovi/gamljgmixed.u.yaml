@@ -265,7 +265,7 @@ children:
                       ghostText: drag term here
                       itemDropBehaviour: emptyspace
                       events:
-                        change: './gamlj.events::onEvent_addRandomTerm'
+                        change: './gamlj.events::onEvent_addNestedRandomTerm'
                       template:
                         type: TermLabel
                         format: ./rtermFormat

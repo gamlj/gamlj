@@ -9,7 +9,6 @@ const events = {
         fun.updatePostHocSupplier(ui, this);
         fun.updateSimpleSupplier(ui, this);
         fun.updatePlotsSupplier(ui, this);
-
         if (typeof ui.randomSupplier !== 'undefined' ) {
               fun.fixRandomEffects(ui,this);
         }
@@ -204,14 +203,55 @@ const events = {
     },    
 
     onChange_nested_re_add: function(ui) {
-//          console.log("I didn't do anything");
+          console.log("I didn't do anything");
     },
+    
     onEvent_addRandomTerm: function(ui) {
-//        console.log("addRandomTerm does nothing");
+        console.log("addRandomTerm does something");
+        // first we fix possible null values 
+        var re=this.cloneArray(ui.re.value(),[]);
+        var newre=[];
+        re.forEach( (e) => {
+           newre.push( (e[0] === null) ? [] : e );
+          });
+         // now we remove duplicates within each block
+         newre=unique_arrays(newre)
+         ui.re.setValue(newre);
+         
+        re=this.cloneArray(ui.nested_re.value(),[]);
+        newre=[];
+        re.forEach( (e) => {
+           newre.push( (e[0] === null) ? [] : e );
+          });
+         ui.nested_re.setValue(newre);
+
+    },
+    onEvent_addNestedRandomTerm: function(ui) {
+      
+        console.log("addNestedRandomTerm does something");
+         
+        var re=this.cloneArray(ui.nested_re.value(),[]);
+        var newre=[];
+        re.forEach( (e) => {
+           newre.push( (e[0] === null) ? [] : e );
+          });
+        newre=unique_arrays(newre)
+        ui.nested_re.setValue(newre);
+
     },
 
-   onEvent_nothing: function(ui, data) {
-//          console.log("I didn't do anything");
+    onEvent_re_block_add: function(ui) {
+      
+      //  console.log("re_block_add does nothing");
+
+    },
+    onEvent_re_block_remove: function(ui) {
+        // console.log("re_block_remove does nothing");
+
+    },
+
+   onEvent_nothing: function(ui) {
+          console.log("I didn't do anything");
     }    
 
 };
@@ -292,3 +332,20 @@ var normalize = function(cosmos) {
         return cosmos;
 }
 
+var unique_arrays = function( aArray) {
+  
+  var used= [];
+  const u = aArray.map( (a) => {
+    var loc = [];
+    a.forEach( (e) => {
+       var s = e.toString();
+       if (!used.includes(s)) {
+        loc.push(e);
+        used.push(s);
+       }
+    })
+   return loc;
+})
+
+ return u;  
+}

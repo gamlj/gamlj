@@ -238,7 +238,7 @@ const fun = {
             var option=ui.re_corr.value();
             var oldOption = context.workspace.re_corr;
             context.workspace.re_corr=option;
-            
+            console.log("in fun.fixRandomEffects");
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
