@@ -214,6 +214,13 @@ const events = {
            newre.push( (e[0] === null) ? [] : e );
           });
          ui.re.setValue(newre);
+         
+        re=this.cloneArray(ui.nested_re.value(),[]);
+        newre=[];
+        re.forEach( (e) => {
+           newre.push( (e[0] === null) ? [] : e );
+          });
+         ui.nested_re.setValue(newre);
 
     },
     onEvent_re_block_add: function(ui) {
