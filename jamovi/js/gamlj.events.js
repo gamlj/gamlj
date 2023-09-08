@@ -205,33 +205,35 @@ const events = {
     onChange_nested_re_add: function(ui) {
           console.log("I didn't do anything");
     },
+    
     onEvent_addRandomTerm: function(ui) {
-        console.log("addRandomTerm does nothing");
-        console.log(ui.re.value())
+        console.log("addRandomTerm does something");
+        var re=this.cloneArray(ui.re.value(),[]);
+        var newre=[];
+        re.forEach( (e) => {
+           newre.push( (e[0] === null) ? [] : e );
+          });
+         ui.re.setValue(newre);
 
     },
     onEvent_re_block_add: function(ui) {
-        console.log("re_block_add does this:");
-     // we make sure that there are enough arrays in the array list, each for each block
-     var random =this.cloneArray(ui.re.value(),[]);
-     console.log(random);
-     var okList= [];
-     for (var i = 0; i < random.length; i++) {
-         var aList = random[i] === undefined || random[i] === null  ? [] : random[i] ;
-             okList.push(aList);
-     }
-      console.log(random);
-      ui.re.setValue(okList);    
-
+      
+        console.log("re_block_add does nothing");
+//        var re=this.cloneArray(ui.re.value(),[]);
+//        var newre=[];
+//        re.forEach( (e) => {
+//          console.log(e+ " "+  (e === null) ? [] : e )
+//          newre.push( (e === null) ? [] : e );
+//          });
+//         ui.re.setValue(newre);
 
     },
     onEvent_re_block_remove: function(ui) {
         console.log("re_block_remove does nothing");
-        console.log(ui.re.value())
 
     },
 
-   onEvent_nothing: function(ui, data) {
+   onEvent_nothing: function(ui) {
           console.log("I didn't do anything");
     }    
 
