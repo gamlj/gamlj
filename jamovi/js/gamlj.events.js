@@ -9,7 +9,6 @@ const events = {
         fun.updatePostHocSupplier(ui, this);
         fun.updateSimpleSupplier(ui, this);
         fun.updatePlotsSupplier(ui, this);
-
         if (typeof ui.randomSupplier !== 'undefined' ) {
               fun.fixRandomEffects(ui,this);
         }
@@ -204,14 +203,36 @@ const events = {
     },    
 
     onChange_nested_re_add: function(ui) {
-//          console.log("I didn't do anything");
+          console.log("I didn't do anything");
     },
     onEvent_addRandomTerm: function(ui) {
-//        console.log("addRandomTerm does nothing");
+        console.log("addRandomTerm does nothing");
+        console.log(ui.re.value())
+
+    },
+    onEvent_re_block_add: function(ui) {
+        console.log("re_block_add does this:");
+     // we make sure that there are enough arrays in the array list, each for each block
+     var random =this.cloneArray(ui.re.value(),[]);
+     console.log(random);
+     var okList= [];
+     for (var i = 0; i < random.length; i++) {
+         var aList = random[i] === undefined || random[i] === null  ? [] : random[i] ;
+             okList.push(aList);
+     }
+      console.log(random);
+      ui.re.setValue(okList);    
+
+
+    },
+    onEvent_re_block_remove: function(ui) {
+        console.log("re_block_remove does nothing");
+        console.log(ui.re.value())
+
     },
 
    onEvent_nothing: function(ui, data) {
-//          console.log("I didn't do anything");
+          console.log("I didn't do anything");
     }    
 
 };

@@ -45,6 +45,7 @@ children:
             events:
               change: './gamlj.events::onChange_cluster'
   - type: LayoutBox
+    name: panel_input
     margin: large
     style: inline
     children:
@@ -124,6 +125,7 @@ children:
                 name: nested_intercept
                 enable: (comparison)
   - type: CollapseBox
+    name: panel_random
     label: Random Effects
     collapsed: true
     stretchFactor: 1
@@ -146,7 +148,8 @@ children:
                 height: normal
                 addButton: Add correlated effects block
                 events:
-                  change: './gamlj.events::onChange_nested_re_add'
+                  listItemAdded: './gamlj.events::onEvent_re_block_add'
+                  listItemRemoved: './gamlj.events::onEvent_re_block_remove'
                 selectable: true
                 templateName: linreg-block-template
                 template:

@@ -100,7 +100,9 @@ options:
       default: false
       description:
           R: >
-             Not present in R
+            Not present in R
+          ui: > 
+            Activate the options and fields required to conduct a model comparison analyses
 
 
     - name: nested_intercept
@@ -113,7 +115,7 @@ options:
 
 
     - name: estimates_ci
-      title: Coefficients
+      title: Fixed Parameters
       type: Bool
       default: true
       description:
@@ -133,6 +135,11 @@ options:
       title: Do not run
       type: Bool
       default: false
+      description:
+          R: >
+            Not present in R
+          ui: > 
+            Do not update results when options are changed. Useful to setup complex models without waiting for each update to conclude 
 
 
     - name: ci_method
@@ -163,7 +170,7 @@ options:
       description:
           R: >
             a number between 50 and 99.9 (default: 95) specifying the confidence
-            interval width for the plots.
+            intervals width.
 
 
 
@@ -597,7 +604,8 @@ options:
       description:
           R: >
             Not in R interface
-            
+          ui: >
+            Show the fixed effects defined in the model in the list of potential random coefficients
             
     - name: re_listing
       type: List
@@ -617,6 +625,10 @@ options:
       description:
           R: >
              Not in R interface
+          ui: >
+             Show potential random effects in the `Components` field. `None` nothing (more than the fixed effects), the other can be
+             `Main Effects`, `Up to 2-way` interactions, `Up to 3-way` interactions, `All possible` means showing in the `Components` list
+             all possible potential random coefficients. 
 
 
 
