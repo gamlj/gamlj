@@ -903,16 +903,50 @@ items:
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GZLM_PRED_${ dep }`'
+    varTitle: '`GLM_${ dep }_PRED`'
     varDescription: Predicted values
-    initInRun: true
     clearWith:
-        - dep
-        - model_terms
+                    ### modeloptions  begins
+                 -  model_type
+                 -  dep
+                 -  factors
+                 -  covs
+                 -  covs_scale
+                 -  scale_missing
+                 -  model_terms
+                 -  fixed_intercept
+                 -  se_method
+                 -  mute
+                 -  df_method
+                 -  contrasts
+                 -  covs_scale
+                 -  offset
+                 -  omnibus
+                    ### modeloptions  ends
+        
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GZLM_RES_${ dep }`'
+    varTitle: '`GLM_${ dep }_RES`'
     varDescription: Residuals values
+    clearWith:
+                    ### modeloptions  begins
+                 -  model_type
+                 -  dep
+                 -  factors
+                 -  covs
+                 -  covs_scale
+                 -  scale_missing
+                 -  model_terms
+                 -  fixed_intercept
+                 -  se_method
+                 -  mute
+                 -  df_method
+                 -  contrasts
+                 -  covs_scale
+                 -  offset
+                 -  omnibus
+                    ### modeloptions  ends
+        
 
 

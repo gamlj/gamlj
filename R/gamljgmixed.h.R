@@ -1676,7 +1676,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 options=options,
                 name="predicted",
                 title="Predicted Vales",
-                varTitle="`GZMIXED_PRED_${ dep }`",
+                varTitle="`GZMIXED_${ dep }_PRED`",
                 varDescription="Predicted values",
                 clearWith=list(
                     "dep",
@@ -1699,7 +1699,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 options=options,
                 name="residuals",
                 title="Residuals Vales",
-                varTitle="`GZMIXED_RES_${ dep }`",
+                varTitle="`GZMIXED_${ dep }_RES`",
                 varDescription="Residuals values",
                 clearWith=list(
                     "dep",

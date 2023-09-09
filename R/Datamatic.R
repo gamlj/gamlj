@@ -35,7 +35,7 @@ Datamatic <- R6::R6Class(
       }
       
       data64 <- jmvcore::naOmit(data64)
-      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
+#      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
       return(data64)
       

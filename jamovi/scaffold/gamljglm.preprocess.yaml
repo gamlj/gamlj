@@ -679,16 +679,18 @@ items:
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GZLM_PRED_${ dep }`'
+    varTitle: '`GLM_${ dep }_PRED`'
     varDescription: Predicted values
-    initInRun: true
     clearWith:
-        - dep
-        - model_terms
+                 -  __modeloptions__
+        
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GZLM_RES_${ dep }`'
+    varTitle: '`GLM_${ dep }_RES`'
     varDescription: Residuals values
+    clearWith:
+                 -  __modeloptions__
+        
 
 
