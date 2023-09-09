@@ -34,7 +34,6 @@ items:
                         - __modeloptions__
                         - __nestedoptions__                     
 
-             rows: 1
              columns:
                     - name: model
                       title: Model
@@ -56,6 +55,33 @@ items:
                       type: number
                       format: zto,pvalue
              refs: goodness
+
+           - name: fit
+             title: Additional Indices
+             type: Table
+             visible: (more_fit_indices)
+             clearWith:
+                         - __modeloptions__
+
+             columns:
+                    - name: info
+                      type: text
+                      title: "Info"
+                    - name: value
+                      type: text
+                      title: "Model Value"
+                    - name: nested
+                      type: text
+                      title: "Nested Model"
+                      visible: (comparison)
+                    - name: diff
+                      type: text
+                      title: Δ 
+                      visible: (comparison)
+
+                    - name: specs
+                      type: text
+                      title: "Comment"
 
 
            - name: anova

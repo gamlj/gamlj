@@ -679,7 +679,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
-                            rows=1,
                             columns=list(
                                 list(
                                     `name`="model", 

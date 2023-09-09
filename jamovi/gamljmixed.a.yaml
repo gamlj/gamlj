@@ -751,6 +751,13 @@ options:
           R: >
             Not present in R
 
+    - name: more_fit_indices
+      title: More Fit Indices
+      type: Bool
+      default: false
+      description:
+          R: >
+            shows AIC and BIC indices for the estimated model
 
 
 

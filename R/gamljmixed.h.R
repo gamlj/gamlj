@@ -71,7 +71,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             cluster_respred = FALSE,
             cluster_respred_grid = FALSE,
             rand_hist = FALSE,
-            mute = FALSE, ...) {
+            mute = FALSE,
+            more_fit_indices = FALSE, ...) {
 
             super$initialize(
                 package="GAMLj3",
@@ -464,6 +465,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "mute",
                 mute,
                 default=FALSE)
+            private$..more_fit_indices <- jmvcore::OptionBool$new(
+                "more_fit_indices",
+                more_fit_indices,
+                default=FALSE)
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
@@ -530,6 +535,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..cluster_respred_grid)
             self$.addOption(private$..rand_hist)
             self$.addOption(private$..mute)
+            self$.addOption(private$..more_fit_indices)
         }),
     active = list(
         .caller = function() private$...caller$value,
@@ -596,7 +602,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         cluster_respred = function() private$..cluster_respred$value,
         cluster_respred_grid = function() private$..cluster_respred_grid$value,
         rand_hist = function() private$..rand_hist$value,
-        mute = function() private$..mute$value),
+        mute = function() private$..mute$value,
+        more_fit_indices = function() private$..more_fit_indices$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
@@ -662,7 +669,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..cluster_respred = NA,
         ..cluster_respred_grid = NA,
         ..rand_hist = NA,
-        ..mute = NA)
+        ..mute = NA,
+        ..more_fit_indices = NA)
 )
 
 gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -712,6 +720,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
                     r2 = function() private$.items[["r2"]],
+                    fit = function() private$.items[["fit"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
@@ -755,7 +764,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
-                            rows=1,
                             columns=list(
                                 list(
                                     `name`="model", 
@@ -783,6 +791,56 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number", 
                                     `format`="zto,pvalue")),
                             refs="goodness"))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="fit",
+                            title="Additional Indices",
+                            visible="(more_fit_indices)",
+                            clearWith=list(
+                                "dep",
+                                "reml",
+                                "factors",
+                                "covs",
+                                "cluster",
+                                "covs_scale",
+                                "dep_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale",
+                                "mute",
+                                "donotrun",
+                                "res_struct"),
+                            columns=list(
+                                list(
+                                    `name`="info", 
+                                    `type`="text", 
+                                    `title`="Info"),
+                                list(
+                                    `name`="value", 
+                                    `type`="text", 
+                                    `title`="Model Value"),
+                                list(
+                                    `name`="nested", 
+                                    `type`="text", 
+                                    `title`="Nested Model", 
+                                    `visible`="(comparison)"),
+                                list(
+                                    `name`="diff", 
+                                    `type`="text", 
+                                    `title`="\u0394", 
+                                    `visible`="(comparison)"),
+                                list(
+                                    `name`="specs", 
+                                    `type`="text", 
+                                    `title`="Comment"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",

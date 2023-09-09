@@ -714,7 +714,6 @@ estimate_lme<-function(...) {
    model$call$random<-opts$random
    model$call$method<-opts$method
    model$call[[1]]<-quote(nlme::lme.formula)
-   mark(summary(model))
   return(model)
 }
 
