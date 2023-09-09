@@ -120,6 +120,7 @@ gFit <- R6::R6Class(
 
       r2comp$model <- paste0(greek_vector[["Delta"]], "R", "\u00B2")
       r2comp$type <- "Comparison"
+      
       ### give some warning
       if (r2comp$df1 < 0) 
         self$operator$warning <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
@@ -128,7 +129,9 @@ gFit <- R6::R6Class(
       if (r2comp$df1 == 0) 
         self$operator$warning <- list(topic = "main_r2", message = "Nested and full models are identical, try removing some term from the nested model")
       
-      
+      if (self$operator$option(".caller", c("lmer", "glmer"))) 
+            self$operator$warning <- list(topic = "main_r2", message = "Models comparison is done on the conditional models (random and fixed effects)")
+          
       r2comp$r2 <- private$.r2-private$.r2n
       if (length(r2comp$r2) == 0)  r2comp$r2 <- NA
       

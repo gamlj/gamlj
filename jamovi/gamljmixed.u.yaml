@@ -78,6 +78,9 @@ children:
             name: comparison
             events:
               change: './gamlj.events::onEvent_comparison'
+          - type: CheckBox
+            name: more_fit_indices
+
   - type: CollapseBox
     label: Fixed Effects
     collapsed: true

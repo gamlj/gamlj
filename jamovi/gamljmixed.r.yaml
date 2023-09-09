@@ -60,7 +60,6 @@ items:
                         - comparison                     
                           ### nestedoptions  ends
 
-             rows: 1
              columns:
                     - name: model
                       title: Model
@@ -82,6 +81,55 @@ items:
                       type: number
                       format: zto,pvalue
              refs: goodness
+
+           - name: fit
+             title: Additional Indices
+             type: Table
+             visible: (more_fit_indices)
+             clearWith:
+                           ### modeloptions  begins
+                         - dep
+                         - reml
+                         - factors
+                         - covs
+                         - cluster
+                         - covs_scale
+                         - dep_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - re
+                         - re_corr
+                         - df_method
+                         - relm
+                         - contrasts
+                         - covs_scale
+                         - mute
+                         - donotrun
+                         - res_struct
+                           ### modeloptions  ends
+
+             columns:
+                    - name: info
+                      type: text
+                      title: "Info"
+                    - name: value
+                      type: text
+                      title: "Model Value"
+                    - name: nested
+                      type: text
+                      title: "Nested Model"
+                      visible: (comparison)
+                    - name: diff
+                      type: text
+                      title: Δ 
+                      visible: (comparison)
+
+                    - name: specs
+                      type: text
+                      title: "Comment"
 
 
            - name: anova

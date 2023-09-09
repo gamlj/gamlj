@@ -36,7 +36,10 @@ gamljmixedClass <- R6::R6Class(
       aSmartObj$spaceBy<-"model"
       ladd(private$.smartObjs)<-aSmartObj
       
-
+      ## AIC and BIC table ###
+      aSmartObj<-SmartTable$new(self$results$main$fit,runner_machine)
+      ladd(private$.smartObjs)<-aSmartObj
+      
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj

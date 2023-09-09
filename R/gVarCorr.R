@@ -169,7 +169,6 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   if (obj$options$res_struct=="cs")
                 vmat$rho<-c(as.numeric(coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))
 
-  mark(.names,ngrp)  
   info<-paste("Number of Obs:", 
               model$dims$N,
               ", Number of groups:",

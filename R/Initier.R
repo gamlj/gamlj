@@ -115,14 +115,12 @@ Initier <- R6::R6Class(
       
           tab<-self$infomatic$r2
           if (self$options$comparison) {
-            for (i in length(tab)) {
-                tab[[i]]$type="Full"
-                one<-tab[[i]]
-                one$type<-"Nested"
-                ladd(tab)<-one
-            }
-            ladd(tab)<-list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
+             tab<-c(tab,tab)
+             models<-rep(c("Full","Nested"),each=length(tab)/2)
+             for (i in seq_along(tab)) tab[[i]]$model<-models[[i]]
+             ladd(tab)<-list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
           }
+          mark(tab)
       tab
       
     },
