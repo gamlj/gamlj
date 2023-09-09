@@ -304,7 +304,7 @@ Plotter <- R6::R6Class(
       clusterResPredGrid=function(image,ggtheme,theme)  {
   
       
-          if (!self$option("cluster_respred"))
+          if (!self$option("cluster_respred_grid"))
              return()
   
   
