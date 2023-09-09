@@ -684,18 +684,13 @@ items:
     varTitle: '`MIXED_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
-        - reml
-        - dep
-        - model_terms
-        - re
+                - __modeloptions__
   - name: residuals
     title: Residuals Vales
     type: Output            
     varTitle: '`MIXED_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
-        - reml
-        - dep
-        - model_terms
-        - re
-        
+                - __modeloptions__
+
+

@@ -410,7 +410,7 @@ Runner <- R6::R6Class("Runner",
 
                                 
                                 pdf <- predicted(self$model,self)
-                                
+
                                 results$predicted$set(1:ncol(pdf),
                                                       names(pdf),
                                                       rep("Predicted",ncol(pdf)),

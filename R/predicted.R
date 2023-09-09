@@ -11,6 +11,7 @@ predicted<- function(model,...) UseMethod(".predicted")
       pdf[[p]]<-fromb64(as.character(pdf[[p]]))
   
   names(pdf)  <- paste0(paste0(root,"_",obj$options$dep),"_",fromb64(names(pdf)))  
+  mark(head(pdf))
   pdf  
 }
 
@@ -26,5 +27,6 @@ predicted<- function(model,...) UseMethod(".predicted")
       pdf[[p]]<-fromb64(as.character(pdf[[p]]))
   
   names(pdf)  <- paste0(paste0("MIXED_",obj$options$dep),"_",fromb64(names(pdf)))  
+  mark(head(pdf))
   pdf  
 }

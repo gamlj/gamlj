@@ -1081,18 +1081,57 @@ items:
     varTitle: '`MIXED_PRED_${ dep }`'
     varDescription: Predicted values
     clearWith:
-        - reml
-        - dep
-        - model_terms
-        - re
+                  ### modeloptions  begins
+                - dep
+                - reml
+                - factors
+                - covs
+                - cluster
+                - covs_scale
+                - dep_scale
+                - scale_missing
+                - model_terms
+                - fixed_intercept
+                - se_method
+                - mute
+                - re
+                - re_corr
+                - df_method
+                - relm
+                - contrasts
+                - covs_scale
+                - mute
+                - donotrun
+                - res_struct
+                  ### modeloptions  ends
   - name: residuals
     title: Residuals Vales
     type: Output            
     varTitle: '`MIXED_RES_${ dep }`'
     varDescription: Residuals values
     clearWith:
-        - reml
-        - dep
-        - model_terms
-        - re
-        
+                  ### modeloptions  begins
+                - dep
+                - reml
+                - factors
+                - covs
+                - cluster
+                - covs_scale
+                - dep_scale
+                - scale_missing
+                - model_terms
+                - fixed_intercept
+                - se_method
+                - mute
+                - re
+                - re_corr
+                - df_method
+                - relm
+                - contrasts
+                - covs_scale
+                - mute
+                - donotrun
+                - res_struct
+                  ### modeloptions  ends
+
+

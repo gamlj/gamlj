@@ -662,14 +662,14 @@ items:
   - name: predicted
     title: Predicted Vales
     type: Output            
-    varTitle: '`GZMIXED_PRED_${ dep }`'
+    varTitle: '`GZMIXED_${ dep }_PRED`'
     varDescription: Predicted values
     clearWith:
              - __modeloptions__
   - name: residuals
     title: Residuals Vales
     type: Output            
-    varTitle: '`GZMIXED_RES_${ dep }`'
+    varTitle: '`GZMIXED_${ dep }_RES`'
     varDescription: Residuals values
     clearWith:
              - __modeloptions__

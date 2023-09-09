@@ -1830,7 +1830,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="predicted",
                 title="Predicted Vales",
-                varTitle="`GLM_PRED_${ dep }`",
+                varTitle="`LM_${ dep }_PRED`",
                 varDescription="Predicted values",
                 clearWith=list(
                     "dep",
@@ -1849,7 +1849,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="residuals",
                 title="Residuals Vales",
-                varTitle="`GLM_RES_${ dep }`",
+                varTitle="`LM_${ dep }_RES`",
                 varDescription="Residuals values",
                 clearWith=list(
                     "dep",
