@@ -38,7 +38,7 @@ Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select
 # Version 3
 
 GAMLj has undergone a major upgrading with version 3.*. The upgrading made version 3 not compatible with previous versions of the module, meaning
-that analyses that are done with previous versions cannot be opened with version 3. At the moment, version 3 is not yet available in the jamovi library, but can be installed and tested in jamovi by downloading it from here and sideload the module in jamovi. Installing version 3 will not disrupt previous version of the model.
+that analyses that are done with previous versions cannot be opened with version 3. At the moment, version 3 is not yet available in the jamovi library, but it can be installed and tested in jamovi by downloading it from here and sideload the module in jamovi. Installing version 3 will not disrupt previous versions of the module.
 
 So, to try out version 3, please download it:
 
