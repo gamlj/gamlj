@@ -238,11 +238,12 @@ Plotter <- R6::R6Class(
             data <- as.data.frame(stats::residuals(private$.operator$model))
             names(data) <- ".resid"
             data$.fitted <- stats::predict(private$.operator$model)
+            size<-2
 
               # library(ggplot2)
             plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid)) + 
                        ggplot2::labs(x = "Predicted", y = "Residuals")
-            plot <- plot + ggplot2::geom_point(shape = 21, color = color, fill = fill)
+            plot <- plot + ggplot2::geom_point(shape = 21, color = color, fill = fill,size=size)
             
             if (self$option("plot_extremes")) {
               cutoff1<-quantile(data$.resid,.01)
@@ -252,7 +253,7 @@ Plotter <- R6::R6Class(
                                                  show.legend=FALSE,
                                                  position=ggplot2::position_jitter())
             }
-            
+            plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
             plot <- plot + ggtheme
             return(plot)
       },
@@ -314,7 +315,7 @@ Plotter <- R6::R6Class(
         data$cluster<-data[[cluster]]
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid,color=cluster)) 
         plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
-        plot <- plot + ggplot2::geom_point(shape = 19)
+        plot <- plot + ggplot2::geom_point(shape = 19,size=2)
         plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
 
         if (self$option("plot_extremes")) {
