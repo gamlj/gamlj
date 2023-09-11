@@ -35,6 +35,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_around = "none",
             plot_re = FALSE,
             plot_re_method = "average",
+            plot_extremes = FALSE,
             emmeans = NULL,
             posthoc = NULL,
             posthoc_ci = FALSE,
@@ -245,6 +246,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=list(
                     "average",
                     "full"))
+            private$..plot_extremes <- jmvcore::OptionBool$new(
+                "plot_extremes",
+                plot_extremes,
+                default=FALSE)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -499,6 +504,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
+            self$.addOption(private$..plot_extremes)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
@@ -567,6 +573,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_around = function() private$..plot_around$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
+        plot_extremes = function() private$..plot_extremes$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
@@ -634,6 +641,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_around = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
+        ..plot_extremes = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
@@ -1742,20 +1750,22 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms")))
+                                "model_terms",
+                                "plot_extremes")))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="residPlot",
                             title="Residual-Predicted Scatterplot",
                             visible="(resid_plot)",
-                            width=500,
-                            height=400,
+                            width=700,
+                            height=700,
                             renderFun=".residPlot",
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
                                 "model_terms",
-                                "dep_scale")))
+                                "dep_scale",
+                                "plot_extremes")))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterBoxplot",
@@ -1764,13 +1774,14 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms"),
+                                "model_terms",
+                                "plot_extremes"),
                             template=jmvcore::Image$new(
                                 options=options,
                                 title="$key",
                                 renderFun=".clusterBoxplot",
-                                width=500,
-                                height=400)))
+                                width=700,
+                                height=900)))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPred",
@@ -1779,7 +1790,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms"),
+                                "model_terms",
+                                "plot_extremes"),
                             template=jmvcore::Image$new(
                                 options=options,
                                 title="$key",
@@ -1794,7 +1806,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms"),
+                                "model_terms",
+                                "plot_extremes"),
                             template=jmvcore::Image$new(
                                 options=options,
                                 title="$key",

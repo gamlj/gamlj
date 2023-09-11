@@ -236,14 +236,23 @@ Plotter <- R6::R6Class(
             fill <- theme$fill[2]
             color <- theme$color[1]
             data <- as.data.frame(stats::residuals(private$.operator$model))
-            names(data) <- "res"
-            data$pred <- stats::predict(private$.operator$model)
+            names(data) <- ".resid"
+            data$.fitted <- stats::predict(private$.operator$model)
 
               # library(ggplot2)
-            plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = pred, y = res)) + 
+            plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid)) + 
                        ggplot2::labs(x = "Predicted", y = "Residuals")
-      
             plot <- plot + ggplot2::geom_point(shape = 21, color = color, fill = fill)
+            
+            if (self$option("plot_extremes")) {
+              cutoff1<-quantile(data$.resid,.01)
+              cutoff2<-quantile(data$.resid,.99)
+              edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
+              plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=.fitted,y=.resid,label=rownames(edata)),
+                                                 show.legend=FALSE,
+                                                 position=ggplot2::position_jitter())
+            }
+            
             plot <- plot + ggtheme
             return(plot)
       },
@@ -261,14 +270,24 @@ Plotter <- R6::R6Class(
         
         cluster<-image$state$cluster
 
-        fmodel<-lme4::fortify.merMod(private$.operator$model)
+        data<-lme4::fortify.merMod(private$.operator$model)
         
         if (inherits(private$.operator$model,"lme"))
-          fmodel$.resid<-stats::resid(private$.operator$model,type="normalized")
+          data$.resid<-stats::resid(private$.operator$model,type="normalized")
 
-        fmodel$cluster<-fmodel[[cluster]]
-        plot<-ggplot2::ggplot(fmodel, ggplot2::aes(cluster,.resid)) +
-              ggplot2::geom_boxplot() + ggplot2::coord_flip()
+        data$cluster<-data[[cluster]]
+        plot<-ggplot2::ggplot(data, ggplot2::aes(cluster,.resid)) +
+              ggplot2::geom_boxplot() 
+        
+        if (self$option("plot_extremes")) {
+          cutoff1<-quantile(data$.resid,.01)
+          cutoff2<-quantile(data$.resid,.99)
+          edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
+          plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=cluster,y=.resid,label=rownames(edata)),
+                                             show.legend=FALSE,
+                                             position=ggplot2::position_jitter())
+        }
+        plot <- plot+ ggplot2::coord_flip()
         plot<-plot+ggplot2::xlab(fromb64(cluster))+ggplot2::ylab("Residuals")
         plot<-plot+ ggtheme 
 
@@ -291,11 +310,22 @@ Plotter <- R6::R6Class(
         if (inherits(private$.operator$model,"lme"))
           data$.resid<-stats::resid(private$.operator$model,type="normalized")
         
+
         data$cluster<-data[[cluster]]
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid,color=cluster)) 
         plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals", color=fromb64(cluster))
         plot <- plot + ggplot2::geom_point(shape = 19)
         plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
+
+        if (self$option("plot_extremes")) {
+          cutoff1<-quantile(data$.resid,.01)
+          cutoff2<-quantile(data$.resid,.99)
+          edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
+          plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=.fitted,y=.resid,label=rownames(edata)),
+                                             show.legend=FALSE,
+                                             position=ggplot2::position_jitter())
+        }
+        
         plot <- plot + ggtheme
         plot <- plot + ggplot2::theme(legend.position="bottom")
         return(plot)
@@ -321,6 +351,16 @@ Plotter <- R6::R6Class(
           plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals")
           plot <- plot + ggplot2::geom_point(shape = 19)
           plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
+          
+          if (self$option("plot_extremes")) {
+              cutoff1<-quantile(data$.resid,.01)
+              cutoff2<-quantile(data$.resid,.99)
+              edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
+              plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=.fitted,y=.resid,label=rownames(edata)),
+                                                 show.legend=FALSE,
+                                                 position=ggplot2::position_jitter())
+          }
+          
           plot <- plot + ggtheme 
           plot <- plot + ggplot2::theme(legend.position="bottom")
           plot <- plot + ggplot2::facet_wrap(cluster)

@@ -546,6 +546,7 @@ items:
     type: Html
     visible: false
 
+
   - name: assumptions
     title: Assumption Checks
     type: Group
@@ -600,19 +601,21 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
         - name: residPlot
           title: Residual-Predicted Scatterplot
           visible: (resid_plot)
           type: Image
           description: Residual Predicted plot
-          width: 500
-          height: 400
+          width: 700
+          height: 700
           renderFun: .residPlot
           requiresData: true
           clearWith:
             - dep
             - model_terms
             - dep_scale
+            - plot_extremes
 
         - name: clusterBoxplot
           title: Residuals by cluster boxplot
@@ -623,12 +626,14 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
+
           template:
              title: $key
              type: Image
              renderFun: .clusterBoxplot
-             width: 500
-             height: 400
+             width: 700
+             height: 900
 
         - name: clusterResPred
           title: Residuals-Predicted by cluster
@@ -639,6 +644,8 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
+            
           template:
              title: $key
              type: Image
@@ -655,6 +662,8 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
+
           template:
              title: $key
              type: Image
@@ -692,5 +701,6 @@ items:
     varDescription: Residuals values
     clearWith:
                 - __modeloptions__
+              
 
 

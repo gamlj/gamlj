@@ -349,6 +349,17 @@ options:
             bars, use confidence intervals, or use standard errors on the
             plots, respectively.
 
+    - name: plot_extremes
+      title: Identify extremes
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), Indentify 1% and 99% extreme values in the plots by marking them with their rowname in the data.frame
+          ui: >
+             Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
+
+
     - name: emmeans
       title: Estimated Marginal Means
       type: Terms
