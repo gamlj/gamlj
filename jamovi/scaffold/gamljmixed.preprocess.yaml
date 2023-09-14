@@ -539,8 +539,8 @@ items:
           title: ""
           type: Image
           renderFun: .mainPlot
-          width: 600
-          height: 400
+          width: 700
+          height: 500
 
   - name: plotnotes
     type: Html
@@ -579,8 +579,8 @@ items:
           visible: (qq_plot)
           type: Image
           description: a q-q plot
-          width: 500
-          height: 400
+          width: 700
+          height: 500
           renderFun: .qqPlot
           requiresData: true
           clearWith:
@@ -593,8 +593,8 @@ items:
           visible: (norm_plot)
           type: Image
           description: Residual histogram
-          width: 500
-          height: 400
+          width: 700
+          height: 500
           renderFun: .normPlot
           requiresData: true
           clearWith:
@@ -651,7 +651,7 @@ items:
              type: Image
              renderFun: .clusterResPred
              width: 700
-             height: 900
+             height: 700
 
         - name: clusterResPredGrid
           title: Residuals-Predicted Grid
@@ -684,8 +684,8 @@ items:
              title: $key
              type: Image
              renderFun: .randHist
-             width: 500
-             height: 400
+             width: 700
+             height: 500
 
   - name: predicted
     title: Predicted Vales

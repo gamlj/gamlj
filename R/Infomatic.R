@@ -80,6 +80,8 @@ Infomatic <- R6::R6Class(
         self$family        <-   "binomial"
         self$call          <-   CALLS[[self$caller]]
         self$rcall         <-   FUNCS[[self$caller]]
+        if (self$caller=="glmer")
+            self$calloptions<-list(control=lme4::glmerControl(optimizer = "bobyqa"))
         self$link          <-   "logit"
         self$emmeans       <-    "probabilities"
         self$comparison    <-  "OR"

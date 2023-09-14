@@ -104,7 +104,9 @@ Dispatch <- R6::R6Class(
                                     return()
           
                                obj$message<-self$translate(obj$message)
-                          
+          mark(obj$message)                     
+                               if (exists("fromb64")) obj$message<-fromb64(obj$message)
+                               
                                if (hasName(obj,"final") && (obj$final))
                                    stop(obj$message)
                           

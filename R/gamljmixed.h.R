@@ -1678,8 +1678,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="",
                     renderFun=".mainPlot",
-                    width=600,
-                    height=400)))
+                    width=700,
+                    height=500)))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1730,8 +1730,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="qqplot",
                             title="Q-Q Plot",
                             visible="(qq_plot)",
-                            width=500,
-                            height=400,
+                            width=700,
+                            height=500,
                             renderFun=".qqPlot",
                             requiresData=TRUE,
                             clearWith=list(
@@ -1743,8 +1743,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="normplot",
                             title="Residual histogram",
                             visible="(norm_plot)",
-                            width=500,
-                            height=400,
+                            width=700,
+                            height=500,
                             renderFun=".normPlot",
                             requiresData=TRUE,
                             clearWith=list(
@@ -1797,7 +1797,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 title="$key",
                                 renderFun=".clusterResPred",
                                 width=700,
-                                height=900)))
+                                height=700)))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPredGrid",
@@ -1827,8 +1827,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 options=options,
                                 title="$key",
                                 renderFun=".randHist",
-                                width=500,
-                                height=400)))}))$new(options=options))
+                                width=700,
+                                height=500)))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",

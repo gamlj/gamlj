@@ -522,11 +522,11 @@ Runner <- R6::R6Class("Runner",
                                 if (self$option("model_type","custom"))
                                   stop("No solution has been found for the combination of link function and distribution")
                                 else
-                                  stop(results$error)
+                                  stop(fromb64(results$error))
                               }
-                              
+                              mark(results)
                               if (!isFALSE(results$warning))
-                                warning(results$warning)
+                                warning(fromb64(results$warning))
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"])
