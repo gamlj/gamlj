@@ -120,7 +120,6 @@ Initier <- R6::R6Class(
              for (i in seq_along(tab)) tab[[i]]$model<-models[[i]]
              ladd(tab)<-list(type="Comparison",model=paste0(greek_vector[["Delta"]],"R\u00B2"))
           }
-          mark(tab)
       tab
       
     },

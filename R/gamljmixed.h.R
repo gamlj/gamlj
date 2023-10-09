@@ -60,6 +60,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 list()),
             re_corr = "all",
             re_modelterms = TRUE,
+            re_crossedclusters = FALSE,
+            re_nestedclusters = FALSE,
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
@@ -404,6 +406,14 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "re_modelterms",
                 re_modelterms,
                 default=TRUE)
+            private$..re_crossedclusters <- jmvcore::OptionBool$new(
+                "re_crossedclusters",
+                re_crossedclusters,
+                default=FALSE)
+            private$..re_nestedclusters <- jmvcore::OptionBool$new(
+                "re_nestedclusters",
+                re_nestedclusters,
+                default=FALSE)
             private$..re_listing <- jmvcore::OptionList$new(
                 "re_listing",
                 re_listing,
@@ -528,6 +538,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..nested_re)
             self$.addOption(private$..re_corr)
             self$.addOption(private$..re_modelterms)
+            self$.addOption(private$..re_crossedclusters)
+            self$.addOption(private$..re_nestedclusters)
             self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
@@ -597,6 +609,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         nested_re = function() private$..nested_re$value,
         re_corr = function() private$..re_corr$value,
         re_modelterms = function() private$..re_modelterms$value,
+        re_crossedclusters = function() private$..re_crossedclusters$value,
+        re_nestedclusters = function() private$..re_nestedclusters$value,
         re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
@@ -665,6 +679,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..nested_re = NA,
         ..re_corr = NA,
         ..re_modelterms = NA,
+        ..re_crossedclusters = NA,
+        ..re_nestedclusters = NA,
         ..re_listing = NA,
         ..reml = NA,
         ..re_lrt = NA,

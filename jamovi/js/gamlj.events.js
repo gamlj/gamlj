@@ -3,7 +3,9 @@ var fun=require('./functions');
 
 const events = {
     update: function(ui) {
+      
         this.setCustomVariable("Intercept", "none", "");
+
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
@@ -38,16 +40,19 @@ const events = {
     },
 
     onChange_factors: function(ui) {
+      
         fun.calcModelTerms(ui, this);
         fun.updateRandomSupplier(ui,this);
     },
 
     onChange_covariates: function(ui) {
+      
         fun.calcModelTerms(ui, this);
         fun.updateRandomSupplier(ui,this);
     },
 
     onChange_model_terms: function(ui) {
+      
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
         fun.updateSimpleSupplier(ui, this);
@@ -77,6 +82,7 @@ const events = {
 
     },
     onChange_plotsSupplier: function(ui) {
+      
         let values = this.itemsToValues(ui.plotsSupplier.value());
         this.checkValue(ui.plot_x, false, values, FormatDef.variable);
         this.checkValue(ui.plot_z, false, values, FormatDef.variable);
@@ -176,11 +182,21 @@ const events = {
             ui.modelSupplier.setValue(this.valuesToItems(variablesList, FormatDef.variable));
     },
     onChange_cluster: function(ui) {
+      var clusters=this.cloneArray(ui.cluster.value(), []);
+      if (clusters.length>1) {
+         ui.re_nestedclusters.$el.show();
+         ui.re_crossedclusters.$el.show();
+
+      } else {
+         ui.re_nestedclusters.$el.hide();
+         ui.re_crossedclusters.$el.hide();
+      }
         fun.updateRandomSupplier(ui,this);
     },
 
     onChange_randomSupplier: function(ui){
       
+
         let supplierList = this.itemsToValues(ui.randomSupplier.value());
         var changes = this.findChanges("randomSupplier",supplierList,rtermFormat);
         if (changes.removed.length>0) {

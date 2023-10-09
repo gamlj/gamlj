@@ -216,6 +216,15 @@ children:
                 name: re_listing
                 events:
                   change: './gamlj.events::onEvent_re_list'
+              - type: CheckBox
+                name: re_nestedclusters
+                events:
+                  change: './gamlj.events::onEvent_re_list'
+              - type: CheckBox
+                name: re_crossedclusters
+                events:
+                  change: './gamlj.events::onEvent_re_list'
+
           - type: Label
             label: Effects correlation
             children:

@@ -617,6 +617,26 @@ options:
           ui: >
             Show the fixed effects defined in the model in the list of potential random coefficients
             
+    - name: re_crossedclusters
+      title: Crossing by formula
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not in R interface
+          ui: >
+            Show the clusters in crossed formulation (cluster1:cluster2)
+
+    - name: re_nestedclusters
+      title: Nesting by formula
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not in R interface
+          ui: >
+            Show the clusters in nested formulation (cluster1/cluster2)
+            
     - name: re_listing
       type: List
       title: "Add"

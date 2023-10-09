@@ -199,7 +199,22 @@ gFormula <- R6::R6Class(
       
             .intercept <- "Intercept"
              if (encoding == "b64") {
-                 terms <- tob64(terms)
+                 terms<-lapply(terms, function(term) {
+                   lapply(term, function(x) {
+                     x64<-tob64(x)
+                     test<-grep("\\/",x)
+                     if (length(test)>0) {
+                       asplit<-stringr::str_split(x[[test]],"\\/")[[1]]
+                       x64[[test]]<-paste0(tob64(asplit),collapse = "/")
+                     } 
+                     test<-grep("\\:",x)
+                     if (length(test)>0) {
+                       asplit<-stringr::str_split(x[[length(x)]],"\\:")[[1]]
+                       x64[[test]]<-paste0(tob64(asplit),collapse = ":")
+                     } 
+                     
+                   x64
+                 })})
                 .intercept <- tob64(.intercept)
              }
       

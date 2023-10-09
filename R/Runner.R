@@ -524,7 +524,6 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              mark(results)
                               if (!isFALSE(results$warning))
                                 warning(fromb64(results$warning))
                               
@@ -684,11 +683,10 @@ Runner <- R6::R6Class("Runner",
 ### additional functions useful for estimation of some model ###
 
 estimate_lmer<-function(...) {
-  
   opts<-list(...)
   data<-opts$data
   reml<-opts$reml
-
+  
   for (opt in opts$optimizers) {
             model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
             if (mf.converged(model))
