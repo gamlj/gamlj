@@ -522,11 +522,10 @@ Runner <- R6::R6Class("Runner",
                                 if (self$option("model_type","custom"))
                                   stop("No solution has been found for the combination of link function and distribution")
                                 else
-                                  stop(results$error)
+                                  stop(fromb64(results$error))
                               }
-                              
                               if (!isFALSE(results$warning))
-                                warning(results$warning)
+                                warning(fromb64(results$warning))
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"])
@@ -684,11 +683,10 @@ Runner <- R6::R6Class("Runner",
 ### additional functions useful for estimation of some model ###
 
 estimate_lmer<-function(...) {
-  
   opts<-list(...)
   data<-opts$data
   reml<-opts$reml
-
+  
   for (opt in opts$optimizers) {
             model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
             if (mf.converged(model))

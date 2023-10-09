@@ -138,6 +138,7 @@ var rtermFormat = new Format ({
   },
   
   _validateItem: function(item, level) {
+
     if (level > 0 && typeof item === 'string')
       return true;
     else if (level > 2 || Array.isArray(item) === false || item.length === 0)

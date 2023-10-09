@@ -936,12 +936,13 @@ items:
           title: ""
           type: Image
           renderFun: .mainPlot
-          width: 600
-          height: 400
+          width: 700
+          height: 500
 
   - name: plotnotes
     type: Html
     visible: false
+
 
   - name: assumptions
     title: Assumption Checks
@@ -975,8 +976,8 @@ items:
           visible: (qq_plot)
           type: Image
           description: a q-q plot
-          width: 500
-          height: 400
+          width: 700
+          height: 500
           renderFun: .qqPlot
           requiresData: true
           clearWith:
@@ -989,27 +990,29 @@ items:
           visible: (norm_plot)
           type: Image
           description: Residual histogram
-          width: 500
-          height: 400
+          width: 700
+          height: 500
           renderFun: .normPlot
           requiresData: true
           clearWith:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
         - name: residPlot
           title: Residual-Predicted Scatterplot
           visible: (resid_plot)
           type: Image
           description: Residual Predicted plot
-          width: 500
-          height: 400
+          width: 700
+          height: 700
           renderFun: .residPlot
           requiresData: true
           clearWith:
             - dep
             - model_terms
             - dep_scale
+            - plot_extremes
 
         - name: clusterBoxplot
           title: Residuals by cluster boxplot
@@ -1020,12 +1023,14 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
+
           template:
              title: $key
              type: Image
              renderFun: .clusterBoxplot
-             width: 500
-             height: 400
+             width: 700
+             height: 900
 
         - name: clusterResPred
           title: Residuals-Predicted by cluster
@@ -1036,12 +1041,14 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
+            
           template:
              title: $key
              type: Image
              renderFun: .clusterResPred
              width: 700
-             height: 900
+             height: 700
 
         - name: clusterResPredGrid
           title: Residuals-Predicted Grid
@@ -1052,6 +1059,8 @@ items:
             - dep
             - dep_scale
             - model_terms
+            - plot_extremes
+
           template:
              title: $key
              type: Image
@@ -1072,8 +1081,8 @@ items:
              title: $key
              type: Image
              renderFun: .randHist
-             width: 500
-             height: 400
+             width: 700
+             height: 500
 
   - name: predicted
     title: Predicted Vales
@@ -1133,5 +1142,6 @@ items:
                 - donotrun
                 - res_struct
                   ### modeloptions  ends
+              
 
 

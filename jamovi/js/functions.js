@@ -282,6 +282,8 @@ const fun = {
    if (typeof ui.randomSupplier == 'undefined' ) {
               return;
         }
+   context.setCustomVariable("Intercept", "none", "");
+
 
     console.log("updating random supplier");
 // first we check if the update is needed    
@@ -315,20 +317,51 @@ const fun = {
     }
     termsList.unshift(["Intercept"]);
 
-    var alist=[];
+    var randomterms=[];
     for (var i=0; i < clusterList.length; i++) {
      for (var j = 0; j < termsList.length; j++) {
        var item=context.cloneArray(termsList[j]);
        item[item.length]=clusterList[i];
-       alist.push(item);
+       randomterms.push(item);
      }
     }
-    var formatted=context.valuesToItems(alist, rtermFormat);
+    var option = ui.re_nestedclusters.value();
 
+    if (option && clusterList.length > 1 ) {
+      var newclusters= generateNested(clusterList);
+      var newterms=[];
+     for (var i = 0; i < newclusters.length; i++) {
+             context.setCustomVariable(newclusters[i],"none","");
+             for (var j = 0; j < termsList.length; j++) {
+               console.log(termsList[j])
+                  var aterm = [...termsList[j], newclusters[i]]; 
+              console.log(aterm)
+
+                  newterms.push(aterm);
+              }
+       }
+        randomterms=randomterms.concat(newterms); 
+     }
+
+    var option = ui.re_crossedclusters.value();
+
+    if (option && clusterList.length > 1 ) {
+      var newclusters= generateCrossed(clusterList);
+      var newterms=[];
+     for (var i = 0; i < newclusters.length; i++) {
+             context.setCustomVariable(newclusters[i],"none","");
+             for (var j = 0; j < termsList.length; j++) {
+                  var aterm = [...termsList[j], newclusters[i]]; 
+                  newterms.push(aterm);
+              }
+       }
+        randomterms=randomterms.concat(newterms); 
+     }
+
+    var formatted=context.valuesToItems(randomterms, rtermFormat);
     ui.randomSupplier.setValue(formatted);
-  
 
-},
+   },
 
 
          mark: function(obj) {
@@ -512,3 +545,29 @@ var dim = function(aList) {
   
     return(value);
 };
+
+
+
+var  generateNested = function(arr) {
+  const combinations = [];
+  const len = arr.length;
+  const f = [arr[0]]
+  for (let i = 1; i < len; i++) {
+    for (let j = i + 1; j <= len; j++) {
+      combinations.push(f.concat(arr.slice(i, j)).join("/"));
+    }
+  }
+  return combinations;
+}
+
+var  generateCrossed = function(arr) {
+  const combinations = [];
+  const len = arr.length;
+  const f = [arr[0]]
+  for (let i = 1; i < len; i++) {
+    for (let j = i + 1; j <= len; j++) {
+      combinations.push(f.concat(arr.slice(i, j)).join(":"));
+    }
+  }
+  return combinations;
+}

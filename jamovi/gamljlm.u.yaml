@@ -491,6 +491,10 @@ children:
           - type: CheckBox
             name: resid_plot
             label: Residuals-Predicted plot
+          - type: CheckBox
+            name: plot_extremes
+            enable: (resid_plot)
+            
   - type: CollapseBox
     label: Options
     name: panel_options

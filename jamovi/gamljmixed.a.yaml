@@ -317,6 +317,16 @@ options:
         - name:  full
           title: Full predicted method
 
+    - name: plot_extremes
+      title: Identify extremes
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), Indentify 1% and 99% extreme values in the plots by marking them with their rowname in the data.frame
+          ui: >
+             Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
+
 ###
 
     - name: emmeans
@@ -606,6 +616,26 @@ options:
             Not in R interface
           ui: >
             Show the fixed effects defined in the model in the list of potential random coefficients
+            
+    - name: re_crossedclusters
+      title: Crossing by formula
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not in R interface
+          ui: >
+            Show the clusters in crossed formulation (cluster1:cluster2)
+
+    - name: re_nestedclusters
+      title: Nesting by formula
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not in R interface
+          ui: >
+            Show the clusters in nested formulation (cluster1/cluster2)
             
     - name: re_listing
       type: List

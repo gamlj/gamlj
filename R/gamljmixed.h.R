@@ -35,6 +35,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_around = "none",
             plot_re = FALSE,
             plot_re_method = "average",
+            plot_extremes = FALSE,
             emmeans = NULL,
             posthoc = NULL,
             posthoc_ci = FALSE,
@@ -59,6 +60,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 list()),
             re_corr = "all",
             re_modelterms = TRUE,
+            re_crossedclusters = FALSE,
+            re_nestedclusters = FALSE,
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
@@ -245,6 +248,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=list(
                     "average",
                     "full"))
+            private$..plot_extremes <- jmvcore::OptionBool$new(
+                "plot_extremes",
+                plot_extremes,
+                default=FALSE)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -399,6 +406,14 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "re_modelterms",
                 re_modelterms,
                 default=TRUE)
+            private$..re_crossedclusters <- jmvcore::OptionBool$new(
+                "re_crossedclusters",
+                re_crossedclusters,
+                default=FALSE)
+            private$..re_nestedclusters <- jmvcore::OptionBool$new(
+                "re_nestedclusters",
+                re_nestedclusters,
+                default=FALSE)
             private$..re_listing <- jmvcore::OptionList$new(
                 "re_listing",
                 re_listing,
@@ -499,6 +514,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
+            self$.addOption(private$..plot_extremes)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
@@ -522,6 +538,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..nested_re)
             self$.addOption(private$..re_corr)
             self$.addOption(private$..re_modelterms)
+            self$.addOption(private$..re_crossedclusters)
+            self$.addOption(private$..re_nestedclusters)
             self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
@@ -567,6 +585,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_around = function() private$..plot_around$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
+        plot_extremes = function() private$..plot_extremes$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
@@ -590,6 +609,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         nested_re = function() private$..nested_re$value,
         re_corr = function() private$..re_corr$value,
         re_modelterms = function() private$..re_modelterms$value,
+        re_crossedclusters = function() private$..re_crossedclusters$value,
+        re_nestedclusters = function() private$..re_nestedclusters$value,
         re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
@@ -634,6 +655,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_around = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
+        ..plot_extremes = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
@@ -657,6 +679,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..nested_re = NA,
         ..re_corr = NA,
         ..re_modelterms = NA,
+        ..re_crossedclusters = NA,
+        ..re_nestedclusters = NA,
         ..re_listing = NA,
         ..reml = NA,
         ..re_lrt = NA,
@@ -1670,8 +1694,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="",
                     renderFun=".mainPlot",
-                    width=600,
-                    height=400)))
+                    width=700,
+                    height=500)))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1722,8 +1746,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="qqplot",
                             title="Q-Q Plot",
                             visible="(qq_plot)",
-                            width=500,
-                            height=400,
+                            width=700,
+                            height=500,
                             renderFun=".qqPlot",
                             requiresData=TRUE,
                             clearWith=list(
@@ -1735,27 +1759,29 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="normplot",
                             title="Residual histogram",
                             visible="(norm_plot)",
-                            width=500,
-                            height=400,
+                            width=700,
+                            height=500,
                             renderFun=".normPlot",
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms")))
+                                "model_terms",
+                                "plot_extremes")))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="residPlot",
                             title="Residual-Predicted Scatterplot",
                             visible="(resid_plot)",
-                            width=500,
-                            height=400,
+                            width=700,
+                            height=700,
                             renderFun=".residPlot",
                             requiresData=TRUE,
                             clearWith=list(
                                 "dep",
                                 "model_terms",
-                                "dep_scale")))
+                                "dep_scale",
+                                "plot_extremes")))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterBoxplot",
@@ -1764,13 +1790,14 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms"),
+                                "model_terms",
+                                "plot_extremes"),
                             template=jmvcore::Image$new(
                                 options=options,
                                 title="$key",
                                 renderFun=".clusterBoxplot",
-                                width=500,
-                                height=400)))
+                                width=700,
+                                height=900)))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPred",
@@ -1779,13 +1806,14 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms"),
+                                "model_terms",
+                                "plot_extremes"),
                             template=jmvcore::Image$new(
                                 options=options,
                                 title="$key",
                                 renderFun=".clusterResPred",
                                 width=700,
-                                height=900)))
+                                height=700)))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="clusterResPredGrid",
@@ -1794,7 +1822,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "dep",
                                 "dep_scale",
-                                "model_terms"),
+                                "model_terms",
+                                "plot_extremes"),
                             template=jmvcore::Image$new(
                                 options=options,
                                 title="$key",
@@ -1814,8 +1843,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 options=options,
                                 title="$key",
                                 renderFun=".randHist",
-                                width=500,
-                                height=400)))}))$new(options=options))
+                                width=700,
+                                height=500)))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",

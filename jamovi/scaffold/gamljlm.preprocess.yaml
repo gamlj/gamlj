@@ -806,12 +806,13 @@ items:
           visible: (resid_plot)
           type: Image
           description: Residual Predicted plot
-          width: 450
-          height: 400
+          width: 700
+          height: 700
           renderFun: .residPlot
           requiresData: true
           clearWith:
                  -  __modeloptions__
+                 -  plot_extremes
 
 
 

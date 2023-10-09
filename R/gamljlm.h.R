@@ -35,6 +35,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_xoriginal = FALSE,
             plot_black = FALSE,
             plot_around = "ci",
+            plot_extremes = FALSE,
             emmeans = NULL,
             posthoc = NULL,
             posthoc_ci = FALSE,
@@ -239,6 +240,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ci",
                     "se"),
                 default="ci")
+            private$..plot_extremes <- jmvcore::OptionBool$new(
+                "plot_extremes",
+                plot_extremes,
+                default=FALSE)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -454,6 +459,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_xoriginal)
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
+            self$.addOption(private$..plot_extremes)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
@@ -515,6 +521,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_xoriginal = function() private$..plot_xoriginal$value,
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
+        plot_extremes = function() private$..plot_extremes$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
@@ -575,6 +582,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_xoriginal = NA,
         ..plot_black = NA,
         ..plot_around = NA,
+        ..plot_extremes = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
@@ -1809,8 +1817,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="residPlot",
                             title="Residual-Predicted Scatterplot",
                             visible="(resid_plot)",
-                            width=450,
-                            height=400,
+                            width=700,
+                            height=700,
                             renderFun=".residPlot",
                             requiresData=TRUE,
                             clearWith=list(
@@ -1825,7 +1833,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "fixed_intercept",
                                 "se_method",
                                 "robust_method",
-                                "mute")))}))$new(options=options))
+                                "mute",
+                                "plot_extremes")))}))$new(options=options))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="predicted",

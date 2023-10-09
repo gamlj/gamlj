@@ -194,7 +194,6 @@ gamljmixedClass <- R6::R6Class(
       jinfo("MODULE:  #### phase end ####")
       now<-Sys.time()
       jinfo("TIME:",now-private$.time," secs")
-      
       return()
           
     },

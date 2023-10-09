@@ -216,6 +216,15 @@ children:
                 name: re_listing
                 events:
                   change: './gamlj.events::onEvent_re_list'
+              - type: CheckBox
+                name: re_nestedclusters
+                events:
+                  change: './gamlj.events::onEvent_re_list'
+              - type: CheckBox
+                name: re_crossedclusters
+                events:
+                  change: './gamlj.events::onEvent_re_list'
+
           - type: Label
             label: Effects correlation
             children:
@@ -591,6 +600,9 @@ children:
         label: By clusters
         children:
           - type: CheckBox
+            name: rand_hist
+            label: Random coeff. histogram
+          - type: CheckBox
             name: cluster_boxplot
             label: Residuals boxplot
           - type: CheckBox
@@ -599,10 +611,9 @@ children:
           - type: CheckBox
             name: cluster_respred_grid
             label: Residuals-Predicted (grid)
-
           - type: CheckBox
-            name: rand_hist
-            label: Random coeff. histogram
+            name: plot_extremes
+
   - type: CollapseBox
     label: Options
     style: list
