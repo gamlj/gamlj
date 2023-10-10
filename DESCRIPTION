@@ -8,7 +8,6 @@ Description: A suite for estimating linear models, such as the general linear mo
              generalized linear models and generalized mixed models. For each family, models can be estimated
              with categorical and/or continuous variables, with options to facilitate estimation of 
              interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes, and visualization of the results.
-            
 License: GPL
 Encoding: UTF-8
 LazyData: true
