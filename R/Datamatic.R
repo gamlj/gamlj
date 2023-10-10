@@ -16,11 +16,10 @@ Datamatic <- R6::R6Class(
       
       self$vars<-unlist(c(self$options$dep,self$options$factors,self$options$covs))
       if (utils::hasName(self$options,"cluster")) {
-         if (self$options$re_nestedclusters)
-            lapply(self$options$cluster, function(x) 
+         if (utils::hasName(self$options,"re_nestedclusters") && self$options$re_nestedclusters)
+             lapply(self$options$cluster, function(x) 
                    if (length(grep("\\/",x))>0) stop("Cluster variables names cannot contain `/` when nesting by formula is used."))
          self$vars<-c(self$options$cluster,self$vars)
-        
       }
       if (utils::hasName(self$options,"offset"))
         self$vars<-c(self$options$offset,self$vars)

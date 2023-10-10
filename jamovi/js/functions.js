@@ -333,10 +333,7 @@ const fun = {
      for (var i = 0; i < newclusters.length; i++) {
              context.setCustomVariable(newclusters[i],"none","");
              for (var j = 0; j < termsList.length; j++) {
-               console.log(termsList[j])
                   var aterm = [...termsList[j], newclusters[i]]; 
-              console.log(aterm)
-
                   newterms.push(aterm);
               }
        }
@@ -352,13 +349,12 @@ const fun = {
              context.setCustomVariable(newclusters[i],"none","");
              for (var j = 0; j < termsList.length; j++) {
                   var aterm = [...termsList[j], newclusters[i]]; 
-                  newterms.push(aterm);
+                  newterms.push(aterm);v
               }
        }
         randomterms=randomterms.concat(newterms); 
      }
-
-    var formatted=context.valuesToItems(randomterms, rtermFormat);
+    var formatted=context.valuesToItems(unique_arrays(randomterms), rtermFormat);
     ui.randomSupplier.setValue(formatted);
 
    },
@@ -381,6 +377,19 @@ var mark = function(obj) {
 var unique = function(avec) {
   return(avec.filter((v, i, a) => a.indexOf(v) === i));
 };
+
+var unique_arrays = function( aArray) {
+  
+var n = [];  
+const r = aArray.filter((x) => {
+    var j=JSON.stringify(x)
+    var test=!n.includes(j)
+    if (test) n.push(j) 
+    return test
+    });
+  
+ return r;  
+}
 
 
 var containsCovariate = function(value, covariates) {
