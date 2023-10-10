@@ -21,6 +21,7 @@ Datamatic <- R6::R6Class(
                    if (length(grep("\\/",x))>0) stop("Cluster variables names cannot contain `/` when nesting by formula is used."))
          self$vars<-c(self$options$cluster,self$vars)
       }
+
       if (utils::hasName(self$options,"offset"))
         self$vars<-c(self$options$offset,self$vars)
       private$.inspect_data(self$analysis$data)
@@ -73,6 +74,8 @@ Datamatic <- R6::R6Class(
       
     }
     
+    
+
   ), ### end of public
   private=list(
     .inspect_data=function(data) {

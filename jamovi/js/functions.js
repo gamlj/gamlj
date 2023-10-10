@@ -349,7 +349,7 @@ const fun = {
              context.setCustomVariable(newclusters[i],"none","");
              for (var j = 0; j < termsList.length; j++) {
                   var aterm = [...termsList[j], newclusters[i]]; 
-                  newterms.push(aterm);v
+                  newterms.push(aterm);
               }
        }
         randomterms=randomterms.concat(newterms); 

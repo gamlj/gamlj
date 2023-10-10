@@ -272,7 +272,7 @@ Plotter <- R6::R6Class(
         cluster<-image$state$cluster
 
         data<-lme4::fortify.merMod(private$.operator$model)
-        
+
         if (inherits(private$.operator$model,"lme"))
           data$.resid<-stats::resid(private$.operator$model,type="normalized")
 
@@ -486,7 +486,11 @@ Plotter <- R6::R6Class(
       if (self$option("plot_re") && 
           !self$option("model_type","ordinal") &&
           !self$option("model_type","multinomial"))     {
-        self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
+        
+        ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works 
+        
+        rawData<-private$.fix_clusters(rawData)
+        
         if (self$option("plot_re_method","average")) {
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
             .model<-mf.update(private$.operator$model,formula=formula)
@@ -500,10 +504,10 @@ Plotter <- R6::R6Class(
         self$warning<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
         # prepare a test for between variables to plot dots for random effects
 
+        xbetween<-FALSE
         test<-tapply(as.numeric(rawData[[self$scatterX$name64]]),rawData[[self$scatterCluster$name64]],sd)
         test<-sum(sapply(test,function(x) as.numeric(is.na(x) || x==0)))
         nc<-self$scatterCluster$nlevels
-        xbetween<-FALSE
         if ((test/nc)>.30) xbetween<-TRUE
       }
       ### end of random ###
@@ -657,6 +661,15 @@ Plotter <- R6::R6Class(
       else
         clusters<-names(private$.operator$model@cnms)
       
+      p<-length(clusters)
+      ### remove built clusters combinations
+      test<-grep("[\\:\\/]",clusters,invert = TRUE)
+      clusters<-clusters[test]
+      d<-length(clusters) 
+       if (p!=d)     
+            self$warning<-list(topic="plotnotes",
+                          message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+       
       resultsgroup<-private$.results$assumptions$clusterBoxplot
 
       for (cluster in clusters) {
@@ -679,6 +692,17 @@ Plotter <- R6::R6Class(
       else
         clusters<-names(private$.operator$model@cnms)
 
+      
+      p<-length(clusters)
+      ### remove built clusters combinations
+      test<-grep("[\\:\\/]",clusters,invert = TRUE)
+      clusters<-clusters[test]
+      d<-length(clusters) 
+      if (p!=d)     
+        self$warning<-list(topic="plotnotes",
+                           message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+      
+      
       resultsgroup<-private$.results$assumptions$clusterResPred
       
       for (cluster in clusters) {
@@ -700,6 +724,15 @@ Plotter <- R6::R6Class(
         clusters<-names(private$.operator$model$groups)
       else
         clusters<-names(private$.operator$model@cnms)
+      
+      p<-length(clusters)
+      ### remove built clusters combinations
+      test<-grep("[\\:\\/]",clusters,invert = TRUE)
+      clusters<-clusters[test]
+      d<-length(clusters) 
+      if (p!=d)     
+        self$warning<-list(topic="plotnotes",
+                           message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
       
       resultsgroup<-private$.results$assumptions$clusterResPredGrid
       
@@ -843,6 +876,22 @@ Plotter <- R6::R6Class(
         values<-exp(values)
       
       values
+      
+    },
+    .fix_clusters=function(data) {
+      
+      test<-grep("[\\:\\/]",private$.operator$formulaobj$clusters)
+      if (length(test)>0) {
+        cluster<-private$.operator$formulaobj$clusters[[test]]
+        .clustervars<-stringr::str_split(cluster,"[\\:\\/]")[[1]]
+        name64<-tob64(cluster)
+        sel<-paste0("data$",name64,"=","paste0(",paste0("data$",tob64(.clustervars),collapse=","),",sep='_')")
+        eval(parse(text=sel))
+        data[[name64]]<-factor(data[[name64]])
+        self$scatterCluster=list(name=cluster,name64=name64,nlevels=nlevels(data[[name64]]))
+      } else
+        self$scatterCluster<-private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
+      return(data)
       
     }
     
