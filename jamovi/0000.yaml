@@ -14,7 +14,9 @@ description: >-
   mixed models. For ech family, models can be estimated with categorical and/or
   continuous variables, with options to facilitate estimation of  interactions,
   simple slopes, simple effects, post-hoc tests, contrast analysis and
-  visualization of the results.
+  visualization of the results. GAMLj3 is a major rewriting of the GAMLj module.
+  Analyses done with GAMLj version 2.* are not compatible with GAMLj3, so they
+  should be opened with the previous version of the module.
 analyses:
   - title: General Linear Model
     name: gamljlm
