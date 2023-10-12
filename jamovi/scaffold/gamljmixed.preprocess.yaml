@@ -62,6 +62,7 @@ items:
              visible: (more_fit_indices)
              clearWith:
                          - __modeloptions__
+                         - __nestedoptions__                     
 
              columns:
                     - name: info

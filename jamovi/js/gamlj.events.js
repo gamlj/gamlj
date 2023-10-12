@@ -182,14 +182,19 @@ const events = {
             ui.modelSupplier.setValue(this.valuesToItems(variablesList, FormatDef.variable));
     },
     onChange_cluster: function(ui) {
+      
       var clusters=this.cloneArray(ui.cluster.value(), []);
       if (clusters.length>1) {
+        if (ui.re_nested !== undefined) {
          ui.re_nestedclusters.$el.show();
          ui.re_crossedclusters.$el.show();
+        }
 
       } else {
-         ui.re_nestedclusters.$el.hide();
-         ui.re_crossedclusters.$el.hide();
+        if (ui.re_nested !== undefined) {
+           ui.re_nestedclusters.$el.hide();
+           ui.re_crossedclusters.$el.hide();
+        }
       }
         fun.updateRandomSupplier(ui,this);
     },

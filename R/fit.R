@@ -53,7 +53,6 @@ gFit <- R6::R6Class(
       
       private$.r2<-r2list[[1]]$r2
       private$.ar2<-r2list[[1]]$ar2
-    
       return(r2list)
       
     }, # end of .r2list
@@ -79,7 +78,15 @@ gFit <- R6::R6Class(
         
         private$.r2n<-r2list[[1]]$r2
         private$.ar2n<-r2list[[1]]$ar2
+        mark(self$operator$options$model_type)
+        if (self$operator$options$model_type=="multinomial") 
+            return(r2list)
         
+        if (self$operator$options$.caller %in% c("lmer","glmer") && length(r2list)==1) {
+          r2list[[1]]$type="Conditional"
+          ladd(r2list)<-list(model="Nested",type="Marginal")
+        }
+
         return(r2list)
         
     }, # end of .r2list
@@ -98,22 +105,31 @@ gFit <- R6::R6Class(
 
       omnibus<-"Chisq"
       if (self$operator$option("omnibus")) omnibus<-self$operator$optionValue("omnibus")
-      if (self$operator$option(".caller", c("lmer", "glmer")) 
-                               || self$operator$option("omnibus", "LRT")
-                               || self$operator$option("model_type","beta")) {
-         comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model,self$operator$model)))
-      } else {
-         comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
-      }
-      comp <- comp$obj
+
+      comp <- try_hard(lmtest::lrtest(self$operator$nested_model, self$operator$model))
       
+      if (!isFALSE(comp$error))
+            comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model,self$operator$model)))
+      if (!isFALSE(comp$error)) {
+         self$operator$warning <- list(topic = "main_r2", message = "Model comparison test cannot be computed ")
+         return(list())
+      }
+      # if (self$operator$option(".caller", c("lmer", "glmer")) 
+      #                          || self$operator$option("omnibus", "LRT")
+      #                          || self$operator$option("model_type","beta")) {
+      #    comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model,self$operator$model)))
+      # } else {
+      #    comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
+      # }
+      comp <- comp$obj
       if ("df_diff" %in% names(comp)) comp$df<-comp$df_diff
       r2comp <- as.list(comp[2, ])
+
       .names <- list(
                      df2 = c("Res.Df", "Resid. Df"),
                      df1 = c("Df", "df_diff","df"), p = c("Pr(>Chi)", "Pr(>F)","Pr(Chi)","Pr(>Chisq)"),
                      f = "F",
-                     test = c("Deviance", "Chi2","LR stat.","LR.stat")
+                     test = c("Deviance", "Chi2","LR stat.","LR.stat","Chisq")
                     )
       
       names(r2comp) <- transnames(names(r2comp), .names)
@@ -139,7 +155,6 @@ gFit <- R6::R6Class(
       if (is.something(private$.ar2)) r2comp$ar2 <- private$.ar2-private$.ar2n
       if (length(r2comp$ar2) == 0)  r2comp$ar2 <- NA
       
-
     return(list(r2comp))
     } # end of compare
   ) # end of private
