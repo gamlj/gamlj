@@ -293,7 +293,19 @@ gamlj_mixed <- function(
     nested_terms <-f$terms
   }
 
-  if (is.something(nested_terms) | !is.null(nested_intercept))
+  if (inherits(nested_terms, "formula")) {
+    f<-rFormula$new(nested_terms)
+    nested_intercept<-f$intercept
+    nested_terms <-f$terms
+  }
+  
+
+  if (inherits(nested_re, "formula")) {
+    f<-rFormula$new(nested_re)
+    nested_re=f$random
+  }
+  
+  if (is.something(nested_terms) || !is.null(nested_intercept) || is.something(nested_re))
     comparison<-TRUE
   
   

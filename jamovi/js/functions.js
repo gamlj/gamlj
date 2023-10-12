@@ -325,12 +325,14 @@ const fun = {
        randomterms.push(item);
      }
     }
-    var option = ui.re_nestedclusters.value();
+    if (ui.re_nestedclusters !== undefined) {
+      
+     var option = ui.re_nestedclusters.value();
 
-    if (option && clusterList.length > 1 ) {
-      var newclusters= generateNested(clusterList);
-      var newterms=[];
-     for (var i = 0; i < newclusters.length; i++) {
+     if (option && clusterList.length > 1 ) {
+       var newclusters= generateNested(clusterList);
+       var newterms=[];
+      for (var i = 0; i < newclusters.length; i++) {
              context.setCustomVariable(newclusters[i],"none","");
              for (var j = 0; j < termsList.length; j++) {
                   var aterm = [...termsList[j], newclusters[i]]; 
@@ -354,6 +356,7 @@ const fun = {
        }
         randomterms=randomterms.concat(newterms); 
      }
+    }
     var formatted=context.valuesToItems(unique_arrays(randomterms), rtermFormat);
     ui.randomSupplier.setValue(formatted);
 

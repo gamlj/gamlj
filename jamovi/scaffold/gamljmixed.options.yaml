@@ -24,7 +24,7 @@ nestedoptions:
         - nested_terms
         - nested_intercept
         - comparison
-        
+        - nested_re        
 cioptions:
         - ci_width
         - ci_method

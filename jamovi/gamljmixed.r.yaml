@@ -58,6 +58,7 @@ items:
                         - nested_terms                     
                         - nested_intercept                     
                         - comparison                     
+                        - nested_re                     
                           ### nestedoptions  ends
 
              columns:
@@ -110,6 +111,12 @@ items:
                          - donotrun
                          - res_struct
                            ### modeloptions  ends
+                           ### nestedoptions  begins
+                         - nested_terms                     
+                         - nested_intercept                     
+                         - comparison                     
+                         - nested_re                     
+                           ### nestedoptions  ends
 
              columns:
                     - name: info
