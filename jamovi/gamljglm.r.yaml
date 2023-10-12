@@ -49,6 +49,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
@@ -100,6 +101,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
 
              columns:
@@ -144,6 +146,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
 
              columns:
@@ -182,6 +185,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -259,6 +263,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -315,6 +320,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
 
              columns:
@@ -370,6 +376,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
                            ### simpleeffectsoptions  begins
                          - simple_x
@@ -437,6 +444,7 @@ items:
                          - covs_scale
                          - offset
                          - omnibus
+                         - model_type
                            ### modeloptions  ends
                          - __effectsizeoptions
                     
@@ -491,6 +499,7 @@ items:
                     - covs_scale
                     - offset
                     - omnibus
+                    - model_type
                       ### modeloptions  ends
                     - propodds_test
                   
@@ -537,6 +546,7 @@ items:
         - covs_scale
         - offset
         - omnibus
+        - model_type
           ### modeloptions  ends
         - posthoc
         - adjust
@@ -566,6 +576,7 @@ items:
             - covs_scale
             - offset
             - omnibus
+            - model_type
               ### modeloptions  ends
             - posthoc
             - adjust
@@ -834,6 +845,7 @@ items:
               - covs_scale
               - offset
               - omnibus
+              - model_type
                 ### modeloptions  ends
                 ### cioptions  begins
               - ci_width        
@@ -922,6 +934,7 @@ items:
                  -  covs_scale
                  -  offset
                  -  omnibus
+                 -  model_type
                     ### modeloptions  ends
         
   - name: residuals
@@ -946,6 +959,7 @@ items:
                  -  covs_scale
                  -  offset
                  -  omnibus
+                 -  model_type
                     ### modeloptions  ends
         
 

@@ -676,6 +676,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -727,7 +728,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "model_type"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -772,7 +774,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "model_type"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -812,6 +815,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -921,6 +925,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -986,6 +991,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1048,6 +1054,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1107,7 +1114,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "model_type"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1163,7 +1171,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "model_type"),
                             template=jmvcore::Table$new(
                                 options=options,
                                 title="Covariances for:  ___key___",
@@ -1193,7 +1202,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "relm",
                                 "contrasts",
                                 "covs_scale",
-                                "mute"),
+                                "mute",
+                                "model_type"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1246,6 +1256,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "contrasts",
                         "covs_scale",
                         "mute",
+                        "model_type",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1349,6 +1360,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1395,6 +1407,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "contrasts",
                                 "covs_scale",
                                 "mute",
+                                "model_type",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1497,6 +1510,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "contrasts",
                                     "covs_scale",
                                     "mute",
+                                    "model_type",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1546,6 +1560,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "contrasts",
                                     "covs_scale",
                                     "mute",
+                                    "model_type",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1631,6 +1646,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "contrasts",
                         "covs_scale",
                         "mute",
+                        "model_type",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1694,7 +1710,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "relm",
                     "contrasts",
                     "covs_scale",
-                    "mute")))
+                    "mute",
+                    "model_type")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1717,7 +1734,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "relm",
                     "contrasts",
                     "covs_scale",
-                    "mute")))},
+                    "mute",
+                    "model_type")))},
         .setModel=function(x) private$..model <- x))
 
 gamljgmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
