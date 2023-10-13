@@ -51,6 +51,7 @@ items:
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
+                         - nested_re
                          - nested_intercept
                          - comparison
                            ### nestedoptions  ends
@@ -66,12 +67,15 @@ items:
                     - name: r2
                       title: R²
                       type: number
+                      format: zto
                     - name:  df1
                       title: df
                       type: integer
+                      format: zto
                     - name: test
                       title: LRT X²
                       type: number
+                      format: zto
                     - name: p
                       title: p
                       type: number
@@ -102,6 +106,12 @@ items:
                          - mute
                          - model_type
                            ### modeloptions  ends
+                           ### nestedoptions  begins
+                         - nested_terms
+                         - nested_re
+                         - nested_intercept
+                         - comparison
+                           ### nestedoptions  ends
 
              columns:
                     - name: info
@@ -110,15 +120,17 @@ items:
                     - name: value
                       type: text
                       title: "Model Value"
+                      format: zto
                     - name: nested
                       type: text
                       title: "Nested Model"
                       visible: (comparison)
+                      format: zto
                     - name: diff
                       type: text
                       title: Δ 
                       visible: (comparison)
-
+                      format: zto
                     - name: specs
                       type: text
                       title: "Comment"

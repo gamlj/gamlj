@@ -122,6 +122,7 @@ gFit <- R6::R6Class(
       #    comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
       # }
       comp <- comp$obj
+
       if ("df_diff" %in% names(comp)) comp$df<-comp$df_diff
       r2comp <- as.list(comp[2, ])
 
@@ -142,9 +143,10 @@ gFit <- R6::R6Class(
         self$operator$warning <- list(topic = "main_r2", message = "Nested model is not actually nested in the full model ")
       
       
-      if (r2comp$df1 == 0) 
+      if (r2comp$df1 == 0) {
         self$operator$warning <- list(topic = "main_r2", message = "Nested and full models are identical, try removing some term from the nested model")
-      
+        r2comp$p<-1
+      }
       if (self$operator$option(".caller", c("lmer", "glmer"))) 
             self$operator$warning <- list(topic = "main_r2", message = "Models comparison is done on the conditional models (random and fixed effects)")
           
@@ -154,7 +156,7 @@ gFit <- R6::R6Class(
       r2comp$note <- "R^2 difference "
       if (is.something(private$.ar2)) r2comp$ar2 <- private$.ar2-private$.ar2n
       if (length(r2comp$ar2) == 0)  r2comp$ar2 <- NA
-      
+      mark(r2comp)
     return(list(r2comp))
     } # end of compare
   ) # end of private

@@ -89,6 +89,15 @@ testthat::test_that("test mixed comparison: random", {
   testthat::expect_equal(mod$main$r2$asDF[5,4],2,tolerance = tol)
 })
 
+
+mod <- GAMLj3::gamlj_gmixed(
+  formula = ybin~x*z+(1+z|cluster),
+  nested_terms = ~x*z,
+  nested_re = ~(1+z|cluster),
+  data = data
+)
+mod
+
 mod <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*cat2+(1+x|cluster),
   nested_terms = ~x*cat2,
@@ -181,6 +190,8 @@ mod <- GAMLj3::gamlj_glm(
   nested_terms = ~x,
   data = data
 )
+
+
 mod$main$r2
 testthat::test_that("test gzlm comparison: logistic", {
   testthat::expect_equal(mod$main$r2$asDF[3,5],155.044,tolerance = tol)

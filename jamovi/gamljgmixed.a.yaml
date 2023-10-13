@@ -145,6 +145,8 @@ options:
       type: Bool
       default: false
       description:
+          R: >
+              not present in R
           ui: >
              Activate the model comparison fields and options.
 
@@ -182,6 +184,8 @@ options:
       type: Bool
       default: false
       description:
+          R:  >
+            not present in R
           ui: >
              Do not update the results when options are changed in the GUI. Unselect to run the analysis.
 
