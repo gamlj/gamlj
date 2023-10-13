@@ -98,6 +98,7 @@ children:
   - type: LayoutBox
     margin: large
     style: inline
+    name: panel_input
     children:
       - type: LayoutBox
         style: list
@@ -199,6 +200,7 @@ children:
                 enable: (comparison)
   - type: CollapseBox
     label: Random Effects
+    name: panel_random
     collapsed: true
     stretchFactor: 1
     children:
@@ -469,6 +471,7 @@ children:
                 type: CheckBox
   - type: CollapseBox
     label: Plots
+    name: panel_plots
     collapsed: true
     stretchFactor: 1
     children:

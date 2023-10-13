@@ -605,6 +605,10 @@ options:
             non correlated. If `'re'` is a list of 
             lists of length > 1, the option is automatially set to `'block'`.
             The option is ignored if the model is passed using `formula`.
+          ui: >
+            Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`).
+            If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated
+            within block and independent between blocks.
 
 
     - name: re_modelterms
@@ -780,6 +784,7 @@ options:
       description:
           R: >
             Not present in R
+          ui: Do not add footnotes to the tables.
 
     - name: more_fit_indices
       title: More Fit Indices

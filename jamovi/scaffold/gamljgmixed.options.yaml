@@ -15,9 +15,11 @@ modeloptions:
         - contrasts
         - covs_scale
         - mute
+        - model_type
         
 nestedoptions:
         - nested_terms
+        - nested_re
         - nested_intercept
         - comparison
         

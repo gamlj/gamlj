@@ -223,7 +223,9 @@ Infomatic <- R6::R6Class(
           self$calloptions   <-    list(formula=as.formula(formulas$fixed_formula64()),
                                         random=formulas$listify_random_formulas64(),
                                         model=TRUE,
+                                        maxit=50,
                                         estimator="REML",
+                                        trace=FALSE,
                                         trace.inner=FALSE)
           self$r2 <-list(list(type="McFadden"))
         } 
