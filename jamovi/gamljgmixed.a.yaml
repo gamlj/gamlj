@@ -145,8 +145,8 @@ options:
       type: Bool
       default: false
       description:
-          R: >
-             Not present in R
+          ui: >
+             Activate the model comparison fields and options.
 
 
     - name: nested_intercept
@@ -181,6 +181,9 @@ options:
       title: Do not run
       type: Bool
       default: false
+      description:
+          ui: >
+             Do not update the results when options are changed in the GUI. Unselect to run the analysis.
 
 
     - name: ci_method
@@ -642,6 +645,11 @@ options:
             non correlated. If `'re'` is a list of 
             lists of length > 1, the option is automatially set to `'block'`.
             The option is ignored if the model is passed using `formula`.
+          ui: >
+            Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`).
+            If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated
+            within block and independent between blocks.
+
 
 
     - name: re_modelterms
@@ -651,7 +659,8 @@ options:
       description:
           R: >
             Not in R interface
-            
+          ui: >
+            List in the random coefficients supplier the terms included as fixed effects
             
     - name: re_listing
       type: List
@@ -671,6 +680,8 @@ options:
       description:
           R: >
              Not in R interface
+          ui: >
+            Listing of random coefficients in the supplier: `none` do not add any term, otherwise add the selected terms. 
 
 
 
@@ -682,6 +693,8 @@ options:
       description:
           R: >
             `TRUE` or `FALSE` (default), LRT for the random effects
+          ui: >
+             Compute LRT for the random effects
 
 
 

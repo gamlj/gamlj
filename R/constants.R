@@ -103,6 +103,9 @@ TRANS_WARNS[[5]]<-list(original="Random slopes not present",new=NULL)
 TRANS_WARNS[[6]]<-list(original="too close to zero",new=NULL)
 TRANS_WARNS[[7]]<-list(original="contrasts dropped",new=NULL)
 TRANS_WARNS[[8]]<-list(original="Hessian is not positive",prepend="Valid estimates cannot be found. Please try to specify a different model. Reason: ")
+TRANS_WARNS[[9]]<-list(original="Inner iterations did not coverge",new=NULL)
+
+
 
 ########### Greek Letters  ###############
 
