@@ -78,7 +78,6 @@ gFit <- R6::R6Class(
         
         private$.r2n<-r2list[[1]]$r2
         private$.ar2n<-r2list[[1]]$ar2
-        mark(self$operator$options$model_type)
         if (self$operator$options$model_type=="multinomial") 
             return(r2list)
         
@@ -156,7 +155,7 @@ gFit <- R6::R6Class(
       r2comp$note <- "R^2 difference "
       if (is.something(private$.ar2)) r2comp$ar2 <- private$.ar2-private$.ar2n
       if (length(r2comp$ar2) == 0)  r2comp$ar2 <- NA
-      mark(r2comp)
+
     return(list(r2comp))
     } # end of compare
   ) # end of private

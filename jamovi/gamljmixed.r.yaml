@@ -71,12 +71,14 @@ items:
                     - name: r2
                       title: R²
                       type: number
+                      format: zto
                     - name:  df1
                       title: df
                       type: integer
                     - name: test
                       title: LRT X²
                       type: number
+                      format: zto
                     - name: p
                       title: p
                       type: number
@@ -133,7 +135,7 @@ items:
                       type: text
                       title: Δ 
                       visible: (comparison)
-
+                      format: zto
                     - name: specs
                       type: text
                       title: "Comment"

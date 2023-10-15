@@ -801,7 +801,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="r2", 
                                     `title`="R\u00B2", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="df1", 
                                     `title`="df", 
@@ -809,7 +810,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="test", 
                                     `title`="LRT X\u00B2", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="p", 
                                     `title`="p", 
@@ -865,7 +867,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="diff", 
                                     `type`="text", 
                                     `title`="\u0394", 
-                                    `visible`="(comparison)"),
+                                    `visible`="(comparison)", 
+                                    `format`="zto"),
                                 list(
                                     `name`="specs", 
                                     `type`="text", 
