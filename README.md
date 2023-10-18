@@ -38,22 +38,7 @@ Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select
 # Version 3
 
 GAMLj has undergone a major upgrading with version 3.*. The upgrading made version 3 not compatible with previous versions of the module, meaning
-that analyses that are done with previous versions cannot be opened with version 3. At the moment, version 3 is not yet available in the jamovi library, but it can be installed and tested in jamovi by downloading it from here and sideload the module in jamovi. Installing version 3 will not disrupt previous versions of the module.
-
-So, to try out version 3, please download it:
-
-* [GAMLj for Windows](https://library.jamovi.org/win64/R4.1.3/gamlj3-3.0.7.jmo)
-* [GAMLj for MacOS](https://library.jamovi.org/macos/R4.1.3/gamlj3-3.0.7.jmo  ) 
-* [GAMLj for Linux](https://library.jamovi.org/linux/R4.1.3/gamlj3-3.0.7.jmo  )
-
-Once downloaded, go to jamovi library within jamovi and activate `sideload`. Click on the big arrow and navigate to the folder where you saved the downloded file. Select it and  click select.
-
-<center>
-<img width="600" src="https://gamlj.github.io/pics/sideload.png" class="img-responsive" alt="">
-</center>
-
-GAMLj3 should now be available within jamovi.
-
+that analyses that are done with previous versions cannot be opened with version 3. If you need to open and work with analyses done with GAMLj version < 3.0.0, you can install GAMLj legacy from the jamovi library. It will not interfere with GAMLj3.
 
 ## From source
 
