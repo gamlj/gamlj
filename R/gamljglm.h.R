@@ -634,6 +634,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "offset",
                                 "omnibus",
                                 "model_type",
+                                "custom_family",
+                                "custom_link",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -686,7 +688,9 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "offset",
                                 "omnibus",
-                                "model_type"),
+                                "model_type",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -730,7 +734,9 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "offset",
                                 "omnibus",
-                                "model_type"),
+                                "model_type",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -770,6 +776,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "offset",
                                 "omnibus",
                                 "model_type",
+                                "custom_family",
+                                "custom_link",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -853,6 +861,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "offset",
                                 "omnibus",
                                 "model_type",
+                                "custom_family",
+                                "custom_link",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -912,7 +922,9 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "offset",
                                 "omnibus",
-                                "model_type"),
+                                "model_type",
+                                "custom_family",
+                                "custom_link"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -967,6 +979,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "offset",
                                 "omnibus",
                                 "model_type",
+                                "custom_family",
+                                "custom_link",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1038,6 +1052,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "offset",
                                 "omnibus",
                                 "model_type",
+                                "custom_family",
+                                "custom_link",
                                 "__effectsizeoptions"),
                             columns=list(
                                 list(
@@ -1098,6 +1114,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "offset",
                                 "omnibus",
                                 "model_type",
+                                "custom_family",
+                                "custom_link",
                                 "propodds_test"),
                             columns=list(
                                 list(
@@ -1147,6 +1165,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "offset",
                     "omnibus",
                     "model_type",
+                    "custom_family",
+                    "custom_link",
                     "posthoc",
                     "adjust",
                     "ci_width",
@@ -1172,6 +1192,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "offset",
                         "omnibus",
                         "model_type",
+                        "custom_family",
+                        "custom_link",
                         "posthoc",
                         "adjust",
                         "ci_width",
@@ -1481,6 +1503,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "offset",
                         "omnibus",
                         "model_type",
+                        "custom_family",
+                        "custom_link",
                         "ci_width",
                         "ci_method",
                         "boot_r"),
@@ -1563,7 +1587,9 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "covs_scale",
                     "offset",
                     "omnibus",
-                    "model_type")))
+                    "model_type",
+                    "custom_family",
+                    "custom_link")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1586,7 +1612,9 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "covs_scale",
                     "offset",
                     "omnibus",
-                    "model_type")))},
+                    "model_type",
+                    "custom_family",
+                    "custom_link")))},
         .setModel=function(x) private$..model <- x))
 
 gamljglmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
