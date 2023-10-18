@@ -54,11 +54,16 @@ gFormula <- R6::R6Class(
       paste(c(self$fixed_formula64(), self$random_formula64()),collapse = " + ")
     },
     nested_tested_fixed = function(obj) {
+      ## we need to sort the tems otherswize x:z will be considered different from z:x
       if (is.something(obj$fixed)) {
-        return(private$.buildfixed(self$dep, setdiff(self$fixed, obj$fixed)))
+        full <- lapply(self$fixed,sort)
+        nested   <- lapply(obj$fixed,sort)
+        return(private$.buildfixed(self$dep, setdiff(full, nested)))
       }
     },
     nested_tested_random = function(obj) {
+      ## TODO: for R, we should do some sorting of interactions
+
         return(private$.buildfixed(NULL, setdiff(unlist(self$random), unlist(obj$random))))
     },
     keep = function(term) {
@@ -331,12 +336,15 @@ rFormula <- R6::R6Class(
         bars <- gsub("^0", "", bars)
         barslist <- lapply(bars, function(b) strsplit(b, "|", fixed = T)[[1]])
         self$random <- lapply(barslist, function(b) {
+          form<-formula(paste0("~",b[[1]]))
+          expanded<-reformulate(labels(terms(form)))
+          .terms <-jmvcore::decomposeFormula(expanded)
           cluster <- trimws(b[[2]])
           ladd(self$clusters) <- cluster
-         .terms <-jmvcore::decomposeFormula(formula(paste0("~",b[[1]])))
           lapply(.terms, function(t) c(t,cluster))
         })
       }
+
       fformula <- lme4::nobars(aformula)
       if (!is.null(data)) {
         self$dep <- jmvcore::marshalFormula(fformula, data, from = "lhs", permitted = c("numeric", "factor"))

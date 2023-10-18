@@ -96,8 +96,6 @@ children:
               - type: ComboBox
                 name: custom_link
                 enable: (model_type_custom)
-                events:
-                  change: './gamlj.events::onChange_model'
   - type: VariableSupplier
     name: variablesupplier
     suggested:

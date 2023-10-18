@@ -519,8 +519,12 @@ Runner <- R6::R6Class("Runner",
                               self$warning<-list(topic="info", message=results$warning)
 
                               if (!isFALSE(results$error)) {
-                                if (self$option("model_type","custom"))
-                                  stop("No solution has been found for the combination of link function and distribution")
+                                if (self$option("model_type","custom")) {
+                                 msg1<-"No solution has been found for the combination of link function and distribution. \n\n"
+                                 msg2<-results$error
+                                 if (length(grep("valid starting values",msg2))>0) msg2<-""
+                                 stop(msg1,msg2)
+                                }
                                 else
                                   stop(fromb64(results$error))
                               }

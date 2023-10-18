@@ -78,7 +78,6 @@ gFit <- R6::R6Class(
         
         private$.r2n<-r2list[[1]]$r2
         private$.ar2n<-r2list[[1]]$ar2
-        mark(self$operator$options$model_type)
         if (self$operator$options$model_type=="multinomial") 
             return(r2list)
         
@@ -105,9 +104,13 @@ gFit <- R6::R6Class(
 
       omnibus<-"Chisq"
       if (self$operator$option("omnibus")) omnibus<-self$operator$optionValue("omnibus")
+      mark(self$operator$optionValue("omnibus"))
+      comp=switch (omnibus,
+        Chisq     = try_hard(lmtest::lrtest(self$operator$nested_model, self$operator$model)),
+        LRT       = try_hard(lmtest::lrtest(self$operator$nested_model, self$operator$model)),
+        F         = try_hard(anova(self$operator$nested_model, self$operator$model))
+      )
 
-      comp <- try_hard(lmtest::lrtest(self$operator$nested_model, self$operator$model))
-      
       if (!isFALSE(comp$error))
             comp <- try_hard(as.data.frame(performance::test_likelihoodratio(self$operator$nested_model,self$operator$model)))
       if (!isFALSE(comp$error)) {
@@ -121,6 +124,7 @@ gFit <- R6::R6Class(
       # } else {
       #    comp <- try_hard(stats::anova(self$operator$nested_model, self$operator$model, test = omnibus))
       # }
+
       comp <- comp$obj
 
       if ("df_diff" %in% names(comp)) comp$df<-comp$df_diff
@@ -134,7 +138,6 @@ gFit <- R6::R6Class(
                     )
       
       names(r2comp) <- transnames(names(r2comp), .names)
-
       r2comp$model <- paste0(greek_vector[["Delta"]], "R", "\u00B2")
       r2comp$type <- "Comparison"
       
@@ -156,7 +159,7 @@ gFit <- R6::R6Class(
       r2comp$note <- "R^2 difference "
       if (is.something(private$.ar2)) r2comp$ar2 <- private$.ar2-private$.ar2n
       if (length(r2comp$ar2) == 0)  r2comp$ar2 <- NA
-      mark(r2comp)
+
     return(list(r2comp))
     } # end of compare
   ) # end of private

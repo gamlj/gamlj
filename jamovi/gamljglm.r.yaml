@@ -50,6 +50,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
@@ -102,6 +104,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
 
              columns:
@@ -147,6 +151,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
 
              columns:
@@ -186,6 +192,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -264,6 +272,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -321,6 +331,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
 
              columns:
@@ -377,6 +389,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
                            ### simpleeffectsoptions  begins
                          - simple_x
@@ -445,6 +459,8 @@ items:
                          - offset
                          - omnibus
                          - model_type
+                         - custom_family
+                         - custom_link
                            ### modeloptions  ends
                          - __effectsizeoptions
                     
@@ -500,6 +516,8 @@ items:
                     - offset
                     - omnibus
                     - model_type
+                    - custom_family
+                    - custom_link
                       ### modeloptions  ends
                     - propodds_test
                   
@@ -547,6 +565,8 @@ items:
         - offset
         - omnibus
         - model_type
+        - custom_family
+        - custom_link
           ### modeloptions  ends
         - posthoc
         - adjust
@@ -577,6 +597,8 @@ items:
             - offset
             - omnibus
             - model_type
+            - custom_family
+            - custom_link
               ### modeloptions  ends
             - posthoc
             - adjust
@@ -846,6 +868,8 @@ items:
               - offset
               - omnibus
               - model_type
+              - custom_family
+              - custom_link
                 ### modeloptions  ends
                 ### cioptions  begins
               - ci_width        
@@ -935,6 +959,8 @@ items:
                  -  offset
                  -  omnibus
                  -  model_type
+                 -  custom_family
+                 -  custom_link
                     ### modeloptions  ends
         
   - name: residuals
@@ -960,6 +986,8 @@ items:
                  -  offset
                  -  omnibus
                  -  model_type
+                 -  custom_family
+                 -  custom_link
                     ### modeloptions  ends
         
 
