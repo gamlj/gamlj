@@ -734,7 +734,6 @@ items:
                      - name: df
                        title: "df"
                        type: integer
-                       format: zto
                      - name: test
                        title: "t"
                        type: number

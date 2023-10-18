@@ -1409,8 +1409,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="df", 
                                     `title`="df", 
-                                    `type`="integer", 
-                                    `format`="zto"),
+                                    `type`="integer"),
                                 list(
                                     `name`="test", 
                                     `title`="t", 
