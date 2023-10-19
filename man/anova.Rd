@@ -26,7 +26,7 @@ are returned.
 \examples{
 data(fivegroups)
 fivegroups$Group<-factor(fivegroups$Group)
-gmod<-gamlj::gamlj_lm(
+gmod<-GAMLj3::gamlj_lm(
   formula = Score ~Group,
   data = fivegroups)
 

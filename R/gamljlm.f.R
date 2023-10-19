@@ -9,7 +9,7 @@
 
 #' @examples
 #' data('ToothGrowth')
-#' gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
+#' GAMLj3::gamlj_lm(formula = len ~ supp,  data = ToothGrowth)
 #' @param formula (optional) the formula of the model, see the examples. If not passed
 #'                model terms should be defined as a list in  \code{model_terms} option.
 #' @param data the data as a data frame
@@ -366,5 +366,6 @@ gamlj_lm <- function(
   
   analysis$results
 }
+
 
 

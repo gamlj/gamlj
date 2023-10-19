@@ -18,7 +18,7 @@
 \arguments{
 \item{object}{of class `gamlj*Results`}
 
-\item{...}{any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link{gamlj_gmixed}}}
+\item{...}{any parameter to be passed to \code{\link[GAMLj3]{gamlj_lm}},  \code{\link[GAMLj3]{gamlj_mixed}},  \code{\link[GAMLj3]{gamlj_glm}}, or  \code{\link{gamlj_gmixed}}}
 }
 \value{
 an object of class gamlj*Results as the input object

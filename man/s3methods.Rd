@@ -24,6 +24,8 @@ fit(x, ...)
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}
 
+\item{...}{additional arguments passed to the GAMLj estimation function}
+
 \item{x}{a gamlj results object of the class `gamlj`}
 }
 \value{
@@ -36,7 +38,7 @@ and print them in R style.
 \examples{
 data(fivegroups)
 fivegroups$Group<-factor(fivegroups$Group)
-gmod<-gamlj::gamlj_lm(
+gmod<-GAMLj3::gamlj_lm(
   formula = Score ~Group,
   data = fivegroups)
 

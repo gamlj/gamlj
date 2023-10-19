@@ -1,17 +1,17 @@
 
 #' Mixed Model
 #'
-#' Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTest]{merTest-package} functions and 
+#' Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTest]{lmer} functions and 
 #' provides options to facilitate estimation of 
 #' interactions, simple slopes, simple effects, post-hoc tests, contrast 
 #' analysis, effect size indexes and visualization of the results.
 
 #'
 #' @examples
-#' data(subjects_by_stimuli)
-#' gamlj::gamlj_mixed(
-#'        formula = y ~ 1 + cond+( 1|subj ),
-#'        data = subjects_by_stimuli)
+#' data(clustermanymodels)
+#' GAMLj3::gamlj_mixed(formula = ycont ~ 1 + x+( 1|cluster ),
+#'                      data = clustermanymodels
+#'                      )
 #' @param formula (optional) the formula of the linear mixed model as defined in \link[lme4]{lmer}.
 #' @param data the data as a data frame
  #' @param cluster a vector of strings naming the clustering variables from
@@ -67,7 +67,9 @@
 #'   plots, respectively.
 #' @param plot_re \code{TRUE} or \code{FALSE} (default), add predicted values
 #'   based on random effect in plot
-#' @param plot_re_method 
+#' @param plot_re_method Method to plot the random effects. \code{average}
+#'        plots the random effect of the selected variable averaging across all other predictors
+#'        in the model.  \code{full} plots the predicted values based on the whole model.
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -109,7 +111,7 @@
 #'   lists of length > 1, the option is automatially set to \code{'block'}. The
 #'   option is ignored if the model is passed using \code{formula}.
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-#'   be used rather than ML
+#'   be re_corrused rather than ML
 #' @param re_lrt \code{TRUE} or \code{FALSE} (default), LRT for the random
 #'   effects
 #' @param re_ci \code{TRUE} or \code{FALSE} (default), confidence intervals

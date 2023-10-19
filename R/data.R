@@ -74,23 +74,10 @@ NULL
 NULL
 
 
-#' Clustered data for generalized mixed model
-#'
-#' Generated data to test generalized mixed models. The variables can be used:
-#'  `x` and `z` as two continuous independent variables; `w` as categorical independent variable;
-#' `ybin` as dichotomous dependent variable; `ypoi` as count variable (Poisson);
-#' `cluster` as the clustering variable.
-#' @docType data
-#' @name gmixeddata
-#' @usage data(glmmixeddata)
-#' @keywords datasets
-#' @examples
-#' data(glmmixeddata)
-NULL
 
-#' Many GMixed Models Data
+#' Many Models Data
 #'
-#' Generated data to test different types of linear models. The variables can be used as:
+#' Generated data to test linear models. The variables can be used as:
 #'       
 #'       `x` and `z` as two continuous independent variables; 
 #'       
@@ -131,3 +118,28 @@ NULL
 #' data(clustermanymodels)
 NULL
 
+
+#' School data for testing
+#'
+#' Data for different examples
+#'
+#' @docType data
+#' @name hsbdemo
+#' @usage data(hsbdemo)
+#' @keywords datasets
+#' @examples
+#' data(hsbdemo)
+NULL
+
+
+#' Poisson data
+#'
+#'  Simulated data of a poisson distributed dependent variables with some independent variabes
+#'
+#' @docType data
+#' @name poissonacts
+#' @usage data(poissonacts)
+#' @keywords datasets
+#' @examples
+#' data(poissonacts)
+NULL

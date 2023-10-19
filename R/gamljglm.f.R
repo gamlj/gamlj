@@ -7,7 +7,7 @@
 #' 
 #' @examples
 #'    data <- emmeans::neuralgia
-#'    gamlj::gamlj_glm(formula = Pain ~ Duration,
+#'    GAMLj3::gamlj_glm(formula = Pain ~ Duration,
 #'                     data = data,
 #'                     model_type = "logistic"
 #'                     )
@@ -19,7 +19,7 @@
 #'            variable must be numeric. Not needed if \code{formula} is used.
 #' @param model_type define the type of model (link function and distribution combination) required.
 #'                   It can be \code{linear}, \code{poisson}, \code{poiover}, \code{nb},
-#'                   \code{logistic}, \code{probit}, \code{custom}, \code{ordinal}, \code{multinomial}
+#'                   \code{logistic}, \code{probit}, \code{custom}, \code{ordinal}, \code{multinomial}, and \code{beta}.
 #' @param custom_family Distribution family for the custom model, accepts
 #'                        \code{gaussian}, \code{binomial}, \code{gamma} and \code{inverse_gaussian}.
 #' @param custom_link Distribution family for the \code{model_type="custom"}, accepts

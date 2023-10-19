@@ -254,9 +254,11 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 Generalized Mixed  Model
 }
 \examples{
-data(schoolexam)
-gamlj::gamlj_gmixed(formula = pass ~ 1 + math+( 1|school ),
-                     data = schoolexam
+data(clustermanymodels)
+clustermanymodels$ybin<-factor(clustermanymodels$ybin)
+GAMLj3::gamlj_gmixed(formula = ybin ~ 1 + x+( 1|cluster ),
+                     data = clustermanymodels,
+                     model_type="logistic"
                      )
        
 }

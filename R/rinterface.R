@@ -4,7 +4,7 @@
 #' Re-estimates a GAMLj model applying new options to the original model
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link{gamlj_gmixed}} 
+#' @param  ... any parameter to be passed to \code{\link[GAMLj3]{gamlj_lm}},  \code{\link[GAMLj3]{gamlj_mixed}},  \code{\link[GAMLj3]{gamlj_glm}}, or  \code{\link{gamlj_gmixed}} 
 #' @return an object of class gamlj*Results as the input object
 #' @author Marcello Gallucci
 #' @rdname update
@@ -75,7 +75,7 @@ update.gamljgmixedResults <- function(object, ...) {
 #' @author Marcello Gallucci
 #' @examples
 #' data(qsport)
-#' gmod<-gamlj::gamlj_lm(
+#' gmod<-GAMLj3::gamlj_lm(
 #'   formula = performance ~ hours,
 #'   data = qsport)
 #' 
@@ -176,7 +176,7 @@ assumptions <- function(object) {
 #' Returns the parameters variances and covariances
 #'
 #' @param  object of class `gamlj*Results` 
-#' @param  ... any parameter to be passed to \code{\link[gamlj]{gamlj_lm}},  \code{\link[gamlj]{gamlj_mixed}},  \code{\link[gamlj]{gamlj_glm}}, or  \code{\link[gamlj]{gamlj_gmixed}} 
+#' @param  ... any parameter to be passed to \code{\link[GAMLj3]{gamlj_lm}},  \code{\link[GAMLj3]{gamlj_mixed}},  \code{\link[GAMLj3]{gamlj_glm}}, or  \code{\link[GAMLj3]{gamlj_gmixed}} 
 #' @return an table of class gamlj*Results 
 #' @author Marcello Gallucci
 #' @export 
@@ -185,7 +185,7 @@ vcov.gamlj <- function(object, ...) {
     
     if(utils::hasName(object,"main") && utils::hasName(object$main,"vcov"))
        return(object$main$vcov)
-    mod<-gamlj_update(object, vcov=T,...)
+    mod<-stats::update(object, vcov=T,...)
     mod$main$vcov
 }
 
@@ -198,14 +198,15 @@ vcov.gamlj <- function(object, ...) {
 #'
 #'@name   get_data
 #' @param object a gamlj results object of the class `gamlj*Results`
+#' @param ... additional arguments passed to the GAMLj estimation function
 #' @aliases get_data.gamlj
 #' @return a dataset
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamlj_lm(formula = performance ~ hours,
+#' gmod<-GAMLj3::gamlj_lm(formula = performance ~ hours,
 #'                 data = qsport,
-#'                 scaling = c(hours='standardized'))
+#'                 covs_scale = c(hours='standardized'))
 #' 
 #' gdata<-get_data(gmod)
 #' lm(performance ~ hours,data=gdata)
@@ -251,7 +252,7 @@ get_data.gamlj <- function(object,...) {
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamlj_lm(
+#' gmod<-GAMLj3::gamlj_lm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-predict(gmod)
@@ -302,7 +303,7 @@ predict.gamljgmixedResults <- function(object, re.form = NULL, type = "response"
 #' @author Marcello Gallucci
 #' @examples 
 #' data('qsport')
-#' gmod<-gamlj::gamlj_lm(
+#' gmod<-GAMLj3::gamlj_lm(
 #'    formula = performance ~ hours,
 #'    data = qsport)
 #'  preds<-residuals(gmod)
@@ -352,7 +353,7 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamlj_lm(
+#' gmod<-GAMLj3::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -397,7 +398,7 @@ anova.gamlj <- function(object, object2,...) {
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamlj_lm(
+#' gmod<-GAMLj3::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -441,14 +442,16 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 #' @return an object of class gamlj results
 #' @author Marcello Gallucci
 #' @examples
-#' data(winkel)
+#' data(wicksell)
 #' wicksell$time<-factor(wicksell$time)
 #' wicksell$group<-factor(wicksell$group) 
-#' gmod<-gamlj::gamljmixed(
+#' wicksell$subj<-factor(wicksell$subj) 
+
+#' gmod<-GAMLj3::gamlj_mixed(
 #'    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
 #'    data = wicksell)
 #' 
-#' simpleEffects(gmod,formula =~time:group)
+#' simple_effects(gmod,formula =~time:group)
 #' @rdname simple_effects
 #' @export
 
@@ -482,12 +485,13 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 #' and print them in R style.
 
 #' @param object a gamlj results object of the class `gamlj`
+#' @param ... additional arguments passed to the GAMLj estimation function
 #' @return a list of table as data.frame
 #' @author Marcello Gallucci
 #' @examples
 #' data(fivegroups)
 #' fivegroups$Group<-factor(fivegroups$Group)
-#' gmod<-gamlj::gamlj_lm(
+#' gmod<-GAMLj3::gamlj_lm(
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
@@ -584,4 +588,58 @@ fit.gamlj<-function(x,...) {
   
   return(res)
 }
+
+
+#' Alternative spelling of GAMLj main functions
+#'
+#' An alternative spelling of the command \code{\link{gamlj_lm}}
+
+#' @param ... the same arguments that can be passed to the corresponding function
+#' @return a GAMLj results object equivalent to the results of (\code{\link{gamlj_lm}})
+#' @author Marcello Gallucci
+#' @rdname alternatives
+#' 
+#' @export
+
+gamljlm<-function(...) GAMLj3::gamlj_lm(...)
+
+#' Alternative spelling of GAMLj main functions
+#'
+#' An alternative spelling of the command \code{\link{gamlj_glm}}
+
+#' @param ... the same arguments that can be passed to the corresponding function
+#' @return a GAMLj results object equivalent to the results of (\code{\link{gamlj_glm}})
+#' @author Marcello Gallucci
+#' @rdname alternatives
+#' 
+#' @export
+
+gamljglm<-function(...) GAMLj3::gamlj_glm(...)
+
+#' Alternative spelling of GAMLj main functions
+#'
+#' An alternative spelling of the command \code{\link{gamlj_mixed}}
+
+#' @param ... the same arguments that can be passed to the corresponding function
+#' @return a GAMLj results object equivalent to the results of (\code{\link{gamlj_mixed}})
+#' @author Marcello Gallucci
+#' @rdname alternatives
+#' 
+#' @export
+
+gamljmixed<-function(...) GAMLj3::gamlj_mixed(...)
+
+#' Alternative spelling of GAMLj main functions
+#'
+#' An alternative spelling of the command \code{\link{gamlj_gmixed}}
+
+#' @param ... the same arguments that can be passed to the corresponding function
+#' @return a GAMLj results object equivalent to the results of (\code{\link{gamlj_gmixed}})
+#' @author Marcello Gallucci
+#' @rdname alternatives
+#' 
+#' @export
+
+gamljgmixed<-function(...) GAMLj3::gamlj_gmixed(...)
+
 

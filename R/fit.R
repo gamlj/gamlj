@@ -104,7 +104,6 @@ gFit <- R6::R6Class(
 
       omnibus<-"Chisq"
       if (self$operator$option("omnibus")) omnibus<-self$operator$optionValue("omnibus")
-      mark(self$operator$optionValue("omnibus"))
       comp=switch (omnibus,
         Chisq     = try_hard(lmtest::lrtest(self$operator$nested_model, self$operator$model)),
         LRT       = try_hard(lmtest::lrtest(self$operator$nested_model, self$operator$model)),
@@ -329,7 +328,7 @@ r2 <- function(model, ...) UseMethod(".r2")
   df1<-attr(l1,"df")
   
   dep <- insight::find_response(model)
-  form<- as.formula(paste(dep,"~ 1"))
+  form<- stats::as.formula(paste(dep,"~ 1"))
   mod0<- betareg::betareg(form,data=model$model)
   
   l0<-stats::logLik(mod0)
@@ -338,7 +337,7 @@ r2 <- function(model, ...) UseMethod(".r2")
   alist$r2 <- model$pseudo.r.squared
   alist$test <- as.numeric(2*(l1-l0))
   alist$df1 <- df1-df0
-  alist$p <-   as.numeric(pchisq(q = 2*(l1-l0),df = 1,lower.tail = F))
+  alist$p <-   as.numeric(stats::pchisq(q = 2*(l1-l0),df = 1,lower.tail = F))
 
   return(list(alist))
   
@@ -554,10 +553,10 @@ fit.lrt <- function(model,model0, ...) UseMethod(".lrt")
 
 .lrt.default<-function(model,model0,...) {
 
-  l0<-logLik(model0)
-  l1<-logLik(model)
+  l0<-stats::logLik(model0)
+  l1<-stats::logLik(model)
   test<--2*(l0-l1)
   df1<-attr(l1,"df")-attr(l0,"df")  
-  p<-as.numeric(pchisq(test,df = df1,lower.tail = F))
+  p<-as.numeric(stats::pchisq(test,df = df1,lower.tail = F))
   data.frame(test,df1,p)
 }

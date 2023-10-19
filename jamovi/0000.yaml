@@ -101,22 +101,6 @@ datasets:
     tags:
       - Poisson
       - GzLM
-  - name: schoolexam
-    path: schoolexam.csv
-    description: |
-      Simulated data for testing logistic mixed models.
-    tags:
-      - Mixed models
-      - Logistic mixed models
-  - name: glmmixeddata
-    path: glmmixeddata.csv
-    description: |
-      Generated data to test generalized mixed models
-    tags:
-      - GMixed
-      - GLM
-      - GZLM
-      - Mixed
   - name: manymodels
     path: manymodels.csv
     description: |
