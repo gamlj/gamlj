@@ -8,7 +8,7 @@
 data(subjects_on_stimuli)
 }
 \description{
-Data for stimuli nested in subjects classification examples
+Simulated data for stimuli nested in subjects classification examples
 }
 \examples{
 data(subjects_on_stimuli)

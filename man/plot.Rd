@@ -12,23 +12,24 @@
 \item{formula}{a right hand side formula specifying the effect to plot, of the form `~x`, `~x*z` or `~x*z*w`. 
 It has prevalence on other options defining a plot.}
 
-\item{...}{all options accepted by a gamlj model function. Relevant for new plots are `plotHAxis`, `plotSepLines` and `plotSepPlots`}
+\item{...}{all options accepted by a gamlj model function. 
+Relevant for new plots are \code{plot_x}, \code{plot_z} and \code{plot_by}}
 }
 \value{
 an object of class ggplot or a list of ggplot objects
 }
 \description{
-This function re-estimates a GAMLj model adding a new plot. If no options is passed, extracts the 
+This function re-estimates a GAMLj model adding a new plot. If no option is passed, extracts the 
 plots present in the `gamlj*Results` object. If one plot is present, it is returned as a ggplot2 object,
  if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined.
 }
 \examples{
 data(qsport)
-gmod<-gamlj::gamljGlm(
+gmod<-gamlj::gamlj_lm(
   formula = performance ~ hours,
   data = qsport)
 
-plot(gmod,plotHAxis = 'hours')
+plot(gmod,plot_x = 'hours')
 plot(gmod,formula=~hours)
 }
 \author{

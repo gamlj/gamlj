@@ -4,7 +4,7 @@
 #'
 #' @examples
 #' data(schoolexam)
-#' gamlj::gamljGlmMixed(formula = pass ~ 1 + math+( 1|school ),
+#' gamlj::gamlj_gmixed(formula = pass ~ 1 + math+( 1|school ),
 #'                      data = schoolexam
 #'                      )
 #'        

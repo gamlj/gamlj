@@ -6,7 +6,7 @@
 #' 
 #' @examples
 #'    data <- emmeans::neuralgia
-#'    gamlj::gamljGzlm(formula = Pain ~ Duration,
+#'    gamlj::gamlj_glm(formula = Pain ~ Duration,
 #'                     data = data,
 #'                     model_type = "logistic"
 #'                     )
