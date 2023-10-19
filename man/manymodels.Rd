@@ -3,15 +3,7 @@
 \docType{data}
 \name{manymodels}
 \alias{manymodels}
-\title{Generated data to test different types of linear models. The variables can be used as:
-      
-      `x` and `z` as two continuous independent variables; 
-      
-      `cat2` and `cat3`  as categorical independent variables, with two and three groups respectively;
-      
-      `ycont` is a continuous variable, suitable as dependent variable. 
-      `ybin` is dichotomous dependent variable; `ypoi` a count variable (Poisson),
-      `yord` and ordinal dependent variable with 5 levels, and `ycat` a categorical dependent variable with three groups.}
+\title{Many GMixed Models Data}
 \usage{
 data(manymodels)
 }
