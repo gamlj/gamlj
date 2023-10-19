@@ -62,7 +62,7 @@ update.gamljgmixedResults <- function(object, ...) {
 
 #'  GAMLj plot
 #'
-#' This function re-estimates a GAMLj model adding a new plot. If no options is passed, extracts the 
+#' This function re-estimates a GAMLj model adding a new plot. If no option is passed, extracts the 
 #' plots present in the `gamlj*Results` object. If one plot is present, it is returned as a ggplot2 object,
 #'  if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined. 
 
@@ -382,7 +382,7 @@ anova.gamlj <- function(object, object2,...) {
 
 #'  Post-hoc test on GAMLj results 
 #'
-#' This is a convenience function to re-estimates a GAMLj model adding posthoc tests. If no options is passed, extracts the 
+#' This is a convenience function to re-estimates a GAMLj model adding posthoc tests. If no option is passed, extracts the 
 #' post-hoc tests tables already in the model results (if any). If new post-hoc are defined, the post-hoc tests tables 
 #' are returned.
 
@@ -427,7 +427,7 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 
 #'  Simple Effects on GAMLj results 
 #'
-#' This is a convenience function to re-estimates a GAMLj model adding simple effect analysis. If no options is passed, extracts the 
+#' This is a convenience function to re-estimates a GAMLj model adding simple effect analysis. If no option is passed, extracts the 
 #' simple effects tables already in the model results (if any). If new tests are defined, the simple effects tests tables 
 #' are returned.
 

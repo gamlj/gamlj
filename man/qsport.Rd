@@ -8,7 +8,7 @@
 data(qsport)
 }
 \description{
-Data for curvilinear effects
+Simulated data for curvilinear effects examples
 }
 \examples{
 data(qsport)

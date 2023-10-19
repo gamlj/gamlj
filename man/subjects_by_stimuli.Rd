@@ -8,7 +8,7 @@
 data(subjects_by_stimuli)
 }
 \description{
-Data for Subjects by stimuli cross-classification examples
+Simulated data for subjects by stimuli cross-classification examples
 }
 \examples{
 data(subjects_by_stimuli)

@@ -1,5 +1,5 @@
 ---
-title: "Examples of gamljGlm()"
+title: "Examples of gamlj_lm()"
 author: Marcello Gallucci
 date: '`r Sys.Date()`'
 output: 
@@ -14,7 +14,7 @@ output:
              collapsed: false
          css: style.css
 vignette: >
-  %\VignetteIndexEntry{Examples of gamljGlm()}
+  %\VignetteIndexEntry{Examples of gamlj_lm()}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -34,7 +34,7 @@ options(digits=3)
 ```
 
 ```{r setup}
-library(gamlj)
+library(GAMLj3)
 ```
 
 # Linear models in GAMLj
@@ -62,19 +62,24 @@ We first run a multiple regression (to warm up), then we estimate a multiple reg
 
 # Multiple regression
 
-GAMLj GML function minimum setup only requires to specify the formula of the model and the dataframe. The formula interface is the same one uses in `lm()` function.
-```{r warning=FALSE, message=FALSE}
-mod1<-gamljGlm(formula = yendu~xage+zexer, data=data)
-mod1
+GAMLj `gamlj_lm()` function minimum setup only requires to specify the formula of the model and the dataframe. The formula interface is the same one used in `lm()` function.
+```{r warning=FALSE, message=F,results='hide'}
+
+mod1<-gamlj_lm(formula = yendu~xage+zexer, data=data)
+
 ```
 
+```{r warning=FALSE, message=F}
+mod1
+```
 
 
 The object `mod' is an R6 object which contains all the results tables and some additional function that can be used in subsequent analyses. Tables are pretty printed, but they can be modified or manipulated by transforming them in dataframes as follows:
 
 ```{r }
-anofaDF<-mod1$main$anova$asDF
-anofaDF
+anovaDF<-mod1$main$anova$asDF
+anovaDF
+
 ```
 
 
@@ -82,22 +87,30 @@ anofaDF
 
 Results show three tables. The _Model Info_ table contains information about the overall model. The _ANOVA omnibus tests_ table contains the results of the `car:Anova()` function, with the addition of the partial $\eta^2$ index for each effect and the inferential test for the whole model. The _Fixed Effecta Parameter Estimates_ table contains the `summary()` results. For each coefficient the confidence interval is also reported.
 
-A special note should be made for the intercept. The intercept is the expected value (the mean) of the dependent variable, estimated for all independent variables equal to their means. This is because in gamljGlm(), continuous variables are centered to their mean by default. In case one wants the independent variables not to be centered, one can select a different scaling with the option `scaling`.
+A special note should be made for the intercept. The intercept is the expected value (the mean) of the dependent variable, estimated for all independent variables equal to their means. This is because in `gamlj_lm()`, continuous variables are centered to their mean by default. In case one wants the independent variables not to be centered, one can select a different scaling with the option `scaling`.
 
 Additional effect size indexes can be asked with the option `effectSize`. 
 
-```{r }
-mod2<-gamljGlm(formula = yendu~xage+zexer, 
-              data=data,
-              effectSize = c("beta", "eta","etap","omega","epsilon"))
+```{r results='hide'}
+mod2<-gamlj_lm(formula = yendu~xage+zexer, 
+               data=data,
+               es = c("beta", "eta","etap"))
+
+```
+
+```{r warning=FALSE, message=F}
 mod2$main$anova
 ```
 
-The same analysis can be done by updating the model with the `update()` function. Almost all the options available in `gamljGlm()` can be added to a model by running `update(mod,...)` where `...` is any option or options accepted by `gamljGlm()`.
+
+The same analysis can be done by updating the model with the `update()` function. Almost all the options available in `gamlj_lm()` can be added to a model by running `update(mod,...)` where `...` is any option or options accepted by `gamlj_lm()`.
 
 
-```{r }
-mod2_2<-update(mod1,effectSize = c("beta", "eta","etap","omega","epsilon"))
+```{r warning=FALSE, message=F,results='hide'}
+mod2_2<-update(mod1,es = c("beta", "eta","etap","omega","epsilon"))
+```
+
+```{r, warning=FALSE, message=F}
 mod2_2$main$anova
 ```
 
@@ -107,9 +120,15 @@ mod2_2$main$anova
 
 To include the interaction we simply add the interaction effect in the formula.
 
-```{r warning=FALSE, message=FALSE}
-mod3<-gamljGlm(formula = yendu~xage*zexer, data=data)
-mod3
+```{r warning=FALSE, message=FALSE, results='hide'}
+mod3<-gamlj_lm(formula = yendu~xage*zexer, 
+               data=data,
+               es = c("beta", "eta","etap"))
+
+```
+
+```{r, warning=FALSE, message=F}
+mod3$main$anova
 ```
 
 ## Results
@@ -123,63 +142,83 @@ We can now probe the interaction. One can re-run the model adding the appropriat
 
 
 
-```{r warning=FALSE, message=FALSE}
-#mod4<-gamljGlm(formula = yendu~xage*zexer,
-#               data=data,
-#               simpleVariable = "xage",
-#               simpleModerator = "zexer")
-### equivalent results :
-gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer")
+```{r warning=FALSE, message=FALSE, results='hide'}
+mod3b<-gamlj_lm(formula = yendu~xage*zexer, 
+               data=data,
+               simple_x = "xage",
+               simple_mods = "zexer")
 ```
+
+```{r warning=FALSE, message=FALSE}
+
+mod3b$simpleEffects
+
+```
+
+Equivalently, we can do use the command `simple_effects()`:
+
+```{r warning=FALSE, message=FALSE,results='hide'}
+se<-simple_effects(mod3,simple_x = "xage",simple_mods = "zexer")
+```
+
+```{r warning=FALSE, message=FALSE}
+se
+```
+
 
 In this way we obtain the effect of age computed for high exercise (`zexer` centered to 1 SD above average), the main effect of age (`zexer` centered to its mean) and the effect of age computed for low exercise (`zexer` centered to -1 SD above average). `gamlGLM()` produces both the F-tests and the parameter estimates for the simple slopes. We focus on the latter table now.
 
 
-One can change the conditioning levels of the moderators with the `simpleScale` option (default is `mean_sd` for mean plus/minus one SD), either added to the `gamljGlm()` function or to the `gamlj_simpleEffects()` function. If one wants to use the percentiles (25%,50%,75%), for instance, one can run the following.
+One can change the conditioning levels of the moderators with the `covs_conditioning` option (default is `mean_sd` for mean plus/minus one SD), either added to the `gamlj_lm()` function or to the `simple_effects()` function. If one wants to use the percentiles (25%,50%,75%), for instance, one can run the following.
+
+```{r warning=F, message=F,results='hide'}
+se<-simple_effects(mod3,simple_x = "xage",simple_mods = "zexer",covs_conditioning="percent")
+
+```
 
 ```{r warning=FALSE, message=FALSE}
-gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer",simpleScale="percent")
+se
 ```
 
 The simple effects are now changed, because they are estimated for a different set of values of the moderator.
 
-One can further tweak the appearance of the tables by selecting a different value/labels  in `simpleScaleLabels` option. Options are "labels", "values" and "values_labels". The latter outputs the values and the labels of the conditioning values.
+One can further tweak the appearance of the tables by selecting a different value/labels  in `covs_scale_labels` option. Options are "labels", "values" and "values_labels". The latter outputs the values and the labels of the conditioning values.
 
-```{r warning=FALSE, message=FALSE}
-gamlj_simpleEffects(mod3,variable = "xage",moderator = "zexer",
-                    simpleScale="percent", 
-                    simpleScaleLabels="values_labels")
+```{r warning=FALSE, message=T,results='hide'}
+se<-simple_effects(mod3,simple_x = "xage",simple_mods = "zexer",covs_conditioning="percent",covs_scale_labels="values_labels")
 ```
 
-
+```{r warning=FALSE, message=FALSE}
+se
+```
 
 ## Simple Slopes Plot
 
 We can get a clear picture of the interaction by asking for a plot. Also the plot module takes care of centering the variables in a way that makes the plot clearly understandable. 
 
 
-The options needed in `gamljGlm()` are `plotHAxis` for the x-axis variable and  `plotSepLines` for the moderator. At which three levels of the moderator the separate lines are computed is decided by the option `simpleScale` as for the simple effects. 
+The options needed in `gamlj_lm()` are `plot_x` for the x-axis variable and  `plot_z` for the moderator. At which three levels of the moderator the separate lines are computed is decided by the option `simpleScale` as for the simple effects. 
 
 
-```{r warning=FALSE, message=FALSE}
-mod4<-gamljGlm(formula = yendu~xage*zexer, data=data, 
-               plotHAxis = "xage",plotSepLines = "zexer",plotError = "ci")
+```{r warning=FALSE, message=FALSE, results='hide'}
+mod4<-gamlj_lm(formula = yendu~xage*zexer, data=data, 
+               plot_x = "xage",plot_z= "zexer")
+mod4
 plot(mod4)
 ```
 
-The nice plot we get shows the simple effects (simple equations to be precise) with the prediction confidence intervals indicated by the colored shades around the lines. If needed, the confidence intervals can be substituted with the standard errors of the estimates or they can be removed completely.
 
 We use the`plot()` function. The function, applied to a `gamlj` results object, returns one plot if it is present in the model, returned as a ggplot2 object. If more than one plot is present, a list of plots is returned. FALSE is returned if no plot is present or defined. The function `plot()` can also be use to add new plots or to add options to the plots.
 
-For instance, if we want to give a more honest account of the model fit, we can visualize the simple slopes over the the actual data. The function `plot()` produces a new plot after adding any options accepted by `gamljGlm()`
+For instance, if we want to give a more honest account of the model fit, we can visualize the simple slopes over the the actual data. The function `plot()` produces a new plot after adding any options accepted by `gamlj_lm()`
 
-```{r warning=FALSE, message=FALSE}
-plot(mod4,plotRaw=T)
+```{r warning=FALSE, message=FALSE,results='hide'}
+plot(mod4,plot_raw=T)
 ```
 
-Any plot produced by `gamljGlm` or `plot()` can be obtained as a ggplot2 object for further manipulations or usage. For instance, one can change the theme of the plot:
+Any plot produced by `gamlj_lm` or `plot()` can be obtained as a ggplot2 object for further manipulations or usage. For instance, one can change the theme of the plot:
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE,results='hide'}
 myplot<-plot(mod4)
 myplot+ggplot2::theme_grey()
 

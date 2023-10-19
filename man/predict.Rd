@@ -2,19 +2,20 @@
 % Please edit documentation in R/rinterface.R
 \name{predict}
 \alias{predict}
-\alias{predict.gamljGlmResults}
-\alias{predict.gamljGzlmResults}
-\alias{predict.gamljMixedResults}
-\alias{predict.gamljGlmMixedResults}
+\alias{predict.gamljlmResults}
+\alias{predict.gamlj_lm_Results}
+\alias{predict.gamljglmResults}
+\alias{predict.gamljmixedResults}
+\alias{predict.gamljgmixedResults}
 \title{Predicted values from GAMLj models}
 \usage{
-\method{predict}{gamljGlmResults}(object, ...)
+\method{predict}{gamljlmResults}(object, ...)
 
-\method{predict}{gamljGzlmResults}(object, type = "response", ...)
+\method{predict}{gamljglmResults}(object, type = "response", ...)
 
-\method{predict}{gamljMixedResults}(object, re.form = NULL, type = "response", ...)
+\method{predict}{gamljmixedResults}(object, re.form = NULL, type = "response", ...)
 
-\method{predict}{gamljGlmMixedResults}(object, re.form = NULL, type = "response", ...)
+\method{predict}{gamljgmixedResults}(object, re.form = NULL, type = "response", ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj*Results`}
@@ -35,7 +36,7 @@ Returns predicted values from the estimated model
 }
 \examples{
 data('qsport')
-gmod<-gamlj::gamljGlm(
+gmod<-gamlj::gamlj_lm(
    formula = performance ~ hours,
    data = qsport)
  preds<-predict(gmod)
