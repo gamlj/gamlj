@@ -7,15 +7,22 @@
 gamlj_gmixed(
   formula = NULL,
   data = NULL,
+  model_type = "logistic",
   dep = NULL,
   factors = NULL,
   covs = NULL,
   model_terms = NULL,
   fixed_intercept = TRUE,
-  es = list("expb"),
-  expb_ci = TRUE,
+  cluster = cluster,
+  re = NULL,
+  re_corr = "all",
+  re_lrt = FALSE,
+  re_ci = FALSE,
   nested_terms = NULL,
   nested_intercept = NULL,
+  nested_re = NULL,
+  es = list("expb"),
+  expb_ci = TRUE,
   estimates_ci = FALSE,
   ci_method = "wald",
   boot_r = 1000,
@@ -44,21 +51,19 @@ gamlj_gmixed(
   ccp_value = 25,
   covs_scale_labels = "labels",
   adjust = list("bonf"),
-  model_type = "logistic",
   covs_scale = NULL,
   scale_missing = "complete",
-  norm_test = FALSE,
-  re = NULL,
-  nested_re = NULL,
-  re_corr = "all",
-  re_lrt = FALSE,
-  re_ci = FALSE
+  norm_test = FALSE
 )
 }
 \arguments{
 \item{formula}{(optional) the formula to use, see the examples}
 
 \item{data}{the data as a data frame}
+
+\item{model_type}{Select the generalized linear model:
+\code{logistic},\code{probit},\code{nb} for negative binomial
+\code{poisson},\code{multinomial}, \code{ordinal} for cumulative logit models.}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. Not needed if \code{formula} is used.}
@@ -74,13 +79,24 @@ terms. Not needed if \code{formula} is used.}
 
 \item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used
-and "1" is passed explicitly to the formula.}
+and "1" is passed explicitly to the formula.#'}
 
-\item{es}{Effect size indices. \code{expb} (default) exponentiates the
-coefficients. For dichotomous dependent variables relative risk indices
-(RR) can be obtained. \code{marginals} computes the marginal effects.}
+\item{cluster}{a vector of strings naming the clustering variables from
+\code{data}, not needed if \code{formula} is defined.}
 
-\item{expb_ci}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in table}
+\item{re}{a list of lists specifying the models random effects.}
+
+\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
+When random effects are passed as list of length 1, it decides whether the
+effects should be correlated,  non correlated. If \code{'re'} is a list of
+lists of length > 1, the option is automatially set to \code{'block'}. The
+option is ignored if the model is passed using \code{formula}.}
+
+\item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
+effects}
+
+\item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
+for the random effects}
 
 \item{nested_terms}{a list of character vectors describing effects terms
 for the nested model. It can be passed as right-hand formula.}
@@ -88,14 +104,22 @@ for the nested model. It can be passed as right-hand formula.}
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Not needed if \code{formula} is used.}
 
+\item{nested_re}{a list of lists specifying the models random effects.}
+
+\item{es}{Effect size indices. \code{expb} (default) exponentiates the
+coefficients. For dichotomous dependent variables relative risk indices
+(RR) can be obtained. \code{marginals} computes the marginal effects.}
+
+\item{expb_ci}{\code{TRUE} (default) or \code{FALSE} , exp(B) CI in table}
+
 \item{estimates_ci}{\code{TRUE}  or \code{FALSE} (default), parameters CI
 in table}
 
 \item{ci_method}{The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
 errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
 the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
-estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
-the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.}
+estimate. `quantile` performs a non-parametric boostrap, with \code{boot_r} repetitions, and compute
+the CI based on the percentiles of the boostrap distribution. \code{bcai} implements the bias-corrected bootstrap method.}
 
 \item{boot_r}{a number bootstrap repetitions.}
 
@@ -153,8 +177,8 @@ to estimate (of the form \code{'~x+x:z'})}
 
 \item{posthoc}{a rhs formula with the terms specifying the table to apply
 the comparisons (of the form \code{'~x+x:z'}). The formula is not expanded,
-so '\code{x*z}' becomes '\code{x+z' and not '}x+z+x:z\code{'. It can be
-passed also as a list of the form '}list("x","z",c("x","z")`'}
+so \code{'x*z'} becomes \code{'x+z'} and not \code{'x+z+x:z'}. It can be
+passed also as a list of the form '`list("x","z",c("x","z")`'}
 
 \item{simple_x}{The variable for which the simple effects (slopes)
 are computed}
@@ -184,10 +208,6 @@ to the variable orginal levels, before scaling.}
 \code{'holm'},\code{'scheffe'}, \code{'tukey'}; provide no,  Bonferroni,
 Tukey and Holm Post Hoc corrections respectively.}
 
-\item{model_type}{Select the generalized linear model:
-\code{logistic},\code{probit},\code{nb} for negative binomial
-\code{poisson},\code{multinomial}, \code{ordinal} for cumulative logit models.}
-
 \item{covs_scale}{a list of lists specifying the covariates scaling, one of
 \code{'centered to the mean'}, \code{'standardized'}, or \code{'none'}.
 \code{'none'} leaves the variable as it is}
@@ -196,25 +216,6 @@ Tukey and Holm Post Hoc corrections respectively.}
 
 \item{norm_test}{\code{TRUE} or \code{FALSE} (default), provide a test for
 normality of residuals}
-
-\item{re}{a list of lists specifying the models random effects.}
-
-\item{nested_re}{a list of lists specifying the models random effects.}
-
-\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
-When random effects are passed as list of length 1, it decides whether the
-effects should be correlated,  non correlated. If \code{'re'} is a list of
-lists of length > 1, the option is automatially set to \code{'block'}. The
-option is ignored if the model is passed using \code{formula}.}
-
-\item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
-effects}
-
-\item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
-for the random effects}
-
-\item{cluster}{a vector of strings naming the clustering variables from
-\code{data}, not necessary if \code{formula} is defined.}
 }
 \value{
 A results object containing:

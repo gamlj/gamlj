@@ -201,6 +201,15 @@ options:
           title: Profile 
         - name: quantile
           title: Bootstrap (Parametric)
+      description:
+          R: >
+            Method to compute the confidence intervals. It accepts `wald` for Wald method, `profile` for LL profiling method, `quantile` for bootstrap  method.
+          ui: >
+            The method used to compute the confidence intervals. 
+            Standard uses the Wald method to compute standard errors and confidence intervals.
+            Profile computes Profile Likelihood Based Confidence Interval, 
+            in which the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. 
+            Bootstrap performs parametric bootstrap, with Bootstrap rep repetitions.
     - name: boot_r
       title: Bootstrap rep.
       type: Number
@@ -208,7 +217,7 @@ options:
       default: 1000
       description:
           R: >
-            a number bootstrap repetitions.
+            a number for bootstrap repetitions.
 
     - name: ci_width
       title: Confidence level
@@ -517,10 +526,20 @@ options:
     - name: predicted
       title: Predicted
       type: Output            
+      description:
+          R: >
+            not present in R
+          ui: >
+            Saves the predicted values in the dataset
 
     - name: residuals
       title: Residuals
       type: Output            
+      description:
+          R: >
+            not present in R
+          ui: >
+            Saves the residuals values in the dataset
 
 
 ############ generic with some specs ###########
@@ -595,6 +614,8 @@ options:
       description:
           R: >
             Not present in R
+          ui: >
+            Remove all footnotes from the tables
 
 
 #!#!# #### specs here #####
