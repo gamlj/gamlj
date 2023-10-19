@@ -20,6 +20,9 @@ gFormula <- R6::R6Class(
     fixed_formula64 = function() {
       private$.buildfixed(tob64(self$dep), tob64(self$fixed))
     },
+    rhsfixed_formula=function() {
+         private$.rhsfixed(self$fixed)      
+    },
     random_formula = function() {
       alist<-private$.buildrandom(self$random, self$random_corr, "plain")
       if (is.something(alist))
@@ -58,7 +61,7 @@ gFormula <- R6::R6Class(
       if (is.something(obj$fixed)) {
         full <- lapply(self$fixed,sort)
         nested   <- lapply(obj$fixed,sort)
-        return(private$.buildfixed(self$dep, setdiff(full, nested)))
+        return(private$.buildfixed(NULL, setdiff(full, nested)))
       }
     },
     nested_tested_random = function(obj) {
@@ -199,7 +202,10 @@ gFormula <- R6::R6Class(
     .buildfixed = function(dep, terms) {
       gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(dep, terms)))
     },
-
+    .rhsfixed = function(terms) {
+      gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(NULL,terms)))
+    },
+    
     .buildrandom = function(terms, correl, encoding) {
       
             .intercept <- "Intercept"
@@ -238,51 +244,6 @@ gFormula <- R6::R6Class(
             })
             return(alist)
             
-    },
-    .buildrandomx = function(terms, correl, encoding) {
-      
-      if (!is.something(terms)) {
-        return()
-      }
-
-      # remove empty sublists
-      terms <- alist[sapply(terms, function(a) !is.null(unlist(a)))]
-      
-      rterms <- ""
-      for (i in seq_along(terms)) {
-        .intercept <- "Intercept"
-        .one <- terms[[i]]
-        if (encoding == "b64") {
-          .one <- tob64(.one)
-          .intercept <- tob64(.intercept)
-        }
-        flatterms <- lapply(.one, function(x) c(jmvcore::composeTerm(head(x, -1)), tail(x, 1)))
-        res <- do.call("rbind", flatterms)
-        ### check blocks coherence
-        if (length(unique(res[, 2])) > 1 && correl == "block") {
-          stop("Correlated random effects by block should have the same cluster variable within each block. Please specify different blocks for random coefficients with different clusters.")
-        }
-        res <- tapply(res[, 1], res[, 2], paste)
-        res <- sapply(res, function(x) paste(x, collapse = " + "))
-
-        ### deal with intercept ###
-        
-        for (i in seq_along(res)) {
-          test <- grep(.intercept, res[[i]], fixed = TRUE)
-          if (is.something(test)) {
-            res[[i]] <- gsub(.intercept, 1, res[[i]])
-          } else {
-            res[[i]] <- paste("0 + ", res[[i]])
-          }
-        }
-        ### compose ####
-        form <- paste(res, names(res), sep = " | ")
-        form <- paste("(", form, ")")
-        rterms <- paste(rterms, form, sep = "+ ")
-      }
-      ## paste and return
-      rterms <- trimws(paste(rterms, collapse = ""))
-      return(rterms)
     },
     .composeRandom=function(term) {
       w<-which(term=="Intercept")

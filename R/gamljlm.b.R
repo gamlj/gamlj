@@ -250,17 +250,31 @@ gamljlmClass <- R6::R6Class(
 
 .formula=function() {
   
-  private$.runner_machine$formula
+  if (!is.something(private$.runner_machine$formulaobj))
+    return()
+  
+  private$.runner_machine$formulaobj$formula()
   
 },
 
 
 .sourcifyOption = function(option) {
 
-  skip<-c("modelTerms","factors","covs","dep")
-  defaults<-c(scaling="centered",contrasts="simple")
+ 
+  defaults<-c(covs_scale="centered",contrasts="simple")
   
-  if (option$name %in% skip)
+  if (option$name=="nested_terms") {
+    if (self$options$comparison)
+            if (!is.something(option$value)) {
+              if (self$options$nested_intercept)
+                return("nested_terms= ~1")
+              else
+                return("nested_terms= ~0")
+            }
+         
+  }
+
+  if (option$name %in% NO_R_OPTS)
      return('')
  sourcifyOption(option,defaults)
 

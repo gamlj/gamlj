@@ -23,7 +23,11 @@ NO_R_OPTS<-c(
             "donotrun",
             "comparison",
             "re_modelterms",
-            "re_listing"
+            "re_listing",
+            "re_nestedclusters",
+            "re_crossedclusters",
+            "re_corr"
+            
            )
 
 

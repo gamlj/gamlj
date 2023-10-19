@@ -263,7 +263,7 @@ gamlj_glm <- function(
     nested_terms <- f$terms
   }
 
-  if (is.something(nested_terms) | !is.null(nested_intercept)) {
+  if (is.something(nested_terms) || !is.null(nested_intercept)) {
     comparison <- TRUE
   }
 
