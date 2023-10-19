@@ -2,10 +2,7 @@
 % Please edit documentation in R/gamljglm.f.R
 \name{gamlj_glm}
 \alias{gamlj_glm}
-\title{Generalized Linear Model with options to estimate logistic, probit, 
-ordinal, multinomial and custum link function models. Provides options
-to estimate posthoc, simple effects and slopes, plots of main effects and
-interaction. Model comparison is also an option.}
+\title{Generalized Linear Model}
 \usage{
 gamlj_glm(
   formula = NULL,
@@ -21,7 +18,6 @@ gamlj_glm(
   custom_family = "gaussian",
   custom_link = "identity",
   nested_terms = NULL,
-  comparison = FALSE,
   omnibus = "LRT",
   estimates_ci = FALSE,
   ci_method = "wald",
@@ -94,8 +90,6 @@ fixed intercept. Not needed if \code{formula} is used.}
 
 \item{nested_terms}{a list of character vectors describing effects terms
 for nested model. It can be passed as right-hand formula.}
-
-\item{comparison}{Not present in R}
 
 \item{omnibus}{Whether the omnibus test for the model should be \code{wald} or \code{LRT}.}
 

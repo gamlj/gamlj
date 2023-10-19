@@ -240,8 +240,7 @@ gamljglmClass <- R6::R6Class(
 .sourcifyOption = function(option) {
   
   skip<-c("model_terms","factors","covs","dep")
-  defaults<-c(scaling="centered",contrasts="simple")
-  
+  defaults<-c(covs_scale="centered",contrasts="simple")
   if (option$name %in% skip)
     return('')
   sourcifyOption(option,defaults)

@@ -10,10 +10,16 @@ gamlj_mixed(
   dep = NULL,
   factors = NULL,
   covs = NULL,
+  cluster = NULL,
   model_terms = NULL,
+  re = NULL,
+  reml = TRUE,
+  re_lrt = FALSE,
+  re_ci = FALSE,
   fixed_intercept = TRUE,
   nested_terms = NULL,
   nested_intercept = NULL,
+  nested_re = NULL,
   omnibus = "LRT",
   estimates_ci = TRUE,
   ci_method = "wald",
@@ -46,12 +52,6 @@ gamlj_mixed(
   dep_scale = "none",
   scale_missing = "complete",
   norm_test = FALSE,
-  cluster = NULL,
-  re = NULL,
-  nested_re = NULL,
-  reml = TRUE,
-  re_lrt = FALSE,
-  re_ci = FALSE,
   df_method = "Satterthwaite",
   norm_plot = FALSE,
   qq_plot = FALSE,
@@ -75,8 +75,22 @@ variable must be numeric. Not needed if \code{formula} is used.}
 \item{covs}{a vector of strings naming the covariates from \code{data}. Not
 needed if \code{formula} is used.}
 
+\item{cluster}{a vector of strings naming the clustering variables from
+\code{data}. Not necessary if \code{formula} is defined.}
+
 \item{model_terms}{a list of character vectors describing fixed effects
 terms. Not needed if \code{formula} is used.}
+
+\item{re}{a list of lists specifying the models random effects.}
+
+\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
+be used rather than ML}
+
+\item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
+effects}
+
+\item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
+for the random effects}
 
 \item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Overridden if \code{formula} is used and contains \code{~1} or \code{~0}.}
@@ -85,7 +99,9 @@ fixed intercept. Overridden if \code{formula} is used and contains \code{~1} or 
 for nestet. It can be passed as right-hand formula.}
 
 \item{nested_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
-fixed intercept. Not needed if \code{formula} is used.}
+fixed intercept. Not needed if \code{nested_terms} is used.}
+
+\item{nested_re}{a list of lists specifying the models random effects.}
 
 \item{omnibus}{\code{TRUE} (default) or \code{FALSE}, estimates fixed
 intercept. Not needed if \code{formula} is used.}
@@ -189,22 +205,6 @@ Tukey and Holm Post Hoc corrections respectively.}
 
 \item{norm_test}{\code{TRUE} or \code{FALSE} (default), provide a test for
 normality of residuals}
-
-\item{cluster}{a vector of strings naming the clustering variables from
-\code{data}. Not necessary if \code{formula} is defined.}
-
-\item{re}{a list of lists specifying the models random effects.}
-
-\item{nested_re}{a list of lists specifying the models random effects.}
-
-\item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
-be used rather than ML}
-
-\item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
-effects}
-
-\item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
-for the random effects}
 
 \item{df_method}{The method for computing the denominator degrees of
 freedom and F-statistics. "Satterthwaite" (default) uses Satterthwaite’s

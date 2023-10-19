@@ -1,5 +1,5 @@
-j_DEBUG <- F
-j_INFO  <- F
+j_DEBUG <- T
+j_INFO  <- T
 t_INFO  <- F
 
 #### Helper functions used by Scaffold (not exported)
@@ -114,6 +114,8 @@ sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
   }
   ''
 }
+
+
 .sourcifyOption.OptionVariables<-function(option,def=NULL) {
   
   if (is.null(option$value))
@@ -127,8 +129,11 @@ sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
     return(paste0(option$name,"=c(",paste0(values,collapse = ","),")"))
 }
   
-.sourcifyOption.OptionTerms<-function(option,def=NULL)
-     .sourcifyOption.default(option,def)
+.sourcifyOption.OptionTerms<-function(option,def=NULL) {
+  mark("source terms",option$name)
+  .sourcifyOption.default(option,def)
+  
+}
   
 .sourcifyOption.OptionArray<-function(option,def=NULL) {
   alist<-option$value

@@ -626,6 +626,7 @@ children:
                   type: TermLabel
   - type: CollapseBox
     label: Options
+    name: panel_options
     style: list
     collapsed: true
     stretchFactor: 1

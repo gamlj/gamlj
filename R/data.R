@@ -88,7 +88,9 @@ NULL
 #' data(glmmixeddata)
 NULL
 
-#'       Generated data to test different types of linear models. The variables can be used as:
+#' Many GMixed Models Data
+#'
+#' Generated data to test different types of linear models. The variables can be used as:
 #'       
 #'       `x` and `z` as two continuous independent variables; 
 #'       
@@ -107,6 +109,8 @@ NULL
 NULL
 
 
+#' Many Mixed Models
+#'
 #'       Generated data to test different types of linear models with clustered data. 
 #'       The variables can be used as:
 #'       

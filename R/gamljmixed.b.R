@@ -275,27 +275,32 @@ gamljmixedClass <- R6::R6Class(
 
 
 .formula=function() {
+
+  if (!is.something(private$.runner_machine$formulaobj))
+    return()
   
-  private$.runner_machine$formula
+  private$.runner_machine$formulaobj$formula()
   
 },
 
 .sourcifyOption = function(option) {
-
-
-  if (option$name=="nested_re") 
-          return('')
-
-  if (option$name=="nested_terms") 
-      return('')
   
-  if (option$name=="comparison") 
-        if (self$options$comparison) {
-            form<-stats::as.formula(fromb64(private$.runner_machine$nested_formula64))  
-            return(paste0("nested_model = ",deparse(form)))
-        }
+  if (self$options$donotrun)
+      return('')
 
-
+  if (option$name=="nested_terms") {
+    if (self$options$comparison)
+      return(paste("nested_terms =", private$.runner_machine$nestedformulaobj$rhsfixed_formula()))
+  }
+      
+  
+  if (option$name=="nested_re") {
+    if (self$options$comparison) {
+       return(paste("nested_re = ~", private$.runner_machine$nestedformulaobj$random_formula()))
+    } else 
+        return("")
+  }
+      
   defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
   if (option$name %in% NO_R_OPTS)
      return('')

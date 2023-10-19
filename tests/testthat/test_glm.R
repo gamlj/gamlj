@@ -16,7 +16,9 @@ mod1 <- GAMLj3::gamlj_glm(
   factors = "honors",
   covs = "write",
   model_terms = ~ write + honors + honors:write
+  
 )
+
 
 mod2 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write * honors,

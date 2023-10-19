@@ -29,7 +29,7 @@
 #' @param nested_terms a list of character vectors describing effects terms
 #'   for nestet. It can be passed as right-hand formula.
 #' @param nested_intercept \code{TRUE} (default) or \code{FALSE}, estimates
-#'   fixed intercept. Not needed if \code{formula} is used.
+#'   fixed intercept. Not needed if \code{nested_terms} is used.
 #' @param omnibus \code{TRUE} (default) or \code{FALSE}, estimates fixed
 #'   intercept. Not needed if \code{formula} is used.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
@@ -173,10 +173,16 @@ gamlj_mixed <- function(
     dep = NULL,
     factors = NULL,
     covs = NULL,
+    cluster = NULL,
     model_terms = NULL,
+    re = NULL,
+    reml = TRUE,
+    re_lrt = FALSE,
+    re_ci = FALSE,
     fixed_intercept = TRUE,
     nested_terms = NULL,
     nested_intercept = NULL,
+    nested_re =NULL,
     omnibus = "LRT",
     estimates_ci = TRUE,
     ci_method = "wald",
@@ -209,12 +215,6 @@ gamlj_mixed <- function(
     dep_scale = "none",
     scale_missing = "complete",
     norm_test = FALSE,
-    cluster = NULL,
-    re = NULL,
-    nested_re =NULL,
-    reml = TRUE,
-    re_lrt = FALSE,
-    re_ci = FALSE,
     df_method = "Satterthwaite",
     norm_plot = FALSE,
     qq_plot = FALSE,
@@ -298,11 +298,11 @@ gamlj_mixed <- function(
     nested_intercept<-f$intercept
     nested_terms <-f$terms
   }
-  
-
+  print(nested_re)
   if (inherits(nested_re, "formula")) {
     f<-rFormula$new(nested_re)
     nested_re=f$random
+   
   }
   
   if (is.something(nested_terms) || !is.null(nested_intercept) || is.something(nested_re))
@@ -390,4 +390,5 @@ gamlj_mixed <- function(
   
   analysis$results
 }
+
 

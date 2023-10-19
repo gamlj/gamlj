@@ -1,4 +1,5 @@
-#'
+#' Generalized Linear Model
+#' 
 #' Generalized Linear Model with options to estimate logistic, probit, 
 #' ordinal, multinomial and custum link function models. Provides options
 #' to estimate posthoc, simple effects and slopes, plots of main effects and
@@ -36,7 +37,6 @@
 #'   fixed intercept. Not needed if \code{formula} is used.
 #' @param nested_terms a list of character vectors describing effects terms
 #'   for nested model. It can be passed as right-hand formula.
-#' @param comparison Not present in R
 #' @param omnibus Whether the omnibus test for the model should be \code{wald} or \code{LRT}.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
 #'   in tables
@@ -161,7 +161,6 @@ gamlj_glm <- function(
     custom_family = "gaussian",
     custom_link = "identity",
     nested_terms = NULL,
-    comparison = FALSE,
     omnibus = "LRT",
     estimates_ci = FALSE,
     ci_method = "wald",
@@ -264,7 +263,7 @@ gamlj_glm <- function(
     nested_terms <- f$terms
   }
 
-  if (is.something(nested_terms) | !is.null(nested_intercept)) {
+  if (is.something(nested_terms) || !is.null(nested_intercept)) {
     comparison <- TRUE
   }
 

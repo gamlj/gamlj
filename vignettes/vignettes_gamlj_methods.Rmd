@@ -1,0 +1,237 @@
+---
+title: "Examples of GAMLj Methods"
+author: Marcello Gallucci
+date: '`r Sys.Date()`'
+output: 
+  
+     rmarkdown::html_vignette:
+          css: style.css
+     html_document:
+         includes:
+            in_header: ganalytics.txt
+         toc: true
+         toc_float:
+             collapsed: false
+         css: style.css
+vignette: >
+  %\VignetteIndexEntry{Examples of gamlj_lm()}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "",
+  fig.align = "center",
+  fig.height = 4,
+  fig.width = 6
+)
+options(digits=3)
+
+```
+
+```{r setup}
+library(GAMLj3)
+```
+
+# Linear models in GAMLj
+
+In this example we run a logistic model using the file `data(manymodels)` and show the standard R commands such as `summary()`, `print()` and some additional commands that can be applied to a GAMLj object to extract relevant information.
+
+# Estimating the model
+
+
+We use GAMLj `gamlj_glm()` function to estimate a logistic model with variable `manymodels$ybin` as dependent variable, a continuous covariate `manymodels$x` and  two categorical factors,`manymodels$cat2` and `manymodels$cat3`. We add also the independent variables interaction.
+
+```{r warning=FALSE, message=F,results='hide'}
+manymodels$ybin<-factor(manymodels$ybin)
+manymodels$cat2<-factor(manymodels$cat2)
+manymodels$cat3<-factor(manymodels$cat3)
+manymodels$x<-as.numeric(manymodels$x)
+
+mod1<-gamlj_glm(formula = ybin~x*cat3*cat2, data=manymodels,model_type = "logistic")
+
+```
+
+```{r warning=FALSE, message=F}
+mod1
+```
+
+## Extracting tables
+
+The model is pretty printed, and the returned object is a R6 class object containing all tables and functions required to manipulate the results. For instance, the `Omnibus tests` table can be assessed with
+
+```{r warning=FALSE, message=F}
+mod1$main$anova
+```
+
+If a table is required to be in R dara.frame format (for using in other code, for instance), one can obtain it as follows:
+
+```{r warning=FALSE, message=F}
+df<-mod1$main$anova$asDF
+class(df)
+df
+
+```
+
+If all tables are required as R data.frame, one can use the command `summary()`
+
+```{r warning=FALSE, message=F}
+summary(mod1)
+```
+
+Summary returns a list of data.frame, so the data.frame of particular table can be easely accessed by its position in the list.
+
+```{r warning=FALSE, message=F}
+mysum<-summary(mod1)
+mysum[[4]]
+
+```
+
+## Getting data
+
+GAMLj operates a series of data transformations before estimating the models, such as setting the contrasts for factors, centering or standardizing the variables, and so on. The command `get_data()` allows the users  to access the processed data.
+
+```{r warning=FALSE, message=F}
+df<-get_data(mod1)
+head(df)
+contrasts(manymodels$cat3)
+contrasts(df$cat3)
+```
+
+## Other types of information
+
+GAMLj results objects respond to a series of R standard commands
+
+### Coefficients
+
+```{r warning=FALSE, message=F}
+coef(mod1)
+```
+
+### Predicted values
+
+```{r warning=FALSE, message=F}
+preds<-predict(mod1)
+head(preds)
+```
+
+### Residuals values
+
+```{r warning=FALSE, message=F}
+res<-residuals(mod1)
+head(res)
+```
+
+
+## GAMLj additional R commands
+
+Other commands are available. For all of them, if the command is passed without arguments, the command search the required results in the GAMLj object. If the results are not available, FALSE is returned.  For instance, the model we estimated has results tables regarding the model fit, so the command  `fit()` returns them.
+
+```{r warning=FALSE, message=F}
+fit(mod1)
+```
+
+On the other hand, the model does not have results regarding post-hoc tests (they were not required in the first run), so the command `posthoc()` returns FALSE.
+
+```{r warning=FALSE, message=F,results='hide'}
+ph<-posthoc(mod1)
+```
+```{r warning=FALSE, message=F}
+ph
+```
+
+However, one can pass the options required to obtain the results to the command as one would do to the estimation command. For instance, to obtain the post-hoc tests in the example, one can issue:
+
+
+```{r warning=FALSE, message=F,results='hide',eval=FALSE}
+posthoc(mod1,posthoc= ~cat3)
+```
+
+```{r warning=FALSE, message=F,echo=FALSE,results='hide'}
+ph<-posthoc(mod1,posthoc= ~cat3)
+```
+
+```{r warning=FALSE, message=F,echo=FALSE}
+ph
+```
+
+
+or equivalently
+
+```{r warning=FALSE, message=F,results='hide',eval=FALSE}
+posthoc(mod1,posthoc= "cat3")
+```
+
+```{r warning=FALSE, message=F,echo=FALSE,results='hide'}
+ph<-posthoc(mod1,posthoc= "cat3")
+```
+
+```{r warning=FALSE, message=F,echo=FALSE}
+ph
+```
+
+
+Notice that the GAMLj R commands accept their arguments (variables or terms involved) either as a formula or as a list. Furthermore, any other option accepted by the estimation command can be passed to the commands.
+
+Here are the specific commands:
+
+## Post-Hoc
+
+Accepts:
+
+* **formula**: a RHS formula specify the variables to be tested, such as `~cat3`, or `cat3:cat4` for combinations of levels.
+* **posthoc**: a vector of variables name (`posthoc="cat3"`) or a list of vectors, where vectors of length > 1 referes to interactions, such as  `posthoc(mod1,posthoc=list(c("cat3","cat2")))`. 
+
+
+## Simple Effects
+
+```{r warning=FALSE, message=F,results='hide',eval=FALSE}
+simple_effects(mod1,formula = ~x:cat3)
+```
+
+```{r warning=FALSE, message=F,echo=FALSE,results='hide'}
+se<-simple_effects(mod1,formula = ~x:cat3)
+```
+
+```{r warning=FALSE, message=F,echo=FALSE}
+se
+```
+
+
+Accepts:
+
+* **formula**: a RHS formula specify the variables to be tested, such as  `~x:cat3`, where the first term is the simple effect variable and the second is the moderator.
+* **simple_x**: a variable for which the effects are required
+* **simple_mod**: a variable or a vectors of moderators
+
+## anova
+
+```{r warning=FALSE, message=F}
+anova(mod1)
+
+```
+
+When a single model is passed, it returns the model fit tables. If two models are passed as arguments, the model comparison tests are returned.
+
+
+```{r warning=FALSE, message=F,results='hide'}
+mod1<-gamlj_glm(formula = ybin~x*cat3*cat2, data=manymodels,model_type = "logistic")
+mod2<-gamlj_glm(formula = ybin~x+cat3+cat2, data=manymodels,model_type = "logistic")
+anova(mod1,mod2)
+
+```
+
+
+```{r warning=FALSE, message=F,echo=FALSE,results='hide'}
+an<-anova(mod1,mod2)
+```
+
+```{r warning=FALSE, message=F,echo=FALSE}
+an
+```
+
+[back to top](#linear-models-in-gamlj)
