@@ -123,7 +123,7 @@ model<-GAMLj3::gamlj_mixed(
   plot_re = T,
   re_lrt=T  
 )
-
+model
 
 testthat::test_that("ranova works", {
                     testthat::expect_equal(model$main$ranova$asDF[2,2],6)

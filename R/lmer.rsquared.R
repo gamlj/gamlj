@@ -37,8 +37,6 @@ r.squared.merMod <- function(mdl){
     sapply(
       lme4::VarCorr(mdl)[!sapply(unique(unlist(strsplit(names(lme4::ranef(mdl)),":|/"))), function(l) length(unique(mdl@frame[,l])) == nrow(mdl@frame))],
       function(Sigma) {
-        print(Sigma)
-        print(rownames(Sigma))
         X <- stats::model.matrix(mdl)
         Z <- X[,rownames(Sigma)]
         sum(diag(Z %*% Sigma %*% t(Z)))/nrow(X) } ) )

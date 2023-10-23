@@ -300,7 +300,7 @@ gamlj_mixed <- function(
     nested_intercept<-f$intercept
     nested_terms <-f$terms
   }
-  print(nested_re)
+
   if (inherits(nested_re, "formula")) {
     f<-rFormula$new(nested_re)
     nested_re=f$random

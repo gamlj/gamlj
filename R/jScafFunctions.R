@@ -130,7 +130,6 @@ sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
 }
   
 .sourcifyOption.OptionTerms<-function(option,def=NULL) {
-  mark("source terms",option$name)
   .sourcifyOption.default(option,def)
   
 }
