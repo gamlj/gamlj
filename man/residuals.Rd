@@ -33,7 +33,7 @@ Returns residuals values from the estimated model
 }
 \examples{
 data('qsport')
-gmod<-gamlj::gamlj_lm(
+gmod<-GAMLj3::gamlj_lm(
    formula = performance ~ hours,
    data = qsport)
  preds<-residuals(gmod)

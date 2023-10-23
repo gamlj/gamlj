@@ -1,5 +1,5 @@
-j_DEBUG <- T
-j_INFO  <- T
+j_DEBUG <- F
+j_INFO  <- F
 t_INFO  <- F
 
 #### Helper functions used by Scaffold (not exported)
@@ -130,7 +130,6 @@ sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
 }
   
 .sourcifyOption.OptionTerms<-function(option,def=NULL) {
-  mark("source terms",option$name)
   .sourcifyOption.default(option,def)
   
 }

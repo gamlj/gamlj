@@ -51,6 +51,12 @@ testthat::test_that("updating", {
 })
 
 
+obj<-GAMLj3::gamlj_lm(
+  formula = performance ~ hours+type,
+  posthoc = ~type,
+  data = qsport)
+
+
 data("hsbdemo")
 
 mod<-GAMLj3::gamlj_glm(
@@ -90,29 +96,15 @@ testthat::test_that("Mixed dots work", {
 })
 
 
-data("schoolexam")
-schoolexam$school<-factor(schoolexam$school)
-mod<-GAMLj3::gamlj_mixed(
-  formula = pass ~ 1 + math+( 1 | school ),
-  data = schoolexam,
-  plot_x = math,
-  ci_method = "wald")
+data("clustermanymodels")
 
-preds<-predict(mod)
-n<-dim(GAMLj3::get_data(mod))[1]
-testthat::test_that("glmixed predict", {
-  testthat::expect_equal(round(mean(preds),2),0.51)
-  testthat::expect_equal(n,5041)
-  
-})
-
-
-
+clustermanymodels$ybin<-factor(clustermanymodels$ybin)
+clustermanymodels$cluster<-factor(clustermanymodels$cluster)
 
 mod1<-GAMLj3::gamlj_mixed(
-  formula = formula("pass ~ 1 + math+( 1 | school )"),
-  data = schoolexam,
-  plot_x = math,
+  formula = ycont~ 1 + x+( 1 | cluster ),
+  data = clustermanymodels,
+  plot_x = x,
   ci_method = "wald")
 
 
@@ -248,7 +240,7 @@ testthat::test_that("glm get model ", {
 
 
 
-se<-simple_effects(mod1,simple_x="write",simple_mods="honors")
+se<-GAMLj3::simple_effects(mod1,simple_x="write",simple_mods="honors")
 res<-se$anova$asDF
 testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,2],2),6.64)
@@ -270,3 +262,10 @@ testthat::test_that("test scaling works ", {
   testthat::expect_equal(res,-0.214873,tol=.001)
 })
 
+
+data<-GAMLj3::get_data(mod)
+
+testthat::test_that("get_data works ", {
+  testthat::expect_equal(dim(data)[1],200)
+  testthat::expect_equal(names(data)[1],"schtyp")
+})

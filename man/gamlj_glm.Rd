@@ -60,7 +60,7 @@ model terms should be defined as a list in  \code{model_terms} option.}
 
 \item{model_type}{define the type of model (link function and distribution combination) required.
 It can be \code{linear}, \code{poisson}, \code{poiover}, \code{nb},
-\code{logistic}, \code{probit}, \code{custom}, \code{ordinal}, \code{multinomial}}
+\code{logistic}, \code{probit}, \code{custom}, \code{ordinal}, \code{multinomial}, and \code{beta}.}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. Not needed if \code{formula} is used.}
@@ -239,7 +239,7 @@ interaction. Model comparison is also an option.
 }
 \examples{
    data <- emmeans::neuralgia
-   gamlj::gamlj_glm(formula = Pain ~ Duration,
+   GAMLj3::gamlj_glm(formula = Pain ~ Duration,
                     data = data,
                     model_type = "logistic"
                     )

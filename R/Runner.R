@@ -692,7 +692,7 @@ estimate_lmer<-function(...) {
   reml<-opts$reml
   
   for (opt in opts$optimizers) {
-            model = lmerTest::lmer(formula=as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
+            model = lmerTest::lmer(formula=stats::as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
             if (mf.converged(model))
             break()
   }
@@ -709,9 +709,9 @@ estimate_lme<-function(...) {
   model = nlme::lme(fixed=opts$fixed, 
                       random=opts$random,
                       data=data,method=opts$method,
-                      correlation=do.call(opts$cor,list(form=formula(opts$form)))
+                      correlation=do.call(opts$cor,list(form=stats::formula(opts$form)))
                       )
-   model$call$correlation<-do.call(opts$cor,list(form=formula(opts$form)))  
+   model$call$correlation<-do.call(opts$cor,list(form=stats::formula(opts$form)))  
    model$call$fixed<-opts$fixed
    model$call$random<-opts$random
    model$call$method<-opts$method

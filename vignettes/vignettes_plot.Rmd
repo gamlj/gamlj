@@ -39,7 +39,7 @@ library(GAMLj3)
 
 # Obtaining a plot
 
-`gamlj` functions (`gamlj_lm()`,`gamlj_glm()`,`gamlj_mixed()` and `gamlj_gmixed()`) can produce plots including up to three variables. The plots portrait the model predicted values in the Y-axis. Using the functions, one can obtain the plots by using the following options:
+`GAMLj` functions (`gamlj_lm()`,`gamlj_glm()`,`gamlj_mixed()` and `gamlj_gmixed()`) can produce plots including up to three variables. The plots portrait the model predicted values in the Y-axis. Using the functions, one can obtain the plots by using the following options:
 
 * `plot_x` the variable in the X-axis
 * `plot_z` the moderator variable, whose levels define the traces (separated lines)
@@ -154,13 +154,12 @@ In case of multiple plots produced, the ggplot objects are contained in a list r
 All model functions in GAMLj, (`gamlj_lm()`,`gamlj_glm()`,`gamlj_mixed()` and `gamlj_gmixed()`), can produce plots using the options and functions described above. Here an example with a generalized (logistic) mixed model in which we plot the fixed and random effects predicted values.
 
 ```{r warning=FALSE, message=FALSE, results='hide'}
-data("schoolexam")
-schoolexam$school<-factor(schoolexam$school)
-schoolexam$pass<-factor(schoolexam$pass)
+data("clustermanymodels")
+clustermanymodels$ybin<-factor(clustermanymodels$ybin)
 
-mod3<-gamlj_gmixed(formula=pass~math+(1|school),data=schoolexam)
+mod3<-gamlj_gmixed(formula=ybin~z+(1+z|cluster),data=clustermanymodels)
 
-p<-plot(mod3, plot_x = "math",plot_re=T)
+p<-plot(mod3, plot_x = "z",plot_re=T)
 ```
 
 ```{r warning=FALSE, message=FALSE, echo=FALSE}

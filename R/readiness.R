@@ -13,7 +13,7 @@ readiness <- function(options) {
 if(!is.something(options$dep)) {
     result$ready <- FALSE
     result$report <- TRUE
-    result$reason <- glue::glue("Please select the dependent variable")
+    result$reason <- "Please select the dependent variable"
     return(result)
 } 
 
@@ -22,7 +22,7 @@ if(!is.something(options$dep)) {
     {
       result$ready <- FALSE
       result$report <- TRUE
-      result$reason <- glue::glue("Please select a cluster variable")
+      result$reason <- "Please select a cluster variable"
       return(result)
     } 
   
@@ -32,7 +32,7 @@ if(!is.something(options$dep)) {
        {
          result$ready <- FALSE
          result$report <- TRUE
-         result$reason <- glue::glue("Please define the random coefficients")
+         result$reason <- "Please define the random coefficients"
          return(result)
        } 
   }

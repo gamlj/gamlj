@@ -29,14 +29,15 @@ simple effects tables already in the model results (if any). If new tests are de
 are returned.
 }
 \examples{
-data(winkel)
+data(wicksell)
 wicksell$time<-factor(wicksell$time)
 wicksell$group<-factor(wicksell$group) 
-gmod<-gamlj::gamljmixed(
+wicksell$subj<-factor(wicksell$subj) 
+gmod<-GAMLj3::gamlj_mixed(
    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
    data = wicksell)
 
-simpleEffects(gmod,formula =~time:group)
+simple_effects(gmod,formula =~time:group)
 }
 \author{
 Marcello Gallucci

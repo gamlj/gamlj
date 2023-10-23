@@ -3,7 +3,6 @@ testthat::context("model comparisons")
 tol=.001
 data("clustermanymodels")
 data<-clustermanymodels
-str(data)
 data$cluster<-factor(data$cluster)
 data$cat2<-factor(data$cat2)
 data$cat3<-factor(data$cat3)

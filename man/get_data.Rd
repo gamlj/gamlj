@@ -9,6 +9,8 @@ get_data(object, ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj*Results`}
+
+\item{...}{additional arguments passed to the GAMLj estimation function}
 }
 \value{
 a dataset
@@ -20,9 +22,9 @@ models with other R packages with the same setup used by GAMLj
 }
 \examples{
 data('qsport')
-gmod<-gamlj::gamlj_lm(formula = performance ~ hours,
+gmod<-GAMLj3::gamlj_lm(formula = performance ~ hours,
                 data = qsport,
-                scaling = c(hours='standardized'))
+                covs_scale = c(hours='standardized'))
 
 gdata<-get_data(gmod)
 lm(performance ~ hours,data=gdata)

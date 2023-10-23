@@ -14,7 +14,7 @@ output:
              collapsed: false
          css: style.css
 vignette: >
-  %\VignetteIndexEntry{Examples of gamlj_lm()}
+  %\VignetteIndexEntry{Examples of GAMLj Methods}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

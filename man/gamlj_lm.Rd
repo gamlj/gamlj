@@ -269,5 +269,5 @@ analysis, effect size indexes and visualization of the results.
 }
 \examples{
 data('ToothGrowth')
-gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
+GAMLj3::gamlj_lm(formula = len ~ supp,  data = ToothGrowth)
 }

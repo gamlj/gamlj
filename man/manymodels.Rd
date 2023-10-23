@@ -3,12 +3,12 @@
 \docType{data}
 \name{manymodels}
 \alias{manymodels}
-\title{Many GMixed Models Data}
+\title{Many Models Data}
 \usage{
 data(manymodels)
 }
 \description{
-Generated data to test different types of linear models. The variables can be used as:
+Generated data to test linear models. The variables can be used as:
       
       `x` and `z` as two continuous independent variables; 
       
