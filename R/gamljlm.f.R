@@ -35,7 +35,9 @@
 #'   table
 #' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
 #'   confidence interval width for the plots.
-#' @param ci_method .
+#' @param ci_method the method to compute the confidence intervals. It can be `wald` (default) for
+#'        large samples confidence intervals, `quantile` for percentile bootstrap method, or `bcai`
+#'        for bias corrected accelarated method.
 #' @param boot_r a number bootstrap repetitions.
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of

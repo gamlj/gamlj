@@ -20,7 +20,7 @@ posthoc(object, ...)
 It has prevalence on other options defining a post-hoc test via character options.}
 }
 \value{
-an object of class
+a list of tables of class `ResultsElement`
 }
 \description{
 This is a convenience function to re-estimates a GAMLj model adding posthoc tests. If no option is passed, extracts the 

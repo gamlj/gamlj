@@ -2,7 +2,7 @@
 % Please edit documentation in R/rinterface.R
 \name{anova.gamlj}
 \alias{anova.gamlj}
-\title{anova test on GAMLj results}
+\title{anova tests in GAMLj results}
 \usage{
 \method{anova}{gamlj}(object, object2, ...)
 }
@@ -15,7 +15,7 @@ It can be passed also as a a right-hand side formula specifying terms of the nes
 \item{...}{all options accepted by a gamlj model function.}
 }
 \value{
-an object of class ggplot or a list of ggplot objects
+a list of tables of class `ResultsElement`
 }
 \description{
 This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no option is passed, extracts the 
@@ -30,7 +30,7 @@ gmod<-GAMLj3::gamlj_lm(
   formula = Score ~Group,
   data = fivegroups)
 
-posthoc(gmod,formula =~Group)
+anova(gmod)
 }
 \author{
 Marcello Gallucci
