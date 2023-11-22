@@ -408,7 +408,6 @@ procedure.emmeans<-function(obj) {
     ### now we get the estimated means #######
     referenceGrid<-do.call(emmeans::emmeans,opts_list)
     tableData<-as.data.frame(referenceGrid)
-
     ### rename the columns ####
     names(tableData)<-c(term64,"estimate","se","df","est.ci.lower","est.ci.upper")
 
@@ -452,7 +451,6 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   variable<-obj$options$simple_x
   variable64<-tob64(variable)
   varobj<-obj$datamatic$variables[[variable64]]
-  
   term<-obj$options$simple_mods
 
   term64<-tob64(term)
@@ -514,9 +512,10 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       
     }
     
-    
+
     grid<-.get_se(opts_list)
     estimates<-as.data.frame(grid)
+
     ## deal with  CI
     .transnames<-list("ci.lower"=c("asymp.LCL","CI_low","lower.CL"),
                      "ci.upper"=c("asymp.UCL","CI_high","upper.CL"))
@@ -582,8 +581,8 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
     if (is.something(.issues))
       obj$warning<-list(topic="simpleEffects_anova",message=paste("Variable",paste(fromb64(.issues),collapse = ","),"is included in the simple effects analysis but it does not appear in any interaction"))
-    
-    if (.anova$df2==Inf) {
+
+    if (any(.anova$df2==Inf)) {
         attr(.anova,"titles")<-list(test=letter_chi2,df1="df")
         attr(.params,"titles")<-list(test="z")
         

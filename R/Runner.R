@@ -636,7 +636,6 @@ Runner <- R6::R6Class("Runner",
                           .estimateSimpleEffects=function() {
                             
                             results<-try_hard(procedure.simpleEffects(self$model,self))
-                            
                             if (!isFALSE(results$error)) {
                                stop(results$error)
                             }  else {

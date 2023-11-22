@@ -469,9 +469,8 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
       if (length(v)<2) stop("Specify a simple effect formula with at least two variables in the model.")
       args$simple_x<-v[[1]]
       args$simple_mods<-v[-1]
-      object <- stats::update(object, args)
-      
     }
+    object <- stats::update(object, args)
     if (dim(object$simpleEffects$anova$asDF)[1] != 0)  
          return(object$simpleEffects)
     else
