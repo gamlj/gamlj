@@ -1,4 +1,4 @@
-testthat::context("glm")
+testthat::context("lm")
 tol<-.001
 
 mod0<-GAMLj3::gamlj_lm(
@@ -74,10 +74,11 @@ mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
   formula=science~math+schtyp+math:schtyp,
   ci_width = 90,
-  simple_x  = "math",
-  simple_mods  = "schtyp",
+  simple_x  = math,
+  simple_mods  = schtyp,
   es = c("eta","etap","omega","omegap")
 )
+
 
 mod$simpleEffects$anova$asDF
 r.anova<-mod$main$anova$asDF

@@ -21,7 +21,7 @@ the third an optional additional moderator, an so on.
 It has prevalence on other options defining a simple effects test via character options.}
 }
 \value{
-an object of class gamlj results
+a list of tables of class `ResultsElement`
 }
 \description{
 This is a convenience function to re-estimates a GAMLj model adding simple effect analysis. If no option is passed, extracts the 

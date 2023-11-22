@@ -7,6 +7,7 @@
 \alias{coef.gamlj}
 \alias{fit}
 \alias{fit.gamlj}
+\alias{em_means.gamlj}
 \title{S3 methods for class jamovi ResultsElement}
 \usage{
 \method{summary}{ResultsElement}(object, ...)
@@ -20,6 +21,8 @@
 fit(x, ...)
 
 \method{fit}{gamlj}(x, ...)
+
+\method{em_means}{gamlj}(object, formula = NULL, ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}

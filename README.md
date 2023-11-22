@@ -40,6 +40,16 @@ Please install [jamovi](https://www.jamovi.org/download.html) and run it. Select
 GAMLj has undergone a major upgrading with version 3.*. The upgrading made version 3 not compatible with previous versions of the module, meaning
 that analyses that are done with previous versions cannot be opened with version 3. If you need to open and work with analyses done with GAMLj version < 3.0.0, you can install GAMLj legacy from the jamovi library. It will not interfere with GAMLj3.
 
+## From GitHub
+
+In your R script (or Rstudio) simply issue 
+
+```
+library(jmvtools)
+devtools::install_github("gamlj/gamlj")
+
+```
+
 ## From source
 
 
@@ -54,21 +64,27 @@ jmvtools::install()
 
 ```
 
-# Install in R
+# Previous Version (GAMLj 2.6.6 or below)
+
+If you want to install the latest previous version of the module (Version 2.6.6) in R, run this:
+
+```
+library(jmvtools)
+devtools::install_github("gamlj/gamlj",ref="Version.2.6.6")
 
 ```
 
-devtools::install_github("gamlj/gamlj")
 
-```
+## From GitHub
+
+In your R script (or Rstudio) simply issue 
+
 
 
 # Versions
 
 Please check out the  [release notes](https://gamlj.github.io/release_notes.html). 
 
-
-# Troubleshooting
 
 
 

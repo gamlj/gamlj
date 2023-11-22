@@ -75,7 +75,7 @@ mod <- GAMLj3::gamlj_glm(
   plot_x = "write",
   show_contrastcodes = T
 )
-
+# 
 r.anova <- mod$main$anova$asDF
 r.show <- as.character(mod$main$contrastCodeTables[[1]]$asDF[1, 1])
 testthat::test_that("gzlm anova is correct", {

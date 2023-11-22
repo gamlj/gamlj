@@ -337,7 +337,7 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 }
 
 
-#'  anova test on GAMLj results 
+#'  anova tests in GAMLj results 
 #'
 #' This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no option is passed, extracts the 
 #' ANOVA tests table already in the model results (if any). If two GAMLj models are provided, a model comparison is produces. Any option
@@ -348,7 +348,7 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 #' @param object2 a gamlj results object of the class `gamlj` representing the nested model. Overiddes \code{nested_terms}.
 #'                 It can be passed also as a a right-hand side formula specifying terms of the nested model.
 #' @param ... all options accepted by a gamlj model function.  
-#' @return an object of class ggplot or a list of ggplot objects
+#' @return a list of tables of class `ResultsElement`
 #' @author Marcello Gallucci
 #' @examples
 #' data(fivegroups)
@@ -357,7 +357,7 @@ residuals.gamljgmixedResults <- function(object, type = "deviance", ...) {
 #'   formula = Score ~Group,
 #'   data = fivegroups)
 #' 
-#' posthoc(gmod,formula =~Group)
+#' anova(gmod)
 #' @rdname anova
 #' @export
 
@@ -393,7 +393,7 @@ anova.gamlj <- function(object, object2,...) {
 #' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
 #'   `post_hoc` (a list of list of terms), `adjust`, a list of correction to apply:
 #'    one or more of \code{none}, \code{bonf},  \code{holm}, \code{scheffe} or \code{sidak}. 
-#' @return an object of class 
+#' @return a list of tables of class `ResultsElement`
 #' @author Marcello Gallucci
 #' @examples
 #' data(fivegroups)
@@ -439,7 +439,7 @@ posthoc.gamlj <- function(object, formula = NULL, ...) {
 #' It has prevalence on other options defining a simple effects test via character options.
 #' @param ... all options accepted by a gamlj model function. Relevant for new tests are 
 #'   `simple_x` (the simple effect variable), \code{`simple_mods`}, the moderator(s). Both are overriden by the formula option. 
-#' @return an object of class gamlj results
+#' @return a list of tables of class `ResultsElement`
 #' @author Marcello Gallucci
 #' @examples
 #' data(wicksell)
@@ -588,6 +588,46 @@ fit.gamlj<-function(x,...) {
   
   return(res)
 }
+
+
+#'  Estimated marginal means in GAMLj results 
+#'
+#' This is a convenience function to extract the estimated marginal means table from a GAMLj model. If no option is passed, extracts the 
+#' emmeans table already in the model results (if any). If a formula is passed, the estimated marginal means for the defined
+#' factors are displayed.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @param formula (optional) rhs formula defining the factor(s) for which levels expected means are estimated
+#' @param ... all options accepted by a gamlj model function.  
+#' @return an object of class 
+#' @author Marcello Gallucci
+#' @examples
+#' data(fivegroups)
+#' fivegroups$Group<-factor(fivegroups$Group)
+#' gmod<-GAMLj3::gamlj_lm(
+#'   formula = Score ~Group,
+#'   data = fivegroups)
+#' 
+#' em_means(gmod,formula =~Group)
+#' @export
+#' 
+em_means <- function(object, ...) UseMethod("em_means")
+
+
+#' @rdname s3methods
+#' @export
+
+em_means.gamlj <- function(object, formula = NULL, ...) {
+  
+  if (is.something(formula)) 
+    object <- stats::update(object, emmeans = formula, ...) 
+  else if (is.something(list(...))) 
+    object <- stats::update(object, ...)
+  if (length(object$emmeans) == 0) 
+    return(FALSE)
+  object$emmeans
+}
+
 
 
 #' Alternative spelling of GAMLj main functions

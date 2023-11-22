@@ -96,7 +96,9 @@ table}
 \item{ci_width}{a number between 50 and 99.9 (default: 95) specifying the
 confidence interval width for the plots.}
 
-\item{ci_method}{.}
+\item{ci_method}{the method to compute the confidence intervals. It can be `wald` (default) for
+large samples confidence intervals, `quantile` for percentile bootstrap method, or `bcai`
+for bias corrected accelarated method.}
 
 \item{boot_r}{a number bootstrap repetitions.}
 
