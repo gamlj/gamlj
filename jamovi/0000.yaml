@@ -30,20 +30,20 @@ analyses:
 
       interactions, simple slopes, simple effects, post-hoc tests, contrast
       analysis, effect size indexes and visualization of the results.
-  - title: Mixed Model
+  - title: Linear Mixed Model
     name: gamljmixed
     ns: GAMLj3
     menuGroup: Linear Models
     menuSubgroup: GAMLj3
-    menuTitle: Mixed Model
+    menuTitle: Linear Mixed Model
     description: |
       Mixed Linear Model
-  - title: Generalized Linear Models
+  - title: Generalized Linear Model
     name: gamljglm
     ns: GAMLj3
     menuGroup: Linear Models
     menuSubgroup: GAMLj3
-    menuTitle: Generalized Linear Models
+    menuTitle: Generalized Linear Model
     description: Generalized Linear Model
   - title: Generalized Mixed Model
     name: gamljgmixed

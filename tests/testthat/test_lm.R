@@ -19,6 +19,7 @@ testthat::test_that("equivalent model input (1)", {
   })
 
 
+
 mod0<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
   dep = "len",
