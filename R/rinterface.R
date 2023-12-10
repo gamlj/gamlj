@@ -470,7 +470,9 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
       args$simple_x<-v[[1]]
       args$simple_mods<-v[-1]
     }
-    object <- stats::update(object, args)
+    if (is.something(args))
+          object <- stats::update(object, args)
+    
     if (dim(object$simpleEffects$anova$asDF)[1] != 0)  
          return(object$simpleEffects)
     else

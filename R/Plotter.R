@@ -48,7 +48,7 @@ Plotter <- R6::R6Class(
         private$.prepareRandHist()
         
       },
-      scatterPlot=function(image) {
+      scatterPlot=function(image,ggtheme,theme) {
         
         ## debug: return this to see what error is in the plotter code ### 
         if (!is.something(self$plotData)) {
@@ -59,7 +59,8 @@ Plotter <- R6::R6Class(
         ## collect the data 
         data<-self$plotData[[image$key]]
 
-                
+
+        linesdiff<-(theme$bw || self$options$plot_black)
         ### prepare aestetics for one or two way scatterplot
         if (is.null(self$scatterZ)) {
                      names(data)[1]<-"x"
@@ -67,12 +68,15 @@ Plotter <- R6::R6Class(
                     .aesbar<-ggplot2::aes(x = x, ymin = lower, ymax = upper)
         } else {
                      names(data)[1:2]<-c("x","z")
-                     if (isFALSE(self$options$plot_black)) {
+                     if (isFALSE(linesdiff)) {
                          .aestetics<-ggplot2::aes(x = x, y = estimate,   group = z, colour = z)
                          .aesbar<-ggplot2::aes(x = x, ymin = lower, ymax = upper, group = z,color = z ,fill=z)
                      } else {
                          .aestetics<-ggplot2::aes(x = x, y = estimate,   group = z, linetype = z)
                          .aesbar<-ggplot2::aes(x = x, ymin = lower, ymax = upper, group = z,linetype = z )
+                         if (!theme$bw && self$options$plot_black)
+                               .aestetics<-ggplot2::aes(x = x, y = estimate,   group = z, linetype = z, colour=z)
+ 
                      }
         }
         
@@ -137,7 +141,7 @@ Plotter <- R6::R6Class(
         ######### fix the bars ##########        
         if (self$scatterBars) {
           if (self$scatterX$type=="factor")
-            p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width=.3, position = self$scatterDodge)
+            p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width=.3, position = self$scatterDodge,show.legend = FALSE)
           else
             p <- p + ggplot2::geom_ribbon(data = data, .aesbar, linetype = 0, show.legend = F, alpha = 0.2)
         }
@@ -158,20 +162,19 @@ Plotter <- R6::R6Class(
                                             .aestetics,
                                             shape = 21, size = 4, fill="white",
                                             position = self$scatterDodge,show.legend = FALSE)
+
+        p<-p+ ggtheme
+
+        p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, 
+                               colour = self$scatterClabel,
+                               shape=self$scatterClabel,
+                               linetype=self$scatterClabel)
         
-        if (isFALSE(self$options$plot_black))
-           p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, colour = self$scatterClabel)
-        else
-          p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, linetype = self$scatterClabel)
+        if (self$options$plot_black)
+          p <- p + ggplot2::theme(legend.key.width = ggplot2::unit(2,"cm"))
+
+
         
-        # if (self$scatterXscale) {
-        #      
-        #   o<-ggplot2::ggplot_build(p)
-        #   values<-o$layout$panel_params[[1]]$x$breaks
-        #   newlabs<-private$.rescale(self$scatterX,values)
-        #   p<-p+ggplot2::scale_x_continuous(labels= newlabs)
-        # }
-           
         return(p)        
       },
       

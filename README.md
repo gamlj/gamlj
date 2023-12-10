@@ -64,6 +64,14 @@ jmvtools::install()
 
 ```
 
+## From GitHub
+
+```
+library(jmvtools)
+devtools::install_github("gamlj/gamlj")
+
+```
+
 # Previous Version (GAMLj 2.6.6 or below)
 
 If you want to install the latest previous version of the module (Version 2.6.6) in R, run this:
@@ -75,34 +83,7 @@ devtools::install_github("gamlj/gamlj",ref="Version.2.6.6")
 ```
 
 
-## From GitHub
 
-In your R script (or Rstudio) simply issue 
-
-
-
-# Versions
-
-Please check out the  [release notes](https://gamlj.github.io/release_notes.html). 
-
-
-
-
-
-## Installing from source
-
-The module installs dependencies automatically, but in some R installations the process seems to fail when it comes to the dependencies. The solution is to install in the module build folder the required package that fails before installing the module. For example, if "pbkrtest" fails and you cloned the source in YOURCLONEFOLDER folder, run this before installing the module.
-
-
-
-```
-package<-"pbkrtest"
-dirroot<-YOURCLONEFOLDER
-instdir<-paste0(dirroot,"/build/R")
-install.packages(package,lib = instdir)
-
-
-```
 
 # Programmatic name
 

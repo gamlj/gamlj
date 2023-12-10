@@ -241,6 +241,7 @@ testthat::test_that("glm get model ", {
 
 
 se<-GAMLj3::simple_effects(mod1,simple_x="write",simple_mods="honors")
+
 res<-se$anova$asDF
 testthat::test_that("simple effects ", {
   testthat::expect_equal(round(res[2,2],2),6.64)
