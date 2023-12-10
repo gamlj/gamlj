@@ -707,7 +707,7 @@ items:
           title: ""
           type: Image
           renderFun: .mainPlot
-          width: 600
+          width: 750
           height: 400
 
           clearWith:

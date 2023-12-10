@@ -1650,7 +1650,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="",
                     renderFun=".mainPlot",
-                    width=600,
+                    width=750,
                     height=400,
                     clearWith=list(
                         "dep",

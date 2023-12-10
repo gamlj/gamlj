@@ -262,6 +262,7 @@ options:
             `TRUE` or `FALSE` (default), shows coefficients covariances
 
 
+### Plots options
 
     - name: plot_x
       title: Horizontal axis
@@ -359,6 +360,7 @@ options:
           ui: >
              Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
 
+####### end of plots #########
 
     - name: emmeans
       title: Estimated Marginal Means
