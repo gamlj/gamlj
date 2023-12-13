@@ -201,9 +201,9 @@ gamljmixedClass <- R6::R6Class(
 
 .mainPlot=function(image, ggtheme, theme, ...) {
 
-  plot<-private$.plotter_machine$scatterPlot(image)
-  plot<-plot + ggtheme
+  plot<-private$.plotter_machine$scatterPlot(image,ggtheme,theme)
   
+
   return(plot)
   
 },

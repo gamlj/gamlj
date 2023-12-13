@@ -223,10 +223,10 @@ gamljglmClass <- R6::R6Class(
           return()
       if (!is.something(image$key))
         return()
-      
-      plot<-private$.plotter_machine$scatterPlot(image)
-      plot<-plot + ggtheme
-      
+
+        plot<-private$.plotter_machine$scatterPlot(image,ggtheme,theme)
+        
+
       return(plot)
       
     },
