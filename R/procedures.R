@@ -244,13 +244,13 @@ procedure.posthoc_effsize <- function(obj) {
       return(referenceGrid)
 }
 
-.posthoc.clm <- function(model, term, vfun=NULL,df=NULL) {
-  
+.posthoc.clm <- function(model, term, vfun=NULL,df=NULL,mode=NULL) {
+
   .posthoc.default(model,term,vfun=vfun,df=df,mode="linear.predictor")
   
 }
 
-.posthoc.clmm <- function(model, term, vfun=NULL,df=NULL) {
+.posthoc.clmm <- function(model, term, vfun=NULL,df=NULL,mode=NULL) {
   
   .posthoc.default(model,term,vfun=vfun,df=df,mode="linear.predictor")
   
@@ -276,7 +276,7 @@ procedure.posthoc_effsize <- function(obj) {
   return(referenceGrid)
 }
 
-.posthoc.mmblogit <- function(model, term, adjust,ci=FALSE,vfun=NULL,df=NULL) {
+.posthoc.mmblogit <- function(model, term, adjust,ci=FALSE,vfun=NULL,df=NULL,mode=NULL) {
   
   dep <- names(attr(stats::terms(model), "dataClass"))[1]
   dep <- jmvcore::composeTerm(dep)
@@ -316,19 +316,19 @@ procedure.posthoc_effsize <- function(obj) {
   
 }
 
-.posthoc_ci.clm=function(model,term,width,method,vfun=NULL) {
+.posthoc_ci.clm=function(model,term,width,method,vfun=NULL,mode=NULL) {
   
   .posthoc_ci.default(model,term,width,method,vfun=vfun,mode="linear.predictor")
     
 }
 
-.posthoc_ci.clmm=function(model,term,width,method,vfun=NULL) {
+.posthoc_ci.clmm=function(model,term,width,method,vfun=NULL,mode=NULL) {
     
     .posthoc_ci.default(model,term,width,method,vfun=vfun,mode="linear.predictor") 
       
     }
     
-.posthoc_ci.multinom=function(model,term,width,method,vfun=NULL) {
+.posthoc_ci.multinom=function(model,term,width,method,vfun=NULL, mode=NULL) {
 
   if (inherits(model,"bootstrap_model") )
     model<-attr(model,"original_model")
