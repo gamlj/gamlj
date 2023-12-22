@@ -112,6 +112,10 @@
 #'   option is ignored if the model is passed using \code{formula}.
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be re_corrused rather than ML
+#' @param  res_struct Residual variance-covariance matrix structure. It can be \code{'id'}
+#'   (default) for identity (no correlation), \code{'cs'} for compound symmetry (constant correlation),
+#'   \code{'ar1'} for autoregressive of order 1.
+#'   and \code{'un'} for unstructured. 
 #' @param re_lrt \code{TRUE} or \code{FALSE} (default), LRT for the random
 #'   effects
 #' @param re_ci \code{TRUE} or \code{FALSE} (default), confidence intervals
@@ -179,6 +183,7 @@ gamlj_mixed <- function(
     model_terms = NULL,
     re = NULL,
     reml = TRUE,
+    res_struct="id",
     re_lrt = FALSE,
     re_ci = FALSE,
     fixed_intercept = TRUE,
@@ -374,6 +379,7 @@ gamlj_mixed <- function(
     nested_re = nested_re,
     re_corr = re_corr,
     reml = reml,
+    res_struct= res_struct,
     re_lrt = re_lrt,
     re_ci = re_ci,
     df_method = df_method,
