@@ -386,7 +386,6 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
     if (int == 0) {
       return(NULL)
     }
-
     re <- lme4::findbars(stats::formula(model))
     re <- paste("(", re, ")", collapse = "+")
     dep <- insight::model_info(model)$model_terms$response

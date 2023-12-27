@@ -91,7 +91,7 @@ mf.update<- function(x,...) UseMethod(".update")
     .fixed<-formula(paste(deparse(.fixed)))
    
     ### mclogit requires the data to be matrix
-     warning("No random coefficients in the nested model. A fixed effects multinomial model is used for comparison")
+     warning("No random coefficients in the nested model. A fixed effects multinomial model is used for comparison. The validity of the tests may be questionnable.")
     ##  we do not use  because it does not accept intercept only models
     return(nnet::multinom(.fixed,.data))
     
@@ -108,8 +108,13 @@ mf.update<- function(x,...) UseMethod(".update")
   form<-formula(formula)
   fixed<-lme4::nobars(form)
   .random<-lme4::findbars(form)
-  random<-lapply(.random, function(x) formula(paste("~",as.character(x)[2],"|",as.character(x)[3])))
   data<-model$data
+  
+  random<-lapply(.random, function(x) formula(paste("~",as.character(x)[2],"|",as.character(x)[3])))
+  if (!is.something(random)) {
+    warning("No random coefficients in the nested model. A fixed effects linear model is used for comparison. The validity of the tests may be questionnable.")
+    return(stats::lm(fixed,data=data))
+  }
   umodel<-stats::update(model,fixed = fixed,random=random,data=data)
   umodel$call$fixed<-fixed
   umodel$call$random<-random
