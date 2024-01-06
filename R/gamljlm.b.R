@@ -224,7 +224,7 @@ gamljlmClass <- R6::R6Class(
   if (!private$.ready$ready) 
     return()
   
-  plot<-private$.plotter_machine$qqplot(theme,ggtheme)
+  plot<-private$.plotter_machine$qqplot(image,theme,ggtheme)
   return(plot)
   
 },

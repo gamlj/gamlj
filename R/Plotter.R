@@ -32,7 +32,8 @@ Plotter <- R6::R6Class(
             else 
                     self$scatterType<-"response"
       },
-
+      ## plot should be inited by changing the their image in someway, otherwise
+      ## they do not get exported properly
       initPlots=function() {
            private$.initMainPlot()
       },
@@ -42,6 +43,8 @@ Plotter <- R6::R6Class(
         ## each function skips if the plot is not required
 
         private$.prepareMainPlot()
+        private$.prepareQqplot()
+
         private$.prepareClusterBoxplot()
         private$.prepareClusterResPred()
         private$.prepareClusterResPredGrid()
@@ -178,15 +181,16 @@ Plotter <- R6::R6Class(
         return(p)        
       },
       
-      qqplot=function(theme,ggtheme)  {
+      qqplot=function(image,theme,ggtheme)  {
         
               if (!self$option("qq_plot"))
                          return()
         
-              if (!is.something(private$.operator$model))
+              if (!is.something(image$state$residuals))
                          return()
-
-              residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
+        
+               residuals<-image$state$residuals
+#              residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
               df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
               plot<-ggplot2::ggplot(data=df, ggplot2::aes(y=y, x=x)) +
                 ggplot2::geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
@@ -411,7 +415,7 @@ Plotter <- R6::R6Class(
       
             if (!is.something(self$options$plot_x)) 
                    return()
-            
+      
             jinfo("PLOTTER: init main plot")
       
             resultsgroup<-private$.results$get("mainPlots")
@@ -468,6 +472,7 @@ Plotter <- R6::R6Class(
         return()
 
       jinfo("PLOTTER: prepare main plot")
+      
       
       private$.results$plotnotes$setContent("")
       
@@ -652,6 +657,16 @@ Plotter <- R6::R6Class(
              }
       }
 
+    },
+    .prepareQqplot=function() {
+      
+      if (!self$option("qq_plot"))
+        return()
+      
+      residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
+      image<-private$.results$assumptions$get("qqplot")
+      image$setState(list(residuals=residuals))
+      
     },
     .prepareClusterBoxplot=function() {
       
