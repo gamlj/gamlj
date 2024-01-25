@@ -1130,16 +1130,16 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="text"),
                                 list(
                                     `name`="var1", 
-                                    `title`="name", 
+                                    `title`="param1", 
+                                    `type`="text"),
+                                list(
+                                    `name`="var2", 
+                                    `title`="param2", 
                                     `type`="text"),
                                 list(
                                     `name`="vcov", 
                                     `title`="Cov.", 
                                     `type`="number"),
-                                list(
-                                    `name`="var2", 
-                                    `title`="name2", 
-                                    `type`="text"),
                                 list(
                                     `name`="sdcor", 
                                     `title`="Corr.", 

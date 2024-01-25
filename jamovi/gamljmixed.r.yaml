@@ -391,14 +391,14 @@ items:
                      combineBelow: true
                      type: text
                    - name: var1
-                     title: "name"
+                     title: "param1"
+                     type: text
+                   - name: var2
+                     title: "param2"
                      type: text
                    - name: vcov
                      title: "Cov."
                      type: number
-                   - name: var2
-                     title: "name2"
-                     type: text
                    - name: sdcor
                      title: "Corr."
                      type: number
