@@ -5,9 +5,6 @@ Plotter <- R6::R6Class(
   inherit = Scaffold,
   public=list(
       options=NULL,
-      plotData=list(),
-      rawData=list(),
-      randomData=list(),
       scatterRange=NULL,
       scatterDodge=NULL,
       scatterClabel=NULL,
@@ -32,16 +29,22 @@ Plotter <- R6::R6Class(
             else 
                     self$scatterType<-"response"
       },
-
+      ## plot should be inited and prepared storing all information needed to produce the plot in 
+      ## the image (Image object) state. It does not matter if the state is set in init() or run()
+      ## as long as the plot does not require the model to be re-estimated
+      ## Info present at .init() (number of variables, variables names, etc) me be omitted from the 
+      ## information contained in the image$state
       initPlots=function() {
            private$.initMainPlot()
       },
       preparePlots=function(image, ggtheme, theme, ...) {
-        ## here are the plots that require some preparations. Other types of plots 
-        ## are not prepared because they can be handled directly by the plot call
-        ## each function skips if the plot is not required
-
+        ## here are the plots that require some preparations. All plots 
+        ## are  prepared 
+        
         private$.prepareMainPlot()
+        private$.prepareQqplot()
+        private$.prepareNormplot()
+        private$.prepareResidplot()
         private$.prepareClusterBoxplot()
         private$.prepareClusterResPred()
         private$.prepareClusterResPredGrid()
@@ -51,13 +54,13 @@ Plotter <- R6::R6Class(
       scatterPlot=function(image,ggtheme,theme) {
         
         ## debug: return this to see what error is in the plotter code ### 
-        if (!is.something(self$plotData)) {
+        if (!is.something(image$state$plotData)) {
            pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
            return(pp)
         }
         
         ## collect the data 
-        data<-self$plotData[[image$key]]
+        data<-image$state$plotData
 
 
         linesdiff<-(theme$bw || self$options$plot_black)
@@ -84,20 +87,20 @@ Plotter <- R6::R6Class(
         p <- ggplot2::ggplot()
         
         # give a scale to the Y axis
-        if (is.something(self$scatterRange))
-              p <- p + ggplot2::scale_y_continuous(limits = self$scatterRange)
+        if (is.something(image$state$scatterRange))
+              p <- p + ggplot2::scale_y_continuous(limits = image$state$scatterRange)
         
 
         #### plot the actual data if required 
         
         if (self$scatterRaw) {
           
-          rawdata<-self$rawData[[image$key]]
+          rawdata<-image$state$rawData
 
           y<-self$scatterY$name64
           x<-self$scatterX$name64
           z<-self$scatterZ$name64
-          
+       
           .aesraw<-ggplot2::aes_string(x = x, y = y)
           
           if (!is.null(self$scatterZ))
@@ -110,9 +113,9 @@ Plotter <- R6::R6Class(
                                         show.legend = FALSE, alpha = 0.5, shape = 16)
         }
         ##### END OF RAW DATA #############
-        if (is.something(self$randomData)) {
+        if (is.something(image$state$randomData)) {
           
-          randomData<-self$randomData[[image$key]]
+          randomData<-image$state$randomData
           if ("z" %in% names(randomData)) {
                       .aesrandom<-ggplot2::aes(x = x, y = y, group=cluster, colour=z)
                        p <- p + ggplot2::geom_line(data = randomData, 
@@ -174,19 +177,19 @@ Plotter <- R6::R6Class(
           p <- p + ggplot2::theme(legend.key.width = ggplot2::unit(2,"cm"))
 
 
-        
         return(p)        
       },
       
-      qqplot=function(theme,ggtheme)  {
+      qqplot=function(image,theme,ggtheme)  {
         
               if (!self$option("qq_plot"))
                          return()
         
-              if (!is.something(private$.operator$model))
+              if (!is.something(image$state$residuals))
                          return()
-
-              residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
+        
+               residuals<-image$state$residuals
+#              residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
               df <- as.data.frame(qqnorm(residuals, plot.it=FALSE))
               plot<-ggplot2::ggplot(data=df, ggplot2::aes(y=y, x=x)) +
                 ggplot2::geom_abline(slope=1, intercept=0, colour=theme$color[1]) +
@@ -197,17 +200,17 @@ Plotter <- R6::R6Class(
                plot+ggtheme
       },
       
-      normplot=function(theme,ggtheme)  {
+      normplot=function(image,theme,ggtheme)  {
         
         if (!self$option("norm_plot"))
           return()
         
-        if (!is.something(private$.operator$model))
+        if (!is.something(image$state$residuals))
           return()
         
         fill <- theme$fill[2]
         color <- theme$color[1]
-        data <- as.data.frame(stats::residuals(private$.operator$model))
+        data<-image$state$residuals
         names(data) <- "x"
         # library(ggplot2)
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = x)) +
@@ -223,36 +226,31 @@ Plotter <- R6::R6Class(
         return(plot)
 
       },
-      residPlot=function(theme,ggtheme)  {
+      residPlot=function(image,theme,ggtheme)  {
 
-#        if (!self$option("resid_plot") && !self$option("cluster_respred") )
-#          return()
-        
+
         if (!self$option("resid_plot"))
           return()        
-        
 
-        if (!is.something(private$.operator$model))
+        if (!is.something(image$state$data))
           return()
-        
+
         
             fill <- theme$fill[2]
             color <- theme$color[1]
-            data <- as.data.frame(stats::residuals(private$.operator$model))
-            names(data) <- ".resid"
-            data$.fitted <- stats::predict(private$.operator$model)
+            data <- image$state$data
             size<-2
 
               # library(ggplot2)
-            plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid)) + 
+            plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = predicted, y = residuals)) + 
                        ggplot2::labs(x = "Predicted", y = "Residuals")
             plot <- plot + ggplot2::geom_point(shape = 21, color = color, fill = fill,size=size)
             
             if (self$option("plot_extremes")) {
-              cutoff1<-quantile(data$.resid,.01)
-              cutoff2<-quantile(data$.resid,.99)
-              edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
-              plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=.fitted,y=.resid,label=rownames(edata)),
+              cutoff1<-quantile(data$residuals,.01)
+              cutoff2<-quantile(data$residuals,.99)
+              edata<-data[data$residuals<=cutoff1 | data$residuals>=cutoff2,]
+              plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=predicted,y=residuals,label=rownames(edata)),
                                                  show.legend=FALSE,
                                                  position=ggplot2::position_jitter())
             }
@@ -411,7 +409,7 @@ Plotter <- R6::R6Class(
       
             if (!is.something(self$options$plot_x)) 
                    return()
-            
+      
             jinfo("PLOTTER: init main plot")
       
             resultsgroup<-private$.results$get("mainPlots")
@@ -468,6 +466,7 @@ Plotter <- R6::R6Class(
         return()
 
       jinfo("PLOTTER: prepare main plot")
+      
       
       private$.results$plotnotes$setContent("")
       
@@ -531,8 +530,9 @@ Plotter <- R6::R6Class(
         dep64  <- self$scatterY$name64
 
         ### give a range to the y-axis, if needed
+        scatterRange<-NULL
         if (self$options$plot_yscale)
-            self$scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
+            scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
 
       if (self$option("model_type","multinomial")) {
         self$scatterRaw<-FALSE
@@ -540,7 +540,7 @@ Plotter <- R6::R6Class(
       
       if (self$scatterType=="link") {
         self$scatterRaw<-FALSE
-        self$scatterRange<-NULL
+        scatterRange<-NULL
       }
       
       
@@ -554,10 +554,10 @@ Plotter <- R6::R6Class(
         if (self$option("model_type","ordinal")) {
           rawData[[dep64]]<-rawData[[dep64]]+1
           if (self$option("plot_scale","mean.class"))
-                    self$scatterRange<-c(1,self$scatterY$nlevels)
+                    scatterRange<-c(1,self$scatterY$nlevels)
         }
       if (self$option("model_type",c("logistic","multinomial"))) {
-          self$scatterRange<-c(0,1)
+          scatterRange<-c(0,1)
       }
 
       
@@ -587,6 +587,7 @@ Plotter <- R6::R6Class(
       ### continuous are retained
       #### TODO: this is abstruse, try changing it
 
+      state<-list(scatterRange=scatterRange)  
       dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
 
       if (is.something(dims))  {
@@ -604,7 +605,7 @@ Plotter <- R6::R6Class(
                 aplot$setTitle(label)
                 sel<-paste(paste0("data$",.names64,sep=""),paste0('"',grid[i,],'"'),sep="==",collapse = " & ")
                 localdata<-data[eval(parse(text=sel)),]
-                self$plotData[[i]]<-localdata
+                state[["plotData"]]<-localdata
                 
                 if (self$scatterRaw) {
                        if (length(selectable)>0) {
@@ -613,7 +614,7 @@ Plotter <- R6::R6Class(
                        } else
                             raw<-rawData
                     
-                      self$rawData[[i]]<-raw
+                      state[["rawData"]]<-raw
                 }
                 
                 if (!is.null(randomData)) {
@@ -628,16 +629,17 @@ Plotter <- R6::R6Class(
                         rdata<- stats::aggregate(rdata$y, selectorlist, mean)
                         names(rdata)<-.rnames
                         attr(rdata,"xbetween")<-xbetween
-                        self$randomData[[i]]<-rdata
+                        state[["randomData"]]<-rdata
                 }
+                aplot$setState(state)
              }
 
             }  else {
              aplot<-resultsgroup$get(key=resultsgroup$itemKeys[[1]])
              aplot$setTitle(jmvcore::stringifyTerm(c(self$scatterX$name,self$scatterZ$name)))
-             self$plotData[[1]]<-data
+             state[["plotData"]]<-data
              if (self$scatterRaw) 
-                  self$rawData[[1]]<-rawData
+                  state[["rawData"]]<-rawData
              
              if (!is.null(randomData)) {
                
@@ -647,12 +649,50 @@ Plotter <- R6::R6Class(
                rdata<- stats::aggregate(rdata$y, selectorlist, mean)
                names(rdata)<-.rnames
                attr(rdata,"xbetween")<-xbetween
-               self$randomData[[1]]<-rdata
+               state[["randomData"]]<-rdata
                
              }
+             aplot$setState(state)
       }
 
     },
+    .prepareQqplot=function() {
+      
+      if (!self$option("qq_plot"))
+        return()
+      
+      residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
+      image<-private$.results$assumptions$get("qqplot")
+      image$setState(list(residuals=residuals))
+      
+    },
+    
+    .prepareNormplot=function() {
+      
+      if (!self$option("norm_plot"))
+        return()
+      
+      residuals <- as.data.frame(stats::residuals(private$.operator$model))
+      image<-private$.results$assumptions$get("normPlot")
+      image$setState(list(residuals=residuals))
+      
+    },
+    
+    .prepareResidplot=function() {
+      
+      if (!self$option("resid_plot"))
+        return()
+      
+      residuals <- stats::residuals(private$.operator$model)
+      predicted  <- stats::predict(private$.operator$model)
+      image<-private$.results$assumptions$get("residPlot")
+      image$setState(list(data=data.frame(residuals=residuals,predicted=predicted)))
+      mark(image$state)
+      
+      
+    },
+    
+    
     .prepareClusterBoxplot=function() {
       
       if (!self$option("cluster_boxplot"))
