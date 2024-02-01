@@ -25,8 +25,10 @@ jinfo <- function(...) {
 mark <- function(...) {
   if (!j_DEBUG) 
     return()
-  if (.Platform$OS.type=="windows")
-      sink("jamovi_jscaff_.log",append = TRUE)
+  if (.Platform$OS.type=="windows") {
+    wosjscaf <- paste0(base::Sys.getenv("TEMP"),"\\wosjscaf.log")
+    sink(wosjscaf,append = TRUE)
+  }
   
   if (missing(...))
     cat("Mark here\n")
