@@ -141,7 +141,7 @@ Plotter <- R6::R6Class(
           }
 
         }
-        ## clean up the image (must be done)
+        ## clean up the image (must be done otherwise it takes forever to produce the plot)
         image$setState(NULL)
         ######### fix the bars ##########        
         if (self$scatterBars) {
