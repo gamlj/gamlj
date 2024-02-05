@@ -92,26 +92,27 @@ Plotter <- R6::R6Class(
         
 
         #### plot the actual data if required 
-        
+
         if (self$scatterRaw) {
           
-          rawdata<-image$state$rawData
-
-          y<-self$scatterY$name64
-          x<-self$scatterX$name64
-          z<-self$scatterZ$name64
-       
+           rawdata<-image$state$rawData
+           y<-self$scatterY$name64
+           x<-self$scatterX$name64
+           z<-self$scatterZ$name64
+          # 
           .aesraw<-ggplot2::aes_string(x = x, y = y)
           
-          if (!is.null(self$scatterZ))
-              if (self$scatterZ$type=="factor")
-               .aesraw<-ggplot2::aes_string(x = x, y = y, color=z)
-
+           if (!is.null(self$scatterZ))
+               if (self$scatterZ$type=="factor")
+                .aesraw<-ggplot2::aes_string(x = x, y = y, color=z)
 
           p <- p +  ggplot2::geom_point(data = rawdata,
                                         .aesraw,
                                         show.legend = FALSE, alpha = 0.5, shape = 16)
+
         }
+
+
         ##### END OF RAW DATA #############
         if (is.something(image$state$randomData)) {
           
@@ -140,7 +141,8 @@ Plotter <- R6::R6Class(
           }
 
         }
-        
+        ## clean up the image (must be done)
+        image$setState(NULL)
         ######### fix the bars ##########        
         if (self$scatterBars) {
           if (self$scatterX$type=="factor")
@@ -149,7 +151,6 @@ Plotter <- R6::R6Class(
             p <- p + ggplot2::geom_ribbon(data = data, .aesbar, linetype = 0, show.legend = F, alpha = 0.2)
         }
         #########  ##########        
-        
         
         
         ### plot the lines 
@@ -175,7 +176,6 @@ Plotter <- R6::R6Class(
         
         if (self$options$plot_black)
           p <- p + ggplot2::theme(legend.key.width = ggplot2::unit(2,"cm"))
-
 
         return(p)        
       },
@@ -522,7 +522,9 @@ Plotter <- R6::R6Class(
                   if (varobj$type=="factor")
                   levels(rawData[[var]])<-varobj$levels_labels
             }
+       
       }
+      
       ## end of raw data
     
 
@@ -579,7 +581,6 @@ Plotter <- R6::R6Class(
         if (is.something(randomData))
           randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
       }
-      
       #### compute the levels combinations
       #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
       #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
@@ -638,6 +639,7 @@ Plotter <- R6::R6Class(
              aplot<-resultsgroup$get(key=resultsgroup$itemKeys[[1]])
              aplot$setTitle(jmvcore::stringifyTerm(c(self$scatterX$name,self$scatterZ$name)))
              state[["plotData"]]<-data
+
              if (self$scatterRaw) 
                   state[["rawData"]]<-rawData
              
@@ -687,8 +689,7 @@ Plotter <- R6::R6Class(
       predicted  <- stats::predict(private$.operator$model)
       image<-private$.results$assumptions$get("residPlot")
       image$setState(list(data=data.frame(residuals=residuals,predicted=predicted)))
-      mark(image$state)
-      
+
       
     },
     
