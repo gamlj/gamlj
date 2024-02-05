@@ -193,7 +193,7 @@ gamljglmClass <- R6::R6Class(
         smarttab$runTable()
       
 
-      private$.checkpoint()
+ #     private$.checkpoint()
       
       ### do plots 
       private$.plotter_machine$preparePlots()
@@ -224,9 +224,7 @@ gamljglmClass <- R6::R6Class(
       if (!is.something(image$key))
         return()
 
-        plot<-private$.plotter_machine$scatterPlot(image,ggtheme,theme)
-        
-
+      plot<-private$.plotter_machine$scatterPlot(image,ggtheme,theme)
       return(plot)
       
     },
