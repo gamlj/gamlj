@@ -468,7 +468,13 @@ Runner <- R6::R6Class("Runner",
                                     t2  <-  paste(self$infomatic$deptype,collapse = " or ")
                                     t1  <-  self$datamatic$dep$type
                                     m   <-   self$infomatic$model[1]
-                                    msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type",t2)
+                                    if (self$options$.interface=="jamovi") {
+                                      t2<-gsub("numeric","Continuous",t2,fixed = TRUE)
+                                      t2<-gsub("factor","Nominal",t2,fixed=TRUE)
+                                      t2<-gsub("integer","Measurement type=`Continuous`, Data type=`Integer`",t2,fixed=TRUE)
+                                      
+                                    }
+                                    msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type: ",t2)
                                     stop(msg)
                               }
 
@@ -573,12 +579,13 @@ Runner <- R6::R6Class("Runner",
                                          if (Sys.info()['sysname']!="Windows")
                                                   opts_list[["parallel"]]<-"multicore"
                                          else
-                                                  opts_list[["parallel"]]<-"snow"
+                                                  opts_list[["parallel"]]<-"no"
                                      }
                                       
                                 
                                 jinfo("RUNNER: estimating bootstrap model")
                                 t<-Sys.time()
+                                
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
                                 etime<-as.numeric(Sys.time()-t)
                                 jinfo("RUNNER: done ",etime," secs")
