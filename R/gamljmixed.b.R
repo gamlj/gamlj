@@ -228,11 +228,11 @@ gamljmixedClass <- R6::R6Class(
 
 .residPlot=function(image, ggtheme, theme, ...) {
 
+
   if (!private$.ready$ready) 
     return()
   
-  plot<-private$.plotter_machine$residPlot(theme,ggtheme)
-  
+  plot<-private$.plotter_machine$residPlot(image,theme,ggtheme)
   return(plot)
 },
 

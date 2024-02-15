@@ -12,9 +12,11 @@ formula<-y~1+cond+(1|subj)+(1|stimulus)
 model<-GAMLj3::gamlj_mixed(
   formula =y ~ 1 + cond+( 1|subj ),
   data = subjects_by_stimuli,
-  plot_x=cond,
-  resid_plot = T, cluster_boxplot = T, cluster_respred = T, rand_hist = T
+  plot_x="cond",
+  norm_plot= T, resid_plot = T, cluster_boxplot = T, cluster_respred = T, rand_hist = T
 )
+
+
 
 infotable<-model$info$asDF
 
@@ -48,9 +50,16 @@ testthat::test_that("a mainplot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 })
 
+
 testthat::test_that("a  residplot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(model$assumptions$residPlot$plot$fun()))
 })
+
+
+testthat::test_that("a  normplot is produced", {
+  testthat::expect_true(ggplot2::is.ggplot(model$assumptions$normPlot$plot$fun()))
+})
+
 
 testthat::test_that("a  resid boxplot is produced", {
   testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterBoxplot[[1]]$plot$fun()))
