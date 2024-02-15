@@ -1713,7 +1713,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 active = list(
                     normtest = function() private$.items[["normtest"]],
                     qqplot = function() private$.items[["qqplot"]],
-                    normplot = function() private$.items[["normplot"]],
+                    normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]],
                     clusterBoxplot = function() private$.items[["clusterBoxplot"]],
                     clusterResPred = function() private$.items[["clusterResPred"]],
@@ -1764,7 +1764,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "dep_scale")))
                         self$add(jmvcore::Image$new(
                             options=options,
-                            name="normplot",
+                            name="normPlot",
                             title="Residual histogram",
                             visible="(norm_plot)",
                             width=700,

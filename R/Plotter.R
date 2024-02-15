@@ -215,8 +215,8 @@ Plotter <- R6::R6Class(
         # library(ggplot2)
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = x)) +
           ggplot2::labs(x = "Residuals", y = "density")
-        
-#        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = after_stat(density)), position = "identity", stat = "bin", color = color, fill = fill)
+        ## after_stat() is new, so we need to wait for jamovi to update. In the meantime, we use ..density..
+#        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)), position = "identity", stat = "bin", color = color, fill = fill)
         plot <- plot + ggplot2::geom_histogram(ggplot2::aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
         plot <- plot + ggplot2::stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))
         
@@ -227,7 +227,6 @@ Plotter <- R6::R6Class(
 
       },
       residPlot=function(image,theme,ggtheme)  {
-
 
         if (!self$option("resid_plot"))
           return()        
@@ -472,7 +471,7 @@ Plotter <- R6::R6Class(
       
       resultsgroup<-private$.results$get("mainPlots")
 
-      ### stop is filled from previous run ###
+      ### stop if it is filled from previous run ###
       test<-any(unlist(sapply(resultsgroup$items, function(i) !i$isNotFilled())))
       if (test)
            return()
@@ -539,7 +538,7 @@ Plotter <- R6::R6Class(
       if (self$option("model_type","multinomial")) {
         self$scatterRaw<-FALSE
       }
-      
+
       if (self$scatterType=="link") {
         self$scatterRaw<-FALSE
         scatterRange<-NULL
@@ -559,7 +558,8 @@ Plotter <- R6::R6Class(
                     scatterRange<-c(1,self$scatterY$nlevels)
         }
       if (self$option("model_type",c("logistic","multinomial"))) {
-          scatterRange<-c(0,1)
+        if (self$scatterType!="link") 
+            scatterRange<-c(0,1)
       }
 
       
@@ -684,13 +684,10 @@ Plotter <- R6::R6Class(
       
       if (!self$option("resid_plot"))
         return()
-      
       residuals <- stats::residuals(private$.operator$model)
       predicted  <- stats::predict(private$.operator$model)
       image<-private$.results$assumptions$get("residPlot")
       image$setState(list(data=data.frame(residuals=residuals,predicted=predicted)))
-
-      
     },
     
     
