@@ -364,6 +364,11 @@ const fun = {
 
     updateModelOptions: function(ui, context) {
 
+        const noneed=["lm", "lmer"];
+        
+        if (noneed.includes(ui.model_type.getValue())) {
+          return ;
+        }
 // takes care of the effect size names and visibility
 
         if (typeof ui.es_RR !== 'undefined' ) {

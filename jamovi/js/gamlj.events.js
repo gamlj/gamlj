@@ -38,8 +38,10 @@ const events = {
               ui.precision.$el.hide();
             }
         }
+        
+        
         // updates all options related with model_type
-        fun.updateModelOptions(ui,this)
+           fun.updateModelOptions(ui,this)
 
 
     },
