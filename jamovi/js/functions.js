@@ -362,14 +362,73 @@ const fun = {
 
    },
 
+    updateModelOptions: function(ui, context) {
 
-         mark: function(obj) {
+// takes care of the effect size names and visibility
+
+        if (typeof ui.es_RR !== 'undefined' ) {
+              ui.es_RR.setValue(false);
+        }
+        if (typeof ui.plot_scale !== 'undefined' ) {
+              ui.plot_scale.setValue('response');
+        }
+
+        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear")        {
+               ui.es_expb.setValue(false);
+               ui.estimates_ci.setValue(true);
+               ui.expb_ci.setValue(false);
+        } else  {
+               ui.es_expb.setValue(true);
+               ui.estimates_ci.setValue(false);
+               ui.expb_ci.setValue(true);
+        }
+
+        if (typeof ui.es_expb !== 'undefined' ) {
+          
+            var odds=["logistic","probit","multinomial","ordinal"]
+            var irr=["poisson","poiover","nb"]
+            ui.es_expb.$label.text("Exp(B)") 
+            
+            if (odds.includes(ui.model_type.getValue())) {
+               ui.es_expb.$label.text("Odd Rations (expB)") 
+            } 
+            if (irr.includes(ui.model_type.getValue())) {
+               ui.es_expb.$label.text("Incidence rate ratios (expB)") 
+            } 
+
+        }
+
+// done
+
+        if (typeof ui.propodds_test !== 'undefined') {
+              if (ui.model_type.getValue()==="ordinal") {
+                  ui.propodds_test.$el.show();
+              } else {
+                  ui.propodds_test.$el.hide();
+              }
+        }
+
+        if (typeof ui.es_marginals !== 'undefined') {
+          
+              ui.es_marginals.setValue(false);
+
+        }
+        
+        if (typeof ui.preds_phi !== 'undefined' ) {
+          
+            if (ui.model_type.getValue()==="beta") {
+              ui.precision.$el.show();
+            } else {
+              ui.precision.$el.hide();
+            }
+        }
+
+   },
+    mark: function(obj) {
                console.log(obj);
          }
 
-}
-
-
+    }
 
 module.exports=fun
 
