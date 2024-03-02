@@ -479,6 +479,10 @@ children:
           - type: CheckBox
             name: norm_test
             label: Test normality of residuals
+          - type: CheckBox
+            name: colli_test
+            label: Collinearity statistics
+
       - type: Label
         label: Plots
         children:

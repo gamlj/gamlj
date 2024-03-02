@@ -110,8 +110,11 @@
 #'   for epsilon-squared, \code{'epsilonp'} for partial epsilon-squared  and
 #'   \code{'beta'} for standardized  coefficients (betas). Default is
 #'   \code{"beta"} and \code{"parEta"}.
-#' @param homo_test \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#' @param homo_test \code{TRUE} or \code{FALSE} (default), performs homogeneity
 #'   tests
+#' @param colli_test \code{TRUE} or \code{FALSE} (default), computes VIF and Tollerance 
+#'        for the terms in the model
+
 #' @param qq_plot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
 #' @param norm_test \code{TRUE} or \code{FALSE} (default), provide a test for
@@ -214,6 +217,7 @@ gamlj_lm <- function(
       "beta",
       "etap"),
     homo_test = FALSE,
+    colli_test = FALSE,
     qq_plot = FALSE,
     norm_test = FALSE,
     norm_plot = FALSE,
@@ -351,6 +355,7 @@ gamlj_lm <- function(
     model_type = model_type,
     es = es,
     homo_test = homo_test,
+    colli_test = homo_test,
     qq_plot = qq_plot,
     norm_test = norm_test,
     norm_plot = norm_plot,

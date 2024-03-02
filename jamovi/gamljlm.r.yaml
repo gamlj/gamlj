@@ -1077,6 +1077,37 @@ items:
               type: number
               format: zto,pvalue
 
+        - name: collitest
+          title: Collinearity statistics
+          type: Table
+          description: a table for collinearity statistics
+          visible: (colli_test)
+          clearWith:
+                    ### modeloptions  begins
+                 -  dep
+                 -  factors
+                 -  covs
+                 -  covs_scale
+                 -  dep_scale
+                 -  scale_missing
+                 -  contrasts
+                 -  model_terms
+                 -  fixed_intercept
+                 -  se_method
+                 -  robust_method
+                 -  mute
+                    ### modeloptions  ends
+          columns:
+            - name: source
+              type: text
+              title: Term
+            - name: vif
+              type: number
+              title: VIF
+            - name: tol
+              type: number
+              title: Tollerance
+
         - name: qqplot
           title: Q-Q Plot
           visible: (qq_plot)

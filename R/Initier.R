@@ -414,6 +414,14 @@ init_main_res_corr=function() {
         resultsList
       
     },
+    init_assumptions_collitest=function() {
+      
+      tab<-list(source="")
+      if (self$formulaobj$hasTerms) {
+        tab<-lapply(self$formulaobj$anova_terms, function(x) list(source=.stringifyTerm(x)))
+      }
+      tab
+    },
 
    
    run_assumptions_homotest=function() {

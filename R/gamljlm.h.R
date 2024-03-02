@@ -59,6 +59,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "beta",
                 "etap"),
             homo_test = FALSE,
+            colli_test = FALSE,
             qq_plot = FALSE,
             norm_test = FALSE,
             norm_plot = FALSE,
@@ -381,6 +382,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "homo_test",
                 homo_test,
                 default=FALSE)
+            private$..colli_test <- jmvcore::OptionBool$new(
+                "colli_test",
+                colli_test,
+                default=FALSE)
             private$..qq_plot <- jmvcore::OptionBool$new(
                 "qq_plot",
                 qq_plot,
@@ -481,6 +486,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..model_type)
             self$.addOption(private$..es)
             self$.addOption(private$..homo_test)
+            self$.addOption(private$..colli_test)
             self$.addOption(private$..qq_plot)
             self$.addOption(private$..norm_test)
             self$.addOption(private$..norm_plot)
@@ -543,6 +549,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         model_type = function() private$..model_type$value,
         es = function() private$..es$value,
         homo_test = function() private$..homo_test$value,
+        colli_test = function() private$..colli_test$value,
         qq_plot = function() private$..qq_plot$value,
         norm_test = function() private$..norm_test$value,
         norm_plot = function() private$..norm_plot$value,
@@ -604,6 +611,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..model_type = NA,
         ..es = NA,
         ..homo_test = NA,
+        ..colli_test = NA,
         ..qq_plot = NA,
         ..norm_test = NA,
         ..norm_plot = NA,
@@ -1689,6 +1697,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 active = list(
                     homotest = function() private$.items[["homotest"]],
                     normtest = function() private$.items[["normtest"]],
+                    collitest = function() private$.items[["collitest"]],
                     qqplot = function() private$.items[["qqplot"]],
                     normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]]),
@@ -1767,6 +1776,37 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="collitest",
+                            title="Collinearity statistics",
+                            visible="(colli_test)",
+                            clearWith=list(
+                                "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "dep_scale",
+                                "scale_missing",
+                                "contrasts",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "robust_method",
+                                "mute"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `type`="text", 
+                                    `title`="Term"),
+                                list(
+                                    `name`="vif", 
+                                    `type`="number", 
+                                    `title`="VIF"),
+                                list(
+                                    `name`="tol", 
+                                    `type`="number", 
+                                    `title`="Tollerance"))))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="qqplot",

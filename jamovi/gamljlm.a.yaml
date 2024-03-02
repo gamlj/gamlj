@@ -655,6 +655,16 @@ options:
             Provides [Levene's test](https://biostats.w.uib.no/test-for-homogeneity-of-variances-levenes-test/){target="_blank"} 
             for equal variances across groups defined by factors  (homoschedasticity).
 
+    - name: colli_test
+      title: Collinearity tests
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), computes VIF and tollerance for the model
+          ui: >
+            Computes VIF and tollerance for the model term of the model
+
     - name: qq_plot
       title: Q-Q plot of residuals
       type: Bool

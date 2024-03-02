@@ -382,6 +382,7 @@ Runner <- R6::R6Class("Runner",
                                 warning("Levene's test is done only for factors.")
                                 return(list(bptable,ltable))
                           },
+
                           run_assumptions_normtest=function() {
                            
                             table<-data.frame(name=c("Kolmogorov-Smirnov","Shapiro-Wilk"),test=c(NaN,NaN),p=c(NaN,NaN))
@@ -399,6 +400,11 @@ Runner <- R6::R6Class("Runner",
                               table$p[2]=st$obj$p.value 
                             }
                             table
+                          },
+                          run_assumptions_collitest=function() {
+                            
+                            tab<-lapply(car::vif(self$model), function(x) list(vif=x,tol=1/x))
+                            tab
                           },
                           
                           
