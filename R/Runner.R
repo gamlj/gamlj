@@ -402,14 +402,13 @@ Runner <- R6::R6Class("Runner",
                             table
                           },
                           run_assumptions_collitest=function() {
-                            
-                            tab<-lapply(car::vif(self$model), function(x) list(vif=x,tol=1/x))
+                            tab <- as.data.frame(car::vif(self$model, type = "terms"))
+                            names(tab)[1]<-"vif"
+                            tab$tol=1/tab$vif
                             tab
                           },
-                          
-                          
+
                           savePredRes=function(results) {
-                            
                             
                             if (self$options$predicted && results$predicted$isNotFilled()) {
                                 jinfo("Saving predicted")
