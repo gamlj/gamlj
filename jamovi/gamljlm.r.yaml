@@ -625,6 +625,7 @@ items:
                  -  ccp_value
                  -  covs_scale_labels
                  -  covs_conditioning
+                 -  ccmm_step
                     ### simpleeffectsoptions  ends
               columns:
                    - name: test
@@ -702,6 +703,7 @@ items:
                  -  ccp_value
                  -  covs_scale_labels
                  -  covs_conditioning
+                 -  ccmm_step
                     ### simpleeffectsoptions  ends
 
               columns:
@@ -780,6 +782,7 @@ items:
                 -  ccp_value
                 -  covs_scale_labels
                 -  covs_conditioning
+                -  ccmm_step
                    ### simpleeffectsoptions  ends
                 
              columns:
@@ -861,6 +864,7 @@ items:
                 -  ccp_value
                 -  covs_scale_labels
                 -  covs_conditioning
+                -  ccmm_step
                    ### simpleeffectsoptions  ends
 
              columns:

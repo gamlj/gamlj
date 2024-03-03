@@ -87,12 +87,15 @@
 #' @param covs_conditioning '\code{mean_sd}' (default), or '\code{percent}'.
 #'   How to condition covariates in simple effects and plots. '\code{mean_sd}'
 #'   for mean +/- '\code{ccp_value}' * sd. '\code{percent}' for median
-#'   +/-'\code{ccp_value}' for percentiles.
+#'   +/-'\code{ccp_value}' for percentiles. \code{range} conditions to min and max and \code{ccmm_steps} values in between.
 #' @param ccm_value how many st.deviations around the means used to condition
 #'   simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}
 #' @param ccp_value offsett (number of percentiles) around the median used to
 #'   condition simple effects and plots. Used if
 #'   \code{simpleScale}=\code{'percent'}
+#' @param ccmm_value   Covariate condition min max steps (not very mnemonic): 
+#'        At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}
+#'   
 #' @param covs_scale_labels how the levels of a continuous moderator should
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
@@ -207,6 +210,7 @@ gamlj_lm <- function(
     covs_conditioning = "mean_sd",
     ccm_value = 1,
     ccp_value = 25,
+    ccmm_steps = 1,
     covs_scale_labels = "labels",
     adjust = list(
       "bonf"),
@@ -348,6 +352,7 @@ gamlj_lm <- function(
     covs_conditioning = covs_conditioning,
     ccm_value = ccm_value,
     ccp_value = ccp_value,
+    ccmm_steps = ccmm_steps,
     covs_scale_labels = covs_scale_labels,
     adjust = adjust,
     posthoc_es = posthoc_es,

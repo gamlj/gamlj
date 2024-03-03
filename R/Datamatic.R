@@ -604,6 +604,7 @@ Variable <- R6::R6Class(
                               mean=mean(vardata,na.rm = TRUE),
                               sd=sd(vardata,na.rm = TRUE))
 
+    
       if (self$datamatic$options$covs_conditioning=="mean_sd")  {
         
         .span<-ifelse(is.null(self$datamatic$options$ccm_value),1,self$datamatic$options$ccm_value)
@@ -624,6 +625,23 @@ Variable <- R6::R6Class(
         self$levels<-round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span),na.rm=TRUE), digits = 3) 
           
         self$method="percent"
+      }
+
+      if (self$datamatic$options$covs_conditioning=="range") {
+        
+         steps <- ifelse(is.null(self$datamatic$options$ccmm_steps),1,self$datamatic$options$ccmm_steps)
+         min   <- min(vardata,na.rm = TRUE)
+         max   <- max(vardata,na.rm = TRUE)
+        .labs  <- pretty(c(min,max),steps)
+
+         self$levels<-.labs 
+          
+         self$method="range"
+      }
+      # if the user wants a range conditioning, only actual value can be used
+      if (self$method == "range") {
+        if (! labels_type %in% c("values", "uvalues"))
+          labels_type <- "values"
       }
       
       if (labels_type == "labels") 

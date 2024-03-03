@@ -249,6 +249,17 @@ children:
                         suffix: '%'
                         format: number
                         enable: (covs_conditioning_percent)
+                  - type: RadioButton
+                    name: covs_conditioning_minmax
+                    optionName: covs_conditioning
+                    optionPart: range
+                    children:
+                      - type: TextBox
+                        name: ccmm_steps
+                        format: number
+                        enable: (covs_conditioning_minmax)
+
+
           - type: LayoutBox
             margin: large
             style: list
