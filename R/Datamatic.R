@@ -631,19 +631,19 @@ Variable <- R6::R6Class(
 
       if (self$datamatic$options$covs_conditioning=="range") {
         
-         steps <- ifelse(is.null(self$datamatic$options$ccmm_steps),1,self$datamatic$options$ccmm_steps)
-         min   <- min(vardata,na.rm = TRUE)
-         max   <- max(vardata,na.rm = TRUE)
-        .labs  <- round(epretty(min,max,steps),digits=3)
-
-         self$levels<-.labs 
-          
+         steps         <- ifelse(is.null(self$datamatic$options$ccmm_steps),1,self$datamatic$options$ccmm_steps)
+         min           <- min(vardata,na.rm = TRUE)
+         max           <- max(vardata,na.rm = TRUE)
+         self$levels   <- round(epretty(min,max,steps),digits=3)
+        .labs          <- rep("",length(self$levels))
+        .labs[1]       <- "Min"
+        .labs[length(.labs)]  <- "Max"
          self$method="range"
       }
-      # if the user wants a range conditioning, only actual value can be used
+
       if (self$method == "range") {
-        if (! labels_type %in% c("values", "uvalues"))
-          labels_type <- "values"
+        if ( labels_type == "labels")
+                    labels_type <- "values_labels"
       }
       
       if (labels_type == "labels") 
@@ -656,12 +656,14 @@ Variable <- R6::R6Class(
         self$levels_labels<-self$original_levels
       
       
-      if (labels_type == "values_labels") 
+      if (labels_type == "values_labels") {
         self$levels_labels<-paste(.labs,self$levels,sep="=")
-      
-      if (labels_type == "uvalues_labels") 
+        self$levels_labels<-gsub("^\\=","",self$levels_labels)
+      }
+      if (labels_type == "uvalues_labels") {
         self$levels_labels<-paste(.labs,self$original_levels,sep="=")
-  
+        self$levels_labels<-gsub("^\\=","",self$levels_labels)
+      }
       if (all(!is.nan(self$levels)) &  all(!is.na(self$levels)))
             if(any(duplicated(self$levels))) {
                self$levels<-unique(self$levels)
