@@ -205,11 +205,13 @@ Variable <- R6::R6Class(
         if (is.factor(vardata)) {
           self$datamatic$warning<-list(topic="info",message=paste("Variable",var,"has been coerced to numeric"))
         }
-        self$contrast_labels<-self$name
-        self$paramsnames<-var
-        self$paramsnames64<-tob64(var)
-        self$nlevels=3
-        self$neffects=1
+        self$contrast_labels <- self$name
+        self$paramsnames     <- var
+        self$paramsnames64   <- tob64(var)
+        self$nlevels         <- 3
+        self$neffects        <- 1
+        if (self$datamatic$options$covs_conditioning == "range")
+                self$nlevels <- as.numeric(self$datamatic$options$ccmm_steps)+1
         
       }
       ### end covs ####
@@ -632,7 +634,7 @@ Variable <- R6::R6Class(
          steps <- ifelse(is.null(self$datamatic$options$ccmm_steps),1,self$datamatic$options$ccmm_steps)
          min   <- min(vardata,na.rm = TRUE)
          max   <- max(vardata,na.rm = TRUE)
-        .labs  <- pretty(c(min,max),steps)
+        .labs  <- round(epretty(min,max,steps),digits=3)
 
          self$levels<-.labs 
           

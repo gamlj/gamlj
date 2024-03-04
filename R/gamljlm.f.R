@@ -87,7 +87,7 @@
 #' @param covs_conditioning '\code{mean_sd}' (default), or '\code{percent}'.
 #'   How to condition covariates in simple effects and plots. '\code{mean_sd}'
 #'   for mean +/- '\code{ccp_value}' * sd. '\code{percent}' for median
-#'   +/-'\code{ccp_value}' for percentiles. \code{range} conditions to min and max and \code{ccmm_steps} values in between.
+#'   +/-'\code{ccp_value}' for percentiles. \code{range} conditions to min and max divided in \code{ccmm_steps} steps (aproximately).
 #' @param ccm_value how many st.deviations around the means used to condition
 #'   simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}
 #' @param ccp_value offsett (number of percentiles) around the median used to
@@ -210,7 +210,7 @@ gamlj_lm <- function(
     covs_conditioning = "mean_sd",
     ccm_value = 1,
     ccp_value = 25,
-    ccmm_steps = 1,
+    ccmm_steps = 3,
     covs_scale_labels = "labels",
     adjust = list(
       "bonf"),

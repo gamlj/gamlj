@@ -29,4 +29,4 @@ simpleeffectsoptions:
                  - ccp_value
                  - covs_scale_labels
                  - covs_conditioning
-                 - ccmm_step
+                 - ccmm_steps

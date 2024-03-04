@@ -71,6 +71,11 @@ is.b64<-function(a) {
     any(test1,test2,test3,test4)
 }
 
+epretty<-function(min,max,steps) {
+  i     <- (max-min)/steps
+  seq(min,max,by=i)
+}
+#epretty(-.3,.5,10)
 ### basic functions ###
 
 
