@@ -22,11 +22,12 @@ cioptions:
         - boot_r
 
 simpleeffectsoptions:
-                 - simple_x
-                 - simple_mods
-                 - simple_scale
-                 - ccm_value
-                 - ccp_value
-                 - covs_scale_labels
-                 - covs_conditioning
-                 - ccmm_steps
+        - simple_x
+        - simple_mods
+        - simple_scale
+covscalingoptions:                 
+        - covs_conditioning
+        - covs_scale_labels
+        - ccp_value
+        - ccm_value
+        - ccmm_steps

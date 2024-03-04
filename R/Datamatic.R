@@ -660,6 +660,7 @@ Variable <- R6::R6Class(
         self$levels_labels<-paste(.labs,self$levels,sep="=")
         self$levels_labels<-gsub("^\\=","",self$levels_labels)
       }
+      
       if (labels_type == "uvalues_labels") {
         self$levels_labels<-paste(.labs,self$original_levels,sep="=")
         self$levels_labels<-gsub("^\\=","",self$levels_labels)

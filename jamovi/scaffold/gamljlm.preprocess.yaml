@@ -456,6 +456,7 @@ items:
               clearWith:
                  -  __modeloptions__
                  -  __simpleeffectsoptions__
+                 -  __covscalingoptions__                 
               columns:
                    - name: test
                      title: F
@@ -508,6 +509,7 @@ items:
                  -  __modeloptions__
                  -  __cioptions__
                  -  __simpleeffectsoptions__
+                 -  __covscalingoptions__                 
 
               columns:
                      - name: contrast
@@ -564,6 +566,7 @@ items:
              title: ANOVA 
              clearWith:
                 -  __modeloptions__
+                -  __covscalingoptions__                 
                 -  __simpleeffectsoptions__
                 
              columns:
@@ -621,6 +624,7 @@ items:
                 -  __modeloptions__
                 -  __cioptions__
                 -  __simpleeffectsoptions__
+                - __covscalingoptions__                 
 
              columns:
                    - name: effect
@@ -667,13 +671,8 @@ items:
         clearWith:
             -  __modeloptions__
             -  __cioptions__
+            -  __covscalingoptions__            
             - emmeans
-            - covs_conditioning            
-            - covs_scale_labels   
-            - covs_conditioning
-            - covs_scale_labels
-            - ccp_value
-            - ccm_value
             
             
         columns:
@@ -713,6 +712,7 @@ items:
           clearWith:
            -  __modeloptions__
            -  __cioptions__
+           -  __covscalingoptions__                 
            - plot_x
            - plot_z
            - plot_by
@@ -721,10 +721,6 @@ items:
            - plot_xoriginal
            - plot_black
            - plot_around
-           - covs_conditioning
-           - covs_scale_labels
-           - ccp_value
-           - ccm_value
 
   - name: plotnotes
     type: Html

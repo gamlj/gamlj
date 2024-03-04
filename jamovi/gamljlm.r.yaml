@@ -621,12 +621,14 @@ items:
                  -  simple_x
                  -  simple_mods
                  -  simple_scale
-                 -  ccm_value
-                 -  ccp_value
-                 -  covs_scale_labels
-                 -  covs_conditioning
-                 -  ccmm_steps
                     ### simpleeffectsoptions  ends
+                    ### covscalingoptions  begins
+                 -  covs_conditioning                 
+                 -  covs_scale_labels                 
+                 -  ccp_value                 
+                 -  ccm_value                 
+                 -  ccmm_steps                 
+                    ### covscalingoptions  ends
               columns:
                    - name: test
                      title: F
@@ -699,12 +701,14 @@ items:
                  -  simple_x
                  -  simple_mods
                  -  simple_scale
-                 -  ccm_value
-                 -  ccp_value
-                 -  covs_scale_labels
-                 -  covs_conditioning
-                 -  ccmm_steps
                     ### simpleeffectsoptions  ends
+                    ### covscalingoptions  begins
+                 -  covs_conditioning                 
+                 -  covs_scale_labels                 
+                 -  ccp_value                 
+                 -  ccm_value                 
+                 -  ccmm_steps                 
+                    ### covscalingoptions  ends
 
               columns:
                      - name: contrast
@@ -774,15 +778,17 @@ items:
                 -  robust_method
                 -  mute
                    ### modeloptions  ends
+                   ### covscalingoptions  begins
+                -  covs_conditioning                 
+                -  covs_scale_labels                 
+                -  ccp_value                 
+                -  ccm_value                 
+                -  ccmm_steps                 
+                   ### covscalingoptions  ends
                    ### simpleeffectsoptions  begins
                 -  simple_x
                 -  simple_mods
                 -  simple_scale
-                -  ccm_value
-                -  ccp_value
-                -  covs_scale_labels
-                -  covs_conditioning
-                -  ccmm_steps
                    ### simpleeffectsoptions  ends
                 
              columns:
@@ -860,12 +866,14 @@ items:
                 -  simple_x
                 -  simple_mods
                 -  simple_scale
-                -  ccm_value
-                -  ccp_value
-                -  covs_scale_labels
-                -  covs_conditioning
-                -  ccmm_steps
                    ### simpleeffectsoptions  ends
+                  ### covscalingoptions  begins
+                - covs_conditioning                 
+                - covs_scale_labels                 
+                - ccp_value                 
+                - ccm_value                 
+                - ccmm_steps                 
+                  ### covscalingoptions  ends
 
              columns:
                    - name: effect
@@ -929,13 +937,14 @@ items:
             -  ci_method
             -  boot_r
                ### cioptions  ends
+               ### covscalingoptions  begins
+            -  covs_conditioning            
+            -  covs_scale_labels            
+            -  ccp_value            
+            -  ccm_value            
+            -  ccmm_steps            
+               ### covscalingoptions  ends
             - emmeans
-            - covs_conditioning            
-            - covs_scale_labels   
-            - covs_conditioning
-            - covs_scale_labels
-            - ccp_value
-            - ccm_value
             
             
         columns:
@@ -992,6 +1001,13 @@ items:
            -  ci_method
            -  boot_r
               ### cioptions  ends
+              ### covscalingoptions  begins
+           -  covs_conditioning                 
+           -  covs_scale_labels                 
+           -  ccp_value                 
+           -  ccm_value                 
+           -  ccmm_steps                 
+              ### covscalingoptions  ends
            - plot_x
            - plot_z
            - plot_by
@@ -1000,10 +1016,6 @@ items:
            - plot_xoriginal
            - plot_black
            - plot_around
-           - covs_conditioning
-           - covs_scale_labels
-           - ccp_value
-           - ccm_value
 
   - name: plotnotes
     type: Html
