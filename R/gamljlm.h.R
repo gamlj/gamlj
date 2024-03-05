@@ -45,7 +45,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale = NULL,
             scale_missing = "complete",
             covs_conditioning = "mean_sd",
-            ccmm_steps = 1,
+            ccra_steps = 1,
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
@@ -306,9 +306,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "percent",
                     "range"),
                 default="mean_sd")
-            private$..ccmm_steps <- jmvcore::OptionNumber$new(
-                "ccmm_steps",
-                ccmm_steps,
+            private$..ccra_steps <- jmvcore::OptionNumber$new(
+                "ccra_steps",
+                ccra_steps,
                 default=1,
                 min=1,
                 max=50)
@@ -482,7 +482,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..covs_conditioning)
-            self$.addOption(private$..ccmm_steps)
+            self$.addOption(private$..ccra_steps)
             self$.addOption(private$..ccm_value)
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
@@ -546,7 +546,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         covs_conditioning = function() private$..covs_conditioning$value,
-        ccmm_steps = function() private$..ccmm_steps$value,
+        ccra_steps = function() private$..ccra_steps$value,
         ccm_value = function() private$..ccm_value$value,
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
@@ -609,7 +609,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..covs_conditioning = NA,
-        ..ccmm_steps = NA,
+        ..ccra_steps = NA,
         ..ccm_value = NA,
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
@@ -1311,7 +1311,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale_labels",
                                 "ccp_value",
                                 "ccm_value",
-                                "ccmm_steps"),
+                                "ccra_steps"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1393,7 +1393,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale_labels",
                                 "ccp_value",
                                 "ccm_value",
-                                "ccmm_steps"),
+                                "ccra_steps"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1480,7 +1480,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale_labels",
                                     "ccp_value",
                                     "ccm_value",
-                                    "ccmm_steps",
+                                    "ccra_steps",
                                     "simple_x",
                                     "simple_mods",
                                     "simple_scale"),
@@ -1568,7 +1568,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "covs_scale_labels",
                                     "ccp_value",
                                     "ccm_value",
-                                    "ccmm_steps"),
+                                    "ccra_steps"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1637,7 +1637,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "covs_scale_labels",
                         "ccp_value",
                         "ccm_value",
-                        "ccmm_steps",
+                        "ccra_steps",
                         "emmeans"),
                     columns=list(
                         list(
@@ -1694,7 +1694,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "covs_scale_labels",
                         "ccp_value",
                         "ccm_value",
-                        "ccmm_steps",
+                        "ccra_steps",
                         "plot_x",
                         "plot_z",
                         "plot_by",

@@ -30,4 +30,4 @@ covscalingoptions:
         - covs_scale_labels
         - ccp_value
         - ccm_value
-        - ccmm_steps
+        - ccra_steps

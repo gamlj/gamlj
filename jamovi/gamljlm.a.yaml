@@ -16,8 +16,6 @@ description:
             data('ToothGrowth')
             gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
 
-
-
 options:
     - name: data
       type: Data
@@ -466,16 +464,16 @@ options:
               '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots.
               '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
 
-    - name: ccmm_steps
+    - name: ccra_steps
       type: Number
       default: 1
       min: 1
       max: 50
       description:
           R: >
-            Covariate condition min max steps (not very mnemonic): At how many values between min and max should the covariate be conditioned 
+            Covariate condition range steps (not very mnemonic): At how many values between min and max should the covariate be conditioned 
           ui: >
-            Covariate condition min max steps: At how many values between min and max should the covariate be conditioned 
+            Covariate condition range steps: At how many values between min and max should the covariate be conditioned 
 
     - name: ccm_value
       type: Number

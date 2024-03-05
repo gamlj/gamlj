@@ -256,7 +256,7 @@ children:
                     children:
                       - type: TextBox
                         label: Steps
-                        name: ccmm_steps
+                        name: ccra_steps
                         format: number
                         enable: (covs_conditioning_range)
 

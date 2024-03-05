@@ -627,7 +627,7 @@ items:
                  -  covs_scale_labels                 
                  -  ccp_value                 
                  -  ccm_value                 
-                 -  ccmm_steps                 
+                 -  ccra_steps                 
                     ### covscalingoptions  ends
               columns:
                    - name: test
@@ -707,7 +707,7 @@ items:
                  -  covs_scale_labels                 
                  -  ccp_value                 
                  -  ccm_value                 
-                 -  ccmm_steps                 
+                 -  ccra_steps                 
                     ### covscalingoptions  ends
 
               columns:
@@ -783,7 +783,7 @@ items:
                 -  covs_scale_labels                 
                 -  ccp_value                 
                 -  ccm_value                 
-                -  ccmm_steps                 
+                -  ccra_steps                 
                    ### covscalingoptions  ends
                    ### simpleeffectsoptions  begins
                 -  simple_x
@@ -872,7 +872,7 @@ items:
                 - covs_scale_labels                 
                 - ccp_value                 
                 - ccm_value                 
-                - ccmm_steps                 
+                - ccra_steps                 
                   ### covscalingoptions  ends
 
              columns:
@@ -942,7 +942,7 @@ items:
             -  covs_scale_labels            
             -  ccp_value            
             -  ccm_value            
-            -  ccmm_steps            
+            -  ccra_steps            
                ### covscalingoptions  ends
             - emmeans
             
@@ -1006,7 +1006,7 @@ items:
            -  covs_scale_labels                 
            -  ccp_value                 
            -  ccm_value                 
-           -  ccmm_steps                 
+           -  ccra_steps                 
               ### covscalingoptions  ends
            - plot_x
            - plot_z
