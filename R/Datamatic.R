@@ -211,7 +211,7 @@ Variable <- R6::R6Class(
         self$nlevels         <- 3
         self$neffects        <- 1
         if (self$datamatic$options$covs_conditioning == "range")
-                self$nlevels <- as.numeric(self$datamatic$options$ccmm_steps)+1
+                self$nlevels <- as.numeric(self$datamatic$options$ccra_steps)+1
         
       }
       ### end covs ####
@@ -631,7 +631,7 @@ Variable <- R6::R6Class(
 
       if (self$datamatic$options$covs_conditioning=="range") {
         
-         steps         <- ifelse(is.null(self$datamatic$options$ccmm_steps),1,self$datamatic$options$ccmm_steps)
+         steps         <- ifelse(is.null(self$datamatic$options$ccra_steps),1,self$datamatic$options$ccra_steps)
          min           <- min(vardata,na.rm = TRUE)
          max           <- max(vardata,na.rm = TRUE)
          self$levels   <- round(epretty(min,max,steps),digits=3)

@@ -44,6 +44,7 @@ children:
                         isTarget: true
                         events:
                                 change: ./gamlj.events::onChange_cluster
+                                
 -       name: panel_input
         type: LayoutBox
         margin: large
@@ -80,6 +81,7 @@ children:
                                 change: ./gamlj.events::onEvent_comparison
                 -       type: CheckBox
                         name: more_fit_indices
+                        
 -       name: panel_fixed
         type: CollapseBox
         label: Fixed Effects
@@ -127,6 +129,7 @@ children:
                         -       type: CheckBox
                                 name: nested_intercept
                                 enable: (comparison)
+                                
 -       name: panel_random
         type: CollapseBox
         label: Random Effects
@@ -250,6 +253,7 @@ children:
                         children:
                         -       type: CheckBox
                                 name: re_lrt
+                                
 -       name: panel_structure
         type: CollapseBox
         label: Residuals Structure
@@ -280,119 +284,15 @@ children:
                                 name: res_struct_ar1
                                 optionName: res_struct
                                 optionPart: ar1
+        
 -       name: panel_factors
-        type: CollapseBox
-        label: Factors Coding
-        collapsed: true
-        stretchFactor: 1
-        children:
-        -       type: ListBox
-                name: contrasts
-                stretchFactor: 1
-                showColumnHeaders: false
-                columns:
-                -       name: var
-                        label: ~
-                        selectable: false
-                        stretchFactor: 1
-                        maxWidth: 300
-                        template:
-                                type: VariableLabel
-                -       name: type
-                        label: ~
-                        selectable: false
-                        stretchFactor: 0.5
-                        template:
-                                type: ComboBox
-        -       type: CheckBox
-                name: show_contrastnames
-        -       type: CheckBox
-                name: show_contrastcodes
+        type: scaffold
+        file: commons.u.yaml    
+        
 -       name: panel_covs
-        type: CollapseBox
-        label: Covariates Scaling
-        collapsed: true
-        stretchFactor: 1
-        children:
-        -       type: ListBox
-                name: covs_scale
-                stretchFactor: 1
-                showColumnHeaders: false
-                columns:
-                -       name: var
-                        label: ~
-                        selectable: false
-                        stretchFactor: 1
-                        maxWidth: 300
-                        template:
-                                type: VariableLabel
-                -       name: type
-                        label: ~
-                        selectable: false
-                        stretchFactor: 0.5
-                        template:
-                                type: ComboBox
-        -       type: LayoutBox
-                margin: large
-                style: inline
-                children:
-                -       type: Label
-                        label: Covariates conditioning
-                        children:
-                        -       type: LayoutBox
-                                margin: large
-                                style: list
-                                children:
-                                -       type: RadioButton
-                                        name: covs_conditioning_mean_sd
-                                        optionName: covs_conditioning
-                                        optionPart: mean_sd
-                                        children:
-                                        -       type: TextBox
-                                                name: ccm_value
-                                                format: number
-                                                enable: (covs_conditioning_mean_sd)
-                                -       name: covs_conditioning_percent
-                                        type: RadioButton
-                                        optionName: covs_conditioning
-                                        optionPart: percent
-                                        children:
-                                        -       type: TextBox
-                                                name: ccp_value
-                                                label: ~
-                                                suffix: '%'
-                                                format: number
-                                                enable: (covs_conditioning_percent)
-                                -       type: RadioButton
-                                        name: covs_conditioning_range
-                                        optionName: covs_conditioning
-                                        optionPart: range
-                                        children:
-                                        -       type: TextBox
-                                                label: Steps
-                                                name: ccra_steps
-                                                format: number
-                                                enable: (covs_conditioning_range)
-                -       type: LayoutBox
-                        margin: large
-                        style: list
-                        children:
-                        -       type: Label
-                                label: Covariates labeling
-                                children:
-                                -       type: ComboBox
-                                        name: covs_scale_labels
-                        -       type: Label
-                                label: Dependent variable
-                                children:
-                                -       type: ComboBox
-                                        name: dep_scale
-                        -       type: Label
-                                label: Scaling on
-                                children:
-                                -       type: ComboBox
-                                        name: scale_missing
-                                        label: ''
+        type: scaffold
+        file: commons.u.yaml    
+
 -       name: panel_posthoc
         type: CollapseBox
         label: Post Hoc Tests
@@ -452,9 +352,11 @@ children:
                         children:
                         -       name: posthoc_ci
                                 type: CheckBox
+                                
 -       name: panel_plots
         type: CollapseBox
         label: Plots
+        
         collapsed: true
         stretchFactor: 1
         children:
@@ -536,59 +438,15 @@ children:
                                 optionName: plot_re_method
                                 optionPart: full
                                 enable: (plot_re)
+                                
 -       name: panel_simpleeffects
-        type: CollapseBox
-        label: Simple Effects
-        collapsed: true
-        stretchFactor: 1
-        children:
-        -       type: VariableSupplier
-                name: simpleSupplier
-                populate: manual
-                stretchFactor: 1
-                persistentItems: false
-                events:
-                        change: ./gamlj.events::onChange_simpleSupplier
-                        update: ./gamlj.events::onUpdate_simpleSupplier
-                children:
-                -       type: TargetLayoutBox
-                        children:
-                        -       type: VariablesListBox
-                                name: simple_x
-                                isTarget: true
-                                maxItemCount: 1
-                -       type: TargetLayoutBox
-                        children:
-                        -       type: VariablesListBox
-                                name: simple_mods
-                                isTarget: true
-        -       type: CheckBox
-                name: simple_interactions
-                label: Simple interactions
-                enable: (! model_type_multinomial)
+        type: scaffold
+        file: commons.u.yaml    
+
 -       name: panel_emmeans
-        type: CollapseBox
-        label: Estimated Marginal Means
-        collapsed: true
-        stretchFactor: 1
-        children:
-        -       type: Supplier
-                name: emmeansSupplier
-                persistentItems: false
-                stretchFactor: 1
-                format: term
-                events:
-                        change: ./gamlj.events::onChange_emmeansSupplier
-                        update: ./gamlj.events::onUpdate_emmeansSupplier
-                children:
-                -       type: TargetLayoutBox
-                        label: ''
-                        children:
-                        -       type: ListBox
-                                name: emmeans
-                                isTarget: true
-                                template:
-                                        type: TermLabel
+        type: scaffold
+        file: commons.u.yaml    
+
 -       name: panel_assumptions
         type: CollapseBox
         label: Assumption Checks
@@ -630,6 +488,7 @@ children:
                         label: Residuals-Predicted (grid)
                 -       type: CheckBox
                         name: plot_extremes
+                        
 -       name: panel_options
         type: CollapseBox
         label: Options

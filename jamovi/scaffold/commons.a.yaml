@@ -1,0 +1,44 @@
+    - name: fixed_intercept
+      title: Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+          ui: >
+            Estimates fixed intercept if flagged
+
+    - name: nested_intercept
+      title: Nested intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+
+    - name: covs_conditioning
+      title: Covariates conditioning
+      type: List
+      options:
+        - name: mean_sd
+          title: Mean ±  SD
+        - name: percent
+          title: Percentiles 50 ± offset 
+        - name: range
+          title: Min to Max 
+      default: mean_sd
+      description:
+          R: >
+              '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots.
+              '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
+
+    - name: ccra_steps
+      type: Number
+      default: 1
+      min: 1
+      max: 50
+      description:
+          R: >
+            Covariate condition range steps (not very mnemonic): At how many values between min and max should the covariate be conditioned 
+          ui: >
+            Covariate condition range steps: At how many values between min and max should the covariate be conditioned 

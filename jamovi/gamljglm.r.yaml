@@ -398,6 +398,7 @@ items:
                          - simple_scale
                          - ccm_value
                          - ccp_value
+                         - ccra_steps
                          - covs_scale_labels
                          - covs_conditioning
                            ### simpleeffectsoptions  ends

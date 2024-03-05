@@ -6,8 +6,6 @@ items:
   - name: model
     type: Property
 
-
-
   - name: info
     title: Model Info
     type: Table

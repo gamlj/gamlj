@@ -46,6 +46,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             simple_mods = NULL,
             simple_interactions = FALSE,
             covs_conditioning = "mean_sd",
+            ccra_steps = 1,
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
@@ -286,8 +287,15 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 covs_conditioning,
                 options=list(
                     "mean_sd",
-                    "percent"),
+                    "percent",
+                    "range"),
                 default="mean_sd")
+            private$..ccra_steps <- jmvcore::OptionNumber$new(
+                "ccra_steps",
+                ccra_steps,
+                default=1,
+                min=1,
+                max=50)
             private$..ccm_value <- jmvcore::OptionNumber$new(
                 "ccm_value",
                 ccm_value,
@@ -458,6 +466,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_conditioning)
+            self$.addOption(private$..ccra_steps)
             self$.addOption(private$..ccm_value)
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
@@ -516,6 +525,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         covs_conditioning = function() private$..covs_conditioning$value,
+        ccra_steps = function() private$..ccra_steps$value,
         ccm_value = function() private$..ccm_value$value,
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
@@ -573,6 +583,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..simple_mods = NA,
         ..simple_interactions = NA,
         ..covs_conditioning = NA,
+        ..ccra_steps = NA,
         ..ccm_value = NA,
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
@@ -1380,6 +1391,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
+                                "ccra_steps",
                                 "covs_scale_labels",
                                 "covs_conditioning"),
                             columns=list(
@@ -1427,6 +1439,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
+                                "ccra_steps",
                                 "covs_scale_labels",
                                 "covs_conditioning"),
                             columns=list(
@@ -1530,6 +1543,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "simple_scale",
                                     "ccm_value",
                                     "ccp_value",
+                                    "ccra_steps",
                                     "covs_scale_labels",
                                     "covs_conditioning"),
                                 columns=list(
@@ -1580,6 +1594,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "simple_scale",
                                     "ccm_value",
                                     "ccp_value",
+                                    "ccra_steps",
                                     "covs_scale_labels",
                                     "covs_conditioning"),
                                 columns=list(
@@ -1666,6 +1681,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "simple_scale",
                         "ccm_value",
                         "ccp_value",
+                        "ccra_steps",
                         "covs_scale_labels",
                         "covs_conditioning"),
                     columns=list(

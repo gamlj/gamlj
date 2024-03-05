@@ -427,6 +427,14 @@ const fun = {
               ui.precision.$el.hide();
             }
         }
+        // model specific options 
+        if (ui.model_type.getValue() === "multinomial" && ui['.caller'].value()=="glmer") {
+          ui.simple_interactions.setValue(false);
+          ui.simple_interactions.setEnabled(false);
+        } else {
+           ui.simple_interactions.setEnabled(true);
+        }      
+
 
    },
     mark: function(obj) {
