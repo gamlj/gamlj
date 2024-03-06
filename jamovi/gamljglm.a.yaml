@@ -37,6 +37,16 @@ options:
         description:
                 R: |
                         a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
+-       name: dep2
+        title: Failures
+        type: Variable
+        default: ~
+        permitted:
+        - factor
+        - numeric
+        description:
+                R: |
+                        not present in R
 -       name: factors
         title: Factors
         type: Variables
@@ -117,6 +127,25 @@ options:
                         not present in R
                 ui: |
                         If flagged, the results are not updated each time an option is changed.  This allows settings complex model options without waiting for the results to update every time. Unflag it when ready to go.
+-       name: input_method
+        title: Input Method
+        type: List
+        default: standard
+        options:
+        -       name: standard
+                title: Responses
+        -       name: success
+                title: Success/Failure
+        -       name: total
+                title: P(success)/Totals
+        description:
+                R: |
+                        notpresent
+                ui: |
+                        The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
+                        `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
+                          and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
+                          of each proportion.
 -       name: ci_method
         title: CI Method
         type: List

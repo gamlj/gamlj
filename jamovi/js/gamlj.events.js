@@ -42,6 +42,7 @@ const events = {
         
         // updates all options related with model_type
            fun.updateModelOptions(ui,this)
+           
 
 
     },
@@ -183,6 +184,13 @@ const events = {
         fun.updateRandomSupplier(ui,this);
 
     },
+
+    onChange_input_method: function(ui) {
+      
+      fun.updateInputMethod(ui,this);
+
+    },
+    
     onEvent_re_list: function(ui) {
       fun.updateRandomSupplier(ui,this);
     },

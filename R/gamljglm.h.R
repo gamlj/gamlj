@@ -9,6 +9,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             .caller = "glm",
             .interface = "jamovi",
             dep = NULL,
+            dep2 = NULL,
             factors = NULL,
             covs = NULL,
             offset = NULL,
@@ -19,6 +20,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             comparison = FALSE,
             estimates_ci = FALSE,
             donotrun = FALSE,
+            input_method = "standard",
             ci_method = "wald",
             boot_r = 1000,
             ci_width = 95,
@@ -83,6 +85,13 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 permitted=list(
                     "factor",
                     "numeric"))
+            private$..dep2 <- jmvcore::OptionVariable$new(
+                "dep2",
+                dep2,
+                default=NULL,
+                permitted=list(
+                    "factor",
+                    "numeric"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
@@ -132,6 +141,14 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "donotrun",
                 donotrun,
                 default=FALSE)
+            private$..input_method <- jmvcore::OptionList$new(
+                "input_method",
+                input_method,
+                default="standard",
+                options=list(
+                    "standard",
+                    "success",
+                    "total"))
             private$..ci_method <- jmvcore::OptionList$new(
                 "ci_method",
                 ci_method,
@@ -401,6 +418,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
             self$.addOption(private$..dep)
+            self$.addOption(private$..dep2)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..offset)
@@ -411,6 +429,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..comparison)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
+            self$.addOption(private$..input_method)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
             self$.addOption(private$..ci_width)
@@ -456,6 +475,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         .caller = function() private$...caller$value,
         .interface = function() private$...interface$value,
         dep = function() private$..dep$value,
+        dep2 = function() private$..dep2$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         offset = function() private$..offset$value,
@@ -466,6 +486,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         comparison = function() private$..comparison$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
+        input_method = function() private$..input_method$value,
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
         ci_width = function() private$..ci_width$value,
@@ -510,6 +531,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ...caller = NA,
         ...interface = NA,
         ..dep = NA,
+        ..dep2 = NA,
         ..factors = NA,
         ..covs = NA,
         ..offset = NA,
@@ -520,6 +542,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..comparison = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
+        ..input_method = NA,
         ..ci_method = NA,
         ..boot_r = NA,
         ..ci_width = NA,
@@ -631,6 +654,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -686,6 +710,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -732,6 +757,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -773,6 +799,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -858,6 +885,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -920,6 +948,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -976,6 +1005,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1050,6 +1080,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1112,6 +1143,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1163,6 +1195,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "model_type",
                     "dep",
+                    "dep2",
                     "factors",
                     "covs",
                     "covs_scale",
@@ -1190,6 +1223,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "model_type",
                         "dep",
+                        "dep2",
                         "factors",
                         "covs",
                         "covs_scale",
@@ -1501,6 +1535,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "model_type",
                         "dep",
+                        "dep2",
                         "factors",
                         "covs",
                         "covs_scale",
@@ -1586,6 +1621,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "model_type",
                     "dep",
+                    "dep2",
                     "factors",
                     "covs",
                     "covs_scale",
@@ -1611,6 +1647,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "model_type",
                     "dep",
+                    "dep2",
                     "factors",
                     "covs",
                     "covs_scale",

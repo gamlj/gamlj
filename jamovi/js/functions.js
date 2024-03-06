@@ -363,12 +363,24 @@ const fun = {
    },
 
     updateModelOptions: function(ui, context) {
+      
+
 
         const noneed=["lm", "lmer"];
         
         if (noneed.includes(ui.model_type.getValue())) {
           return ;
         }
+        
+
+        // restore in case users used logistic second dep field
+        if (typeof ui.dep2 !== 'undefined' ) {
+             ui.dep_box.$label.text("Dependent Variable");
+             ui.dep2.$el.hide();
+          
+        }
+        
+
 // takes care of the effect size names and visibility
 
         if (typeof ui.es_RR !== 'undefined' ) {
@@ -434,9 +446,67 @@ const fun = {
         } else {
            ui.simple_interactions.setEnabled(true);
         }      
+        
+      // deal with extra field of logistic by tables
+      
+       ui.dep_box.$label.text("Dependent Variable");
+       if (typeof ui.input_method !== 'undefined' ) {
+         
+            if (ui['.caller'].value() === "glm") {
+              
+              const models=["logistic","probit"];
+              
+              if (models.includes(ui.model_type.getValue())) {
+              
+                   ui.input_method.$input.show();
+                   ui.input_method.$label.show();
+                   if (["success","total"].includes(ui.input_method.value()))
+                           ui.dep2.$el.show();
+
+              } else {
+                   ui.input_method.$input.hide();
+                   ui.input_method.$label.hide();
+                   ui.dep2.$el.hide();
+
+              }
+              this.updateInputMethod(ui,context);
+            }
+       }
+
 
 
    },
+    updateInputMethod: function(ui, context) {
+      
+      
+       
+       if (ui.model_type.getValue() !== "logistic" || !ui[".caller"].getValue()=="glm") {
+           ui.dep_box.$label.text("Dependent Variable");
+           ui.dep2.setValue(null);
+          return ;
+        }
+
+      
+      if (ui.input_method.value() === "success") {
+        ui.dep_box.$label.text("Successes/Faillures");
+        ui.dep2.$el.show();
+
+      }
+      if (ui.input_method.value() === "total") {
+        ui.dep_box.$label.text("Successes/Totals");
+        ui.dep2.$el.show();
+
+      }
+      if (ui.input_method.value() === "standard") {
+        ui.dep_box.$label.text("Dependent Variable");
+        ui.dep2.setValue(null);
+
+        ui.dep2.$el.hide();
+
+      }
+
+      
+    },
     mark: function(obj) {
                console.log(obj);
          }

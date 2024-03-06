@@ -1,6 +1,7 @@
 modeloptions:
         - model_type
         - dep
+        - dep2
         - factors
         - covs
         - covs_scale

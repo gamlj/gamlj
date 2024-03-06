@@ -565,7 +565,6 @@ children:
         -       type: CheckBox
                 name: simple_interactions
                 label: Simple interactions
-                enable: (! model_type_multinomial)
 -       name: panel_emmeans
         type: CollapseBox
         label: Estimated Marginal Means

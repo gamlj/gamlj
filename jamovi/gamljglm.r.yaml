@@ -36,6 +36,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -90,6 +91,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -137,6 +139,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -178,6 +181,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -258,6 +262,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -317,6 +322,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -375,6 +381,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -446,6 +453,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -503,6 +511,7 @@ items:
                       ### modeloptions  begins
                     - model_type
                     - dep
+                    - dep2
                     - factors
                     - covs
                     - covs_scale
@@ -552,6 +561,7 @@ items:
           ### modeloptions  begins
         - model_type
         - dep
+        - dep2
         - factors
         - covs
         - covs_scale
@@ -584,6 +594,7 @@ items:
               ### modeloptions  begins
             - model_type
             - dep
+            - dep2
             - factors
             - covs
             - covs_scale
@@ -855,6 +866,7 @@ items:
                 ### modeloptions  begins
               - model_type
               - dep
+              - dep2
               - factors
               - covs
               - covs_scale
@@ -946,6 +958,7 @@ items:
                     ### modeloptions  begins
                  -  model_type
                  -  dep
+                 -  dep2
                  -  factors
                  -  covs
                  -  covs_scale
@@ -973,6 +986,7 @@ items:
                     ### modeloptions  begins
                  -  model_type
                  -  dep
+                 -  dep2
                  -  factors
                  -  covs
                  -  covs_scale

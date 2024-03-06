@@ -5,8 +5,8 @@ compilerMode: tame
 events:
         update: ./gamlj.events::update
 children:
--       type: LayoutBox
-        name: panel_data
+-       name: panel_data
+        type: LayoutBox
         margin: large
         style: inline
         children:
@@ -107,9 +107,15 @@ children:
         stretchFactor: 1
         children:
         -       type: TargetLayoutBox
+                name: dep_box
                 children:
                 -       type: VariablesListBox
                         name: dep
+                        maxItemCount: 1
+                        isTarget: true
+                        itemDropBehaviour: overwrite
+                -       type: VariablesListBox
+                        name: dep2
                         maxItemCount: 1
                         isTarget: true
                         itemDropBehaviour: overwrite
@@ -180,6 +186,10 @@ children:
                 children:
                 -       name: donotrun
                         type: CheckBox
+                -       type: ComboBox
+                        name: input_method
+                        events:
+                                change: ./gamlj.events::onChange_input_method
 -       type: CollapseBox
         label: Model
         name: panel_model
@@ -526,7 +536,6 @@ children:
         -       type: CheckBox
                 name: simple_interactions
                 label: Simple interactions
-                enable: (! model_type_multinomial)
 -       name: panel_emmeans
         type: CollapseBox
         label: Estimated Marginal Means
