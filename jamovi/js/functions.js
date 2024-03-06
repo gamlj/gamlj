@@ -480,7 +480,7 @@ const fun = {
       
       
        
-       if (ui.model_type.getValue() !== "logistic" || !ui[".caller"].getValue()=="glm") {
+       if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
            ui.dep_box.$label.text("Dependent Variable");
            ui.dep2.setValue(null);
           return ;
@@ -488,7 +488,7 @@ const fun = {
 
       
       if (ui.input_method.value() === "success") {
-        ui.dep_box.$label.text("Successes/Faillures");
+        ui.dep_box.$label.text("Successes/Failures");
         ui.dep2.$el.show();
 
       }
