@@ -10,15 +10,24 @@ readiness <- function(options) {
     return(result)
   } 
   
-if(!is.something(options$dep)) {
+  if( !is.something(options$dep) ) {
     result$ready <- FALSE
     result$report <- TRUE
     result$reason <- "Please select the dependent variable"
     return(result)
-} 
+  } 
 
-  if (utils::hasName(options,"cluster"))
-    if (!is.something(options$cluster))  
+  if( utils::hasName(options, "input_method" ) && options$input_method != "standard" && !is.something(options$dep2) ) {
+    result$ready <- FALSE
+    result$report <- TRUE
+    result$reason <- "Please select all column of the data table"
+    return(result)
+  } 
+  
+  
+  
+  if ( utils::hasName(options,"cluster") )
+    if ( !is.something(options$cluster) )  
     {
       result$ready <- FALSE
       result$report <- TRUE
@@ -26,7 +35,7 @@ if(!is.something(options$dep)) {
       return(result)
     } 
   
-  if (utils::hasName(options,"re")) {
+  if ( utils::hasName(options,"re") ) {
      
        if (any(sapply(options$re,function(x) length(x)==0)))  
        {

@@ -459,49 +459,21 @@ Runner <- R6::R6Class("Runner",
                           
                           ),# end of public
 
-                        privat=list(
+                        private=list(
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
                             
-                              jinfo("MODULE: Estimating the model: checking")
-                              ### check the dependent variable ####
+                            jinfo("MODULE: Estimating the model: checking")
+                            ### check the dependent variable ####
+                            self$infomatic$check_dependent()
 
-                            
-                              if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
-
-                                    t2  <-  paste(self$infomatic$deptype,collapse = " or ")
-                                    t1  <-  self$datamatic$dep$type
-                                    m   <-   self$infomatic$model[1]
-                                    if (self$options$.interface=="jamovi") {
-                                      t2<-gsub("numeric","Continuous",t2,fixed = TRUE)
-                                      t2<-gsub("factor","Nominal",t2,fixed=TRUE)
-                                      t2<-gsub("integer","Measurement type=`Continuous`, Data type=`Integer`",t2,fixed=TRUE)
-                                      
-                                    }
-                                    msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type: ",t2)
-                                    stop(msg)
-                              }
-
-                            ### when necessary, check the number of levels
-                            if (is.something(self$infomatic$depnlevels)) {
-                                 nvar  <-  self$datamatic$dep$nlevels
-                                 nreq  <-  self$infomatic$depnlevels
-                                 if ( nreq > 0 ) {
-                                       if ( nreq !=  nvar)
-                                            stop(paste(self$infomatic$model[1],"requires exactly",nreq,"levels"))
-                                 } else {                               
-                                        if (nvar < abs(nreq) )
-                                               stop(paste(self$infomatic$model[1],"requires a minimum of",abs(nreq),"levels"))
-                                 }
-                            }
                              ### Some functions, such as lme4::glmer.nb 
                              ### require a package to be loaded 
                              ### in the function parent environment.
                              ### we give the required functions to them
                              glmer<-lme4::glmer
                              ###
-
                              jinfo("MODULE: Estimating the model: making options")
                              
                               opts    <-  opts<-list(str2lang(self$infomatic$rcall))
@@ -509,7 +481,6 @@ Runner <- R6::R6Class("Runner",
                               if (is.something(self$infomatic$formula))
                                           opts[["formula"]]<-self$infomatic$formula
 
-                              
                               if (is.something(self$infomatic$family))
                                           opts[["family"]]<-str2lang(self$infomatic$family)    
                               
@@ -517,8 +488,7 @@ Runner <- R6::R6Class("Runner",
                                         opts[[opt]]<-self$infomatic$calloptions[[opt]]   
 
                               ## for some reason, mclogit::mblogit requires the list of random terms
- 
-                              
+   
                               if (self$option("offset"))
                                  opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
 
@@ -560,12 +530,20 @@ Runner <- R6::R6Class("Runner",
                           },
                           .bootstrap_model=function() {
                             
+                            ## there are models for which we cannot compute the bootstrap CI
+                            ## in this case, we simply do not run and warn the user
+                            if (!self$infomatic$bootstrap) {
+                                self$warning<-list(topic="main_coefficients",message=paste("Bootstrap C.I not available for models",self$infomatic$model[1]))
+                                return()
+                            }
+                            
                             ### Here is how the storage mechanism works:
                             ### In the .b.R file we assign a table to be the runner storage.
                             ### When the model is estimated we save it as a Rdata file named with a random sequence and
                             ### save in the storage table name the file name. When results update, if self$storage$state
                             ### is not null, the Rdata file is load retrieving its name from the storage$state
                             ### if storage$state is null, the model is bootstrapped
+                            
 
                             if (is.something(self$storage) && is.something(self$storage$state)) {
                               

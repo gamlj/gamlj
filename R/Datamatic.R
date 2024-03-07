@@ -24,6 +24,10 @@ Datamatic <- R6::R6Class(
 
       if (utils::hasName(self$options,"offset"))
         self$vars<-c(self$options$offset,self$vars)
+      
+      if (utils::hasName(self$options,"dep2"))
+        self$vars<-c(self$options$dep2,self$vars)
+      
       private$.inspect_data(self$analysis$data)
       
     },
@@ -40,7 +44,6 @@ Datamatic <- R6::R6Class(
       }
       
       data64 <- jmvcore::naOmit(data64)
-#      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
       return(data64)
       
@@ -78,6 +81,7 @@ Datamatic <- R6::R6Class(
 
   ), ### end of public
   private=list(
+    
     .inspect_data=function(data) {
       
       self$variables<-lapply(self$vars,function(var) Variable$new(var,self)$checkVariable(data))
@@ -125,6 +129,7 @@ Variable <- R6::R6Class(
     nClusters=0,
     isBetween=FALSE,
     isDependent=FALSE,
+    isInteger= FALSE,
     initialize=function(var,datamatic) {
       self$name<-var
       self$datamatic<-datamatic
@@ -132,6 +137,7 @@ Variable <- R6::R6Class(
 
     },
     checkVariable=function(data) { 
+      
       var<-self$name
       if (inherits(data,"data.frame"))
              vardata<-data[[var]]
@@ -190,10 +196,13 @@ Variable <- R6::R6Class(
            }
            if (self$type %in% c("numeric","integer")) {
                if (self$datamatic$option("dep_scale")) 
-                 self$covs_scale<-self$datamatic$options$dep_scale
-                 self$contrast_labels<-self$name
-             }
+                 self$covs_scale      <- self$datamatic$options$dep_scale
+                 self$contrast_labels <- self$name
+                 self$isInteger       <- all(vardata%%1 == 0)
+
             }
+           return(self)  
+      }
 
             
       if (var %in% self$datamatic$options$covs) {
@@ -212,11 +221,13 @@ Variable <- R6::R6Class(
         self$neffects        <- 1
         if (self$datamatic$options$covs_conditioning == "range")
                 self$nlevels <- as.numeric(self$datamatic$options$ccra_steps)+1
-        
+        self$isInteger <- all(vardata%%1 == 0)
+       return(self)  
       }
       ### end covs ####
       
       if (self$datamatic$option("cluster")) {
+        
         if (self$name %in% self$datamatic$options$cluster) {
             if (!is.factor(vardata)) stop("Cluster variable ",self$name," should be a nominal variable")
             self$type="cluster"
@@ -228,14 +239,37 @@ Variable <- R6::R6Class(
            self$hasCluster<-self$datamatic$options$cluster
            self$nClusters<-length(self$datamatic$options$cluster)
         }
+       return(self)  
       }
       
       if (self$datamatic$option("offset")) {
         if (var %in% self$datamatic$options$offset) 
             self$type="numeric"
-        }
+        return(self)  
+      }
       
       ### end offset ####
+      ### if we get here, just accept what it is
+      if (is.factor(vardata)) {
+        
+            self$type="factor"
+            self$levels<-levels(vardata)
+            self$levels_labels<-levels(vardata)
+            self$nlevels<-length(self$levels)
+            self$neffects<-self$nlevels-1
+        
+      } else {
+            self$type="numeric"
+            covs_scale<-sapply(self$datamatic$options$covs_scale,function(a) a$type)
+            names(covs_scale)<-unlist(sapply(self$datamatic$options$covs_scale,function(a) a$var))
+            self$covs_scale<-"none"
+            self$contrast_labels <- self$name
+            self$paramsnames     <- var
+            self$paramsnames64   <- tob64(var)
+            self$nlevels         <- 3
+            self$neffects        <- 1
+            self$isInteger       <- all(vardata%%1 == 0)
+      }
       
       return(self)  
       

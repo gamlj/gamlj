@@ -25,13 +25,23 @@ Initier <- R6::R6Class(
       x<-self$datamatic$data_structure64
       names(x)<-fromb64(names(x))
       #### we prepare the model syntax
-      self$formulaobj<-gFormula$new()
-      self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
-      self$formulaobj$random_corr<-self$optionValue("re_corr")
-      self$formulaobj$dep<-self$options$dep
-      self$formulaobj$fixed<-self$options$model_terms
-      self$formulaobj$random<-self$optionValue("re")
-      self$formulaobj$offset<-self$optionValue("offset")
+      self$formulaobj <- gFormula$new()
+      self$formulaobj$fixed_intercept  <- self$optionValue("fixed_intercept")
+      self$formulaobj$random_corr      <- self$optionValue("re_corr")
+      self$formulaobj$fixed            <- self$options$model_terms
+      self$formulaobj$random           <- self$optionValue("re")
+      self$formulaobj$offset           <- self$optionValue("offset")
+      self$formulaobj$dep               <-self$options$dep
+      
+      if (is.something(self$optionValue("input_method"))) {
+        
+         if (self$optionValue("input_method")=="success") {
+            self$formulaobj$dep       <- c(self$options$dep,self$options$dep2)
+            self$formulaobj$interface <- "success" 
+         }
+      }
+
+      
       self$formulaobj$update_terms(self$datamatic$data_structure64)
 
       #### we prepare the nested model syntax, if necessary
@@ -50,7 +60,7 @@ Initier <- R6::R6Class(
       
       
       ### infomatic class takes care of all info about different models
-      self$infomatic<-Infomatic$new(self$options,datamatic,self$formulaobj)
+      self$infomatic<-Infomatic$new(self$analysis,datamatic,self$formulaobj)
       
     }, # here initialize ends
     #### init functions #####

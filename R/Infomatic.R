@@ -2,6 +2,7 @@ Infomatic <- R6::R6Class(
   "Infomatic",
   class=TRUE, ## this and the next 
   cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
+  inherit = Scaffold,
   public=list(
     operator=NULL,
     caller=NULL,
@@ -25,22 +26,35 @@ Infomatic <- R6::R6Class(
     df          =   NULL,
     comparison  =  "Difference",
     posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
-    omnibus_test=  NULL,
+    omnibus_test= NULL,
+    bootstrap   = TRUE,
     extra_info  = NULL,
-    initialize=function(options,datamatic,formulas) {
+    datamatic   = NULL,
+    initialize=function(jmvobj,datamatic,formulas) {
       
-      
-      self$model_type        <- options$model_type
-      if (options$model_type=="lmer" && options$res_struct!="id")
+      super$initialize(jmvobj)
+      self$model_type        <- self$options$model_type
+      self$datamatic         <- datamatic
+      ## handle strange cases
+      if (self$options$model_type=="lmer" && self$options$res_struct!="id")
                     self$model_type<-"lme"
 
+      if (self$options$model_type=="logistic" && self$options$input_method=="success")
+                    self$model_type<-"logistic_success"
+      
+      if (self$options$model_type=="probit" && self$options$input_method=="success")
+                    self$model_type<-"probit_success"
+
+      ## done
+      
       self$formula           <- formulas$formula64()
-      self$caller            <- options$.caller
-      dep                    <- options$dep
+      self$caller            <- self$options$.caller
+      dep                    <- self$options$dep
+      if (hasName(self$options,"dep2")) dep2<-self$options$dep2
       dlevs                  <- datamatic$variables[[tob64(dep)]]$levels_labels
       
       if (utils::hasName(options,"omnibus"))
-          self$omnibus_test<-toupper(options$omnibus)
+          self$omnibus_test<-toupper(self$options$omnibus)
       
       if (self$caller=="glm") {
           self$fit<-c("lik" , "aic",  "bic",  "dev",  "dfr",  "over")
@@ -51,6 +65,16 @@ Infomatic <- R6::R6Class(
         self$r2<-list(list(type="Marginal"),list(type="Conditional"))
       }
       
+      if (self$model_type=="logistic_success") {
+        self$fit<-c("lik" , "aic",  "bic")
+        self$r2 <-list(list(model=""))
+        self$warning<-list(topic="main_r2",message=paste("R-squared are not reliable for logistic models estimated with tabular data."))
+      }
+      if (self$model_type=="probit_success") {
+        self$fit<-c("lik" , "aic",  "bic")
+        self$r2 <-list(list(model=""))
+        self$warning<-list(topic="main_r2",message=paste("R-squared are not reliable for probit models estimated with tabular data."))
+      }
       
 
       if (self$model_type=="lm") {
@@ -89,12 +113,33 @@ Infomatic <- R6::R6Class(
         self$depnlevels    <-    2
         
         ### compute directions ###
-        dlevs              <-  datamatic$variables[[tob64(options$dep)]]$levels
+        dlevs              <-  datamatic$variables[[tob64(self$options$dep)]]$levels
         actual             <-  paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
         theory             <-  "P(y=1)/P(y=0)"
         self$direction     <-  c(theory,actual)
         
       }
+      
+      if (self$model_type=="logistic_success") {
+        
+        self$model        <-   c("Logistic Model","Model for tabular data")
+        self$distribution  <-  "binomial"
+        self$family        <-   "binomial"
+        self$call          <-   CALLS[[self$caller]]
+        self$rcall         <-   FUNCS[[self$caller]]
+        self$link          <-   "logit"
+        self$emmeans       <-    "probabilities"
+        self$comparison    <-  "OR"
+        self$deptype       <-    "integer"
+
+        ### compute directions ###
+        actual             <-  paste("P(",dep,") / P(",dep2,")")
+        theory             <-  "P(Success)/P(Failure)"
+        self$direction     <-  c(theory,actual)
+        self$bootstrap     <-  FALSE
+        
+      }
+
       if (self$model_type=="probit") {
         
         self$model         <-   c("Probit Model","Model for binary y")
@@ -108,11 +153,34 @@ Infomatic <- R6::R6Class(
         self$depnlevels    <-    2
         self$comparison    <-    "OR"
         ### compute direction ###
-        dlevs              <-   datamatic$variables[[tob64(options$dep)]]$levels
+        dlevs              <-   datamatic$variables[[tob64(self$options$dep)]]$levels
         theory             <-   "P(y=1)"
         actual             <-   paste("P(",dep,"=",dlevs[2],")")
         self$direction     <-   c(theory,actual)
       }
+      
+      if (self$model_type=="probit_success") {
+        
+        self$model        <-   c("Probit Model","Model for tabular data")
+        self$distribution  <-  "binomial"
+        self$family        <-  "binomial(link='probit')"
+        self$call          <-  CALLS[[self$caller]]
+        self$rcall         <-  FUNCS[[self$caller]]
+        self$link          <-  "probit"
+        self$emmeans       <-  "probabilities"
+        self$comparison    <-  "OR"
+        self$deptype       <-  "factor"
+
+        ### compute directions ###
+        actual             <-  paste("P(",dep,") / P(",dep2,")")
+        theory             <-  "P(Success)/P(Failure)"
+        self$direction     <-  c(theory,actual)
+        self$bootstrap     <-  FALSE
+      }
+
+      
+      
+      
       if (self$model_type=="poisson") {
         
         self$model         <-   c("Poisson Model","Model for count y")
@@ -167,18 +235,18 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "prop."
         self$direction     <-   c("y","Dependent variable proportion")
         self$deptype       <-   "numeric"
-        if (options$preds_phi)
+        if (self$options$preds_phi)
               self$formula <-   paste(formulas$fixed_formula64(),strsplit(formulas$fixed_formula64(),"~")[[1]][[2]],sep = "|")
       }
 
       if (self$model_type=="custom") {
        
         self$model         <-   c("User Model","Generalized model")
-        self$family        <-    paste0(options$custom_family,"('",options$custom_link,"')")
-        self$distribution  <-    options$custom_family
+        self$family        <-    paste0(self$options$custom_family,"('",self$options$custom_link,"')")
+        self$distribution  <-    self$options$custom_family
         self$call          <-    CALLS[[self$caller]]
         self$rcall         <-    FUNCS[[self$caller]]
-        self$link          <-    options$custom_link
+        self$link          <-    self$options$custom_link
         self$emmeans       <-   "the response metric"
         self$direction     <-   c("y","Dependent variable scores")
         self$deptype       <-   c("numeric","integer","factor")
@@ -189,7 +257,7 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Cumlative Link Model","Proportional odds logistic")
         self$distribution  <-    "logistic"
         self$call          <-    ORDINAL[[self$caller]]
-        self$rcall        <-     ORDINAL[[self$caller]]
+        self$rcall         <-     ORDINAL[[self$caller]]
         self$calloptions   <-    list(model=TRUE, Hess=TRUE)
         self$link          <-    "logit"
         self$emmeans       <-   "expected class"
@@ -252,13 +320,13 @@ Infomatic <- R6::R6Class(
         self$distribution  <-    "gaussian"
         self$call          <-    "lmer"
         self$rcall         <-    "estimate_lmer"
-        self$calloptions   <-    list(reml=options$reml,optimizers=c("bobyqa","Nelder_Mead","nloptwrap"))
+        self$calloptions   <-    list(reml=self$options$reml,optimizers=c("bobyqa","Nelder_Mead","nloptwrap"))
         self$optimized     <-   TRUE
         self$direction     <-   c("y","Dependend variable scores")
         self$deptype       <-   c("numeric","integer")
         self$fit           <-   c("lik" , "aic",  "bic")
         self$r2            <-   list(list(type="Marginal"),list(type="Conditional"))
-        self$df            <-   options$df_method
+        self$df            <-   self$options$df_method
       }
       
 
@@ -269,11 +337,11 @@ Infomatic <- R6::R6Class(
         self$distribution  <-    "gaussian"
         self$call          <-    "lme"
         self$rcall         <-    "estimate_lme"
-        form               <-    paste("~1|",tob64(options$cluster[1]))
-        if (options$res_struct=="cs")  cor<-nlme::corCompSymm 
-        if (options$res_struct=="un")  cor<-nlme::corSymm 
-        if (options$res_struct=="ar1") cor<-nlme::corAR1
-        if (options$reml) method="REML" else method="ML"
+        form               <-    paste("~1|",tob64(self$options$cluster[1]))
+        if (self$options$res_struct=="cs")  cor<-nlme::corCompSymm 
+        if (self$options$res_struct=="un")  cor<-nlme::corSymm 
+        if (self$options$res_struct=="ar1") cor<-nlme::corAR1
+        if (self$options$reml) method="REML" else method="ML"
         self$calloptions   <-    list(fixed=as.formula(formulas$fixed_formula64()),
                                       random=formulas$listify_random_formulas64(),
                                       cor=cor,
@@ -285,12 +353,13 @@ Infomatic <- R6::R6Class(
         self$deptype       <-   c("numeric","integer")
         self$fit           <-   c("lik" , "aic",  "bic")
         self$r2            <-   list(list(type="Marginal"),list(type="Conditional"))
-        if (options$res_struct=="un") res<-"Unstructured" else res<-"AutoRegressive 1"
-        self$extra_info    <-   list(info="Residuals",value=res,specs=paste("within cluster",options$cluster[1]))
+        if (self$options$res_struct=="un") res<-"Unstructured" else res<-"AutoRegressive 1"
+        self$extra_info    <-   list(info="Residuals",value=res,specs=paste("within cluster",self$options$cluster[1]))
       }
       
       
     },
+    
     info_table=function() {
       
       alist<-list()
@@ -304,7 +373,7 @@ Infomatic <- R6::R6Class(
       if (is.something(self$direction))
              alist[["dir"]]   <-  private$.dir()
      
-       if (self$optimized)
+      if (self$optimized)
              alist[["optim"]]<-list(info="Optimizer",value="",specs="") 
 
       if (is.something(self$omnibus_test))
@@ -333,8 +402,56 @@ Infomatic <- R6::R6Class(
       }
       return(alist)
       
-    }
-    
+    },
+    check_dependent = function() {
+
+      if (self$model_type %in% c("logistic_success","probit_success")) {
+         dep2 <- self$optionValue("dep2")
+         dep2obj<-self$datamatic$variables[[tob64(dep2)]]
+
+         if (! (dep2obj$type %in%  c("integer", "numeric")) )
+             stop(self$model[1]," for tabular data requires numeric table columns (",dep2obj,")")
+
+         if (! dep2obj$isInteger )
+             stop(self$model[1]," for tabular data requires table columns (",dep2obj,") of type integer")
+
+
+         if (! (self$datamatic$dep$type %in%  c("integer", "numeric")) )
+             stop(self$model[1]," for tabular data requires numeric table columns (",self$datamatic$dep,")")
+
+         if (! self$datamatic$dep$isInteger )
+             stop(self$model[1]," for tabular data requires table columns (",self$datamatic$dep,") of type integer")
+
+         return()
+      }
+      
+      if (!(self$datamatic$dep$type %in% self$deptype)) {
+
+        t2  <-  paste(self$deptype,collapse = " or ")
+        t1  <-  self$datamatic$dep$type
+        m   <-   self$model[1]
+        if (self$options$.interface=="jamovi") {
+                t2<-gsub("numeric","Continuous",t2,fixed = TRUE)
+                t2<-gsub("factor","Nominal",t2,fixed=TRUE)
+                t2<-gsub("integer","Measurement type=`Continuous`, Data type=`Integer`",t2,fixed=TRUE)
+                }
+        msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type: ",t2)
+                                    stop(msg)
+      }
+
+    ### when necessary, check the number of levels
+        if (is.something(self$infomatic$depnlevels)) {
+                nvar  <-  self$datamatic$dep$nlevels
+                nreq  <-  self$infomatic$depnlevels
+                if ( nreq > 0 ) {
+                     if ( nreq !=  nvar)
+                        stop(paste(self$model[1],"requires exactly",nreq,"levels"))
+                     } else {                               
+                        if (nvar < abs(nreq) )
+                           stop(paste(self$model[1],"requires a minimum of",abs(nreq),"levels"))
+                     }
+        }
+  }
     
   ), # end of public
   private = list(
@@ -414,24 +531,24 @@ FIT[["over"]]  <-  list(info="Chi-squared/DF", specs="Overdispersion indicator")
 
 
 
-.explainPrediction=function() {
-  
-  if (!utils::hasName(self$tab_info,"dir"))
-    return()
-  
-  dlevs<-self$datamatic$variables[[tob64(self$options$dep)]]$levels
-  dep<-self$options$dep
-  if (self$options$model_type %in% c("logistic")) {
-    self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
-    
-  }
-  if (self$options$model_type %in% c("probit")) {
-    self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],")")
-  }
-  if (self$options$model_type %in% c("multinomial")) {
-    self$tab_info[["dir"]]$value<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
-  }
-  
-  if (self$tab_info[["dir"]]$value=="")
-    self$tab_info[["dir"]]$value<-paste(dep,"scores")
-}
+# .explainPrediction=function() {
+#   
+#   if (!utils::hasName(self$tab_info,"dir"))
+#     return()
+#   
+#   dlevs<-self$datamatic$variables[[tob64(self$self$options$dep)]]$levels
+#   dep<-self$self$options$dep
+#   if (self$self$options$model_type %in% c("logistic")) {
+#     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
+#     
+#   }
+#   if (self$self$options$model_type %in% c("probit")) {
+#     self$tab_info[["dir"]]$value<-paste("P(",dep,"=",dlevs[2],")")
+#   }
+#   if (self$self$options$model_type %in% c("multinomial")) {
+#     self$tab_info[["dir"]]$value<-paste(paste0("P(",dep,"=",dlevs[-1],")"),paste0("P(",dep,"=",dlevs[1],")"),sep="/",collapse = " , ")
+#   }
+#   
+#   if (self$tab_info[["dir"]]$value=="")
+#     self$tab_info[["dir"]]$value<-paste(dep,"scores")
+# }

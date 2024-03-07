@@ -26,7 +26,7 @@ gamljglmClass <- R6::R6Class(
       runner_machine          <-  Runner$new(self,data_machine)
       runner_machine$storage  <-  self$results$main$coefficients      
       
-      
+
       ### info table ###
       aSmartObj<-SmartTable$new(self$results$info,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj

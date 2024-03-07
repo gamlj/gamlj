@@ -210,8 +210,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.glm <- function(model,obj) {
   
-  jinfo(" .glm R2 is used for object of class",paste(class(model)))
-  
+
   alist <- list()
   # mcFadden and adjusted
   alist$r2 <- 1 - (model$deviance / model$null.deviance)
@@ -233,7 +232,6 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.polr <- function(model, obj) {
   
-  jinfo(".polr R2 is used")
   alist <- list()
   results <- fit.compare_null_model(model)
 
@@ -273,7 +271,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 }
 
 .r2.mblogit <- function(model, obj) {
-  jinfo("mblogit R2 is used")
+  
   llfull <- model$deviance
   llnull <- model$null.deviance
   ss <- mclogit::getSummary.mmblogit(model)
@@ -353,8 +351,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.default <- function(model) {
   
-  jinfo("Default null model comparison is used for object of class ",paste(class(model),collapse = " "))
-  
+
   data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
@@ -490,8 +487,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.polr <- function(model) {
   
-  jinfo(".polr null model comparison is used")
-  
+
   data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))

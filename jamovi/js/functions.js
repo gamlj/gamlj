@@ -376,6 +376,7 @@ const fun = {
         // restore in case users used logistic second dep field
         if (typeof ui.dep2 !== 'undefined' ) {
              ui.dep_box.$label.text("Dependent Variable");
+             ui.dep2.setValue(null);
              ui.dep2.$el.hide();
           
         }
@@ -490,19 +491,20 @@ const fun = {
       if (ui.input_method.value() === "success") {
         ui.dep_box.$label.text("Successes/Failures");
         ui.dep2.$el.show();
+        ui.es_RR.setEnabled(false);
 
       }
       if (ui.input_method.value() === "total") {
         ui.dep_box.$label.text("Successes/Totals");
         ui.dep2.$el.show();
+        ui.es_RR.setEnabled(false);
 
       }
       if (ui.input_method.value() === "standard") {
         ui.dep_box.$label.text("Dependent Variable");
         ui.dep2.setValue(null);
-
         ui.dep2.$el.hide();
-
+        ui.es_RR.setEnabled(false);
       }
 
       
