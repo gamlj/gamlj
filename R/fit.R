@@ -170,18 +170,20 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.default <- function(model,obj) {
   
-  performance::r2(model, tolerance = 0)
-  
+  r2<-performance::r2(model, tolerance = 0)
+  return(r2)
 }
 
 .r2.lm <- function(model,obj) {
-  
+
   ss <- summary(model)
   results <- list()
   results$df1 <- ss$fstatistic[["numdf"]]
   results$df2 <- ss$fstatistic[["dendf"]]
   results$r2 <- ss$r.squared
   results$ar2 <- ss$adj.r.squared
+  if (results$ar2 < 0) results$ar2 <- 0
+  
   if (utils::hasName(ss, "fstatistic")) {
     if (obj$option("omnibus", "LRT")) {
       ssres <- stats::sigma(model)^2 * model$df.residual

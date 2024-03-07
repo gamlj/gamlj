@@ -402,10 +402,17 @@ Runner <- R6::R6Class("Runner",
                             table
                           },
                           run_assumptions_collitest=function() {
-                            tab <- as.data.frame(car::vif(self$model, type = "terms"))
+                            
+                            obj<-try_hard(tab <- as.data.frame(car::vif(self$model, type = "terms")))
+                            if (!isFALSE(obj$error)) {
+                             warning(obj$error)
+                             return()
+                            }
+                            tab<-obj$obj   
                             names(tab)[1]<-"vif"
                             tab$tol=1/tab$vif
                             tab
+                            
                           },
 
                           savePredRes=function(results) {
@@ -459,7 +466,7 @@ Runner <- R6::R6Class("Runner",
                           
                           ),# end of public
 
-                        privat=list(
+                        private=list(
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
