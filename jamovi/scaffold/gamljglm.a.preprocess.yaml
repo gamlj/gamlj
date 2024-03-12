@@ -138,7 +138,7 @@ options:
 
     - name: donotrun
       title: Do not run
-      type: Bool
+      type: Bool    
       default: false
       description:
          R:  > 
@@ -273,6 +273,15 @@ options:
           R: >
             `TRUE` or `FALSE` (default), shows coefficients covariances
 
+    - name: crosstab
+      title: Classification Table
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
+          ui: >
+            Produces a classification table (predicted vs observed)
 
 
     - name: plot_x

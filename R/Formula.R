@@ -97,7 +97,7 @@ gFormula <- R6::R6Class(
       paste(f, r,sep=" + ")
     },
     update_terms = function(data) {
-      mark(fromb64(names(data)))
+
       .formulalist <- self$fixed
       ## we want to be sure that the order of terms is the same used by the estimator
       ## because in R it may arrive a formula like y~x:z+z+x, which would processed by

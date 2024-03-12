@@ -132,6 +132,17 @@ Initier <- R6::R6Class(
             tab
             
     },
+     init_main_crosstab=function() {
+
+            nl <- self$datamatic$dep$nlevels
+            tab<-as.data.frame(matrix(".",ncol=nl+2,nrow=nl))
+            names(tab)<-c("obs",paste0("pred",1:nl),"pcorrect") 
+            tab$preds<-self$datamatic$dep$levels_labels
+            attr(tab,"titles")<-c(self$datamatic$dep$levels_labels,"% Correct")
+            tab
+            
+    },
+
     init_main_anova=function() {
       
       if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") {

@@ -45,6 +45,13 @@ gamljglmClass <- R6::R6Class(
       ### additional fit table ###
       aSmartObj<-SmartTable$new(self$results$main$fit,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
+
+      ### cross table ###
+      aSmartObj<-SmartTable$new(self$results$main$crosstab,runner_machine)
+      aSmartObj$expandOnInit<-TRUE
+      aSmartObj$expandFrom<-2
+      aSmartObj$expandSuperTitle<-"Predicted"
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### anova table ###
       aSmartObj<-SmartTable$new(self$results$main$anova,runner_machine)

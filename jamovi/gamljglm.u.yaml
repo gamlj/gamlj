@@ -600,6 +600,9 @@ children:
                         -       type: CheckBox
                                 name: vcov
                         -       type: CheckBox
+                                name: crosstab
+                                enable: (model_type_logistic || model_type_probit)
+                        -       type: CheckBox
                                 name: propodds_test
         -       type: LayoutBox
                 margin: large

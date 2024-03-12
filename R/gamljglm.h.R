@@ -28,6 +28,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
             vcov = FALSE,
+            crosstab = FALSE,
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -205,6 +206,10 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..vcov <- jmvcore::OptionBool$new(
                 "vcov",
                 vcov,
+                default=FALSE)
+            private$..crosstab <- jmvcore::OptionBool$new(
+                "crosstab",
+                crosstab,
                 default=FALSE)
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
@@ -437,6 +442,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
             self$.addOption(private$..vcov)
+            self$.addOption(private$..crosstab)
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
@@ -494,6 +500,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
         vcov = function() private$..vcov$value,
+        crosstab = function() private$..crosstab$value,
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
@@ -550,6 +557,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
         ..vcov = NA,
+        ..crosstab = NA,
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
@@ -632,6 +640,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 active = list(
                     r2 = function() private$.items[["r2"]],
                     fit = function() private$.items[["fit"]],
+                    crosstab = function() private$.items[["crosstab"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
                     phi = function() private$.items[["phi"]],
@@ -750,6 +759,36 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="specs", 
                                     `type`="text", 
                                     `title`="Comment"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="crosstab",
+                            title="Classification table",
+                            visible="(crosstab)",
+                            clearWith=list(
+                                "model_type",
+                                "dep",
+                                "dep2",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
+                                "offset",
+                                "omnibus",
+                                "model_type",
+                                "custom_family",
+                                "custom_link"),
+                            columns=list(
+                                list(
+                                    `name`="preds", 
+                                    `title`="Predicted", 
+                                    `type`="integer"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="anova",
