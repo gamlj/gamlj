@@ -117,14 +117,13 @@ Runner <- R6::R6Class("Runner",
                               
                               prop <- 1/self$datamatic$dep$nlevels
                               tab  <- table(self$model$y,self$model$fitted.values>prop)
-                              marg <- diag(tab)/apply(tab,1,sum)
-                              mark(marg)
+                              marg <- round(100*diag(tab)/apply(tab,1,sum))
                               tab  <- lapply(1:nrow(tab), function(i) {
-                                          t<-as.list(tab[i,])
-                                          names(t)<-paste0("pred",1:length(t))
-                                           t
+                                          t<-as.list(c(tab[i,],marg[i]))
+                                          names(t)<-(c(paste0("pred",1:(length(t)-1)), "pcorrect"))
+                                          t
                                           })
-                              tab$percent <- as.numeric(marg)
+                           
                               return(tab)
                           },
                           run_main_anova = function() {

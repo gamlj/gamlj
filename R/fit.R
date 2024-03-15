@@ -50,7 +50,6 @@ gFit <- R6::R6Class(
                         })
         }
       
-      
       private$.r2<-r2list[[1]]$r2
       private$.ar2<-r2list[[1]]$ar2
       return(r2list)
@@ -85,7 +84,6 @@ gFit <- R6::R6Class(
           r2list[[1]]$type="Conditional"
           ladd(r2list)<-list(model="Nested",type="Marginal")
         }
-
         return(r2list)
         
     }, # end of .r2list
@@ -252,8 +250,6 @@ r2 <- function(model, ...) UseMethod(".r2")
 }
 
 
-
-
 .r2.multinom <- function(model, obj) {
   llfull <- stats::logLik(model) ### model loglikelihood
   data <- insight::get_data(model,source="frame")
@@ -290,9 +286,10 @@ r2 <- function(model, ...) UseMethod(".r2")
 .r2.lmerModLmerTest <- function(model, obj) {
 
   r2 <- .r2.default(model, obj)
-  if (is.null(r2) || is.na(r2)) {
-    r2 <- list(R2_conditional = NA, R2_marginal = NA)
-  }
+  
+#  if (is.null(r2) || is.na(r2)) {
+#    r2 <- list(R2_conditional = NA, R2_marginal = NA)
+#  }
 
   cond <- fit.compare_null_model(model, type = "c")
   cond$type <- "Conditional"

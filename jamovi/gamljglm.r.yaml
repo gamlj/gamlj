@@ -159,8 +159,8 @@ items:
                            ### modeloptions  ends
 
              columns:
-                    - name: preds
-                      title: Predicted
+                    - name: obs
+                      title: Observed
                       type: integer
 
 

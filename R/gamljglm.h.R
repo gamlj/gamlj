@@ -786,8 +786,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_link"),
                             columns=list(
                                 list(
-                                    `name`="preds", 
-                                    `title`="Predicted", 
+                                    `name`="obs", 
+                                    `title`="Observed", 
                                     `type`="integer"))))
                         self$add(jmvcore::Table$new(
                             options=options,

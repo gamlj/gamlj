@@ -136,9 +136,11 @@ Initier <- R6::R6Class(
 
             nl <- self$datamatic$dep$nlevels
             tab<-as.data.frame(matrix(".",ncol=nl+2,nrow=nl))
+            
             names(tab)<-c("obs",paste0("pred",1:nl),"pcorrect") 
-            tab$preds<-self$datamatic$dep$levels_labels
+            tab$obs<-self$datamatic$dep$levels_labels
             attr(tab,"titles")<-c(self$datamatic$dep$levels_labels,"% Correct")
+            attr(tab,"types")<-c(rep("integer",length(nl)+2))
             tab
             
     },
