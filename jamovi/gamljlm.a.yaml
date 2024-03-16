@@ -294,6 +294,10 @@ options:
                         `TRUE` or `FALSE` (default), Indentify 1% and 99% extreme values in the plots by marking them with their rowname in the data.frame
                 ui: |
                         Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
+-       name: plot_jn
+        title: Johnson-Neyman plot
+        type: Bool
+        default: false
 -       name: emmeans
         title: Estimated Marginal Means
         type: Terms
@@ -394,8 +398,8 @@ options:
                 R: "Covariate condition range steps (not very mnemonic): At how many
                         values between min and max should the covariate be conditioned
                         \n"
-                ui: 'Covariate condition range steps: At how many values between min
-                        and max should the covariate be conditioned '
+                ui: "Covariate condition range steps: At how many values between min
+                        and max should the covariate be conditioned \n"
 -       name: ccm_value
         type: Number
         default: 1

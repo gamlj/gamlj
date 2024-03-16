@@ -157,7 +157,6 @@ items:
                          - custom_family
                          - custom_link
                            ### modeloptions  ends
-
              columns:
                     - name: obs
                       title: Observed

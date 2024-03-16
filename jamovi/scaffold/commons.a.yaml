@@ -42,3 +42,8 @@
             Covariate condition range steps (not very mnemonic): At how many values between min and max should the covariate be conditioned 
           ui: >
             Covariate condition range steps: At how many values between min and max should the covariate be conditioned 
+
+    - name: plot_jn
+      title: Johnson-Neyman plot
+      type: Bool
+      default: False

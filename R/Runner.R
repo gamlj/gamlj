@@ -594,10 +594,12 @@ Runner <- R6::R6Class("Runner",
                             } else {
                             
                                    opts_list<-list(model=self$model,iterations=self$options$boot_r)
+                                   jinfo(paste("Boot repetitions: ",opts_list$iterations))
+
                                    ### check if we can go in paraller ###
                                      test<-try_hard(find.package("parallel"))
                                      if (isFALSE(test$error)) {
-                                         jinfo("we go in parallel")
+                                         jinfo("We go in parallel")
                                          if (Sys.info()['sysname']!="Windows") {
                                            opts_list[["n_cpus"]]<-parallel::detectCores()
                                            opts_list[["parallel"]]<-"multicore"
@@ -606,10 +608,9 @@ Runner <- R6::R6Class("Runner",
                                             opts_list[["parallel"]]<-"no"
                                      }
                                       
-                                
                                 jinfo("RUNNER: estimating bootstrap model")
                                 t<-Sys.time()
-                                
+                              
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
                                 etime<-as.numeric(Sys.time()-t)
                                 jinfo("RUNNER: done ",etime," secs")

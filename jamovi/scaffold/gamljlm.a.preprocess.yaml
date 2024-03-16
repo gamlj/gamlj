@@ -357,6 +357,10 @@ options:
           ui: >
              Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
 
+    - name: plot_jn
+      type: scaffold
+      file: commons.a.yaml
+
 ####### end of plots #########
 
     - name: emmeans

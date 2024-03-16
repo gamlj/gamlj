@@ -36,6 +36,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_black = FALSE,
             plot_around = "ci",
             plot_extremes = FALSE,
+            plot_jn = FALSE,
             emmeans = NULL,
             posthoc = NULL,
             posthoc_ci = FALSE,
@@ -245,6 +246,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..plot_extremes <- jmvcore::OptionBool$new(
                 "plot_extremes",
                 plot_extremes,
+                default=FALSE)
+            private$..plot_jn <- jmvcore::OptionBool$new(
+                "plot_jn",
+                plot_jn,
                 default=FALSE)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
@@ -473,6 +478,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_extremes)
+            self$.addOption(private$..plot_jn)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
@@ -537,6 +543,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
         plot_extremes = function() private$..plot_extremes$value,
+        plot_jn = function() private$..plot_jn$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
@@ -600,6 +607,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_black = NA,
         ..plot_around = NA,
         ..plot_extremes = NA,
+        ..plot_jn = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
@@ -648,6 +656,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         emmeans = function() private$.items[["emmeans"]],
         mainPlots = function() private$.items[["mainPlots"]],
         plotnotes = function() private$.items[["plotnotes"]],
+        jnPlots = function() private$.items[["jnPlots"]],
+        jnplotnotes = function() private$.items[["jnplotnotes"]],
         assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
@@ -1672,7 +1682,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="",
                     renderFun=".mainPlot",
-                    width=750,
+                    width=700,
                     height=400,
                     clearWith=list(
                         "dep",
@@ -1706,6 +1716,49 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
+                visible=FALSE))
+            self$add(jmvcore::Array$new(
+                options=options,
+                name="jnPlots",
+                title="Johnson-Neyman Plot",
+                visible="(plot_jn)",
+                template=jmvcore::Image$new(
+                    options=options,
+                    title="",
+                    renderFun=".jnPlot",
+                    width=700,
+                    height=400,
+                    clearWith=list(
+                        "dep",
+                        "factors",
+                        "covs",
+                        "covs_scale",
+                        "dep_scale",
+                        "scale_missing",
+                        "contrasts",
+                        "model_terms",
+                        "fixed_intercept",
+                        "se_method",
+                        "robust_method",
+                        "mute",
+                        "ci_width",
+                        "ci_method",
+                        "boot_r",
+                        "covs_conditioning",
+                        "covs_scale_labels",
+                        "ccp_value",
+                        "ccm_value",
+                        "ccra_steps",
+                        "plot_x",
+                        "plot_z",
+                        "plot_by",
+                        "plot_raw",
+                        "plot_yscale",
+                        "plot_xoriginal",
+                        "plot_black"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="jnplotnotes",
                 visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,

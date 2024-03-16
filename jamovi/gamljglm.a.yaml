@@ -366,8 +366,8 @@ options:
                 R: "Covariate condition range steps (not very mnemonic): At how many
                         values between min and max should the covariate be conditioned
                         \n"
-                ui: 'Covariate condition range steps: At how many values between min
-                        and max should the covariate be conditioned '
+                ui: "Covariate condition range steps: At how many values between min
+                        and max should the covariate be conditioned \n"
 -       name: ccm_value
         type: Number
         default: 1
