@@ -696,15 +696,18 @@ Plotter <- R6::R6Class(
       if (is.null(self$scatterZ))
           return()
 
-       ### JN has no meaning if z is a factor
+       ### JN has no meaning if z or x is a factor
+
       if ( self$scatterZ$type=="factor" ) {
            self$warning<-list(topic="jnplotnotes",
-                          message=paste("Variable",self$scatterZ$name,"is a factor, the Johnson-Neyman plot cannot be computed."))
+                          message=paste("Variable",self$scatterZ$name,"is a factor, the Johnson-Neyman plot cannot be computed."),
+                          head="warning")
            return()    
       }
       if ( self$scatterX$type=="factor" ) {
            self$warning<-list(topic="jnplotnotes",
-                          message=paste("Variable",self$scatterX$name,"is a factor, the Johnson-Neyman plot cannot be computed."))
+                          message=paste("Variable",self$scatterX$name,"is a factor, the Johnson-Neyman plot cannot be computed."),
+                          head="warning")
            return()    
       }
 
@@ -715,7 +718,8 @@ Plotter <- R6::R6Class(
       .issues <- .all[test]
       if (is.something(.issues)) {
         self$warning<-list(topic="jnplotnotes",
-                          message=paste("Variable",paste(fromb64(.issues),collapse = ",")," not in interaction, the Johnson-Neyman plot cannot be produced."))
+                           message=paste("Variable",paste(fromb64(.issues),collapse = ",")," not in interaction, the Johnson-Neyman plot cannot be produced."),
+                           head="warning")
         return()
       }
       
