@@ -185,7 +185,7 @@ Plotter <- R6::R6Class(
       
            if (is.null(image$state$prep))
               return()
-        
+           
            x<-self$scatterX$name64
            z<-self$scatterZ$name64
            model<-private$.operator$model
@@ -197,7 +197,6 @@ Plotter <- R6::R6Class(
            p <- p + ggplot2::xlab(self$scatterZ$name)
            p <- p + ggtheme
            p <- p + ggplot2::labs(fill = NULL)+ggplot2::guides(colour="none")
-           
            return(p)
            
 

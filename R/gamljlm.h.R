@@ -1722,6 +1722,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="jnPlots",
                 title="Johnson-Neyman Plot",
                 visible="(plot_jn)",
+                refs="interactions",
                 template=jmvcore::Image$new(
                     options=options,
                     title="",

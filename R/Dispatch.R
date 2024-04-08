@@ -126,7 +126,7 @@ Dispatch <- R6::R6Class(
                                     switch (obj$head,
                                           "issue"     =  head <- "<h2 style='color:red;'> Warning </h2>",
                                           "warning"   =  head <- "<i style='color:red;'> Warning: </i>",
-                                                         head <- obj$head
+                                                          head <- obj$head
                                          )
                         } else head <-  "<i>Note:</i>"
                         

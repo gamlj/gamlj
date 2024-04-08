@@ -254,9 +254,10 @@ mod<-GAMLj3::gamlj_glm(
   data = hsbdemo,
   estimates_ci = TRUE,
   model_type = "logistic",
-  covs_scale = c(write="standardized")
+  covs_scale = c(write="standardized"),
+  ci_method = "quantile"
   )
-
+mod
 
 res<-mod$main$coefficients$asDF[2,3]
 testthat::test_that("test scaling works ", {

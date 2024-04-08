@@ -729,6 +729,7 @@ items:
     type: Array
     description: an array of plots
     visible: (plot_jn)
+    refs: interactions
     template:
           title: ""
           type: Image
