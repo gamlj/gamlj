@@ -28,4 +28,10 @@
         `author`="Gallucci, M.", 
         `year`=2020, 
         `title`="Model goodness of fit in GAMLj", 
-        `url`="https://gamlj.github.io/details_goodness.html"))
+        `url`="https://gamlj.github.io/details_goodness.html"), 
+    `interactions`=list(
+        `type`="software", 
+        `title`="interactions: Comprehensive, User-Friendly Toolkit for Probing Interactions. R package version 1.1.0", 
+        `author`="Jacob A. Long", 
+        `year`=2019, 
+        `url`="https://cran.r-project.org/package=interactions"))

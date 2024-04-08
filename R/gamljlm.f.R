@@ -87,12 +87,15 @@
 #' @param covs_conditioning '\code{mean_sd}' (default), or '\code{percent}'.
 #'   How to condition covariates in simple effects and plots. '\code{mean_sd}'
 #'   for mean +/- '\code{ccp_value}' * sd. '\code{percent}' for median
-#'   +/-'\code{ccp_value}' for percentiles.
+#'   +/-'\code{ccp_value}' for percentiles. \code{range} conditions to min and max divided in \code{ccra_steps} steps (aproximately).
 #' @param ccm_value how many st.deviations around the means used to condition
 #'   simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}
 #' @param ccp_value offsett (number of percentiles) around the median used to
 #'   condition simple effects and plots. Used if
 #'   \code{simpleScale}=\code{'percent'}
+#' @param ccra_value   Covariate condition min max steps (not very mnemonic): 
+#'        At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}
+#'   
 #' @param covs_scale_labels how the levels of a continuous moderator should
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
@@ -110,8 +113,11 @@
 #'   for epsilon-squared, \code{'epsilonp'} for partial epsilon-squared  and
 #'   \code{'beta'} for standardized  coefficients (betas). Default is
 #'   \code{"beta"} and \code{"parEta"}.
-#' @param homo_test \code{TRUE} or \code{FALSE} (default), perform homogeneity
+#' @param homo_test \code{TRUE} or \code{FALSE} (default), performs homogeneity
 #'   tests
+#' @param colli_test \code{TRUE} or \code{FALSE} (default), computes VIF and Tollerance 
+#'        for the terms in the model
+
 #' @param qq_plot \code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 #'   residuals
 #' @param norm_test \code{TRUE} or \code{FALSE} (default), provide a test for
@@ -204,6 +210,7 @@ gamlj_lm <- function(
     covs_conditioning = "mean_sd",
     ccm_value = 1,
     ccp_value = 25,
+    ccra_steps = 3,
     covs_scale_labels = "labels",
     adjust = list(
       "bonf"),
@@ -214,6 +221,7 @@ gamlj_lm <- function(
       "beta",
       "etap"),
     homo_test = FALSE,
+    colli_test = FALSE,
     qq_plot = FALSE,
     norm_test = FALSE,
     norm_plot = FALSE,
@@ -344,6 +352,7 @@ gamlj_lm <- function(
     covs_conditioning = covs_conditioning,
     ccm_value = ccm_value,
     ccp_value = ccp_value,
+    ccra_steps = ccra_steps,
     covs_scale_labels = covs_scale_labels,
     adjust = adjust,
     posthoc_es = posthoc_es,
@@ -351,6 +360,7 @@ gamlj_lm <- function(
     model_type = model_type,
     es = es,
     homo_test = homo_test,
+    colli_test = homo_test,
     qq_plot = qq_plot,
     norm_test = norm_test,
     norm_plot = norm_plot,

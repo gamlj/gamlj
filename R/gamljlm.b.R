@@ -143,6 +143,10 @@ gamljlmClass <- R6::R6Class(
       aSmartObj<-SmartTable$new(self$results$assumptions$normtest,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
       
+      ### assumptions collinearity stats
+      aSmartObj<-SmartTable$new(self$results$assumptions$collitest,runner_machine)
+      ladd(private$.smartObjs)<-aSmartObj
+      
       ### init all ####
 
       
@@ -217,6 +221,13 @@ gamljlmClass <- R6::R6Class(
   
 },
 
+.jnPlot=function(image, ggtheme, theme, ...) {
+
+  plot<-private$.plotter_machine$jnPlot(image,ggtheme,theme)
+
+  return(plot)
+  
+},
 
 
 .qqPlot=function(image, ggtheme, theme, ...) {

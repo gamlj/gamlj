@@ -1,6 +1,7 @@
 modeloptions:
         - model_type
         - dep
+        - dep2
         - factors
         - covs
         - covs_scale
@@ -37,6 +38,7 @@ simpleeffectsoptions:
                  - simple_scale
                  - ccm_value
                  - ccp_value
+                 - ccra_steps
                  - covs_scale_labels
                  - covs_conditioning
 

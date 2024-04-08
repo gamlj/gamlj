@@ -382,14 +382,17 @@ SmartTable <- R6::R6Class("SmartTable",
                               
                               rtable<-private$.framefy(rtable)
                               .names    <-  names(rtable)
-                         
                               .types<-unlist(lapply(rtable,class))
+
                               .types<-gsub("numeric","number",.types)
                               .types<-gsub("integer","number",.types)
                               .types<-gsub("factor","text",.types)
                               .present<-names(self$table$columns)
                               .ncols<-length(.present)
                               .names<-setdiff(.names,.present)
+                              if (is.something(attr(rtable,"types")))
+                                .types<-attr(rtable,"types")
+
                               if (is.something(attr(rtable,"titles")))
                                 .titles<-attr(rtable,"titles")
                               else 

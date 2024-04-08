@@ -1,0 +1,781 @@
+---
+name: gamljlm
+title: General Linear Model
+menuGroup: Linear Models
+version: '3.0.0'
+jas: '1.2'
+export: false
+completeWhenFilled: true
+description:
+    main: |
+           General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
+           interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
+    R:
+        dontrun: false
+        usage: |
+            data('ToothGrowth')
+            gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
+
+options:
+    - name: data
+      type: Data
+      description:
+          R: the data as a data frame
+
+    - name: .caller
+      type: String
+      default: "lm"
+      hidden: true
+
+    - name: .interface
+      type: String
+      default: "jamovi"
+      hidden: true
+
+    - name: dep
+      title: Dependent Variable
+      type: Variable
+      default:
+      permitted:
+        - factor
+        - numeric
+      description:
+          R: >
+            a string naming the dependent variable from `data`; the variable
+            must be numeric. Not needed if `formula` is used.
+
+    - name: factors
+      title: Factors
+      type: Variables
+      suggested:
+         - nominal
+      permitted:
+        - factor
+      default:
+      description:
+          R: a vector of strings naming the fixed factors from `data`. Not needed if `formula` is used.
+
+    - name: covs
+      title: Covariates
+      type: Variables
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+      default:
+      description:
+          R: a vector of strings naming the covariates from `data`. Not needed if `formula` is used.
+
+
+    - name: model_terms
+      title: Model Terms
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
+
+    - name: nested_terms
+      title: Nested Model
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+
+    - name: comparison
+      title: Activate
+      type: Bool
+      default: false
+      description:
+          R: >
+             Activates models comparison
+
+    - name: fixed_intercept
+      title: Intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+
+    - name: nested_intercept
+      title: Nested intercept
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+
+
+    - name: omnibus
+      title: Test
+      type: List
+      default: F
+      options:
+        - name:  F
+          title: F-test
+        - name: LRT
+          title: LRT
+
+      description:
+          R: >
+             Omnibus test of the model is based on F-test `F` (default) or loglikelihood ration test `LRT`.
+          ui: >
+             Omnibus test of the model is based on F-test  (default) or loglikelihood ration test `LRT`.
+
+    - name: estimates_ci
+      title: Estimates C.I.
+      type: Bool
+      default: true
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , parameters CI in table
+          ui: >
+             Non standardized coefficients (estimastes) CI in tables if flagged
+
+    - name: betas_ci
+      title: β C.I.
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` (default) or `FALSE` , parameters CI in table
+          ui: >
+             Standardized coefficients CI in tables if flagged
+
+    - name: ci_width
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width for the plots.
+
+
+    - name: donotrun
+      title: Do not run
+      type: Bool
+      default: false
+      description:
+         R:  > 
+             not present in R
+         ui: >
+             If flagged, the results are not updated each time an option is changed. 
+             This allows settings complex model options without waiting for the results
+             to update every time. Unflag it when ready to go.
+
+
+    - name: ci_method
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name:  wald
+          title: Standard (fast)
+        - name:  quantile
+          title: Bootstrap (Percent)
+        - name:  bcai
+          title: Bootstrap (BCa)
+      description:
+         R: >
+            The method to estimate the confidence intervals. Standard method (`wald`) or bootstrap methods. For
+            bootstrap, `quantile` compute the confidence intervals based on the bootstrap distribution, whereas
+            `bcai` computes the bootstrap bias corrected accelerated intervals.
+         ui: >
+            The method to estimate the confidence intervals. Standard method (`Wald`) or bootstrap methods. For
+            bootstrap, `Quantile` computes the confidence intervals based on the bootstrap distribution, whereas
+            `BCAi` computes the bootstrap bias corrected accelerated intervals.
+           
+    - name: boot_r
+      title: Bootstrap rep.
+      type: Number
+      min: 1
+      default: 1000
+      description:
+          R: >
+            The number bootstrap repetitions.
+
+
+
+
+    - name: contrasts
+      title: Factors Coding
+      type: Array
+      items: (factors)
+      default: 
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                  - simple
+                  - deviation
+                  - dummy
+                  - difference
+                  - helmert
+                  - repeated
+                  - polynomial
+
+                default: simple
+      description:
+          R: >
+            a named vector of the form `c(var1="type", var2="type2")` specifying the type of contrast to use,
+            one of `'deviation'`, `'simple'`, `'dummy'`, `'difference'`, `'helmert'`,
+            `'repeated'` or `'polynomial'`. If NULL, `simple` is used. Can also be passed as a list of list of the form list(list(var="var1",type="type1")).
+
+
+    - name: show_contrastnames
+      title: Names in estimates table
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), shows raw names of the contrasts variables in tables
+
+
+    - name: show_contrastcodes
+      title: Contrast Coefficients tables
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), shows contrast coefficients tables
+
+    - name: vcov
+      title: Coefficients Covariances
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), shows coefficients covariances
+
+
+### Plots options
+
+    - name: plot_x
+      title: Horizontal axis
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable placed on the horizontal axis of the
+            plot
+
+    - name: plot_z
+      title: Separate lines
+      type: Variable
+      default:
+      description:
+          R: >
+            a string naming the variable represented as separate lines in the
+            plot
+
+    - name: plot_by
+      title: Separate plots
+      type: Variables
+      default:
+      
+      description:
+          R: >
+            a list of variables defining the levels at which a separate plot should be produced.
+
+    - name: plot_raw
+      title: Observed scores
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), plot raw data along the predicted values
+
+    - name: plot_yscale
+      title: Y-axis observed range 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
+
+    - name: plot_xoriginal
+      title: X original scale 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use original scale for covariates.
+          ui: >
+            If selected, the X-axis variable is scaled with the orginal scale of the variable,
+            independently to the scaling set is the `Covariates Scaling`.
+
+    - name: plot_black
+      title: Varying line types 
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), use different linetypes per levels.
+          ui: >
+            If selected, a black and white theme is set for the plot, with multiple lines (if present)
+            drawn in different styles.
+
+    - name: plot_around
+      title: Display
+      type: List
+      options:
+        - name: 'none'
+          title: None
+        - name: ci
+          title: Confidence intervals
+        - name: se
+          title: Standard Error
+      default: ci
+      description:
+          R: >
+            `'none'` (default), `'ci'`, or `'se'`. Use no error
+            bars, use confidence intervals, or use standard errors on the
+            plots, respectively.
+          ui: >
+            `'None'` (default), `Confidence Intervals`, or `Standard Error`. Display on plots no error
+            bars, use confidence intervals, or use standard errors on the
+            plots, respectively.
+
+    - name: plot_extremes
+      title: Identify extremes
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), Indentify 1% and 99% extreme values in the plots by marking them with their rowname in the data.frame
+          ui: >
+             Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
+
+    - name: plot_jn
+      type: scaffold
+      file: commons.a.yaml
+
+####### end of plots #########
+
+    - name: emmeans
+      title: Estimated Marginal Means
+      type: Terms
+      default:
+      description:
+          R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
+
+
+    - name: posthoc
+      title: Post Hoc Tests
+      type: Terms
+      default:
+      description:
+          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
+             The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
+             also as a list of the form '`list("x","z",c("x","z")`'
+
+    - name: posthoc_ci
+      title: Confidence intervals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), posthoc confidence intervals
+
+
+    - name: simple_x
+      title: Simple effects variable
+      type: Variable
+      default:
+      description:
+          R: >
+            The variable for which the simple effects (slopes) are computed
+
+    - name: simple_mods
+      title: Moderators
+      type: Variables
+      default:
+      description:
+          R: >
+            the variable that provides the levels at which the simple effects are computed
+
+    - name: simple_interactions
+      title: Simple Interactions
+      type: Bool
+      default: false
+      description:
+          R: >
+            should simple Interactions be computed
+
+    - name: covs_scale
+      title: Covariates Scaling
+      type: Array
+      items: (covs)
+      default:
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: type
+                type: List
+                options:
+                    - title: Centered
+                      name:  centered
+                    - title: z-scores
+                      name: standardized
+                    - title: Original
+                      name: 'none'
+
+                default: centered 
+      description:
+          R: >
+             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
+             one of `'centered'` to the mean, `'standardized'` or  `'none'`. `'none'` leaves the variable as it is.
+
+    - name: scale_missing
+      title: Scale on 
+      type: List
+      options:
+          - title: Complete cases
+            name: 'complete'
+          - title: Columnwise 
+            name: colwise
+      default: 'complete'
+
+
+    - name: covs_conditioning
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: ccra_steps
+      type: scaffold
+      file: commons.a.yaml
+
+
+    - name: ccm_value
+      type: Number
+      default: 1
+      description:
+          R: >
+            how many st.deviations around the means used to condition simple effects and plots.
+            Used if `covs_conditioning`=`'mean_sd'`
+
+    - name: ccp_value
+      type: Number
+      default: 25
+      min: 5
+      max: 50
+      description:
+          R: >
+            Offset (number of percentiles) around the median used to condition simple effects and plots.
+            Used if `covs_conditioning='percent'`. 
+          ui: >
+            Offset (number of percentiles) around the median used to condition simple effects and plots.
+            Used if `covs_conditioning='percent'`. 
+
+
+    - name: covs_scale_labels
+      type: List
+      options:
+        - name: labels
+          title: Labels
+        - name: values
+          title: Values
+        - name: values_labels
+          title: Values + Labels
+        - name:  uvalues
+          title: Unscaled Values
+        - name: uvalues_labels
+          title: Unscaled Values + Labels
+
+      default: labels
+      description:
+          R: >
+            how the levels of a continuous moderator should appear in tables and plots: `labels`,
+            `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the
+            variable orginal levels, before scaling.
+
+
+
+
+    - name: adjust
+      title: Correction
+      type: NMXList
+      options:
+          - name: 'none'
+            title: No correction (LSD)
+          - name: bonf
+            title: Bonferroni
+          - name: tukey
+            title: Tukey 
+          - name: holm
+            title: Holm
+          - name: scheffe
+            title: Scheffe
+          - name: sidak
+            title: Sidak
+      default:
+          - bonf
+      description:
+          R: >
+            Adjustment method for posthoc tests. One or more of `'none'`,  `'bonf'`,`'tukey'` 
+            `'holm'`, `'scheffe'` and `'sidak'`; provide no,  Bonferroni, Tukey and
+            Holm Scheffé and Sidak Post Hoc corrections, respectively. See \[emmeans]{summary.emmGrid} for details.
+          ui: >
+            Adjustment method for posthoc tests. One or more of `'None'`,  `'Bonferroni'`,`'Tukey'` 
+            `'Holm'` `'Scheffe'` and `'Sidak'` Post Hoc corrections. See \[emmeans](https://cran.r-project.org/web/packages/emmeans/emmeans.pdf) for details.
+
+
+    - name: mute
+      title: Remove notes
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not present in R
+          ui: >
+              Removes all notes and warnings from the Tables. Useful to produce pubblication quality
+              tables.
+          
+
+    - name: predicted
+      title: Predicted
+      type: Output            
+      initInRun: true
+      description:
+        R: not present
+        ui: >
+            Saves in the dataset the predicted values of the model
+            
+    - name: residuals
+      title: Residuals
+      type: Output            
+      description:
+        R: not present
+        ui: >
+            Saves in the dataset the residual values of the model
+
+
+
+
+############ generic with some specs ###########
+
+
+
+    - name: posthoc_es
+      title: Effect size 
+      type: NMXList
+      options:
+          - name: dm
+            title: Cohen's d (model SD)
+          - name: ds
+            title: Cohen's d (sample SD)
+          - name: g
+            title: Hedge's g (sample SD)
+      description:
+          R: >
+            effect size indices for mean comparisons. One or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD ) 
+            or Hedge's g
+      default:
+          - dm
+
+    - name: d_ci
+      title: Confidence intervals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), d confidence intervals
+
+
+    - name: model_type
+      type: List
+      hidden: true
+      options:
+        - name: lm
+      default: lm
+
+
+    - name: es
+      title: Effect Size
+      type: NMXList
+      options:
+          - name: beta
+            title: β  
+          - name: eta
+            title: η²
+          - name: etap
+            title: partial η²
+          - name: omega
+            title:  ω²
+          - name: omegap
+            title:  partial ω²
+          - name: epsilon
+            title: ε²
+          - name: epsilonp
+            title: partial ε²
+            
+      default:
+          - beta
+          - etap
+      description:
+          R: >
+              a list of effect sizes to print out. They can be:
+              `"eta"` for eta-squared, `'etap'` for partial eta-squared,
+              `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
+              `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
+              and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
+          ui: >
+              The effect size to show in tables. They can be:
+              `"eta"` for eta-squared, ` partial eta'` for partial eta-squared,
+              `'omega'` for omega-squared, `'omega partial'` for partial omega-squared,
+              `'epsilon'` for epsilon-squared, `'epsilon partial'` for partial epsilon-squared
+               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"eta partial"`.
+          
+    - name: homo_test
+      title: Homogeneity tests
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), performs Levene's homogeneity tests on residuals for categorical independent variables
+          ui: >
+            Provides [Levene's test](https://biostats.w.uib.no/test-for-homogeneity-of-variances-levenes-test/){target="_blank"} 
+            for equal variances across groups defined by factors  (homoschedasticity).
+
+    - name: colli_test
+      title: Collinearity tests
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), computes VIF and tollerance for the model
+          ui: >
+            Computes VIF and tollerance for the model term of the model
+
+    - name: qq_plot
+      title: Q-Q plot of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+          ui: >
+            Outputs a Q-Q plot (observed residual quantiles on expected residual quantiles). More general info [here](https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot){target="_blank"}
+
+    - name: norm_test
+      title: Normality of residuals
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a test for normality of residuals
+          ui: >
+            Provides [Kolmogorov-Smirnov](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test){target="_blank"} and [Shapiro-Wilk](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test#Interpretation){target="_blank"} tests for normality of residuals.
+
+    - name: norm_plot
+      title: Residuals Histogram
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+          ui: > 
+            Outputs the histogram of the distribution of the residuals, with an overlaying ideal normal distribution with mean and variance equal to the residuals distribution parameters.
+
+    - name: resid_plot
+      title: Residuals-Predicted plot
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+          ui: >
+            Produces a scatterplot with the residuals on the Y-axis and the predicted in the X-axis. It can be usufull to assess heteroschdasticity.
+
+    - name: intercept_info
+      title: On intercept
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provides ìnformation about the intercept (F test, effect size indexes)
+          ui: >
+            If selected provides ìnformation about the intercept (F test, effect size indexes)
+
+    - name: es_info
+      title: On Effect sizes
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
+          ui: >
+            If selected, provides ìnformation about the effect size indexes
+
+
+    - name: dep_scale
+      title: Scale
+      type: List
+      options:
+          - title: Original
+            name: 'none'
+          - title: Centered
+            name:  centered
+          - title: z-scores
+            name:  standardized
+
+      default: 'none'
+      description:
+         R: >
+           Re-scale the dependent variable.
+
+
+    - name: se_method
+      title: SE Method
+      type: List
+      default: standard
+      options:
+        - name:  standard
+          title: Standard 
+        - name:  robust
+          title: Robust
+      description:
+         R: >
+           The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3`
+           sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC}
+           for deatils.
+         ui: >
+           The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for
+           robust method.
+           
+    - name: robust_method
+      title: Method
+      type: List
+      default: HC3
+      options:
+        - name:  HC3
+          title: HC3 
+        - name:  HC2
+          title: HC2
+        - name:  HC1
+          title: HC1
+        - name:  HC0
+          title: HC0 
+      description:
+         R: not present in T
+         ui: >
+           `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. 
+           See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf)
+           for deatils.
+
+...
+

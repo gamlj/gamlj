@@ -362,14 +362,156 @@ const fun = {
 
    },
 
+    updateModelOptions: function(ui, context) {
+      
 
-         mark: function(obj) {
+
+        const noneed=["lm", "lmer"];
+        
+        if (noneed.includes(ui.model_type.getValue())) {
+          return ;
+        }
+        
+
+        // restore in case users used logistic second dep field
+        if (typeof ui.dep2 !== 'undefined' ) {
+             ui.dep_box.$label.text("Dependent Variable");
+             ui.dep2.$el.hide();
+          
+        }
+        
+
+// takes care of the effect size names and visibility
+
+        if (typeof ui.es_RR !== 'undefined' ) {
+              ui.es_RR.setValue(false);
+        }
+        if (typeof ui.plot_scale !== 'undefined' ) {
+              ui.plot_scale.setValue('response');
+        }
+
+        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear")        {
+               ui.es_expb.setValue(false);
+               ui.estimates_ci.setValue(true);
+               ui.expb_ci.setValue(false);
+        } else  {
+               ui.es_expb.setValue(true);
+               ui.estimates_ci.setValue(false);
+               ui.expb_ci.setValue(true);
+        }
+
+        if (typeof ui.es_expb !== 'undefined' ) {
+          
+            var odds=["logistic","probit","multinomial","ordinal"]
+            var irr=["poisson","poiover","nb"]
+            ui.es_expb.$label.text("Exp(B)") 
+            
+            if (odds.includes(ui.model_type.getValue())) {
+               ui.es_expb.$label.text("Odd Rations (expB)") 
+            } 
+            if (irr.includes(ui.model_type.getValue())) {
+               ui.es_expb.$label.text("Incidence rate ratios (expB)") 
+            } 
+
+        }
+
+// done
+
+        if (typeof ui.propodds_test !== 'undefined') {
+              if (ui.model_type.getValue()==="ordinal") {
+                  ui.propodds_test.$el.show();
+              } else {
+                  ui.propodds_test.$el.hide();
+              }
+        }
+
+        if (typeof ui.es_marginals !== 'undefined') {
+          
+              ui.es_marginals.setValue(false);
+
+        }
+        
+        if (typeof ui.preds_phi !== 'undefined' ) {
+          
+            if (ui.model_type.getValue()==="beta") {
+              ui.precision.$el.show();
+            } else {
+              ui.precision.$el.hide();
+            }
+        }
+        // model specific options 
+        if (ui.model_type.getValue() === "multinomial" && ui['.caller'].value()=="glmer") {
+          ui.simple_interactions.setValue(false);
+          ui.simple_interactions.setEnabled(false);
+        } else {
+           ui.simple_interactions.setEnabled(true);
+        }      
+        
+      // deal with extra field of logistic by tables
+      
+       ui.dep_box.$label.text("Dependent Variable");
+       if (typeof ui.input_method !== 'undefined' ) {
+         
+            if (ui['.caller'].value() === "glm") {
+              
+              const models=["logistic","probit"];
+              
+              if (models.includes(ui.model_type.getValue())) {
+              
+                   ui.input_method.$input.show();
+                   ui.input_method.$label.show();
+                   if (["success","total"].includes(ui.input_method.value()))
+                           ui.dep2.$el.show();
+
+              } else {
+                   ui.input_method.$input.hide();
+                   ui.input_method.$label.hide();
+                   ui.dep2.$el.hide();
+
+              }
+              this.updateInputMethod(ui,context);
+            }
+       }
+
+
+
+   },
+    updateInputMethod: function(ui, context) {
+      
+      
+       
+       if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
+           ui.dep_box.$label.text("Dependent Variable");
+           ui.dep2.setValue(null);
+          return ;
+        }
+
+      
+      if (ui.input_method.value() === "success") {
+        ui.dep_box.$label.text("Successes/Failures");
+        ui.dep2.$el.show();
+
+      }
+      if (ui.input_method.value() === "total") {
+        ui.dep_box.$label.text("Successes/Totals");
+        ui.dep2.$el.show();
+
+      }
+      if (ui.input_method.value() === "standard") {
+        ui.dep_box.$label.text("Dependent Variable");
+        ui.dep2.setValue(null);
+
+        ui.dep2.$el.hide();
+
+      }
+
+      
+    },
+    mark: function(obj) {
                console.log(obj);
          }
 
-}
-
-
+    }
 
 module.exports=fun
 

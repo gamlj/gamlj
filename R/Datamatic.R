@@ -205,11 +205,13 @@ Variable <- R6::R6Class(
         if (is.factor(vardata)) {
           self$datamatic$warning<-list(topic="info",message=paste("Variable",var,"has been coerced to numeric"))
         }
-        self$contrast_labels<-self$name
-        self$paramsnames<-var
-        self$paramsnames64<-tob64(var)
-        self$nlevels=3
-        self$neffects=1
+        self$contrast_labels <- self$name
+        self$paramsnames     <- var
+        self$paramsnames64   <- tob64(var)
+        self$nlevels         <- 3
+        self$neffects        <- 1
+        if (self$datamatic$options$covs_conditioning == "range")
+                self$nlevels <- as.numeric(self$datamatic$options$ccra_steps)+1
         
       }
       ### end covs ####
@@ -604,6 +606,7 @@ Variable <- R6::R6Class(
                               mean=mean(vardata,na.rm = TRUE),
                               sd=sd(vardata,na.rm = TRUE))
 
+    
       if (self$datamatic$options$covs_conditioning=="mean_sd")  {
         
         .span<-ifelse(is.null(self$datamatic$options$ccm_value),1,self$datamatic$options$ccm_value)
@@ -625,6 +628,23 @@ Variable <- R6::R6Class(
           
         self$method="percent"
       }
+
+      if (self$datamatic$options$covs_conditioning=="range") {
+        
+         steps         <- ifelse(is.null(self$datamatic$options$ccra_steps),1,self$datamatic$options$ccra_steps)
+         min           <- min(vardata,na.rm = TRUE)
+         max           <- max(vardata,na.rm = TRUE)
+         self$levels   <- round(epretty(min,max,steps),digits=3)
+        .labs          <- rep("",length(self$levels))
+        .labs[1]       <- "Min"
+        .labs[length(.labs)]  <- "Max"
+         self$method="range"
+      }
+
+      if (self$method == "range") {
+        if ( labels_type == "labels")
+                    labels_type <- "values_labels"
+      }
       
       if (labels_type == "labels") 
         self$levels_labels<-.labs
@@ -636,12 +656,15 @@ Variable <- R6::R6Class(
         self$levels_labels<-self$original_levels
       
       
-      if (labels_type == "values_labels") 
+      if (labels_type == "values_labels") {
         self$levels_labels<-paste(.labs,self$levels,sep="=")
+        self$levels_labels<-gsub("^\\=","",self$levels_labels)
+      }
       
-      if (labels_type == "uvalues_labels") 
+      if (labels_type == "uvalues_labels") {
         self$levels_labels<-paste(.labs,self$original_levels,sep="=")
-  
+        self$levels_labels<-gsub("^\\=","",self$levels_labels)
+      }
       if (all(!is.nan(self$levels)) &  all(!is.na(self$levels)))
             if(any(duplicated(self$levels))) {
                self$levels<-unique(self$levels)

@@ -9,6 +9,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             .caller = "glm",
             .interface = "jamovi",
             dep = NULL,
+            dep2 = NULL,
             factors = NULL,
             covs = NULL,
             offset = NULL,
@@ -19,6 +20,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             comparison = FALSE,
             estimates_ci = FALSE,
             donotrun = FALSE,
+            input_method = "standard",
             ci_method = "wald",
             boot_r = 1000,
             ci_width = 95,
@@ -26,6 +28,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
             vcov = FALSE,
+            crosstab = FALSE,
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -41,6 +44,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             simple_mods = NULL,
             simple_interactions = FALSE,
             covs_conditioning = "mean_sd",
+            ccra_steps = 1,
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
@@ -78,6 +82,13 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
+                default=NULL,
+                permitted=list(
+                    "factor",
+                    "numeric"))
+            private$..dep2 <- jmvcore::OptionVariable$new(
+                "dep2",
+                dep2,
                 default=NULL,
                 permitted=list(
                     "factor",
@@ -131,6 +142,14 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "donotrun",
                 donotrun,
                 default=FALSE)
+            private$..input_method <- jmvcore::OptionList$new(
+                "input_method",
+                input_method,
+                default="standard",
+                options=list(
+                    "standard",
+                    "success",
+                    "total"))
             private$..ci_method <- jmvcore::OptionList$new(
                 "ci_method",
                 ci_method,
@@ -187,6 +206,10 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..vcov <- jmvcore::OptionBool$new(
                 "vcov",
                 vcov,
+                default=FALSE)
+            private$..crosstab <- jmvcore::OptionBool$new(
+                "crosstab",
+                crosstab,
                 default=FALSE)
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
@@ -253,8 +276,15 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 covs_conditioning,
                 options=list(
                     "mean_sd",
-                    "percent"),
+                    "percent",
+                    "range"),
                 default="mean_sd")
+            private$..ccra_steps <- jmvcore::OptionNumber$new(
+                "ccra_steps",
+                ccra_steps,
+                default=1,
+                min=1,
+                max=50)
             private$..ccm_value <- jmvcore::OptionNumber$new(
                 "ccm_value",
                 ccm_value,
@@ -393,6 +423,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
             self$.addOption(private$..dep)
+            self$.addOption(private$..dep2)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..offset)
@@ -403,6 +434,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..comparison)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..donotrun)
+            self$.addOption(private$..input_method)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
             self$.addOption(private$..ci_width)
@@ -410,6 +442,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
             self$.addOption(private$..vcov)
+            self$.addOption(private$..crosstab)
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
@@ -425,6 +458,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_conditioning)
+            self$.addOption(private$..ccra_steps)
             self$.addOption(private$..ccm_value)
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
@@ -447,6 +481,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         .caller = function() private$...caller$value,
         .interface = function() private$...interface$value,
         dep = function() private$..dep$value,
+        dep2 = function() private$..dep2$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         offset = function() private$..offset$value,
@@ -457,6 +492,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         comparison = function() private$..comparison$value,
         estimates_ci = function() private$..estimates_ci$value,
         donotrun = function() private$..donotrun$value,
+        input_method = function() private$..input_method$value,
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
         ci_width = function() private$..ci_width$value,
@@ -464,6 +500,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
         vcov = function() private$..vcov$value,
+        crosstab = function() private$..crosstab$value,
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
@@ -479,6 +516,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         covs_conditioning = function() private$..covs_conditioning$value,
+        ccra_steps = function() private$..ccra_steps$value,
         ccm_value = function() private$..ccm_value$value,
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
@@ -500,6 +538,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ...caller = NA,
         ...interface = NA,
         ..dep = NA,
+        ..dep2 = NA,
         ..factors = NA,
         ..covs = NA,
         ..offset = NA,
@@ -510,6 +549,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..comparison = NA,
         ..estimates_ci = NA,
         ..donotrun = NA,
+        ..input_method = NA,
         ..ci_method = NA,
         ..boot_r = NA,
         ..ci_width = NA,
@@ -517,6 +557,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
         ..vcov = NA,
+        ..crosstab = NA,
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
@@ -532,6 +573,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..simple_mods = NA,
         ..simple_interactions = NA,
         ..covs_conditioning = NA,
+        ..ccra_steps = NA,
         ..ccm_value = NA,
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
@@ -598,6 +640,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 active = list(
                     r2 = function() private$.items[["r2"]],
                     fit = function() private$.items[["fit"]],
+                    crosstab = function() private$.items[["crosstab"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
                     phi = function() private$.items[["phi"]],
@@ -620,6 +663,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -675,6 +719,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -716,11 +761,42 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Comment"))))
                         self$add(jmvcore::Table$new(
                             options=options,
+                            name="crosstab",
+                            title="Classification table",
+                            visible="(crosstab)",
+                            clearWith=list(
+                                "model_type",
+                                "dep",
+                                "dep2",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "covs_scale",
+                                "offset",
+                                "omnibus",
+                                "model_type",
+                                "custom_family",
+                                "custom_link"),
+                            columns=list(
+                                list(
+                                    `name`="obs", 
+                                    `title`="Observed", 
+                                    `type`="integer"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
                             name="anova",
                             title="Omnibus tests",
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -762,6 +838,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -847,6 +924,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -909,6 +987,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -965,6 +1044,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -986,6 +1066,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "simple_scale",
                                 "ccm_value",
                                 "ccp_value",
+                                "ccra_steps",
                                 "covs_scale_labels",
                                 "covs_conditioning"),
                             columns=list(
@@ -1038,6 +1119,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1100,6 +1182,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             clearWith=list(
                                 "model_type",
                                 "dep",
+                                "dep2",
                                 "factors",
                                 "covs",
                                 "covs_scale",
@@ -1151,6 +1234,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "model_type",
                     "dep",
+                    "dep2",
                     "factors",
                     "covs",
                     "covs_scale",
@@ -1178,6 +1262,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "model_type",
                         "dep",
+                        "dep2",
                         "factors",
                         "covs",
                         "covs_scale",
@@ -1489,6 +1574,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     clearWith=list(
                         "model_type",
                         "dep",
+                        "dep2",
                         "factors",
                         "covs",
                         "covs_scale",
@@ -1574,6 +1660,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "model_type",
                     "dep",
+                    "dep2",
                     "factors",
                     "covs",
                     "covs_scale",
@@ -1599,6 +1686,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "model_type",
                     "dep",
+                    "dep2",
                     "factors",
                     "covs",
                     "covs_scale",

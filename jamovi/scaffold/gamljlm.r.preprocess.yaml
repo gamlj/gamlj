@@ -6,8 +6,6 @@ items:
   - name: model
     type: Property
 
-
-
   - name: info
     title: Model Info
     type: Table
@@ -456,6 +454,7 @@ items:
               clearWith:
                  -  __modeloptions__
                  -  __simpleeffectsoptions__
+                 -  __covscalingoptions__                 
               columns:
                    - name: test
                      title: F
@@ -508,6 +507,7 @@ items:
                  -  __modeloptions__
                  -  __cioptions__
                  -  __simpleeffectsoptions__
+                 -  __covscalingoptions__                 
 
               columns:
                      - name: contrast
@@ -564,6 +564,7 @@ items:
              title: ANOVA 
              clearWith:
                 -  __modeloptions__
+                -  __covscalingoptions__                 
                 -  __simpleeffectsoptions__
                 
              columns:
@@ -621,6 +622,7 @@ items:
                 -  __modeloptions__
                 -  __cioptions__
                 -  __simpleeffectsoptions__
+                - __covscalingoptions__                 
 
              columns:
                    - name: effect
@@ -667,13 +669,8 @@ items:
         clearWith:
             -  __modeloptions__
             -  __cioptions__
+            -  __covscalingoptions__            
             - emmeans
-            - covs_conditioning            
-            - covs_scale_labels   
-            - covs_conditioning
-            - covs_scale_labels
-            - ccp_value
-            - ccm_value
             
             
         columns:
@@ -707,12 +704,13 @@ items:
           title: ""
           type: Image
           renderFun: .mainPlot
-          width: 750
+          width: 700
           height: 400
 
           clearWith:
            -  __modeloptions__
            -  __cioptions__
+           -  __covscalingoptions__                 
            - plot_x
            - plot_z
            - plot_by
@@ -721,14 +719,41 @@ items:
            - plot_xoriginal
            - plot_black
            - plot_around
-           - covs_conditioning
-           - covs_scale_labels
-           - ccp_value
-           - ccm_value
 
   - name: plotnotes
     type: Html
     visible: false
+
+  - name: jnPlots
+    title: Johnson-Neyman Plot
+    type: Array
+    description: an array of plots
+    visible: (plot_jn)
+    refs: interactions
+    template:
+          title: ""
+          type: Image
+          renderFun: .jnPlot
+          width: 700
+          height: 400
+
+          clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+  - name: jnplotnotes
+    type: Html
+    visible: false
+
+
 
   - name: assumptions
     title: Assumption Checks
@@ -775,6 +800,24 @@ items:
             - name: p
               type: number
               format: zto,pvalue
+
+        - name: collitest
+          title: Collinearity statistics
+          type: Table
+          description: a table for collinearity statistics
+          visible: (colli_test)
+          clearWith:
+                 -  __modeloptions__
+          columns:
+            - name: source
+              type: text
+              title: Term
+            - name: vif
+              type: number
+              title: VIF
+            - name: tol
+              type: number
+              title: Tollerance
 
         - name: qqplot
           title: Q-Q Plot

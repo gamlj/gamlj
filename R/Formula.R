@@ -5,14 +5,15 @@ gFormula <- R6::R6Class(
   class = TRUE,
   cloneable = FALSE,
   public = list(
-    dep = NULL,
-    offset = NULL,
-    clusters = NULL,
-    fixed_intercept = NULL,
-    hasTerms = FALSE,
-    isProper = FALSE,
-    anova_terms = NULL,
-    params_terms = NULL,
+    dep              = NULL,
+    offset           = NULL,
+    clusters         = NULL,
+    fixed_intercept  = NULL,
+    hasTerms         = FALSE,
+    isProper         = FALSE,
+    anova_terms      = NULL,
+    params_terms     = NULL,
+    interface        = "standard",
     
     fixed_formula = function() {
       private$.buildfixed(self$dep, self$fixed)
@@ -23,6 +24,10 @@ gFormula <- R6::R6Class(
     rhsfixed_formula=function() {
          private$.rhsfixed(self$fixed)      
     },
+    rhsfixed_formula64=function() {
+         private$.rhsfixed(tob64(self$fixed))      
+    },
+
     random_formula = function() {
       alist<-private$.buildrandom(self$random, self$random_corr, "plain")
       if (is.something(alist))
@@ -92,6 +97,7 @@ gFormula <- R6::R6Class(
       paste(f, r,sep=" + ")
     },
     update_terms = function(data) {
+
       .formulalist <- self$fixed
       ## we want to be sure that the order of terms is the same used by the estimator
       ## because in R it may arrive a formula like y~x:z+z+x, which would processed by
@@ -100,7 +106,7 @@ gFormula <- R6::R6Class(
       .formula <- attr(terms(as.formula(.formula)), "term.labels")
       .formulalist <- jmvcore::decomposeTerms(.formula)
       self$anova_terms <- fromb64(.formulalist)
-      self$params_terms <- fromb64(colnames(model.matrix(as.formula(self$fixed_formula64()), data)))
+      self$params_terms <- fromb64(colnames(model.matrix(as.formula(self$rhsfixed_formula64()), data)))
       
     },
     reduced_random=function() {
@@ -200,7 +206,17 @@ gFormula <- R6::R6Class(
     .random = NULL,
     .random_corr = "all",
     .buildfixed = function(dep, terms) {
-      gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(dep, terms)))
+      
+      if (self$interface == "standard")
+           return(gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(dep, terms))))
+      
+      if (self$interface == "success") {
+
+           dep<-paste0("cbind(",paste0(dep,collapse=","),")")
+           rhform<-gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(NULL, terms)))
+           return(paste0(dep,rhform))
+      }
+      
     },
     .rhsfixed = function(terms) {
       gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(NULL,terms)))

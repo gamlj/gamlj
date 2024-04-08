@@ -859,7 +859,7 @@ procedure.simpleInteractions<-function(obj) {
             resgrid<-do.call(emmeans::contrast,opts_list)
 
             res<-as.data.frame(resgrid)
-            
+  
             ### deal with confidence intervals ###
 
             
@@ -949,7 +949,6 @@ procedure.simpleInteractions<-function(obj) {
 #      if (is.something(attr(obj$obj,"mesg")))
 #           for ()
       anova<-results$obj      
-                          
       resultsList[[length(resultsList)+1]]<-list(anova,params)
       j<-j-1
         }

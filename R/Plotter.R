@@ -49,6 +49,7 @@ Plotter <- R6::R6Class(
         private$.prepareClusterResPred()
         private$.prepareClusterResPredGrid()
         private$.prepareRandHist()
+        private$.prepareJnPlot()
         
       },
       scatterPlot=function(image,ggtheme,theme) {
@@ -179,7 +180,29 @@ Plotter <- R6::R6Class(
 
         return(p)        
       },
+
+      jnPlot=function(image,ggtheme,theme) {
       
+           if (is.null(image$state$prep))
+              return()
+           
+           x<-self$scatterX$name64
+           z<-self$scatterZ$name64
+           model<-private$.operator$model
+           ## we need the rlang::sym notation because interactions::jn expect the arguments to be symbols
+           results<-interactions::johnson_neyman(model,!!rlang::sym(x),!!rlang::sym(z),
+                                                 plot=FALSE,insig.color="gray80", title="")
+           p <- results$plot
+           p <- p + ggplot2::ylab(paste("Slope of ",self$scatterX$name))
+           p <- p + ggplot2::xlab(self$scatterZ$name)
+           p <- p + ggtheme
+           p <- p + ggplot2::labs(fill = NULL)+ggplot2::guides(colour="none")
+           return(p)
+           
+
+        
+      },
+
       qqplot=function(image,theme,ggtheme)  {
         
               if (!self$option("qq_plot"))
@@ -658,6 +681,54 @@ Plotter <- R6::R6Class(
       }
 
     },
+    
+     .prepareJnPlot=function() {
+
+      if (!self$option("plot_jn")) 
+        return()
+
+      jinfo("PLOTTER: prepare johnson-neyman plot")
+
+      if (is.null(self$scatterX))
+          return()
+      
+      if (is.null(self$scatterZ))
+          return()
+
+       ### JN has no meaning if z or x is a factor
+
+      if ( self$scatterZ$type=="factor" ) {
+           self$warning<-list(topic="jnplotnotes",
+                          message=paste("Variable",self$scatterZ$name,"is a factor, the Johnson-Neyman plot cannot be computed."),
+                          head="warning")
+           return()    
+      }
+      if ( self$scatterX$type=="factor" ) {
+           self$warning<-list(topic="jnplotnotes",
+                          message=paste("Variable",self$scatterX$name,"is a factor, the Johnson-Neyman plot cannot be computed."),
+                          head="warning")
+           return()    
+      }
+
+       
+      ### JN fails if there is no interaction between x and z
+      .all <- c(self$scatterZ$name64,self$scatterX$name64)
+       test <- unlist(sapply(.all,function(x) !(.is.scaleDependent(private$.operator$model,x))))
+      .issues <- .all[test]
+      if (is.something(.issues)) {
+        self$warning<-list(topic="jnplotnotes",
+                           message=paste("Variable",paste(fromb64(.issues),collapse = ",")," not in interaction, the Johnson-Neyman plot cannot be produced."),
+                           head="warning")
+        return()
+      }
+      
+      private$.results$jnplotnotes$setContent("")
+      resultsgroup<-private$.results$get("jnPlots")
+      aplot<-resultsgroup$addItem(key=1)
+      aplot$setState(list(prep=TRUE))
+
+     },
+    
     .prepareQqplot=function() {
       
       if (!self$option("qq_plot"))

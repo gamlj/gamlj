@@ -50,7 +50,6 @@ gFit <- R6::R6Class(
                         })
         }
       
-      
       private$.r2<-r2list[[1]]$r2
       private$.ar2<-r2list[[1]]$ar2
       return(r2list)
@@ -85,7 +84,6 @@ gFit <- R6::R6Class(
           r2list[[1]]$type="Conditional"
           ladd(r2list)<-list(model="Nested",type="Marginal")
         }
-
         return(r2list)
         
     }, # end of .r2list
@@ -170,18 +168,20 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.default <- function(model,obj) {
   
-  performance::r2(model, tolerance = 0)
-  
+  r2<-performance::r2(model, tolerance = 0)
+  return(r2)
 }
 
 .r2.lm <- function(model,obj) {
-  
+
   ss <- summary(model)
   results <- list()
   results$df1 <- ss$fstatistic[["numdf"]]
   results$df2 <- ss$fstatistic[["dendf"]]
   results$r2 <- ss$r.squared
   results$ar2 <- ss$adj.r.squared
+  if (results$ar2 < 0) results$ar2 <- 0
+  
   if (utils::hasName(ss, "fstatistic")) {
     if (obj$option("omnibus", "LRT")) {
       ssres <- stats::sigma(model)^2 * model$df.residual
@@ -210,8 +210,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.glm <- function(model,obj) {
   
-  jinfo(" .glm R2 is used for object of class",paste(class(model)))
-  
+
   alist <- list()
   # mcFadden and adjusted
   alist$r2 <- 1 - (model$deviance / model$null.deviance)
@@ -233,7 +232,6 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.polr <- function(model, obj) {
   
-  jinfo(".polr R2 is used")
   alist <- list()
   results <- fit.compare_null_model(model)
 
@@ -250,8 +248,6 @@ r2 <- function(model, ...) UseMethod(".r2")
 .r2.clm <- function(model, obj) {
   .r2.polr(model,obj)
 }
-
-
 
 
 .r2.multinom <- function(model, obj) {
@@ -273,7 +269,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 }
 
 .r2.mblogit <- function(model, obj) {
-  jinfo("mblogit R2 is used")
+
   llfull <- model$deviance
   llnull <- model$null.deviance
   ss <- mclogit::getSummary.mmblogit(model)
@@ -290,9 +286,10 @@ r2 <- function(model, ...) UseMethod(".r2")
 .r2.lmerModLmerTest <- function(model, obj) {
 
   r2 <- .r2.default(model, obj)
-  if (is.null(r2) || is.na(r2)) {
-    r2 <- list(R2_conditional = NA, R2_marginal = NA)
-  }
+  
+#  if (is.null(r2) || is.na(r2)) {
+#    r2 <- list(R2_conditional = NA, R2_marginal = NA)
+#  }
 
   cond <- fit.compare_null_model(model, type = "c")
   cond$type <- "Conditional"
@@ -353,8 +350,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.default <- function(model) {
   
-  jinfo("Default null model comparison is used for object of class ",paste(class(model),collapse = " "))
-  
+
   data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
@@ -490,8 +486,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 .compare_null_model.polr <- function(model) {
   
-  jinfo(".polr null model comparison is used")
-  
+
   data <- insight::get_data(model,source="frame")
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))

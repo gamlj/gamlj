@@ -36,6 +36,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -90,6 +91,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -127,7 +129,39 @@ items:
                     - name: specs
                       type: text
                       title: "Comment"
-  
+
+           - name: crosstab
+             title:  Classification table
+             type: Table
+             description: Predicted vs Observed Table
+             visible: (crosstab)
+             clearWith:
+                           ### modeloptions  begins
+                         - model_type
+                         - dep
+                         - dep2
+                         - factors
+                         - covs
+                         - covs_scale
+                         - scale_missing
+                         - model_terms
+                         - fixed_intercept
+                         - se_method
+                         - mute
+                         - df_method
+                         - contrasts
+                         - covs_scale
+                         - offset
+                         - omnibus
+                         - model_type
+                         - custom_family
+                         - custom_link
+                           ### modeloptions  ends
+             columns:
+                    - name: obs
+                      title: Observed
+                      type: integer
+
 
            - name: anova
              title:  Omnibus tests
@@ -137,6 +171,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -178,6 +213,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -258,6 +294,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -317,6 +354,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -375,6 +413,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -398,6 +437,7 @@ items:
                          - simple_scale
                          - ccm_value
                          - ccp_value
+                         - ccra_steps
                          - covs_scale_labels
                          - covs_conditioning
                            ### simpleeffectsoptions  ends
@@ -445,6 +485,7 @@ items:
                            ### modeloptions  begins
                          - model_type
                          - dep
+                         - dep2
                          - factors
                          - covs
                          - covs_scale
@@ -502,6 +543,7 @@ items:
                       ### modeloptions  begins
                     - model_type
                     - dep
+                    - dep2
                     - factors
                     - covs
                     - covs_scale
@@ -551,6 +593,7 @@ items:
           ### modeloptions  begins
         - model_type
         - dep
+        - dep2
         - factors
         - covs
         - covs_scale
@@ -583,6 +626,7 @@ items:
               ### modeloptions  begins
             - model_type
             - dep
+            - dep2
             - factors
             - covs
             - covs_scale
@@ -854,6 +898,7 @@ items:
                 ### modeloptions  begins
               - model_type
               - dep
+              - dep2
               - factors
               - covs
               - covs_scale
@@ -945,6 +990,7 @@ items:
                     ### modeloptions  begins
                  -  model_type
                  -  dep
+                 -  dep2
                  -  factors
                  -  covs
                  -  covs_scale
@@ -972,6 +1018,7 @@ items:
                     ### modeloptions  begins
                  -  model_type
                  -  dep
+                 -  dep2
                  -  factors
                  -  covs
                  -  covs_scale

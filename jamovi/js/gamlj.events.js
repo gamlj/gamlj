@@ -1,9 +1,11 @@
+// This file containts the function that are called bu *.u.yaml where the GUI is defined
 var rtermFormat = require('./rtermFormat');
 var fun=require('./functions');
 
 const events = {
     update: function(ui) {
       
+        console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
 
         fun.calcModelTerms(ui, this);
@@ -36,6 +38,12 @@ const events = {
               ui.precision.$el.hide();
             }
         }
+        
+        
+        // updates all options related with model_type
+           fun.updateModelOptions(ui,this)
+           
+
 
     },
 
@@ -102,52 +110,13 @@ const events = {
         fun.updateSimpleSupplier(ui, this);
     },
 
-     onChange_model: function(ui) {
-
-        if (typeof ui.es_RR !== 'undefined' ) {
-              ui.es_RR.setValue(false);
-        }
-        if (typeof ui.plot_scale !== 'undefined' ) {
-              ui.plot_scale.setValue('response');
-        }
-
-        if (ui.model_type.getValue()==="custom" ||  ui.model_type.getValue()==="linear")        {
-               ui.es_expb.setValue(false);
-               ui.estimates_ci.setValue(true);
-               ui.expb_ci.setValue(false);
-        } else  {
-               ui.es_expb.setValue(true);
-               ui.estimates_ci.setValue(false);
-               ui.expb_ci.setValue(true);
-        }
-
-        if (typeof ui.propodds_test !== 'undefined') {
-              if (ui.model_type.getValue()==="ordinal") {
-                  ui.propodds_test.$el.show();
-              } else {
-                  ui.propodds_test.$el.hide();
-              }
-        }
-
-
-  
-        if (typeof ui.es_marginals !== 'undefined') {
-          
-              ui.es_marginals.setValue(false);
-
-        }
-        
-        if (typeof ui.preds_phi !== 'undefined' ) {
-          
-            if (ui.model_type.getValue()==="beta") {
-              ui.precision.$el.show();
-            } else {
-              ui.precision.$el.hide();
-            }
-        }
-
-        
+   onChange_model: function(ui) {
+       
+        fun.updateModelOptions(ui,this)
         ui.dep.setValue(null);
+        
+        
+        
       },
 
     onChange_model_remove: function(ui) {
@@ -215,6 +184,13 @@ const events = {
         fun.updateRandomSupplier(ui,this);
 
     },
+
+    onChange_input_method: function(ui) {
+      
+      fun.updateInputMethod(ui,this);
+
+    },
+    
     onEvent_re_list: function(ui) {
       fun.updateRandomSupplier(ui,this);
     },

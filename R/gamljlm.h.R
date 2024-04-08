@@ -36,6 +36,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_black = FALSE,
             plot_around = "ci",
             plot_extremes = FALSE,
+            plot_jn = FALSE,
             emmeans = NULL,
             posthoc = NULL,
             posthoc_ci = FALSE,
@@ -45,6 +46,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale = NULL,
             scale_missing = "complete",
             covs_conditioning = "mean_sd",
+            ccra_steps = 1,
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
@@ -59,6 +61,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "beta",
                 "etap"),
             homo_test = FALSE,
+            colli_test = FALSE,
             qq_plot = FALSE,
             norm_test = FALSE,
             norm_plot = FALSE,
@@ -244,6 +247,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plot_extremes",
                 plot_extremes,
                 default=FALSE)
+            private$..plot_jn <- jmvcore::OptionBool$new(
+                "plot_jn",
+                plot_jn,
+                default=FALSE)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
                 emmeans,
@@ -301,8 +308,15 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 covs_conditioning,
                 options=list(
                     "mean_sd",
-                    "percent"),
+                    "percent",
+                    "range"),
                 default="mean_sd")
+            private$..ccra_steps <- jmvcore::OptionNumber$new(
+                "ccra_steps",
+                ccra_steps,
+                default=1,
+                min=1,
+                max=50)
             private$..ccm_value <- jmvcore::OptionNumber$new(
                 "ccm_value",
                 ccm_value,
@@ -380,6 +394,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..homo_test <- jmvcore::OptionBool$new(
                 "homo_test",
                 homo_test,
+                default=FALSE)
+            private$..colli_test <- jmvcore::OptionBool$new(
+                "colli_test",
+                colli_test,
                 default=FALSE)
             private$..qq_plot <- jmvcore::OptionBool$new(
                 "qq_plot",
@@ -460,6 +478,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_extremes)
+            self$.addOption(private$..plot_jn)
             self$.addOption(private$..emmeans)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
@@ -469,6 +488,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..covs_conditioning)
+            self$.addOption(private$..ccra_steps)
             self$.addOption(private$..ccm_value)
             self$.addOption(private$..ccp_value)
             self$.addOption(private$..covs_scale_labels)
@@ -481,6 +501,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..model_type)
             self$.addOption(private$..es)
             self$.addOption(private$..homo_test)
+            self$.addOption(private$..colli_test)
             self$.addOption(private$..qq_plot)
             self$.addOption(private$..norm_test)
             self$.addOption(private$..norm_plot)
@@ -522,6 +543,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
         plot_extremes = function() private$..plot_extremes$value,
+        plot_jn = function() private$..plot_jn$value,
         emmeans = function() private$..emmeans$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
@@ -531,6 +553,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         covs_conditioning = function() private$..covs_conditioning$value,
+        ccra_steps = function() private$..ccra_steps$value,
         ccm_value = function() private$..ccm_value$value,
         ccp_value = function() private$..ccp_value$value,
         covs_scale_labels = function() private$..covs_scale_labels$value,
@@ -543,6 +566,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         model_type = function() private$..model_type$value,
         es = function() private$..es$value,
         homo_test = function() private$..homo_test$value,
+        colli_test = function() private$..colli_test$value,
         qq_plot = function() private$..qq_plot$value,
         norm_test = function() private$..norm_test$value,
         norm_plot = function() private$..norm_plot$value,
@@ -583,6 +607,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_black = NA,
         ..plot_around = NA,
         ..plot_extremes = NA,
+        ..plot_jn = NA,
         ..emmeans = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
@@ -592,6 +617,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..covs_conditioning = NA,
+        ..ccra_steps = NA,
         ..ccm_value = NA,
         ..ccp_value = NA,
         ..covs_scale_labels = NA,
@@ -604,6 +630,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..model_type = NA,
         ..es = NA,
         ..homo_test = NA,
+        ..colli_test = NA,
         ..qq_plot = NA,
         ..norm_test = NA,
         ..norm_plot = NA,
@@ -629,6 +656,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         emmeans = function() private$.items[["emmeans"]],
         mainPlots = function() private$.items[["mainPlots"]],
         plotnotes = function() private$.items[["plotnotes"]],
+        jnPlots = function() private$.items[["jnPlots"]],
+        jnplotnotes = function() private$.items[["jnplotnotes"]],
         assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
@@ -1288,10 +1317,11 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
-                                "ccm_value",
-                                "ccp_value",
+                                "covs_conditioning",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "ccp_value",
+                                "ccm_value",
+                                "ccra_steps"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1369,10 +1399,11 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
-                                "ccm_value",
-                                "ccp_value",
+                                "covs_conditioning",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "ccp_value",
+                                "ccm_value",
+                                "ccra_steps"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1455,13 +1486,14 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "se_method",
                                     "robust_method",
                                     "mute",
+                                    "covs_conditioning",
+                                    "covs_scale_labels",
+                                    "ccp_value",
+                                    "ccm_value",
+                                    "ccra_steps",
                                     "simple_x",
                                     "simple_mods",
-                                    "simple_scale",
-                                    "ccm_value",
-                                    "ccp_value",
-                                    "covs_scale_labels",
-                                    "covs_conditioning"),
+                                    "simple_scale"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1542,10 +1574,11 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "simple_x",
                                     "simple_mods",
                                     "simple_scale",
-                                    "ccm_value",
-                                    "ccp_value",
+                                    "covs_conditioning",
                                     "covs_scale_labels",
-                                    "covs_conditioning"),
+                                    "ccp_value",
+                                    "ccm_value",
+                                    "ccra_steps"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1610,13 +1643,12 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
-                        "emmeans",
-                        "covs_conditioning",
-                        "covs_scale_labels",
                         "covs_conditioning",
                         "covs_scale_labels",
                         "ccp_value",
-                        "ccm_value"),
+                        "ccm_value",
+                        "ccra_steps",
+                        "emmeans"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1650,7 +1682,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     options=options,
                     title="",
                     renderFun=".mainPlot",
-                    width=750,
+                    width=700,
                     height=400,
                     clearWith=list(
                         "dep",
@@ -1668,6 +1700,11 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "covs_conditioning",
+                        "covs_scale_labels",
+                        "ccp_value",
+                        "ccm_value",
+                        "ccra_steps",
                         "plot_x",
                         "plot_z",
                         "plot_by",
@@ -1675,20 +1712,61 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "plot_yscale",
                         "plot_xoriginal",
                         "plot_black",
-                        "plot_around",
-                        "covs_conditioning",
-                        "covs_scale_labels",
-                        "ccp_value",
-                        "ccm_value"))))
+                        "plot_around"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
+                visible=FALSE))
+            self$add(jmvcore::Array$new(
+                options=options,
+                name="jnPlots",
+                title="Johnson-Neyman Plot",
+                visible="(plot_jn)",
+                refs="interactions",
+                template=jmvcore::Image$new(
+                    options=options,
+                    title="",
+                    renderFun=".jnPlot",
+                    width=700,
+                    height=400,
+                    clearWith=list(
+                        "dep",
+                        "factors",
+                        "covs",
+                        "covs_scale",
+                        "dep_scale",
+                        "scale_missing",
+                        "contrasts",
+                        "model_terms",
+                        "fixed_intercept",
+                        "se_method",
+                        "robust_method",
+                        "mute",
+                        "ci_width",
+                        "ci_method",
+                        "boot_r",
+                        "covs_conditioning",
+                        "covs_scale_labels",
+                        "ccp_value",
+                        "ccm_value",
+                        "ccra_steps",
+                        "plot_x",
+                        "plot_z",
+                        "plot_by",
+                        "plot_raw",
+                        "plot_yscale",
+                        "plot_xoriginal",
+                        "plot_black"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="jnplotnotes",
                 visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
                     homotest = function() private$.items[["homotest"]],
                     normtest = function() private$.items[["normtest"]],
+                    collitest = function() private$.items[["collitest"]],
                     qqplot = function() private$.items[["qqplot"]],
                     normPlot = function() private$.items[["normPlot"]],
                     residPlot = function() private$.items[["residPlot"]]),
@@ -1767,6 +1845,37 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="collitest",
+                            title="Collinearity statistics",
+                            visible="(colli_test)",
+                            clearWith=list(
+                                "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "dep_scale",
+                                "scale_missing",
+                                "contrasts",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "robust_method",
+                                "mute"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `type`="text", 
+                                    `title`="Term"),
+                                list(
+                                    `name`="vif", 
+                                    `type`="number", 
+                                    `title`="VIF"),
+                                list(
+                                    `name`="tol", 
+                                    `type`="number", 
+                                    `title`="Tollerance"))))
                         self$add(jmvcore::Image$new(
                             options=options,
                             name="qqplot",

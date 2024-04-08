@@ -111,11 +111,22 @@ Runner <- R6::R6Class("Runner",
                               }
                             }
                             }
-                            
-                            
-                            tab
+                            return(tab)
                           },
-                          run_main_anova=function() {
+                          run_main_crosstab= function() {
+                              
+                              prop <- 1/self$datamatic$dep$nlevels
+                              tab  <- table(self$model$y,self$model$fitted.values>prop)
+                              marg <- round(100*diag(tab)/apply(tab,1,sum))
+                              tab  <- lapply(1:nrow(tab), function(i) {
+                                          t<-as.list(c(tab[i,],marg[i]))
+                                          names(t)<-(c(paste0("pred",1:(length(t)-1)), "pcorrect"))
+                                          t
+                                          })
+                           
+                              return(tab)
+                          },
+                          run_main_anova = function() {
 
                             if (!self$formulaobj$isProper) {
 
@@ -382,6 +393,7 @@ Runner <- R6::R6Class("Runner",
                                 warning("Levene's test is done only for factors.")
                                 return(list(bptable,ltable))
                           },
+
                           run_assumptions_normtest=function() {
                            
                             table<-data.frame(name=c("Kolmogorov-Smirnov","Shapiro-Wilk"),test=c(NaN,NaN),p=c(NaN,NaN))
@@ -400,10 +412,21 @@ Runner <- R6::R6Class("Runner",
                             }
                             table
                           },
-                          
-                          
-                          savePredRes=function(results) {
+                          run_assumptions_collitest=function() {
                             
+                            obj<-try_hard(tab <- as.data.frame(car::vif(self$model, type = "terms")))
+                            if (!isFALSE(obj$error)) {
+                             warning(obj$error)
+                             return()
+                            }
+                            tab<-obj$obj   
+                            names(tab)[1]<-"vif"
+                            tab$tol=1/tab$vif
+                            tab
+                            
+                          },
+
+                          savePredRes=function(results) {
                             
                             if (self$options$predicted && results$predicted$isNotFilled()) {
                                 jinfo("Saving predicted")
@@ -454,7 +477,7 @@ Runner <- R6::R6Class("Runner",
                           
                           ),# end of public
 
-                        privat=list(
+                        private=list(
                           .data64=NULL,
                           .contr_index=0,
                           .estimateModel=function(data) {
@@ -571,10 +594,12 @@ Runner <- R6::R6Class("Runner",
                             } else {
                             
                                    opts_list<-list(model=self$model,iterations=self$options$boot_r)
+                                   jinfo(paste("Boot repetitions: ",opts_list$iterations))
+
                                    ### check if we can go in paraller ###
                                      test<-try_hard(find.package("parallel"))
                                      if (isFALSE(test$error)) {
-                                         jinfo("we go in parallel")
+                                         jinfo("We go in parallel")
                                          if (Sys.info()['sysname']!="Windows") {
                                            opts_list[["n_cpus"]]<-parallel::detectCores()
                                            opts_list[["parallel"]]<-"multicore"
@@ -583,10 +608,9 @@ Runner <- R6::R6Class("Runner",
                                             opts_list[["parallel"]]<-"no"
                                      }
                                       
-                                
                                 jinfo("RUNNER: estimating bootstrap model")
                                 t<-Sys.time()
-                                
+                              
                                 bmodel<-try_hard(do.call(parameters::bootstrap_model,opts_list))
                                 etime<-as.numeric(Sys.time()-t)
                                 jinfo("RUNNER: done ",etime," secs")

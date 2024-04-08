@@ -31,20 +31,20 @@ options:
         title: Dependent Variable
         type: Variable
         default: ~
-        suggested:
-        - continuous
-        permitted:
-        - numeric
+        suggested: 
+         - continuous
+        permitted: 
+         - numeric
         description:
                 R: |
                         a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
 -       name: factors
         title: Factors
         type: Variables
-        suggested:
-        - nominal
+        suggested: 
+         - nominal
         permitted:
-        - factor
+         - factor
         default: ~
         description:
                 R: a vector of strings naming the fixed factors from `data`. Not needed
@@ -55,8 +55,7 @@ options:
         suggested:
         - continuous
         - ordinal
-        permitted:
-        - numeric
+        permitted: numeric
         default: ~
         description:
                 R: a vector of strings naming the covariates from `data`. Not needed
@@ -316,31 +315,15 @@ options:
         description:
                 R: |
                         should simple Interactions be computed
+
 -       name: covs_conditioning
-        title: Covariates conditioning
-        type: List
-        options:
-        -       name: mean_sd
-                title: Mean ±  SD
-        -       name: percent
-                title: Percentiles 50 ± offset
-        -       name: range
-                title: Min to Max
-        default: mean_sd
-        description:
-                R: |
-                        '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots. '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
+        type: scaffold
+        file: commons.a.yaml
+
 -       name: ccra_steps
-        type: Number
-        default: 1
-        min: 1
-        max: 50
-        description:
-                R: "Covariate condition range steps (not very mnemonic): At how many
-                        values between min and max should the covariate be conditioned
-                        \n"
-                ui: "Covariate condition range steps: At how many values between min
-                        and max should the covariate be conditioned \n"
+        type: scaffold
+        file: commons.a.yaml
+        
 -       name: ccm_value
         type: Number
         default: 1
@@ -388,7 +371,7 @@ options:
                 title: Scheffe
         -       name: sidak
                 title: Sidak
-        default:
+        default: 
         - bonf
         description:
                 R: |
@@ -475,8 +458,7 @@ options:
         title: Cluster variables
         type: Variables
         default: ~
-        suggested:
-        - nominal
+        suggested: nominal
         description:
                 R: a vector of strings naming the clustering variables from `data`
 -       name: re
@@ -664,4 +646,5 @@ options:
         type: Bool
         default: false
         description:
-                R: shows AIC and BIC indices for the estimated model
+                R: |
+                        shows AIC and BIC indices for the estimated model
