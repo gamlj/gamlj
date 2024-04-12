@@ -268,8 +268,9 @@ gobj<-GAMLj3::gamlj_mixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
   contrasts = c("group"="simple","time"="polynomial"),
-   simple_x = "time",
-   simple_mods = "group"
+   simple_x = time,
+   simple_mods = group,
+  res_struct='un'
 )
 gobj
 testthat::test_that("simple effects", {
