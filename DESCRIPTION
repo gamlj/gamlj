@@ -1,7 +1,7 @@
 Package: GAMLj3
 Type: Package
 Title: GAMLj Suite for linear models
-Version: 3.2.5
+Version: 3.2.7
 Author: Marcello Gallucci
 Maintainer: Marcello Gallucci <mcfanda@gmail.com>
 Description: A suite for estimating linear models, such as the general linear model, linear mixed models,
