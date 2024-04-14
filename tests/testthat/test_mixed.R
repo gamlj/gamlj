@@ -268,10 +268,9 @@ gobj<-GAMLj3::gamlj_mixed(
   formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
   data = data,
   contrasts = c("group"="simple","time"="polynomial"),
-   simple_x = "time",
-   simple_mods = "group"
-)
-gobj
+   simple_x = time,
+   simple_mods = group)
+
 testthat::test_that("simple effects", {
   testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[1]),"linear")
   testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[2]),"quadratic")

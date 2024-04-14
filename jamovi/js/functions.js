@@ -448,8 +448,10 @@ const fun = {
         }      
         
       // deal with extra field of logistic by tables
-      
-       ui.dep_box.$label.text("Dependent Variable");
+       if (typeof ui.dep_box !== 'undefined' ) {
+              ui.dep_box.$label.text("Dependent Variable");
+       }
+       
        if (typeof ui.input_method !== 'undefined' ) {
          
             if (ui['.caller'].value() === "glm") {

@@ -190,6 +190,7 @@ data("poissonacts")
 data <- poissonacts
 data$age <- factor(data$age)
 
+
 mod <- GAMLj3::gamlj_glm(
   formula = acts ~ agg_test * age,
   data = data,
