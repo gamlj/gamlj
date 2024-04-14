@@ -39,7 +39,12 @@ Infomatic <- R6::R6Class(
                     self$model_type<-"logistic_success"
          if (options$model_type=="logistic" && options$input_method=="total")
                     self$model_type<-"logistic_total"
-      }
+         if (options$model_type=="probit" && options$input_method=="success")
+                    self$model_type<-"probit_success"
+         if (options$model_type=="probit" && options$input_method=="total")
+                    self$model_type<-"probit_total"
+
+         }
 
       self$formula           <- formulas$formula64()
       self$caller            <- options$.caller
@@ -179,6 +184,54 @@ Infomatic <- R6::R6Class(
         self$comparison    <-    "Ratio"
         
       }
+
+      
+      if (self$model_type=="probit_success") {
+        dep1               <-   options$dep
+        dep2               <-   options$dep2
+        self$model         <-   c("Logistic Model","Model for success over failure")
+        self$distribution  <-  "binomial"
+        self$family        <-   "binomial(link='probit')"
+        self$call          <-   "acall"
+        self$rcall         <-   "stats::glm"
+        form               <-    paste("cbind(",tob64(dep1),",",tob64(dep2),") ",formulas$rhsfixed_formula64())
+        self$calloptions   <-    list(formula=form,family=binomial(link='probit'))
+        self$link          <-   "logit"
+        self$emmeans       <-    "probabilities"
+        self$comparison    <-  "OR"
+        self$deptype       <-    "integer"
+
+        ### compute directions ###
+        actual             <-  paste("P(",dep1,") / P(",dep2,")")
+        theory             <-  "P(y=1)/P(y=0)"
+        self$direction     <-  c(theory,actual)
+        
+      }
+     if (self$model_type=="probit_total") {
+        dep1               <-   options$dep
+        dep2               <-   options$dep2
+        self$model         <-   c("Logistic Model","Model for success over totals")
+        self$distribution  <-  "binomial"
+        self$family        <-   "binomial"
+        self$call          <-   "acall"
+        self$rcall         <-   "stats::glm"
+        form               <-    paste(tob64(dep1),"/",tob64(dep2),formulas$rhsfixed_formula64())
+        self$calloptions   <-    list(formula=form,family=binomial(link="probit"),weights = str2lang(tob64(dep2)))
+        self$link          <-   "logit"
+        self$emmeans       <-    "probabilities"
+        self$comparison    <-  "OR"
+        self$deptype       <-    "integer"
+
+        ### compute directions ###
+        actual             <-  paste(dep1," / ",dep2)
+        theory             <-  "P(y=1)/P(y=0)"
+        self$direction     <-  c(theory,actual)
+        
+      }
+      
+      
+      
+      
       if (self$model_type=="poiover") {
         
         self$model         <-   c("Poisson Model","Model for overdispersed count y")
