@@ -9,7 +9,7 @@ maintainer: Marcello Gallucci <mcfanda@gmail.com>
 date: 2022-1-1
 type: R
 description: >-
-  (Experimental) A suite for estimation of linear models, such as the general
+  A suite for estimation of linear models, such as the general
   linear model, linear mixed model, generalized linear models and generalized
   mixed models. For ech family, models can be estimated with categorical and/or
   continuous variables, with options to facilitate estimation of  interactions,
