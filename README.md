@@ -67,7 +67,7 @@ jmvtools::install()
 ## From GitHub
 
 ```
-library(jmvtools)
+
 devtools::install_github("gamlj/gamlj")
 
 ```
