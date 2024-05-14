@@ -689,7 +689,6 @@ Runner <- R6::R6Class("Runner",
                               atable$label     <-  self$datamatic$get_params_labels(atable$label)
                             
                             if ("response" %in% names(atable)) {
-                              mark(fromb64(atable$response))
                                    atable$response          <-  fromb64(atable$response)
                                    atable$response          <-  factor(atable$response)
                                    levels(atable$response)  <-  unlist(self$datamatic$dep$contrast_labels)
@@ -700,7 +699,6 @@ Runner <- R6::R6Class("Runner",
                               levels(atable$level)  <-  unlist(self$datamatic$dep$levels_labels)
                               atable$level          <-  as.character(atable$level)
                             }
-                            
                             if ("Component" %in% names(atable))
                                                atable$source[atable$Component=="alpha"]<-"Threshold"
 

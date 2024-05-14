@@ -514,12 +514,18 @@ Plotter <- R6::R6Class(
         ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works 
         
         rawData<-private$.fix_clusters(rawData)
+
+       .model<-private$.operator$model
         
         if (self$option("plot_re_method","average")) {
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
-            .model<-mf.update(private$.operator$model,formula=formula)
-        } else
-            .model<-private$.operator$model
+            res<- try_hard(mf.update(private$.operator$model,formula=formula))
+            if (!isFALSE(res$error)) {
+                 self$warning<-list(topic="plotnotes",message=paste("Random effects cannot be plotted for",self$scatterX$name," with the averaging method."))
+            } else
+              .model<-res$obj
+
+        } 
         y<-stats::predict(.model,type=self$scatterType)
         randomData<-as.data.frame(cbind(y,rawData))
         if (self$scatterX$type=="factor")
