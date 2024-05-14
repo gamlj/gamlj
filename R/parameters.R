@@ -160,8 +160,6 @@ gparameters<- function(x,...) UseMethod(".parameters")
 .parameters.multinom<-function(model,obj) {
   .coefficients<-.parameters.glm(model,obj)
   names(.coefficients)<-tolower(names(.coefficients))
-  mark(.coefficients)
-  mark(fromb64(.coefficients$response),fromb64(.coefficients$source))
   .coefficients
 }
 
