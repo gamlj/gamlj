@@ -354,7 +354,6 @@ Runner <- R6::R6Class("Runner",
                             
                             if (is.null(self$tab_simpleCoefficients))
                                private$.estimateSimpleEffects()
-                            
                             self$tab_simpleCoefficients
                           },
                           
@@ -690,6 +689,8 @@ Runner <- R6::R6Class("Runner",
                               atable$label     <-  self$datamatic$get_params_labels(atable$label)
                             
                             if ("response" %in% names(atable)) {
+                              mark(fromb64(atable$response))
+                                   atable$response          <-  fromb64(atable$response)
                                    atable$response          <-  factor(atable$response)
                                    levels(atable$response)  <-  unlist(self$datamatic$dep$contrast_labels)
                                    atable$response          <-  as.character(atable$response)
