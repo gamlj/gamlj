@@ -1,6 +1,8 @@
 testthat::context("glm")
 data("hsbdemo")
 tol <- 0.001
+object<-hsbdemo
+length(serialize(object, connection=NULL))
 
 mod0 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,

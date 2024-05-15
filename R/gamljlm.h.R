@@ -1678,6 +1678,9 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="mainPlots",
                 title="Results Plots",
+                clearWith=list(
+                    "dep",
+                    "factors"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",

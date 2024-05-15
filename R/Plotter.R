@@ -17,6 +17,7 @@ Plotter <- R6::R6Class(
       scatterBars=FALSE,
       scatterRaw=FALSE,
       scatterType=NULL,
+      largedata=NULL,
       initialize=function(jmvobj,operator) {
         
             super$initialize(jmvobj)
@@ -101,11 +102,11 @@ Plotter <- R6::R6Class(
            x<-self$scatterX$name64
            z<-self$scatterZ$name64
           # 
-          .aesraw<-ggplot2::aes_string(x = x, y = y)
+          .aesraw<-ggplot2::aes(x = .data[[x]], y = .data[[y]])
           
            if (!is.null(self$scatterZ))
                if (self$scatterZ$type=="factor")
-                .aesraw<-ggplot2::aes_string(x = x, y = y, color=z)
+                .aesraw<-ggplot2::aes(x = .data[[x]], y = .data[[y]], color=.data[[z]])
 
           p <- p +  ggplot2::geom_point(data = rawdata,
                                         .aesraw,
@@ -142,8 +143,7 @@ Plotter <- R6::R6Class(
           }
 
         }
-        ## clean up the image (must be done otherwise it takes forever to produce the plot)
-        image$setState(NULL)
+      
         ######### fix the bars ##########        
         if (self$scatterBars) {
           if (self$scatterX$type=="factor")
@@ -177,6 +177,7 @@ Plotter <- R6::R6Class(
         
         if (self$options$plot_black)
           p <- p + ggplot2::theme(legend.key.width = ggplot2::unit(2,"cm"))
+        
 
         return(p)        
       },
@@ -199,8 +200,6 @@ Plotter <- R6::R6Class(
            p <- p + ggplot2::labs(fill = NULL)+ggplot2::guides(colour="none")
            return(p)
            
-
-        
       },
 
       qqplot=function(image,theme,ggtheme)  {
@@ -238,9 +237,10 @@ Plotter <- R6::R6Class(
         # library(ggplot2)
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = x)) +
           ggplot2::labs(x = "Residuals", y = "density")
-        ## after_stat() is new, so we need to wait for jamovi to update. In the meantime, we use ..density..
-#        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)), position = "identity", stat = "bin", color = color, fill = fill)
-        plot <- plot + ggplot2::geom_histogram(ggplot2::aes_string(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
+        ## after_stat() is new, so we used to wait for jamovi to update. In the meantime, we used ..density..
+        ## now after_stat() works
+        plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)), position = "identity", stat = "bin", color = color, fill = fill)
+ #       plot <- plot + ggplot2::geom_histogram(ggplot2::aes(y = "..density.."), position = "identity", stat = "bin", color = color, fill = fill)
         plot <- plot + ggplot2::stat_function(fun = stats::dnorm, args = list(mean = mean(data$x), sd = stats::sd(data$x)))
         
         themeSpec <- ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
@@ -252,10 +252,10 @@ Plotter <- R6::R6Class(
       residPlot=function(image,theme,ggtheme)  {
 
         if (!self$option("resid_plot"))
-          return()        
+           return()        
 
         if (!is.something(image$state$data))
-          return()
+           return()
 
         
             fill <- theme$fill[2]
@@ -286,11 +286,11 @@ Plotter <- R6::R6Class(
         ########## working here ##########
 
         if (!self$option("cluster_boxplot"))
-          return()
+             return()
         
 
         if (!is.something(private$.operator$model) )
-          return(FALSE)
+             return(FALSE)
         
         cluster<-image$state$cluster
 
@@ -325,14 +325,13 @@ Plotter <- R6::R6Class(
         if (!self$option("cluster_respred"))
           return()
         
-        
         if (!is.something(private$.operator$model) )
           return(FALSE)
         
         cluster<-image$state$cluster
         data<-lme4::fortify.merMod(private$.operator$model)
         if (inherits(private$.operator$model,"lme"))
-          data$.resid<-stats::resid(private$.operator$model,type="normalized")
+            data$.resid<-stats::resid(private$.operator$model,type="normalized")
         
 
         data$cluster<-data[[cluster]]
@@ -342,10 +341,11 @@ Plotter <- R6::R6Class(
         plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
 
         if (self$option("plot_extremes")) {
-          cutoff1<-quantile(data$.resid,.01)
-          cutoff2<-quantile(data$.resid,.99)
-          edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
-          plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=.fitted,y=.resid,label=rownames(edata)),
+          
+           cutoff1<-quantile(data$.resid,.01)
+           cutoff2<-quantile(data$.resid,.99)
+           edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
+           plot <- plot + ggplot2::geom_label(data=edata,ggplot2::aes(x=.fitted,y=.resid,label=rownames(edata)),
                                              show.legend=FALSE,
                                              position=ggplot2::position_jitter())
         }
@@ -416,7 +416,6 @@ Plotter <- R6::R6Class(
               themeSpec <- ggplot2::theme(axis.text.y=ggplot2::element_blank(),
                              axis.ticks.y=ggplot2::element_blank())
               plot <- plot + ggtheme + themeSpec
-          
           
           return(plot)
   
@@ -493,7 +492,6 @@ Plotter <- R6::R6Class(
       private$.results$plotnotes$setContent("")
       
       resultsgroup<-private$.results$get("mainPlots")
-
       ### stop if it is filled from previous run ###
       test<-any(unlist(sapply(resultsgroup$items, function(i) !i$isNotFilled())))
       if (test)
@@ -503,7 +501,9 @@ Plotter <- R6::R6Class(
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
       rawData<-mf.data(private$.operator$model)
-      
+      attr(rawData,"terms")<-NULL
+
+
       ### here we deal with plotting random effects, if needed
       randomData<-NULL
 
@@ -683,6 +683,9 @@ Plotter <- R6::R6Class(
                state[["randomData"]]<-rdata
                
              }
+             mark(length(serialize(state, connection=NULL)))
+             mark(length(serialize(rawData, connection=NULL)))
+
              aplot$setState(state)
       }
 
@@ -750,6 +753,8 @@ Plotter <- R6::R6Class(
       
       if (!self$option("norm_plot"))
         return()
+
+      jinfo("PLOTTER: prepare norm plot")
       
       residuals <- as.data.frame(stats::residuals(private$.operator$model))
       image<-private$.results$assumptions$get("normPlot")
