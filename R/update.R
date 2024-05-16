@@ -1,6 +1,6 @@
 
 ####### model update ##########
-
+### we need some custom update to be sure that the returned model can be used within gamlj
 
 mf.update<- function(x,...) UseMethod(".update")
 
@@ -77,7 +77,7 @@ mf.update<- function(x,...) UseMethod(".update")
 
 .update.mmblogit<-function(model,formula) {
   
-  jinfo("mmblogit update is used")
+  jinfo("GAMLj: mmblogit update is used")
   ### mclogit is quite unflexible with the class of formulas. 
   ### we should deparse them and reset as formulas
   .fixed  <- lme4::nobars(stats::formula(formula))
@@ -85,8 +85,6 @@ mf.update<- function(x,...) UseMethod(".update")
   .data   <- model$data
   .random<-(lapply(.random,function(x) formula(paste("~",deparse(x)))))
 
-   
-  
   if (!is.something(.random)) {
     .fixed<-formula(paste(deparse(.fixed)))
    
@@ -96,8 +94,7 @@ mf.update<- function(x,...) UseMethod(".update")
     return(nnet::multinom(.fixed,.data))
     
   }
-
-  mclogit::mblogit(.fixed,random=.random,data=.data)
+  mclogit::mblogit(.fixed,random=.random,data=.data, trace=FALSE,trace.inner=FALSE)
   
 }
 

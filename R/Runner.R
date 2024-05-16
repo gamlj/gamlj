@@ -541,7 +541,6 @@ Runner <- R6::R6Class("Runner",
 
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
-                       
                               jinfo("MODULE: Estimating the model: running")
                           
                               results<-try_hard(eval(acall))
