@@ -318,7 +318,7 @@ Infomatic <- R6::R6Class(
         if (self$caller=="glm") {
             self$call          <-    "nnet::multinom"
             self$rcall         <-    "nnet::multinom"
-            self$calloptions   <-    list(model=TRUE)
+            self$calloptions   <-    list(model=TRUE,trace=FALSE)
         } 
         if (self$caller=="glmer") {
 

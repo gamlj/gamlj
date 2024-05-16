@@ -147,6 +147,7 @@ mod <- GAMLj3::gamlj_gmixed(
   data = data
 )
 })
+
 testthat::test_that("test mixed comparison: ordinal", {
   testthat::expect_equal(mod$main$r2$asDF[2,5],393.26,tolerance = tol)
   testthat::expect_true(is.na(mod$main$r2$asDF[3,5]))

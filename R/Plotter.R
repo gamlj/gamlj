@@ -37,6 +37,9 @@ Plotter <- R6::R6Class(
       ## information contained in the image$state
       initPlots=function() {
            private$.initMainPlot()
+           private$.initJnPlot()
+           private$.initClusterPlots()
+           private$.initRandHist()
       },
       preparePlots=function(image, ggtheme, theme, ...) {
         ## here are the plots that require some preparations. All plots 
@@ -184,12 +187,12 @@ Plotter <- R6::R6Class(
 
       jnPlot=function(image,ggtheme,theme) {
       
-           if (is.null(image$state$prep))
+           if (is.null(image$state$model))
               return()
            
            x<-self$scatterX$name64
            z<-self$scatterZ$name64
-           model<-private$.operator$model
+           model<-image$state$model
            ## we need the rlang::sym notation because interactions::jn expect the arguments to be symbols
            results<-interactions::johnson_neyman(model,!!rlang::sym(x),!!rlang::sym(z),
                                                  plot=FALSE,insig.color="gray80", title="")
@@ -288,16 +291,11 @@ Plotter <- R6::R6Class(
         if (!self$option("cluster_boxplot"))
              return()
         
-
-        if (!is.something(private$.operator$model) )
+        if (!is.something(image$state ))
              return(FALSE)
         
         cluster<-image$state$cluster
-
-        data<-lme4::fortify.merMod(private$.operator$model)
-
-        if (inherits(private$.operator$model,"lme"))
-          data$.resid<-stats::resid(private$.operator$model,type="normalized")
+        data<-image$state$data
 
         data$cluster<-data[[cluster]]
         plot<-ggplot2::ggplot(data, ggplot2::aes(cluster,.resid)) +
@@ -318,6 +316,7 @@ Plotter <- R6::R6Class(
         return(plot)
         
       },
+
       clusterResPred=function(image,ggtheme,theme)  {
         
         ########## working here ##########
@@ -325,14 +324,11 @@ Plotter <- R6::R6Class(
         if (!self$option("cluster_respred"))
           return()
         
-        if (!is.something(private$.operator$model) )
+        if (!is.something(image$state) )
           return(FALSE)
         
-        cluster<-image$state$cluster
-        data<-lme4::fortify.merMod(private$.operator$model)
-        if (inherits(private$.operator$model,"lme"))
-            data$.resid<-stats::resid(private$.operator$model,type="normalized")
-        
+        cluster<- image$state$cluster
+        data   <- image$state$data       
 
         data$cluster<-data[[cluster]]
         plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid,color=cluster)) 
@@ -360,23 +356,19 @@ Plotter <- R6::R6Class(
       
           if (!self$option("cluster_respred_grid"))
              return()
-  
-  
-          if (!is.something(private$.operator$model) )
-            return(FALSE)
-  
-          cluster<-image$state$cluster
-          data<-lme4::fortify.merMod(private$.operator$model)
-          if (inherits(private$.operator$model,"lme"))
-                   data$.resid<-stats::resid(private$.operator$model,type="normalized")
-  
-          data$cluster<-data[[cluster]]
-          plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid)) 
-          plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals")
-          plot <- plot + ggplot2::geom_point(shape = 19)
-          plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
+        
+        if (!is.something(image$state ))
+             return(FALSE)
+        
+        cluster<-image$state$cluster
+        data<-image$state$data
+        data$cluster<-data[[cluster]]
+        plot <- ggplot2::ggplot(data = data, ggplot2::aes(x = .fitted, y = .resid)) 
+        plot <- plot + ggplot2::labs(x = "Predicted", y = "Residuals")
+        plot <- plot + ggplot2::geom_point(shape = 19)
+        plot <- plot + ggplot2::geom_hline(yintercept = 0, colour = "gray")
           
-          if (self$option("plot_extremes")) {
+        if (self$option("plot_extremes")) {
               cutoff1<-quantile(data$.resid,.01)
               cutoff2<-quantile(data$.resid,.99)
               edata<-data[data$.resid<=cutoff1 | data$.resid>=cutoff2,]
@@ -385,10 +377,10 @@ Plotter <- R6::R6Class(
                                                  position=ggplot2::position_jitter())
           }
           
-          plot <- plot + ggtheme 
-          plot <- plot + ggplot2::theme(legend.position="bottom")
-          plot <- plot + ggplot2::facet_wrap(cluster)
-          return(plot)
+        plot <- plot + ggtheme 
+        plot <- plot + ggplot2::theme(legend.position="bottom")
+        plot <- plot + ggplot2::facet_wrap(cluster)
+        return(plot)
        },
 
         randHist=function(image,ggtheme,theme)  {
@@ -396,12 +388,9 @@ Plotter <- R6::R6Class(
   
               if (!self$option("rand_hist"))
                   return()
-  
-  
-              if (!is.something(private$.operator$model) )
-                  return(FALSE)
- 
-              label<-image$state$label
+              if (!is.something(image$state))
+                  return()
+
               data<-image$state$data
               fill <- theme$fill[2]
               color <- theme$color[1]
@@ -488,7 +477,6 @@ Plotter <- R6::R6Class(
 
       jinfo("PLOTTER: checking main plot")
       
-      
       private$.results$plotnotes$setContent("")
       
       resultsgroup<-private$.results$get("mainPlots")
@@ -503,8 +491,7 @@ Plotter <- R6::R6Class(
       moderators<-self$scatterModerators
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
-      rawData<-mf.data(private$.operator$model)
-      attr(rawData,"terms")<-NULL
+      rawData<-mf.clean(mf.data(private$.operator$model))
 
 
       ### here we deal with plotting random effects, if needed
@@ -542,6 +529,7 @@ Plotter <- R6::R6Class(
         test<-sum(sapply(test,function(x) as.numeric(is.na(x) || x==0)))
         nc<-self$scatterCluster$nlevels
         if ((test/nc)>.30) xbetween<-TRUE
+        
       }
       ### end of random ###
       
@@ -575,8 +563,6 @@ Plotter <- R6::R6Class(
         self$scatterRaw<-FALSE
         scatterRange<-NULL
       }
-      
-      
       
       ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
       
@@ -691,6 +677,17 @@ Plotter <- R6::R6Class(
       }
 
     },
+
+     .initJnPlot=function() {
+
+      if (!self$option("plot_jn")) 
+        return()
+
+      jinfo("PLOTTER: init johnson-neyman plot")
+      resultsgroup<-private$.results$get("jnPlots")
+      aplot<-resultsgroup$addItem(key=1)
+
+     },
     
      .prepareJnPlot=function() {
 
@@ -713,6 +710,7 @@ Plotter <- R6::R6Class(
                           head="warning")
            return()    
       }
+      
       if ( self$scatterX$type=="factor" ) {
            self$warning<-list(topic="jnplotnotes",
                           message=paste("Variable",self$scatterX$name,"is a factor, the Johnson-Neyman plot cannot be computed."),
@@ -734,12 +732,14 @@ Plotter <- R6::R6Class(
       
       private$.results$jnplotnotes$setContent("")
       resultsgroup<-private$.results$get("jnPlots")
-      aplot<-resultsgroup$addItem(key=1)
-      aplot$setState(list(prep=TRUE))
-
+      aplot<-resultsgroup$get(key=1)
+      ### we should clean the model otherwise is too big to be serialized
+      model<-private$.operator$model
+      model <- mf.clean(model)
+      aplot$setState(list(model=model))
      },
     
-    .prepareQqplot=function() {
+     .prepareQqplot=function() {
       
       if (!self$option("qq_plot"))
         return()
@@ -750,7 +750,7 @@ Plotter <- R6::R6Class(
       
     },
     
-    .prepareNormplot=function() {
+     .prepareNormplot=function() {
       
       if (!self$option("norm_plot"))
         return()
@@ -763,7 +763,7 @@ Plotter <- R6::R6Class(
       
     },
     
-    .prepareResidplot=function() {
+     .prepareResidplot=function() {
       
       if (!self$option("resid_plot"))
         return()
@@ -772,23 +772,68 @@ Plotter <- R6::R6Class(
       image<-private$.results$assumptions$get("residPlot")
       image$setState(list(data=data.frame(residuals=residuals,predicted=predicted)))
     },
+
+     .initClusterPlots=function() {
+
+      clusters<-private$.operator$formulaobj$clusters
+      if (is.null(clusters))
+         return()
+      p<-length(clusters)
+      ### remove built clusters combinations
+      test<-grep("[\\:\\/]",clusters,invert = TRUE)
+      clusters64<-tob64(clusters[test])
+      d<-length(clusters64) 
+       if (p!=d)     
+            self$warning<-list(topic="plotnotes",
+                          message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+  
+      
+       if (self$option("cluster_boxplot")) {
+            resultsgroup<-private$.results$assumptions$clusterBoxplot
+            for (cluster in clusters64) {
+                     title<-paste("Clustering variable:", fromb64(cluster))
+                     resultsgroup$addItem(cluster)
+                     resultsgroup$get(key=cluster)$setTitle(title)
+            }
+       }
+       
+       if (self$option("cluster_respred")) {
+           resultsgroup<-private$.results$assumptions$clusterResPred
+            for (cluster in clusters64) {
+                     title<-paste("Clustering variable:", fromb64(cluster))
+                     resultsgroup$addItem(cluster)
+                     resultsgroup$get(key=cluster)$setTitle(title)
+            }
+       }
+
+      if (self$option("cluster_respred_grid")) {
+          resultsgroup<-private$.results$assumptions$clusterResPredGrid
+            for (cluster in clusters64) {
+                     title<-paste("Clustering variable:", fromb64(cluster))
+                     resultsgroup$addItem(cluster)
+                     resultsgroup$get(key=cluster)$setTitle(title)
+            }
+        }
+
+
+    }, 
     
-    
-    .prepareClusterBoxplot=function() {
+     .prepareClusterBoxplot=function() {
       
       if (!self$option("cluster_boxplot"))
         return()
-      
-      ### we get the clusters from the model because the model may contain less cluster variables than selected
-      if (inherits(private$.operator$model,"lme"))
-        clusters<-names(private$.operator$model$groups)
-      else
-        clusters<-names(private$.operator$model@cnms)
+      ### we get the clusters from the formulaobj because the model may contain less cluster variables than selected
+
+      clusters<-private$.operator$formulaobj$clusters
+      if (is.null(clusters))
+         return()
+
+      jinfo("PLOTTER: prepare ClusterBoxplot")
       
       p<-length(clusters)
       ### remove built clusters combinations
       test<-grep("[\\:\\/]",clusters,invert = TRUE)
-      clusters<-clusters[test]
+      clusters<-tob64(clusters[test])
       d<-length(clusters) 
        if (p!=d)     
             self$warning<-list(topic="plotnotes",
@@ -796,45 +841,48 @@ Plotter <- R6::R6Class(
        
       resultsgroup<-private$.results$assumptions$clusterBoxplot
 
+      data<-lme4::fortify.merMod(private$.operator$model)
+      if (inherits(private$.operator$model,"lme"))
+            data$.resid<-stats::resid(private$.operator$model,type="normalized")
+
       for (cluster in clusters) {
-        title<-paste("Clustering variable:", fromb64(cluster))
-        id<-cluster
-        resultsgroup$addItem(id)
-        resultsgroup$get(key=id)$setTitle(title)
-        resultsgroup$get(key=id)$setState(list(cluster=cluster,label=fromb64(cluster)))
-        
+        resultsgroup$get(key=cluster)$setState(list(cluster=cluster,data=data))
       }
     },
+    
     .prepareClusterResPred=function() {
       
       if (!self$option("cluster_respred"))
         return()
-      
-      ### we get the clusters from the model because the model may contain less cluster variables than selected
-      if (inherits(private$.operator$model,"lme"))
-        clusters<-names(private$.operator$model$groups)
-      else
-        clusters<-names(private$.operator$model@cnms)
 
-      
+      ### we get the clusters from the formulaobj because the model may contain less cluster variables than selected
+
+      clusters<-private$.operator$formulaobj$clusters
+      if (is.null(clusters))
+         return()
+
+      jinfo("PLOTTER: prepare ClusterResPred")
+
       p<-length(clusters)
       ### remove built clusters combinations
       test<-grep("[\\:\\/]",clusters,invert = TRUE)
-      clusters<-clusters[test]
+      clusters<-tob64(clusters[test])
       d<-length(clusters) 
       if (p!=d)     
         self$warning<-list(topic="plotnotes",
                            message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
       
-      
+
       resultsgroup<-private$.results$assumptions$clusterResPred
+      data<-lme4::fortify.merMod(private$.operator$model)
+      if (inherits(private$.operator$model,"lme"))
+            data$.resid<-stats::resid(private$.operator$model,type="normalized")
       
       for (cluster in clusters) {
         title<-paste("Clustering variable:", fromb64(cluster))
         id<-cluster
-        resultsgroup$addItem(id)
         resultsgroup$get(key=id)$setTitle(title)
-        resultsgroup$get(key=id)$setState(list(cluster=cluster,label=fromb64(cluster)))
+        resultsgroup$get(key=id)$setState(list(cluster=cluster,data=data))
         
       }
     },
@@ -842,17 +890,18 @@ Plotter <- R6::R6Class(
       
       if (!self$option("cluster_respred_grid"))
         return()
-      
-      ### we get the clusters from the model because the model may contain less cluster variables than selected
-      if (inherits(private$.operator$model,"lme"))
-        clusters<-names(private$.operator$model$groups)
-      else
-        clusters<-names(private$.operator$model@cnms)
-      
+      ### we get the clusters from the formulaobj because the model may contain less cluster variables than selected
+
+      clusters<-private$.operator$formulaobj$clusters
+      if (is.null(clusters))
+         return()
+
+      jinfo("PLOTTER: prepare ClusterResPredGrid")
+
       p<-length(clusters)
       ### remove built clusters combinations
       test<-grep("[\\:\\/]",clusters,invert = TRUE)
-      clusters<-clusters[test]
+      clusters<-tob64(clusters[test])
       d<-length(clusters) 
       if (p!=d)     
         self$warning<-list(topic="plotnotes",
@@ -860,46 +909,80 @@ Plotter <- R6::R6Class(
       
       resultsgroup<-private$.results$assumptions$clusterResPredGrid
       
+      data<-lme4::fortify.merMod(private$.operator$model)
+      if (inherits(private$.operator$model,"lme"))
+            data$.resid<-stats::resid(private$.operator$model,type="normalized")
+      
       for (cluster in clusters) {
         title<-paste("Clustering variable:", fromb64(cluster))
         id<-cluster
-        resultsgroup$addItem(id)
         resultsgroup$get(key=id)$setTitle(title)
-        resultsgroup$get(key=id)$setState(list(cluster=cluster,label=fromb64(cluster)))
-        
+        resultsgroup$get(key=id)$setState(list(cluster=cluster,data=data))
       }
     },
-    
-    .prepareRandHist=function() {
-      
-      if (!self$option("rand_hist"))
+
+    .initRandHist=function() {
+
+     if (!self$option("rand_hist"))
         return()
+      jinfo("PLOTTER: init RandHist")
       
-  
-      if (!is.something(private$.operator$model))
-            return()
-      
-      res<-lme4::ranef(private$.operator$model)
-      clusters64<-names(res)
+      clusters <- private$.operator$formulaobj$clusters
+      random   <- private$.operator$formulaobj$random
+      random   <- lapply(random,function(x) unlist(lapply(x,function(z) z[-length(z)])))
+
+      if (is.null(clusters))
+         return()
       
       resultsgroup<-private$.results$assumptions$randHist
       
-      for (cluster in clusters64) {
-        clusterres<-res[[cluster]]
-        vars<-names(clusterres)
+      for (i in seq_along(clusters)) {
+        cluster<-clusters[i]
+        vars <- random[[i]]
+        i<-0
         for (v in vars) {
-          data<-data.frame(clusterres[,v])
-          names(data)<-"x"
-          label<-fromb64(v,self$vars)
-          title<-paste("Coefficient",label," random across",fromb64(cluster))
-          id<-paste0(v,cluster)
+          i<-i+1
+          title<-paste("Coefficient",v," random across",cluster)
+          id   <- tob64(paste0(cluster,i))
           resultsgroup$addItem(id)
           resultsgroup$get(key=id)$setTitle(title)
-          resultsgroup$get(key=id)$setState(list(data=data,label=label))
         }
-        
       }
+
+    
+    },
+    .prepareRandHist=function() {
+
+      if (!self$option("rand_hist"))
+         return()
+
+      if (is.null(private$.operator$model))
+         return()
+
+      jinfo("PLOTTER: prepare RandHist")
+
+      clusters <- private$.operator$formulaobj$clusters
+      random   <- private$.operator$formulaobj$random
+      random   <- lapply(random,function(x) unlist(lapply(x,function(z) z[-length(z)])))
+
+      if (is.null(clusters))
+         return()
       
+      res<-lme4::ranef(private$.operator$model)
+      resultsgroup<-private$.results$assumptions$randHist
+      
+      for (cluster in clusters) {
+        clusterres<-res[[tob64(cluster)]]
+        vars<-names(clusterres)
+        i <- 0
+        for (v in vars) {
+          i<-i+1
+          data<-data.frame(clusterres[,v])
+          names(data)<-"x"
+          id<-tob64(paste0(cluster,i))
+          resultsgroup$get(key=id)$setState(list(data=data))
+        }
+      }
     },
     
     .estimate=function(x,term) {
@@ -1002,6 +1085,7 @@ Plotter <- R6::R6Class(
       values
       
     },
+
     .fix_clusters=function(data) {
       
       test<-grep("[\\:\\/]",private$.operator$formulaobj$clusters)

@@ -172,3 +172,29 @@ mf.data<- function(x,...) UseMethod(".data")
 .data.lmerModLmerTest<-function(model) model@frame
 
 .data.lme<-function(model) model$data
+
+
+mf.clean<- function(x,...) UseMethod(".clean")
+
+.clean.data.frame<-function(x) {
+  
+  attr(x,"terms") <- NULL
+  
+  return(x)
+
+}
+
+.clean.lm<-function(x) {
+  
+     .terms<-x$terms
+      attr(.terms,".Environment")<-NULL
+      x$terms<-.terms
+      data<-x$model
+      attr(data,"terms")<-NULL
+      x$model<-data
+
+      return(x)
+
+}
+
+
