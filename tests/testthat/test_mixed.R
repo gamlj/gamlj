@@ -17,7 +17,6 @@ model<-GAMLj3::gamlj_mixed(
 )
 
 
-
 infotable<-model$info$asDF
 
 testthat::test_that("info is ok", {
