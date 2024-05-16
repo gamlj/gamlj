@@ -199,7 +199,7 @@ Plotter <- R6::R6Class(
            p <- results$plot
            p <- p + ggplot2::ylab(paste("Slope of ",self$scatterX$name))
            p <- p + ggplot2::xlab(self$scatterZ$name)
-           p <- p + ggtheme
+           suppressMessages(p <- p + ggtheme)
            p <- p + ggplot2::labs(fill = NULL)+ggplot2::guides(colour="none")
            return(p)
            
