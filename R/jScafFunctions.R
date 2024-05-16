@@ -1,5 +1,5 @@
-j_DEBUG <- T
-j_INFO  <- T
+j_DEBUG <- F
+j_INFO  <- F
 t_INFO  <- F
 
 #### Helper functions used by Scaffold (not exported)
@@ -67,23 +67,24 @@ try_hard<-function(exp,max_warn=5) {
   .results<-list(error=FALSE,warning=list(),message=FALSE,obj=FALSE)
   
   .results$obj <- withCallingHandlers(
-    tryCatch(exp, error=function(e) {
-      mark("SOURCE:")
-      mark(conditionCall(e))
-      .results$error<<-conditionMessage(e)
-      NULL
-    }), warning=function(w) {
+    tryCatch(exp, 
+             error=function(e) {
+                      mark("SOURCE:")
+                      mark(conditionCall(e))
+                     .results$error<<-conditionMessage(e)
+                     NULL
+    }),      warning=function(w) {
       
-      if (length(.results$warning)==max_warn) 
-        .results$warning[[length(.results$warning)+1]]<<-"Additional warnings are present."
+                     if (length(.results$warning)==max_warn) 
+                         .results$warning[[length(.results$warning)+1]]<<-"Additional warnings are present."
       
-      if (length(.results$warning)<max_warn)
-        .results$warning[[length(.results$warning)+1]]<<-conditionMessage(w)
+                     if (length(.results$warning)<max_warn)
+                         .results$warning[[length(.results$warning)+1]]<<-conditionMessage(w)
       
-      invokeRestart("muffleWarning")
-    }, message = function(m) {
-      .results$message<<-conditionMessage(m)
-      invokeRestart("muffleMessage")
+                     invokeRestart("muffleWarning")
+    },       message = function(m) {
+                  .results$message<<-conditionMessage(m)
+                   invokeRestart("muffleMessage")
     })
   
   

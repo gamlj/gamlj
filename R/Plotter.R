@@ -123,21 +123,21 @@ Plotter <- R6::R6Class(
                       .aesrandom<-ggplot2::aes(x = x, y = y, group=cluster, colour=z)
                        p <- p + ggplot2::geom_line(data = randomData, 
                                                   .aesrandom, 
-                                                  linewidth = 0.4, 
-                                                  alpha = .50)
+                                                  linewidth = 0.5, 
+                                                  alpha = .80)
           }
           else { 
                       .aesrandom<-ggplot2::aes(x = x, y = y, group=cluster)
                       p <- p + ggplot2::geom_line(data = randomData, 
                                                   .aesrandom,
-                                                  color="gray74",
-                                                  linewidth = 0.4, 
+                                                  color="gray50",
+                                                  linewidth = 0.5, 
                                                   alpha = .80)
                       if (attr(randomData,"xbetween"))
                                   p <- p + ggplot2::geom_point(data = randomData, 
                                                   .aesrandom,
                                                   color="gray4",
-                                                  linewidth = 0.4, 
+                                                  linewidth = 0.5, 
                                                   alpha = .80)
                       
           }
@@ -486,16 +486,19 @@ Plotter <- R6::R6Class(
       if (!is.something(self$options$plot_x)) 
         return()
 
-      jinfo("PLOTTER: prepare main plot")
+      jinfo("PLOTTER: checking main plot")
       
       
       private$.results$plotnotes$setContent("")
       
       resultsgroup<-private$.results$get("mainPlots")
       ### stop if it is filled from previous run ###
+    
       test<-any(unlist(sapply(resultsgroup$items, function(i) !i$isNotFilled())))
       if (test)
            return()
+
+      jinfo("PLOTTER: prepare main plot")
       
       moderators<-self$scatterModerators
       ### compute the expected values to be plotted ###
@@ -683,8 +686,6 @@ Plotter <- R6::R6Class(
                state[["randomData"]]<-rdata
                
              }
-             mark(length(serialize(state, connection=NULL)))
-             mark(length(serialize(rawData, connection=NULL)))
 
              aplot$setState(state)
       }

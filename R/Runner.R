@@ -543,8 +543,9 @@ Runner <- R6::R6Class("Runner",
                               acall<-as.call(opts)
                        
                               jinfo("MODULE: Estimating the model: running")
+                          
                               results<-try_hard(eval(acall))
-                              
+  
                               self$warning<-list(topic="info", message=results$warning)
 
                               if (!isFALSE(results$error)) {

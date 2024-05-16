@@ -45,7 +45,7 @@ that analyses that are done with previous versions cannot be opened with version
 In your R script (or Rstudio) simply issue 
 
 ```
-library(jmvtools)
+
 devtools::install_github("gamlj/gamlj")
 
 ```
@@ -64,20 +64,11 @@ jmvtools::install()
 
 ```
 
-## From GitHub
-
-```
-library(jmvtools)
-devtools::install_github("gamlj/gamlj")
-
-```
-
 # Previous Version (GAMLj 2.6.6 or below)
 
 If you want to install the latest previous version of the module (Version 2.6.6) in R, run this:
 
 ```
-library(jmvtools)
 devtools::install_github("gamlj/gamlj",ref="Version.2.6.6")
 
 ```
