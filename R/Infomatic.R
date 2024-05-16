@@ -313,7 +313,7 @@ Infomatic <- R6::R6Class(
       if (self$model_type=="multinomial") {
         
         
-        self$model         <-   c("Multinomial Model","Model for categorical y")
+        self$model         <-    c("Multinomial Model","Model for categorical y")
         self$distribution  <-    "multinomial"
         if (self$caller=="glm") {
             self$call          <-    "nnet::multinom"

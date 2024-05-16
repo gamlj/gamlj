@@ -1,7 +1,6 @@
 testthat::context("glm")
 data("hsbdemo")
 tol <- 0.001
-
 mod0 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
@@ -372,6 +371,7 @@ testthat::test_that("logistic comparison", {
   testthat::expect_equal(mod$main$r2$asDF[1,6],.0444,tol)
   
 })
+
 
 mod <- GAMLj3::gamlj_glm(
   formula = prog ~ write + honors + honors:write,

@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models (v3)
 name: GAMLj3
-version: 3.2.7
+version: 3.2.8
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -9,14 +9,14 @@ maintainer: Marcello Gallucci <mcfanda@gmail.com>
 date: 2022-1-1
 type: R
 description: >-
-  (Experimental) A suite for estimation of linear models, such as the general
-  linear model, linear mixed model, generalized linear models and generalized
-  mixed models. For ech family, models can be estimated with categorical and/or
-  continuous variables, with options to facilitate estimation of  interactions,
-  simple slopes, simple effects, post-hoc tests, contrast analysis and
-  visualization of the results. GAMLj3 is a major rewriting of the GAMLj module.
-  Analyses done with GAMLj version 2.* are not compatible with GAMLj3, so they
-  should be opened with the previous version of the module.
+  A suite for estimation of linear models, such as the general linear model,
+  linear mixed model, generalized linear models and generalized mixed models.
+  For ech family, models can be estimated with categorical and/or continuous
+  variables, with options to facilitate estimation of  interactions, simple
+  slopes, simple effects, post-hoc tests, contrast analysis and visualization of
+  the results. GAMLj3 is a major rewriting of the GAMLj module. Analyses done
+  with GAMLj version 2.* are not compatible with GAMLj3, so they should be
+  opened with the previous version of the module.
 analyses:
   - title: General Linear Model
     name: gamljlm

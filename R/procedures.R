@@ -514,6 +514,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     
 
     grid<-.get_se(opts_list)
+  
     estimates<-as.data.frame(grid)
 
     ## deal with  CI
@@ -552,7 +553,6 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
     names(.params)[names(.params) %in% term64]<-paste0("mod_",make.names(fromb64(term64),unique = T))
 
     ## add effect sizes
-
     class(.params)<-c(paste0("simple_params_",obj$options$.caller),class(.params))
     .params<-add_effect_size(.params,model,variable64)
 

@@ -654,33 +654,38 @@ items:
     title: Results Plots
     type: Array
     description: an array of results plots
-    template:
-          title: ""
-          type: Image
-          renderFun: .mainPlot
-          width: 600
-          height: 400
-
-          clearWith:
-           - dep
+    clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
            - plot_x
            - plot_z
            - plot_by
            - plot_raw
            - plot_yscale
-           - plot_scale
            - plot_xoriginal
            - plot_black
            - plot_around
-           - ci_width
-           - covs_scale
-           - dep_scale
-           - model_terms
-           - fixed_intercept
-           - covs_conditioning
-           - covs_scale_labels
-           - ccp_value
-           - ccm_value
+
+    template:
+          title: ""
+          type: Image
+          renderFun: .mainPlot
+          width: 700
+          height: 400
+
+          clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+           - plot_around
 
 
   - name: plotnotes

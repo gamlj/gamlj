@@ -158,14 +158,14 @@ gparameters<- function(x,...) UseMethod(".parameters")
 }
 
 .parameters.multinom<-function(model,obj) {
-  params<-.parameters.glm(model,obj)
-  names(params)<-tolower(names(params))
-  params
+  .coefficients<-.parameters.glm(model,obj)
+  names(.coefficients)<-tolower(names(.coefficients))
+  .coefficients
 }
 
 .parameters.betareg<-function(model,obj) {
-  params<-.parameters.glm(model,obj)
-  params
+  .coefficients<-.parameters.glm(model,obj)
+  .coefficients
 }
 
 
