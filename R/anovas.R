@@ -258,6 +258,28 @@ anovas.ranova<- function(x,...) UseMethod(".ranova")
   tab
 }
 
+
+.ranova.lme<-function(model,obj) {
+
+  jinfo("ranova for lme")  
+  models<-obj$formulaobj$reduced_random()
+  fixed<-obj$formulaobj$fixed_formula64()
+  .names<-list(LRT=c("Chisq","L.Ratio"), npar="df", p="p-value")
+
+  tab<-lapply(names(models),function(x) { 
+    .formula<-fixed
+     if (is.something(models[[x]]))
+         .formula<-paste(fixed,models[[x]],sep=" + ")
+     model0<-mf.update(model,formula=.formula)
+    .anova<-stats::anova(model,model0)[2,]
+     names(.anova)<-transnames(names(.anova),.names)
+    .anova$test=x
+    .anova
+  })
+  tab
+}
+
+
 .ranova.glmerMod<-function(model,obj) {
 
   jinfo("ranova for glmerMod")  

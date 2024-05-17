@@ -56,6 +56,7 @@ Initier <- R6::R6Class(
     #### init functions #####
     
     init_info=function() {
+      
       tab                   <-   self$infomatic$info_table()
       tab[["call"]]$specs   <-    self$formulaobj$formula()
       

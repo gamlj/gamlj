@@ -375,13 +375,19 @@ Infomatic <- R6::R6Class(
         self$call          <-    "lme"
         self$rcall         <-    "estimate_lme"
         form               <-    paste("~1|",tob64(options$cluster[1]))
+        coropts            <-    NULL
         if (options$res_struct=="cs")  cor<-nlme::corCompSymm 
         if (options$res_struct=="un")  cor<-nlme::corSymm 
         if (options$res_struct=="ar1") cor<-nlme::corAR1
+        if (options$res_struct=="arma") { 
+                                        cor<-nlme::corARMA
+                                        coropts<-list(p=1,q=1)
+                                        }
         if (options$reml) method="REML" else method="ML"
         self$calloptions   <-    list(fixed=as.formula(formulas$fixed_formula64()),
                                       random=formulas$listify_random_formulas64(),
                                       cor=cor,
+                                      coropts=coropts,
                                       form=form,
                                       method=method
         )
@@ -390,7 +396,13 @@ Infomatic <- R6::R6Class(
         self$deptype       <-   c("numeric","integer")
         self$fit           <-   c("lik" , "aic",  "bic")
         self$r2            <-   list(list(type="Marginal"),list(type="Conditional"))
-        if (options$res_struct=="un") res<-"Unstructured" else res<-"AutoRegressive 1"
+        switch (options$res_struct,
+                un   =  {res<-"Unstructured"},
+                ar1  =  {res<-"Autoregressive 1"},
+                cs   =  {res<-"Compound Symmetry"},
+                arma =  {res<-"ARMA(1 1)"},
+        )
+
         self$extra_info    <-   list(info="Residuals",value=res,specs=paste("within cluster",options$cluster[1]))
       }
       

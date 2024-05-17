@@ -72,6 +72,7 @@ gamljmixedClass <- R6::R6Class(
 
       ### random variances lrt table
       aSmartObj<-SmartTable$new(self$results$main$ranova,runner_machine)
+      aSmartObj$hideOn<-list(df=NA)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### residual correlations for res_struct=un

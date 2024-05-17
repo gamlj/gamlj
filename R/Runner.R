@@ -737,12 +737,16 @@ estimate_lme<-function(...) {
   
   opts<-list(...)
   data<-opts$data
+  coropts<-list(form=stats::formula(opts$form))
+  if (hasName(opts,"coropts")) coropts<-c(coropts,opts$coropts)
+  cor <- do.call(opts$cor,coropts)
   model = nlme::lme(fixed=opts$fixed, 
                       random=opts$random,
-                      data=data,method=opts$method,
-                      correlation=do.call(opts$cor,list(form=stats::formula(opts$form)))
+                      data=data,
+                      method=opts$method,
+                      correlation=cor
                       )
-   model$call$correlation<-do.call(opts$cor,list(form=stats::formula(opts$form)))  
+   model$call$correlation<-cor  
    model$call$fixed<-opts$fixed
    model$call$random<-opts$random
    model$call$method<-opts$method
