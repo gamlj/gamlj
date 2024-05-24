@@ -219,7 +219,7 @@ r2 <- function(model, ...) UseMethod(".r2")
   if (alist$ar2 < 0) {
     alist$ar2 <- 0
   }
-  results <- fit.compare_null_model(model)
+  results <- .gfit.compare_null_model(model)
   alist$test <- results$test
   alist$df1 <- results$df1
   alist$p <- results$p
@@ -233,7 +233,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 .r2.polr <- function(model, obj) {
   
   alist <- list()
-  results <- fit.compare_null_model(model)
+  results <- .gfit.compare_null_model(model)
 
   # mcFadden
 
@@ -291,10 +291,10 @@ r2 <- function(model, ...) UseMethod(".r2")
 #    r2 <- list(R2_conditional = NA, R2_marginal = NA)
 #  }
 
-  cond <- fit.compare_null_model(model, type = "c")
+  cond <- .gfit.compare_null_model(model, type = "c")
   cond$type <- "Conditional"
   cond$r2 <- r2$R2_conditional
-  marg <- fit.compare_null_model(model, type = "m")
+  marg <- .gfit.compare_null_model(model, type = "m")
   if (is.null(marg)) {
     marg <- list()
   }
@@ -345,7 +345,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 ######### model comparisons for one model ########
 
-fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
+.gfit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
 
 
 .compare_null_model.default <- function(model) {
@@ -448,7 +448,7 @@ fit.compare_null_model <- function(x, ...) UseMethod(".compare_null_model")
   ### on the estimated models, no matter what REML is. If one compares the results with
   ### lmerTest::anova() they are slightly different because the latter re-estimate the models
   ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
-  results <- fit.lrt(model, model0)
+  results <- .gfit.lrt(model, model0)
   results
   
 }
@@ -515,13 +515,13 @@ deviance.clm <- function(object) as.numeric(-2 * stats::logLik(object))
 
 #### additional fit indices
 
-fit.indices <- function(model, ...) UseMethod(".fit")
+.gfit.indices <- function(model, ...) UseMethod(".fit")
 
-.fit.default <- function(model, obj) {
+..gfit.default <- function(model, obj) {
   return(NULL)
 }
 
-.fit.glm <- function(model, obj) {
+..gfit.glm <- function(model, obj) {
   alist <- list()
   alist[[length(alist) + 1]] <- list(value = as.numeric(stats::logLik(model)))
   alist[[length(alist) + 1]] <- list(value = stats::extractAIC(model)[2])
@@ -534,7 +534,7 @@ fit.indices <- function(model, ...) UseMethod(".fit")
   alist
 }
 
-.fit.multinom <- function(model, obj) {
+..gfit.multinom <- function(model, obj) {
   alist <- list()
   alist[[length(alist) + 1]] <- list(value = as.numeric(stats::logLik(model)))
   alist[[length(alist) + 1]] <- list(value = stats::extractAIC(model)[2])
@@ -543,7 +543,7 @@ fit.indices <- function(model, ...) UseMethod(".fit")
   alist
 }
 
-fit.lrt <- function(model,model0, ...) UseMethod(".lrt")
+.gfit.lrt <- function(model,model0, ...) UseMethod(".lrt")
 
 .lrt.default<-function(model,model0,...) {
 

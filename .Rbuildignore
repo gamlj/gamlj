@@ -7,3 +7,5 @@ jamovi$
 local$
 ^data-raw$
 docs$
+^doc$
+^Meta$
