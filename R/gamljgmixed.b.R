@@ -69,6 +69,7 @@ gamljgmixedClass <- R6::R6Class(
         ### marginal effects tables
         aSmartObj<-SmartTable$new(self$results$main$marginals,runner_machine)
         aSmartObj$ci("est",width=self$options$ci_width)
+        aSmartObj$spaceBy<-"response"
         ladd(private$.smartObjs)<- aSmartObj        
         
         

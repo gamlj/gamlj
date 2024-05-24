@@ -36,3 +36,9 @@ refs:
      year :  2019
      url  : https://cran.r-project.org/package=interactions
   
+   margins:
+     type: 'software'
+     title: 'Marginal Effects Zoo'
+     author :  Arel-Bundock V, Greifer N, Heiss A
+     year :  2024
+     url  : https://marginaleffects.com/

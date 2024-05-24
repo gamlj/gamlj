@@ -1,63 +1,51 @@
 
 ### marginal effects ###
 
-es.marginals<-function(obj) {
+es.marginals<- function(x,...) UseMethod(".margins")
+
+.margins.default<-function(obj) {
+
+     model       <-  obj$model
+     jinfo("EFFECTSIZE: margins default for model of class", class(model))  
+     ciWidth     <-  obj$ciwidth
+     results     <-  try_hard(marginaleffects::avg_slopes(model))
+     params      <-  results$obj
+     if (!isFALSE(results$error)) {
+         obj$error<-list(topic="main_marginals",message="Marginal effects cannot be computed for this model")
+        return()
+      }    
   
-      model          <-  obj$model
-      params<-.margins(model,obj)
-      
-      if (is.null(params))
-          return(list(list(name=NA)))
-      
-      names(params)<-transnames(names(params),
-                            list("level"="group",
-                                 "source"="factor",
-                                 "se"="SE",
+     if (obj$option("ci_method",c("quantile","bcai"))) {
+          method="boot"
+          switch (object$options$ci_method,
+             quantile = type <- "perc",
+             bcai     = type  <- "bca"
+          )
+          params<-as.data.frame(marginaleffects::inferences(params,method="boot",R=obj$options$boot_r,conf_type=type))
+       }
+  params<-as.data.frame(params)
+  names(params)<-transnames(names(params),
+                            list("source"="term",
+                                 "response" ="group",
+                                 "se"="std.error",
                                  "estimate"="AME",
-                                 "test"="z",
-                                 "est.ci.lower"="lower",
-                                 "est.ci.upper"="upper")
+                                 "test"="statistic",
+                                 "est.ci.lower"="conf.low",
+                                 "est.ci.upper"="conf.high",
+                                 "p"="p.value")
                              )
-      
-      params$contrast<-fromb64(params$source)
-      ### we should change the names of the effects because margins::
-      ### uses a different standard
-      for (i in seq_len(nrow(params))) {
-        
-        string<-stringr::str_split(params$source[[i]],LEVEL_SYMBOL)[[1]]
-        name<-string[[1]]
-        params$source[[i]]<-fromb64(name)
-        if (length(string)>1) {
-              lev<-string[[2]]
-              ref<-obj$datamatic$variables[[name]]
-              ref_lev<-ref$levels_labels[[1]]
-              params$contrast[[i]]<-paste(fromb64(lev),"-",ref_lev)
-        }
-        
-      }
+      params$contrast <- fromb64(params$contrast)
+      params$source   <- fromb64(params$source)
+      if (hasName(params,"response"))
+            params$response    <- fromb64(params$response)
+      mark(params)
       return(params)
   
 }      
 
-.margins<- function(x,...) UseMethod("..margins")
+.zmargins<- function(x,...) UseMethod("..margins")
 
 ..margins.default<-function(model,obj) {
-  jinfo("EFFECTSIZE: margins default for model of class", class(model))  
-  if (obj$option("offset")) {
-     obj$warning<-list(topic="main_marginals",message="A the moment, marginal effects cannot be computed for models with an offest")
-     return()
-  }    
-  vce<- "delta"
-  if (obj$option("ci_method",c("quantile","bcai")))
-    vce <- "bootstrap"
-  ciWidth        <-  obj$ciwidth
-  data           <-  insight::get_data(model,source="frame")
-  .model         <-  model
-  m              <-  try_hard(margins::margins(.model,data=data,vce=vce))
-  results        <-  try_hard(summary(m$obj,level=ciWidth,by_factor=FALSE))
-
-  results$obj
-
 }
 
 ..margins.multinom<-function(model,obj) {
@@ -94,7 +82,7 @@ es.marginals<-function(obj) {
 # in margings. So, we re-estimaste the model with MASS::polr.  
 # We do not use MASS:polr for other estimation because it does not work well with parameters::bootstrap_model() emmeans
 
-..margins.clm<-function(model,obj) {
+..margins.clma<-function(model,obj) {
   jinfo("EFFECTSIZE: margins clm for model of class", class(model))  
    vce<- "delta"
    if (obj$option("ci_method",c("quantile","bcai")))

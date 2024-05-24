@@ -284,7 +284,8 @@ items:
            - name:  marginals
              title: Marginal Effects
              type: Table
-             visible: (es:marginals)
+             visible: (es:marginals && !model_type:ordinal)
+             refs: margins
              clearWith:
                            ### modeloptions  begins
                          - dep
