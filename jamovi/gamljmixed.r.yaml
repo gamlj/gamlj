@@ -986,6 +986,8 @@ items:
            - plot_xoriginal
            - plot_black
            - plot_around
+           - plot_re
+           - plot_re_method           
 
     template:
           title: ""

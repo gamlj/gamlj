@@ -67,7 +67,6 @@ Plotter <- R6::R6Class(
         ## collect the data 
         data<-image$state$plotData
 
-
         linesdiff<-(theme$bw || self$options$plot_black)
         ### prepare aestetics for one or two way scatterplot
         if (is.null(self$scatterZ)) {
@@ -119,6 +118,7 @@ Plotter <- R6::R6Class(
 
 
         ##### END OF RAW DATA #############
+     
         if (is.something(image$state$randomData)) {
           
           randomData<-image$state$randomData

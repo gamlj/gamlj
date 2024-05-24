@@ -664,6 +664,7 @@ items:
            - plot_xoriginal
            - plot_black
            - plot_around
+           - plot_re
 
     template:
           title: ""

@@ -448,7 +448,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "id",
                     "cs",
                     "un",
-                    "ar1"))
+                    "ar1",
+                    "arma"))
             private$..df_method <- jmvcore::OptionList$new(
                 "df_method",
                 df_method,
@@ -1747,7 +1748,9 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "plot_yscale",
                     "plot_xoriginal",
                     "plot_black",
-                    "plot_around"),
+                    "plot_around",
+                    "plot_re",
+                    "plot_re_method"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",

@@ -571,7 +571,10 @@ options:
         -       name: un
                 title: Unstructured
         -       name: ar1
-                title: Autoregressive
+                title: "AR(1)"
+        -       name:  arma
+                title: "ARMA(1,1)"
+
 -       name: df_method
         title: DF Method
         type: List

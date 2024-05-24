@@ -259,7 +259,7 @@ children:
         children:
         -       type: LayoutBox
                 margin: large
-                style: list
+                style: inline
                 children:
                 -       type: Label
                         label: Repeated Measures
@@ -276,10 +276,17 @@ children:
                                 name: res_struct_un
                                 optionName: res_struct
                                 optionPart: un
+                -       type: Label
+                        label: Autoregressive
+                        children:
                         -       type: RadioButton
                                 name: res_struct_ar1
                                 optionName: res_struct
                                 optionPart: ar1
+                        -       type: RadioButton
+                                name: res_struct_arma
+                                optionName: res_struct
+                                optionPart: arma
 -       name: panel_factors
         type: CollapseBox
         label: Factors Coding
