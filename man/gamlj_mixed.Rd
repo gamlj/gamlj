@@ -14,6 +14,7 @@ gamlj_mixed(
   model_terms = NULL,
   re = NULL,
   reml = TRUE,
+  res_struct = "id",
   re_lrt = FALSE,
   re_ci = FALSE,
   fixed_intercept = TRUE,
@@ -85,6 +86,11 @@ terms. Not needed if \code{formula} is used.}
 
 \item{reml}{\code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 be re_corrused rather than ML}
+
+\item{res_struct}{Residual variance-covariance matrix structure. It can be \code{'id'}
+(default) for identity (no correlation), \code{'cs'} for compound symmetry (constant correlation),
+\code{'ar1'} for autoregressive of order 1.
+and \code{'un'} for unstructured.}
 
 \item{re_lrt}{\code{TRUE} or \code{FALSE} (default), LRT for the random
 effects}

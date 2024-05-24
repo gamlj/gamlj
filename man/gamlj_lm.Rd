@@ -41,12 +41,14 @@ gamlj_lm(
   covs_conditioning = "mean_sd",
   ccm_value = 1,
   ccp_value = 25,
+  ccra_steps = 3,
   covs_scale_labels = "labels",
   adjust = list("bonf"),
   posthoc_es = list("dm"),
   d_ci = FALSE,
   es = list("beta", "etap"),
   homo_test = FALSE,
+  colli_test = FALSE,
   qq_plot = FALSE,
   norm_test = FALSE,
   norm_plot = FALSE,
@@ -167,7 +169,7 @@ var2='type2')} specifying the transformation to apply to covariates, one of
 \item{covs_conditioning}{'\code{mean_sd}' (default), or '\code{percent}'.
 How to condition covariates in simple effects and plots. '\code{mean_sd}'
 for mean +/- '\code{ccp_value}' * sd. '\code{percent}' for median
-+/-'\code{ccp_value}' for percentiles.}
++/-'\code{ccp_value}' for percentiles. \code{range} conditions to min and max divided in \code{ccra_steps} steps (aproximately).}
 
 \item{ccm_value}{how many st.deviations around the means used to condition
 simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}}
@@ -198,8 +200,11 @@ for epsilon-squared, \code{'epsilonp'} for partial epsilon-squared  and
 \code{'beta'} for standardized  coefficients (betas). Default is
 \code{"beta"} and \code{"parEta"}.}
 
-\item{homo_test}{\code{TRUE} or \code{FALSE} (default), perform homogeneity
+\item{homo_test}{\code{TRUE} or \code{FALSE} (default), performs homogeneity
 tests}
+
+\item{colli_test}{\code{TRUE} or \code{FALSE} (default), computes VIF and Tollerance 
+for the terms in the model}
 
 \item{qq_plot}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
 residuals}
@@ -227,6 +232,9 @@ Four methods for  heteroschedasticy-consistent
 standard errors are available: \code{HC0},
 \code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
 See \code{\link[sandwich]{vcovHC}} for details.}
+
+\item{ccra_value}{Covariate condition min max steps (not very mnemonic): 
+At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
 }
 \value{
 A results object containing:

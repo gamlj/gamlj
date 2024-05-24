@@ -49,6 +49,7 @@ gamlj_gmixed(
   covs_conditioning = "mean_sd",
   ccm_value = 1,
   ccp_value = 25,
+  ccra_steps = 1,
   covs_scale_labels = "labels",
   adjust = list("bonf"),
   covs_scale = NULL,

@@ -137,7 +137,6 @@ gobj<-GAMLj3::gamlj_mixed(
   data = wicksell)
 
 
-
 r2<-simple_effects(gobj,formula=~group:time)
 tab<-r2[[2]]$asDF
 
