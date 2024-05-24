@@ -38,7 +38,6 @@ es.marginals<- function(x,...) UseMethod(".margins")
       params$source   <- fromb64(params$source)
       if (hasName(params,"response"))
             params$response    <- fromb64(params$response)
-      mark(params)
       return(params)
   
 }      

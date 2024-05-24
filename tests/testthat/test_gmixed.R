@@ -92,8 +92,8 @@ testthat::test_that("Poisson works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0105, tol)
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[1], .883, tol)
-  testthat::expect_equal(mod$main$marginals$asDF[2,3],.162,tol)
-  testthat::expect_equal(mod$main$marginals$asDF[2,5],.00919,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[1,3],.162,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[1,5],.00919,tol)
 })
 
 
