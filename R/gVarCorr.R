@@ -164,10 +164,14 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   vmat$icc<-NA
   for (i in int)
     vmat$icc[i]<-vmat$vcov[i]/(vmat$vcov[i]+stats::sigma(model)^2)
-  if (obj$options$res_struct=="ar1")
-                vmat$phi<-c(as.numeric(stats::coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))
-  if (obj$options$res_struct=="cs")
-                vmat$rho<-c(as.numeric(stats::coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))
+  switch(obj$options$res_struct,
+            ar1  = {vmat$phi<-c(as.numeric(stats::coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))},
+            cs   = {vmat$rho<-c(as.numeric(stats::coef(model$modelStruct$corStruct,unconstrained = FALSE)),rep(NA,nrow(vmat)-1))},
+            arma = {
+                     vmat$phi<-c(as.numeric(stats::coef(model$modelStruct$corStruct,unconstrained = FALSE)[1]),rep(NA,nrow(vmat)-1))
+                     vmat$theta<-c(as.numeric(stats::coef(model$modelStruct$corStruct,unconstrained = FALSE)[2]),rep(NA,nrow(vmat)-1))
+                   }
+  )
 
   info<-paste("Number of Obs:", 
               model$dims$N,

@@ -425,12 +425,7 @@ const fun = {
               }
         }
 
-        if (typeof ui.es_marginals !== 'undefined') {
-          
-              ui.es_marginals.setValue(false);
 
-        }
-        
         if (typeof ui.preds_phi !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="beta") {

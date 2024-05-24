@@ -34,4 +34,10 @@
         `title`="interactions: Comprehensive, User-Friendly Toolkit for Probing Interactions. R package version 1.1.0", 
         `author`="Jacob A. Long", 
         `year`=2019, 
-        `url`="https://cran.r-project.org/package=interactions"))
+        `url`="https://cran.r-project.org/package=interactions"), 
+    `margins`=list(
+        `type`="software", 
+        `title`="Marginal Effects Zoo", 
+        `author`="Arel-Bundock V, Greifer N, Heiss A", 
+        `year`=2024, 
+        `url`="https://marginaleffects.com/"))

@@ -130,7 +130,7 @@ children:
                         type: CheckBox
                         optionPart: marginals
                         optionName: es
-                        enable: (!model_type_multinomial && !model_type_ordinal)
+                        enable: (!model_type_ordinal)
                 -       name: es_RR
                         type: CheckBox
                         optionPart: RR
