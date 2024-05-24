@@ -590,9 +590,6 @@ options:
                 title: Unstructured
         -       name: ar1
                 title: Autoregressive
-        -       name: arma
-                title: "ARMA(1,1)"
-
 -       name: df_method
         title: DF Method
         type: List

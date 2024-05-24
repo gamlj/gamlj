@@ -929,8 +929,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                             options=options,
                             name="marginals",
                             title="Marginal Effects",
-                            visible="(es:marginals && !model_type:ordinal)",
-                            refs="margins",
+                            visible="(es:marginals && ! model_type:ordinal)",
                             clearWith=list(
                                 "dep",
                                 "factors",

@@ -409,7 +409,6 @@ items:
              title: Marginal Effects
              type: Table
              visible: (es:marginals)
-             refs: margins
              clearWith:
                            ### modeloptions  begins
                          - model_type
@@ -442,13 +441,13 @@ items:
                          - covs_scale_labels
                          - covs_conditioning
                            ### simpleeffectsoptions  ends
-                    
+             refs: margins        
              columns:
                     - name: response
                       title: "Response"
                       type: text
                       combineBelow: true
-                      visible: (model_type:multinomial || model_type:ordinal)
+                      visible: (model_type:multinomial && model_type:ordinal)
                     - name: source
                       title: "Name"
                       type: text

@@ -1041,7 +1041,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             name="marginals",
                             title="Marginal Effects",
                             visible="(es:marginals)",
-                            refs="margins",
                             clearWith=list(
                                 "model_type",
                                 "dep",
@@ -1070,13 +1069,14 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ccra_steps",
                                 "covs_scale_labels",
                                 "covs_conditioning"),
+                            refs="margins",
                             columns=list(
                                 list(
                                     `name`="response", 
                                     `title`="Response", 
                                     `type`="text", 
                                     `combineBelow`=TRUE, 
-                                    `visible`="(model_type:multinomial || model_type:ordinal)"),
+                                    `visible`="(model_type:multinomial && model_type:ordinal)"),
                                 list(
                                     `name`="source", 
                                     `title`="Name", 

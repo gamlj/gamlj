@@ -260,13 +260,13 @@ items:
              clearWith:
                          - __modeloptions__
                          - __simpleeffectsoptions__
-                    
+             refs: margins        
              columns:
                     - name: response
                       title: "Response"
                       type: text
                       combineBelow: true
-                      visible: (model_type:multinomial)
+                      visible: (model_type:multinomial && model_type:ordinal)
                     - name: source
                       title: "Name"
                       type: text

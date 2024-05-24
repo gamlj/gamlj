@@ -448,8 +448,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "id",
                     "cs",
                     "un",
-                    "ar1",
-                    "arma"))
+                    "ar1"))
             private$..df_method <- jmvcore::OptionList$new(
                 "df_method",
                 df_method,
@@ -1097,17 +1096,12 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="phi", 
                                     `title`="Phi", 
                                     `type`="number", 
-                                    `visible`="(res_struct:ar1 || res_struct:arma)"),
+                                    `visible`="(res_struct:ar1)"),
                                 list(
                                     `name`="rho", 
                                     `title`="rho", 
                                     `type`="number", 
-                                    `visible`="(res_struct:cs)"),
-                                list(
-                                    `name`="theta", 
-                                    `title`="Theta", 
-                                    `type`="number", 
-                                    `visible`="(res_struct:arma)"))))
+                                    `visible`="(res_struct:cs)"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="randomcov",

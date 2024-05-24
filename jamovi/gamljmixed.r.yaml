@@ -345,15 +345,11 @@ items:
                     - name: phi
                       title: "Phi"
                       type: number
-                      visible: (res_struct:ar1 || res_struct:arma)
+                      visible: (res_struct:ar1)
                     - name: rho
                       title: "rho"
                       type: number
                       visible: (res_struct:cs)
-                    - name: theta
-                      title: "Theta"
-                      type: number
-                      visible: (res_struct:arma)
 
            - name: randomcov
              title: Random Parameters correlations
