@@ -448,7 +448,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "id",
                     "cs",
                     "un",
-                    "ar1"))
+                    "ar1",
+                    "arma"))
             private$..df_method <- jmvcore::OptionList$new(
                 "df_method",
                 df_method,
