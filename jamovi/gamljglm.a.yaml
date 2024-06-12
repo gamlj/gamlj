@@ -337,7 +337,6 @@ options:
                 R: |
                         the variable that provides the levels at which the simple effects are computed
 -       name: simple_interactions
-        title: Simple Interactions
         type: Bool
         default: false
         description:

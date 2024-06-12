@@ -24,6 +24,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ci_method = "wald",
             boot_r = 1000,
             contrasts = NULL,
+            constrast_custom_values = list(),
             show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
             vcov = FALSE,
@@ -193,8 +194,25 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "difference",
                                 "helmert",
                                 "repeated",
-                                "polynomial"),
+                                "polynomial",
+                                "custom"),
                             default="simple"))))
+            private$..constrast_custom_values <- jmvcore::OptionArray$new(
+                "constrast_custom_values",
+                constrast_custom_values,
+                default=list(),
+                items="(factors)",
+                template=jmvcore::OptionGroup$new(
+                    "constrast_custom_values",
+                    NULL,
+                    elements=list(
+                        jmvcore::OptionVariable$new(
+                            "var",
+                            NULL,
+                            content="$key"),
+                        jmvcore::OptionString$new(
+                            "codes",
+                            NULL))))
             private$..show_contrastnames <- jmvcore::OptionBool$new(
                 "show_contrastnames",
                 show_contrastnames,
@@ -466,6 +484,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
             self$.addOption(private$..contrasts)
+            self$.addOption(private$..constrast_custom_values)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
             self$.addOption(private$..vcov)
@@ -531,6 +550,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
         contrasts = function() private$..contrasts$value,
+        constrast_custom_values = function() private$..constrast_custom_values$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
         vcov = function() private$..vcov$value,
@@ -595,6 +615,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..ci_method = NA,
         ..boot_r = NA,
         ..contrasts = NA,
+        ..constrast_custom_values = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
         ..vcov = NA,

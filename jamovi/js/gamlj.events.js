@@ -8,11 +8,13 @@ const events = {
         console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
 
+      
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
         fun.updateSimpleSupplier(ui, this);
         fun.updatePlotsSupplier(ui, this);
+         fun.updateCustom(ui,this);
         if (typeof ui.randomSupplier !== 'undefined' ) {
               fun.fixRandomEffects(ui,this);
         }
@@ -247,9 +249,14 @@ const events = {
 
     },
 
+   contrasts_changed: function(ui) {
+     
+     fun.updateCustom(ui,this);
+     
+   },
    onEvent_nothing: function(ui) {
           console.log("I didn't do anything");
-    }    
+    } 
 
 };
 

@@ -338,9 +338,22 @@ Variable <- R6::R6Class(
               },
             'dummy'={
                     contrast <- stats::contr.treatment(levels,base=1)
-      } 
+             },
+            'custom'={
+                     customs=self$datamatic$options$constrast_custom_values
+                     for (cus in customs) if (cus$var==self$name) custom<-cus$codes
+                     custom<-as.numeric(strsplit(custom,split="[,;]")[[1]])
+                     custom<-custom[!is.na(custom)]
+                     if (length(custom)!=nLevels)
+                         stop("Custom codes for variable ",self$name," are not correct: ",nLevels," codes are required.")
+                     if (sum(custom)!=0)
+                           self$datamatic$warning<-list(topic="info",message=paste("Custom codes for variable ",self$name," do not sum up to zero. Results may be uninterpretable"))
+                      x<-factor(1:nLevels)
+                      contrasts(x)<-custom
+                      contrast <- contrasts(x)
+                     }
       ) # end of switch
-      
+ 
       dimnames(contrast)<-list(NULL,paste0(FACTOR_SYMBOL,1:(nLevels-1)))
       contrast
     },
@@ -412,11 +425,21 @@ Variable <- R6::R6Class(
         }
         return(labels)
       }
+      if (type == 'custom') {
+
+        custom<-self$contrast_values[,1]
+        lab <- paste("[",paste(custom,levels,sep="*",collapse=", "),"]")
+        mark(lab)
+        labels[[1]]<-lab
+        for (i in 2:(nLevels-1)) labels[[i]]<-paste0("tech",i)
+        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is mamed ",paste0(self$name,"1"),"and indicated as ",lab, "in the effect labels."))
+        return(labels)
+        
+      }
+      
       jinfo("no contrast definition met")
       
-      all <- paste(levels, collapse=', ')
-      for (i in seq_len(nLevels-1))
-        labels[[i]] <- paste(levels[i+1], '- (', all,")")
+      for (i in seq_len(nLevels-1)) labels[[i]]<-paste0("User",i)
       return(labels)
     },
     .contrast_label=function(levels, type) {
@@ -487,6 +510,14 @@ Variable <- R6::R6Class(
         }
         return(labels)
       }
+      
+      if (type == 'custom') {
+            labels[[1]] <- "Custom" 
+            for (i in 2:(nLevels-1)) labels[[i]]<-"Orthogonal"
+            return(labels)
+        }
+
+      
       jinfo("no contrast definition met")
       
       all <- paste(levels, collapse=', ')
