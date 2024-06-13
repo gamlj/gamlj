@@ -15,19 +15,19 @@ description:
                                formula = y ~ 1 + cond+( 1|subj ),
                                data = subjects_by_stimuli)
 options:
--       name: data
+     -  name: data
         type: Data
         description:
                 R: the data as a data frame
--       name: .caller
+     -  name: .caller
         type: String
         default: lmer
         hidden: true
--       name: .interface
+     -  name: .interface
         type: String
         default: jamovi
         hidden: true
--       name: dep
+     -  name: dep
         title: Dependent Variable
         type: Variable
         default: ~
@@ -38,7 +38,7 @@ options:
         description:
                 R: |
                         a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
--       name: factors
+     -  name: factors
         title: Factors
         type: Variables
         suggested: 
@@ -49,7 +49,7 @@ options:
         description:
                 R: a vector of strings naming the fixed factors from `data`. Not needed
                         if `formula` is used.
--       name: covs
+     -  name: covs
         title: Covariates
         type: Variables
         suggested:
@@ -60,28 +60,28 @@ options:
         description:
                 R: a vector of strings naming the covariates from `data`. Not needed
                         if `formula` is used.
--       name: model_terms
+     -  name: model_terms
         title: Model Terms
         type: Terms
         default: ~
         description:
                 R: |
                         a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
--       name: fixed_intercept
+     -  name: fixed_intercept
         title: Fixed Intercept
         type: Bool
         default: true
         description:
                 R: |
                         `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
--       name: nested_terms
+     -  name: nested_terms
         title: Nested Model
         type: Terms
         default: ~
         description:
                 R: |
                         a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
--       name: comparison
+     -  name: comparison
         title: Activate
         type: Bool
         default: false
@@ -90,28 +90,28 @@ options:
                         Not present in R
                 ui: |
                         Activate the options and fields required to conduct a model comparison analyses
--       name: nested_intercept
+     -  name: nested_intercept
         title: Nested Intercept
         type: Bool
         default: true
         description:
                 R: |
                         `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
--       name: estimates_ci
+     -  name: estimates_ci
         title: Fixed Parameters
         type: Bool
         default: true
         description:
                 R: |
                         `TRUE` (default) or `FALSE` , parameters CI in table
--       name: re_ci
+     -  name: re_ci
         title: Random Variances C.I.
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE`  or `FALSE` (default), random effects CI in table. It could be very slow.
--       name: donotrun
+     -  name: donotrun
         title: Do not run
         type: Bool
         default: false
@@ -121,16 +121,16 @@ options:
                 ui: "Do not update results when options are changed. Useful to setup
                         complex models without waiting for each update to conclude
                         \n"
--       name: ci_method
+     -  name: ci_method
         title: CI Method
         type: List
         default: wald
         options:
-        -       name: wald
+             -  name: wald
                 title: Standard (fast)
-        -       name: quantile
+             -  name: quantile
                 title: Bootstrap (Parametric)
--       name: boot_r
+     -  name: boot_r
         title: Bootstrap rep.
         type: Number
         min: 1
@@ -138,7 +138,7 @@ options:
         description:
                 R: |
                         a number bootstrap repetitions.
--       name: ci_width
+     -  name: ci_width
         title: Confidence level
         type: Number
         min: 50
@@ -147,124 +147,147 @@ options:
         description:
                 R: |
                         a number between 50 and 99.9 (default: 95) specifying the confidence intervals width.
--       name: contrasts
-        title: Factors Coding
-        type: Array
-        items: (factors)
-        default: ~
-        template:
-                type: Group
-                elements:
-                -       name: var
-                        type: Variable
-                        content: $key
-                -       name: type
-                        type: List
-                        options:
-                        - simple
-                        - deviation
-                        - dummy
-                        - difference
-                        - helmert
-                        - repeated
-                        - polynomial
-                        default: simple
-        description:
-                R: |
-                        a named vector of the form `c(var1="type", var2="type2")` specifying the type of contrast to use, one of `'deviation'`, `'simple'`, `'dummy'`, `'difference'`, `'helmert'`, `'repeated'` or `'polynomial'`. If NULL, `simple` is used. Can also be passed as a list of list of the form list(list(var="var1",type="type1")).
--       name: show_contrastnames
-        title: Names in estimates table
-        type: Bool
-        default: false
-        description:
-                R: |
-                        `TRUE` or `FALSE` (default), shows raw names of the contrasts variables in tables
--       name: show_contrastcodes
-        title: Contrast Coefficients tables
-        type: Bool
-        default: false
-        description:
-                R: |
-                        `TRUE` or `FALSE` (default), shows contrast coefficients tables
--       name: plot_x
+
+
+### posthoc
+     -  name: posthoc
+        type: scaffold
+        file: commons.a.yaml
+
+     -  name: posthoc_ci
+        type: scaffold
+        file: commons.a.yaml
+
+####
+
+### contrasts
+
+     - name: contrasts
+       type: scaffold
+       file: commons.a.yaml
+
+     - name: show_contrastnames
+       type: scaffold
+       file: commons.a.yaml
+
+     - name: show_contrastcodes
+       type: scaffold
+       file: commons.a.yaml
+
+     - name: contrast_custom_focus
+       type: scaffold
+       file: commons.a.yaml
+      
+     - name: contrast_custom_values
+       type: scaffold
+       file: commons.a.yaml
+###
+
+### simple effects 
+
+     - name: simple_x
+       type: scaffold
+       file: commons.a.yaml
+
+     - name: simple_mods
+       type: scaffold
+       file: commons.a.yaml
+
+     - name: simple_interactions
+       type: scaffold
+       file: commons.a.yaml
+###
+
+### emmeans
+     - name: emmeans
+       type: scaffold
+       file: commons.a.yaml
+
+###
+
+
+## plot
+
+
+     -  name: plot_x
         title: Horizontal axis
         type: Variable
         default: ~
         description:
                 R: |
                         a string naming the variable placed on the horizontal axis of the plot
--       name: plot_z
+     -  name: plot_z
         title: Separate lines
         type: Variable
         default: ~
         description:
                 R: |
                         a string naming the variable represented as separate lines in the plot
--       name: plot_by
+     -  name: plot_by
         title: Separate plots
         type: Variables
         default: ~
         description:
                 R: |
                         a list of string naming the variables defining the levels for multiple plots
--       name: plot_raw
+     -  name: plot_raw
         title: Observed scores
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), plot raw data along the predicted values
--       name: plot_yscale
+     -  name: plot_yscale
         title: Y-axis observed range
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
--       name: plot_xoriginal
+     -  name: plot_xoriginal
         title: Original scale
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), use original scale for covariates.
--       name: plot_black
+     -  name: plot_black
         title: Varying line types
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), use different linetypes per levels.
--       name: plot_around
+     -  name: plot_around
         title: Error Bar Definition
         type: List
         options:
-        -       name: none
+             -  name: none
                 title: None
-        -       name: ci
+             -  name: ci
                 title: Confidence intervals
-        -       name: se
+             -  name: se
                 title: Standard Error
         default: none
         description:
                 R: |
                         `'none'` (default), `'ci'`, or `'se'`. Use no error bars, use confidence intervals, or use standard errors on the plots, respectively.
--       name: plot_re
+     -  name: plot_re
         title: Random effects
         type: Bool
         default: false
         description:
                 R: "`TRUE` or `FALSE` (default), add predicted values based on random
                         effect in plot \n"
--       name: plot_re_method
+     -  name: plot_re_method
         type: List
         default: average
         options:
-        -       name: average
+             -  name: average
                 title: Average method
-        -       name: full
+             -  name: full
                 title: Full predicted method
--       name: plot_extremes
+     -  name: plot_extremes
         title: Identify extremes
         type: Bool
         default: false
@@ -273,64 +296,22 @@ options:
                         `TRUE` or `FALSE` (default), Indentify 1% and 99% extreme values in the plots by marking them with their rowname in the data.frame
                 ui: |
                         Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
--       name: emmeans
-        title: Estimated Marginal Means
-        type: Terms
-        default: ~
-        description:
-                R: a rhs formula with the terms specifying the marginal means to estimate
-                        (of the form `'~x+x:z'`)
--       name: posthoc
-        title: Post Hoc Tests
-        type: Terms
-        default: ~
-        description:
-                R: |
-                        a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`). The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed also as a list of the form '`list("x","z",c("x","z")`'
--       name: posthoc_ci
-        title: Confidence Intervals
-        type: Bool
-        default: false
-        description:
-                R: |
-                        Posthoc confidence intervals
--       name: simple_x
-        title: Simple effects variable
-        type: Variable
-        default: ~
-        description:
-                R: |
-                        The variable for which the simple effects (slopes) are computed
--       name: simple_mods
-        title: Moderators
-        type: Variables
-        default: ~
-        description:
-                R: |
-                        the variable that provides the levels at which the simple effects are computed
--       name: simple_interactions
-        title: Simple Interactions
-        type: Bool
-        default: false
-        description:
-                R: |
-                        should simple Interactions be computed
 
--       name: covs_conditioning
+     -  name: covs_conditioning
         type: scaffold
         file: commons.a.yaml
 
--       name: ccra_steps
+     -  name: ccra_steps
         type: scaffold
         file: commons.a.yaml
         
--       name: ccm_value
+     -  name: ccm_value
         type: Number
         default: 1
         description:
                 R: |
                         Covariates conditioning mean offset value: how many st.deviations around the means used to condition simple effects and plots. Used if `covs_conditioning`=`'mean_sd'`
--       name: ccp_value
+     -  name: ccp_value
         type: Number
         default: 25
         min: 5
@@ -338,57 +319,57 @@ options:
         description:
                 R: |
                         Covariates conditioning percentile offset value: number of percentiles around the median used to condition simple effects and plots. Used if `covs_conditioning`=`'percent'`
--       name: covs_scale_labels
+     -  name: covs_scale_labels
         type: List
         options:
-        -       name: labels
+             -  name: labels
                 title: Labels
-        -       name: values
+             -  name: values
                 title: Values
-        -       name: values_labels
+             -  name: values_labels
                 title: Values + Labels
-        -       name: uvalues
+             -  name: uvalues
                 title: Unscaled Values
-        -       name: uvalues_labels
+             -  name: uvalues_labels
                 title: Unscaled Values + Labels
         default: labels
         description:
                 R: |
                         how the levels of a continuous moderator should appear in tables and plots: `labels`, `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the variable orginal levels, before scaling.
--       name: adjust
+     -  name: adjust
         title: Correction
         type: NMXList
         options:
-        -       name: none
+             -  name: none
                 title: No correction (LSD)
-        -       name: bonf
+             -  name: bonf
                 title: Bonferroni
-        -       name: tukey
+             -  name: tukey
                 title: Tukey
-        -       name: holm
+             -  name: holm
                 title: Holm
-        -       name: scheffe
+             -  name: scheffe
                 title: Scheffe
-        -       name: sidak
+             -  name: sidak
                 title: Sidak
         default: 
         - bonf
         description:
                 R: |
                         one or more of `'none'`,  `'bonf'`,`'tukey'`  `'holm'`,`'scheffe'`, `'tukey'`; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections respectively.
--       name: predicted
+     -  name: predicted
         title: Predicted
         type: Output
--       name: residuals
+     -  name: residuals
         title: Residuals
         type: Output
--       name: model_type
+     -  name: model_type
         type: List
         hidden: true
         options:
-        -       name: lmer
+             -  name: lmer
         default: lmer
--       name: covs_scale
+     -  name: covs_scale
         title: Covariates Scaling
         type: Array
         items: (covs)
@@ -396,72 +377,72 @@ options:
         template:
                 type: Group
                 elements:
-                -       name: var
+                     -  name: var
                         type: Variable
                         content: $key
-                -       name: type
+                     -  name: type
                         type: List
                         options:
-                        -       title: Centered
+                             -  title: Centered
                                 name: centered
-                        -       title: z-scores
+                             -  title: z-scores
                                 name: standardized
-                        -       title: Centered clusterwise
+                             -  title: Centered clusterwise
                                 name: clusterbasedcentered
-                        -       title: Clusters means
+                             -  title: Clusters means
                                 name: clustermeans
-                        -       title: z-scores clusterwise
+                             -  title: z-scores clusterwise
                                 name: clusterbasedstandardized
-                        -       title: None
+                             -  title: None
                                 name: none
                         default: centered
         description:
                 R: |
                         a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
--       name: dep_scale
+     -  name: dep_scale
         title: Scale
         type: List
         options:
-        -       title: Original
+             -  title: Original
                 name: none
-        -       title: Centered
+             -  title: Centered
                 name: centered
-        -       title: z-scores
+             -  title: z-scores
                 name: standardized
-        -       title: Centered clusterwise
+             -  title: Centered clusterwise
                 name: clusterbasedcentered
-        -       title: Clusters means
+             -  title: Clusters means
                 name: clustermeans
-        -       title: multilevel z-scores
+             -  title: multilevel z-scores
                 name: clusterbasedstandardized
         default: none
         description:
                 R: |
                         Re-scale the dependent variable.
--       name: scale_missing
+     -  name: scale_missing
         title: Scale on
         type: List
         options:
-        -       title: Columnwise
+             -  title: Columnwise
                 name: colwise
-        -       title: Complete cases
+             -  title: Complete cases
                 name: complete
         default: colwise
--       name: norm_test
+     -  name: norm_test
         title: Normality of residuals
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), provide a test for normality of residuals
--       name: cluster
+     -  name: cluster
         title: Cluster variables
         type: Variables
         default: ~
         suggested: nominal
         description:
                 R: a vector of strings naming the clustering variables from `data`
--       name: re
+     -  name: re
         title: Random Coefficients
         type: Array
         default:
@@ -470,7 +451,7 @@ options:
                 type: Terms
         description:
                 R: "a list of lists specifying the models random effects.          \n"
--       name: nested_re
+     -  name: nested_re
         title: Nested Model Random Coefficients
         type: Array
         default:
@@ -479,15 +460,15 @@ options:
                 type: Terms
         description:
                 R: "a list of lists specifying the models random effects.          \n"
--       name: re_corr
+     -  name: re_corr
         title: Effects correlation
         type: List
         options:
-        -       name: all
+             -  name: all
                 title: Correlated
-        -       name: none
+             -  name: none
                 title: Not correlated
-        -       name: block
+             -  name: block
                 title: Correlated by block
         default: all
         description:
@@ -495,7 +476,7 @@ options:
                         `'all'`, `'none'` (default), or `'block'`. When random effects are passed as list of length 1, it decides whether the effects should be correlated,  non correlated. If `'re'` is a list of  lists of length > 1, the option is automatially set to `'block'`. The option is ignored if the model is passed using `formula`.
                 ui: |
                         Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`). If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated within block and independent between blocks.
--       name: re_modelterms
+     -  name: re_modelterms
         title: Model terms
         type: Bool
         default: true
@@ -504,7 +485,7 @@ options:
                         Not in R interface
                 ui: |
                         Show the fixed effects defined in the model in the list of potential random coefficients
--       name: re_crossedclusters
+     -  name: re_crossedclusters
         title: Crossing by formula
         type: Bool
         default: false
@@ -513,7 +494,7 @@ options:
                         Not in R interface
                 ui: |
                         Show the clusters in crossed formulation (cluster1:cluster2)
--       name: re_nestedclusters
+     -  name: re_nestedclusters
         title: Nesting by formula
         type: Bool
         default: false
@@ -522,19 +503,19 @@ options:
                         Not in R interface
                 ui: |
                         Show the clusters in nested formulation (cluster1/cluster2)
--       name: re_listing
+     -  name: re_listing
         type: List
         title: Add
         options:
-        -       name: none
+             -  name: none
                 title: None
-        -       name: main
+             -  name: main
                 title: Main effects
-        -       name: way2
+             -  name: way2
                 title: Up to 2-way
-        -       name: way3
+             -  name: way3
                 title: Up to 3-way
-        -       name: all
+             -  name: all
                 title: All possible
         default: none
         description:
@@ -545,98 +526,98 @@ options:
                         Effects`, `Up to 2-way` interactions, `Up to 3-way` interactions,
                         `All possible` means showing in the `Components` list all
                         possible potential random coefficients. \n"
--       name: reml
+     -  name: reml
         title: REML
         type: Bool
         default: true
         description:
                 R: |
                         `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
--       name: re_lrt
+     -  name: re_lrt
         title: LRT for Random Effects
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), LRT for the random effects
--       name: res_struct
+     -  name: res_struct
         title: Structure
         type: List
         default: id
         options:
-        -       name: id
+             -  name: id
                 title: Identity
-        -       name: cs
+             -  name: cs
                 title: Compound Symmetry
-        -       name: un
+             -  name: un
                 title: Unstructured
-        -       name: ar1
+             -  name: ar1
                 title: "AR(1)"
-        -       name:  arma
+             -  name:  arma
                 title: "ARMA(1,1)"
 
--       name: df_method
+     -  name: df_method
         title: DF Method
         type: List
         default: Satterthwaite
         options:
-        -       name: Satterthwaite
+             -  name: Satterthwaite
                 title: Satterthwaite
-        -       name: Kenward-Roger
+             -  name: Kenward-Roger
                 title: Kenward-Roger  (slow)
         description:
                 R: |
                         The method for computing the denominator degrees of freedom and F-statistics. "Satterthwaite" (default) uses Satterthwaite’s method; "Kenward-Roger" uses Kenward-Roger’s method, "lme4" returns the lme4-anova table, i.e., using the anova method for lmerMod objects as defined in the lme4-package
--       name: norm_plot
+     -  name: norm_plot
         title: Histogram of residuals
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
--       name: qq_plot
+     -  name: qq_plot
         title: Q-Q plot of residuals
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
--       name: resid_plot
+     -  name: resid_plot
         title: Residuals-Predicted scatterplot
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
--       name: cluster_boxplot
+     -  name: cluster_boxplot
         title: Residuals by cluster boxplot
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), provide a boxplot of random effects by the  clusters
--       name: cluster_respred
+     -  name: cluster_respred
         title: Residuals vs Predicted
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), residuals vs predicted by  cluster
--       name: cluster_respred_grid
+     -  name: cluster_respred_grid
         title: Residuals vs Predicted (grid)
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), residuals vs predicted for each cluster
--       name: rand_hist
+     -  name: rand_hist
         title: Histogram of random Coefficients
         type: Bool
         default: false
         description:
                 R: |
                         `TRUE` or `FALSE` (default), provide histogram of random Coefficients
--       name: mute
+     -  name: mute
         title: Remove notes
         type: Bool
         default: false
@@ -644,7 +625,7 @@ options:
                 R: |
                         Not present in R
                 ui: Do not add footnotes to the tables.
--       name: more_fit_indices
+     -  name: more_fit_indices
         title: More Fit Indices
         type: Bool
         default: false

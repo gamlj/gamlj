@@ -202,53 +202,61 @@ options:
 
 
 
+### posthoc
+    -  name: posthoc
+       type: scaffold
+       file: commons.a.yaml
+
+    -  name: posthoc_ci
+       type: scaffold
+       file: commons.a.yaml
+
+####
+
+### contrasts
 
     - name: contrasts
-      title: Factors Coding
-      type: Array
-      items: (factors)
-      default: 
-      template:
-          type: Group
-          elements:
-              - name: var
-                type: Variable
-                content: $key
-              - name: type
-                type: List
-                options:
-                  - simple
-                  - deviation
-                  - dummy
-                  - difference
-                  - helmert
-                  - repeated
-                  - polynomial
-
-                default: simple
-      description:
-          R: >
-            a named vector of the form `c(var1="type", var2="type2")` specifying the type of contrast to use,
-            one of `'deviation'`, `'simple'`, `'dummy'`, `'difference'`, `'helmert'`,
-            `'repeated'` or `'polynomial'`. If NULL, `simple` is used. Can also be passed as a list of list of the form list(list(var="var1",type="type1")).
-
+      type: scaffold
+      file: commons.a.yaml
 
     - name: show_contrastnames
-      title: Names in estimates table
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), shows raw names of the contrasts variables in tables
-
+      type: scaffold
+      file: commons.a.yaml
 
     - name: show_contrastcodes
-      title: Contrast Coefficients tables
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), shows contrast coefficients tables
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: contrast_custom_focus
+      type: scaffold
+      file: commons.a.yaml
+      
+    - name: contrast_custom_values
+      type: scaffold
+      file: commons.a.yaml
+###
+
+### simple effects 
+
+    - name: simple_x
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: simple_mods
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: simple_interactions
+      type: scaffold
+      file: commons.a.yaml
+###
+
+### emmeans
+    - name: emmeans
+      type: scaffold
+      file: commons.a.yaml
+
+###
 
     - name: vcov
       title: Coefficients Covariances
@@ -363,55 +371,7 @@ options:
 
 ####### end of plots #########
 
-    - name: emmeans
-      title: Estimated Marginal Means
-      type: Terms
-      default:
-      description:
-          R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
 
-
-    - name: posthoc
-      title: Post Hoc Tests
-      type: Terms
-      default:
-      description:
-          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form `'~x+x:z'`).
-             The formula is not expanded, so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
-             also as a list of the form '`list("x","z",c("x","z")`'
-
-    - name: posthoc_ci
-      title: Confidence intervals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), posthoc confidence intervals
-
-
-    - name: simple_x
-      title: Simple effects variable
-      type: Variable
-      default:
-      description:
-          R: >
-            The variable for which the simple effects (slopes) are computed
-
-    - name: simple_mods
-      title: Moderators
-      type: Variables
-      default:
-      description:
-          R: >
-            the variable that provides the levels at which the simple effects are computed
-
-    - name: simple_interactions
-      title: Simple Interactions
-      type: Bool
-      default: false
-      description:
-          R: >
-            should simple Interactions be computed
 
     - name: covs_scale
       title: Covariates Scaling
@@ -567,8 +527,6 @@ options:
 
 
 ############ generic with some specs ###########
-
-
 
     - name: posthoc_es
       title: Effect size 

@@ -191,6 +191,22 @@ options:
         description:
                 R: |
                         a number between 50 and 99.9 (default: 95) specifying the confidence interval width for the plots.
+-       name: posthoc
+        title: Post Hoc Tests
+        type: Terms
+        default: ~
+        description:
+                R: a rhs formula with the terms specifying the table to apply the
+                        comparisons (of the form `'~x+x:z'`). The formula is not expanded,
+                        so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
+                        also as a list of the form '`list("x","z",c("x","z")`'
+-       name: posthoc_ci
+        title: Confidence Intervals
+        type: Bool
+        default: false
+        description:
+                R: |
+                        `TRUE`  or `FALSE` (default), coefficients CI in tables
 -       name: contrasts
         title: Factors Coding
         type: Array
@@ -212,6 +228,7 @@ options:
                         - helmert
                         - repeated
                         - polynomial
+                        - custom
                         default: simple
         description:
                 R: |
@@ -230,6 +247,50 @@ options:
         description:
                 R: |
                         `TRUE` or `FALSE` (default), shows contrast coefficients tables
+-       name: contrast_custom_focus
+        type: Bool
+        title: Focus on custom contrast
+        default: false
+-       name: contrast_custom_values
+        type: Array
+        default: []
+        items: (factors)
+        template:
+                type: Group
+                elements:
+                -       name: var
+                        type: Variable
+                        content: $key
+                -       name: codes
+                        type: String
+-       name: simple_x
+        title: Simple effects variable
+        type: Variable
+        default: ~
+        description:
+                R: |
+                        The variable for which the simple effects (slopes) are computed
+-       name: simple_mods
+        title: Moderators
+        type: Variables
+        default: ~
+        description:
+                R: |
+                        the variable that provides the levels at which the simple effects are computed
+-       name: simple_interactions
+        title: Simple Interactions
+        type: Bool
+        default: false
+        description:
+                R: |
+                        should simple Interactions be computed
+-       name: emmeans
+        title: Estimated Marginal Means
+        type: Terms
+        default: ~
+        description:
+                R: a rhs formula with the terms specifying the marginal means to estimate
+                        (of the form `'~x+x:z'`)
 -       name: plot_x
         title: Horizontal axis
         type: Variable
@@ -322,50 +383,6 @@ options:
         description:
                 R: |
                         Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
--       name: emmeans
-        title: Estimated Marginal Means
-        type: Terms
-        default: ~
-        description:
-                R: a rhs formula with the terms specifying the marginal means to estimate
-                        (of the form `'~x+x:z'`)
--       name: posthoc
-        title: Post Hoc Tests
-        type: Terms
-        default: ~
-        description:
-                R: a rhs formula with the terms specifying the table to apply the
-                        comparisons (of the form `'~x+x:z'`). The formula is not expanded,
-                        so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
-                        also as a list of the form '`list("x","z",c("x","z")`'
--       name: posthoc_ci
-        title: Confidence Intervals
-        type: Bool
-        default: false
-        description:
-                R: |
-                        `TRUE`  or `FALSE` (default), coefficients CI in tables
--       name: simple_x
-        title: Simple effects variable
-        type: Variable
-        default: ~
-        description:
-                R: |
-                        The variable for which the simple effects (slopes) are computed
--       name: simple_mods
-        title: Moderators
-        type: Variables
-        default: ~
-        description:
-                R: |
-                        the variable that provides the levels at which the simple effects are computed
--       name: simple_interactions
-        title: Simple Interactions
-        type: Bool
-        default: false
-        description:
-                R: |
-                        should simple Interactions be computed
 -       name: covs_conditioning
         title: Covariates conditioning
         type: List

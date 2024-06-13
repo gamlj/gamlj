@@ -88,34 +88,57 @@
                     name: scale_missing
                     label: ''
 
-  - name: panel_factors
-    type: CollapseBox
-    label: Factors Coding
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: ListBox
-        name: contrasts
+  -     name: panel_factors
+        type: CollapseBox
+        label: Factors Coding
+        collapsed: true
         stretchFactor: 1
-        showColumnHeaders: false
-        columns:
-          - name: var
-            label: null
-            selectable: false
-            stretchFactor: 1
-            maxWidth: 300
-            template:
-              type: VariableLabel
-          - name: type
-            label: null
-            selectable: false
-            stretchFactor: 0.5
-            template:
-              type: ComboBox
-      - type: CheckBox
-        name: show_contrastnames
-      - type: CheckBox
-        name: show_contrastcodes
+        children:
+        -       type: ListBox
+                name: contrasts
+                stretchFactor: 1
+                events: 
+                       change: ./gamlj.events::contrasts_changed
+                showColumnHeaders: false
+                columns:
+                -       name: var
+                        label: ~
+                        selectable: false
+                        stretchFactor: 1
+                        maxWidth: 300
+                        template:
+                                type: VariableLabel
+                -       name: type
+                        label: ~
+                        selectable: false
+                        stretchFactor: 0.5
+                        template:
+                                type: ComboBox
+        -       type: CheckBox
+                name: show_contrastnames
+        -       type: CheckBox
+                name: show_contrastcodes
+
+
+        -       type: Label
+                label: Contrast Codes
+                name: custom_values
+                children:
+                     - type: ListBox
+                       name: contrast_custom_values
+                       showColumnHeaders: false
+                       columns:
+                           - name: var
+                             label: Var
+                             template:
+                                  type: Label
+                           - name: codes
+                             label: Var
+                             template:
+                                  type: TextBox
+                     - type: CheckBox
+                       name: contrast_custom_focus
+
 
   - name: panel_simpleeffects
     type: CollapseBox

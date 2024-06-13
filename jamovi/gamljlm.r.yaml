@@ -34,6 +34,8 @@ items:
         -  se_method
         -  robust_method
         -  mute
+        -  contrast_custom_values
+        -  contrast_custom_focus
            ### modeloptions  ends
            ### nestedoptions  begins
         -  nested_terms
@@ -70,6 +72,8 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
+                         -  contrast_custom_focus
                             ### modeloptions  ends
                             ### nestedoptions  begins
                          -  nested_terms
@@ -131,6 +135,8 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
+                         -  contrast_custom_focus
                             ### modeloptions  ends
                             ### cioptions  begins
                          -  ci_width
@@ -189,6 +195,8 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
+                         -  contrast_custom_focus
                             ### modeloptions  ends
 
              columns:
@@ -262,6 +270,8 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
+                         -  contrast_custom_focus
                             ### modeloptions  ends
                             ### cioptions  begins
                          -  ci_width
@@ -304,6 +314,8 @@ items:
                     -  se_method
                     -  robust_method
                     -  mute
+                    -  contrast_custom_values
+                    -  contrast_custom_focus
                        ### modeloptions  ends
                        ### cioptions  begins
                     -  ci_width
@@ -367,10 +379,10 @@ items:
 
              refs: parameters
 
-           - name: vcov
-             title: Coefficients Covariances
+           - name: contrasts
+             title:  Custom Contrast Tests
              type: Table
-             visible: (vcov)
+             visible: (contrast_custom_focus)
              clearWith:
                        ### modeloptions  begins
                     -  dep
@@ -385,39 +397,14 @@ items:
                     -  se_method
                     -  robust_method
                     -  mute
-                       ### modeloptions  ends
-             columns:
-                    - name: source
-                      title: "Coefficient"
-                      type: text
-                      visible: (show_contrastnames)
-
-
-           - name: contrasts
-             title:  Custom Contrast Tests
-             type: Table
-             visible: (contrast_custom_focus)
-             clearWith:
-                    -  dep
-                    -  factors
-                    -  covs
-                    -  covs_scale
-                    -  dep_scale
-                    -  scale_missing
-                    -  contrasts
-                    -  model_terms
-                    -  fixed_intercept
-                    -  se_method
-                    -  robust_method
-                    -  mute
+                    -  contrast_custom_values
+                    -  contrast_custom_focus
                        ### modeloptions  ends
                        ### cioptions  begins
                     -  ci_width
                     -  ci_method
                     -  boot_r
                        ### cioptions  ends
-                    - betas_ci
- 
              columns:
                     - name: source
                       title: "Variable"
@@ -470,6 +457,36 @@ items:
                       format: zto,pvalue
 
 
+
+           - name: vcov
+             title: Coefficients Covariances
+             type: Table
+             visible: (vcov)
+             clearWith:
+                       ### modeloptions  begins
+                    -  dep
+                    -  factors
+                    -  covs
+                    -  covs_scale
+                    -  dep_scale
+                    -  scale_missing
+                    -  contrasts
+                    -  model_terms
+                    -  fixed_intercept
+                    -  se_method
+                    -  robust_method
+                    -  mute
+                    -  contrast_custom_values
+                    -  contrast_custom_focus
+                       ### modeloptions  ends
+             columns:
+                    - name: source
+                      title: "Coefficient"
+                      type: text
+                      visible: (show_contrastnames)
+
+
+
            - name: contrastCodeTables
              title: Contrast Coefficients 
              type: Array
@@ -517,6 +534,8 @@ items:
               -  se_method
               -  robust_method
               -  mute
+              -  contrast_custom_values
+              -  contrast_custom_focus
                  ### modeloptions  ends
                  ### cioptions  begins
               -  ci_width
@@ -603,6 +622,8 @@ items:
               -  se_method
               -  robust_method
               -  mute
+              -  contrast_custom_values
+              -  contrast_custom_focus
                  ### modeloptions  ends
                  ### cioptions  begins
               -  ci_width
@@ -690,6 +711,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
                     ### simpleeffectsoptions  begins
                  -  simple_x
@@ -765,6 +788,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
                     ### cioptions  begins
                  -  ci_width
@@ -851,6 +876,8 @@ items:
                 -  se_method
                 -  robust_method
                 -  mute
+                -  contrast_custom_values
+                -  contrast_custom_focus
                    ### modeloptions  ends
                    ### covscalingoptions  begins
                 -  covs_conditioning                 
@@ -930,6 +957,8 @@ items:
                 -  se_method
                 -  robust_method
                 -  mute
+                -  contrast_custom_values
+                -  contrast_custom_focus
                    ### modeloptions  ends
                    ### cioptions  begins
                 -  ci_width
@@ -1005,6 +1034,8 @@ items:
             -  se_method
             -  robust_method
             -  mute
+            -  contrast_custom_values
+            -  contrast_custom_focus
                ### modeloptions  ends
                ### cioptions  begins
             -  ci_width
@@ -1062,6 +1093,8 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
+           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1105,6 +1138,8 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
+           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1151,6 +1186,8 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
+           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1193,6 +1230,8 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
+           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1243,6 +1282,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
           columns:
             - name: name
@@ -1279,6 +1320,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
           columns:
             - name: name
@@ -1311,6 +1354,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
           columns:
             - name: source
@@ -1346,6 +1391,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
 
         - name: normPlot
@@ -1371,6 +1418,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
                  
         - name: residPlot
@@ -1396,6 +1445,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
                  -  plot_extremes
 
@@ -1421,6 +1472,8 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
         
   - name: residuals
@@ -1442,5 +1495,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
+                 -  contrast_custom_focus
                     ### modeloptions  ends
         

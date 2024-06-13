@@ -11,6 +11,9 @@ modeloptions:
         - se_method
         - robust_method
         - mute
+        - contrast_custom_values
+        - contrast_custom_focus
+
 nestedoptions:
         - nested_terms
         - nested_intercept

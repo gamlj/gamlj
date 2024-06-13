@@ -25,9 +25,17 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             ci_method = "wald",
             boot_r = 1000,
             ci_width = 95,
+            posthoc = NULL,
+            posthoc_ci = FALSE,
             contrasts = NULL,
             show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
+            contrast_custom_focus = FALSE,
+            contrast_custom_values = list(),
+            simple_x = NULL,
+            simple_mods = NULL,
+            simple_interactions = FALSE,
+            emmeans = NULL,
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -39,12 +47,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             plot_re = FALSE,
             plot_re_method = "average",
             plot_scale = "response",
-            emmeans = NULL,
-            posthoc = NULL,
-            posthoc_ci = FALSE,
-            simple_x = NULL,
-            simple_mods = NULL,
-            simple_interactions = FALSE,
             covs_conditioning = "mean_sd",
             ccra_steps = 1,
             ccm_value = 1,
@@ -170,6 +172,14 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 min=50,
                 max=99.9,
                 default=95)
+            private$..posthoc <- jmvcore::OptionTerms$new(
+                "posthoc",
+                posthoc,
+                default=NULL)
+            private$..posthoc_ci <- jmvcore::OptionBool$new(
+                "posthoc_ci",
+                posthoc_ci,
+                default=FALSE)
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -193,7 +203,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "difference",
                                 "helmert",
                                 "repeated",
-                                "polynomial"),
+                                "polynomial",
+                                "custom"),
                             default="simple"))))
             private$..show_contrastnames <- jmvcore::OptionBool$new(
                 "show_contrastnames",
@@ -203,6 +214,42 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "show_contrastcodes",
                 show_contrastcodes,
                 default=FALSE)
+            private$..contrast_custom_focus <- jmvcore::OptionBool$new(
+                "contrast_custom_focus",
+                contrast_custom_focus,
+                default=FALSE)
+            private$..contrast_custom_values <- jmvcore::OptionArray$new(
+                "contrast_custom_values",
+                contrast_custom_values,
+                default=list(),
+                items="(factors)",
+                template=jmvcore::OptionGroup$new(
+                    "contrast_custom_values",
+                    NULL,
+                    elements=list(
+                        jmvcore::OptionVariable$new(
+                            "var",
+                            NULL,
+                            content="$key"),
+                        jmvcore::OptionString$new(
+                            "codes",
+                            NULL))))
+            private$..simple_x <- jmvcore::OptionVariable$new(
+                "simple_x",
+                simple_x,
+                default=NULL)
+            private$..simple_mods <- jmvcore::OptionVariables$new(
+                "simple_mods",
+                simple_mods,
+                default=NULL)
+            private$..simple_interactions <- jmvcore::OptionBool$new(
+                "simple_interactions",
+                simple_interactions,
+                default=FALSE)
+            private$..emmeans <- jmvcore::OptionTerms$new(
+                "emmeans",
+                emmeans,
+                default=NULL)
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
                 plot_x,
@@ -258,30 +305,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "link",
                     "mean.class"),
                 default="response")
-            private$..emmeans <- jmvcore::OptionTerms$new(
-                "emmeans",
-                emmeans,
-                default=NULL)
-            private$..posthoc <- jmvcore::OptionTerms$new(
-                "posthoc",
-                posthoc,
-                default=NULL)
-            private$..posthoc_ci <- jmvcore::OptionBool$new(
-                "posthoc_ci",
-                posthoc_ci,
-                default=FALSE)
-            private$..simple_x <- jmvcore::OptionVariable$new(
-                "simple_x",
-                simple_x,
-                default=NULL)
-            private$..simple_mods <- jmvcore::OptionVariables$new(
-                "simple_mods",
-                simple_mods,
-                default=NULL)
-            private$..simple_interactions <- jmvcore::OptionBool$new(
-                "simple_interactions",
-                simple_interactions,
-                default=FALSE)
             private$..covs_conditioning <- jmvcore::OptionList$new(
                 "covs_conditioning",
                 covs_conditioning,
@@ -445,9 +468,17 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..ci_method)
             self$.addOption(private$..boot_r)
             self$.addOption(private$..ci_width)
+            self$.addOption(private$..posthoc)
+            self$.addOption(private$..posthoc_ci)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
+            self$.addOption(private$..contrast_custom_focus)
+            self$.addOption(private$..contrast_custom_values)
+            self$.addOption(private$..simple_x)
+            self$.addOption(private$..simple_mods)
+            self$.addOption(private$..simple_interactions)
+            self$.addOption(private$..emmeans)
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
@@ -459,12 +490,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..plot_scale)
-            self$.addOption(private$..emmeans)
-            self$.addOption(private$..posthoc)
-            self$.addOption(private$..posthoc_ci)
-            self$.addOption(private$..simple_x)
-            self$.addOption(private$..simple_mods)
-            self$.addOption(private$..simple_interactions)
             self$.addOption(private$..covs_conditioning)
             self$.addOption(private$..ccra_steps)
             self$.addOption(private$..ccm_value)
@@ -504,9 +529,17 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ci_method = function() private$..ci_method$value,
         boot_r = function() private$..boot_r$value,
         ci_width = function() private$..ci_width$value,
+        posthoc = function() private$..posthoc$value,
+        posthoc_ci = function() private$..posthoc_ci$value,
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
+        contrast_custom_focus = function() private$..contrast_custom_focus$value,
+        contrast_custom_values = function() private$..contrast_custom_values$value,
+        simple_x = function() private$..simple_x$value,
+        simple_mods = function() private$..simple_mods$value,
+        simple_interactions = function() private$..simple_interactions$value,
+        emmeans = function() private$..emmeans$value,
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
@@ -518,12 +551,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
         plot_scale = function() private$..plot_scale$value,
-        emmeans = function() private$..emmeans$value,
-        posthoc = function() private$..posthoc$value,
-        posthoc_ci = function() private$..posthoc_ci$value,
-        simple_x = function() private$..simple_x$value,
-        simple_mods = function() private$..simple_mods$value,
-        simple_interactions = function() private$..simple_interactions$value,
         covs_conditioning = function() private$..covs_conditioning$value,
         ccra_steps = function() private$..ccra_steps$value,
         ccm_value = function() private$..ccm_value$value,
@@ -562,9 +589,17 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..ci_method = NA,
         ..boot_r = NA,
         ..ci_width = NA,
+        ..posthoc = NA,
+        ..posthoc_ci = NA,
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
+        ..contrast_custom_focus = NA,
+        ..contrast_custom_values = NA,
+        ..simple_x = NA,
+        ..simple_mods = NA,
+        ..simple_interactions = NA,
+        ..emmeans = NA,
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
@@ -576,12 +611,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..plot_re = NA,
         ..plot_re_method = NA,
         ..plot_scale = NA,
-        ..emmeans = NA,
-        ..posthoc = NA,
-        ..posthoc_ci = NA,
-        ..simple_x = NA,
-        ..simple_mods = NA,
-        ..simple_interactions = NA,
         ..covs_conditioning = NA,
         ..ccra_steps = NA,
         ..ccm_value = NA,

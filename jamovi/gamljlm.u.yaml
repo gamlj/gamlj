@@ -172,8 +172,8 @@ children:
         -       type: ListBox
                 name: contrasts
                 stretchFactor: 1
-                events: 
-                       change: ./gamlj.events::contrasts_changed
+                events:
+                        change: ./gamlj.events::contrasts_changed
                 showColumnHeaders: false
                 columns:
                 -       name: var
@@ -193,28 +193,24 @@ children:
                 name: show_contrastnames
         -       type: CheckBox
                 name: show_contrastcodes
-
-
         -       type: Label
                 label: Contrast Codes
                 name: custom_values
                 children:
-                     - type: ListBox
-                       name: contrast_custom_values
-                       showColumnHeaders: false
-                       columns:
-                           - name: var
-                             label: Var
-                             template:
-                                  type: Label
-                           - name: codes
-                             label: Var
-                             template:
-                                  type: TextBox
-                     - type: CheckBox
-                       name: contrast_custom_focus
-
-                
+                -       type: ListBox
+                        name: contrast_custom_values
+                        showColumnHeaders: false
+                        columns:
+                        -       name: var
+                                label: Var
+                                template:
+                                        type: Label
+                        -       name: codes
+                                label: Var
+                                template:
+                                        type: TextBox
+                -       type: CheckBox
+                        name: contrast_custom_focus
 -       name: panel_covs
         type: CollapseBox
         label: Covariates Scaling
