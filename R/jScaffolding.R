@@ -4,6 +4,7 @@ Scaffold <- R6::R6Class("Scaffold",
                           public=list(
                             analysis=NULL,  
                             options=NULL,
+                            ready=TRUE,
                             initialize=function(object) {
                                  
                               self$analysis<-object

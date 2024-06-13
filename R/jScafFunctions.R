@@ -48,6 +48,7 @@ mark <- function(...) {
   
 }
 
+
 is.something <- function(x, ...) UseMethod(".is.something")
 
 .is.something.default <- function(obj) (!is.null(obj))
@@ -56,8 +57,10 @@ is.something <- function(x, ...) UseMethod(".is.something")
 
 .is.something.numeric <- function(obj) (length(obj) > 0)
 
-.is.something.character <- function(obj) (length(obj) > 0)
-
+.is.something.character <- function(obj)  {
+          if (length(obj)>1) return(TRUE)
+          (stringr::str_length(trimws(obj)) > 0)
+          }
 .is.something.logical <- function(obj) !is.na(obj)
 
 is.there<-function(pattern,string) length(grep(pattern,string,fixed=T))>0
