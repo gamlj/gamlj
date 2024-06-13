@@ -745,6 +745,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     effectsizes = function() private$.items[["effectsizes"]],
                     coefficients = function() private$.items[["coefficients"]],
                     vcov = function() private$.items[["vcov"]],
+                    contrasts = function() private$.items[["contrasts"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
                 public=list(
@@ -1104,6 +1105,90 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="Coefficient", 
                                     `type`="text", 
                                     `visible`="(show_contrastnames)"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="contrasts",
+                            title="Custom Contrast Tests",
+                            visible="(contrast_custom_focus)",
+                            clearWith=list(
+                                "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "dep_scale",
+                                "scale_missing",
+                                "contrasts",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "robust_method",
+                                "mute",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r",
+                                "betas_ci"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="Variable", 
+                                    `type`="text"),
+                                list(
+                                    `name`="label", 
+                                    `title`="Contrast", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="Estimate", 
+                                    `type`="number", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="se", 
+                                    `title`="SE", 
+                                    `type`="number", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `format`="zto", 
+                                    `visible`="(estimates_ci)"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(estimates_ci)", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="d", 
+                                    `type`="number", 
+                                    `title`="d", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="beta.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `format`="zto", 
+                                    `visible`="(betas_ci)"),
+                                list(
+                                    `name`="beta.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `format`="zto", 
+                                    `visible`="(betas_ci)"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="integer"),
+                                list(
+                                    `name`="test", 
+                                    `title`="t", 
+                                    `type`="number", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",

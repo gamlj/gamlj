@@ -49,6 +49,10 @@ gamljlmClass <- R6::R6Class(
             aSmartObj$setColumnVisible<-"label"
       
       ladd(private$.smartObjs)<-aSmartObj
+
+      ### custom contrasts 
+      aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      ladd(private$.smartObjs)<-aSmartObj
       
       ### contrasts code tables
       aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,runner_machine)

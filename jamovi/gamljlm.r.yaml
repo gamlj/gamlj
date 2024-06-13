@@ -393,6 +393,82 @@ items:
                       visible: (show_contrastnames)
 
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: (contrast_custom_focus)
+             clearWith:
+                    -  dep
+                    -  factors
+                    -  covs
+                    -  covs_scale
+                    -  dep_scale
+                    -  scale_missing
+                    -  contrasts
+                    -  model_terms
+                    -  fixed_intercept
+                    -  se_method
+                    -  robust_method
+                    -  mute
+                       ### modeloptions  ends
+                       ### cioptions  begins
+                    -  ci_width
+                    -  ci_method
+                    -  boot_r
+                       ### cioptions  ends
+                    - betas_ci
+ 
+             columns:
+                    - name: source
+                      title: "Variable"
+                      type: text
+                    - name: label
+                      title: "Contrast"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                      format: zto
+                    - name: se
+                      title: SE
+                      type: number
+                      format: zto
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      format: zto
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                      format: zto
+                    - name: d
+                      type: number
+                      title: d
+                      format: zto
+                    - name: beta.ci.lower
+                      type: number
+                      title: Lower
+                      format: zto
+                      visible: (betas_ci)
+                    - name: beta.ci.upper
+                      type: number
+                      title: Upper
+                      format: zto
+                      visible: (betas_ci)
+                    - name: df
+                      title: "df"
+                      type: integer
+                    - name: test
+                      title: "t"
+                      type: number
+                      format: zto
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
 
            - name: contrastCodeTables
              title: Contrast Coefficients 

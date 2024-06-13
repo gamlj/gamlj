@@ -158,9 +158,24 @@ Runner <- R6::R6Class("Runner",
                               tab       <-  gparameters(self$model,self)
                               tab       <-  private$.fix_names(tab)
                             }
+                            private$.coefficientstab<-tab
                             tab
                             
                           },
+                          # focus on custom contrasts
+                          
+                          run_main_contrasts=function() {
+
+                             tab<-private$.coefficientstab
+                             if (is.null(tab)) return()
+                             labels<-unlist(lapply(self$datamatic$variables, function(x) if (x$method == "custom") x$contrast_labels[[1]] else NULL))
+                             w<-which(tab$label %in% labels)
+                             tab<-tab[w,]
+                             tab$source<-NULL
+                             tab$d<-2*tab$t/sqrt(tab$df)
+                             return(tab)
+                          },
+
                           ### this is for beta regression
                           run_main_phi=function() {
                             
@@ -485,6 +500,7 @@ Runner <- R6::R6Class("Runner",
                         private=list(
                           .data64=NULL,
                           .contr_index=0,
+                          .coefficientstab=NULL,
                           .estimateModel=function(data) {
                             
                               jinfo("MODULE: Estimating the model: checking")

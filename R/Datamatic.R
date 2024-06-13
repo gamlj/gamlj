@@ -85,7 +85,6 @@ Datamatic <- R6::R6Class(
 
       labels<-list()
       for (var in self$variables)  {
-        mark(str(var))
         for (i in seq_along(var$paramsnames64)) {
           par64<-var$paramsnames64[[i]]
           lab<-var$contrast_labels[[i]]
@@ -121,7 +120,7 @@ Variable <- R6::R6Class(
     contrast_values=NULL,
     contrast_labels=NULL,
     levels_labels=NULL,
-    method=NULL,
+    method="numeric",
     covs_scale="none",
     hasCluster=NULL,
     nClusters=0,
