@@ -200,7 +200,7 @@ children:
                 name: custom_values
                 children:
                      - type: ListBox
-                       name: constrast_custom_values
+                       name: contrast_custom_values
                        showColumnHeaders: false
                        columns:
                            - name: var
@@ -211,7 +211,8 @@ children:
                              label: Var
                              template:
                                   type: TextBox
-                                  
+                     - type: CheckBox
+                       name: contrast_custom_focus
 
                 
 -       name: panel_covs

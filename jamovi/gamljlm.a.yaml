@@ -197,7 +197,7 @@ options:
                 R: |
                         a named vector of the form `c(var1="type", var2="type2")` specifying the type of contrast to use, one of `'deviation'`, `'simple'`, `'dummy'`, `'difference'`, `'helmert'`, `'repeated'` or `'polynomial'`. If NULL, `simple` is used. Can also be passed as a list of list of the form list(list(var="var1",type="type1")).
 
--       name: constrast_custom_values
+-       name: contrast_custom_values
         type: Array
    #   hidden: true
         default: []
@@ -212,6 +212,10 @@ options:
                        type: String
 
 
+-       name: contrast_custom_focus
+        type: Bool
+        title: Focus on custom contrast
+        default: false
 
 
 -       name: show_contrastnames

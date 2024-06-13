@@ -94,8 +94,11 @@ const fun = {
 
 
  updateCustom: function(ui, context) {
+    if (ui.contrast_custom_values===undefined) 
+           return
+    
     var contrastsList = context.cloneArray(ui.contrasts.value(), []);
-    var customList = context.cloneArray(ui.constrast_custom_values.value(), []);
+    var customList = context.cloneArray(ui.contrast_custom_values.value(), []);
     console.log(customList)
     
     contrastsList.forEach((item) => {
@@ -111,7 +114,7 @@ const fun = {
          }
          });
 
-    ui.constrast_custom_values.setValue(customList);
+    ui.contrast_custom_values.setValue(customList);
     
     if (customList.length>0)
         ui.custom_values.$el.show();

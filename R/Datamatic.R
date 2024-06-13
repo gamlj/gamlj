@@ -84,12 +84,14 @@ Datamatic <- R6::R6Class(
       names(self$variables)<-unlist(lapply(self$variables,function(var) var$name64))
 
       labels<-list()
-      for (var in self$variables) 
+      for (var in self$variables)  {
+        mark(str(var))
         for (i in seq_along(var$paramsnames64)) {
           par64<-var$paramsnames64[[i]]
           lab<-var$contrast_labels[[i]]
           labels[[par64]]<-lab
         }
+      }
       self$labels<-labels
       self$data_structure64<-self$cleandata(data)
 
@@ -110,11 +112,11 @@ Variable <- R6::R6Class(
     name64=NULL,
     paramsnames64=NULL,
     type=NULL,
-    levels=NULL,
-    original_levels=NULL,
-    original_descriptive=NULL,
-    descriptive=NULL,
-    nlevels=NULL,
+    levels               = NULL,
+    original_levels      = NULL,
+    original_descriptive = NULL,
+    descriptive          = NULL,
+    nlevels              = NULL,
     neffects=NULL,
     contrast_values=NULL,
     contrast_labels=NULL,
@@ -123,13 +125,14 @@ Variable <- R6::R6Class(
     covs_scale="none",
     hasCluster=NULL,
     nClusters=0,
-    isBetween=FALSE,
-    isDependent=FALSE,
+    isBetween            = FALSE,
+    isDependent          = FALSE,
+    isFocal              = FALSE,
+
     initialize=function(var,datamatic) {
       self$name<-var
       self$datamatic<-datamatic
       self$name64<-tob64(var)
-
     },
     checkVariable=function(data) { 
       var<-self$name
@@ -237,6 +240,9 @@ Variable <- R6::R6Class(
       
       ### end offset ####
       
+      ## this is for special treatments of variables
+      
+
       return(self)  
       
     },
@@ -277,6 +283,13 @@ Variable <- R6::R6Class(
         levels(vardata)<-paste0(LEVEL_SYMBOL,tob64(levels(vardata)))
         return(vardata)
     
+      },
+      requireFocus = function() {
+        
+        if (self$method=="custom" && self$datamatic$options$contrast_custom_focus && self$isFocal)
+           return(TRUE)
+        else
+           return(FALSE)
       },
       
       contrast_codes=function(type) {
@@ -340,7 +353,7 @@ Variable <- R6::R6Class(
                     contrast <- stats::contr.treatment(levels,base=1)
              },
             'custom'={
-                     customs=self$datamatic$options$constrast_custom_values
+                     customs=self$datamatic$options$contrast_custom_values
                      for (cus in customs) if (cus$var==self$name) custom<-cus$codes
                      custom<-as.numeric(strsplit(custom,split="[,;]")[[1]])
                      custom<-custom[!is.na(custom)]
@@ -428,11 +441,11 @@ Variable <- R6::R6Class(
       if (type == 'custom') {
 
         custom<-self$contrast_values[,1]
-        lab <- paste("[",paste(custom,levels,sep="*",collapse=", "),"]")
-        mark(lab)
+        lab <- paste("{",paste(custom,levels,sep="*",collapse=", "),"}")
         labels[[1]]<-lab
-        for (i in 2:(nLevels-1)) labels[[i]]<-paste0("tech",i)
-        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is mamed ",paste0(self$name,"1"),"and indicated as ",lab, "in the effect labels."))
+        if (nLevels>2)
+           for (i in 2:(nLevels-1)) labels[[i]]<-paste0("tech",i)
+        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is mamed ",paste0(self$name,"1"),"and indicated as <b>",lab, "</b> in the effect labels."))
         return(labels)
         
       }
@@ -442,89 +455,89 @@ Variable <- R6::R6Class(
       for (i in seq_len(nLevels-1)) labels[[i]]<-paste0("User",i)
       return(labels)
     },
-    .contrast_label=function(levels, type) {
-      
-      nLevels <- length(levels)
-      labels <- list()
-      
-      if (is.null(type))
-        type<-"simple"
-      
-      if (type == 'simple') {
-        for (i in seq_len(nLevels-1))
-          labels[[i]] <- paste(levels[i+1], '-', levels[1])
-        return(labels)
-      } 
-      
-      if (type == 'dummy') {
-        for (i in seq_len(nLevels-1))
-          labels[[i]] <- paste(levels[i+1], '-', levels[1])
-        return(labels)
-      } 
-      
-      if (type == 'deviation') {
-        all <- paste(levels, collapse=', ')
-        for (i in seq_len(nLevels-1))
-          labels[[i]] <- paste(levels[i+1], '- (', all,")")
-        return(labels)
-        
-      } 
-      
-      if (type == 'difference') {
-        
-        for (i in seq_len(nLevels-1)) {
-          rhs <- paste0(levels[1:i], collapse=', ')
-          if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
-          labels[[i]] <- paste(levels[i + 1], '-', rhs)
-        }
-        return(labels)
-      }
-      
-      if (type == 'helmert') {
-        
-        for (i in seq_len(nLevels-1)) {
-          rhs <- paste(levels[(i+1):nLevels], collapse=', ')
-          if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
-          labels[[i]] <- paste(levels[i], '-', rhs)
-        }
-        return(labels)
-      }
-      
-      
-      
-      if (type == 'repeated') {
-        
-        for (i in seq_len(nLevels-1))
-          labels[[i]] <- paste(levels[i], '-', levels[i+1])
-        return(labels)
-        
-      } 
-      if (type == 'polynomial') {
-        names <- c('linear', 'quadratic', 'cubic', 'quartic', 'quintic', 'sextic', 'septic', 'octic')
-        for (i in seq_len(nLevels-1)) {
-          if (i <= length(names)) {
-            labels[[i]] <- names[i]
-          } else {
-            labels[[i]] <- paste('degree', i, 'polynomial')
-          }
-        }
-        return(labels)
-      }
-      
-      if (type == 'custom') {
-            labels[[1]] <- "Custom" 
-            for (i in 2:(nLevels-1)) labels[[i]]<-"Orthogonal"
-            return(labels)
-        }
-
-      
-      jinfo("no contrast definition met")
-      
-      all <- paste(levels, collapse=', ')
-      for (i in seq_len(nLevels-1))
-        labels[[i]] <- paste(levels[i+1], '- (', all,")")
-      return(labels)
-    },
+    # .contrast_label=function(levels, type) {
+    #   
+    #   nLevels <- length(levels)
+    #   labels <- list()
+    #   
+    #   if (is.null(type))
+    #     type<-"simple"
+    #   
+    #   if (type == 'simple') {
+    #     for (i in seq_len(nLevels-1))
+    #       labels[[i]] <- paste(levels[i+1], '-', levels[1])
+    #     return(labels)
+    #   } 
+    #   
+    #   if (type == 'dummy') {
+    #     for (i in seq_len(nLevels-1))
+    #       labels[[i]] <- paste(levels[i+1], '-', levels[1])
+    #     return(labels)
+    #   } 
+    #   
+    #   if (type == 'deviation') {
+    #     all <- paste(levels, collapse=', ')
+    #     for (i in seq_len(nLevels-1))
+    #       labels[[i]] <- paste(levels[i+1], '- (', all,")")
+    #     return(labels)
+    #     
+    #   } 
+    #   
+    #   if (type == 'difference') {
+    #     
+    #     for (i in seq_len(nLevels-1)) {
+    #       rhs <- paste0(levels[1:i], collapse=', ')
+    #       if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
+    #       labels[[i]] <- paste(levels[i + 1], '-', rhs)
+    #     }
+    #     return(labels)
+    #   }
+    #   
+    #   if (type == 'helmert') {
+    #     
+    #     for (i in seq_len(nLevels-1)) {
+    #       rhs <- paste(levels[(i+1):nLevels], collapse=', ')
+    #       if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
+    #       labels[[i]] <- paste(levels[i], '-', rhs)
+    #     }
+    #     return(labels)
+    #   }
+    #   
+    #   
+    #   
+    #   if (type == 'repeated') {
+    #     
+    #     for (i in seq_len(nLevels-1))
+    #       labels[[i]] <- paste(levels[i], '-', levels[i+1])
+    #     return(labels)
+    #     
+    #   } 
+    #   if (type == 'polynomial') {
+    #     names <- c('linear', 'quadratic', 'cubic', 'quartic', 'quintic', 'sextic', 'septic', 'octic')
+    #     for (i in seq_len(nLevels-1)) {
+    #       if (i <= length(names)) {
+    #         labels[[i]] <- names[i]
+    #       } else {
+    #         labels[[i]] <- paste('degree', i, 'polynomial')
+    #       }
+    #     }
+    #     return(labels)
+    #   }
+    #   
+    #   if (type == 'custom') {
+    #         labels[[1]] <- "Custom" 
+    #         for (i in 2:(nLevels-1)) labels[[i]]<-"Orthogonal"
+    #         return(labels)
+    #     }
+    # 
+    #   
+    #   jinfo("no contrast definition met")
+    #   
+    #   all <- paste(levels, collapse=', ')
+    #   for (i in seq_len(nLevels-1))
+    #     labels[[i]] <- paste(levels[i+1], '- (', all,")")
+    #   return(labels)
+    # },
     
     .continuous_values=function(data) {
 
