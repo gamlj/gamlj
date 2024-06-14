@@ -52,6 +52,11 @@ gamljmixedClass <- R6::R6Class(
         aSmartObj$setColumnVisible<-"label"
       ladd(private$.smartObjs)<-aSmartObj
       
+      ### custom contrasts 
+      aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$ci("beta",self$options$ci_width,label=greek_vector[["beta"]])
+      ladd(private$.smartObjs)<-aSmartObj
 
       
       ### contrasts code tables

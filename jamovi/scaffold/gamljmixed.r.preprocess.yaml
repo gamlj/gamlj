@@ -156,6 +156,45 @@ items:
 
              refs: parameters
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: (contrast_custom_focus)
+             clearWith:
+                    -  __modeloptions__
+                    -  __cioptions__
+             columns:
+
+                    - name: source
+                      title: "Names"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: SE
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                    - name: df
+                      title: "df"
+                      type: number
+                    - name: test
+                      title: "t"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
            - name: contrastCodeTables
              title: Contrast Coefficients 
@@ -576,6 +615,7 @@ items:
   - name: plotnotes
     type: Html
     visible: false
+
 
 
   - name: assumptions

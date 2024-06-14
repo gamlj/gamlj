@@ -70,12 +70,6 @@ options:
         description:
                 R: a vector of strings naming the covariates from `data`. Not needed
                         if `formula` is used.
--       name: offset
-        title: Offset
-        type: Variable
-        default: ~
-        description:
-                R: a vector of strings naming the offset variables.
 -       name: model_terms
         title: Model Terms
         type: Terms
@@ -83,6 +77,20 @@ options:
         description:
                 R: |
                         a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
+-       name: nested_terms
+        title: Nested Model
+        type: Terms
+        default: ~
+        description:
+                R: |
+                        a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+-       name: comparison
+        title: Activate
+        type: Bool
+        default: false
+        description:
+                R: |
+                        Activates models comparison
 -       name: fixed_intercept
         title: Intercept
         type: Bool
@@ -90,6 +98,8 @@ options:
         description:
                 R: |
                         `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
+                ui: |
+                        Estimates fixed intercept if flagged
 -       name: nested_intercept
         title: Nested intercept
         type: Bool
@@ -97,81 +107,6 @@ options:
         description:
                 R: |
                         `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
--       name: nested_terms
-        title: Nested Model
-        type: Terms
-        default: ~
-        description:
-                R: |
-                        a list of character vectors describing effects terms for nested. It can be passed as right-hand formula.
--       name: comparison
-        title: Activate
-        type: Bool
-        default: false
-        description:
-                R: |
-                        Not present in R
--       name: estimates_ci
-        title: For estimates
-        type: Bool
-        default: false
-        description:
-                R: |
-                        `TRUE`  or `FALSE` (default), coefficients CI in tables
--       name: donotrun
-        title: Do not run
-        type: Bool
-        default: false
-        description:
-                R: |
-                        not present in R
-                ui: |
-                        If flagged, the results are not updated each time an option is changed.  This allows settings complex model options without waiting for the results to update every time. Unflag it when ready to go.
--       name: input_method
-        title: Input Method
-        type: List
-        default: standard
-        options:
-        -       name: standard
-                title: Responses
-        -       name: success
-                title: Success/Failure
-        -       name: total
-                title: P(success)/Totals
-        description:
-                R: |
-                        notpresent
-                ui: |
-                        The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
-                        `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
-                          and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
-                          of each proportion.
--       name: ci_method
-        title: CI Method
-        type: List
-        default: wald
-        options:
-        -       name: wald
-                title: Standard
-        -       name: profile
-                title: Profile
-        -       name: quantile
-                title: Bootstrap Percent
-        -       name: bcai
-                title: Bootstrap BCa
-        description:
-                R: |
-                        The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which  the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. `quantile` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
-                ui: |
-                        The method used to compute the confidence intervals. `Standard` uses the Wald method to compute standard errors and confidence intervals. `Profile` computes Profile Likelihood Based Confidence Interval, in which  the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. `Bootstrap percent` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute the CI based on the percentiles of the boostrap distribution. The `BCa` implements the bias-corrected bootstrap method.
--       name: boot_r
-        title: Bootstrap rep.
-        type: Number
-        min: 1
-        default: 1000
-        description:
-                R: |
-                        a number bootstrap repetitions.
 -       name: ci_width
         title: Confidence level
         type: Number
@@ -181,6 +116,32 @@ options:
         description:
                 R: |
                         a number between 50 and 99.9 (default: 95) specifying the confidence interval width for the plots.
+-       name: boot_r
+        title: Bootstrap rep.
+        type: Number
+        min: 1
+        default: 1000
+        description:
+                R: |
+                        The number bootstrap repetitions.
+-       name: donotrun
+        title: Do not run
+        type: Bool
+        default: false
+        description:
+                R: |
+                        not present in R
+                ui: |
+                        If flagged, the results are not updated each time an option is changed.  This allows settings complex model options without waiting for the results to update every time. Unflag it when ready to go.
+-       name: mute
+        title: Remove notes
+        type: Bool
+        default: false
+        description:
+                R: |
+                        Not present in R
+                ui: |
+                        Removes all notes and warnings from the Tables. Useful to produce pubblication quality tables.
 -       name: posthoc
         title: Post Hoc Tests
         type: Terms
@@ -197,6 +158,29 @@ options:
         description:
                 R: |
                         `TRUE`  or `FALSE` (default), coefficients CI in tables
+-       name: adjust
+        title: Correction
+        type: NMXList
+        options:
+        -       name: none
+                title: No correction (LSD)
+        -       name: bonf
+                title: Bonferroni
+        -       name: tukey
+                title: Tukey
+        -       name: holm
+                title: Holm
+        -       name: scheffe
+                title: Scheffe
+        -       name: sidak
+                title: Sidak
+        default:
+        - bonf
+        description:
+                R: |
+                        Adjustment method for posthoc tests. One or more of `'none'`,  `'bonf'`,`'tukey'`  `'holm'`, `'scheffe'` and `'sidak'`; provide no,  Bonferroni, Tukey and Holm Scheffé and Sidak Post Hoc corrections, respectively. See \[emmeans]{summary.emmGrid} for details.
+                ui: |
+                        Adjustment method for posthoc tests. One or more of `'None'`,  `'Bonferroni'`,`'Tukey'`  `'Holm'` `'Scheffe'` and `'Sidak'` Post Hoc corrections. See \[emmeans](https://cran.r-project.org/web/packages/emmeans/emmeans.pdf) for details.
 -       name: contrasts
         title: Factors Coding
         type: Array
@@ -281,22 +265,82 @@ options:
         description:
                 R: a rhs formula with the terms specifying the marginal means to estimate
                         (of the form `'~x+x:z'`)
--       name: vcov
-        title: Coefficients Covariances
-        type: Bool
-        default: false
+-       name: covs_conditioning
+        title: Covariates conditioning
+        type: List
+        options:
+        -       name: mean_sd
+                title: Mean ±  SD
+        -       name: percent
+                title: Percentiles 50 ± offset
+        -       name: range
+                title: Min to Max
+        default: mean_sd
         description:
                 R: |
-                        `TRUE` or `FALSE` (default), shows coefficients covariances
--       name: crosstab
-        title: Classification Table
-        type: Bool
-        default: false
+                        '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots. '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
+-       name: ccra_steps
+        type: Number
+        default: 1
+        min: 1
+        max: 50
+        description:
+                R: "Covariate condition range steps (not very mnemonic): At how many
+                        values between min and max should the covariate be conditioned
+                        \n"
+                ui: "Covariate condition range steps: At how many values between min
+                        and max should the covariate be conditioned \n"
+-       name: ccm_value
+        type: Number
+        default: 1
         description:
                 R: |
-                        `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
+                        how many st.deviations around the means used to condition simple effects and plots. Used if `simpleScale`=`'mean_sd'`
+-       name: ccp_value
+        type: Number
+        default: 25
+        min: 5
+        max: 50
+        description:
+                R: "Offset (number of percentiles) around the median used to condition
+                        simple effects and plots. Used if `covs_conditioning='percent'`.
+                        \n"
+                ui: "Offset (number of percentiles) around the median used to condition
+                        simple effects and plots. Used if `covs_conditioning='percent'`.
+                        \n"
+-       name: covs_scale_labels
+        type: List
+        options:
+        -       name: labels
+                title: Labels
+        -       name: values
+                title: Values
+        -       name: values_labels
+                title: Values + Labels
+        -       name: uvalues
+                title: Unscaled Values
+        -       name: uvalues_labels
+                title: Unscaled Values + Labels
+        default: labels
+        description:
+                R: |
+                        how the levels of a continuous moderator should appear in tables and plots: `labels`, `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the variable orginal levels, before scaling.
+-       name: predicted
+        title: Predicted
+        type: Output
+        description:
+                R: |
+                        not used in R
                 ui: |
-                        Produces a classification table (predicted vs observed)
+                        Saves the predicted values of the model. Predicted values are always scaled in the dependent variable original scale, that in the majority of cases is the probability scale. For `Poisson` models and `Negative Binomial` the count scale is used.
+-       name: residuals
+        title: Residuals
+        type: Output
+        description:
+                R: |
+                        not used in R
+                ui: |
+                        Saves the residual values of the model. The response scale is used.
 -       name: plot_x
         title: Horizontal axis
         type: Variable
@@ -339,6 +383,8 @@ options:
         description:
                 R: |
                         `TRUE` or `FALSE` (default), use original scale for covariates.
+                ui: |
+                        If selected, the X-axis variable is scaled with the orginal scale of the variable, independently to the scaling set is the `Covariates Scaling`.
 -       name: plot_black
         title: Varying line types
         type: Bool
@@ -346,8 +392,10 @@ options:
         description:
                 R: |
                         `TRUE` or `FALSE` (default), use different linetypes per levels.
+                ui: |
+                        If selected, a black and white theme is set for the plot, with multiple lines (if present) drawn in different styles.
 -       name: plot_around
-        title: Error Bar Definition
+        title: Display
         type: List
         options:
         -       name: none
@@ -360,115 +408,8 @@ options:
         description:
                 R: |
                         `'none'` (default), `'ci'`, or `'se'`. Use no error bars, use confidence intervals, or use standard errors on the plots, respectively.
--       name: posthoc
-        title: Post Hoc Tests
-        type: Terms
-        default: ~
-        description:
-                R: a rhs formula with the terms specifying the table to apply the
-                        comparisons (of the form '~x+x:z'). The formula is not expanded,
-                        so 'x*z' becomes 'x+z' and not 'x+z+x:z'. It can be passed
-                        also as a list of the form 'list("x","z",c("x","z")'
--       name: posthoc_ci
-        title: Confidence Intervals
-        type: Bool
-        default: false
-        description:
-                R: |
-                        `TRUE`  or `FALSE` (default), coefficients CI in tables
--       name: covs_conditioning
-        title: Covariates conditioning
-        type: List
-        options:
-        -       name: mean_sd
-                title: Mean ±  SD
-        -       name: percent
-                title: Percentiles 50 ± offset
-        -       name: range
-                title: Min to Max
-        default: mean_sd
-        description:
-                R: |
-                        '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots. '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
--       name: ccra_steps
-        type: Number
-        default: 1
-        min: 1
-        max: 50
-        description:
-                R: "Covariate condition range steps (not very mnemonic): At how many
-                        values between min and max should the covariate be conditioned
-                        \n"
-                ui: "Covariate condition range steps: At how many values between min
-                        and max should the covariate be conditioned \n"
--       name: ccm_value
-        type: Number
-        default: 1
-        description:
-                R: |
-                        how many st.deviations around the means used to condition simple effects and plots. Used if `simpleScale`=`'mean_sd'`
--       name: ccp_value
-        type: Number
-        default: 25
-        min: 5
-        max: 50
-        description:
-                R: |
-                        offsett (number of percentiles) around the median used to condition simple effects and plots. Used if `simpleScale`=`'percent'`
--       name: covs_scale_labels
-        type: List
-        options:
-        -       name: labels
-                title: Labels
-        -       name: values
-                title: Values
-        -       name: values_labels
-                title: Values + Labels
-        -       name: uvalues
-                title: Unscaled Values
-        -       name: uvalues_labels
-                title: Unscaled Values + Labels
-        default: labels
-        description:
-                R: |
-                        how the levels of a continuous moderator should appear in tables and plots: `labels`, `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the variable orginal levels, before scaling.
--       name: adjust
-        title: Correction
-        type: NMXList
-        options:
-        -       name: none
-                title: No correction (LSD)
-        -       name: bonf
-                title: Bonferroni
-        -       name: tukey
-                title: Tukey
-        -       name: holm
-                title: Holm
-        -       name: scheffe
-                title: Scheffe
-        -       name: sidak
-                title: Sidak
-        default:
-        - bonf
-        description:
-                R: |
-                        one or more of `'none'`,  `'bonf'`,`'tukey'`  `'holm'`; provide no,  Bonferroni, Tukey and Holm Post Hoc corrections respectively.
--       name: predicted
-        title: Predicted
-        type: Output
-        description:
-                R: |
-                        not used in R
                 ui: |
-                        Saves the predicted values of the model. Predicted values are always scaled in the dependent variable original scale, that in the majority of cases is the probability scale. For `Poisson` models and `Negative Binomial` the count scale is used.
--       name: residuals
-        title: Residuals
-        type: Output
-        description:
-                R: |
-                        not used in R
-                ui: |
-                        Saves the residual values of the model. The response scale is used.
+                        `'None'` (default), `Confidence Intervals`, or `Standard Error`. Display on plots no error bars, use confidence intervals, or use standard errors on the plots, respectively.
 -       name: covs_scale
         title: Covariates Scaling
         type: Array
@@ -502,15 +443,71 @@ options:
         -       title: Columnwise
                 name: colwise
         default: complete
--       name: mute
-        title: Remove notes
+-       name: offset
+        title: Offset
+        type: Variable
+        default: ~
+        description:
+                R: a vector of strings naming the offset variables.
+-       name: estimates_ci
+        title: For estimates
+        type: Bool
+        default: false
+        description:
+                R: "`TRUE`  or `FALSE` (default), coefficients CI in tables                \n"
+-       name: vcov
+        title: Coefficients Covariances
         type: Bool
         default: false
         description:
                 R: |
-                        Not present in R
+                        `TRUE` or `FALSE` (default), shows coefficients covariances
+-       name: crosstab
+        title: Classification Table
+        type: Bool
+        default: false
+        description:
+                R: |
+                        `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
                 ui: |
-                        Remove all notes and warning from the Tables. Useful to produce pubblication quality tables.
+                        Produces a classification table (predicted vs observed)
+-       name: input_method
+        title: Input Method
+        type: List
+        default: standard
+        options:
+        -       name: standard
+                title: Responses
+        -       name: success
+                title: Success/Failure
+        -       name: total
+                title: P(success)/Totals
+        description:
+                R: |
+                        notpresent
+                ui: |
+                        The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
+                        `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
+                          and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
+                          of each proportion.
+-       name: ci_method
+        title: CI Method
+        type: List
+        default: wald
+        options:
+        -       name: wald
+                title: Standard
+        -       name: profile
+                title: Profile
+        -       name: quantile
+                title: Bootstrap Percent
+        -       name: bcai
+                title: Bootstrap BCa
+        description:
+                R: |
+                        The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which  the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. `quantile` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
+                ui: |
+                        The method used to compute the confidence intervals. `Standard` uses the Wald method to compute standard errors and confidence intervals. `Profile` computes Profile Likelihood Based Confidence Interval, in which  the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. `Bootstrap percent` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute the CI based on the percentiles of the boostrap distribution. The `BCa` implements the bias-corrected bootstrap method.
 -       name: expb_ci
         title: For exp(B)
         type: Bool

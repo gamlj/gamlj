@@ -18,6 +18,8 @@ modeloptions:
         - model_type
         - custom_family
         - custom_link  
+        - contrast_custom_values
+        - contrast_custom_focus
 
 nestedoptions:
         - nested_terms

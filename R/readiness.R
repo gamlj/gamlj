@@ -41,7 +41,7 @@ if (utils::hasName(options,"cluster"))
        types <- unlist(lapply(options$contrasts, function(x) x$type))
        test  <- any(types=="custom")
        if (!test) return(result)
-       test<-any(sapply(options$contrast_custom_values,function(x) !is.something(x$codes)))
+       test<-any(sapply(options$contrast_custom_values,function(x) (stringr::str_length(x$codes)==0)))
        if (test)  
        {
          result$ready <- FALSE

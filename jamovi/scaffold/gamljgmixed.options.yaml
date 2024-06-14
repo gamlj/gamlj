@@ -16,6 +16,8 @@ modeloptions:
         - covs_scale
         - mute
         - model_type
+        - contrast_custom_values
+        - contrast_custom_focus
         
 nestedoptions:
         - nested_terms

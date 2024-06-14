@@ -20,6 +20,9 @@ modeloptions:
         - mute
         - donotrun
         - res_struct
+        - contrast_custom_values
+        - contrast_custom_focus
+        
 nestedoptions:
         - nested_terms
         - nested_intercept

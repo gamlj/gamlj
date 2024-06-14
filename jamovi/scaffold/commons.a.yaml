@@ -1,3 +1,54 @@
+#### common flags
+
+    - name: factors
+      title: Factors
+      type: Variables
+      suggested:
+         - nominal
+      permitted:
+        - factor
+      default:
+      description:
+          R: a vector of strings naming the fixed factors from `data`. Not needed if `formula` is used.
+
+    - name: covs
+      title: Covariates
+      type: Variables
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+      default:
+      description:
+          R: a vector of strings naming the covariates from `data`. Not needed if `formula` is used.
+
+
+    - name: model_terms
+      title: Model Terms
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
+
+    - name: nested_terms
+      title: Nested Model
+      type: Terms
+      default:
+      description:
+          R: >
+            a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
+
+    - name: comparison
+      title: Activate
+      type: Bool
+      default: false
+      description:
+          R: >
+             Activates models comparison
+
+
     - name: fixed_intercept
       title: Intercept
       type: Bool
@@ -16,6 +67,28 @@
           R: >
             `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
 
+    - name: ci_width
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      description:
+          R: >
+            a number between 50 and 99.9 (default: 95) specifying the confidence
+            interval width for the plots.
+
+    - name: boot_r
+      title: Bootstrap rep.
+      type: Number
+      min: 1
+      default: 1000
+      description:
+          R: >
+            The number bootstrap repetitions.
+
+### covariate scaling 
+
     - name: covs_conditioning
       title: Covariates conditioning
       type: List
@@ -32,6 +105,27 @@
               '`mean_sd`' (default), or '`percent`'. How to condition covariates in simple effects and plots.
               '`mean_sd`' for mean +/- '`ccp_value`' * sd. '`percent`' for median +/-'`ccp_value`' for percentiles.
 
+    - name: ccp_value
+      type: Number
+      default: 25
+      min: 5
+      max: 50
+      description:
+          R: >
+            Offset (number of percentiles) around the median used to condition simple effects and plots.
+            Used if `covs_conditioning='percent'`. 
+          ui: >
+            Offset (number of percentiles) around the median used to condition simple effects and plots.
+            Used if `covs_conditioning='percent'`. 
+
+    - name: ccm_value
+      type: Number
+      default: 1
+      description:
+          R: >
+            how many st.deviations around the means used to condition simple effects and plots.
+            Used if `simpleScale`=`'mean_sd'`
+
     - name: ccra_steps
       type: Number
       default: 1
@@ -43,11 +137,52 @@
           ui: >
             Covariate condition range steps: At how many values between min and max should the covariate be conditioned 
 
-    - name: plot_jn
-      title: Johnson-Neyman plot
-      type: Bool
-      default: False
+    - name: covs_scale_labels
+      type: List
+      options:
+        - name: labels
+          title: Labels
+        - name: values
+          title: Values
+        - name: values_labels
+          title: Values + Labels
+        - name:  uvalues
+          title: Unscaled Values
+        - name: uvalues_labels
+          title: Unscaled Values + Labels
 
+      default: labels
+      description:
+          R: >
+            how the levels of a continuous moderator should appear in tables and plots: `labels`,
+            `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the
+            variable orginal levels, before scaling.
+
+############
+
+
+
+    - name: donotrun
+      title: Do not run
+      type: Bool    
+      default: false
+      description:
+         R:  > 
+             not present in R
+         ui: >
+             If flagged, the results are not updated each time an option is changed. 
+             This allows settings complex model options without waiting for the results
+             to update every time. Unflag it when ready to go.
+    - name: mute
+      title: Remove notes
+      type: Bool
+      default: false
+      description:
+          R: >
+            Not present in R
+          ui: >
+              Removes all notes and warnings from the Tables. Useful to produce pubblication quality
+              tables.
 
 ### contrasts 
 
@@ -125,6 +260,34 @@
                         comparisons (of the form `'~x+x:z'`). The formula is not expanded,
                         so '`x*z`' becomes '`x+z' and not '`x+z+x:z`'. It can be passed
                         also as a list of the form '`list("x","z",c("x","z")`'
+
+    - name: adjust
+      title: Correction
+      type: NMXList
+      options:
+          - name: 'none'
+            title: No correction (LSD)
+          - name: bonf
+            title: Bonferroni
+          - name: tukey
+            title: Tukey 
+          - name: holm
+            title: Holm
+          - name: scheffe
+            title: Scheffe
+          - name: sidak
+            title: Sidak
+      default:
+          - bonf
+      description:
+          R: >
+            Adjustment method for posthoc tests. One or more of `'none'`,  `'bonf'`,`'tukey'` 
+            `'holm'`, `'scheffe'` and `'sidak'`; provide no,  Bonferroni, Tukey and
+            Holm Scheffé and Sidak Post Hoc corrections, respectively. See \[emmeans]{summary.emmGrid} for details.
+          ui: >
+            Adjustment method for posthoc tests. One or more of `'None'`,  `'Bonferroni'`,`'Tukey'` 
+            `'Holm'` `'Scheffe'` and `'Sidak'` Post Hoc corrections. See \[emmeans](https://cran.r-project.org/web/packages/emmeans/emmeans.pdf) for details.
+
     -  name: posthoc_ci
        title: Confidence Intervals
        type: Bool
@@ -172,3 +335,29 @@
           R: a rhs formula with the terms specifying the marginal means to estimate (of the form `'~x+x:z'`)
 
 ###
+
+
+
+### output 
+
+    - name: predicted
+      title: Predicted
+      type: Output            
+      description:
+          R: >
+            not used in R
+          ui: >
+            Saves the predicted values of the model. Predicted values are always scaled in the
+            dependent variable original scale, that in the majority of cases is the probability
+            scale. For `Poisson` models and `Negative Binomial` the count scale is used.
+
+
+    - name: residuals
+      title: Residuals
+      type: Output            
+      description:
+          R: >
+            not used in R
+          ui: >
+            Saves the residual values of the model. The response scale is used.
+

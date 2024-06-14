@@ -55,6 +55,13 @@ gamljgmixedClass <- R6::R6Class(
         if (is.something(self$options$factors) || self$options$model_type=="ordinal")
             aSmartObj$setColumnVisible<-"label"
         ladd(private$.smartObjs)<- aSmartObj        
+
+        ### custom contrasts 
+        aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+        aSmartObj$ci("est",self$options$ci_width)
+        aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
+        aSmartObj$spaceBy<-"response"
+        ladd(private$.smartObjs)<- aSmartObj        
         
         ### contrasts code tables
         aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,runner_machine)

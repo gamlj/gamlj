@@ -169,6 +169,57 @@ items:
 
              refs: parameters
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: (contrast_custom_focus)
+             clearWith:
+                    -  __modeloptions__
+                    -  __cioptions__
+             columns:
+                    - name: response
+                      title: Response 
+                      type: text
+                      visible: (model_type:multinomial)
+                    - name: source
+                      title: "Names"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: SE
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                    - name: expb
+                      type: number
+                      title: Exp(B)
+                      visible: (es:expb)
+                    - name: expb.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (es:expb & expb_ci)
+                    - name: expb.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (es:expb & expb_ci)
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
            - name: contrastCodeTables
              title: Contrast Coefficients 

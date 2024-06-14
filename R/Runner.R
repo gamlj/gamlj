@@ -287,6 +287,8 @@ Runner <- R6::R6Class("Runner",
                               jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
+                            
+
                               return(results[[1]])
                               
                           },

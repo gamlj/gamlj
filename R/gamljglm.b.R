@@ -66,6 +66,15 @@ gamljglmClass <- R6::R6Class(
       aSmartObj$spaceBy<-"response"
       ladd(private$.smartObjs)<-aSmartObj
 
+      ### custom contrasts 
+      aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
+      aSmartObj$spaceBy<-"response"
+      ladd(private$.smartObjs)<-aSmartObj
+
+      
+      
       ### predictors for phi in beta regression ###
       aSmartObj<-SmartTable$new(self$results$main$phi,runner_machine)
       aSmartObj$ci("est",self$options$ci_width)

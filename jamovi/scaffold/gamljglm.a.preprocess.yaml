@@ -17,10 +17,13 @@ description:
                              model_type = "logistic")
 
 options:
+
     - name: data
       type: Data
       description:
           R: the data as a data frame
+
+### constants setting
 
     - name: .caller
       type: String
@@ -31,6 +34,8 @@ options:
       type: String
       default: "jamovi"
       hidden: true
+
+### dependent variable
 
     - name: dep
       title: Dependent Variable
@@ -55,168 +60,52 @@ options:
           R: >
             not present in R
 
+### standard input
 
     - name: factors
-      title: Factors
-      type: Variables
-      suggested:
-         - nominal
-      permitted:
-        - factor
-      default:
-      description:
-          R: a vector of strings naming the fixed factors from `data`. Not needed if `formula` is used.
+      type: scaffold
+      file: commons.a.yaml
 
     - name: covs
-      title: Covariates
-      type: Variables
-      suggested:
-        - continuous
-        - ordinal
-      permitted:
-        - numeric
-      default:
-      description:
-          R: a vector of strings naming the covariates from `data`. Not needed if `formula` is used.
+      type: scaffold
+      file: commons.a.yaml
 
-    - name: offset
-      title: Offset
-      type: Variable
-      default:
-      description:
-          R: a vector of strings naming the offset variables.
 
     - name: model_terms
-      title: Model Terms
-      type: Terms
-      default:
-      description:
-          R: >
-            a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
-
-    - name: fixed_intercept
-      title: Intercept
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
-
-    - name: nested_intercept
-      title: Nested intercept
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE`, estimates fixed intercept. Not needed if `formula` is used.
-
+      type: scaffold
+      file: commons.a.yaml
 
     - name: nested_terms
-      title: Nested Model
-      type: Terms
-      default:
-      description:
-          R: >
-            a list of character vectors describing effects terms for nested. It can be passed as right-hand formula.
+      type: scaffold
+      file: commons.a.yaml
 
     - name: comparison
-      title: Activate
-      type: Bool
-      default: false
-      description:
-          R: >
-             Not present in R
+      type: scaffold
+      file: commons.a.yaml
 
+    - name: fixed_intercept
+      type: scaffold
+      file: commons.a.yaml
 
-    - name: estimates_ci
-      title: For estimates
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE`  or `FALSE` (default), coefficients CI in tables
-
-    - name: donotrun
-      title: Do not run
-      type: Bool    
-      default: false
-      description:
-         R:  > 
-             not present in R
-         ui: >
-             If flagged, the results are not updated each time an option is changed. 
-             This allows settings complex model options without waiting for the results
-             to update every time. Unflag it when ready to go.
-
-    - name: input_method
-      title: Input Method
-      type: List
-      default: standard
-      options:
-        -       name: standard
-                title: 'Responses'
-        -       name: success
-                title: 'Success/Failure'
-        -       name:  total
-                title: 'P(success)/Totals'
-
-      description:
-                R: |
-                        notpresent
-                ui: |
-                        The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
-                        `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
-                          and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
-                          of each proportion.
-                        
-
-    - name: ci_method
-      title: CI Method
-      type: List
-      default: wald
-      options:
-        - name:  wald
-          title: Standard 
-        - name:  profile
-          title: Profile 
-        - name:  quantile
-          title: Bootstrap Percent 
-        - name:  bcai
-          title: Bootstrap BCa
-      description:
-          R: >
-              The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
-              errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
-              the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
-              estimate. `quantile` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute
-              the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
-          ui: > 
-              The method used to compute the confidence intervals. `Standard` uses the Wald method to compute standard
-              errors and confidence intervals. `Profile` computes Profile Likelihood Based Confidence Interval, in which 
-              the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
-              estimate. `Bootstrap percent` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute
-              the CI based on the percentiles of the boostrap distribution. The `BCa` implements the bias-corrected bootstrap method.
-    - name: boot_r
-      title: Bootstrap rep.
-      type: Number
-      min: 1
-      default: 1000
-      description:
-          R: >
-            a number bootstrap repetitions.
-
+    - name: nested_intercept
+      type: scaffold
+      file: commons.a.yaml
 
     - name: ci_width
-      title: Confidence level
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
-      description:
-          R: >
-            a number between 50 and 99.9 (default: 95) specifying the confidence
-            interval width for the plots.
+      type: scaffold
+      file: commons.a.yaml
 
+    - name: boot_r
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: donotrun
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: mute
+      type: scaffold
+      file: commons.a.yaml
 
 ### posthoc
     -  name: posthoc
@@ -224,6 +113,10 @@ options:
        file: commons.a.yaml
 
     -  name: posthoc_ci
+       type: scaffold
+       file: commons.a.yaml
+
+    -  name: adjust
        type: scaffold
        file: commons.a.yaml
 
@@ -274,121 +167,7 @@ options:
 
 ###
 
-    - name: vcov
-      title: Coefficients Covariances
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), shows coefficients covariances
-
-    - name: crosstab
-      title: Classification Table
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
-          ui: >
-            Produces a classification table (predicted vs observed)
-
-
-    - name: plot_x
-      title: Horizontal axis
-      type: Variable
-      default:
-      description:
-          R: >
-            a string naming the variable placed on the horizontal axis of the
-            plot
-
-    - name: plot_z
-      title: Separate lines
-      type: Variable
-      default:
-      description:
-          R: >
-            a string naming the variable represented as separate lines in the
-            plot
-
-    - name: plot_by
-      title: Separate plots
-      type: Variables
-      default:
-      
-      description:
-          R: >
-            a list of variables defining the levels at which a separate plot should be produced.
-
-    - name: plot_raw
-      title: Observed scores
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), plot raw data along the predicted values
-
-    - name: plot_yscale
-      title: Y-axis observed range 
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), set the Y-axis range equal to the range of the observed values.
-
-    - name: plot_xoriginal
-      title: X original scale 
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), use original scale for covariates.
-
-    - name: plot_black
-      title: Varying line types 
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), use different linetypes per levels.
-
-    - name: plot_around
-      title: Error Bar Definition
-      type: List
-      options:
-        - name: 'none'
-          title: None
-        - name: ci
-          title: Confidence intervals
-        - name: se
-          title: Standard Error
-      default: ci
-      description:
-          R: >
-            `'none'` (default), `'ci'`, or `'se'`. Use no error
-            bars, use confidence intervals, or use standard errors on the
-            plots, respectively.
-
-
-
-    - name: posthoc
-      title: Post Hoc Tests
-      type: Terms
-      default:
-      description:
-          R: a rhs formula with the terms specifying the table to apply the comparisons (of the form '~x+x:z').
-             The formula is not expanded, so 'x*z' becomes 'x+z' and not 'x+z+x:z'. It can be passed
-             also as a list of the form 'list("x","z",c("x","z")'
-
-
-    - name: posthoc_ci
-      title: Confidence Intervals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE`  or `FALSE` (default), coefficients CI in tables
-
+### covariate scaling (without covs_scale: put it below)
 
     - name: covs_conditioning
       type: scaffold
@@ -400,96 +179,74 @@ options:
 
 
     - name: ccm_value
-      type: Number
-      default: 1
-      description:
-          R: >
-            how many st.deviations around the means used to condition simple effects and plots.
-            Used if `simpleScale`=`'mean_sd'`
+      type: scaffold
+      file: commons.a.yaml
 
     - name: ccp_value
-      type: Number
-      default: 25
-      min: 5
-      max: 50
-      description:
-          R: >
-            offsett (number of percentiles) around the median used to condition simple effects and plots.
-            Used if `simpleScale`=`'percent'`
-
+      type: scaffold
+      file: commons.a.yaml
 
     - name: covs_scale_labels
-      type: List
-      options:
-        - name: labels
-          title: Labels
-        - name: values
-          title: Values
-        - name: values_labels
-          title: Values + Labels
-        - name:  uvalues
-          title: Unscaled Values
-        - name: uvalues_labels
-          title: Unscaled Values + Labels
-
-      default: labels
-      description:
-          R: >
-            how the levels of a continuous moderator should appear in tables and plots: `labels`,
-            `values` and `values_labels`, `ovalues`, `ovalues_labels. The latter two refer to the
-            variable orginal levels, before scaling.
+      type: scaffold
+      file: commons.a.yaml
 
 
 
-
-    - name: adjust
-      title: Correction
-      type: NMXList
-      options:
-          - name: none
-            title: No correction (LSD)
-          - name: bonf
-            title: Bonferroni
-          - name: tukey
-            title: Tukey 
-          - name: holm
-            title: Holm
-          - name: scheffe
-            title: Scheffe
-          - name: sidak
-            title: Sidak
-      default:
-          - bonf
-      description:
-          R: >
-            one or more of `'none'`,  `'bonf'`,`'tukey'` 
-            `'holm'`; provide no,  Bonferroni, Tukey and
-            Holm Post Hoc corrections respectively.
-
-
+#### output 
 
 
     - name: predicted
-      title: Predicted
-      type: Output            
-      description:
-          R: >
-            not used in R
-          ui: >
-            Saves the predicted values of the model. Predicted values are always scaled in the
-            dependent variable original scale, that in the majority of cases is the probability
-            scale. For `Poisson` models and `Negative Binomial` the count scale is used.
-
-
+      type: scaffold
+      file: commons.a.yaml
+            
     - name: residuals
-      title: Residuals
-      type: Output            
-      description:
-          R: >
-            not used in R
-          ui: >
-            Saves the residual values of the model. The response scale is used.
+      type: scaffold
+      file: commons.a.yaml
 
+
+####
+
+
+### Plots options
+
+    - name: plot_x
+      type: scaffold
+      file: plots.a.yaml
+      
+    - name: plot_z
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_by
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_raw
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_yscale
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_xoriginal
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_black
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_around
+      type: scaffold
+      file: plots.a.yaml
+
+
+
+####### end of plots #########
+
+
+##### end of common #########
 
 
 
@@ -533,18 +290,92 @@ options:
             name: colwise
       default: 'complete'
 
-    - name: mute
-      title: Remove notes
+
+######### specs here ##########
+
+    - name: offset
+      title: Offset
+      type: Variable
+      default: ~
+      description:
+                R: a vector of strings naming the offset variables.
+                
+    - name: estimates_ci
+      title: For estimates
+      type: Bool
+      default: false
+      description:
+                R: |
+                        `TRUE`  or `FALSE` (default), coefficients CI in tables                
+    - name: vcov
+      title: Coefficients Covariances
       type: Bool
       default: false
       description:
           R: >
-            Not present in R
-          ui: >
-              Remove all notes and warning from the Tables. Useful to produce pubblication quality
-              tables.
+            `TRUE` or `FALSE` (default), shows coefficients covariances
 
-######### specs here ##########
+    - name: crosstab
+      title: Classification Table
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
+          ui: >
+            Produces a classification table (predicted vs observed)
+
+
+    - name: input_method
+      title: Input Method
+      type: List
+      default: standard
+      options:
+        -       name: standard
+                title: 'Responses'
+        -       name: success
+                title: 'Success/Failure'
+        -       name:  total
+                title: 'P(success)/Totals'
+
+      description:
+                R: |
+                        notpresent
+                ui: |
+                        The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
+                        `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
+                          and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
+                          of each proportion.
+                        
+
+    - name: ci_method
+      title: CI Method
+      type: List
+      default: wald
+      options:
+        - name:  wald
+          title: Standard 
+        - name:  profile
+          title: Profile 
+        - name:  quantile
+          title: Bootstrap Percent 
+        - name:  bcai
+          title: Bootstrap BCa
+      description:
+          R: >
+              The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
+              errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+              the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
+              estimate. `quantile` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute
+              the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
+          ui: > 
+              The method used to compute the confidence intervals. `Standard` uses the Wald method to compute standard
+              errors and confidence intervals. `Profile` computes Profile Likelihood Based Confidence Interval, in which 
+              the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
+              estimate. `Bootstrap percent` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute
+              the CI based on the percentiles of the boostrap distribution. The `BCa` implements the bias-corrected bootstrap method.
+
+
 
     - name: expb_ci
       title: For exp(B)

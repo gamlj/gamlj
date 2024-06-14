@@ -57,10 +57,8 @@ is.something <- function(x, ...) UseMethod(".is.something")
 
 .is.something.numeric <- function(obj) (length(obj) > 0)
 
-.is.something.character <- function(obj)  {
-          if (length(obj)>1) return(TRUE)
-          (stringr::str_length(trimws(obj)) > 0)
-          }
+## this should be changed, it gives always TRUE. Be sure not to break anything
+.is.something.character <- function(obj) (length(obj)>0)   
 .is.something.logical <- function(obj) !is.na(obj)
 
 is.there<-function(pattern,string) length(grep(pattern,string,fixed=T))>0

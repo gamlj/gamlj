@@ -8,22 +8,23 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         initialize = function(
             .caller = "lmer",
             .interface = "jamovi",
+            model_type = "lmer",
             dep = NULL,
             factors = NULL,
             covs = NULL,
             model_terms = NULL,
-            fixed_intercept = TRUE,
             nested_terms = NULL,
             comparison = FALSE,
+            fixed_intercept = TRUE,
             nested_intercept = TRUE,
-            estimates_ci = TRUE,
-            re_ci = FALSE,
-            donotrun = FALSE,
-            ci_method = "wald",
-            boot_r = 1000,
             ci_width = 95,
+            boot_r = 1000,
+            donotrun = FALSE,
+            mute = FALSE,
             posthoc = NULL,
             posthoc_ci = FALSE,
+            adjust = list(
+                "bonf"),
             contrasts = NULL,
             show_contrastnames = FALSE,
             show_contrastcodes = FALSE,
@@ -33,6 +34,11 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             simple_mods = NULL,
             simple_interactions = FALSE,
             emmeans = NULL,
+            covs_conditioning = "mean_sd",
+            ccra_steps = 1,
+            ccm_value = 1,
+            ccp_value = 25,
+            covs_scale_labels = "labels",
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -40,18 +46,13 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_yscale = FALSE,
             plot_xoriginal = FALSE,
             plot_black = FALSE,
-            plot_around = "none",
+            plot_around = "ci",
+            plot_extremes = FALSE,
+            estimates_ci = TRUE,
+            re_ci = FALSE,
+            ci_method = "wald",
             plot_re = FALSE,
             plot_re_method = "average",
-            plot_extremes = FALSE,
-            covs_conditioning = "mean_sd",
-            ccra_steps = 1,
-            ccm_value = 1,
-            ccp_value = 25,
-            covs_scale_labels = "labels",
-            adjust = list(
-                "bonf"),
-            model_type = "lmer",
             covs_scale = NULL,
             dep_scale = "none",
             scale_missing = "colwise",
@@ -77,7 +78,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             cluster_respred = FALSE,
             cluster_respred_grid = FALSE,
             rand_hist = FALSE,
-            mute = FALSE,
             more_fit_indices = FALSE, ...) {
 
             super$initialize(
@@ -96,6 +96,13 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 .interface,
                 default="jamovi",
                 hidden=TRUE)
+            private$..model_type <- jmvcore::OptionList$new(
+                "model_type",
+                model_type,
+                hidden=TRUE,
+                options=list(
+                    "lmer"),
+                default="lmer")
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
@@ -125,10 +132,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "model_terms",
                 model_terms,
                 default=NULL)
-            private$..fixed_intercept <- jmvcore::OptionBool$new(
-                "fixed_intercept",
-                fixed_intercept,
-                default=TRUE)
             private$..nested_terms <- jmvcore::OptionTerms$new(
                 "nested_terms",
                 nested_terms,
@@ -137,40 +140,33 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "comparison",
                 comparison,
                 default=FALSE)
+            private$..fixed_intercept <- jmvcore::OptionBool$new(
+                "fixed_intercept",
+                fixed_intercept,
+                default=TRUE)
             private$..nested_intercept <- jmvcore::OptionBool$new(
                 "nested_intercept",
                 nested_intercept,
                 default=TRUE)
-            private$..estimates_ci <- jmvcore::OptionBool$new(
-                "estimates_ci",
-                estimates_ci,
-                default=TRUE)
-            private$..re_ci <- jmvcore::OptionBool$new(
-                "re_ci",
-                re_ci,
-                default=FALSE)
-            private$..donotrun <- jmvcore::OptionBool$new(
-                "donotrun",
-                donotrun,
-                default=FALSE)
-            private$..ci_method <- jmvcore::OptionList$new(
-                "ci_method",
-                ci_method,
-                default="wald",
-                options=list(
-                    "wald",
-                    "quantile"))
-            private$..boot_r <- jmvcore::OptionNumber$new(
-                "boot_r",
-                boot_r,
-                min=1,
-                default=1000)
             private$..ci_width <- jmvcore::OptionNumber$new(
                 "ci_width",
                 ci_width,
                 min=50,
                 max=99.9,
                 default=95)
+            private$..boot_r <- jmvcore::OptionNumber$new(
+                "boot_r",
+                boot_r,
+                min=1,
+                default=1000)
+            private$..donotrun <- jmvcore::OptionBool$new(
+                "donotrun",
+                donotrun,
+                default=FALSE)
+            private$..mute <- jmvcore::OptionBool$new(
+                "mute",
+                mute,
+                default=FALSE)
             private$..posthoc <- jmvcore::OptionTerms$new(
                 "posthoc",
                 posthoc,
@@ -179,6 +175,18 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "posthoc_ci",
                 posthoc_ci,
                 default=FALSE)
+            private$..adjust <- jmvcore::OptionNMXList$new(
+                "adjust",
+                adjust,
+                options=list(
+                    "none",
+                    "bonf",
+                    "tukey",
+                    "holm",
+                    "scheffe",
+                    "sidak"),
+                default=list(
+                    "bonf"))
             private$..contrasts <- jmvcore::OptionArray$new(
                 "contrasts",
                 contrasts,
@@ -249,6 +257,44 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "emmeans",
                 emmeans,
                 default=NULL)
+            private$..covs_conditioning <- jmvcore::OptionList$new(
+                "covs_conditioning",
+                covs_conditioning,
+                options=list(
+                    "mean_sd",
+                    "percent",
+                    "range"),
+                default="mean_sd")
+            private$..ccra_steps <- jmvcore::OptionNumber$new(
+                "ccra_steps",
+                ccra_steps,
+                default=1,
+                min=1,
+                max=50)
+            private$..ccm_value <- jmvcore::OptionNumber$new(
+                "ccm_value",
+                ccm_value,
+                default=1)
+            private$..ccp_value <- jmvcore::OptionNumber$new(
+                "ccp_value",
+                ccp_value,
+                default=25,
+                min=5,
+                max=50)
+            private$..covs_scale_labels <- jmvcore::OptionList$new(
+                "covs_scale_labels",
+                covs_scale_labels,
+                options=list(
+                    "labels",
+                    "values",
+                    "values_labels",
+                    "uvalues",
+                    "uvalues_labels"),
+                default="labels")
+            private$..predicted <- jmvcore::OptionOutput$new(
+                "predicted")
+            private$..residuals <- jmvcore::OptionOutput$new(
+                "residuals")
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
                 plot_x,
@@ -284,7 +330,26 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "none",
                     "ci",
                     "se"),
-                default="none")
+                default="ci")
+            private$..plot_extremes <- jmvcore::OptionBool$new(
+                "plot_extremes",
+                plot_extremes,
+                default=FALSE)
+            private$..estimates_ci <- jmvcore::OptionBool$new(
+                "estimates_ci",
+                estimates_ci,
+                default=TRUE)
+            private$..re_ci <- jmvcore::OptionBool$new(
+                "re_ci",
+                re_ci,
+                default=FALSE)
+            private$..ci_method <- jmvcore::OptionList$new(
+                "ci_method",
+                ci_method,
+                default="wald",
+                options=list(
+                    "wald",
+                    "quantile"))
             private$..plot_re <- jmvcore::OptionBool$new(
                 "plot_re",
                 plot_re,
@@ -296,67 +361,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=list(
                     "average",
                     "full"))
-            private$..plot_extremes <- jmvcore::OptionBool$new(
-                "plot_extremes",
-                plot_extremes,
-                default=FALSE)
-            private$..covs_conditioning <- jmvcore::OptionList$new(
-                "covs_conditioning",
-                covs_conditioning,
-                options=list(
-                    "mean_sd",
-                    "percent",
-                    "range"),
-                default="mean_sd")
-            private$..ccra_steps <- jmvcore::OptionNumber$new(
-                "ccra_steps",
-                ccra_steps,
-                default=1,
-                min=1,
-                max=50)
-            private$..ccm_value <- jmvcore::OptionNumber$new(
-                "ccm_value",
-                ccm_value,
-                default=1)
-            private$..ccp_value <- jmvcore::OptionNumber$new(
-                "ccp_value",
-                ccp_value,
-                default=25,
-                min=5,
-                max=50)
-            private$..covs_scale_labels <- jmvcore::OptionList$new(
-                "covs_scale_labels",
-                covs_scale_labels,
-                options=list(
-                    "labels",
-                    "values",
-                    "values_labels",
-                    "uvalues",
-                    "uvalues_labels"),
-                default="labels")
-            private$..adjust <- jmvcore::OptionNMXList$new(
-                "adjust",
-                adjust,
-                options=list(
-                    "none",
-                    "bonf",
-                    "tukey",
-                    "holm",
-                    "scheffe",
-                    "sidak"),
-                default=list(
-                    "bonf"))
-            private$..predicted <- jmvcore::OptionOutput$new(
-                "predicted")
-            private$..residuals <- jmvcore::OptionOutput$new(
-                "residuals")
-            private$..model_type <- jmvcore::OptionList$new(
-                "model_type",
-                model_type,
-                hidden=TRUE,
-                options=list(
-                    "lmer"),
-                default="lmer")
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -508,10 +512,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "rand_hist",
                 rand_hist,
                 default=FALSE)
-            private$..mute <- jmvcore::OptionBool$new(
-                "mute",
-                mute,
-                default=FALSE)
             private$..more_fit_indices <- jmvcore::OptionBool$new(
                 "more_fit_indices",
                 more_fit_indices,
@@ -519,22 +519,22 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
+            self$.addOption(private$..model_type)
             self$.addOption(private$..dep)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..model_terms)
-            self$.addOption(private$..fixed_intercept)
             self$.addOption(private$..nested_terms)
             self$.addOption(private$..comparison)
+            self$.addOption(private$..fixed_intercept)
             self$.addOption(private$..nested_intercept)
-            self$.addOption(private$..estimates_ci)
-            self$.addOption(private$..re_ci)
-            self$.addOption(private$..donotrun)
-            self$.addOption(private$..ci_method)
-            self$.addOption(private$..boot_r)
             self$.addOption(private$..ci_width)
+            self$.addOption(private$..boot_r)
+            self$.addOption(private$..donotrun)
+            self$.addOption(private$..mute)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
+            self$.addOption(private$..adjust)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
             self$.addOption(private$..show_contrastcodes)
@@ -544,6 +544,13 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
             self$.addOption(private$..emmeans)
+            self$.addOption(private$..covs_conditioning)
+            self$.addOption(private$..ccra_steps)
+            self$.addOption(private$..ccm_value)
+            self$.addOption(private$..ccp_value)
+            self$.addOption(private$..covs_scale_labels)
+            self$.addOption(private$..predicted)
+            self$.addOption(private$..residuals)
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
@@ -552,18 +559,12 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_xoriginal)
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
+            self$.addOption(private$..plot_extremes)
+            self$.addOption(private$..estimates_ci)
+            self$.addOption(private$..re_ci)
+            self$.addOption(private$..ci_method)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
-            self$.addOption(private$..plot_extremes)
-            self$.addOption(private$..covs_conditioning)
-            self$.addOption(private$..ccra_steps)
-            self$.addOption(private$..ccm_value)
-            self$.addOption(private$..ccp_value)
-            self$.addOption(private$..covs_scale_labels)
-            self$.addOption(private$..adjust)
-            self$.addOption(private$..predicted)
-            self$.addOption(private$..residuals)
-            self$.addOption(private$..model_type)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..dep_scale)
             self$.addOption(private$..scale_missing)
@@ -587,28 +588,27 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..cluster_respred)
             self$.addOption(private$..cluster_respred_grid)
             self$.addOption(private$..rand_hist)
-            self$.addOption(private$..mute)
             self$.addOption(private$..more_fit_indices)
         }),
     active = list(
         .caller = function() private$...caller$value,
         .interface = function() private$...interface$value,
+        model_type = function() private$..model_type$value,
         dep = function() private$..dep$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         model_terms = function() private$..model_terms$value,
-        fixed_intercept = function() private$..fixed_intercept$value,
         nested_terms = function() private$..nested_terms$value,
         comparison = function() private$..comparison$value,
+        fixed_intercept = function() private$..fixed_intercept$value,
         nested_intercept = function() private$..nested_intercept$value,
-        estimates_ci = function() private$..estimates_ci$value,
-        re_ci = function() private$..re_ci$value,
-        donotrun = function() private$..donotrun$value,
-        ci_method = function() private$..ci_method$value,
-        boot_r = function() private$..boot_r$value,
         ci_width = function() private$..ci_width$value,
+        boot_r = function() private$..boot_r$value,
+        donotrun = function() private$..donotrun$value,
+        mute = function() private$..mute$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
+        adjust = function() private$..adjust$value,
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
         show_contrastcodes = function() private$..show_contrastcodes$value,
@@ -618,6 +618,13 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
         emmeans = function() private$..emmeans$value,
+        covs_conditioning = function() private$..covs_conditioning$value,
+        ccra_steps = function() private$..ccra_steps$value,
+        ccm_value = function() private$..ccm_value$value,
+        ccp_value = function() private$..ccp_value$value,
+        covs_scale_labels = function() private$..covs_scale_labels$value,
+        predicted = function() private$..predicted$value,
+        residuals = function() private$..residuals$value,
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
@@ -626,18 +633,12 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_xoriginal = function() private$..plot_xoriginal$value,
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
+        plot_extremes = function() private$..plot_extremes$value,
+        estimates_ci = function() private$..estimates_ci$value,
+        re_ci = function() private$..re_ci$value,
+        ci_method = function() private$..ci_method$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
-        plot_extremes = function() private$..plot_extremes$value,
-        covs_conditioning = function() private$..covs_conditioning$value,
-        ccra_steps = function() private$..ccra_steps$value,
-        ccm_value = function() private$..ccm_value$value,
-        ccp_value = function() private$..ccp_value$value,
-        covs_scale_labels = function() private$..covs_scale_labels$value,
-        adjust = function() private$..adjust$value,
-        predicted = function() private$..predicted$value,
-        residuals = function() private$..residuals$value,
-        model_type = function() private$..model_type$value,
         covs_scale = function() private$..covs_scale$value,
         dep_scale = function() private$..dep_scale$value,
         scale_missing = function() private$..scale_missing$value,
@@ -661,27 +662,26 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         cluster_respred = function() private$..cluster_respred$value,
         cluster_respred_grid = function() private$..cluster_respred_grid$value,
         rand_hist = function() private$..rand_hist$value,
-        mute = function() private$..mute$value,
         more_fit_indices = function() private$..more_fit_indices$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
+        ..model_type = NA,
         ..dep = NA,
         ..factors = NA,
         ..covs = NA,
         ..model_terms = NA,
-        ..fixed_intercept = NA,
         ..nested_terms = NA,
         ..comparison = NA,
+        ..fixed_intercept = NA,
         ..nested_intercept = NA,
-        ..estimates_ci = NA,
-        ..re_ci = NA,
-        ..donotrun = NA,
-        ..ci_method = NA,
-        ..boot_r = NA,
         ..ci_width = NA,
+        ..boot_r = NA,
+        ..donotrun = NA,
+        ..mute = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
+        ..adjust = NA,
         ..contrasts = NA,
         ..show_contrastnames = NA,
         ..show_contrastcodes = NA,
@@ -691,6 +691,13 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..simple_mods = NA,
         ..simple_interactions = NA,
         ..emmeans = NA,
+        ..covs_conditioning = NA,
+        ..ccra_steps = NA,
+        ..ccm_value = NA,
+        ..ccp_value = NA,
+        ..covs_scale_labels = NA,
+        ..predicted = NA,
+        ..residuals = NA,
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
@@ -699,18 +706,12 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_xoriginal = NA,
         ..plot_black = NA,
         ..plot_around = NA,
+        ..plot_extremes = NA,
+        ..estimates_ci = NA,
+        ..re_ci = NA,
+        ..ci_method = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
-        ..plot_extremes = NA,
-        ..covs_conditioning = NA,
-        ..ccra_steps = NA,
-        ..ccm_value = NA,
-        ..ccp_value = NA,
-        ..covs_scale_labels = NA,
-        ..adjust = NA,
-        ..predicted = NA,
-        ..residuals = NA,
-        ..model_type = NA,
         ..covs_scale = NA,
         ..dep_scale = NA,
         ..scale_missing = NA,
@@ -734,7 +735,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..cluster_respred = NA,
         ..cluster_respred_grid = NA,
         ..rand_hist = NA,
-        ..mute = NA,
         ..more_fit_indices = NA)
 )
 
@@ -788,6 +788,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     fit = function() private$.items[["fit"]],
                     anova = function() private$.items[["anova"]],
                     coefficients = function() private$.items[["coefficients"]],
+                    contrasts = function() private$.items[["contrasts"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]],
                     random = function() private$.items[["random"]],
                     randomcov = function() private$.items[["randomcov"]],
@@ -826,6 +827,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison",
@@ -886,6 +889,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison",
@@ -939,7 +944,9 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
-                                "res_struct"),
+                                "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -988,6 +995,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1034,6 +1043,79 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `type`="number", 
                                     `format`="zto,pvalue")),
                             refs="parameters"))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="contrasts",
+                            title="Custom Contrast Tests",
+                            visible="(contrast_custom_focus)",
+                            clearWith=list(
+                                "dep",
+                                "reml",
+                                "factors",
+                                "covs",
+                                "cluster",
+                                "covs_scale",
+                                "dep_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "re",
+                                "re_corr",
+                                "df_method",
+                                "relm",
+                                "contrasts",
+                                "covs_scale",
+                                "mute",
+                                "donotrun",
+                                "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r",
+                                "re_ci"),
+                            columns=list(
+                                list(
+                                    `name`="source", 
+                                    `title`="Names", 
+                                    `type`="text"),
+                                list(
+                                    `name`="label", 
+                                    `title`="Effect", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="Estimate", 
+                                    `type`="number"),
+                                list(
+                                    `name`="se", 
+                                    `title`="SE", 
+                                    `type`="number"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `type`="number", 
+                                    `title`="Lower", 
+                                    `visible`="(estimates_ci)"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `type`="number", 
+                                    `title`="Upper", 
+                                    `visible`="(estimates_ci)"),
+                                list(
+                                    `name`="df", 
+                                    `title`="df", 
+                                    `type`="number"),
+                                list(
+                                    `name`="test", 
+                                    `title`="t", 
+                                    `type`="number"),
+                                list(
+                                    `name`="p", 
+                                    `title`="p", 
+                                    `type`="number", 
+                                    `format`="zto,pvalue"))))
                         self$add(jmvcore::Array$new(
                             options=options,
                             name="contrastCodeTables",
@@ -1086,6 +1168,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1159,6 +1243,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1223,7 +1309,9 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "covs_scale",
                                 "mute",
                                 "donotrun",
-                                "res_struct"),
+                                "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1278,6 +1366,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "res_struct"),
                             columns=list(
                                 list(
@@ -1314,6 +1404,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "mute",
                         "donotrun",
                         "res_struct",
+                        "contrast_custom_values",
+                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1421,6 +1513,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1478,6 +1572,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
+                                "contrast_custom_values",
+                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1570,6 +1666,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "mute",
                                     "donotrun",
                                     "res_struct",
+                                    "contrast_custom_values",
+                                    "contrast_custom_focus",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1630,6 +1728,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "mute",
                                     "donotrun",
                                     "res_struct",
+                                    "contrast_custom_values",
+                                    "contrast_custom_focus",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1707,6 +1807,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "mute",
                         "donotrun",
                         "res_struct",
+                        "contrast_custom_values",
+                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1766,6 +1868,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "mute",
                     "donotrun",
                     "res_struct",
+                    "contrast_custom_values",
+                    "contrast_custom_focus",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -1808,6 +1912,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "mute",
                         "donotrun",
                         "res_struct",
+                        "contrast_custom_values",
+                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1996,7 +2102,9 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "covs_scale",
                     "mute",
                     "donotrun",
-                    "res_struct")))
+                    "res_struct",
+                    "contrast_custom_values",
+                    "contrast_custom_focus")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -2024,7 +2132,9 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "covs_scale",
                     "mute",
                     "donotrun",
-                    "res_struct")))},
+                    "res_struct",
+                    "contrast_custom_values",
+                    "contrast_custom_focus")))},
         .setModel=function(x) private$..model <- x))
 
 gamljmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

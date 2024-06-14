@@ -52,6 +52,7 @@ gamljlmClass <- R6::R6Class(
 
       ### custom contrasts 
       aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      aSmartObj$ci("est",self$options$ci_width)
       ladd(private$.smartObjs)<-aSmartObj
       
       ### contrasts code tables
