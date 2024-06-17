@@ -209,10 +209,19 @@ gamljmixedClass <- R6::R6Class(
 
   plot<-private$.plotter_machine$scatterPlot(image,ggtheme,theme)
   
+  return(plot)
+  
+},
+
+.jnPlot=function(image, ggtheme, theme, ...) {
+
+  plot<-private$.plotter_machine$jnPlot(image,ggtheme,theme)
 
   return(plot)
   
 },
+
+
 
 .qqPlot=function(image, ggtheme, theme, ...) {
 

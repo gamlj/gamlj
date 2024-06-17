@@ -1148,7 +1148,7 @@ items:
     title: Johnson-Neyman Plot
     type: Array
     description: an array of plots
-    visible: false
+    visible: (plot_jn)
     refs: interactions
     clearWith:
               ### modeloptions  begins

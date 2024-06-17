@@ -174,13 +174,37 @@ mf.data<- function(x,...) UseMethod(".data")
 .data.lme<-function(model) model$data
 
 
+mf.coef<- function(x,...) UseMethod(".coef")
+
+.coef.default<-function(model) coef(model)
+
+.coef.lmerModLmerTest<-function(model) lme4::fixef(model)
+
+.coef.glmerMod<-function(model) lme4::fixef(model)
+
+.coef.lmerModLmerTest<-function(model) lme4::fixef(model)
+
+.coef.lme<-function(model) lme4::fixef(model)
+
+
+
+
 mf.clean<- function(x,...) UseMethod(".clean")
 
-.clean.data.frame<-function(x) {
+.clean.default<-function(x) {
+
+  mark("You did not clean class", class(x))
+  return(x)
   
-  attr(x,"terms") <- NULL
+
+}
+
+.clean.data.frame<-function(x) {
+
+   attr(x,"terms") <- NULL
   
   return(x)
+  
 
 }
 
@@ -197,4 +221,14 @@ mf.clean<- function(x,...) UseMethod(".clean")
 
 }
 
+.clean.lmerModLmerTest<-function(x) {
+  
+      data<-x@frame
+      attr(data,"terms")<-NULL
+      attr(data,"formula")<-NULL
+      x@frame<-data
+      return(x)
 
+}
+
+.clean.glmerMod <- function(x) .clean.lmerModLmerTest(x)

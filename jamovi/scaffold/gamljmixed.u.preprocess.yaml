@@ -445,7 +445,12 @@ children:
                                 optionName: plot_re_method
                                 optionPart: full
                                 enable: (plot_re)
-                                
+                - type: Label
+                  label: Other Plots
+                  children:
+                    -  type:  CheckBox
+                       name:  plot_jn
+
 -       name: panel_simpleeffects
         type: scaffold
         file: commons.u.yaml    

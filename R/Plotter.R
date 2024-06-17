@@ -187,21 +187,54 @@ Plotter <- R6::R6Class(
 
       jnPlot=function(image,ggtheme,theme) {
       
-           if (is.null(image$state$model))
+           if (is.null(image$state))
               return()
            
-           x<-self$scatterX$name64
-           z<-self$scatterZ$name64
-           model<-image$state$model
+  
+           datalist<-image$state
            ## we need the rlang::sym notation because interactions::jn expect the arguments to be symbols
-           results<-interactions::johnson_neyman(model,!!rlang::sym(x),!!rlang::sym(z),
-                                                 plot=FALSE,insig.color="gray80", title="")
-           p <- results$plot
-           p <- p + ggplot2::ylab(paste("Slope of ",self$scatterX$name))
-           p <- p + ggplot2::xlab(self$scatterZ$name)
+           alpha <- .05
+           pmsg <- paste("p <", alpha)
+           colors<-ggtheme[[2]]$palette(2)
+           sig.color <- colors[2]
+           insig.color <-colors[1]
+
+                     
+
+           p <- ggplot2::ggplot() 
            suppressMessages(p <- p + ggtheme)
-           p <- p + ggplot2::labs(fill = NULL)+ggplot2::guides(colour="none")
-           return(p)
+  
+           p <- p + ggplot2::geom_path(data = datalist$cbso1, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend=FALSE)
+           p <- p + ggplot2::geom_path(data = datalist$cbsi, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend=FALSE)
+           p <- p + ggplot2::geom_path(data = datalist$cbso2, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend=FALSE)
+           p <- p + ggplot2::geom_ribbon(data = datalist$cbso1, ggplot2::aes(x = z, ymin = Lower, ymax = Upper, fill = Significance), alpha = 0.2)
+           p <- p + ggplot2::geom_ribbon(data = datalist$cbsi, ggplot2::aes(x = z, ymin = Lower, ymax = Upper, fill = Significance), alpha = 0.2)
+           p <- p + ggplot2::geom_ribbon(data = datalist$cbso2, ggplot2::aes(x = z, ymin = Lower, ymax = Upper, fill = Significance), alpha = 0.2)
+           p <- p + ggplot2::scale_fill_manual(values = c(Significant = sig.color, Insignificant = insig.color), labels=c("Significant (p < .05)"," n.s (p \u2265 .05)"),
+                    breaks = c("Significant", "Insignificant"), drop = FALSE, guide = ggplot2::guide_legend(order = 2))
+           p <- p + ggplot2::scale_color_manual(values = c(Significant = sig.color, Insignificant = insig.color)) 
+
+           p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept = 0))
+           p <- p + ggplot2::geom_segment(ggplot2::aes(x = datalist$modrange[1], 
+             xend = datalist$modrange[2], y = 0, yend = 0, linetype = "Range of\nobserved\ndata"), 
+            lineend = "square", size = 1.25)
+           p <- p + ggplot2::scale_linetype_discrete(name = " ", guide = ggplot2::guide_legend(order = 1))
+           
+    if (datalist$bounds[1] < datalist$modrange[1]) {
+     } else if (datalist$all_sig == FALSE) {
+        p <- p + ggplot2::geom_vline(ggplot2::aes(xintercept = datalist$bounds[1]), linetype = 2, color = sig.color)
+    } 
+    if (datalist$bounds[2] > datalist$modrange[2]) {
+    }  else if (datalist$all_sig == FALSE) {
+        p <- p + ggplot2::geom_vline(ggplot2::aes(xintercept = datalist$bounds[2]), linetype = 2, color = sig.color)
+    }
+    p <- p + ggplot2::xlim(datalist$modrange) 
+    p <- p + ggplot2::theme(legend.key.size = ggplot2::unit(1, "lines"))
+    p <- p + ggplot2::ylab(paste("Slope of ",self$scatterX$name))
+    p <- p + ggplot2::xlab(self$scatterZ$name)
+  #  suppressMessages(p <- p + ggtheme)
+    p <- p + ggplot2::labs(fill = NULL)+ggplot2::guides(colour="none")
+    return(p)
            
       },
 
@@ -733,10 +766,19 @@ Plotter <- R6::R6Class(
       private$.results$jnplotnotes$setContent("")
       resultsgroup<-private$.results$get("jnPlots")
       aplot<-resultsgroup$get(key=1)
-      ### we should clean the model otherwise is too big to be serialized
+   
       model<-private$.operator$model
-      model <- mf.clean(model)
-      aplot$setState(list(model=model))
+      if (self$scatterXscale) {
+          data<-insight::get_data(model,source="frame")
+          data[[self$scatterZ$name64]]<-private$.rescale(self$scatterZ,data[[self$scatterZ$name64]])  
+          self$warning<-list(topic="jnplotnotes",
+                           message=paste("Variable",self$scatterZ$name," is in the original scale."))
+          model<-stats::update(model,newdata=data)
+      } 
+      datalist<-.johnson_neyman(model,pred=self$scatterX$name64,mod=self$scatterZ$name64,alpha=.05)
+      #rescale this datalist$cbso2
+   
+      aplot$setState(datalist)
      },
     
      .prepareQqplot=function() {
@@ -1107,3 +1149,111 @@ Plotter <- R6::R6Class(
   ) # end of private
 ) # end of class
     
+
+############### addition functions  ###############
+
+
+#### this is taken from `interactions` package and adjusted for making it compatible with the module graphic system
+#### We do not use the package function because it does not work with all models and does not fit well with the graphic rendering mechanism
+#### we cite the `interactions` package anyway because this code heavely depend on its.
+
+cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
+  
+        upper <- c()
+        slopes <- c()
+        lower <- c()
+        slopesf <- function(i) {
+            s <- y1 + y3 * i
+            return(s)
+        }
+        upperf <- function(i, s) {
+            u <- s + tcrit * sqrt((covy1 + 2 * i * covy1y3 + 
+                i^2 * covy3))
+            return(u)
+        }
+        lowerf <- function(i, s) {
+            l <- s - tcrit * sqrt((covy1 + 2 * i * covy1y3 + 
+                i^2 * covy3))
+            return(l)
+        }
+        slopes <- sapply(x2, slopesf, simplify = "vector", USE.NAMES = FALSE)
+        upper <- mapply(upperf, x2, slopes)
+        lower <- mapply(lowerf, x2, slopes)
+        out <- matrix(c(x2, slopes, lower, upper), ncol = 4)
+        colnames(out) <- c("z", "slopes", "Lower", "Upper")
+        out <- as.data.frame(out)
+        return(out)
+    }
+
+
+.johnson_neyman = function(model, pred, mod, alpha=.05) {
+ 
+  .terms<-c(pred,mod)
+   mat<-attr(terms(model),"factors")
+   ## how is the interaction named?
+   intterm <- names(which.min(which(apply(mat[rownames(mat) %in% .terms,],2,sum) ==2) ))
+   
+  .data      <-  mf.data(model)  
+   obsrange  <-  range(.data[[mod]])
+   modsd     <-  sd(.data[[mod]])
+   modrange  <-  c(obsrange[1] - modsd, obsrange[2] + modsd)   
+   params    <-  coef(summary(model))
+   y1        <-  params[rownames(params)==pred,1]
+   y3        <-  params[rownames(params)==intterm,1]
+   df        <-  df.residual(model)
+   if (is.null(df)) df<-Inf # normal approximation
+   
+   alpha <- alpha/2
+   tcrit <- qt(alpha, df = df)
+   tcrit <- abs(tcrit)
+   vmat <- vcov(model)
+   covy3 <- vmat[intterm, intterm]
+   covy1 <- vmat[pred, pred]
+   covy1y3 <- vmat[intterm, pred]
+   a <- tcrit^2 * covy3 - y3^2
+   b <- 2 * (tcrit^2 * covy1y3 - y1 * y3)
+   c <- tcrit^2 * covy1 - y1^2
+   disc <- b^2 - 4 * a * c
+   failed <- FALSE
+   if (disc <= 0)  {
+        bounds <- c(-Inf, Inf)
+    } else {
+        .x1 <- (-b + sqrt(disc))/(2 * a)
+        .x2 <- (-b - sqrt(disc))/(2 * a)
+        result <- c(.x1, .x2)
+        bounds <- sort(result, decreasing = FALSE)
+    }
+ 
+    names(bounds) <- c("Lower", "Higher")
+    x2 <- seq(from = modrange[1], to = modrange[2], length.out = 1000)
+    cbs <- cbands(x2, y1, y3, covy1, covy3, covy1y3, tcrit)
+    sigs <- which((cbs$Lower < 0 & cbs$Upper < 0) | (cbs$Lower >   0 & cbs$Upper > 0))
+    insigs <- setdiff(1:1000, sigs)
+    cbs$Significance <- rep(NA, nrow(cbs))
+    cbs$Significance <- factor(cbs$Significance, levels = c("Insignificant", "Significant"))
+    index <- 1:1000 %in% insigs
+    cbs$Significance[index] <- "Insignificant"
+    index <- 1:1000 %in% sigs
+    cbs$Significance[index] <- "Significant"
+    index <- which(cbs$Significance == "Significant")[1]
+    if (!is.na(index) & index != 0) {
+        inside <- (cbs[index, "z"] > bounds[1] && cbs[index, "z"] < bounds[2])
+        all_sig <- NULL
+        if (is.na(which(cbs$Significance == "Insignificant")[1])) {
+            all_sig <- TRUE
+        }
+        else {
+            all_sig <- FALSE
+        }
+    }
+    else {
+        inside <- FALSE
+        all_sig <- TRUE
+    }
+    cbso1 <- cbs[cbs[, "z"] < bounds[1], ]
+    cbso2 <- cbs[cbs[, "z"] > bounds[2], ]
+    cbsi <- cbs[(cbs[, "z"] > bounds[1] & cbs[, "z"] < bounds[2]), ]
+    out <- list(cbso1=cbso1,cbso2=cbso2,cbsi=cbsi,inside = inside, failed = failed, all_sig = all_sig,bounds=bounds, obsrange=obsrange,modrange=modrange)
+    return(out)
+   
+}

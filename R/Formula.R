@@ -209,7 +209,7 @@ gFormula <- R6::R6Class(
       
       if (self$interface == "standard")
            return(gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(dep, terms))))
-      
+ 
       if (self$interface == "success") {
 
            dep<-paste0("cbind(",paste0(dep,collapse=","),")")

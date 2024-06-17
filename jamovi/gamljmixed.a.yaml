@@ -139,6 +139,10 @@ options:
                         Not present in R
                 ui: |
                         Removes all notes and warnings from the Tables. Useful to produce pubblication quality tables.
+-       name: plot_jn
+        title: Johnson-Neyman plot
+        type: Bool
+        default: false
 -       name: posthoc
         title: Post Hoc Tests
         type: Terms

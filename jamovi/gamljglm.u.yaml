@@ -527,6 +527,15 @@ children:
                                 name: plot_xoriginal
                         -       type: CheckBox
                                 name: plot_black
+        -       type: LayoutBox
+                margin: large
+                style: inline
+                children:
+                -       type: Label
+                        label: Other Plots
+                        children:
+                        -       type: CheckBox
+                                name: plot_jn
 -       name: panel_simpleeffects
         type: CollapseBox
         label: Simple Effects

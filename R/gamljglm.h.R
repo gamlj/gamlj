@@ -47,6 +47,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_xoriginal = FALSE,
             plot_black = FALSE,
             plot_around = "ci",
+            plot_jn = FALSE,
             covs_scale = NULL,
             scale_missing = "complete",
             offset = NULL,
@@ -315,6 +316,10 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ci",
                     "se"),
                 default="ci")
+            private$..plot_jn <- jmvcore::OptionBool$new(
+                "plot_jn",
+                plot_jn,
+                default=FALSE)
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -485,6 +490,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_xoriginal)
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
+            self$.addOption(private$..plot_jn)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..offset)
@@ -545,6 +551,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_xoriginal = function() private$..plot_xoriginal$value,
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
+        plot_jn = function() private$..plot_jn$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         offset = function() private$..offset$value,
@@ -604,6 +611,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_xoriginal = NA,
         ..plot_black = NA,
         ..plot_around = NA,
+        ..plot_jn = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..offset = NA,
@@ -1847,7 +1855,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="jnPlots",
                 title="Johnson-Neyman Plot",
-                visible=FALSE,
+                visible="(plot_jn)",
                 refs="interactions",
                 clearWith=list(
                     "model_type",
