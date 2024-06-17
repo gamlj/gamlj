@@ -48,7 +48,23 @@ const events = {
 
 
     },
+    
+    dep_changed: function(ui) {
+      console.log("dep changed");
+       ui.dep2.$el.show();
 
+    },
+    dep2_changed: function(ui) {
+      var dep2=ui.dep2.value();      
+      if (dep2 === null) return;
+
+      if (ui.input_method.value() === "standard") {
+              ui.dep2.setValue(null);
+              ui.dep.setValue(dep2)
+      }
+
+    },
+    
     onChange_factors: function(ui) {
       
         fun.calcModelTerms(ui, this);

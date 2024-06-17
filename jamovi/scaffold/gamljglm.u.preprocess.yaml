@@ -114,11 +114,15 @@ children:
             maxItemCount: 1
             isTarget: true
             itemDropBehaviour: overwrite
+            events:
+                 change:   './gamlj.events::dep_changed' 
           - type: VariablesListBox
             name: dep2
             maxItemCount: 1
             isTarget: true
             itemDropBehaviour: overwrite
+            events:
+                 change:   './gamlj.events::dep2_changed' 
 
       - type: TargetLayoutBox
         children:
