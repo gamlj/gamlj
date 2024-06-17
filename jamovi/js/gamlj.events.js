@@ -50,8 +50,6 @@ const events = {
     },
     
     dep_changed: function(ui) {
-      console.log("dep changed");
-       ui.dep2.$el.show();
 
     },
     dep2_changed: function(ui) {
