@@ -2,8 +2,10 @@
 % Please edit documentation in R/rinterface.R
 \name{summary.ResultsElement}
 \alias{summary.ResultsElement}
+\alias{summary.gamlj_list}
 \alias{print.jmvrtable}
 \alias{print.jmvrobj}
+\alias{print.gamlj_list}
 \alias{coef.gamlj}
 \alias{fit}
 \alias{fit.gamlj}
@@ -12,9 +14,13 @@
 \usage{
 \method{summary}{ResultsElement}(object, ...)
 
+\method{summary}{gamlj_list}(object, ...)
+
 \method{print}{jmvrtable}(x, ...)
 
 \method{print}{jmvrobj}(x, ...)
+
+\method{print}{gamlj_list}(x, ...)
 
 \method{coef}{gamlj}(object, ...)
 
@@ -33,12 +39,24 @@ fit(x, ...)
 }
 \value{
 a list of table as data.frame
+
+a list of table as data.frame
 }
 \description{
-These functions extract all visible tables from a ResultsElement produced by gamlj
+These functions extract all visible tables from a ResultsElement or related classes produced by gamlj
+and print them in R style.
+
+These functions extract all visible tables from a a list of table produced by gamlj
 and print them in R style.
 }
 \examples{
+data(fivegroups)
+fivegroups$Group<-factor(fivegroups$Group)
+gmod<-GAMLj3::gamlj_lm(
+  formula = Score ~Group,
+  data = fivegroups)
+
+summary(gmod)
 data(fivegroups)
 fivegroups$Group<-factor(fivegroups$Group)
 gmod<-GAMLj3::gamlj_lm(

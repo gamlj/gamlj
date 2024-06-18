@@ -11,6 +11,7 @@ mod1<-GAMLj3::gamlj_lm(
   factors = "supp",
   covs="dose")
 
+
 testthat::test_that("equivalent model input (1)", {
   testthat::expect_equal(mod0$info$asDF$specs[2],mod1$info$asDF$specs[2])
   testthat::expect_equal(mod0$main$anova$asDF$f[3],mod1$main$anova$asDF$f[3])
@@ -430,8 +431,11 @@ mod<-GAMLj3::gamlj_lm(
   formula=science~1,
   nested_terms=~0
 )
+
 testthat::test_that("intercept model comparison", {
   testthat::expect_equal(
     mod$main$r2$asDF$ar[1]-mod$main$r2$asDF$ar[2],mod$main$r2$asDF$ar[3]
     ,tol)
 })
+
+

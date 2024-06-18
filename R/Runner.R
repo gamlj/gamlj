@@ -170,9 +170,15 @@ Runner <- R6::R6Class("Runner",
                              if (is.null(tab)) return()
                              labels<-unlist(lapply(self$datamatic$variables, function(x) if (x$method == "custom") x$contrast_labels[[1]] else NULL))
                              w<-which(tab$label %in% labels)
+                             if (length(w)==0) {
+                               warning("No custom contrast defined. Custom contrasts can be defined for variables defined as factors")
+                               return()
+                             }
                              tab<-tab[w,]
-                             tab$source<-NULL
-                             tab$d<-2*tab$t/sqrt(tab$df)
+#                             tab$source<-NULL
+                      
+                             if (utils::hasName(tab,"t") && utils::hasName(tab,"df"))
+                                       tab$d<-2*tab$t/sqrt(tab$df)
                              return(tab)
                           },
 
@@ -581,8 +587,13 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              if (!isFALSE(results$warning))
-                                warning(fromb64(results$warning))
+                              if (!isFALSE(results$warning)) {
+                                  disp<-Dispatch$new(self$analysis$results)
+                                  msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
+                                  msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
+                                  if (is.something(msg))
+                                        warning(msg)
+                              }
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"])

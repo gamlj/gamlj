@@ -352,8 +352,10 @@ Variable <- R6::R6Class(
                     contrast <- stats::contr.treatment(levels,base=1)
              },
             'custom'={
+                     custom<-NULL
                      customs=self$datamatic$options$contrast_custom_values
                      for (cus in customs) if (cus$var==self$name) custom<-cus$codes
+                     if (is.null(custom)) stop("Contrast weights are required for variable",self$name," defined as custom")
                      custom<-as.numeric(strsplit(custom,split="[,;]")[[1]])
                      custom<-custom[!is.na(custom)]
                      if (length(custom)!=nLevels)

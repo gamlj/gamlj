@@ -57,7 +57,6 @@ testthat::test_that("info is ok", {
   testthat::expect_equal(model$info$asDF$value[7],"yes")
 })
 
-model$main
 testthat::test_that("R2 is ok", {
   testthat::expect_equal(model$main$r2$asDF[1,2],.059,tol)
   testthat::expect_equal(model$main$r2$asDF[2,4],42.11,tol)
