@@ -459,6 +459,10 @@ options:
         title: Johnson-Neyman plot
         type: Bool
         default: false
+        description:
+                R: |
+                        `'FALSE'` (default), `'TRUE'` produces the Johnson-Neyman plot for simple slope significance.
+                ui: Produces the Johnson-Neyman plot for simple slope significance.
 -       name: covs_scale
         title: Covariates Scaling
         type: Array

@@ -1153,18 +1153,6 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="d", 
                                     `format`="zto"),
                                 list(
-                                    `name`="beta.ci.lower", 
-                                    `type`="number", 
-                                    `title`="Lower", 
-                                    `format`="zto", 
-                                    `visible`="(betas_ci)"),
-                                list(
-                                    `name`="beta.ci.upper", 
-                                    `type`="number", 
-                                    `title`="Upper", 
-                                    `format`="zto", 
-                                    `visible`="(betas_ci)"),
-                                list(
                                     `name`="df", 
                                     `title`="df", 
                                     `type`="integer"),
