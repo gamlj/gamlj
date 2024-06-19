@@ -301,16 +301,6 @@ items:
                       type: number
                       title: d
                       format: zto
-                    - name: beta.ci.lower
-                      type: number
-                      title: Lower
-                      format: zto
-                      visible: (betas_ci)
-                    - name: beta.ci.upper
-                      type: number
-                      title: Upper
-                      format: zto
-                      visible: (betas_ci)
                     - name: df
                       title: "df"
                       type: integer

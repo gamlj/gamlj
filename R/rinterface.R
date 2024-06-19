@@ -707,7 +707,6 @@ test_contrasts <- function(object, contrasts, ...) {
       w     <- contrasts[[i]]
     
       values<-list(w)
-        print(values)
       names(values)<-name
       settings<-list("custom")
       names(settings)<-name

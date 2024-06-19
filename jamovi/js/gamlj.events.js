@@ -67,6 +67,7 @@ const events = {
       
         fun.calcModelTerms(ui, this);
         fun.updateRandomSupplier(ui,this);
+        fun.updateCustom(ui,this)
     },
 
     onChange_covariates: function(ui) {

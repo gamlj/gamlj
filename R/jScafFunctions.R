@@ -340,3 +340,10 @@ clean_lol<-function(alist) {
   il
 }
 
+### dealing with tests on lists
+
+flat_apply<-function(x, fun) {
+  
+   unlist(lapply(x,function(e) fun(e)))
+  
+}

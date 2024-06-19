@@ -175,10 +175,10 @@ Runner <- R6::R6Class("Runner",
                                return()
                              }
                              tab<-tab[w,]
-#                             tab$source<-NULL
+#                            tab$source<-NULL
                       
-                             if (utils::hasName(tab,"t") && utils::hasName(tab,"df"))
-                                       tab$d<-2*tab$t/sqrt(tab$df)
+                             if (self$infomatic$caller=="lm")
+                                       tab$d<-2*tab$test/sqrt(tab$df)
                              return(tab)
                           },
 

@@ -256,7 +256,6 @@ mod<-GAMLj3::gamlj_glm(
   covs_scale = c(write="standardized"),
   ci_method = "quantile"
   )
-mod
 
 res<-mod$main$coefficients$asDF[2,3]
 testthat::test_that("test scaling works ", {
@@ -270,3 +269,27 @@ testthat::test_that("get_data works ", {
   testthat::expect_equal(dim(data)[1],200)
   testthat::expect_equal(names(data)[1],"schtyp")
 })
+
+
+####### custom contrasts 
+
+
+data("clustermanymodels")
+data<-clustermanymodels
+data$cat2<-factor(data$cat2)
+data$cat3<-factor(data$cat3)
+data$ybin<-factor(data$ybin)
+data$ycat<-factor(data$ycat)
+
+mod<-GAMLj3::gamlj_lm(
+  data = data,
+  formula=ycont~cat3*cat2+x
+)
+
+cont<-GAMLj3::test_contrasts(mod,contrasts=list(cat2=c(-1,1)))
+
+testthat::test_that("test_contrasts works ", {
+  testthat::expect_equal(cont$cat2$asDF$label,"{ -1*-1, 1*1 }")
+  testthat::expect_equal(cont$cat2$asDF$estimate,1.58198, tol)
+})
+

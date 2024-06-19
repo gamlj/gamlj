@@ -67,6 +67,7 @@ const fun = {
 } ,
   
   updateContrasts: function(ui, variableList, context) {
+    
     var currentList = context.cloneArray(ui.contrasts.value(), []);
 
     var list3 = [];
@@ -118,8 +119,10 @@ const fun = {
     
     if (customList.length>0)
         ui.custom_values.$el.show();
-    else
+    else {
         ui.custom_values.$el.hide();
+        ui.contrast_custom_focus.setValue(false);
+    }
     
     
 },
