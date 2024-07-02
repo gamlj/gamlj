@@ -13,9 +13,7 @@ ganova<- function(x,...) UseMethod(".anova")
     return(NULL)
   }
   
-
   anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))
-  
   ### LR is less lenient than Wald
   if (!isFALSE(anoobj$error)) {
     anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))

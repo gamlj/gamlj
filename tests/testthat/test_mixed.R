@@ -131,7 +131,6 @@ model<-GAMLj3::gamlj_mixed(
   plot_re = T,
   re_lrt=T  
 )
-model
 
 testthat::test_that("ranova works", {
                     testthat::expect_equal(model$main$ranova$asDF[2,2],6)
@@ -148,6 +147,8 @@ testthat::test_that("mixed plot works", {
 
 adddata<-subjects_by_stimuli
 adddata$x<-rnorm(length(adddata$nrow))
+adddata$subj<-factor(adddata$subj)
+adddata$stimulus<-factor(adddata$stimulus)
 
 formula<-y~1+cond+x+(1+cond|subj)+(1|stimulus)
 adddata$cond<-factor(adddata$cond)

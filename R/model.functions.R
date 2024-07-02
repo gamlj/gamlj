@@ -176,7 +176,7 @@ mf.data<- function(x,...) UseMethod(".data")
 
 mf.coef<- function(x,...) UseMethod(".coef")
 
-.coef.default<-function(model) coef(model)
+.coef.default<-function(model) stats::coef(model)
 
 .coef.lmerModLmerTest<-function(model) lme4::fixef(model)
 

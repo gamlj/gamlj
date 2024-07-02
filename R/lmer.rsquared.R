@@ -10,7 +10,12 @@
 #' @references  Lefcheck, Jonathan S. (2015) piecewiseSEM: Piecewise structural equation modeling in R for ecology, evolution, and systematics. Methods in Ecology and Evolution. 7(5): 573-579. DOI: 10.1111/2041-210X.12512
 #' 
 #' 
+#' @export
+r.squared <- function(mdl){
+  UseMethod("r.squared")
+}
 
+#' @export
 rsquared.glmm <- function(obj) {
   if( class(obj) != "list" ) obj = list(obj) else obj
   # Iterate over each model in the list
@@ -18,16 +23,14 @@ rsquared.glmm <- function(obj) {
 }
 
 
-r.squared <- function(mdl){
-  UseMethod("r.squared")
-}
-
+#' @export
 r.squared.lm <- function(mdl){
   data.frame(Class=class(mdl), Family="gaussian", Link="identity",
              Marginal=summary(mdl)$r.squared,
              Conditional=NA, AIC=stats::AIC(mdl))
 }
 
+#' @export
 r.squared.merMod <- function(mdl){
   # Get variance of fixed effects by multiplying coefficients by design matrix
   VarF <- stats::var(as.vector(lme4::fixef(mdl) %*% t(mdl@pp$X)))

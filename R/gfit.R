@@ -511,7 +511,10 @@ null.deviance <- function(model) {
 
 deviance <- function(object, ...) UseMethod("stats::deviance")
 
-deviance.clm <- function(object) as.numeric(-2 * stats::logLik(object))
+#' deviance function for clm models
+#' @exportS3Method stats::deviance
+
+deviance.clm <- function(object, ...) as.numeric(-2 * stats::logLik(object))
 
 #### additional fit indices
 

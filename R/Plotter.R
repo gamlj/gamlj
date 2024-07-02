@@ -1189,24 +1189,24 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
 .johnson_neyman = function(model, pred, mod, alpha=.05) {
  
   .terms<-c(pred,mod)
-   mat<-attr(terms(model),"factors")
+   mat<-attr(stats::terms(model),"factors")
    ## how is the interaction named?
    intterm <- names(which.min(which(apply(mat[rownames(mat) %in% .terms,],2,sum) ==2) ))
    
   .data      <-  mf.data(model)  
    obsrange  <-  range(.data[[mod]])
-   modsd     <-  sd(.data[[mod]])
+   modsd     <-  stats::sd(.data[[mod]])
    modrange  <-  c(obsrange[1] - modsd, obsrange[2] + modsd)   
-   params    <-  coef(summary(model))
+   params    <-  stats::coef(summary(model))
    y1        <-  params[rownames(params)==pred,1]
    y3        <-  params[rownames(params)==intterm,1]
-   df        <-  df.residual(model)
+   df        <-  stats::df.residual(model)
    if (is.null(df)) df<-Inf # normal approximation
    
    alpha <- alpha/2
-   tcrit <- qt(alpha, df = df)
+   tcrit <- stats::qt(alpha, df = df)
    tcrit <- abs(tcrit)
-   vmat <- vcov(model)
+   vmat <- stats::vcov(model)
    covy3 <- vmat[intterm, intterm]
    covy1 <- vmat[pred, pred]
    covy1y3 <- vmat[intterm, pred]

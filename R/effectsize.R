@@ -17,7 +17,7 @@ es.marginals<- function(x,...) UseMethod(".margins")
   
      if (obj$option("ci_method",c("quantile","bcai"))) {
           method="boot"
-          switch (object$options$ci_method,
+          switch (obj$options$ci_method,
              quantile = type <- "perc",
              bcai     = type  <- "bca"
           )
@@ -36,7 +36,7 @@ es.marginals<- function(x,...) UseMethod(".margins")
                              )
       params$contrast <- fromb64(params$contrast)
       params$source   <- fromb64(params$source)
-      if (hasName(params,"response"))
+      if (utils::hasName(params,"response"))
             params$response    <- fromb64(params$response)
       return(params)
   

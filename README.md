@@ -4,49 +4,6 @@ General, Mixed, Generalized, and Generalized Mixed Models
 
 <em id="version">Version 3.3.2 </em>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <center>
 <img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
 </center>
@@ -55,56 +12,18 @@ General, Mixed, Generalized, and Generalized Mixed Models
 Estimates a General Linear Model, Mixed Linear Models, Generalized Linear Models and Generalized Mixed Models with categorical and/or continuous variables, with options to facilitate estimation of interactions, simple slopes, simple effects, post-hoc etc.
 
 
-* ANOVA and Regression approach
-* Continuous and categorical independent variables
-* F-test, LR tests, and parameter estimates
-* Confidence intervals, standard, profile and bootstrap
+* Continuous and categorical independent and dependent variables
+* F-test and parameter estimates
+* Confidence intervals
 * Moderation made easy
 * Simple slopes analysis
-* Simple effects analysis
-* Simple interaction analysis
-* Post-hoc analysis
+* Simple effects
+* Polynomial effects
+* post-hoc analysis
 * Contrasts analysis
-* Plots for any order of interactions
+* Plots up to three-way interactions
 * Automatic selection of best estimation methods and degrees of freedom selection
 * Type III estimation
-* A large set of effect size indices, depending on the model being estimated, such as $\eta^2$, $\omega^2$, $\epsilon^2$, and Cohen's $d$, both partial and not partial. 
-
-Available models are:
-
-* OLS Regression (GLM)
-* OLS ANOVA (GLM)
-* OLS ANCOVA (GLM)
-* Random coefficients regression (Mixed)
-* Random coefficients ANOVA-ANCOVA (Mixed)
-* Logistic regression (GZLM)
-* Logistic ANOVA-like model (GZLM)
-* Probit regression (GZLM)
-* Probit ANOVA-like model (GZLM)
-* Multinomial regression (GZLM)
-* Multinomial ANOVA-like model (GZLM)
-* Poisson regression (GZLM)
-* Poisson ANOVA-like model (GZLM)
-* Overdispersed Poisson regression (GZLM)
-* Overdispersed Poisson ANOVA-like model (GZLM)
-* Negative binomial regression (GZLM)
-* Negative binomial  ANOVA-like model (GZLM)
-* Ordinal regression (GZLM)
-* Ordinal ANOVA-like model (GZLM)
-* Mixed Logistic regression (GMixed)
-* Mixed Logistic ANOVA-like model (GMixed)
-* Mixed Probit regression (GMixed)
-* Mixed Probit ANOVA-like model (GMixed)
-* Mixed Multinomial regression (GMixed)
-* Mixed Multinomial ANOVA-like model (GMixed)
-* Mixed Poisson regression (GMixed)
-* Mixed Poisson ANOVA-like model (GMixed)
-* Mixed Overdispersed Poisson regression (GMixed)
-* Mixed Overdispersed Poisson ANOVA-like model (GMixed)
-* Mixed Negative binomial regression (GMixed)
-* Mixed Negative binomail  ANOVA-like model (GMixed)
-* Mixed Ordinal regression (GMixed)
-* Mixed Ordinal ANOVA-like model (GMixed)
 
 # Docs
 
