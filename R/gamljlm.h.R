@@ -991,7 +991,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 list(
                                     `name`="estimate", 
                                     `title`="Estimate", 
-                                    `type`="number"),
+                                    `type`="number", 
+                                    `format`="zto"),
                                 list(
                                     `name`="est.ci.lower", 
                                     `title`="Lower", 

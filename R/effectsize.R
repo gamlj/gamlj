@@ -257,7 +257,7 @@ ci_effectsize<-function(es,df,dfres,obj,what="any") {
   
         fs<-.v_to_F(es,df,dfres)
         cilist<-lapply(seq_along(fs),function(i) {
-                  res<- effectsize:::.get_ncp_F(fs[i],df[i],dfres,conf.level = obj$ciwidth)
+                  res<- .get_ncp_F(fs[i],df[i],dfres,conf.level = obj$ciwidth)
                   res[is.na(res)]<-0
                   c(es[i],.F_to_v(res,df = df[i],dfres))
               })
@@ -275,6 +275,29 @@ ci_effectsize<-function(es,df,dfres,obj,what="any") {
 
 .v_to_F<-function(e,df,dfres) pmax(0, (e/df) / ((1-e)/dfres))
 
+### this is taken from effectsize package. We copied here because effectsize does not expose the function
+.get_ncp_F<-function (f, df, df_error, conf.level = 0.90) {
+  
+    if (!is.finite(f) || !is.finite(df) || !is.finite(df_error)) {
+        return(c(NA, NA))
+    }
+    alpha <- 1 - conf.level
+    probs <- c(alpha/2, 1 - alpha/2)
+    lambda <- f * df
+    ncp <- suppressWarnings(stats::optim(par = 1.1 * rep(lambda, 
+        2), fn = function(x) {
+        p <- stats::pf(q = f, df, df_error, ncp = x)
+        abs(max(p) - probs[2]) + abs(min(p) - probs[1])
+    }, control = list(abstol = 1e-09)))
+    f_ncp <- sort(ncp$par)
+    if (f <= stats::qf(probs[1], df, df_error)) {
+        f_ncp[2] <- 0
+    }
+    if (f <= stats::qf(probs[2], df, df_error)) {
+        f_ncp[1] <- 0
+    }
+    return(f_ncp)
+}
 
 
 ### bootstrap ####

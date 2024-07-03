@@ -285,6 +285,7 @@ items:
                     - name: estimate
                       title: Estimate
                       type: number
+                      format: zto
                     - name: est.ci.lower
                       title: Lower
                       type: number
