@@ -189,12 +189,9 @@ Initier <- R6::R6Class(
     },
     init_main_contrasts = function() {
       
-      if (!self$options$contrast_custom_focus)
-          return()
-      
       vars<-lapply(self$datamatic$variables, function(x) if (x$method == "custom") list(source=x$name,label=x$contrast_labels[[1]]) else NULL)
       vars<-vars[!sapply(vars,is.null)]
-      
+      if (length(vars)==0) return(NULL)      
       return(vars)
       
     },

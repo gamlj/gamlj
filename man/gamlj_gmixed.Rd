@@ -209,6 +209,9 @@ Used if \code{covs_conditioning}=\code{'mean_sd'}}
 percentiles around the median used to condition simple effects and plots.
 Used if \code{covs_conditioning}=\code{'percent'}}
 
+\item{ccra_steps}{Covariate condition  steps from min to max: 
+At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
+
 \item{covs_scale_labels}{how the levels of a continuous moderator should
 appear in tables and plots: \code{labels}, \code{values} and
 \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer

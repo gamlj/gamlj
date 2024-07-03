@@ -54,8 +54,8 @@ gamljmixedClass <- R6::R6Class(
       
       ### custom contrasts 
       aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      aSmartObj$activateOnData<-TRUE
       aSmartObj$ci("est",self$options$ci_width)
-      aSmartObj$ci("beta",self$options$ci_width,label=greek_vector[["beta"]])
       ladd(private$.smartObjs)<-aSmartObj
 
       

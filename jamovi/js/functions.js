@@ -95,6 +95,7 @@ const fun = {
 
 
  updateCustom: function(ui, context) {
+   
     if (ui.contrast_custom_values===undefined) 
            return
     
@@ -117,11 +118,14 @@ const fun = {
 
     ui.contrast_custom_values.setValue(customList);
     
-    if (customList.length>0)
+    if (customList.length>0) {
         ui.custom_values.$el.show();
-    else {
+        ui.contrast_focus_box.$el.show();
+    } else {
         ui.custom_values.$el.hide();
         ui.contrast_custom_focus.setValue(false);
+        ui.contrast_focus_box.$el.hide();
+
     }
     
     

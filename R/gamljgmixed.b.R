@@ -58,6 +58,7 @@ gamljgmixedClass <- R6::R6Class(
 
         ### custom contrasts 
         aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+        aSmartObj$activateOnData<-TRUE
         aSmartObj$ci("est",self$options$ci_width)
         aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
         aSmartObj$spaceBy<-"response"

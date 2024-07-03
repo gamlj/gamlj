@@ -721,7 +721,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -778,8 +777,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_type",
                                 "custom_family",
                                 "custom_link",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -828,8 +826,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_type",
                                 "custom_family",
                                 "custom_link",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="obs", 
@@ -859,8 +856,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_type",
                                 "custom_family",
                                 "custom_link",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -904,7 +900,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -970,7 +965,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=options,
                             name="contrasts",
                             title="Custom Contrast Tests",
-                            visible="(contrast_custom_focus)",
+                            visible=FALSE,
                             clearWith=list(
                                 "model_type",
                                 "dep",
@@ -992,7 +987,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1079,7 +1073,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1143,8 +1136,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "model_type",
                                 "custom_family",
                                 "custom_link",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1203,7 +1195,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1211,7 +1202,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ccp_value",
                                 "ccra_steps",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "covs_conditioning",
+                                "contrast_custom_focus"),
                             refs="margins",
                             columns=list(
                                 list(
@@ -1281,7 +1273,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "__effectsizeoptions"),
                             columns=list(
                                 list(
@@ -1346,7 +1337,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "propodds_test"),
                             columns=list(
                                 list(
@@ -1400,7 +1390,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "custom_family",
                     "custom_link",
                     "contrast_custom_values",
-                    "contrast_custom_focus",
                     "posthoc",
                     "adjust",
                     "ci_width",
@@ -1430,7 +1419,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "posthoc",
                         "adjust",
                         "ci_width",
@@ -1744,7 +1732,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r"),
@@ -1796,7 +1783,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "custom_family",
                     "custom_link",
                     "contrast_custom_values",
-                    "contrast_custom_focus",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -1835,7 +1821,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1878,7 +1863,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "custom_family",
                     "custom_link",
                     "contrast_custom_values",
-                    "contrast_custom_focus",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -1916,7 +1900,6 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1957,8 +1940,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "model_type",
                     "custom_family",
                     "custom_link",
-                    "contrast_custom_values",
-                    "contrast_custom_focus")))
+                    "contrast_custom_values")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1985,8 +1967,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "model_type",
                     "custom_family",
                     "custom_link",
-                    "contrast_custom_values",
-                    "contrast_custom_focus")))},
+                    "contrast_custom_values")))},
         .setModel=function(x) private$..model <- x))
 
 gamljglmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

@@ -483,11 +483,11 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 
 #'  S3 methods for class jamovi ResultsElement 
 #'
-#' These functions extract all visible tables from a ResultsElement or related classes produced by gamlj
+#' These functions extract all visible tables from a ResultsElement or related classes produced by GAMLj3
 #' and print them in R style.
 
 #' @param object a gamlj results object of the class `gamlj`
-#' @param ... additional arguments passed to the GAMLj estimation function
+#' @param ... additional arguments passed to the GAMLj3 estimation function
 #' @return a list of table as data.frame
 #' @author Marcello Gallucci
 #' @examples
@@ -534,12 +534,12 @@ summary.ResultsElement<-function(object,...) {
 
 #'  S3 methods for class galmj_list 
 #'
-#' These functions extract all visible tables from a a list of table produced by gamlj
+#' These functions extract all visible tables from a list of tables produced by GAMLj3
 #' and print them in R style.
 
 #' @param object a gamlj results object of the class `gamlj`
-#' @param ... additional arguments passed to the GAMLj estimation function
-#' @return a list of table as data.frame
+#' @param ... additional arguments passed to the GAMLj3 estimation function
+#' @return a list of tables as data.frame
 #' @author Marcello Gallucci
 #' @examples
 #' data(fivegroups)
@@ -658,7 +658,7 @@ fit.gamlj<-function(x,...) {
 #' em_means(gmod,formula =~Group)
 #' @export
 #' 
-em_means <- function(object, ...) UseMethod("em_means")
+em_means <- function(object, formula, ...) UseMethod("em_means")
 
 
 #' @rdname s3methods

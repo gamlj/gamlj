@@ -101,7 +101,7 @@
 #' @param ccp_value offsett (number of percentiles) around the median used to
 #'   condition simple effects and plots. Used if
 #'   \code{simpleScale}=\code{'percent'}
-#' @param ccra_value   Covariate condition min max steps (not very mnemonic): 
+#' @param ccra_steps   Covariate condition  steps from min to max: 
 #'        At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}
 #'   
 #' @param covs_scale_labels how the levels of a continuous moderator should

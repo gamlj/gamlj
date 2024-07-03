@@ -189,6 +189,9 @@ simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}}
 condition simple effects and plots. Used if
 \code{simpleScale}=\code{'percent'}}
 
+\item{ccra_steps}{Covariate condition  steps from min to max: 
+At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
+
 \item{covs_scale_labels}{how the levels of a continuous moderator should
 appear in tables and plots: \code{labels}, \code{values} and
 \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
@@ -243,9 +246,6 @@ Four methods for  heteroschedasticy-consistent
 standard errors are available: \code{HC0},
 \code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
 See \code{\link[sandwich]{vcovHC}} for details.}
-
-\item{ccra_value}{Covariate condition min max steps (not very mnemonic): 
-At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
 }
 \value{
 A results object containing:

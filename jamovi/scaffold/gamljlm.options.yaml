@@ -12,7 +12,6 @@ modeloptions:
         - robust_method
         - mute
         - contrast_custom_values
-        - contrast_custom_focus
 
 nestedoptions:
         - nested_terms
@@ -28,6 +27,8 @@ simpleeffectsoptions:
         - simple_x
         - simple_mods
         - simple_scale
+        - contrast_custom_focus
+        
 covscalingoptions:                 
         - covs_conditioning
         - covs_scale_labels

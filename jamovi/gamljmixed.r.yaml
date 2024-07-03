@@ -54,7 +54,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                           ### nestedoptions  begins
                         - nested_terms                     
@@ -115,7 +114,6 @@ items:
                          - donotrun
                          - res_struct
                          - contrast_custom_values
-                         - contrast_custom_focus
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms                     
@@ -173,7 +171,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                          
              columns:
@@ -224,7 +221,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -270,7 +266,7 @@ items:
            - name: contrasts
              title:  Custom Contrast Tests
              type: Table
-             visible: (contrast_custom_focus)
+             visible: false
              clearWith:
                        ### modeloptions  begins
                     -  dep
@@ -295,7 +291,6 @@ items:
                     -  donotrun
                     -  res_struct
                     -  contrast_custom_values
-                    -  contrast_custom_focus
                        ### modeloptions  ends
                        ### cioptions  begins
                     -  ci_width
@@ -387,7 +382,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -457,7 +451,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -520,7 +513,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
 
              columns:
@@ -573,7 +565,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                         - res_struct
              columns:
@@ -614,7 +605,6 @@ items:
                         - donotrun
                         - res_struct
                         - contrast_custom_values
-                        - contrast_custom_focus
                           ### modeloptions  ends
                           ### cioptions  begins
                         - ci_width
@@ -711,7 +701,6 @@ items:
                             - donotrun
                             - res_struct
                             - contrast_custom_values
-                            - contrast_custom_focus
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -728,6 +717,7 @@ items:
                             - ccra_steps
                             - covs_scale_labels
                             - covs_conditioning
+                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
 
               columns:
@@ -773,7 +763,6 @@ items:
                             - donotrun
                             - res_struct
                             - contrast_custom_values
-                            - contrast_custom_focus
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -790,6 +779,7 @@ items:
                             - ccra_steps
                             - covs_scale_labels
                             - covs_conditioning
+                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
               columns:
                      - name: contrast
@@ -858,7 +848,6 @@ items:
                             - donotrun
                             - res_struct
                             - contrast_custom_values
-                            - contrast_custom_focus
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -875,6 +864,7 @@ items:
                             - ccra_steps
                             - covs_scale_labels
                             - covs_conditioning
+                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
              columns:
                    - name: effect
@@ -921,7 +911,6 @@ items:
                             - donotrun
                             - res_struct
                             - contrast_custom_values
-                            - contrast_custom_focus
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -938,6 +927,7 @@ items:
                             - ccra_steps
                             - covs_scale_labels
                             - covs_conditioning
+                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
 
              columns:
@@ -1001,7 +991,6 @@ items:
                             - donotrun
                             - res_struct
                             - contrast_custom_values
-                            - contrast_custom_focus
                               ### modeloptions  ends
                               ### cioptions  begins
                             - ci_width
@@ -1018,6 +1007,7 @@ items:
                             - ccra_steps
                             - covs_scale_labels
                             - covs_conditioning
+                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
         columns:
         - name: estimate
@@ -1066,7 +1056,6 @@ items:
            -  donotrun
            -  res_struct
            -  contrast_custom_values
-           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1118,7 +1107,6 @@ items:
            -  donotrun
            -  res_struct
            -  contrast_custom_values
-           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1171,7 +1159,6 @@ items:
            -  donotrun
            -  res_struct
            -  contrast_custom_values
-           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1220,7 +1207,6 @@ items:
            -  donotrun
            -  res_struct
            -  contrast_custom_values
-           -  contrast_custom_focus
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1414,7 +1400,6 @@ items:
                 - donotrun
                 - res_struct
                 - contrast_custom_values
-                - contrast_custom_focus
                   ### modeloptions  ends
   - name: residuals
     title: Residuals Vales
@@ -1445,7 +1430,6 @@ items:
                 - donotrun
                 - res_struct
                 - contrast_custom_values
-                - contrast_custom_focus
                   ### modeloptions  ends
               
 

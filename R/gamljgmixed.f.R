@@ -117,6 +117,8 @@
 #' @param ccp_value Covariates conditioning percentile offset value: number of
 #'   percentiles around the median used to condition simple effects and plots.
 #'   Used if \code{covs_conditioning}=\code{'percent'}
+#' @param ccra_steps   Covariate condition  steps from min to max: 
+#'        At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}
 #' @param covs_scale_labels how the levels of a continuous moderator should
 #'   appear in tables and plots: \code{labels}, \code{values} and
 #'   \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer

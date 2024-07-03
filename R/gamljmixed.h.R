@@ -838,7 +838,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison",
@@ -900,7 +899,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison",
@@ -955,8 +953,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1006,7 +1003,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1057,7 +1053,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=options,
                             name="contrasts",
                             title="Custom Contrast Tests",
-                            visible="(contrast_custom_focus)",
+                            visible=FALSE,
                             clearWith=list(
                                 "dep",
                                 "reml",
@@ -1081,7 +1077,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1179,7 +1174,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1254,7 +1248,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1320,8 +1313,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "mute",
                                 "donotrun",
                                 "res_struct",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1377,7 +1369,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "res_struct"),
                             columns=list(
                                 list(
@@ -1415,7 +1406,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "donotrun",
                         "res_struct",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1524,7 +1514,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1536,7 +1525,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ccp_value",
                                 "ccra_steps",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "covs_conditioning",
+                                "contrast_custom_focus"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1583,7 +1573,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "res_struct",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1595,7 +1584,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ccp_value",
                                 "ccra_steps",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "covs_conditioning",
+                                "contrast_custom_focus"),
                             columns=list(
                                 list(
                                     `name`="contrast", 
@@ -1677,7 +1667,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "donotrun",
                                     "res_struct",
                                     "contrast_custom_values",
-                                    "contrast_custom_focus",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1689,7 +1678,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "ccp_value",
                                     "ccra_steps",
                                     "covs_scale_labels",
-                                    "covs_conditioning"),
+                                    "covs_conditioning",
+                                    "contrast_custom_focus"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1739,7 +1729,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "donotrun",
                                     "res_struct",
                                     "contrast_custom_values",
-                                    "contrast_custom_focus",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1751,7 +1740,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "ccp_value",
                                     "ccra_steps",
                                     "covs_scale_labels",
-                                    "covs_conditioning"),
+                                    "covs_conditioning",
+                                    "contrast_custom_focus"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1818,7 +1808,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "donotrun",
                         "res_struct",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1830,7 +1819,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ccp_value",
                         "ccra_steps",
                         "covs_scale_labels",
-                        "covs_conditioning"),
+                        "covs_conditioning",
+                        "contrast_custom_focus"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1879,7 +1869,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "donotrun",
                     "res_struct",
                     "contrast_custom_values",
-                    "contrast_custom_focus",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -1923,7 +1912,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "donotrun",
                         "res_struct",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1969,7 +1957,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "donotrun",
                     "res_struct",
                     "contrast_custom_values",
-                    "contrast_custom_focus",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -2010,7 +1997,6 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "donotrun",
                         "res_struct",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -2199,8 +2185,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "mute",
                     "donotrun",
                     "res_struct",
-                    "contrast_custom_values",
-                    "contrast_custom_focus")))
+                    "contrast_custom_values")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -2229,8 +2214,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "mute",
                     "donotrun",
                     "res_struct",
-                    "contrast_custom_values",
-                    "contrast_custom_focus")))},
+                    "contrast_custom_values")))},
         .setModel=function(x) private$..model <- x))
 
 gamljmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

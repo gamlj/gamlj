@@ -338,7 +338,6 @@ r2 <- function(model, ...) UseMethod(".r2")
 
   return(list(alist))
   
-    
 }
 
 
@@ -512,6 +511,8 @@ null.deviance <- function(model) {
 deviance <- function(object, ...) UseMethod("stats::deviance")
 
 #' deviance function for clm models
+#' @param object an object of class  \link[ordinal]{clm}.
+#' @param ... additional optional argument.
 #' @exportS3Method stats::deviance
 
 deviance.clm <- function(object, ...) as.numeric(-2 * stats::logLik(object))

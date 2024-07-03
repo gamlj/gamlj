@@ -477,7 +477,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
     if (varobj$type=="factor") {
       alist[["specs"]]=c(variable64,term64)
-      ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
+      ### in 2021 with custom contrast function (not string), infer=c() does not work ####
       referenceGrid<-do.call(emmeans::emmeans,alist)
       grid<-emmeans::contrast(referenceGrid,
                                    by=term64,

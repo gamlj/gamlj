@@ -146,7 +146,7 @@ options:
         description:
                 R: |
                         `'FALSE'` (default), `'TRUE'` produces the Johnson-Neyman plot for simple slope significance.
-                ui: Produces the Johnson-Neyman plot for simple slope significance.
+                ui: Produces the Johnson-Neyman plot for simple slopes significance.
 -       name: posthoc
         title: Post Hoc Tests
         type: Terms

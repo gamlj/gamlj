@@ -209,8 +209,6 @@ children:
                                 label: Var
                                 template:
                                         type: TextBox
-                -       type: CheckBox
-                        name: contrast_custom_focus
 -       name: panel_covs
         type: CollapseBox
         label: Covariates Scaling
@@ -454,6 +452,7 @@ children:
         children:
         -       type: VariableSupplier
                 name: simpleSupplier
+                label: Variables
                 populate: manual
                 stretchFactor: 1
                 persistentItems: false
@@ -472,9 +471,20 @@ children:
                         -       type: VariablesListBox
                                 name: simple_mods
                                 isTarget: true
-        -       type: CheckBox
-                name: simple_interactions
-                label: Simple interactions
+        -       type: Label
+                name: simple_options
+                label: Additional Tests
+                children:
+                -       type: CheckBox
+                        name: simple_interactions
+                        label: Simple interactions
+                -       type: LayoutBox
+                        name: contrast_focus_box
+                        margin: large
+                        style: list
+                        children:
+                        -       type: CheckBox
+                                name: contrast_custom_focus
 -       name: panel_emmeans
         type: CollapseBox
         label: Estimated Marginal Means

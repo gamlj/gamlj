@@ -13,7 +13,7 @@
 #'                      data = clustermanymodels
 #'                      )
 #' @param formula (optional) the formula of the linear mixed model as defined in \link[lme4]{lmer}.
-#' @param data the data as a data frame
+#' @param data the data as a data frame.
  #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}. Not necessary if \code{formula} is defined.
 #' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
@@ -117,7 +117,7 @@
 #' @param re_corr \code{'all'}, \code{'none'} (default), or \code{'block'}.
 #'   When random effects are passed as list of length 1, it decides whether the
 #'   effects should be correlated,  non correlated. If \code{'re'} is a list of
-#'   lists of length > 1, the option is automatially set to \code{'block'}. The
+#'   lists of length > 1, the option is automatically set to \code{'block'}. The
 #'   option is ignored if the model is passed using \code{formula}.
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be re_corrused rather than ML
@@ -195,6 +195,7 @@ gamlj_mixed <- function(
     res_struct="id",
     re_lrt = FALSE,
     re_ci = FALSE,
+    re_corr="block",
     fixed_intercept = TRUE,
     nested_terms = NULL,
     nested_intercept = NULL,
@@ -271,7 +272,7 @@ gamlj_mixed <- function(
   .interface = "R"
   donotrun = FALSE
   model_type = "lmer"
-  re_corr="block"
+#  re_corr="block"
   re_modelterms = TRUE
   re_listing = "none"
   ### model terms

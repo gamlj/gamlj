@@ -4,6 +4,13 @@ General, Mixed, Generalized, and Generalized Mixed Models
 
 <em id="version">Version 3.3.2 </em>
 
+
+
+
+
+
+
+
 <center>
 <img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
 </center>

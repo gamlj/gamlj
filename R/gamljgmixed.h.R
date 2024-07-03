@@ -719,7 +719,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_re",
                                 "nested_intercept",
@@ -778,7 +777,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "nested_terms",
                                 "nested_re",
                                 "nested_intercept",
@@ -832,8 +830,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "covs_scale",
                                 "mute",
                                 "model_type",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -875,7 +872,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -941,7 +937,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                             options=options,
                             name="contrasts",
                             title="Custom Contrast Tests",
-                            visible="(contrast_custom_focus)",
+                            visible=FALSE,
                             clearWith=list(
                                 "dep",
                                 "factors",
@@ -961,7 +957,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1072,7 +1067,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1140,7 +1134,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1205,7 +1198,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1267,8 +1259,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "covs_scale",
                                 "mute",
                                 "model_type",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1326,8 +1317,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "covs_scale",
                                 "mute",
                                 "model_type",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             template=jmvcore::Table$new(
                                 options=options,
                                 title="Covariances for:  ___key___",
@@ -1359,8 +1349,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "covs_scale",
                                 "mute",
                                 "model_type",
-                                "contrast_custom_values",
-                                "contrast_custom_focus"),
+                                "contrast_custom_values"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1415,7 +1404,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "mute",
                         "model_type",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1521,7 +1509,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1532,7 +1519,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "ccp_value",
                                 "ccra_steps",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "covs_conditioning",
+                                "contrast_custom_focus"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1571,7 +1559,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "model_type",
                                 "contrast_custom_values",
-                                "contrast_custom_focus",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
@@ -1582,7 +1569,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "ccp_value",
                                 "ccra_steps",
                                 "covs_scale_labels",
-                                "covs_conditioning"),
+                                "covs_conditioning",
+                                "contrast_custom_focus"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -1677,7 +1665,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "mute",
                                     "model_type",
                                     "contrast_custom_values",
-                                    "contrast_custom_focus",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1688,7 +1675,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "ccp_value",
                                     "ccra_steps",
                                     "covs_scale_labels",
-                                    "covs_conditioning"),
+                                    "covs_conditioning",
+                                    "contrast_custom_focus"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1730,7 +1718,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "mute",
                                     "model_type",
                                     "contrast_custom_values",
-                                    "contrast_custom_focus",
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
@@ -1741,7 +1728,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "ccp_value",
                                     "ccra_steps",
                                     "covs_scale_labels",
-                                    "covs_conditioning"),
+                                    "covs_conditioning",
+                                    "contrast_custom_focus"),
                                 columns=list(
                                     list(
                                         `name`="effect", 
@@ -1819,7 +1807,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "mute",
                         "model_type",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1830,7 +1817,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "ccp_value",
                         "ccra_steps",
                         "covs_scale_labels",
-                        "covs_conditioning"),
+                        "covs_conditioning",
+                        "contrast_custom_focus"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1871,7 +1859,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "mute",
                     "model_type",
                     "contrast_custom_values",
-                    "contrast_custom_focus",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -1909,7 +1896,6 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "mute",
                         "model_type",
                         "contrast_custom_values",
-                        "contrast_custom_focus",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1949,8 +1935,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "covs_scale",
                     "mute",
                     "model_type",
-                    "contrast_custom_values",
-                    "contrast_custom_focus")))
+                    "contrast_custom_values")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -1975,8 +1960,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "covs_scale",
                     "mute",
                     "model_type",
-                    "contrast_custom_values",
-                    "contrast_custom_focus")))},
+                    "contrast_custom_values")))},
         .setModel=function(x) private$..model <- x))
 
 gamljgmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

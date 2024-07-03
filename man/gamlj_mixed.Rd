@@ -17,6 +17,7 @@ gamlj_mixed(
   res_struct = "id",
   re_lrt = FALSE,
   re_ci = FALSE,
+  re_corr = "block",
   fixed_intercept = TRUE,
   nested_terms = NULL,
   nested_intercept = NULL,
@@ -67,7 +68,7 @@ gamlj_mixed(
 \arguments{
 \item{formula}{(optional) the formula of the linear mixed model as defined in \link[lme4]{lmer}.}
 
-\item{data}{the data as a data frame}
+\item{data}{the data as a data frame.}
 
 \item{dep}{a string naming the dependent variable from \code{data}; the
 variable must be numeric. Not needed if \code{formula} is used.}
@@ -99,6 +100,12 @@ effects}
 
 \item{re_ci}{\code{TRUE} or \code{FALSE} (default), confidence intervals
 for the random effects}
+
+\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
+When random effects are passed as list of length 1, it decides whether the
+effects should be correlated,  non correlated. If \code{'re'} is a list of
+lists of length > 1, the option is automatically set to \code{'block'}. The
+option is ignored if the model is passed using \code{formula}.}
 
 \item{fixed_intercept}{\code{TRUE} (default) or \code{FALSE}, estimates
 fixed intercept. Overridden if \code{formula} is used and contains \code{~1} or \code{~0}.}
@@ -248,12 +255,6 @@ predicted by the first defined clustering variable}
 
 \item{rand_hist}{\code{TRUE} or \code{FALSE} (default), provide histogram
 of random Coefficients}
-
-\item{re_corr}{\code{'all'}, \code{'none'} (default), or \code{'block'}.
-When random effects are passed as list of length 1, it decides whether the
-effects should be correlated,  non correlated. If \code{'re'} is a list of
-lists of length > 1, the option is automatially set to \code{'block'}. The
-option is ignored if the model is passed using \code{formula}.}
 }
 \value{
 A results object containing:

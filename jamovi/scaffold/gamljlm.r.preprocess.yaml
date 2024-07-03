@@ -268,7 +268,7 @@ items:
            - name: contrasts
              title:  Custom Contrast Tests
              type: Table
-             visible: (contrast_custom_focus)
+             visible: false
              clearWith:
                     -  __modeloptions__
                     -  __cioptions__
