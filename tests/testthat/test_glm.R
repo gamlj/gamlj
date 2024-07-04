@@ -346,8 +346,9 @@ testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tol)
 })
 
+data$yperc<-(data$ypoi+1)/(max(data$ypoi)+2)
 mod <- GAMLj3::gamlj_glm(
-  formula = yord ~ x * cat3,
+  formula = yperc ~ x * cat3,
   data = data,
   model_type = "beta",
   emmeans = ~cat3,
@@ -355,7 +356,10 @@ mod <- GAMLj3::gamlj_glm(
   simple_mods = cat3,
   posthoc=~cat3
 )
-
+testthat::test_that("beta works", {
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .20968, tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1], 11.9587, tol)  
+})
 
 
 ### model comparison 

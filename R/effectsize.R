@@ -177,17 +177,6 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
 
 
 
-# .add_es.summary_emm<-function(atable) {
-#   
-#   atable$etaSqP<-effectsize::F_to_eta2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-#   atable$omegaSq<-effectsize::F_to_omega2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-#   atable$epsilonSq<-effectsize::F_to_epsilon2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-#   
-#   
-#   return(atable)
-# }
-
-
 
 
 ### confidence intervals for effect size indices
