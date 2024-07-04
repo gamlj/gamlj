@@ -98,8 +98,9 @@ check_package <- function(options, pkg,conditions, aim) {
      str2<-paste(str2,collapse=" && ")
      str <- str2lang(paste(str1,str2,sep=" && "))
      test<-eval(str)
+
      if (test) {
-     if (!requireNamespace(pkg, quietly=T,character.only=T)) {
+     if (!requireNamespace(pkg, quietly=T)) {
        msg<-paste0("Package ",pkg," is required for ",aim,". Please install it and re-run the model.")
        cat(paste0("\033[0;31m",msg,"\033[0m","\n"))
        return(FALSE)
