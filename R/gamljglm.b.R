@@ -198,7 +198,7 @@ gamljglmClass <- R6::R6Class(
       
       if (self$options$donotrun) return()
         
-      private$.ready<-readiness(self$options)
+#      private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()
       }

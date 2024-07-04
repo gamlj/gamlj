@@ -1,9 +1,6 @@
 testthat::context("lm")
 tol<-.001
 
-mod0<-GAMLj3::gamlj_lm(
-  data = ToothGrowth,
-  formula=len~supp+dose)
 
 mod1<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
@@ -11,14 +8,12 @@ mod1<-GAMLj3::gamlj_lm(
   factors = "supp",
   covs="dose")
 
-
 testthat::test_that("equivalent model input (1)", {
   testthat::expect_equal(mod0$info$asDF$specs[2],mod1$info$asDF$specs[2])
   testthat::expect_equal(mod0$main$anova$asDF$f[3],mod1$main$anova$asDF$f[3])
   testthat::expect_equal(mod0$main$coefficients$asDF$label[2],mod0$main$coefficients$asDF$label[2])
   testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[1],mod0$main$coefficients$asDF$est.ci.lower[1])
   })
-
 
 
 mod0<-GAMLj3::gamlj_lm(
@@ -437,5 +432,6 @@ testthat::test_that("intercept model comparison", {
     mod$main$r2$asDF$ar[1]-mod$main$r2$asDF$ar[2],mod$main$r2$asDF$ar[3]
     ,tol)
 })
+
 
 

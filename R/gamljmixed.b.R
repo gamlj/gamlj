@@ -170,7 +170,6 @@ gamljmixedClass <- R6::R6Class(
     .run=function() {
       jinfo("MODULE:",self$options$.caller,"  #### phase run ####")
       
-      private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()
       }

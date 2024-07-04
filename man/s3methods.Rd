@@ -33,9 +33,11 @@ fit(x, ...)
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}
 
-\item{...}{additional arguments passed to the GAMLj3 estimation function}
+\item{...}{not used}
 
 \item{x}{a gamlj results object of the class `gamlj`}
+
+\item{formula}{not used}
 }
 \value{
 a list of table as data.frame

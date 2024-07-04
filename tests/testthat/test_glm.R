@@ -315,7 +315,8 @@ testthat::test_that("quasi poisson binomial works", {
 
 ## ordinal
 
-## testing options for all models
+library(GAMLj3)
+
 data("manymodels")
 data <- manymodels
 data$cat3 <- factor(data$cat3)
@@ -331,7 +332,6 @@ mod <- GAMLj3::gamlj_glm(
   simple_mods = cat3,
   posthoc=~cat3
 )
-library(GAMLj3)
 
 testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .0118, tol)
@@ -346,8 +346,17 @@ testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tol)
 })
 
-mod
-mod$main$fit$asDF
+mod <- GAMLj3::gamlj_glm(
+  formula = yord ~ x * cat3,
+  data = data,
+  model_type = "beta",
+  emmeans = ~cat3,
+  simple_x= x,
+  simple_mods = cat3,
+  posthoc=~cat3
+)
+
+
 
 ### model comparison 
 
@@ -370,7 +379,6 @@ mod <- GAMLj3::gamlj_glm(
 testthat::test_that("logistic comparison", {
   testthat::expect_equal(mod$main$r2$asDF[3,2],.0265,tol)
   testthat::expect_equal(mod$main$r2$asDF[1,6],.0444,tol)
-  
 })
 
 
@@ -386,4 +394,3 @@ testthat::test_that("multinomila comparison", {
 })
 
 
-effectsize:::.get_ncp_F

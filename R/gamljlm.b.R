@@ -179,7 +179,6 @@ gamljlmClass <- R6::R6Class(
     .run=function() {
       jinfo("MODULE:  #### phase run ####")
       
-      private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()
       }

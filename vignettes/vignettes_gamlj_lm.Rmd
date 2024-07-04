@@ -36,7 +36,7 @@ library(GAMLj3)
 
 # Linear models in GAMLj
 
-In this example we run a moderated regression analysis with simple slopes analysis and simple slopes graphs. Data are from   [Cohen et al 2003](http://psycnet.apa.org/record/2002-18109-000) and can be downloaded  [here](https://github.com/mcfanda/gamlj_docs/blob/master/data/exercise.csv). 
+In this example we run a moderated regression analysis with simple slopes analysis and simple slopes graphs. Data are from   [Cohen et al 2003](https://psycnet.apa.org/record/2002-18109-000) and can be downloaded  [here](https://github.com/mcfanda/gamlj_docs/blob/master/data/exercise.csv). 
 
 # The research design
 
@@ -55,7 +55,7 @@ The researcher is interested in studying the relationships between endurance, ag
 
 We can think about this analytic problem as a multiple regression, where the effect of age and exercise can be estimated while keeping constant the other variable. However, the researcher puts forward a _moderation hypothesis_, because s/he expects the effect of age to change for different levels of exercising. We than need an interaction between age and exercise.
 
-We first run a multiple regression (to warm up), then we estimate a multiple regression with an interaction (moderated regression) and we probe the interaction with a simple slope analysis and simple slope graphs. Technical details can be found in [Cohen et al 2003](http://psycnet.apa.org/record/2002-18109-000), or in [Preacher website](http://quantpsy.org/interact/interactions.htm).
+We first run a multiple regression (to warm up), then we estimate a multiple regression with an interaction (moderated regression) and we probe the interaction with a simple slope analysis and simple slope graphs. Technical details can be found in [Cohen et al 2003](https://psycnet.apa.org/record/2002-18109-000), or in [Preacher website](http://quantpsy.org/interact/interactions.htm).
 
 # Multiple regression
 

@@ -192,7 +192,6 @@ Plotter <- R6::R6Class(
            
   
            datalist<-image$state
-           ## we need the rlang::sym notation because interactions::jn expect the arguments to be symbols
            alpha <- .05
            pmsg <- paste("p <", alpha)
            colors<-ggtheme[[2]]$palette(2)

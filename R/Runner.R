@@ -492,7 +492,7 @@ Runner <- R6::R6Class("Runner",
                               names(contrast)<-var$contrast_labels[[1]]
                               return(contrast)
                             }
-                            contrast<-as.data.frame(MASS::ginv(t(contrast)))
+                            contrast<-as.data.frame(.ginv(t(contrast)))
 
                             if (var$type == "factor")
                                       names(contrast)<-paste0("(",gsub(" ","",var$contrast_labels),")")

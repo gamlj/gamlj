@@ -487,6 +487,7 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 #' and print them in R style.
 
 #' @param object a gamlj results object of the class `gamlj`
+#' @param formula not used
 #' @param ... additional arguments passed to the GAMLj3 estimation function
 #' @return a list of table as data.frame
 #' @author Marcello Gallucci
@@ -501,7 +502,6 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 #' @rdname s3methods
 #' 
 #' @export
-
 
 summary.ResultsElement<-function(object,...) {
     
@@ -563,6 +563,8 @@ summary.gamlj_list<-function(object,...) {
 #' Print a jamovi Table in R style 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... options passed to print.data.frame()
+
 #' @rdname s3methods
 #' 
 #' @export
@@ -579,6 +581,7 @@ print.jmvrtable<-function(x,...) {
 #' Print a jamovi summary of jamovi ResultElement in R style 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... options passed to print()
 #' @rdname s3methods
 #' @export
 
@@ -592,6 +595,7 @@ print.jmvrobj<-function(x,...) {
 #' Print a jamovi summary of jamovi ResultElement in R style 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... options passed to print()
 #' @rdname s3methods
 #' @export
 
@@ -607,7 +611,8 @@ print.gamlj_list<-function(x,...) {
 
 #' Extract coefficients from a GAMLj result object 
 #'
-#' @param x a gamlj results object of the class `gamlj`
+#' @param object a gamlj results object of the class `gamlj`
+#' @param ... not used 
 #' @rdname s3methods
 #' 
 #' @export
@@ -619,6 +624,7 @@ coef.gamlj<-function(object,...) {
 #' Extract model R2 (r-squared) from a GAMLj results object 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... not used 
 #' @rdname s3methods
 #' @export
 #' 

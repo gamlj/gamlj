@@ -1,5 +1,36 @@
 
 readiness <- function(options) {
+
+
+   if (!check_package(options, "nlme", c(model_type="lmer",res_struct="!id"),"structured error covariances"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+  
+   if (!check_package(options, "boot", c(ci_method="!wald"),"for bootstrap confidence intervals"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+
+   if (!check_package(options, "marginaleffects", c(es="marginals"),"marginals effects"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+
+  if (!check_package(options, "nnet", c(model_type="multinomial",.caller="glm"),"multinomial models"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+
+  if (!check_package(options, "mclogit", c(model_type="multinomial",.caller="glmer"),"multinomial models"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+    
+  if (!check_package(options, "betareg", c(model_type="beta",.caller="glm"),"beta models"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+
+  if (!check_package(options, "ordinal", c(model_type="ordinal"),"ordinal models"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+
+  if (!check_package(options, "MASS", c(model_type="nb",.caller="glm"),"negative binomial models"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+  
+  if (!check_package(options, "lme4", c(model_type="nb",.caller="glmer"),"negative binomial models"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
+
+  if (!check_package(options, "sandwich", c(se_method="robust"),"robust standard errors"))
+    return(list(ready=FALSE,reason=FALSE,report=FALSE))
   
   result <- list(reason = NULL, ready = TRUE, report = FALSE)
 
@@ -50,6 +81,30 @@ if (utils::hasName(options,"cluster"))
          return(result)
        } 
   }
-  
+
   return(result)
+}
+
+
+check_package <- function(options, pkg,conditions, aim) {
+
+     neg<-grep("!",conditions)
+     names<-names(conditions)
+     conditions<-stringr::str_remove(conditions,"!")
+     names(conditions)<-names
+     str1<- paste0("utils::hasName(options,",paste0("'",names(conditions),"'"),")", collapse=" && ")
+     str2<- paste("(",paste(paste0("'",conditions,"' "),paste0("options$",names(conditions)),sep=" %in% "),")")
+     if (length(neg)>0) str2[[neg]]<-paste0("!",str2[[neg]])
+     str2<-paste(str2,collapse=" && ")
+     str <- str2lang(paste(str1,str2,sep=" && "))
+     test<-eval(str)
+     if (test) {
+     if (!requireNamespace(pkg, quietly=T,character.only=T)) {
+       msg<-paste0("Package ",pkg," is required for ",aim,". Please install it and re-run the model.")
+       cat(paste0("\033[0;31m",msg,"\033[0m","\n"))
+       return(FALSE)
+      } 
+     }
+    return(TRUE)
+
 }

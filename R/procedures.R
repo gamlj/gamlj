@@ -606,7 +606,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
 
   # transform the model matrix into the contrast matrix
-  M <- as.data.frame(MASS::ginv(t(codes)))
+  M <- as.data.frame(.ginv(t(codes)))
   # set some labels
   names(M)<-datamatic$contrast_labels
 

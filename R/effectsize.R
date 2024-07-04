@@ -5,6 +5,7 @@ es.marginals<- function(x,...) UseMethod(".margins")
 
 .margins.default<-function(obj) {
 
+
      model       <-  obj$model
      jinfo("EFFECTSIZE: margins default for model of class", class(model))  
      ciWidth     <-  obj$ciwidth
@@ -41,66 +42,6 @@ es.marginals<- function(x,...) UseMethod(".margins")
       return(params)
   
 }      
-
-.zmargins<- function(x,...) UseMethod("..margins")
-
-..margins.default<-function(model,obj) {
-}
-
-..margins.multinom<-function(model,obj) {
-
-  jinfo("EFFECTSIZE: margins multinom for model of class", class(model))  
-  
-  offset         <-  stats::offset
-  ciWidth        <-  obj$ciwidth
-  data           <-  insight::get_data(model,source="frame")
-  groups         <-  model$lev[-1]
-  ref_lev        <-  model$lev[1]
-  form           <-  stats::formula(model$terms)
-  dep            <-  all.vars(form)[1]
-  results        <-  list()
-
-  if (obj$option("ci_method",c("quantile","bcai")))
-        obj$warning<-list(topic="main_marginals",message="C.I for multinomial margins are available only with the delta method.")    
-  for (g in groups) {
-    .data<-data[data[[dep]]==g | data[[dep]]==ref_lev,]
-    try_hard( {
-      .model<-stats::glm(form,.data,family=stats::binomial())
-      .results<-summary(margins::margins(.model),level=ciWidth,by_factor=FALSE)
-    })
-    .results$or<-1:nrow(.results)
-    ladd(results) <- .results
-  }
-  results<-as.data.frame(do.call("rbind",results))
-  results$response<-fromb64(paste(groups,"-",ref_lev))
-  results<-results[order(results$response,results$or),]
-  results
-}
-
-# at the moment, ordinal::clm does not give confidence intervals or inferential tests
-# in margings. So, we re-estimaste the model with MASS::polr.  
-# We do not use MASS:polr for other estimation because it does not work well with parameters::bootstrap_model() emmeans
-
-..margins.clma<-function(model,obj) {
-  jinfo("EFFECTSIZE: margins clm for model of class", class(model))  
-   vce<- "delta"
-   if (obj$option("ci_method",c("quantile","bcai")))
-     vce <- "bootstrap"
-   ciWidth        <-  obj$ciwidth
-   data           <-  model$model
-   .model <- MASS::polr(model$call$formula,data=model$model,Hess = T)
-   m              <-  try_hard(margins::margins(.model,data=data))
-   results        <-  try_hard(summary(m$obj,level=ciWidth,by_factor=FALSE))
-   results$obj
-   
-}
-
-
-..margins.clmm<-function(model,obj) {
-  jinfo("EFFECTSIZE: margins not available for model of class", class(model))  
-  
-  return(NULL)
-}
 
 
 #### Relative risk ######

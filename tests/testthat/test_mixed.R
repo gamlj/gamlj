@@ -94,9 +94,9 @@ testthat::test_that("uncorrelated error", {
     model<-GAMLj3::gamlj_mixed(
       dep=y,
       factors = "cond",
-      modelTerms = "cond",
+      model_terms = "cond",
       cluster = list("subj","stimulus"),
-      randomTerms = list(list(list("Intercept","subj")),list(list("cond","subj"),list("Intercept","stimulus"))),
+      re=list(list(list("Intercept","subj")),list(list("cond","subj"),list("Intercept","stimulus"))),
       data = data
     )
     )
@@ -302,5 +302,14 @@ testthat::test_that("order does not count", {
 
 })
 
+gobj<-GAMLj3::gamlj_mixed(
+  formula = dv ~ 1 + group + time + group:time+( 1 | subj ),
+  data = data,
+  res_struct="un"
+)
 
+testthat::test_that("unstructured covariances", {
+  testthat::expect_equal(gobj$main$anova$asDF$f[2], 27.784,tol)
+  testthat::expect_equal(gobj$main$res_corr$asDF[2,2],.185,tol)
+ })
 
