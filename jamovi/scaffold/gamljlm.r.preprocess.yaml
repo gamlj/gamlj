@@ -195,6 +195,7 @@ items:
                     - name: estimate
                       title: Estimate
                       type: number
+                      format: zto
                     - name: est.ci.lower
                       title: Lower
                       type: number
@@ -264,6 +265,56 @@ items:
                       format: zto,pvalue
 
              refs: parameters
+
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: false
+             clearWith:
+                    -  __modeloptions__
+                    -  __cioptions__
+             columns:
+                    - name: source
+                      title: "Variable"
+                      type: text
+                    - name: label
+                      title: "Contrast"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                      format: zto
+                    - name: se
+                      title: SE
+                      type: number
+                      format: zto
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      format: zto
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                      format: zto
+                    - name: d
+                      type: number
+                      title: d
+                      format: zto
+                    - name: df
+                      title: "df"
+                      type: integer
+                    - name: test
+                      title: "t"
+                      type: number
+                      format: zto
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+
 
            - name: vcov
              title: Coefficients Covariances

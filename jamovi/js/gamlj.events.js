@@ -8,11 +8,13 @@ const events = {
         console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
 
+      
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
         fun.updateSimpleSupplier(ui, this);
         fun.updatePlotsSupplier(ui, this);
+         fun.updateCustom(ui,this);
         if (typeof ui.randomSupplier !== 'undefined' ) {
               fun.fixRandomEffects(ui,this);
         }
@@ -46,11 +48,26 @@ const events = {
 
 
     },
+    
+    dep_changed: function(ui) {
 
+    },
+    dep2_changed: function(ui) {
+      var dep2=ui.dep2.value();      
+      if (dep2 === null) return;
+
+      if (ui.input_method.value() === "standard") {
+              ui.dep2.setValue(null);
+              ui.dep.setValue(dep2)
+      }
+
+    },
+    
     onChange_factors: function(ui) {
       
         fun.calcModelTerms(ui, this);
         fun.updateRandomSupplier(ui,this);
+        fun.updateCustom(ui,this)
     },
 
     onChange_covariates: function(ui) {
@@ -247,9 +264,14 @@ const events = {
 
     },
 
+   contrasts_changed: function(ui) {
+     
+     fun.updateCustom(ui,this);
+     
+   },
    onEvent_nothing: function(ui) {
           console.log("I didn't do anything");
-    }    
+    } 
 
 };
 

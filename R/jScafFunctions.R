@@ -48,6 +48,7 @@ mark <- function(...) {
   
 }
 
+
 is.something <- function(x, ...) UseMethod(".is.something")
 
 .is.something.default <- function(obj) (!is.null(obj))
@@ -56,8 +57,8 @@ is.something <- function(x, ...) UseMethod(".is.something")
 
 .is.something.numeric <- function(obj) (length(obj) > 0)
 
-.is.something.character <- function(obj) (length(obj) > 0)
-
+## this should be changed, it gives always TRUE. Be sure not to break anything
+.is.something.character <- function(obj) (length(obj)>0)   
 .is.something.logical <- function(obj) !is.na(obj)
 
 is.there<-function(pattern,string) length(grep(pattern,string,fixed=T))>0
@@ -337,4 +338,12 @@ clean_lol<-function(alist) {
     if (length(jl)>0) il[[length(il)+1]]<-jl
   }
   il
+}
+
+### dealing with tests on lists
+
+flat_apply<-function(x, fun) {
+  
+   unlist(lapply(x,function(e) fun(e)))
+  
 }

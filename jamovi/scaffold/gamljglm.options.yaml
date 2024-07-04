@@ -18,6 +18,7 @@ modeloptions:
         - model_type
         - custom_family
         - custom_link  
+        - contrast_custom_values
 
 nestedoptions:
         - nested_terms
@@ -41,4 +42,5 @@ simpleeffectsoptions:
                  - ccra_steps
                  - covs_scale_labels
                  - covs_conditioning
+                 - contrast_custom_focus
 

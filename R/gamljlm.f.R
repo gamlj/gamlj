@@ -42,9 +42,17 @@
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+#'   \code{'helmert'}, \code{'repeated'}, \code{'polynomial'} \code{'custom'}. If NULL,
 #'   \code{simple} is used. Can also be passed as a list of list of the form
-#'   list(list(var="var1",type="type1")).
+#'   list(list(var="var1",type="type1")). If any factor contrast is defined as \code{'custom'},
+#'   a named list of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))} should be passed
+#'   to the option \code{contrast_custom_values}.
+#' @param contrast_custom_focus if any factor is coded with \code{'custom'}, when \code{TRUE} or \code{NULL } (default) the coefficients, simple effects and simple interactions
+#'                               are focused on the custom contrast. If \code{FALSE} , variables are coded accordingly to the passed contrast, but
+#'                               no special table or test is devoted to the contrast.    
+
+#' @param contrast_custom_values a named list with the custom contrast weights, of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))}.
+#'        only one constrast per variable is allowed.    
 #' @param show_contrastnames \code{TRUE} or \code{FALSE} (default), shows raw
 #'   names of the contrasts variables in tables
 #' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
@@ -93,7 +101,7 @@
 #' @param ccp_value offsett (number of percentiles) around the median used to
 #'   condition simple effects and plots. Used if
 #'   \code{simpleScale}=\code{'percent'}
-#' @param ccra_value   Covariate condition min max steps (not very mnemonic): 
+#' @param ccra_steps   Covariate condition  steps from min to max: 
 #'        At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}
 #'   
 #' @param covs_scale_labels how the levels of a continuous moderator should
@@ -190,6 +198,8 @@ gamlj_lm <- function(
     ci_method = "wald",
     boot_r = 1000,
     contrasts = NULL,
+    contrast_custom_values = NULL,
+    contrast_custom_focus = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
     vcov = FALSE,
@@ -307,13 +317,25 @@ gamlj_lm <- function(
   if (is.something(names(contrasts)))
     contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
   
-  ## end of custom code
+
   
   if (se_method!="standard") {
     se_method<-"robust"
     robust_method<-se_method
   }
 
+ 
+  if (is.something(contrast_custom_values)) {
+     custom_values=list()
+     if (is.null(contrast_custom_focus)) contrast_custom_focus<-TRUE
+
+    for (name in names(contrast_custom_values)) {
+       ladd(custom_values)<-list(var=name,codes=paste0(contrast_custom_values[[name]], collapse=","))       
+    }
+     contrast_custom_values<-custom_values 
+  }
+
+    ## end of custom code  
   options <- gamljlmOptions$new(
     .caller = .caller,
     .interface = .interface,
@@ -332,6 +354,8 @@ gamlj_lm <- function(
     ci_method = ci_method,
     boot_r = boot_r,
     contrasts = contrasts,
+    contrast_custom_values=contrast_custom_values,    
+    contrast_custom_focus=contrast_custom_focus,    
     show_contrastnames = show_contrastnames,
     show_contrastcodes = show_contrastcodes,
     vcov = vcov,

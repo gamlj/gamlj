@@ -477,7 +477,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
     if (varobj$type=="factor") {
       alist[["specs"]]=c(variable64,term64)
-      ### at the moment (2021) with custom contrast function (not string), infer=c() does not work ####
+      ### in 2021 with custom contrast function (not string), infer=c() does not work ####
       referenceGrid<-do.call(emmeans::emmeans,alist)
       grid<-emmeans::contrast(referenceGrid,
                                    by=term64,
@@ -512,9 +512,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
       
     }
     
-
     grid<-.get_se(opts_list)
-  
     estimates<-as.data.frame(grid)
 
     ## deal with  CI
@@ -587,6 +585,13 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
         attr(.params,"titles")<-list(test="z")
         
     }
+    ## tell users what custom implies
+    if (varobj$requireFocus()) {
+     custom<-varobj$contrast_labels[[1]]
+     obj$warning<-list(topic="simpleEffects_coefficients",message="Simple effects are estimated only for the custom constrast.")
+     obj$warning<-list(topic="simpleEffects_coefficients",message=paste("Estimates evaluate the contrast",custom," at different levels of",paste(term,collapse=" and ")))
+     obj$warning<-list(topic="simpleEffects_anova",message=paste("Estimates evaluate the contrast",custom," at different levels of",paste(term,collapse=" and ")))
+    }
   jinfo("PROCEDURE: done")    
   return(list(.anova,.params))
 
@@ -599,10 +604,16 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
   if (datamatic$method=="dummy")
         codes<-datamatic$contrast_codes("simple")
 
+
   # transform the model matrix into the contrast matrix
-  M <- as.data.frame(MASS::ginv(t(codes)))
+  M <- as.data.frame(.ginv(t(codes)))
   # set some labels
   names(M)<-datamatic$contrast_labels
+
+  if (datamatic$requireFocus()) {
+     M<-data.frame(M[,1])
+     names(M)<-datamatic$contrast_labels[1]
+  }
   M
 }
 
@@ -813,7 +824,7 @@ procedure.simpleInteractions<-function(obj) {
                               }  else
                                       NULL
               })
-            
+         
             names(conditions)<-term64
             conditions<-conditions[sapply(conditions, function(x) is.something(x))]
             ## these are the selected moderators
@@ -888,7 +899,7 @@ procedure.simpleInteractions<-function(obj) {
             ##
             names(res)[(ncol(res)-6):ncol(res)]<-c("estimate","se","df","test","p","est.ci.lower","est.ci.upper")
             names(res)[1:length(.names)]<-.names
-            
+          
             if (varobj$type=="numeric") {
                     res$focal<-variable
                     labnames<-c("focal",.names)
@@ -902,6 +913,7 @@ procedure.simpleInteractions<-function(obj) {
                levels(res[[.name]])<-obj$datamatic$variables[[.name]]$levels_labels
                res[[.name]]<-as.character(res[[.name]])
             }
+           
             names(res)[names(res)%in% mods]<-make.names(paste0("mod_",fromb64(mods)))
             res
       })
@@ -909,7 +921,7 @@ procedure.simpleInteractions<-function(obj) {
       key<-smartTableName("simpleInteractions",.key,"coefficients")
         
       if (!isFALSE(results$error)) 
-          obj$dispatcher$error<-list(topic=key,message=results$error)
+          obj$error<-list(topic=key,message=results$error)
       if (!isFALSE(results$warning)) 
           obj$warning<-list(topic=key,message=results$warning)
             
@@ -955,6 +967,12 @@ procedure.simpleInteractions<-function(obj) {
       
 #      key<-"simpleInteractions_.._anova"
       
+    if (varobj$requireFocus()) {
+     custom<-varobj$contrast_labels[[1]]
+     obj$warning<-list(topic="simpleInteractions_coefficients",message=paste("Simple interactions are estimated only for the custom constrast of variable",varobj$name))
+     obj$warning<-list(topic="simpleInteractions_coefficients",message=paste("Estimates evaluate the interactions of contrast",custom," at different levels of the moderator"))
+     obj$warning<-list(topic="simpleInteractions_anova",message=paste("Estimates evaluate the interactions of contrast",custom," at different levels of the moderator"))
+    }
 
       jinfo("PROCEDURE: done")
  

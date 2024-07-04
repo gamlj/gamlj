@@ -52,6 +52,11 @@ gamljmixedClass <- R6::R6Class(
         aSmartObj$setColumnVisible<-"label"
       ladd(private$.smartObjs)<-aSmartObj
       
+      ### custom contrasts 
+      aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      aSmartObj$activateOnData<-TRUE
+      aSmartObj$ci("est",self$options$ci_width)
+      ladd(private$.smartObjs)<-aSmartObj
 
       
       ### contrasts code tables
@@ -165,7 +170,6 @@ gamljmixedClass <- R6::R6Class(
     .run=function() {
       jinfo("MODULE:",self$options$.caller,"  #### phase run ####")
       
-      private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()
       }
@@ -204,10 +208,19 @@ gamljmixedClass <- R6::R6Class(
 
   plot<-private$.plotter_machine$scatterPlot(image,ggtheme,theme)
   
+  return(plot)
+  
+},
+
+.jnPlot=function(image, ggtheme, theme, ...) {
+
+  plot<-private$.plotter_machine$jnPlot(image,ggtheme,theme)
 
   return(plot)
   
 },
+
+
 
 .qqPlot=function(image, ggtheme, theme, ...) {
 

@@ -1,5 +1,6 @@
 var rtermFormat = require('./rtermFormat');
 
+
 const fun = {
 
     calcModelTerms: function(ui, context) {
@@ -9,7 +10,6 @@ const fun = {
     ui.modelSupplier.setValue(context.valuesToItems(combinedList, FormatDef.variable));
     ui.plotsSupplier.setValue(context.valuesToItems(combinedList, FormatDef.variable));
     ui.simpleSupplier.setValue(context.valuesToItems(combinedList, FormatDef.variable));
- 
     var diff = context.findChanges("variableList", variableList, true, FormatDef.variable);
     var diff2 = context.findChanges("covariatesList", covariatesList, true, FormatDef.variable);
     var combinedDiff = context.findChanges("combinedList", combinedList, true, FormatDef.variable);
@@ -67,9 +67,12 @@ const fun = {
 } ,
   
   updateContrasts: function(ui, variableList, context) {
+    
     var currentList = context.cloneArray(ui.contrasts.value(), []);
 
     var list3 = [];
+    var list4 = [];
+
     for (let i = 0; i < variableList.length; i++) {
         let found = null;
         for (let j = 0; j < currentList.length; j++) {
@@ -80,12 +83,55 @@ const fun = {
         }
         if (found === null)
             list3.push({ var: variableList[i], type: "simple" });
-        else
+        else {
             list3.push(found);
+        }
     }
 
     ui.contrasts.setValue(list3);
+    
+    
 },
+
+
+ updateCustom: function(ui, context) {
+   
+    if (ui.contrast_custom_values===undefined) 
+           return
+    
+    var contrastsList = context.cloneArray(ui.contrasts.value(), []);
+    var customList = context.cloneArray(ui.contrast_custom_values.value(), []);
+    console.log(customList)
+    
+    contrastsList.forEach((item) => {
+         var found=customList.find((e) => e.var===item.var)
+         if (found===undefined) {
+               if (item.type==="custom") {
+                   customList.push({var: item.var, codes: ""})
+               }
+         } else {
+               if (item.type!=="custom") {
+                  customList=customList.filter((e) => e.var !== item.var)
+               }
+         }
+         });
+
+    ui.contrast_custom_values.setValue(customList);
+    
+    if (customList.length>0) {
+        ui.custom_values.$el.show();
+        ui.contrast_focus_box.$el.show();
+    } else {
+        ui.custom_values.$el.hide();
+        ui.contrast_custom_focus.setValue(false);
+        ui.contrast_focus_box.$el.hide();
+
+    }
+    
+    
+},
+
+
   updateScaling: function(ui, variableList, context) {
     var currentList = context.cloneArray(ui.covs_scale.value(), []);
 

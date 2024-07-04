@@ -20,6 +20,8 @@ modeloptions:
         - mute
         - donotrun
         - res_struct
+        - contrast_custom_values
+        
 nestedoptions:
         - nested_terms
         - nested_intercept
@@ -41,4 +43,5 @@ simpleeffectsoptions:
                  - ccra_steps
                  - covs_scale_labels
                  - covs_conditioning
+                 - contrast_custom_focus
 

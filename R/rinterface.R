@@ -483,11 +483,12 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 
 #'  S3 methods for class jamovi ResultsElement 
 #'
-#' These functions extract all visible tables from a ResultsElement produced by gamlj
+#' These functions extract all visible tables from a ResultsElement or related classes produced by GAMLj3
 #' and print them in R style.
 
 #' @param object a gamlj results object of the class `gamlj`
-#' @param ... additional arguments passed to the GAMLj estimation function
+#' @param formula not used
+#' @param ... additional arguments passed to the GAMLj3 estimation function
 #' @return a list of table as data.frame
 #' @author Marcello Gallucci
 #' @examples
@@ -501,7 +502,6 @@ simple_effects.gamlj <- function(object, formula=NULL,...) {
 #' @rdname s3methods
 #' 
 #' @export
-
 
 summary.ResultsElement<-function(object,...) {
     
@@ -531,9 +531,40 @@ summary.ResultsElement<-function(object,...) {
     tables
 }
 
+
+#'  S3 methods for class galmj_list 
+#'
+#' These functions extract all visible tables from a list of tables produced by GAMLj3
+#' and print them in R style.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @param ... additional arguments passed to the GAMLj3 estimation function
+#' @return a list of tables as data.frame
+#' @author Marcello Gallucci
+#' @examples
+#' data(fivegroups)
+#' fivegroups$Group<-factor(fivegroups$Group)
+#' gmod<-GAMLj3::gamlj_lm(
+#'   formula = Score ~Group,
+#'   data = fivegroups)
+#' 
+#' summary(gmod)
+#' @rdname s3methods
+#' 
+#' @export
+
+summary.gamlj_list<-function(object,...) {
+ 
+    lapply(object, function(x) summary.ResultsElement(x))
+  
+}
+    
+
 #' Print a jamovi Table in R style 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... options passed to print.data.frame()
+
 #' @rdname s3methods
 #' 
 #' @export
@@ -550,6 +581,7 @@ print.jmvrtable<-function(x,...) {
 #' Print a jamovi summary of jamovi ResultElement in R style 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... options passed to print()
 #' @rdname s3methods
 #' @export
 
@@ -560,9 +592,27 @@ print.jmvrobj<-function(x,...) {
     }
 }
 
-#' Extract coefficients from a GAMLj result object 
+#' Print a jamovi summary of jamovi ResultElement in R style 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... options passed to print()
+#' @rdname s3methods
+#' @export
+
+print.gamlj_list<-function(x,...) {
+    .names<-names(x)
+    for (i in seq_along(x)) {
+        name<-.names[i]
+        cat("Table for ",name,"\n")
+         print(x[[i]])
+        cat("\n\n")
+    }
+}
+
+#' Extract coefficients from a GAMLj result object 
+#'
+#' @param object a gamlj results object of the class `gamlj`
+#' @param ... not used 
 #' @rdname s3methods
 #' 
 #' @export
@@ -574,6 +624,7 @@ coef.gamlj<-function(object,...) {
 #' Extract model R2 (r-squared) from a GAMLj results object 
 #'
 #' @param x a gamlj results object of the class `gamlj`
+#' @param ... not used 
 #' @rdname s3methods
 #' @export
 #' 
@@ -613,7 +664,7 @@ fit.gamlj<-function(x,...) {
 #' em_means(gmod,formula =~Group)
 #' @export
 #' 
-em_means <- function(object, ...) UseMethod("em_means")
+em_means <- function(object, formula, ...) UseMethod("em_means")
 
 
 #' @rdname s3methods
@@ -628,6 +679,49 @@ em_means.gamlj <- function(object, formula = NULL, ...) {
   if (length(object$emmeans) == 0) 
     return(FALSE)
   object$emmeans
+}
+
+
+#'  Custom contrasts 
+#'
+#' This is a convenience function to test and extract estimates and information about
+#' custom contrast.
+
+#' @param object a gamlj results object of the class `gamlj`
+#' @param contrasts a named list with contrasts weights to test of the form \code{list(factor1=c(a1,a2,b3), factor2=c(b1,b2,b3))}. Multiple
+#'                  contrasts for the same factor can be tested. In this case, each contrast is tested independently. 
+#' @param ... all options accepted by a gamlj model function.  
+#' @return an object of class 
+#' @author Marcello Gallucci
+#' @examples
+#' data(fivegroups)
+#' fivegroups$Group<-factor(fivegroups$Group)
+#' gmod<-GAMLj3::gamlj_lm(
+#'   formula = Score ~Group,
+#'   data = fivegroups)
+#' 
+#' em_means(gmod,formula =~Group)
+#' @export
+#' 
+
+
+test_contrasts <- function(object, contrasts, ...) {
+
+    results<-list()
+    for (i in seq_along(contrasts)) {
+      name  <- names(contrasts)[i]
+      w     <- contrasts[[i]]
+    
+      values<-list(w)
+      names(values)<-name
+      settings<-list("custom")
+      names(settings)<-name
+      model<-stats::update(object,contrasts=settings,contrast_custom_values=values)
+      ladd(results)<-model$main$contrasts
+    }
+     names(results)<-names(contrasts)
+     class(results)<-c("gamlj_list",class(results))
+     results
 }
 
 

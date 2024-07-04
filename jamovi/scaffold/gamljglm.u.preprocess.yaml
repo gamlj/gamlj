@@ -114,11 +114,15 @@ children:
             maxItemCount: 1
             isTarget: true
             itemDropBehaviour: overwrite
+            events:
+                 change:   './gamlj.events::dep_changed' 
           - type: VariablesListBox
             name: dep2
             maxItemCount: 1
             isTarget: true
             itemDropBehaviour: overwrite
+            events:
+                 change:   './gamlj.events::dep2_changed' 
 
       - type: TargetLayoutBox
         children:
@@ -417,6 +421,18 @@ children:
                 name: plot_xoriginal
               - type: CheckBox
                 name: plot_black
+
+
+      - type: LayoutBox
+        margin: large
+        style: inline
+        children:
+          - type: Label
+            label: Other Plots
+            children:
+              -  type:  CheckBox
+                 name:  plot_jn
+
                 
   - name: panel_simpleeffects
     type: scaffold

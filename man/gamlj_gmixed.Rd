@@ -28,6 +28,8 @@ gamlj_gmixed(
   boot_r = 1000,
   ci_width = 95,
   contrasts = NULL,
+  contrast_custom_values = NULL,
+  contrast_custom_focus = NULL,
   show_contrastnames = TRUE,
   show_contrastcodes = FALSE,
   plot_x = NULL,
@@ -134,6 +136,13 @@ var2="type2")} specifying the type of contrast to use, one of
 \code{simple} is used. Can also be passed as a list of list of the form
 list(list(var="var1",type="type1")).}
 
+\item{contrast_custom_values}{a named list with the custom contrast weights, of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))}.
+only one constrast per variable is allowed.}
+
+\item{contrast_custom_focus}{if any factor is coded with \code{'custom'}, when \code{TRUE} or \code{NULL } (default) the coefficients, simple effects and simple interactions
+are focused on the custom contrast. If \code{FALSE} , variables are coded accordingly to the passed contrast, but
+no special table or test is devoted to the contrast.}
+
 \item{show_contrastnames}{\code{TRUE} or \code{FALSE} (default), shows raw
 names of the contrasts variables in tables}
 
@@ -199,6 +208,9 @@ Used if \code{covs_conditioning}=\code{'mean_sd'}}
 \item{ccp_value}{Covariates conditioning percentile offset value: number of
 percentiles around the median used to condition simple effects and plots.
 Used if \code{covs_conditioning}=\code{'percent'}}
+
+\item{ccra_steps}{Covariate condition  steps from min to max: 
+At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
 
 \item{covs_scale_labels}{how the levels of a continuous moderator should
 appear in tables and plots: \code{labels}, \code{values} and

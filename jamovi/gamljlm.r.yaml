@@ -34,6 +34,7 @@ items:
         -  se_method
         -  robust_method
         -  mute
+        -  contrast_custom_values
            ### modeloptions  ends
            ### nestedoptions  begins
         -  nested_terms
@@ -70,6 +71,7 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
                             ### modeloptions  ends
                             ### nestedoptions  begins
                          -  nested_terms
@@ -131,6 +133,7 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
                             ### modeloptions  ends
                             ### cioptions  begins
                          -  ci_width
@@ -189,6 +192,7 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
                             ### modeloptions  ends
 
              columns:
@@ -262,6 +266,7 @@ items:
                          -  se_method
                          -  robust_method
                          -  mute
+                         -  contrast_custom_values
                             ### modeloptions  ends
                             ### cioptions  begins
                          -  ci_width
@@ -280,6 +285,7 @@ items:
                     - name: estimate
                       title: Estimate
                       type: number
+                      format: zto
                     - name: est.ci.lower
                       title: Lower
                       type: number
@@ -304,6 +310,7 @@ items:
                     -  se_method
                     -  robust_method
                     -  mute
+                    -  contrast_custom_values
                        ### modeloptions  ends
                        ### cioptions  begins
                     -  ci_width
@@ -367,6 +374,74 @@ items:
 
              refs: parameters
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: false
+             clearWith:
+                       ### modeloptions  begins
+                    -  dep
+                    -  factors
+                    -  covs
+                    -  covs_scale
+                    -  dep_scale
+                    -  scale_missing
+                    -  contrasts
+                    -  model_terms
+                    -  fixed_intercept
+                    -  se_method
+                    -  robust_method
+                    -  mute
+                    -  contrast_custom_values
+                       ### modeloptions  ends
+                       ### cioptions  begins
+                    -  ci_width
+                    -  ci_method
+                    -  boot_r
+                       ### cioptions  ends
+             columns:
+                    - name: source
+                      title: "Variable"
+                      type: text
+                    - name: label
+                      title: "Contrast"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                      format: zto
+                    - name: se
+                      title: SE
+                      type: number
+                      format: zto
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      format: zto
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                      format: zto
+                    - name: d
+                      type: number
+                      title: d
+                      format: zto
+                    - name: df
+                      title: "df"
+                      type: integer
+                    - name: test
+                      title: "t"
+                      type: number
+                      format: zto
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
+
+
+
            - name: vcov
              title: Coefficients Covariances
              type: Table
@@ -385,6 +460,7 @@ items:
                     -  se_method
                     -  robust_method
                     -  mute
+                    -  contrast_custom_values
                        ### modeloptions  ends
              columns:
                     - name: source
@@ -441,6 +517,7 @@ items:
               -  se_method
               -  robust_method
               -  mute
+              -  contrast_custom_values
                  ### modeloptions  ends
                  ### cioptions  begins
               -  ci_width
@@ -527,6 +604,7 @@ items:
               -  se_method
               -  robust_method
               -  mute
+              -  contrast_custom_values
                  ### modeloptions  ends
                  ### cioptions  begins
               -  ci_width
@@ -614,11 +692,13 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
                     ### simpleeffectsoptions  begins
                  -  simple_x
                  -  simple_mods
                  -  simple_scale
+                 -  contrast_custom_focus
                     ### simpleeffectsoptions  ends
                     ### covscalingoptions  begins
                  -  covs_conditioning                 
@@ -689,6 +769,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
                     ### cioptions  begins
                  -  ci_width
@@ -699,6 +780,7 @@ items:
                  -  simple_x
                  -  simple_mods
                  -  simple_scale
+                 -  contrast_custom_focus
                     ### simpleeffectsoptions  ends
                     ### covscalingoptions  begins
                  -  covs_conditioning                 
@@ -775,6 +857,7 @@ items:
                 -  se_method
                 -  robust_method
                 -  mute
+                -  contrast_custom_values
                    ### modeloptions  ends
                    ### covscalingoptions  begins
                 -  covs_conditioning                 
@@ -787,6 +870,7 @@ items:
                 -  simple_x
                 -  simple_mods
                 -  simple_scale
+                -  contrast_custom_focus
                    ### simpleeffectsoptions  ends
                 
              columns:
@@ -854,6 +938,7 @@ items:
                 -  se_method
                 -  robust_method
                 -  mute
+                -  contrast_custom_values
                    ### modeloptions  ends
                    ### cioptions  begins
                 -  ci_width
@@ -864,6 +949,7 @@ items:
                 -  simple_x
                 -  simple_mods
                 -  simple_scale
+                -  contrast_custom_focus
                    ### simpleeffectsoptions  ends
                   ### covscalingoptions  begins
                 - covs_conditioning                 
@@ -929,6 +1015,7 @@ items:
             -  se_method
             -  robust_method
             -  mute
+            -  contrast_custom_values
                ### modeloptions  ends
                ### cioptions  begins
             -  ci_width
@@ -986,6 +1073,7 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1029,6 +1117,7 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1075,6 +1164,7 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1117,6 +1207,7 @@ items:
            -  se_method
            -  robust_method
            -  mute
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1167,6 +1258,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
           columns:
             - name: name
@@ -1203,6 +1295,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
           columns:
             - name: name
@@ -1235,6 +1328,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
           columns:
             - name: source
@@ -1270,6 +1364,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
 
         - name: normPlot
@@ -1295,6 +1390,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
                  
         - name: residPlot
@@ -1320,6 +1416,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
                  -  plot_extremes
 
@@ -1345,6 +1442,7 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
         
   - name: residuals
@@ -1366,5 +1464,6 @@ items:
                  -  se_method
                  -  robust_method
                  -  mute
+                 -  contrast_custom_values
                     ### modeloptions  ends
         

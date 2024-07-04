@@ -13,7 +13,7 @@
 #'                      data = clustermanymodels
 #'                      )
 #' @param formula (optional) the formula of the linear mixed model as defined in \link[lme4]{lmer}.
-#' @param data the data as a data frame
+#' @param data the data as a data frame.
  #' @param cluster a vector of strings naming the clustering variables from
 #'   \code{data}. Not necessary if \code{formula} is defined.
 #' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
@@ -41,9 +41,18 @@
 #' @param contrasts a named vector of the form \code{c(var1="type",
 #'   var2="type2")} specifying the type of contrast to use, one of
 #'   \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-#'   \code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+#'   \code{'helmert'}, \code{'repeated'}, \code{'polynomial'} \code{'custom'}. If NULL,
 #'   \code{simple} is used. Can also be passed as a list of list of the form
-#'   list(list(var="var1",type="type1")).
+#'   list(list(var="var1",type="type1")). If any factor contrast is defined as \code{'custom'},
+#'   a named list of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))} should be passed
+#'   to the option \code{contrast_custom_values}.
+#' @param contrast_custom_focus if any factor is coded with \code{'custom'}, when \code{TRUE} or \code{NULL } (default) the coefficients, simple effects and simple interactions
+#'                               are focused on the custom contrast. If \code{FALSE} , variables are coded accordingly to the passed contrast, but
+#'                               no special table or test is devoted to the contrast.    
+
+#' @param contrast_custom_values a named list with the custom contrast weights, of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))}.
+#'        only one constrast per variable is allowed.    
+#'   
 #' @param show_contrastnames \code{TRUE} or \code{FALSE} (default), shows raw
 #'   names of the contrasts variables in tables
 #' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
@@ -108,7 +117,7 @@
 #' @param re_corr \code{'all'}, \code{'none'} (default), or \code{'block'}.
 #'   When random effects are passed as list of length 1, it decides whether the
 #'   effects should be correlated,  non correlated. If \code{'re'} is a list of
-#'   lists of length > 1, the option is automatially set to \code{'block'}. The
+#'   lists of length > 1, the option is automatically set to \code{'block'}. The
 #'   option is ignored if the model is passed using \code{formula}.
 #' @param reml \code{TRUE} (default) or \code{FALSE}, should the Restricted ML
 #'   be re_corrused rather than ML
@@ -186,6 +195,7 @@ gamlj_mixed <- function(
     res_struct="id",
     re_lrt = FALSE,
     re_ci = FALSE,
+    re_corr="block",
     fixed_intercept = TRUE,
     nested_terms = NULL,
     nested_intercept = NULL,
@@ -196,6 +206,8 @@ gamlj_mixed <- function(
     boot_r = 1000,
     ci_width = 95,
     contrasts = NULL,
+    contrast_custom_values = NULL,
+    contrast_custom_focus = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
     plot_x = NULL,
@@ -260,7 +272,7 @@ gamlj_mixed <- function(
   .interface = "R"
   donotrun = FALSE
   model_type = "lmer"
-  re_corr="block"
+#  re_corr="block"
   re_modelterms = TRUE
   re_listing = "none"
   ### model terms
@@ -327,7 +339,21 @@ gamlj_mixed <- function(
   
   if (is.something(names(contrasts)))
     contrasts<-lapply(names(contrasts), function(a) list(var=a,type=contrasts[[a]]))
+
+#### custom contrastd
   
+  if (is.something(contrast_custom_values)) {
+     custom_values=list()
+     if (is.null(contrast_custom_focus)) contrast_custom_focus<-TRUE
+
+    for (name in names(contrast_custom_values)) {
+       ladd(custom_values)<-list(var=name,codes=paste0(contrast_custom_values[[name]], collapse=","))       
+    }
+     contrast_custom_values<-custom_values 
+  }
+
+  
+    
   ## end of custom code
   
   options <- gamljmixedOptions$new(
@@ -347,6 +373,8 @@ gamlj_mixed <- function(
     boot_r = boot_r,
     ci_width = ci_width,
     contrasts = contrasts,
+    contrast_custom_values=contrast_custom_values,    
+    contrast_custom_focus=contrast_custom_focus,    
     show_contrastnames = show_contrastnames,
     show_contrastcodes = show_contrastcodes,
     plot_x = plot_x,

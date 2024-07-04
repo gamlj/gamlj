@@ -53,6 +53,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
@@ -108,6 +109,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
 
              columns:
@@ -156,6 +158,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
              columns:
                     - name: obs
@@ -188,6 +191,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
 
              columns:
@@ -230,6 +234,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -285,6 +290,84 @@ items:
                       type: number
                       format: zto,pvalue
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: false
+             clearWith:
+                       ### modeloptions  begins
+                    -  model_type
+                    -  dep
+                    -  dep2
+                    -  factors
+                    -  covs
+                    -  covs_scale
+                    -  scale_missing
+                    -  model_terms
+                    -  fixed_intercept
+                    -  se_method
+                    -  mute
+                    -  df_method
+                    -  contrasts
+                    -  covs_scale
+                    -  offset
+                    -  omnibus
+                    -  model_type
+                    -  custom_family
+                    -  custom_link
+                    -  contrast_custom_values
+                       ### modeloptions  ends
+                       ### cioptions  begins
+                    -  ci_width
+                    -  ci_method
+                    -  boot_r
+                       ### cioptions  ends
+             columns:
+
+                    - name: response
+                      title: Response 
+                      type: text
+                      visible: (model_type:multinomial)
+                      combineBelow: true
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                    - name: expb
+                      type: number
+                      title: Exp(B)
+                      visible: (es:expb)
+                    - name: expb.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (es:expb & expb_ci)
+                    - name: expb.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (es:expb & expb_ci)
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
            - name: phi
              title:  Precision Parameter Estimates (phi)
@@ -311,6 +394,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -371,6 +455,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
 
              columns:
@@ -430,6 +515,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### simpleeffectsoptions  begins
                          - simple_x
@@ -440,6 +526,7 @@ items:
                          - ccra_steps
                          - covs_scale_labels
                          - covs_conditioning
+                         - contrast_custom_focus
                            ### simpleeffectsoptions  ends
              refs: margins        
              columns:
@@ -502,6 +589,7 @@ items:
                          - model_type
                          - custom_family
                          - custom_link
+                         - contrast_custom_values
                            ### modeloptions  ends
                          - __effectsizeoptions
                     
@@ -560,6 +648,7 @@ items:
                     - model_type
                     - custom_family
                     - custom_link
+                    - contrast_custom_values
                       ### modeloptions  ends
                     - propodds_test
                   
@@ -610,6 +699,7 @@ items:
         - model_type
         - custom_family
         - custom_link
+        - contrast_custom_values
           ### modeloptions  ends
         - posthoc
         - adjust
@@ -643,6 +733,7 @@ items:
             - model_type
             - custom_family
             - custom_link
+            - contrast_custom_values
               ### modeloptions  ends
             - posthoc
             - adjust
@@ -915,6 +1006,7 @@ items:
               - model_type
               - custom_family
               - custom_link
+              - contrast_custom_values
                 ### modeloptions  ends
                 ### cioptions  begins
               - ci_width        
@@ -968,6 +1060,7 @@ items:
            -  model_type
            -  custom_family
            -  custom_link
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1013,6 +1106,7 @@ items:
            -  model_type
            -  custom_family
            -  custom_link
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1032,6 +1126,99 @@ items:
 
 
   - name: plotnotes
+    type: Html
+    visible: false
+ 
+  - name: jnPlots
+    title: Johnson-Neyman Plot
+    type: Array
+    description: an array of plots
+    visible: (plot_jn)
+    refs: interactions
+    clearWith:
+              ### modeloptions  begins
+           -  model_type
+           -  dep
+           -  dep2
+           -  factors
+           -  covs
+           -  covs_scale
+           -  scale_missing
+           -  model_terms
+           -  fixed_intercept
+           -  se_method
+           -  mute
+           -  df_method
+           -  contrasts
+           -  covs_scale
+           -  offset
+           -  omnibus
+           -  model_type
+           -  custom_family
+           -  custom_link
+           -  contrast_custom_values
+              ### modeloptions  ends
+              ### cioptions  begins
+           -  ci_width
+           -  ci_method
+           -  boot_r
+              ### cioptions  ends
+              ### covscalingoptions  begins
+              ### covscalingoptions  ends
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+    template:
+          title: ""
+          type: Image
+          renderFun: .jnPlot
+          width: 700
+          height: 400
+
+          clearWith:
+              ### modeloptions  begins
+           -  model_type
+           -  dep
+           -  dep2
+           -  factors
+           -  covs
+           -  covs_scale
+           -  scale_missing
+           -  model_terms
+           -  fixed_intercept
+           -  se_method
+           -  mute
+           -  df_method
+           -  contrasts
+           -  covs_scale
+           -  offset
+           -  omnibus
+           -  model_type
+           -  custom_family
+           -  custom_link
+           -  contrast_custom_values
+              ### modeloptions  ends
+              ### cioptions  begins
+           -  ci_width
+           -  ci_method
+           -  boot_r
+              ### cioptions  ends
+              ### covscalingoptions  begins
+              ### covscalingoptions  ends
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+  - name: jnplotnotes
     type: Html
     visible: false
 
@@ -1062,6 +1249,7 @@ items:
                  -  model_type
                  -  custom_family
                  -  custom_link
+                 -  contrast_custom_values
                     ### modeloptions  ends
         
   - name: residuals
@@ -1090,6 +1278,7 @@ items:
                  -  model_type
                  -  custom_family
                  -  custom_link
+                 -  contrast_custom_values
                     ### modeloptions  ends
         
 

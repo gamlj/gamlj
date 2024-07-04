@@ -187,6 +187,14 @@ Initier <- R6::R6Class(
       lapply(1:.len, function(t) list(source=""))
       
     },
+    init_main_contrasts = function() {
+      
+      vars<-lapply(self$datamatic$variables, function(x) if (x$method == "custom") list(source=x$name,label=x$contrast_labels[[1]]) else NULL)
+      vars<-vars[!sapply(vars,is.null)]
+      if (length(vars)==0) return(NULL)      
+      return(vars)
+      
+    },
     init_main_contrastCodeTables=function() {
       
         tab<-NULL
@@ -352,7 +360,10 @@ init_main_res_corr=function() {
       if (self$options$model_type=="multinomial" & self$options$.caller=="glmer") 
         return(NULL)
       
-        .var64<-tob64(self$options$simple_x)
+        .simple<-self$options$simple_x
+        .var64<-tob64(.simple)
+        focal<-self$datamatic$variables[[.var64]]
+        focal$isFocal <- TRUE
         .mods<-rev(self$options$simple_mods)
         .mods64<-tob64(.mods)
         nrow<-prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
@@ -365,19 +376,25 @@ init_main_res_corr=function() {
     },
     
     init_simpleEffects_coefficients=function() {
-      
-        .var64<-tob64(self$options$simple_x)
+        
+        .simple<-self$options$simple_x
+        .var64<-tob64(.simple)
         focal<-self$datamatic$variables[[.var64]]
-        neffects<-focal$neffects
+        focal$isFocal <- TRUE
+         neffects<-focal$neffects
         .mods<-rev(self$options$simple_mods)
         .mods64<-tob64(.mods)
-        
+        if (focal$requireFocus()) {
+           neffects<-1
+        }
         nrow<-neffects*prod(unlist(lapply(.mods64,function(m) self$datamatic$variables[[m]]$nlevels)))
         ncol<-length(.mods64)
-        
-        if (self$options$model_type=="multinomial")
+
+        if (self$options$model_type=="multinomial") {
           nrow <- nrow * (self$datamatic$dep$nlevels-1)
-        
+          neffects<-focal$neffects
+        }
+
         df<-data.frame(matrix("",nrow = nrow,ncol=ncol))
         names(df)<-paste0("mod_",make.names(.mods,unique = T))
         attr(df,"titles")<-.mods
@@ -386,10 +403,15 @@ init_main_res_corr=function() {
     },
     init_simpleInteractions=function() {
       
-    
+
+        ## set which is the focal variable, which is used bu contrast_interaction when dealing with custom contrast
+        .simple<-self$options$simple_x
+        .var64<-tob64(.simple)
+        focal<-self$datamatic$variables[[.var64]]
+        focal$isFocal <- TRUE
+
         ### moderators should be reverted in order to match emmeans 
         .term<-rev(self$options$simple_mods)
-        .simple<-self$options$simple_x
         n<-length(.term)
         j<-n
         resultsList<-list()
@@ -414,6 +436,7 @@ init_main_res_corr=function() {
           ## for coefficients
           .inters64<-tob64(.inters)
           neffects<-ntests*prod(unlist(lapply(.inters64,function(m) self$datamatic$variables[[m]]$neffects)))
+          if (focal$method == "custom") neffects <- neffects/focal$neffects
           
           df2<-data.frame(matrix(".",ncol=length(.names),nrow=neffects))
           names(df2)<-.names

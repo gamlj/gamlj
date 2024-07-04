@@ -4,14 +4,14 @@
 \alias{em_means}
 \title{Estimated marginal means in GAMLj results}
 \usage{
-em_means(object, ...)
+em_means(object, formula, ...)
 }
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}
 
-\item{...}{all options accepted by a gamlj model function.}
-
 \item{formula}{(optional) rhs formula defining the factor(s) for which levels expected means are estimated}
+
+\item{...}{all options accepted by a gamlj model function.}
 }
 \value{
 an object of class

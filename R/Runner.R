@@ -158,9 +158,30 @@ Runner <- R6::R6Class("Runner",
                               tab       <-  gparameters(self$model,self)
                               tab       <-  private$.fix_names(tab)
                             }
+                            private$.coefficientstab<-tab
                             tab
                             
                           },
+                          # focus on custom contrasts
+                          
+                          run_main_contrasts=function() {
+
+                             tab<-private$.coefficientstab
+                             if (is.null(tab)) return()
+                             labels<-unlist(lapply(self$datamatic$variables, function(x) if (x$method == "custom") x$contrast_labels[[1]] else NULL))
+                             w<-which(tab$label %in% labels)
+                             if (length(w)==0) {
+                               warning("No custom contrast defined. Custom contrasts can be defined for variables defined as factors")
+                               return()
+                             }
+                             tab<-tab[w,]
+#                            tab$source<-NULL
+                      
+                             if (self$infomatic$caller=="lm")
+                                       tab$d<-2*tab$test/sqrt(tab$df)
+                             return(tab)
+                          },
+
                           ### this is for beta regression
                           run_main_phi=function() {
                             
@@ -272,6 +293,8 @@ Runner <- R6::R6Class("Runner",
                               jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
+                            
+
                               return(results[[1]])
                               
                           },
@@ -456,19 +479,25 @@ Runner <- R6::R6Class("Runner",
                             private$.contr_index<-private$.contr_index+1
                             i<-private$.contr_index
                             var <-datamatic[[i]]
-                            if (var$type=="factor")
+                            if (var$type == "factor")
                                 contrast<-var$contrast_values
                             else 
                                 contrast<-c(-.5,.5)
-                            contrast<-as.data.frame(MASS::ginv(t(contrast)))
+                            
                             if (private$.contr_index==nvar)
                                   private$.contr_index<-0
+                            
+                            if (var$requireFocus()) {
+                              contrast<-data.frame(contrast[,1])
+                              names(contrast)<-var$contrast_labels[[1]]
+                              return(contrast)
+                            }
+                            contrast<-as.data.frame(.ginv(t(contrast)))
 
-                            if (var$type=="factor")
+                            if (var$type == "factor")
                                       names(contrast)<-paste0("(",gsub(" ","",var$contrast_labels),")")
-
                             else
-                              names(contrast)<-var$name
+                                     names(contrast)<-var$name
 
                             return(contrast)
                           }
@@ -479,6 +508,7 @@ Runner <- R6::R6Class("Runner",
                         private=list(
                           .data64=NULL,
                           .contr_index=0,
+                          .coefficientstab=NULL,
                           .estimateModel=function(data) {
                             
                               jinfo("MODULE: Estimating the model: checking")
@@ -557,8 +587,13 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              if (!isFALSE(results$warning))
-                                warning(fromb64(results$warning))
+                              if (!isFALSE(results$warning)) {
+                                  disp<-Dispatch$new(self$analysis$results)
+                                  msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
+                                  msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
+                                  if (is.something(msg))
+                                        warning(msg)
+                              }
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"])
@@ -738,7 +773,7 @@ estimate_lme<-function(...) {
   opts<-list(...)
   data<-opts$data
   coropts<-list(form=stats::formula(opts$form))
-  if (hasName(opts,"coropts")) coropts<-c(coropts,opts$coropts)
+  if (utils::hasName(opts,"coropts")) coropts<-c(coropts,opts$coropts)
   cor <- do.call(opts$cor,coropts)
   model = nlme::lme(fixed=opts$fixed, 
                       random=opts$random,

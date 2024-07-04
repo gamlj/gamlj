@@ -290,7 +290,7 @@ Infomatic <- R6::R6Class(
       }
 
       if (self$model_type=="ordinal") {
-        
+
         self$model         <-   c("Cumlative Link Model","Proportional odds logistic")
         self$distribution  <-    "logistic"
         self$call          <-    ORDINAL[[self$caller]]
@@ -312,7 +312,7 @@ Infomatic <- R6::R6Class(
       
       if (self$model_type=="multinomial") {
         
-        
+
         self$model         <-    c("Multinomial Model","Model for categorical y")
         self$distribution  <-    "multinomial"
         if (self$caller=="glm") {

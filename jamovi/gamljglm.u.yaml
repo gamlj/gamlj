@@ -114,11 +114,15 @@ children:
                         maxItemCount: 1
                         isTarget: true
                         itemDropBehaviour: overwrite
+                        events:
+                                change: ./gamlj.events::dep_changed
                 -       type: VariablesListBox
                         name: dep2
                         maxItemCount: 1
                         isTarget: true
                         itemDropBehaviour: overwrite
+                        events:
+                                change: ./gamlj.events::dep2_changed
         -       type: TargetLayoutBox
                 children:
                 -       type: VariablesListBox
@@ -262,6 +266,8 @@ children:
         -       type: ListBox
                 name: contrasts
                 stretchFactor: 1
+                events:
+                        change: ./gamlj.events::contrasts_changed
                 showColumnHeaders: false
                 columns:
                 -       name: var
@@ -281,6 +287,22 @@ children:
                 name: show_contrastnames
         -       type: CheckBox
                 name: show_contrastcodes
+        -       type: Label
+                label: Contrast Codes
+                name: custom_values
+                children:
+                -       type: ListBox
+                        name: contrast_custom_values
+                        showColumnHeaders: false
+                        columns:
+                        -       name: var
+                                label: Var
+                                template:
+                                        type: Label
+                        -       name: codes
+                                label: Var
+                                template:
+                                        type: TextBox
 -       name: panel_covs
         type: CollapseBox
         label: Covariates Scaling
@@ -507,6 +529,15 @@ children:
                                 name: plot_xoriginal
                         -       type: CheckBox
                                 name: plot_black
+        -       type: LayoutBox
+                margin: large
+                style: inline
+                children:
+                -       type: Label
+                        label: Other Plots
+                        children:
+                        -       type: CheckBox
+                                name: plot_jn
 -       name: panel_simpleeffects
         type: CollapseBox
         label: Simple Effects
@@ -515,6 +546,7 @@ children:
         children:
         -       type: VariableSupplier
                 name: simpleSupplier
+                label: Variables
                 populate: manual
                 stretchFactor: 1
                 persistentItems: false
@@ -533,9 +565,20 @@ children:
                         -       type: VariablesListBox
                                 name: simple_mods
                                 isTarget: true
-        -       type: CheckBox
-                name: simple_interactions
-                label: Simple interactions
+        -       type: Label
+                name: simple_options
+                label: Additional Tests
+                children:
+                -       type: CheckBox
+                        name: simple_interactions
+                        label: Simple interactions
+                -       type: LayoutBox
+                        name: contrast_focus_box
+                        margin: large
+                        style: list
+                        children:
+                        -       type: CheckBox
+                                name: contrast_custom_focus
 -       name: panel_emmeans
         type: CollapseBox
         label: Estimated Marginal Means

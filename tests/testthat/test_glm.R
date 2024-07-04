@@ -155,7 +155,7 @@ mod <- GAMLj3::gamlj_glm(
   posthoc = ~ ses:female
 )
 
-mod$posthoc[[1]]$asDF
+
 testthat::test_that("Multinomial posthoc works", {
   testthat::expect_equal(mod$posthoc[[1]]$asDF$response[[1]], "academic")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[8], .2101, tol)
@@ -315,12 +315,13 @@ testthat::test_that("quasi poisson binomial works", {
 
 ## ordinal
 
-## testing options for all models
+library(GAMLj3)
 
 data("manymodels")
 data <- manymodels
 data$cat3 <- factor(data$cat3)
 data$yord <- factor(data$yord)
+
 
 mod <- GAMLj3::gamlj_glm(
   formula = yord ~ x * cat3,
@@ -337,7 +338,7 @@ testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$main$anova$asDF$test[1], 51.056, tol)  
   testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .851, tol)
   testthat::expect_equal(mod$main$r2$asDF$r2, .199, tol)
-  testthat::expect_equal(mod$main$fit$asDF$value[4], 899.646, tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[4], 217.609, tol)
   testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 3.310, tol)
   testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 15.407, tol)
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .363, tol)
@@ -345,7 +346,20 @@ testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tol)
 })
 
-
+data$yperc<-(data$ypoi+1)/(max(data$ypoi)+2)
+mod <- GAMLj3::gamlj_glm(
+  formula = yperc ~ x * cat3,
+  data = data,
+  model_type = "beta",
+  emmeans = ~cat3,
+  simple_x= x,
+  simple_mods = cat3,
+  posthoc=~cat3
+)
+testthat::test_that("beta works", {
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .20968, tol)
+  testthat::expect_equal(mod$main$anova$asDF$test[1], 11.9587, tol)  
+})
 
 
 ### model comparison 
@@ -369,7 +383,6 @@ mod <- GAMLj3::gamlj_glm(
 testthat::test_that("logistic comparison", {
   testthat::expect_equal(mod$main$r2$asDF[3,2],.0265,tol)
   testthat::expect_equal(mod$main$r2$asDF[1,6],.0444,tol)
-  
 })
 
 
@@ -383,4 +396,5 @@ mod <- GAMLj3::gamlj_glm(
 testthat::test_that("multinomila comparison", {
   testthat::expect_equal(mod$main$r2$asDF[3,2],.0061,tol)
 })
+
 

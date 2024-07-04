@@ -41,3 +41,5 @@ vignettes/*.pdf
 .Rproj.user
 # docs sources
 inst/doc
+/doc/
+/Meta/

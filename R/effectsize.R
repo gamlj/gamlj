@@ -5,6 +5,7 @@ es.marginals<- function(x,...) UseMethod(".margins")
 
 .margins.default<-function(obj) {
 
+
      model       <-  obj$model
      jinfo("EFFECTSIZE: margins default for model of class", class(model))  
      ciWidth     <-  obj$ciwidth
@@ -17,7 +18,7 @@ es.marginals<- function(x,...) UseMethod(".margins")
   
      if (obj$option("ci_method",c("quantile","bcai"))) {
           method="boot"
-          switch (object$options$ci_method,
+          switch (obj$options$ci_method,
              quantile = type <- "perc",
              bcai     = type  <- "bca"
           )
@@ -36,71 +37,11 @@ es.marginals<- function(x,...) UseMethod(".margins")
                              )
       params$contrast <- fromb64(params$contrast)
       params$source   <- fromb64(params$source)
-      if (hasName(params,"response"))
+      if (utils::hasName(params,"response"))
             params$response    <- fromb64(params$response)
       return(params)
   
 }      
-
-.zmargins<- function(x,...) UseMethod("..margins")
-
-..margins.default<-function(model,obj) {
-}
-
-..margins.multinom<-function(model,obj) {
-
-  jinfo("EFFECTSIZE: margins multinom for model of class", class(model))  
-  
-  offset         <-  stats::offset
-  ciWidth        <-  obj$ciwidth
-  data           <-  insight::get_data(model,source="frame")
-  groups         <-  model$lev[-1]
-  ref_lev        <-  model$lev[1]
-  form           <-  stats::formula(model$terms)
-  dep            <-  all.vars(form)[1]
-  results        <-  list()
-
-  if (obj$option("ci_method",c("quantile","bcai")))
-        obj$warning<-list(topic="main_marginals",message="C.I for multinomial margins are available only with the delta method.")    
-  for (g in groups) {
-    .data<-data[data[[dep]]==g | data[[dep]]==ref_lev,]
-    try_hard( {
-      .model<-stats::glm(form,.data,family=stats::binomial())
-      .results<-summary(margins::margins(.model),level=ciWidth,by_factor=FALSE)
-    })
-    .results$or<-1:nrow(.results)
-    ladd(results) <- .results
-  }
-  results<-as.data.frame(do.call("rbind",results))
-  results$response<-fromb64(paste(groups,"-",ref_lev))
-  results<-results[order(results$response,results$or),]
-  results
-}
-
-# at the moment, ordinal::clm does not give confidence intervals or inferential tests
-# in margings. So, we re-estimaste the model with MASS::polr.  
-# We do not use MASS:polr for other estimation because it does not work well with parameters::bootstrap_model() emmeans
-
-..margins.clma<-function(model,obj) {
-  jinfo("EFFECTSIZE: margins clm for model of class", class(model))  
-   vce<- "delta"
-   if (obj$option("ci_method",c("quantile","bcai")))
-     vce <- "bootstrap"
-   ciWidth        <-  obj$ciwidth
-   data           <-  model$model
-   .model <- MASS::polr(model$call$formula,data=model$model,Hess = T)
-   m              <-  try_hard(margins::margins(.model,data=data))
-   results        <-  try_hard(summary(m$obj,level=ciWidth,by_factor=FALSE))
-   results$obj
-   
-}
-
-
-..margins.clmm<-function(model,obj) {
-  jinfo("EFFECTSIZE: margins not available for model of class", class(model))  
-  
-  return(NULL)
-}
 
 
 #### Relative risk ######
@@ -236,17 +177,6 @@ add_effect_size<- function(x,...) UseMethod(".add_es")
 
 
 
-# .add_es.summary_emm<-function(atable) {
-#   
-#   atable$etaSqP<-effectsize::F_to_eta2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-#   atable$omegaSq<-effectsize::F_to_omega2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-#   atable$epsilonSq<-effectsize::F_to_epsilon2(atable$F.ratio,df=atable$df1,df_error = atable$df2)[,1]
-#   
-#   
-#   return(atable)
-# }
-
-
 
 
 ### confidence intervals for effect size indices
@@ -257,7 +187,7 @@ ci_effectsize<-function(es,df,dfres,obj,what="any") {
   
         fs<-.v_to_F(es,df,dfres)
         cilist<-lapply(seq_along(fs),function(i) {
-                  res<- effectsize:::.get_ncp_F(fs[i],df[i],dfres,conf.level = obj$ciwidth)
+                  res<- .get_ncp_F(fs[i],df[i],dfres,conf.level = obj$ciwidth)
                   res[is.na(res)]<-0
                   c(es[i],.F_to_v(res,df = df[i],dfres))
               })
@@ -275,6 +205,29 @@ ci_effectsize<-function(es,df,dfres,obj,what="any") {
 
 .v_to_F<-function(e,df,dfres) pmax(0, (e/df) / ((1-e)/dfres))
 
+### this is taken from effectsize package. We copied here because effectsize does not expose the function
+.get_ncp_F<-function (f, df, df_error, conf.level = 0.90) {
+  
+    if (!is.finite(f) || !is.finite(df) || !is.finite(df_error)) {
+        return(c(NA, NA))
+    }
+    alpha <- 1 - conf.level
+    probs <- c(alpha/2, 1 - alpha/2)
+    lambda <- f * df
+    ncp <- suppressWarnings(stats::optim(par = 1.1 * rep(lambda, 
+        2), fn = function(x) {
+        p <- stats::pf(q = f, df, df_error, ncp = x)
+        abs(max(p) - probs[2]) + abs(min(p) - probs[1])
+    }, control = list(abstol = 1e-09)))
+    f_ncp <- sort(ncp$par)
+    if (f <= stats::qf(probs[1], df, df_error)) {
+        f_ncp[2] <- 0
+    }
+    if (f <= stats::qf(probs[2], df, df_error)) {
+        f_ncp[1] <- 0
+    }
+    return(f_ncp)
+}
 
 
 ### bootstrap ####

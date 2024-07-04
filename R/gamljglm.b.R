@@ -66,6 +66,16 @@ gamljglmClass <- R6::R6Class(
       aSmartObj$spaceBy<-"response"
       ladd(private$.smartObjs)<-aSmartObj
 
+      ### custom contrasts 
+      aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+      aSmartObj$activateOnData<-TRUE
+      aSmartObj$ci("est",self$options$ci_width)
+      aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
+      aSmartObj$spaceBy<-"response"
+      ladd(private$.smartObjs)<-aSmartObj
+
+      
+      
       ### predictors for phi in beta regression ###
       aSmartObj<-SmartTable$new(self$results$main$phi,runner_machine)
       aSmartObj$ci("est",self$options$ci_width)
@@ -188,7 +198,7 @@ gamljglmClass <- R6::R6Class(
       
       if (self$options$donotrun) return()
         
-      private$.ready<-readiness(self$options)
+#      private$.ready<-readiness(self$options)
       if (!private$.ready$ready) {
         return()
       }
@@ -237,7 +247,14 @@ gamljglmClass <- R6::R6Class(
       
     },
     
-    
+    .jnPlot=function(image, ggtheme, theme, ...) {
+
+       plot<-private$.plotter_machine$jnPlot(image,ggtheme,theme)
+
+      return(plot)
+  
+    },
+
 
 
 .formula=function() {

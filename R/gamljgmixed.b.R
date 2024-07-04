@@ -55,6 +55,14 @@ gamljgmixedClass <- R6::R6Class(
         if (is.something(self$options$factors) || self$options$model_type=="ordinal")
             aSmartObj$setColumnVisible<-"label"
         ladd(private$.smartObjs)<- aSmartObj        
+
+        ### custom contrasts 
+        aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
+        aSmartObj$activateOnData<-TRUE
+        aSmartObj$ci("est",self$options$ci_width)
+        aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
+        aSmartObj$spaceBy<-"response"
+        ladd(private$.smartObjs)<- aSmartObj        
         
         ### contrasts code tables
         aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,runner_machine)
@@ -106,6 +114,7 @@ gamljgmixedClass <- R6::R6Class(
         aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
         aSmartObj$activated<-is.something(self$options$emmeans)
         aSmartObj$expandOnInit<-TRUE
+        aSmartObj$expandFrom<-2
         aSmartObj$combineBelow="new!"
         aSmartObj$spaceBy="new!"
         aSmartObj$ci("est",self$options$ci_width)
@@ -184,7 +193,6 @@ gamljgmixedClass <- R6::R6Class(
       .run=function() {
         jinfo("MODULE:  #### phase run ####")
         
-        private$.ready<-readiness(self$options)
         if (!private$.ready$ready) {
           return()
         }

@@ -48,6 +48,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
@@ -105,6 +106,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### nestedoptions  begins
                          - nested_terms
@@ -160,6 +162,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                          
              columns:
@@ -200,6 +203,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -255,6 +259,80 @@ items:
 
              refs: parameters
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: false
+             clearWith:
+                       ### modeloptions  begins
+                    -  dep
+                    -  factors
+                    -  covs
+                    -  covs_scale
+                    -  scale_missing
+                    -  model_terms
+                    -  fixed_intercept
+                    -  se_method
+                    -  mute
+                    -  re
+                    -  re_corr
+                    -  df_method
+                    -  relm
+                    -  contrasts
+                    -  covs_scale
+                    -  mute
+                    -  model_type
+                    -  contrast_custom_values
+                       ### modeloptions  ends
+                       ### cioptions  begins
+                    -  ci_width
+                    -  ci_method
+                    -  boot_r
+                       ### cioptions  ends
+             columns:
+                    - name: response
+                      title: Response 
+                      type: text
+                      visible: (model_type:multinomial)
+                    - name: source
+                      title: "Names"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: SE
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                    - name: expb
+                      type: number
+                      title: Exp(B)
+                      visible: (es:expb)
+                    - name: expb.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (es:expb & expb_ci)
+                    - name: expb.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (es:expb & expb_ci)
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
            - name: contrastCodeTables
              title: Contrast Coefficients 
@@ -305,6 +383,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -367,6 +446,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -426,6 +506,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -484,6 +565,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
 
              columns:
@@ -537,6 +619,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
              template:
                type: Table
@@ -569,6 +652,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
 
              columns:
@@ -620,6 +704,7 @@ items:
                          - covs_scale
                          - mute
                          - model_type
+                         - contrast_custom_values
                            ### modeloptions  ends
                            ### cioptions  begins
                          - ci_width
@@ -713,6 +798,7 @@ items:
                               - covs_scale
                               - mute
                               - model_type
+                              - contrast_custom_values
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -728,6 +814,7 @@ items:
                               - ccra_steps
                               - covs_scale_labels
                               - covs_conditioning
+                              - contrast_custom_focus
                                 ### simpleeffectsoptions  ends
               columns:
                    - name: test
@@ -764,6 +851,7 @@ items:
                               - covs_scale
                               - mute
                               - model_type
+                              - contrast_custom_values
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -779,6 +867,7 @@ items:
                               - ccra_steps
                               - covs_scale_labels
                               - covs_conditioning
+                              - contrast_custom_focus
                                 ### simpleeffectsoptions  ends
 
                 
@@ -858,6 +947,7 @@ items:
                               - covs_scale
                               - mute
                               - model_type
+                              - contrast_custom_values
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -873,6 +963,7 @@ items:
                               - ccra_steps
                               - covs_scale_labels
                               - covs_conditioning
+                              - contrast_custom_focus
                                 ### simpleeffectsoptions  ends
 
              columns:
@@ -912,6 +1003,7 @@ items:
                               - covs_scale
                               - mute
                               - model_type
+                              - contrast_custom_values
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -927,6 +1019,7 @@ items:
                               - ccra_steps
                               - covs_scale_labels
                               - covs_conditioning
+                              - contrast_custom_focus
                                 ### simpleeffectsoptions  ends
 
              columns:
@@ -998,6 +1091,7 @@ items:
                               - covs_scale
                               - mute
                               - model_type
+                              - contrast_custom_values
                                 ### modeloptions  ends
                                 ### cioptions  begins
                               - ci_width
@@ -1013,6 +1107,7 @@ items:
                               - ccra_steps
                               - covs_scale_labels
                               - covs_conditioning
+                              - contrast_custom_focus
                                 ### simpleeffectsoptions  ends
             
         columns:
@@ -1054,6 +1149,7 @@ items:
            -  covs_scale
            -  mute
            -  model_type
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1098,6 +1194,7 @@ items:
            -  covs_scale
            -  mute
            -  model_type
+           -  contrast_custom_values
               ### modeloptions  ends
               ### cioptions  begins
            -  ci_width
@@ -1146,6 +1243,7 @@ items:
              - covs_scale
              - mute
              - model_type
+             - contrast_custom_values
                ### modeloptions  ends
   - name: residuals
     title: Residuals Vales
@@ -1171,5 +1269,6 @@ items:
              - covs_scale
              - mute
              - model_type
+             - contrast_custom_values
                ### modeloptions  ends
         

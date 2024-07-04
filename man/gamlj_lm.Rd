@@ -21,6 +21,8 @@ gamlj_lm(
   ci_method = "wald",
   boot_r = 1000,
   contrasts = NULL,
+  contrast_custom_values = NULL,
+  contrast_custom_focus = NULL,
   show_contrastnames = TRUE,
   show_contrastcodes = FALSE,
   vcov = FALSE,
@@ -107,9 +109,18 @@ for bias corrected accelarated method.}
 \item{contrasts}{a named vector of the form \code{c(var1="type",
 var2="type2")} specifying the type of contrast to use, one of
 \code{'deviation'}, \code{'simple'}, \code{'dummy'}, \code{'difference'},
-\code{'helmert'}, \code{'repeated'} or \code{'polynomial'}. If NULL,
+\code{'helmert'}, \code{'repeated'}, \code{'polynomial'} \code{'custom'}. If NULL,
 \code{simple} is used. Can also be passed as a list of list of the form
-list(list(var="var1",type="type1")).}
+list(list(var="var1",type="type1")). If any factor contrast is defined as \code{'custom'},
+a named list of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))} should be passed
+to the option \code{contrast_custom_values}.}
+
+\item{contrast_custom_values}{a named list with the custom contrast weights, of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))}.
+only one constrast per variable is allowed.}
+
+\item{contrast_custom_focus}{if any factor is coded with \code{'custom'}, when \code{TRUE} or \code{NULL } (default) the coefficients, simple effects and simple interactions
+are focused on the custom contrast. If \code{FALSE} , variables are coded accordingly to the passed contrast, but
+no special table or test is devoted to the contrast.}
 
 \item{show_contrastnames}{\code{TRUE} or \code{FALSE} (default), shows raw
 names of the contrasts variables in tables}
@@ -178,6 +189,9 @@ simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}}
 condition simple effects and plots. Used if
 \code{simpleScale}=\code{'percent'}}
 
+\item{ccra_steps}{Covariate condition  steps from min to max: 
+At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
+
 \item{covs_scale_labels}{how the levels of a continuous moderator should
 appear in tables and plots: \code{labels}, \code{values} and
 \code{values_labels}, \code{ovalues}, `ovalues_labels. The latter two refer
@@ -232,9 +246,6 @@ Four methods for  heteroschedasticy-consistent
 standard errors are available: \code{HC0},
 \code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
 See \code{\link[sandwich]{vcovHC}} for details.}
-
-\item{ccra_value}{Covariate condition min max steps (not very mnemonic): 
-At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
 }
 \value{
 A results object containing:

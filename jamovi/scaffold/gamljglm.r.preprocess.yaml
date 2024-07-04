@@ -177,6 +177,59 @@ items:
                       type: number
                       format: zto,pvalue
 
+           - name: contrasts
+             title:  Custom Contrast Tests
+             type: Table
+             visible: false
+             clearWith:
+                    -  __modeloptions__
+                    -  __cioptions__
+             columns:
+
+                    - name: response
+                      title: Response 
+                      type: text
+                      visible: (model_type:multinomial)
+                      combineBelow: true
+                    - name: source
+                      title: "Name"
+                      type: text
+                    - name: label
+                      title: "Effect"
+                      type: text
+                    - name: estimate
+                      title: "Estimate"
+                      type: number
+                    - name: se
+                      title: "SE"
+                      type: number
+                    - name: est.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (estimates_ci)
+                    - name: est.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (estimates_ci)
+                    - name: expb
+                      type: number
+                      title: Exp(B)
+                      visible: (es:expb)
+                    - name: expb.ci.lower
+                      type: number
+                      title: Lower
+                      visible: (es:expb & expb_ci)
+                    - name: expb.ci.upper
+                      type: number
+                      title: Upper
+                      visible: (es:expb & expb_ci)
+                    - name: test
+                      title: "z"
+                      type: number
+                    - name: p
+                      title: "p"
+                      type: number
+                      format: zto,pvalue
 
            - name: phi
              title:  Precision Parameter Estimates (phi)
@@ -689,6 +742,47 @@ items:
 
 
   - name: plotnotes
+    type: Html
+    visible: false
+ 
+  - name: jnPlots
+    title: Johnson-Neyman Plot
+    type: Array
+    description: an array of plots
+    visible: (plot_jn)
+    refs: interactions
+    clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+    template:
+          title: ""
+          type: Image
+          renderFun: .jnPlot
+          width: 700
+          height: 400
+
+          clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+  - name: jnplotnotes
     type: Html
     visible: false
 
