@@ -7,7 +7,6 @@ obj<-GAMLj3::gamlj_lm(
     posthoc = ~type,
     data = qsport)
 
-
 preds<-predict(obj)
 reds<-residuals(obj)
 

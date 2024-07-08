@@ -523,8 +523,14 @@ Plotter <- R6::R6Class(
       moderators<-self$scatterModerators
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
-      rawData<-mf.clean(mf.data(private$.operator$model))
 
+      ### prepare rawData if needed
+      rawData<-mf.clean(mf.data(private$.operator$model))
+      for (var in intersect(names(rawData),names(private$.datamatic$variables))) {
+                  varobj<-private$.datamatic$variables[[var]]
+                  if (varobj$type=="factor")
+                  levels(rawData[[var]])<-varobj$levels_labels
+            }
 
       ### here we deal with plotting random effects, if needed
       randomData<-NULL
@@ -536,7 +542,7 @@ Plotter <- R6::R6Class(
         ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works 
         
         rawData<-private$.fix_clusters(rawData)
-
+      
        .model<-private$.operator$model
         
         if (self$option("plot_re_method","average")) {
@@ -565,19 +571,6 @@ Plotter <- R6::R6Class(
       }
       ### end of random ###
       
-      ## deal with raw data, if needed
-
-      if (self$option("plot_raw")) {
-            for (var in intersect(names(rawData),names(private$.datamatic$variables))) {
-                  varobj<-private$.datamatic$variables[[var]]
-                  if (varobj$type=="factor")
-                  levels(rawData[[var]])<-varobj$levels_labels
-            }
-       
-      }
-      
-      ## end of raw data
-    
 
       ### deal with Y ####
         dep64  <- self$scatterY$name64
@@ -674,7 +667,7 @@ Plotter <- R6::R6Class(
                               rdata<-randomData[eval(parse(text=sel)),]
                        } else 
                               rdata<-randomData
-                         
+                       
                        selectorlist<-list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
                        .rnames<-c("cluster","x","y")
                         rdata<- stats::aggregate(rdata$y, selectorlist, mean)
