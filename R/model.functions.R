@@ -202,7 +202,7 @@ mf.clean<- function(x,...) UseMethod(".clean")
 .clean.data.frame<-function(x) {
 
    attr(x,"terms") <- NULL
-  
+   attr(x,"formula")<-NULL
   return(x)
   
 

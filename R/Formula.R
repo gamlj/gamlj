@@ -82,7 +82,7 @@ gFormula <- R6::R6Class(
       if (is.something(self$random)) {
         alist <- lapply(self$random, function(z) {
           lapply(z, function(x) {
-            w <- all(term == x[-length(x)]) || x[-length(x)] == "Intercept"
+            w <- all(x[-length(x)] %in% term ) || x[1] == "Intercept"
             if (isFALSE(w)) {
               return(NULL)
             } else {
