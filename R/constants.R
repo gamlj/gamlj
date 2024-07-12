@@ -25,7 +25,8 @@ NO_R_OPTS<-c(
             "re_listing",
             "re_nestedclusters",
             "re_crossedclusters",
-            "re_corr"
+            "re_corr",
+            "duplicate"
             
            )
 

@@ -58,6 +58,24 @@ children:
                                 optionPart: multinomial
                                 events:
                                         change: ./gamlj.events::onChange_model
+
+                -       type: Label
+                        label: Custom Model
+                        children:
+                             - type: RadioButton
+                               name: model_type_custom
+                               optionName: model_type
+                               optionPart: custom
+                               events:
+                                   change: './gamlj.events::onChange_model'
+                             - type: ComboBox
+                               name: custom_family
+                               enable: (model_type_custom)
+                             - type: ComboBox
+                               name: custom_link
+                               enable: (model_type_custom)
+
+
 -       name: variablesupplier
         type: VariableSupplier
         suggested:

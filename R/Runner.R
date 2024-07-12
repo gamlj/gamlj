@@ -606,7 +606,7 @@ Runner <- R6::R6Class("Runner",
                                       self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
                                       self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg))
                                      }                              
-                              
+                              mark(.model)
                               return(.model)
 
 
@@ -788,6 +788,7 @@ estimate_lme<-function(...) {
    model$call[[1]]<-quote(nlme::lme.formula)
   return(model)
 }
+
 
 
 

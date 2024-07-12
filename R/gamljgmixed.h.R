@@ -56,6 +56,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             plot_re_method = "average",
             plot_scale = "response",
             model_type = "logistic",
+            custom_family = "binomial",
+            custom_link = "identity",
             covs_scale = NULL,
             scale_missing = "colwise",
             cluster = NULL,
@@ -368,8 +370,29 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "poisson",
                     "nb",
                     "ordinal",
-                    "multinomial"),
+                    "multinomial",
+                    "custom"),
                 default="logistic")
+            private$..custom_family <- jmvcore::OptionList$new(
+                "custom_family",
+                custom_family,
+                options=list(
+                    "binomial",
+                    "poisson",
+                    "inverse.gaussian",
+                    "Gamma"),
+                default="binomial")
+            private$..custom_link <- jmvcore::OptionList$new(
+                "custom_link",
+                custom_link,
+                options=list(
+                    "identity",
+                    "logit",
+                    "log",
+                    "inverse",
+                    "1/mu^2",
+                    "sqrt"),
+                default="identity")
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -500,6 +523,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..plot_scale)
             self$.addOption(private$..model_type)
+            self$.addOption(private$..custom_family)
+            self$.addOption(private$..custom_link)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..cluster)
@@ -561,6 +586,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         plot_re_method = function() private$..plot_re_method$value,
         plot_scale = function() private$..plot_scale$value,
         model_type = function() private$..model_type$value,
+        custom_family = function() private$..custom_family$value,
+        custom_link = function() private$..custom_link$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         cluster = function() private$..cluster$value,
@@ -621,6 +648,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..plot_re_method = NA,
         ..plot_scale = NA,
         ..model_type = NA,
+        ..custom_family = NA,
+        ..custom_link = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..cluster = NA,

@@ -303,6 +303,12 @@ gamljgmixedClass <- R6::R6Class(
         if (self$options$donotrun)
           return('')
         
+       if (option$name=="custom_family" && self$options$model_type != "custom") 
+           return('')
+       if (option$name=="custom_LINK" && self$options$model_type != "custom") 
+           return('')
+
+
         if (option$name=="nested_terms") {
           if (self$options$comparison)
             return(paste("nested_terms =", private$.runner_machine$nestedformulaobj$rhsfixed_formula()))
@@ -315,8 +321,6 @@ gamljgmixedClass <- R6::R6Class(
           } else 
             return("")
         }
-        
-        
         
         defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
         if (option$name %in% NO_R_OPTS)
