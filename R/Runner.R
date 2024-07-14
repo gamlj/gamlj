@@ -576,6 +576,7 @@ Runner <- R6::R6Class("Runner",
                               results<-try_hard(eval(acall))
 
                               self$warning<-list(topic="modelnotes", message=results$warning, head="warning")
+                              self$warning<-list(topic="info", message=results$message)
 
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom")) {
@@ -755,14 +756,24 @@ estimate_lmer<-function(...) {
   opts<-list(...)
   data<-opts$data
   reml<-opts$reml
-  
+  good<- NULL
+  tried<-list()
   for (opt in opts$optimizers) {
             model = lmerTest::lmer(formula=stats::as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
-            if (mf.converged(model))
-            break()
+            ladd(tried)<-opt
+            if (mf.converged(model)) {
+              good<-ifelse(is.null(good),opt,good)
+              if (!lme4::isSingular(model))
+                         break()
+           }
   }
+  if (lme4::isSingular(model) && !is.null(good))
+        model = lmerTest::lmer(formula=stats::as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(good)))
+  if (length(tried)>1)
+     message(paste("Optimizer ",paste(tried,collapse=", "), "have been tried to find a solution."))    
+  
 #  this is required for lmerTest::ranova to work
-  model@call$control<-lme4::lmerControl(optimizer=opt)
+  model@call$control<-lme4::lmerControl(optimizer=good)
   ### done
   return(model)
 }

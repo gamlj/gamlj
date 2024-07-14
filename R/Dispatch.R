@@ -12,10 +12,11 @@ Dispatch <- R6::R6Class(
             cloneable=FALSE, ## should improve performance https://r6.r-lib.org/articles/Performance.html ###
             public=list(
                         tables=NULL,
+                        interface="jamovi",
                         initialize=function(results) { 
-                          
-                                  self$tables<-results
-                           
+                          if (utils::hasName(results$options,".interface"))
+                                self$interface<-results$options$.interface
+                          self$tables<-results
                         },
                         print=function() {
      
@@ -132,6 +133,11 @@ Dispatch <- R6::R6Class(
                         
                         style=""
                         title=""
+                        mark(self$interface)
+                        if (self$interface=="R") {
+                           warning(obj$message)
+                           return(obj$message)
+                        }
 
                         if (is.something(obj$head)) {
                                     switch (obj$head,

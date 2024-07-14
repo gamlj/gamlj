@@ -10,11 +10,12 @@ data$ybin<-factor(data$ybin)
 
 
 mod0 <- GAMLj3::gamlj_gmixed(
-  formula = ybin~x*cat3+(1+x|cluster),
+  formula = ybin~x+*cat3+(1+x:cat3|cluster),
   data = data,
   model_type = "logistic"
 )
 
+  
 
 mod1 <- GAMLj3::gamlj_gmixed(
   data=data,
@@ -35,7 +36,6 @@ mod2 <- GAMLj3::gamlj_gmixed(
   model_terms = ~ x*cat3,
   re=~(1+x|cluster)
 )
-mod2$main$coefficients$asDF
 testthat::test_that("equivalent model input", {
   testthat::expect_equal(mod0$info$asDF$specs[2], mod1$info$asDF$specs[2])
   testthat::expect_equal(mod0$main$anova$asDF$f[3], mod1$main$anova$asDF$f[3])

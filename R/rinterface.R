@@ -517,7 +517,10 @@ summary.ResultsElement<-function(object,...) {
             }
             return()
         }      
-        
+        if ("Html" %in% class(obj) && obj$visible) {
+            tables[[length(tables)+1]]<<-obj$content
+        }
+
         if (obj$.has("items")) {
             for (item in obj$items)
                 .get_table(item)

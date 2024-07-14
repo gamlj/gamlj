@@ -7,17 +7,16 @@ subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
 subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 levels(subjects_by_stimuli$cond)<-c("A","B")
 
-formula<-y~1+cond+(1|subj)+(1|stimulus)
-
+formula<-y~1+cond+(1|subj)+(1+cond|stimulus)
+#formula<-y ~ 1 + cond+( 1|subj )
 model<-GAMLj3::gamlj_mixed(
-  formula =y ~ 1 + cond+( 1|subj ),
+  formula = formula,
   data = subjects_by_stimuli,
   plot_x="cond",
   norm_plot= T, resid_plot = T, cluster_boxplot = T, cluster_respred = T, rand_hist = T
 )
 
-
-infotable<-model$info$asDF
+summary(model)
 
 testthat::test_that("info is ok", {
   testthat::expect_equal(as.numeric(infotable$value[7]),3000)

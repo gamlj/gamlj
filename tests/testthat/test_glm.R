@@ -250,8 +250,7 @@ testthat::test_that("Custom model works", {
 
 ### negative binomial
 data$q <- as.integer(data$q)
-testthat::expect_warning({
-  mod <- GAMLj3::gamlj_glm(
+mod <- GAMLj3::gamlj_glm(
     formula = q ~ agg_test * age,
     data = data,
     model_type = "nb",
@@ -262,7 +261,6 @@ testthat::expect_warning({
     estimates_ci = TRUE,
     es=c("expb","marginals")
   )
-})
 
 testthat::test_that("negative binomial model works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tol)
