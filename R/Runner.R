@@ -759,8 +759,12 @@ estimate_lmer<-function(...) {
   good<- NULL
   tried<-list()
   for (opt in opts$optimizers) {
-            model = lmerTest::lmer(formula=stats::as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
+            model = lmerTest::lmer(formula=stats::as.formula(opts$formula),
+                                   data=data,
+                                   REML=reml,
+                                   control=lme4::lmerControl(optimizer = eval(opt),calc.derivs=FALSE))
             ladd(tried)<-opt
+            jinfo("MODULE: trying optimizer", opt)
             if (mf.converged(model)) {
               good<-ifelse(is.null(good),opt,good)
               if (!lme4::isSingular(model))
@@ -768,7 +772,10 @@ estimate_lmer<-function(...) {
            }
   }
   if (lme4::isSingular(model) && !is.null(good))
-        model = lmerTest::lmer(formula=stats::as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(good)))
+        model = lmerTest::lmer(formula=stats::as.formula(opts$formula), 
+                               data=data,
+                               REML=reml,
+                               control=lme4::lmerControl(optimizer = eval(good),calc.derivs=FALSE))
   if (length(tried)>1)
      message(paste("Optimizer ",paste(tried,collapse=", "), "have been tried to find a solution."))    
   
