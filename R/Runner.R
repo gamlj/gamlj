@@ -574,8 +574,8 @@ Runner <- R6::R6Class("Runner",
                               jinfo("MODULE: Estimating the model: running")
                           
                               results<-try_hard(eval(acall))
-  
-                              self$warning<-list(topic="info", message=results$warning)
+
+                              self$warning<-list(topic="modelnotes", message=results$warning, head="warning")
 
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom")) {
@@ -587,13 +587,13 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              if (!isFALSE(results$warning)) {
-                                  disp<-Dispatch$new(self$analysis$results)
-                                  msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
-                                  msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
-                                  if (is.something(msg))
-                                        warning(msg)
-                              }
+                              # if (!isFALSE(results$warning)) {
+                              #     disp<-Dispatch$new(self$analysis$results)
+                              #     msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
+                              #     msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
+                              #     if (is.something(msg))
+                              #           self$warning<-list(topic="modelnotes",message=msg,head="warning")
+                              # }
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"])
@@ -606,7 +606,6 @@ Runner <- R6::R6Class("Runner",
                                       self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
                                       self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg))
                                      }                              
-                              mark(.model)
                               return(.model)
 
 

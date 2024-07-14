@@ -622,6 +622,14 @@ children:
                                 optionPart: full
                                 enable: (!model_type_ordinal && !model_type_multinomial
                                         && plot_re)
+                -       type: LayoutBox
+                        margin: large
+                        children:
+                        -       type: Label
+                                label: Other Plots
+                                children:
+                                -       type: CheckBox
+                                        name: plot_jn
 -       name: panel_simpleeffects
         type: CollapseBox
         label: Simple Effects

@@ -468,6 +468,14 @@ options:
                         `'none'` (default), `'ci'`, or `'se'`. Use no error bars, use confidence intervals, or use standard errors on the plots, respectively.
                 ui: |
                         `'None'` (default), `Confidence Intervals`, or `Standard Error`. Display on plots no error bars, use confidence intervals, or use standard errors on the plots, respectively.
+-       name: plot_jn
+        title: Johnson-Neyman plot
+        type: Bool
+        default: false
+        description:
+                R: |
+                        `'FALSE'` (default), `'TRUE'` produces the Johnson-Neyman plot for simple slope significance.
+                ui: Produces the Johnson-Neyman plot for simple slopes significance.
 -       name: plot_re
         title: Random effects
         type: Bool

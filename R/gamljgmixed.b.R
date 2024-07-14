@@ -234,6 +234,12 @@ gamljgmixedClass <- R6::R6Class(
         
       },
 
+      .jnPlot=function(image, ggtheme, theme, ...) {
+
+         plot<-private$.plotter_machine$jnPlot(image,ggtheme,theme)
+         return(plot)
+  
+      },
       
 
       .marshalFormula= function(formula, data, name) {

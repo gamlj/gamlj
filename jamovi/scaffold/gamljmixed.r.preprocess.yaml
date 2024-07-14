@@ -21,6 +21,10 @@ items:
          type: text
          title: ""
     refs: gamlj
+
+  - name: modelnotes
+    type: Html
+    visible: false
      
   - name: main
     type: Group

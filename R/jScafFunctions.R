@@ -1,5 +1,5 @@
-j_DEBUG <- F
-j_INFO  <- F
+j_DEBUG <- T
+j_INFO  <- T
 t_INFO  <- F
 
 
@@ -80,8 +80,10 @@ try_hard<-function(exp,max_warn=5) {
                      if (length(.results$warning)==max_warn) 
                          .results$warning[[length(.results$warning)+1]]<<-"Additional warnings are present."
       
-                     if (length(.results$warning)<max_warn)
+                     if (length(.results$warning)<max_warn) {
                          .results$warning[[length(.results$warning)+1]]<<-conditionMessage(w)
+                         .results$warning<<-unique(.results$warning)
+                     }
       
                      invokeRestart("muffleWarning")
     },       message = function(m) {

@@ -15,7 +15,7 @@ Dispatch <- R6::R6Class(
                         initialize=function(results) { 
                           
                                   self$tables<-results
-                                  
+                           
                         },
                         print=function() {
      
@@ -65,7 +65,7 @@ Dispatch <- R6::R6Class(
                                   return()
                                 
                                 if (exists("fromb64")) obj$message<-fromb64(obj$message)
-                                
+                               
                                 if (inherits(table,"Html")) {
                                   content<-private$.process_html(table$content,obj)
                                   content<-table$setContent(content)
@@ -110,7 +110,15 @@ Dispatch <- R6::R6Class(
                           
                                path<-stringr::str_split(obj$topic,"_")[[1]]
                                table<-private$.find_table(path)
-                               table$setError(obj$message)
+                   
+                              if (inherits(table,"Html")) {
+                                  obj$head<-"error"
+                                  table$setContent(private$.process_html(NULL,obj))
+                              } else {
+                                  table$setError(obj$message)
+                              }
+                              table$setVisible(TRUE)
+                           
 
                        },
                        warnings_topics=function() {return(names(private$.warnings))},
@@ -121,22 +129,47 @@ Dispatch <- R6::R6Class(
                       .warnings=list(),
                       .errors=list(),
                       .process_html= function(content,obj) {
+                        
+                        style=""
+                        title=""
 
                         if (is.something(obj$head)) {
                                     switch (obj$head,
-                                          "issue"     =  head <- "<h2 style='color:red;'> Warning </h2>",
-                                          "warning"   =  head <- "<i style='color:red;'> Warning: </i>",
-                                                          head <- obj$head
+                                          "info"     =  {
+                                                         head<-"<div class='icon info' style='width:40px; height:40px;  background-size:auto'></div>"
+                                                         style<-" border-color: #3e6da9"
+                                                         },
+                                          "warning"   =  {
+                                                          head <- "<div class='icon warning-2' style='width:40px; height:40px;  background-size:auto'></div>"
+                                                          style="border-left-color: red"
+                                                          title<-"<h2 style='color:red'> Warning</h2>"
+
+                                                         },
+                                          "error"   =    {
+                                                         head <- "<div class='icon error' style='width:40px; height:40px;  background-size:auto'></div>"
+                                                         style="border-color: red"
+                                                         title<-"<h2 style='color:red'> Error</h2>"
+
+                                                         },
+                                                         head <- obj$head
                                          )
-                        } else head <-  "<i>Note:</i>"
-                        
+                        } else {
+                                 head<-"<div class='icon info' style=' width:25px; height:25px'></div>"
+                        }
+
+                       
                         test<-grep(obj$message,content,fixed=TRUE)
                         if (length(test) == 0)
-                                     content<-paste(content,"<div>",head,obj$message,"</div>")
+                                     content<-paste(content,"<div class='notice-box' style='",style, "'>",
+                                                    head,
+                                                    "<div class='content' style='padding-buttom: 0px'>",
+                                                    title,
+                                                    obj$message,
+                                                    "</div></div>")
                               return(content)
                        },
                       .find_table=function(path) {
-                        
+
                         tableobj<-self$tables
                         found<-FALSE
                         for (aname in path)

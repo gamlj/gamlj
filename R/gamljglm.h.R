@@ -636,6 +636,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     active = list(
         model = function() private$..model,
         info = function() private$.items[["info"]],
+        modelnotes = function() private$.items[["modelnotes"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
@@ -674,6 +675,10 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="text", 
                         `title`="")),
                 refs="gamlj"))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="modelnotes",
+                visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(

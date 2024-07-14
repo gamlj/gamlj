@@ -48,6 +48,10 @@ items:
            ### cioptions  ends
 
     refs: gamlj
+
+  - name: modelnotes
+    type: Html
+    visible: false
      
   - name: main
     type: Group

@@ -765,10 +765,9 @@ Plotter <- R6::R6Class(
           data[[self$scatterZ$name64]]<-private$.rescale(self$scatterZ,data[[self$scatterZ$name64]])  
           self$warning<-list(topic="jnplotnotes",
                            message=paste("Variable",self$scatterZ$name," is in the original scale."))
-          model<-stats::update(model,newdata=data)
+          model<-mf.update(model,data=data)
       } 
       datalist<-.johnson_neyman(model,pred=self$scatterX$name64,mod=self$scatterZ$name64,alpha=.05)
-      #rescale this datalist$cbso2
    
       aplot$setState(datalist)
      },
