@@ -198,7 +198,7 @@ Plotter <- R6::R6Class(
            sig.color <- colors[2]
            insig.color <-colors[1]
 
-           ypos<-min(c(datalist$cbso1$Lower,datalist$cbso2$Lower,datalist$cbsoi$Lower), na.rm=T)          
+           ypos<-min(c(datalist$cbso1$Lower,datalist$cbso2$Lower,datalist$cbsi$Lower), na.rm=T)          
 
            p <- ggplot2::ggplot() 
            suppressMessages(p <- p + ggtheme)
@@ -744,12 +744,13 @@ Plotter <- R6::R6Class(
            return()    
       }
       
-      if ( self$scatterX$type=="factor" ) {
-           self$warning<-list(topic="jnplotnotes",
-                          message=paste("Variable",self$scatterX$name,"is a factor, the Johnson-Neyman plot cannot be computed."),
-                          head="warning")
-           return()    
-      }
+       if ( self$scatterX$type=="factor"  && self$scatterX$nlevels > 2) {
+            self$warning<-list(topic="jnplotnotes",
+                           message=paste("Variable",self$scatterX$name,"is a factor with more than 2 levels. The Johnson-Neyman can be be computed
+                                           for continuous or dichotomous predictors"),
+                           head="warning")
+            return()    
+       }
 
        
       ### JN fails if there is no interaction between x and z
@@ -774,8 +775,9 @@ Plotter <- R6::R6Class(
           self$warning<-list(topic="jnplotnotes",
                            message=paste("Variable",self$scatterZ$name," is in the original scale."), head="info")
           model<-mf.update(model,data=data)
-      } 
-      datalist<-.johnson_neyman(model,pred=self$scatterX$name64,mod=self$scatterZ$name64,alpha=.05)
+      }
+     
+      datalist<-.johnson_neyman(model,predobj=self$scatterX,mod=self$scatterZ$name64,alpha=.05)
       aplot$setState(datalist)
      },
     
@@ -1188,18 +1190,22 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
     }
 
 
-.johnson_neyman = function(model, pred, mod, alpha=.05) {
+.johnson_neyman = function(model, predobj, mod, alpha=.05) {
  
+  pred<-predobj$name64
+  if (predobj$type=="factor")
+      pred<-predobj$paramsnames64
   .terms<-c(pred,mod)
-   mat<-attr(stats::terms(model),"factors")
+   params    <-  stats::coef(summary(model))
    ## how is the interaction named?
-   intterm <- names(which.min(which(apply(mat[rownames(mat) %in% .terms,],2,sum) ==2) ))
-   
+   ints<-c(paste(.terms,collapse=":"),paste(rev(.terms),collapse=":"))
+   intterm    <- rownames(params)[rownames(params) %in% ints]
+
   .data      <-  mf.data(model)  
    obsrange  <-  range(.data[[mod]])
    modsd     <-  stats::sd(.data[[mod]])
    modrange  <-  c(obsrange[1] - modsd, obsrange[2] + modsd)   
-   params    <-  stats::coef(summary(model))
+   mark(intterm)
    y1        <-  params[rownames(params)==pred,1]
    y3        <-  params[rownames(params)==intterm,1]
    df        <-  stats::df.residual(model)
