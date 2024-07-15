@@ -420,6 +420,7 @@ items:
                             - __modeloptions__
                             - __cioptions__
                             - __simpleeffectsoptions__
+                            - __covscalingoptions__                 
 
               columns:
                    - name: test
@@ -444,6 +445,8 @@ items:
                             - __modeloptions__
                             - __cioptions__
                             - __simpleeffectsoptions__
+                            - __covscalingoptions__                 
+
               columns:
                      - name: contrast
                        title: "Effect"
@@ -491,6 +494,8 @@ items:
                             - __modeloptions__
                             - __cioptions__
                             - __simpleeffectsoptions__
+                            - __covscalingoptions__                 
+
              columns:
                    - name: effect
                      title: 'Effect'
@@ -516,6 +521,7 @@ items:
                             - __modeloptions__
                             - __cioptions__
                             - __simpleeffectsoptions__
+                            - __covscalingoptions__                 
 
              columns:
                    - name: effect
@@ -558,6 +564,8 @@ items:
                             - __modeloptions__
                             - __cioptions__
                             - __simpleeffectsoptions__
+                            -  __covscalingoptions__                 
+                            
         columns:
         - name: estimate
           title: 'Mean'

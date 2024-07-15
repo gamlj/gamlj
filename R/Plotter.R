@@ -198,10 +198,11 @@ Plotter <- R6::R6Class(
            sig.color <- colors[2]
            insig.color <-colors[1]
 
-                     
+           ypos<-min(c(datalist$cbso1$Lower,datalist$cbso2$Lower,datalist$cbsoi$Lower), na.rm=T)          
 
            p <- ggplot2::ggplot() 
            suppressMessages(p <- p + ggtheme)
+           
   
            p <- p + ggplot2::geom_path(data = datalist$cbso1, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend=FALSE)
            p <- p + ggplot2::geom_path(data = datalist$cbsi, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend=FALSE)
@@ -222,10 +223,13 @@ Plotter <- R6::R6Class(
     if (datalist$bounds[1] < datalist$modrange[1]) {
      } else if (datalist$all_sig == FALSE) {
         p <- p + ggplot2::geom_vline(ggplot2::aes(xintercept = datalist$bounds[1]), linetype = 2, color = sig.color)
+        p <- p + ggplot2::geom_text(ggplot2::aes(label=round(datalist$bounds[1],digits=3),x = datalist$bounds[1], y=ypos), color = "black")
+
     } 
     if (datalist$bounds[2] > datalist$modrange[2]) {
     }  else if (datalist$all_sig == FALSE) {
-        p <- p + ggplot2::geom_vline(ggplot2::aes(xintercept = datalist$bounds[2]), linetype = 2, color = sig.color)
+        p <- p + ggplot2::geom_vline(ggplot2::aes(xintercept = datalist$bounds[2]),  linetype = 2, color = sig.color)
+        p <- p + ggplot2::geom_text(ggplot2::aes(label=round(datalist$bounds[2],digits=3),x = datalist$bounds[2], y=ypos), color = "black")
     }
     p <- p + ggplot2::xlim(datalist$modrange) 
     p <- p + ggplot2::theme(legend.key.size = ggplot2::unit(1, "lines"))
@@ -549,7 +553,9 @@ Plotter <- R6::R6Class(
             formula<-private$.operator$formulaobj$keep(self$scatterX$name)
             res<- try_hard(mf.update(private$.operator$model,formula=formula))
             if (!isFALSE(res$error)) {
-                 self$warning<-list(topic="plotnotes",message=paste("Random effects cannot be plotted for",self$scatterX$name," with the averaging method."))
+                 self$warning<-list(topic="plotnotes",
+                                    message=paste("Random effects cannot be plotted for",self$scatterX$name," with the averaging method."),
+                                    head="warning")
             } else
               .model<-res$obj
 
@@ -611,11 +617,13 @@ Plotter <- R6::R6Class(
         
         if (self$scatterX$covs_scale=="clusterbasedcentered")
           self$warning<-list(topic="plotnotes",
-                                         message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
+                             message="Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.",
+                             head="warning")
 
         if (self$scatterX$covs_scale=="clusterbasedstandardized")
           self$warning<-list(topic="plotnotes",
-                                         message="Rescaling cluster-wise standardized variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.")
+                             message="Rescaling cluster-wise standardized variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.",
+                             head="warning")
         
         data[[self$scatterX$name64]]<-private$.rescale(self$scatterX,data[[self$scatterX$name64]])
         
@@ -764,11 +772,10 @@ Plotter <- R6::R6Class(
           data<-insight::get_data(model,source="frame")
           data[[self$scatterZ$name64]]<-private$.rescale(self$scatterZ,data[[self$scatterZ$name64]])  
           self$warning<-list(topic="jnplotnotes",
-                           message=paste("Variable",self$scatterZ$name," is in the original scale."))
+                           message=paste("Variable",self$scatterZ$name," is in the original scale."), head="info")
           model<-mf.update(model,data=data)
       } 
       datalist<-.johnson_neyman(model,pred=self$scatterX$name64,mod=self$scatterZ$name64,alpha=.05)
-   
       aplot$setState(datalist)
      },
     
@@ -818,7 +825,8 @@ Plotter <- R6::R6Class(
       d<-length(clusters64) 
        if (p!=d)     
             self$warning<-list(topic="plotnotes",
-                          message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+                          message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.", 
+                          head="warning")
   
       
        if (self$option("cluster_boxplot")) {
@@ -870,7 +878,8 @@ Plotter <- R6::R6Class(
       d<-length(clusters) 
        if (p!=d)     
             self$warning<-list(topic="plotnotes",
-                          message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+                          message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.",
+                          head="warning")
        
       resultsgroup<-private$.results$assumptions$clusterBoxplot
 
@@ -903,7 +912,8 @@ Plotter <- R6::R6Class(
       d<-length(clusters) 
       if (p!=d)     
         self$warning<-list(topic="plotnotes",
-                           message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+                           message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.",
+                           head="warning")
       
 
       resultsgroup<-private$.results$assumptions$clusterResPred
@@ -938,7 +948,8 @@ Plotter <- R6::R6Class(
       d<-length(clusters) 
       if (p!=d)     
         self$warning<-list(topic="plotnotes",
-                           message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.")
+                           message="Assumptions checking plots are not produced for crossed or nested clusters. Please specify them as dataset variables to obtain this plot.",
+                           head="warning")
       
       resultsgroup<-private$.results$assumptions$clusterResPredGrid
       
@@ -1037,7 +1048,7 @@ Plotter <- R6::R6Class(
            conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
            if (self$option("plot_xoriginal")) {
                  self$scatterXscale<-TRUE
-                 self$warning<-list(topic="plotnotes",message="The X-axis is in the X-variable original scale")
+                 self$warning<-list(topic="plotnotes",message="The X-axis is in the X-variable original scale", head="info")
            }
       }
       allterm64<-c(x64,term64)
@@ -1146,7 +1157,7 @@ Plotter <- R6::R6Class(
 
 #### this is taken from `interactions` package and adjusted for making it compatible with the module graphic system
 #### We do not use the package function because it does not work with all models and does not fit well with the graphic rendering mechanism
-#### we cite the `interactions` package anyway because this code heavely depend on its.
+#### we cite the `interactions` package anyway because this code largely depends on its.
 
 cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
   
@@ -1247,4 +1258,45 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
     out <- list(cbso1=cbso1,cbso2=cbso2,cbsi=cbsi,inside = inside, failed = failed, all_sig = all_sig,bounds=bounds, obsrange=obsrange,modrange=modrange)
     return(out)
    
+}
+
+#### we do now use this stuff below. Keep it for future reference
+.jn_scatter = function(model, pred, mod, alpha=.05) {
+ 
+  .terms<-c(pred,mod)
+   mat<-attr(stats::terms(model),"factors")
+   ## how is the interaction named?
+   intterm <- names(which.min(which(apply(mat[rownames(mat) %in% .terms,],2,sum) ==2) ))
+   
+  .data      <-  mf.data(model)  
+   obsrange  <-  range(.data[[mod]])
+   modsd     <-  stats::sd(.data[[mod]])
+   modrange  <-  c(obsrange[1] - modsd, obsrange[2] + modsd)   
+   params    <-  stats::coef(summary(model))
+   y1        <-  params[rownames(params)==pred,1]
+   y3        <-  params[rownames(params)==intterm,1]
+   df        <-  stats::df.residual(model)
+   if (is.null(df)) df<-Inf # normal approximation
+   
+   alpha <- alpha/2
+   tcrit <- stats::qt(alpha, df = df)
+   tcrit <- abs(tcrit)
+   vmat <- stats::vcov(model)
+   covy3 <- vmat[intterm, intterm]
+   covy1 <- vmat[pred, pred]
+   covy1y3 <- vmat[intterm, pred]
+   a <- tcrit^2 * covy3 - y3^2
+   b <- 2 * (tcrit^2 * covy1y3 - y1 * y3)
+   c <- tcrit^2 * covy1 - y1^2
+   disc <- b^2 - 4 * a * c
+   failed <- FALSE
+   if (disc <= 0)  {
+        bounds <- c(-Inf, Inf)
+    } else {
+        .x1 <- (-b + sqrt(disc))/(2 * a)
+        .x2 <- (-b - sqrt(disc))/(2 * a)
+        result <- c(.x1, .x2)
+        bounds <- sort(result, decreasing = FALSE)
+    }
+   mark(bounds)
 }

@@ -716,13 +716,15 @@ items:
                             - simple_x
                             - simple_mods
                             - simple_scale
-                            - ccm_value
-                            - ccp_value
-                            - ccra_steps
-                            - covs_scale_labels
-                            - covs_conditioning
-                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
+                              ### covscalingoptions  begins
+                            - ccm_value                 
+                            - ccp_value                 
+                            - ccra_steps                 
+                            - covs_scale_labels                 
+                            - covs_conditioning                 
+                            - contrast_custom_focus                 
+                              ### covscalingoptions  ends
 
               columns:
                    - name: test
@@ -778,13 +780,16 @@ items:
                             - simple_x
                             - simple_mods
                             - simple_scale
-                            - ccm_value
-                            - ccp_value
-                            - ccra_steps
-                            - covs_scale_labels
-                            - covs_conditioning
-                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
+                              ### covscalingoptions  begins
+                            - ccm_value                 
+                            - ccp_value                 
+                            - ccra_steps                 
+                            - covs_scale_labels                 
+                            - covs_conditioning                 
+                            - contrast_custom_focus                 
+                              ### covscalingoptions  ends
+
               columns:
                      - name: contrast
                        title: "Effect"
@@ -863,13 +868,16 @@ items:
                             - simple_x
                             - simple_mods
                             - simple_scale
-                            - ccm_value
-                            - ccp_value
-                            - ccra_steps
-                            - covs_scale_labels
-                            - covs_conditioning
-                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
+                              ### covscalingoptions  begins
+                            - ccm_value                 
+                            - ccp_value                 
+                            - ccra_steps                 
+                            - covs_scale_labels                 
+                            - covs_conditioning                 
+                            - contrast_custom_focus                 
+                              ### covscalingoptions  ends
+
              columns:
                    - name: effect
                      title: 'Effect'
@@ -926,13 +934,15 @@ items:
                             - simple_x
                             - simple_mods
                             - simple_scale
-                            - ccm_value
-                            - ccp_value
-                            - ccra_steps
-                            - covs_scale_labels
-                            - covs_conditioning
-                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
+                              ### covscalingoptions  begins
+                            - ccm_value                 
+                            - ccp_value                 
+                            - ccra_steps                 
+                            - covs_scale_labels                 
+                            - covs_conditioning                 
+                            - contrast_custom_focus                 
+                              ### covscalingoptions  ends
 
              columns:
                    - name: effect
@@ -1006,13 +1016,16 @@ items:
                             - simple_x
                             - simple_mods
                             - simple_scale
-                            - ccm_value
-                            - ccp_value
-                            - ccra_steps
-                            - covs_scale_labels
-                            - covs_conditioning
-                            - contrast_custom_focus
                               ### simpleeffectsoptions  ends
+                               ### covscalingoptions  begins
+                            -  ccm_value                 
+                            -  ccp_value                 
+                            -  ccra_steps                 
+                            -  covs_scale_labels                 
+                            -  covs_conditioning                 
+                            -  contrast_custom_focus                 
+                               ### covscalingoptions  ends
+                            
         columns:
         - name: estimate
           title: 'Mean'
@@ -1068,6 +1081,12 @@ items:
            -  re_ci
               ### cioptions  ends
               ### covscalingoptions  begins
+           -  ccm_value                 
+           -  ccp_value                 
+           -  ccra_steps                 
+           -  covs_scale_labels                 
+           -  covs_conditioning                 
+           -  contrast_custom_focus                 
               ### covscalingoptions  ends
            - plot_x
            - plot_z
@@ -1119,6 +1138,12 @@ items:
            -  re_ci
               ### cioptions  ends
               ### covscalingoptions  begins
+           -  ccm_value                 
+           -  ccp_value                 
+           -  ccra_steps                 
+           -  covs_scale_labels                 
+           -  covs_conditioning                 
+           -  contrast_custom_focus                 
               ### covscalingoptions  ends
            - plot_x
            - plot_z
@@ -1171,6 +1196,12 @@ items:
            -  re_ci
               ### cioptions  ends
               ### covscalingoptions  begins
+           -  ccm_value                 
+           -  ccp_value                 
+           -  ccra_steps                 
+           -  covs_scale_labels                 
+           -  covs_conditioning                 
+           -  contrast_custom_focus                 
               ### covscalingoptions  ends
            - plot_x
            - plot_z
@@ -1219,6 +1250,12 @@ items:
            -  re_ci
               ### cioptions  ends
               ### covscalingoptions  begins
+           -  ccm_value                 
+           -  ccp_value                 
+           -  ccra_steps                 
+           -  covs_scale_labels                 
+           -  covs_conditioning                 
+           -  contrast_custom_focus                 
               ### covscalingoptions  ends
            - plot_x
            - plot_z
