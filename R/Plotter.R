@@ -715,10 +715,22 @@ Plotter <- R6::R6Class(
 
       if (!self$option("plot_jn")) 
         return()
+      if (is.null(self$scatterX))
+          return()
+      if (is.null(self$scatterZ))
+          return()
 
       jinfo("PLOTTER: init johnson-neyman plot")
       resultsgroup<-private$.results$get("jnPlots")
-      aplot<-resultsgroup$addItem(key=1)
+       if (is.something(self$scatterModerators)) {
+           plots<-simple_models_labels(self$scatterModerators, private$.operator)
+           for (i in 1:nrow(plots)) {
+               resultsgroup$addItem(key=i)
+               resultsgroup$get(key=i)$setTitle(paste(names(plots),plots[i,], sep="=",collapse=","))
+           }
+       } else
+           aplot<-resultsgroup$addItem(key=1)
+      
 
      },
     
@@ -766,7 +778,8 @@ Plotter <- R6::R6Class(
       
       private$.results$jnplotnotes$setContent("")
       resultsgroup<-private$.results$get("jnPlots")
-      aplot<-resultsgroup$get(key=1)
+      
+     
    
       model<-private$.operator$model
       if (self$scatterXscale) {
@@ -776,9 +789,19 @@ Plotter <- R6::R6Class(
                            message=paste("Variable",self$scatterZ$name," is in the original scale."), head="info")
           model<-mf.update(model,data=data)
       }
-     
-      datalist<-.johnson_neyman(model,predobj=self$scatterX,mod=self$scatterZ$name64,alpha=.05)
-      aplot$setState(datalist)
+      if (is.something(self$scatterModerators)) {
+            models<-simple_models(model,tob64(self$scatterModerators),obj=private$.operator)
+            for (i in seq_along(models)) {
+                  mod<-models[[i]]
+                  datalist<-.johnson_neyman(mod,pred=self$scatterX,mod=self$scatterZ$name64,alpha=.05)
+                  aplot<-resultsgroup$get(resultsgroup$itemKeys[[i]])
+                  aplot$setState(datalist)
+            }
+      } else {
+          aplot<-resultsgroup$get(resultsgroup$itemKeys[[1]])
+          datalist<-.johnson_neyman(model,pred=self$scatterX,mod=self$scatterZ$name64,alpha=.05)
+          aplot$setState(datalist)
+      }
      },
     
      .prepareQqplot=function() {
@@ -1205,7 +1228,6 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
    obsrange  <-  range(.data[[mod]])
    modsd     <-  stats::sd(.data[[mod]])
    modrange  <-  c(obsrange[1] - modsd, obsrange[2] + modsd)   
-   mark(intterm)
    y1        <-  params[rownames(params)==pred,1]
    y3        <-  params[rownames(params)==intterm,1]
    df        <-  stats::df.residual(model)

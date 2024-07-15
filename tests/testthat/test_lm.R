@@ -420,4 +420,14 @@ testthat::test_that("intercept model comparison", {
 })
 
 
+names(hsbdemo)
 
+mod<-GAMLj3::gamlj_lm(
+  data = hsbdemo,
+  formula=science~1+math*write*read*prog,
+  plot_x=math,
+  plot_z=write,
+  plot_by=c(prog,read),
+  plot_jn=T
+)
+mod

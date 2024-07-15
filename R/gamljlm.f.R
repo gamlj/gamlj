@@ -76,6 +76,8 @@
 #' @param plot_around \code{'none'} (default), \code{'ci'}, or \code{'se'}.
 #'   Use no error bars, use confidence intervals, or use standard errors on the
 #'   plots, respectively.
+#' @param plot_jn \code{'FALSE'} (default), \code{'TRUE'}.
+#'   produces Johnson-Neyman plots for the variables specified in the main plot.
 #' @param emmeans a rhs formula with the terms specifying the marginal means
 #'   to estimate (of the form \code{'~x+x:z'})
 #' @param posthoc a rhs formula with the terms specifying the table to apply
@@ -211,6 +213,7 @@ gamlj_lm <- function(
     plot_xoriginal = FALSE,
     plot_black = FALSE,
     plot_around = "ci",
+    plot_jn = FALSE,
     emmeans = NULL,
     posthoc = NULL,
     simple_x = NULL,
@@ -367,6 +370,7 @@ gamlj_lm <- function(
     plot_xoriginal = plot_xoriginal,
     plot_black = plot_black,
     plot_around = plot_around,
+    plot_jn  = plot_jn,
     emmeans = emmeans,
     posthoc = posthoc,
     simple_x = simple_x,

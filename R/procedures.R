@@ -998,3 +998,52 @@ procedure.simpleInteractions<-function(obj) {
 
 
 
+simple_models<-function(model,mods,obj, conditions=list()) {
+
+  ## mods are supposed to be in b64
+        levels <-lapply(mods, function(x) {
+                 if (x %in% names(conditions))
+                     return(conditions[[x]])
+          
+                if (obj$datamatic$variables[[x]]$type=="factor")
+                        seq_along(obj$datamatic$variables[[x]]$levels)
+                else 
+                        obj$datamatic$variables[[x]]$levels
+            })
+        rows  <- expand.grid(levels)
+        names(rows)  <-  mods
+         data64      <-  insight::get_data(model,source="frame")
+         results     <-  list()
+         ## here we do the actual simple model for each combination of moderator levels ####
+         for (i in 1:nrow(rows)) {
+                .data1<-data64
+                 for (.name in mods) {
+                        mark(.name, rows[i,.name])
+                        if (is.factor(.data1[[.name]]))
+                               stats::contrasts(.data1[[.name]])<-stats::contr.treatment(nlevels(.data1[[.name]]),base = rows[i,.name])
+                        else
+                               .data1[[.name]]<-.data1[[.name]]-rows[i,.name]
+                 }
+                 ladd(results)  <-  stats::update(model,data=.data1)
+
+         }
+         return(results)
+}
+
+simple_models_labels<-function(mods,obj) {
+
+  
+  ## mods are supposed to be in plain name
+        levels <-lapply(mods, function(x) {
+
+                if (obj$datamatic$variables[[tob64(x)]]$type=="factor")
+                        seq_along(obj$datamatic$variables[[tob64(x)]]$levels_labels)
+                else 
+                        obj$datamatic$variables[[tob64(x)]]$levels_labels
+            })
+        rows  <- expand.grid(levels)
+        names(rows)<-mods
+        
+        return(rows)
+}
+
