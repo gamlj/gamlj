@@ -133,9 +133,9 @@ Dispatch <- R6::R6Class(
                         
                         style=""
                         title=""
-                        mark(self$interface)
                         if (self$interface=="R") {
-                           warning(obj$message)
+                           if (!utils::hasName(obj,"head") || obj$head!="info")
+                                      warning(obj$message)
                            return(obj$message)
                         }
 
@@ -160,7 +160,7 @@ Dispatch <- R6::R6Class(
                                                          head <- obj$head
                                          )
                         } else {
-                                 head<-"<div class='icon info' style=' width:25px; height:25px'></div>"
+                                 head<-"<div class='icon info' style=' width:40px; height:40px; background-size:auto'></div>"
                         }
 
                        

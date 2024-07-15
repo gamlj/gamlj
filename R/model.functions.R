@@ -17,12 +17,13 @@ mf.fixModel<- function(x,...) UseMethod(".fixModel")
 
 
 .fixModel.lmerModLmerTest<-function(model,obj=NULL,data=NULL) {
-  
+
   if (lme4::isSingular(model))
       obj$warning<-list(topic="modelnotes",message=WARNS[["lmer.singular"]], head="warning")
 
   return(model)
 }
+.fixModel.glmerMod <- function(model,obj=NULL,data=NULL) .fixModel.lmerModLmerTest(model,obj,data)
 
 .fixModel.multinom<-function(model,obj=NULL,data=NULL) {
   

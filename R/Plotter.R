@@ -559,7 +559,7 @@ Plotter <- R6::R6Class(
         if (self$scatterX$type=="factor")
              levels(randomData[[self$scatterX$name64]])<-self$scatterX$levels_labels
                     
-        self$warning<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name))
+        self$warning<-list(topic="plotnotes",message=paste("Random effects are plotted across",self$scatterCluster$name), head="info")
         # prepare a test for between variables to plot dots for random effects
 
         xbetween<-FALSE

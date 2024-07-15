@@ -576,7 +576,7 @@ Runner <- R6::R6Class("Runner",
                               results<-try_hard(eval(acall))
 
                               self$warning<-list(topic="modelnotes", message=results$warning, head="warning")
-                              self$warning<-list(topic="info", message=results$message)
+                              self$warning<-list(topic="info", message=results$message, head="info")
 
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom")) {
@@ -597,15 +597,15 @@ Runner <- R6::R6Class("Runner",
                               # }
                               
                               if (mf.aliased(results$obj))
-                                   self$warning<-list(topic="info",message=WARNS["aliased"])
+                                   self$warning<-list(topic="info",message=WARNS["aliased"], head="info")
 
                               .model<-mf.fixModel(results$obj,self,data)
                               
                               ### add custom info to the model
                               if (self$option("model_type","ordinal")) {
                                       msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
-                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg))
+                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses", head="info")
+                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg), head="info")
                                      }                              
                               return(.model)
 

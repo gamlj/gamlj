@@ -189,7 +189,6 @@ data("poissonacts")
 data <- poissonacts
 data$age <- factor(data$age)
 
-
 mod <- GAMLj3::gamlj_glm(
   formula = acts ~ agg_test * age,
   data = data,
@@ -250,6 +249,7 @@ testthat::test_that("Custom model works", {
 
 ### negative binomial
 data$q <- as.integer(data$q)
+testthat::expect_warning(
 mod <- GAMLj3::gamlj_glm(
     formula = q ~ agg_test * age,
     data = data,
@@ -261,7 +261,7 @@ mod <- GAMLj3::gamlj_glm(
     estimates_ci = TRUE,
     es=c("expb","marginals")
   )
-
+)
 testthat::test_that("negative binomial model works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1], 22.6, tol)
