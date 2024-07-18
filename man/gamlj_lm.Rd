@@ -34,6 +34,7 @@ gamlj_lm(
   plot_xoriginal = FALSE,
   plot_black = FALSE,
   plot_around = "ci",
+  plot_jn = FALSE,
   emmeans = NULL,
   posthoc = NULL,
   simple_x = NULL,
@@ -155,6 +156,9 @@ linetypes per levels.}
 \item{plot_around}{\code{'none'} (default), \code{'ci'}, or \code{'se'}.
 Use no error bars, use confidence intervals, or use standard errors on the
 plots, respectively.}
+
+\item{plot_jn}{\code{'FALSE'} (default), \code{'TRUE'}.
+produces Johnson-Neyman plots for the variables specified in the main plot.}
 
 \item{emmeans}{a rhs formula with the terms specifying the marginal means
 to estimate (of the form \code{'~x+x:z'})}

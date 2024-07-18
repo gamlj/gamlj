@@ -1865,6 +1865,12 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "contrast_custom_focus"),
                     columns=list(
                         list(
+                            `name`="response", 
+                            `title`="Response", 
+                            `type`="text", 
+                            `visible`="(model_type:multinomial)", 
+                            `combineBelow`=TRUE),
+                        list(
                             `name`="estimate", 
                             `title`="Mean", 
                             `type`="number"),

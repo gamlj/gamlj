@@ -111,14 +111,14 @@ gamljgmixedClass <- R6::R6Class(
         
         ### estimate marginal means
         
-        aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
-        aSmartObj$activated<-is.something(self$options$emmeans)
-        aSmartObj$expandOnInit<-TRUE
-        aSmartObj$expandFrom<-2
-        aSmartObj$combineBelow="new!"
-        aSmartObj$spaceBy="new!"
-        aSmartObj$ci("est",self$options$ci_width)
-        ladd(private$.smartObjs)<- aSmartObj        
+      aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
+      aSmartObj$activated<-is.something(self$options$emmeans)
+      aSmartObj$expandOnInit<-TRUE
+      aSmartObj$expandFrom<-2
+      aSmartObj$combineBelow="new!"
+      aSmartObj$spaceBy="new!"
+      aSmartObj$ci("est",self$options$ci_width)
+      ladd(private$.smartObjs)<-aSmartObj
         
         ### simple effects
         ##### anova

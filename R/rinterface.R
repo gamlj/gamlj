@@ -96,13 +96,13 @@ plot.gamlj <- function(x, formula = NULL, ...) {
                 sepPlots <- .call[3] else sepPlots <- NULL
             args <- list(plot_x = haxis, plot_z = sepLines, plot_by = sepPlots, ...)
             object <- stats::update(x, args)
-            .extract_plots(object)
+            .extract_plots(object, "mainPlots")
         })
     } else {
         if (is.something(list(...))) 
             x <- stats::update(x, ...)
 
-        plots <- .extract_plots(x)
+        plots <- .extract_plots(x,"mainPlots")
     }
     if ("list" %in% class(plots) && length(plots) == 1) 
         plots <- plots[[1]]
@@ -110,15 +110,78 @@ plot.gamlj <- function(x, formula = NULL, ...) {
 }
 
 
-.extract_plots <- function(object) {
+#'  GAMLj Johnson-Nayman plots
+#'
+#' This function re-estimates a GAMLj model adding a Johnson-Nayman plot, if not available already. If no option is passed, extracts the 
+#' plots present in the `gamlj*Results` object. If JN plot is present, it is returned as a ggplot2 object,
+#'  if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined. 
+
+#' @param x a gamlj results object of the class `gamlj`
+#' @param formula a right hand side formula specifying the effect to plot, of the form `~x*z` or `~x*z*w`. 
+#' It has prevalence on other options defining a plot.
+#' @param ... all options accepted by a gamlj model function. 
+#'            Relevant for new plots are \code{plot_x}, \code{plot_z} and \code{plot_by}
+#' @return an object of class ggplot or a list of ggplot objects
+#' @author Marcello Gallucci
+#' @examples
+#' data(qsport)
+#' gmod<-GAMLj3::gamlj_lm(
+#'   formula = performance ~ hours,
+#'   data = qsport)
+#' 
+#' plot(gmod,plot_x = 'hours')
+#' plot(gmod,formula=~hours)
+#' @rdname jnplot
+#' @export
+
+jnplot <- function(x, formula = NULL, ...) {
+
+    if (is.something(formula)) {
+        .calls <- jmvcore::marshalFormula(formula, from = "rhs", type = "terms", data = NULL)
+        plots <- lapply(.calls, function(.call) {
+            haxis <- .call[1]
+            if (!is.na(.call[2])) 
+                sepLines <- .call[2] else sepLines <- NULL
+            if (!is.na(.call[3])) 
+                sepPlots <- .call[3] else sepPlots <- NULL
+            args <- list(plot_x = haxis, plot_z = sepLines, plot_by = sepPlots, plot_jn=TRUE,...)
+            object <- stats::update(x, args)
+            .extract_plots(object,"jnPlots")
+        })
+    } else {
+        if (is.something(list(...))) 
+            x <- stats::update(x, ...)
+
+        plots <- .extract_plots(x,"jnPlots")
+    }
+    mark(plots)
+    if ("list" %in% class(plots) && length(plots) == 1) 
+        plots <- plots[[1]]
+    plots
+}
+
+
+.extract_plots <- function(object, what) {
 
         alist <- list()
-        for (i in 1:length(object$mainPlots)) {
-            title <- (object$mainPlots[[i]]$title)
+        mark(what)
+        if (!utils::hasName(object,what)) {
+          warning("The requested plots are not available. You can ask them with the passing the gamlj options to the funcion")
+          return(FALSE)
+        }
+        if (length(object[[what]])==0) {
+          warning("The requested plots are not available. You can ask them with the passing the gamlj options to the funcion")
+          return(FALSE)
+        }
+
+        mark(str(object))
+        for (i in 1:length(object[[what]])) {
+            title <- (object[[what]][[i]]$title)
             gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
             alist[[i]] <- gplot
+        }
         return(alist)
-       }
+
 }
 
 #' Assumptions checking plots

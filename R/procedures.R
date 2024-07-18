@@ -1018,7 +1018,6 @@ simple_models<-function(model,mods,obj, conditions=list()) {
          for (i in 1:nrow(rows)) {
                 .data1<-data64
                  for (.name in mods) {
-                        mark(.name, rows[i,.name])
                         if (is.factor(.data1[[.name]]))
                                stats::contrasts(.data1[[.name]])<-stats::contr.treatment(nlevels(.data1[[.name]]),base = rows[i,.name])
                         else

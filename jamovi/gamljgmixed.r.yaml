@@ -1115,6 +1115,12 @@ items:
                                 ### simpleeffectsoptions  ends
             
         columns:
+        - name: response
+          title: Response 
+          type: text
+          visible: (model_type:multinomial)
+          combineBelow: true
+        
         - name: estimate
           title: 'Mean'
           type: number
