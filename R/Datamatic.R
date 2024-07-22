@@ -446,7 +446,7 @@ Variable <- R6::R6Class(
         labels[[1]]<-lab
         if (nLevels>2)
            for (i in 2:(nLevels-1)) labels[[i]]<-paste0("tech",i)
-        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is mamed ",paste0(self$name,"1"),"and indicated as <b>",lab, "</b> in the effect labels."))
+        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is named ",paste0(self$name,"1"),"and indicated as <b>",lab, "</b> in the effect labels."))
         return(labels)
         
       }

@@ -274,7 +274,7 @@ gamljlmClass <- R6::R6Class(
 
 .sourcifyOption = function(option) {
 
- 
+
   defaults<-c(covs_scale="centered",contrasts="simple")
   
   if (option$name=="nested_terms") {
@@ -290,6 +290,7 @@ gamljlmClass <- R6::R6Class(
 
   if (option$name %in% NO_R_OPTS)
      return('')
+
  sourcifyOption(option,defaults)
 
 }

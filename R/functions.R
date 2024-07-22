@@ -74,8 +74,6 @@ epretty<-function(min,max,steps) {
   i     <- (max-min)/steps
   seq(min,max,by=i)
 }
-#epretty(-.3,.5,10)
-### basic functions ###
 
 
 ### This is taken from MASS::ginv(). It is reproduced here to avoid linking to MASS
