@@ -233,7 +233,6 @@ sourcifyOption<- function(x,...) UseMethod(".sourcifyOption")
   for (a in alist) 
      what<-ifelse(utils::hasName(a,"codes"),"codes",what)
   
-  mark(option$name,what)
   paste0(option$name,"=c(",paste(sapply(alist,function(a) paste0(sourcifyName(a$var),' = \"',a[[what]],'\"')),collapse=", "),")")
 }
 

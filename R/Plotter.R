@@ -720,8 +720,16 @@ Plotter <- R6::R6Class(
       if (is.null(self$scatterZ))
           return()
 
+      if (self$option("model_type","ordinal") || self$option("model_type","multinomial")) {
+           self$warning<-list(topic="jnplotnotes",
+                          message=paste("the Johnson-Neyman plot is not available for models of type:",self$options$model_type),
+                          head="warning")
+           return()    
+      }
+      
       jinfo("PLOTTER: init johnson-neyman plot")
       resultsgroup<-private$.results$get("jnPlots")
+     
        if (is.something(self$scatterModerators)) {
            plots<-simple_models_labels(self$scatterModerators, private$.operator)
            for (i in 1:nrow(plots)) {
@@ -739,6 +747,10 @@ Plotter <- R6::R6Class(
       if (!self$option("plot_jn")) 
         return()
 
+      if (self$option("model_type","ordinal") || self$option("model_type","multinomial")) {
+           return()    
+      }
+ 
       jinfo("PLOTTER: prepare johnson-neyman plot")
 
       if (is.null(self$scatterX))

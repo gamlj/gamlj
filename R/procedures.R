@@ -1040,6 +1040,7 @@ simple_models_labels<-function(mods,obj) {
                 else 
                         obj$datamatic$variables[[tob64(x)]]$levels_labels
             })
+        mark("simple_model_labs",levels)
         rows  <- expand.grid(levels)
         names(rows)<-mods
         

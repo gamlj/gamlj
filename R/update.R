@@ -27,7 +27,7 @@ mf.update<- function(x,...) UseMethod(".update")
     test<-lme4::findbars(.formula)
     
     if (!is.something(test)) {
-      warning("No random coefficients specified. A linear model is used for comparison.")
+      warning("No random coefficients specified in the reduced model. A linear model is used for comparison.")
       .formula<-lme4::nobars(.formula)
       return(stats::lm(formula = .formula,data=.args$data))
     }
@@ -41,8 +41,8 @@ mf.update<- function(x,...) UseMethod(".update")
 .update.glmerMod<-function(model,...) {
   
   .args<-list(...)
-   if (!utils::hasName(.args,"data")) 
-       .args$data<-insight::get_data(model,source="frame")
+#   if (!utils::hasName(.args,"data")) 
+#       .args$data<-model@frame
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)
@@ -50,14 +50,14 @@ mf.update<- function(x,...) UseMethod(".update")
     
     if (!is.something(test)) {
       .formula<-lme4::nobars(.formula)
-      warning("No random coefficients specified. A generalized linear model is used for comparison.")
-      mod<-stats::glm(formula = .formula,data=.args$data,family=stats::family(model))
+      warning("No random coefficients in the reduced model. A generalized linear model is used for comparison.")
+      data<-model@frame
+      mod<-stats::glm(formula = .formula,data=data,family=stats::family(model))
       return(mod)
     }
   }
   .args$object<-model 
   do.call(stats::update, .args)
-
 }
 
 .update.clmm<-function(model,...) {
