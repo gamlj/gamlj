@@ -1023,7 +1023,7 @@ simple_models<-function(model,mods,obj, conditions=list()) {
                         else
                                .data1[[.name]]<-.data1[[.name]]-rows[i,.name]
                  }
-                 ladd(results)  <-  stats::update(model,data=.data1)
+                 ladd(results)  <-  mf.update(model,data=.data1)
 
          }
          return(results)

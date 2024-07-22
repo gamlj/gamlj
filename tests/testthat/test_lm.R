@@ -428,12 +428,6 @@ mod<-GAMLj3::gamlj_lm(
   plot_z=write,
   plot_by=c(prog,read)
 )
-plot(mod)
-jnplot(mod)
-aa
-str(aa)
-aa
-length(mod$mainPlots)
 object<-mod
  alist <- list()
         for (i in 1:length(object$mainPlots)) {

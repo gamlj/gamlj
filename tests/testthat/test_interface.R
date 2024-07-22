@@ -73,7 +73,7 @@ mplots<-plot(mod)
 
 testthat::test_that("plot ok", {
                     testthat::expect_true(is.list(mplots))
-                    testthat::expect_true(ggplot2::is.ggplot(mplots))
+                    testthat::expect_true(ggplot2::is.ggplot(mplots[[1]]))
 }
 )
 

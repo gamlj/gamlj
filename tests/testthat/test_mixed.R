@@ -41,9 +41,10 @@ testthat::test_that("p-table is ok", {
   testthat::expect_equal(rtable[1,3],4.49,tol)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
+p<-plot(model)
 
 testthat::test_that("a mainplot is produced", {
-  testthat::expect_true(ggplot2::is.ggplot(plot(model)))
+  testthat::expect_true(ggplot2::is.ggplot(p))
 })
 
 

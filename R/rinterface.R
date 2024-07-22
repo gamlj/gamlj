@@ -174,7 +174,7 @@ jnplot <- function(x, formula = NULL, ...) {
           return(FALSE)
         }
 
-        mark(str(object))
+       
         for (i in 1:length(object[[what]])) {
             title <- (object[[what]][[i]]$title)
             gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
