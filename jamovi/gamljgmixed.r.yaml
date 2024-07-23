@@ -1177,6 +1177,8 @@ items:
            - plot_black
            - plot_around
            - plot_re
+           - plot_re_method
+           - plot_scale
 
     template:
           title: ""

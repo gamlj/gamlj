@@ -1920,7 +1920,9 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "plot_xoriginal",
                     "plot_black",
                     "plot_around",
-                    "plot_re"),
+                    "plot_re",
+                    "plot_re_method",
+                    "plot_scale"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",
