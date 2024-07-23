@@ -320,7 +320,6 @@ data <- manymodels
 data$cat3 <- factor(data$cat3)
 data$yord <- factor(data$yord)
 
-
 mod <- GAMLj3::gamlj_glm(
   formula = yord ~ x * cat3,
   data = data,
@@ -330,6 +329,7 @@ mod <- GAMLj3::gamlj_glm(
   simple_mods = cat3,
   posthoc=~cat3
 )
+
 
 testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .0118, tol)
@@ -343,6 +343,13 @@ testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tol)
 })
+
+
+
+
+
+
+
 
 data$yperc<-(data$ypoi+1)/(max(data$ypoi)+2)
 mod <- GAMLj3::gamlj_glm(

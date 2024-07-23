@@ -171,7 +171,7 @@ Variable <- R6::R6Class(
         
            self$isDependent<-TRUE
            self$type=class(vardata)
-           if ("character" %in% self$type) stop("Character type not allowed. Please set variables as.numeric or as.factor")
+           if ("character" %in% self$type) stop("Character type not allowed. Please set variable ",self$name," as numeric or factor")
 
 
            if ("ordered" %in% self$type) {
