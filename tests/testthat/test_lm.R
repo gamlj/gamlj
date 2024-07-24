@@ -419,5 +419,20 @@ testthat::test_that("intercept model comparison", {
     ,tol)
 })
 
+library(GAMLj3)
 
-
+mod<-GAMLj3::gamlj_lm(
+  data = hsbdemo,
+  formula=science~1+math*write*read*prog,
+  plot_x=math,
+  plot_z=write,
+  plot_by=c(prog,read)
+)
+object<-mod
+ alist <- list()
+        for (i in 1:length(object$mainPlots)) {
+            title <- (object$mainPlots[[i]]$title)
+            gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
+            alist[[i]] <- gplot
+        }
+ 

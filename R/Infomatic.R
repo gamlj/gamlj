@@ -287,6 +287,9 @@ Infomatic <- R6::R6Class(
         self$emmeans       <-   "the response metric"
         self$direction     <-   c("y","Dependent variable scores")
         self$deptype       <-   c("numeric","integer","factor")
+        if (self$caller=="glmer")
+            self$calloptions<-list(control=lme4::glmerControl(optimizer = c("bobyqa")))
+
       }
 
       if (self$model_type=="ordinal") {

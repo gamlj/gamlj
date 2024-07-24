@@ -468,6 +468,14 @@ options:
                         `'none'` (default), `'ci'`, or `'se'`. Use no error bars, use confidence intervals, or use standard errors on the plots, respectively.
                 ui: |
                         `'None'` (default), `Confidence Intervals`, or `Standard Error`. Display on plots no error bars, use confidence intervals, or use standard errors on the plots, respectively.
+-       name: plot_jn
+        title: Johnson-Neyman plot
+        type: Bool
+        default: false
+        description:
+                R: |
+                        `'FALSE'` (default), `'TRUE'` produces the Johnson-Neyman plot for simple slope significance.
+                ui: Produces the Johnson-Neyman plot for simple slopes significance.
 -       name: plot_re
         title: Random effects
         type: Bool
@@ -513,10 +521,48 @@ options:
                 title: Ordinal (proportional odds)
         -       name: multinomial
                 title: Multinomial
+        -       name: custom
+                title: Custom
         default: logistic
         description:
                 R: |
                         Select the generalized linear model: `poisson`,`logistic`,`multinomial`, `nb`,`ordinal`
+-       name: custom_family
+        title: Distribution
+        type: List
+        options:
+        -       title: Binomial
+                name: binomial
+        -       title: Poisson
+                name: poisson
+        -       title: Inverse gaussian
+                name: inverse.gaussian
+        -       title: Gamma
+                name: Gamma
+        default: binomial
+        description:
+                R: |
+                        Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
+-       name: custom_link
+        title: Link Function
+        type: List
+        options:
+        -       title: Identity
+                name: identity
+        -       title: Logit
+                name: logit
+        -       title: Log
+                name: log
+        -       title: Inverse
+                name: inverse
+        -       title: Inverse squared
+                name: 1/mu^2
+        -       title: Square root
+                name: sqrt
+        default: identity
+        description:
+                R: |
+                        Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
 -       name: covs_scale
         title: Covariates Scaling
         type: Array

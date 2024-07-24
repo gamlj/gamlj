@@ -24,14 +24,17 @@ cioptions:
         - boot_r
 
 simpleeffectsoptions:
-        - simple_x
-        - simple_mods
-        - simple_scale
-        - contrast_custom_focus
-        
-covscalingoptions:                 
-        - covs_conditioning
-        - covs_scale_labels
-        - ccp_value
-        - ccm_value
-        - ccra_steps
+
+                 - simple_x
+                 - simple_mods
+                 - simple_scale
+
+covscalingoptions:
+
+                 - ccm_value
+                 - ccp_value
+                 - ccra_steps
+                 - covs_scale_labels
+                 - covs_conditioning
+                 - contrast_custom_focus
+

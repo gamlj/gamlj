@@ -111,14 +111,14 @@ gamljgmixedClass <- R6::R6Class(
         
         ### estimate marginal means
         
-        aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
-        aSmartObj$activated<-is.something(self$options$emmeans)
-        aSmartObj$expandOnInit<-TRUE
-        aSmartObj$expandFrom<-2
-        aSmartObj$combineBelow="new!"
-        aSmartObj$spaceBy="new!"
-        aSmartObj$ci("est",self$options$ci_width)
-        ladd(private$.smartObjs)<- aSmartObj        
+      aSmartObj<-SmartArray$new(self$results$emmeans,runner_machine)
+      aSmartObj$activated<-is.something(self$options$emmeans)
+      aSmartObj$expandOnInit<-TRUE
+      aSmartObj$expandFrom<-2
+      aSmartObj$combineBelow="new!"
+      aSmartObj$spaceBy="new!"
+      aSmartObj$ci("est",self$options$ci_width)
+      ladd(private$.smartObjs)<-aSmartObj
         
         ### simple effects
         ##### anova
@@ -234,6 +234,12 @@ gamljgmixedClass <- R6::R6Class(
         
       },
 
+      .jnPlot=function(image, ggtheme, theme, ...) {
+
+         plot<-private$.plotter_machine$jnPlot(image,ggtheme,theme)
+         return(plot)
+  
+      },
       
 
       .marshalFormula= function(formula, data, name) {
@@ -303,6 +309,12 @@ gamljgmixedClass <- R6::R6Class(
         if (self$options$donotrun)
           return('')
         
+       if (option$name=="custom_family" && self$options$model_type != "custom") 
+           return('')
+       if (option$name=="custom_LINK" && self$options$model_type != "custom") 
+           return('')
+
+
         if (option$name=="nested_terms") {
           if (self$options$comparison)
             return(paste("nested_terms =", private$.runner_machine$nestedformulaobj$rhsfixed_formula()))
@@ -315,8 +327,6 @@ gamljgmixedClass <- R6::R6Class(
           } else 
             return("")
         }
-        
-        
         
         defaults<-c(covs_scale="centered",contrasts="simple",scale_missing="complete")
         if (option$name %in% NO_R_OPTS)

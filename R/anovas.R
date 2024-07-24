@@ -25,7 +25,7 @@ ganova<- function(x,...) UseMethod(".anova")
   
   if (!isFALSE(anoobj$error))
     return(NULL)
-  
+
   .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
   .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
   names(.anova)<-transnames(names(.anova),.transnames)
@@ -40,8 +40,30 @@ ganova<- function(x,...) UseMethod(".anova")
 .anova.multinom<-function(model,obj)
   .anova.glm(model,obj)
 
-.anova.clm<-function(model,obj) 
-  .anova.glm(model,obj,"Chisq")
+.anova.clm<-function(model,obj) {
+
+  if (!obj$formulaobj$hasTerms) {
+    obj$warning  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
+    return(NULL)
+  }
+  
+  anoobj        <-  try_hard(stats::anova(model,type=3))
+  obj$error    <-  list(topic="main_anova",message=anoobj$error)
+  obj$warning  <-  list(topic="main_anova",message=anoobj$warning)
+  
+  
+  if (!isFALSE(anoobj$error))
+    return(NULL)
+
+  .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
+  .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
+  names(.anova)<-transnames(names(.anova),.transnames)
+  
+  .anova<-.anova[rownames(.anova)!="(Intercept)",]   
+  .anova
+  
+  
+}
 
 .anova.betareg<-function(model,obj) 
   .anova.glm(model,obj,"Chisq")

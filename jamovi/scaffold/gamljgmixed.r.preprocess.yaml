@@ -20,6 +20,10 @@ items:
          type: text
          title: ""
     refs: gamlj
+
+  - name: modelnotes
+    type: Html
+    visible: false
      
   - name: main
     type: Group
@@ -684,6 +688,12 @@ items:
                               - __simpleeffectsoptions__
             
         columns:
+        - name: response
+          title: Response 
+          type: text
+          visible: (model_type:multinomial)
+          combineBelow: true
+        
         - name: estimate
           title: 'Mean'
           type: number
@@ -716,6 +726,8 @@ items:
            - plot_black
            - plot_around
            - plot_re
+           - plot_re_method
+           - plot_scale
 
     template:
           title: ""
@@ -742,6 +754,46 @@ items:
     type: Html
     visible: false
 
+  - name: jnPlots
+    title: Johnson-Neyman Plot
+    type: Array
+    description: an array of plots
+    visible: (plot_jn)
+    refs: interactions
+    clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+    template:
+          title: ""
+          type: Image
+          renderFun: .jnPlot
+          width: 700
+          height: 400
+
+          clearWith:
+           -  __modeloptions__
+           -  __cioptions__
+           -  __covscalingoptions__                 
+           - plot_x
+           - plot_z
+           - plot_by
+           - plot_raw
+           - plot_yscale
+           - plot_xoriginal
+           - plot_black
+
+  - name: jnplotnotes
+    type: Html
+    visible: false
 
 
   - name: predicted

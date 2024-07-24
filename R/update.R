@@ -7,36 +7,42 @@ mf.update<- function(x,...) UseMethod(".update")
 .update.default<-function(model,...) {
   
   jinfo("default update is used")
-  data<-insight::get_data(model,source="frame")
+  .args<-list(...)
+   if (!utils::hasName(.args,"data")) 
+       .args$data<-insight::get_data(model,source="frame")
 
-  stats::update(model,data=data,...)
+  .args$object<-model
+  do.call(stats::update,.args)
   
 }
 
 .update.lmerModLmerTest<-function(model,...) {
   
   .args<-list(...)
-  data<-insight::get_data(model,source="frame")
+   if (!utils::hasName(.args,"data")) 
+       .args$data<-insight::get_data(model,source="frame")
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)
     test<-lme4::findbars(.formula)
     
     if (!is.something(test)) {
-      warning("No random coefficients specified. A linear model is used for comparison.")
+      warning("No random coefficients specified in the reduced model. A linear model is used for comparison.")
       .formula<-lme4::nobars(.formula)
-      return(stats::lm(formula = .formula,data=data))
+      return(stats::lm(formula = .formula,data=.args$data))
     }
   }
+  .args$object<-model 
+  do.call(stats::update, .args)
   
-  stats::update(model,data=data,...)
 }
 
 
 .update.glmerMod<-function(model,...) {
   
   .args<-list(...)
-  data<-insight::get_data(model,source="frame")
+#   if (!utils::hasName(.args,"data")) 
+#       .args$data<-model@frame
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)
@@ -44,20 +50,25 @@ mf.update<- function(x,...) UseMethod(".update")
     
     if (!is.something(test)) {
       .formula<-lme4::nobars(.formula)
-      warning("No random coefficients specified. A generalized linear model is used for comparison.")
+      warning("No random coefficients in the reduced model. A generalized linear model is used for comparison.")
+      data<-model@frame
       mod<-stats::glm(formula = .formula,data=data,family=stats::family(model))
       return(mod)
     }
   }
-  
-  stats::update(model,data=data,...)
+  .args$object<-model 
+  do.call(stats::update, .args)
 }
 
 .update.clmm<-function(model,...) {
   
   
   .args<-list(...)
-  data<-insight::get_data(model,source="frame")
+  
+  if (utils::hasName(.args,"data")) 
+       data <- .args$data
+  else
+       data<-insight::get_data(model,source="frame")
   
   if (!utils::hasName(.args,"formula")) stop("clmm model update requires a formula")
   
@@ -75,14 +86,20 @@ mf.update<- function(x,...) UseMethod(".update")
 }
 
 
-.update.mmblogit<-function(model,formula) {
+.update.mmblogit<-function(model,formula,...) {
   
   jinfo("GAMLj: mmblogit update is used")
+  .args<-list(...)
   ### mclogit is quite unflexible with the class of formulas. 
   ### we should deparse them and reset as formulas
   .fixed  <- lme4::nobars(stats::formula(formula))
   .random <- lme4::findbars(stats::formula(formula))
-  .data   <- model$data
+  
+   if (utils::hasName(.args,"data")) 
+       .data <- .args$data
+   else
+       .data   <- model$data
+
   .random<-(lapply(.random,function(x) formula(paste("~",deparse(x)))))
 
   if (!is.something(.random)) {
@@ -99,14 +116,18 @@ mf.update<- function(x,...) UseMethod(".update")
 }
 
 
-.update.lme<-function(model,formula) {
+.update.lme<-function(model,formula, ...) {
 
   jinfo("lme update is used")
   form<-formula(formula)
   fixed<-lme4::nobars(form)
   .random<-lme4::findbars(form)
-  data<-model$data
-  
+  .args <- list(...)
+  if (utils::hasName(.args,"data")) 
+       data <- .args$data
+  else
+       data<-model$data
+
   random<-lapply(.random, function(x) formula(paste("~",as.character(x)[2],"|",as.character(x)[3])))
   if (!is.something(random)) {
     warning("No random coefficients in the nested model. A fixed effects linear model is used for comparison. The validity of the tests may be questionnable.")

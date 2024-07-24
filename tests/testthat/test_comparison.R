@@ -16,7 +16,6 @@ mod <- GAMLj3::gamlj_lm(
   omnibus = "LRT",
   data = data
 )
-
 testthat::test_that("test glm anova comparison option", {
   testthat::expect_equal(mod$main$r2$asDF[3,5],264.805,tolerance = tol)
   testthat::expect_equal(mod$main$r2$asDF[3,4],2,tolerance = tol)
@@ -36,11 +35,13 @@ testthat::test_that("test glm anova comparison option", {
   
 })
 
+testthat::expect_warning(
 mod <- GAMLj3::gamlj_mixed(
   formula = ycont~x*cat2+(1+x|cluster),
   nested_terms = ~x,
   omnibus = "LRT",
   data = data
+)
 )
 
 testthat::test_that("test mixed comparison: fixed", {
@@ -49,6 +50,7 @@ testthat::test_that("test mixed comparison: fixed", {
   
 })
 
+testthat::expect_warning(
 mod <- GAMLj3::gamlj_mixed(
   formula = ycont~x*cat2+(1+x|cluster),
   nested_terms = ~x*cat2,
@@ -56,31 +58,33 @@ mod <- GAMLj3::gamlj_mixed(
   omnibus = "LRT",
   data = data
 )
-
+)
 testthat::test_that("test mixed comparison: random", {
   testthat::expect_equal(mod$main$r2$asDF[5,5],.458,tolerance = tol)
   testthat::expect_equal(mod$main$r2$asDF[5,4],2,tolerance = tol)
 })
 
-mod <- GAMLj3::gamlj_mixed(
-  formula = ycont~x*cat2+(1+x|cluster),
-  nested_terms = ~x*cat2,
-  nested_re = ~1+(1+x|cluster),
-  omnibus = "LRT",
-  data = data
+testthat::expect_warning(
+ mod <- GAMLj3::gamlj_mixed(
+   formula = ycont~x*cat2+(1+x|cluster),
+   nested_terms = ~x*cat2,
+   nested_re = ~1+(1+x|cluster),
+   omnibus = "LRT",
+   data = data
+ )
 )
-
 testthat::test_that("test mixed comparison: 0 df", {
   testthat::expect_equal(mod$main$r2$asDF[5,5],0,tolerance = tol)
   testthat::expect_equal(mod$main$r2$asDF[5,4],0,tolerance = tol)
 })
 
-
+testthat::expect_warning(
 mod <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*cat2+(1+x|cluster),
   nested_terms = ~x*cat2,
   nested_re = ~1+(1|cluster),
   data = data
+)
 )
 
 testthat::test_that("test mixed comparison: random", {
@@ -89,18 +93,18 @@ testthat::test_that("test mixed comparison: random", {
 })
 
 
-mod <- GAMLj3::gamlj_gmixed(
-  formula = ybin~x*z+(1+z*x|cluster),
-  nested_terms = ~x*z,
-  nested_re = ~(1+x+z|cluster),
-  data = data
-)
+formula = ybin~x*cat2+(1+x|cluster)
+rmod<-  lme4::glmer(formula,data=data,family=binomial())
+
+
+testthat::expect_warning(
 
 mod <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*cat2+(1+x|cluster),
   nested_terms = ~x*cat2,
   nested_re = ~1+(1+x|cluster),
   data = data
+)
 )
 
 testthat::test_that("test mixed comparison: 0 df", {
@@ -251,7 +255,6 @@ mod <- GAMLj3::gamlj_glm(
   nested_terms = ~x,
   data = data
 )
-
 testthat::test_that("test gzlm comparison: negative binomial", {
   testthat::expect_equal(mod$main$r2$asDF[3,5],168.62,tolerance = tol)
   testthat::expect_equal(mod$main$r2$asDF[3,4],2)

@@ -8,13 +8,15 @@ data$cat3<-factor(data$cat3)
 data$yord<-factor(data$yord)
 data$ybin<-factor(data$ybin)
 
-
+testthat::expect_warning(
 mod0 <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*cat3+(1+x|cluster),
   data = data,
   model_type = "logistic"
 )
-
+)
+  
+testthat::expect_warning(
 
 mod1 <- GAMLj3::gamlj_gmixed(
   data=data,
@@ -25,6 +27,9 @@ mod1 <- GAMLj3::gamlj_gmixed(
   model_terms = ~ x*cat3,
   re=list(list(list("Intercept","cluster"),list("x","cluster")))
 )
+)
+mod1
+testthat::expect_warning(
 
 mod2 <- GAMLj3::gamlj_gmixed(
   data=data,
@@ -35,7 +40,7 @@ mod2 <- GAMLj3::gamlj_gmixed(
   model_terms = ~ x*cat3,
   re=~(1+x|cluster)
 )
-mod2$main$coefficients$asDF
+)
 testthat::test_that("equivalent model input", {
   testthat::expect_equal(mod0$info$asDF$specs[2], mod1$info$asDF$specs[2])
   testthat::expect_equal(mod0$main$anova$asDF$f[3], mod1$main$anova$asDF$f[3])
@@ -46,11 +51,13 @@ testthat::test_that("equivalent model input", {
 })
 
 
+testthat::expect_warning(
 
 model <- GAMLj3::gamlj_gmixed(
   formula = ybin~x*cat3*z+(1+x|cluster),
   data = data,
   model_type = "logistic"
+)
 )
 testthat::test_that("info is ok", {
   testthat::expect_equal(as.numeric(model$info$asDF$value[6]),1800)
@@ -69,6 +76,7 @@ testthat::test_that("fit is ok", {
   
 })
 
+
 mod <- GAMLj3::gamlj_gmixed(
   formula = ypoi ~ x * cat3 +(1+x|cluster),
   data = data,
@@ -79,7 +87,6 @@ mod <- GAMLj3::gamlj_gmixed(
   emmeans = ~x,
   es=c("expb","marginals")
 )
-
 testthat::test_that("Poisson works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.5941, tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1], 9.8702, tol)
@@ -94,5 +101,6 @@ testthat::test_that("Poisson works", {
   testthat::expect_equal(mod$main$marginals$asDF[1,3],.162,tol)
   testthat::expect_equal(mod$main$marginals$asDF[1,5],.00919,tol)
 })
+
 
 

@@ -171,7 +171,7 @@ Variable <- R6::R6Class(
         
            self$isDependent<-TRUE
            self$type=class(vardata)
-           if (self$type=="character") stop("Character type not allowed. Please set variables as.numeric or as.factor")
+           if ("character" %in% self$type) stop("Character type not allowed. Please set variable ",self$name," as numeric or factor")
 
 
            if ("ordered" %in% self$type) {
@@ -446,7 +446,7 @@ Variable <- R6::R6Class(
         labels[[1]]<-lab
         if (nLevels>2)
            for (i in 2:(nLevels-1)) labels[[i]]<-paste0("tech",i)
-        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is mamed ",paste0(self$name,"1"),"and indicated as <b>",lab, "</b> in the effect labels."))
+        self$datamatic$warning<-list(topic="info",message=paste("The user defined contrast for variable",self$name," is named ",paste0(self$name,"1"),"and indicated as <b>",lab, "</b> in the effect labels."))
         return(labels)
         
       }

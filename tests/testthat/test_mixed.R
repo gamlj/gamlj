@@ -7,18 +7,15 @@ subjects_by_stimuli$stimulus<-factor(subjects_by_stimuli$stimulus)
 subjects_by_stimuli$cond<-factor(subjects_by_stimuli$cond)
 levels(subjects_by_stimuli$cond)<-c("A","B")
 
-formula<-y~1+cond+(1|subj)+(1|stimulus)
-
+formula<-y ~ 1 + cond+( 1|subj )
 model<-GAMLj3::gamlj_mixed(
-  formula =y ~ 1 + cond+( 1|subj ),
+  formula = formula,
   data = subjects_by_stimuli,
   plot_x="cond",
   norm_plot= T, resid_plot = T, cluster_boxplot = T, cluster_respred = T, rand_hist = T
 )
 
-
 infotable<-model$info$asDF
-
 testthat::test_that("info is ok", {
   testthat::expect_equal(as.numeric(infotable$value[7]),3000)
   testthat::expect_equal(infotable$info[8],"Converged")
@@ -44,9 +41,10 @@ testthat::test_that("p-table is ok", {
   testthat::expect_equal(rtable[1,3],4.49,tol)
   testthat::expect_equal(as.character(rtable[1,"groups"]),"subj")
 })
+p<-plot(model)
 
 testthat::test_that("a mainplot is produced", {
-  testthat::expect_true(ggplot2::is.ggplot(plot(model)))
+  testthat::expect_true(ggplot2::is.ggplot(p))
 })
 
 
@@ -182,9 +180,12 @@ testthat::test_that("standardizing with more clusters",{
 data("beers_bars")
 data<-beers_bars
 
+testthat::expect_warning(
 model<-GAMLj3::gamlj_mixed(
   formula = smile ~ 1 + beer + I(beer^2)+( 1 + beer + I(beer^2) | bar ),
   data = data)
+)
+
 ###### this has changed with lme4 1.1 
 testthat::test_that("some poly", {
   testthat::expect_lt(model$main$anova$asDF[2,2],0.43)

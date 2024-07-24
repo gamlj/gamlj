@@ -52,10 +52,13 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             plot_xoriginal = FALSE,
             plot_black = FALSE,
             plot_around = "ci",
+            plot_jn = FALSE,
             plot_re = FALSE,
             plot_re_method = "average",
             plot_scale = "response",
             model_type = "logistic",
+            custom_family = "binomial",
+            custom_link = "identity",
             covs_scale = NULL,
             scale_missing = "colwise",
             cluster = NULL,
@@ -340,6 +343,10 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "ci",
                     "se"),
                 default="ci")
+            private$..plot_jn <- jmvcore::OptionBool$new(
+                "plot_jn",
+                plot_jn,
+                default=FALSE)
             private$..plot_re <- jmvcore::OptionBool$new(
                 "plot_re",
                 plot_re,
@@ -368,8 +375,29 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "poisson",
                     "nb",
                     "ordinal",
-                    "multinomial"),
+                    "multinomial",
+                    "custom"),
                 default="logistic")
+            private$..custom_family <- jmvcore::OptionList$new(
+                "custom_family",
+                custom_family,
+                options=list(
+                    "binomial",
+                    "poisson",
+                    "inverse.gaussian",
+                    "Gamma"),
+                default="binomial")
+            private$..custom_link <- jmvcore::OptionList$new(
+                "custom_link",
+                custom_link,
+                options=list(
+                    "identity",
+                    "logit",
+                    "log",
+                    "inverse",
+                    "1/mu^2",
+                    "sqrt"),
+                default="identity")
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -496,10 +524,13 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..plot_xoriginal)
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
+            self$.addOption(private$..plot_jn)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..plot_scale)
             self$.addOption(private$..model_type)
+            self$.addOption(private$..custom_family)
+            self$.addOption(private$..custom_link)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..cluster)
@@ -557,10 +588,13 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         plot_xoriginal = function() private$..plot_xoriginal$value,
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
+        plot_jn = function() private$..plot_jn$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
         plot_scale = function() private$..plot_scale$value,
         model_type = function() private$..model_type$value,
+        custom_family = function() private$..custom_family$value,
+        custom_link = function() private$..custom_link$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         cluster = function() private$..cluster$value,
@@ -617,10 +651,13 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..plot_xoriginal = NA,
         ..plot_black = NA,
         ..plot_around = NA,
+        ..plot_jn = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
         ..plot_scale = NA,
         ..model_type = NA,
+        ..custom_family = NA,
+        ..custom_link = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..cluster = NA,
@@ -638,6 +675,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
     active = list(
         model = function() private$..model,
         info = function() private$.items[["info"]],
+        modelnotes = function() private$.items[["modelnotes"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
@@ -645,6 +683,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         emmeans = function() private$.items[["emmeans"]],
         mainPlots = function() private$.items[["mainPlots"]],
         plotnotes = function() private$.items[["plotnotes"]],
+        jnPlots = function() private$.items[["jnPlots"]],
+        jnplotnotes = function() private$.items[["jnplotnotes"]],
         predicted = function() private$.items[["predicted"]],
         residuals = function() private$.items[["residuals"]]),
     private = list(
@@ -674,6 +714,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         `type`="text", 
                         `title`="")),
                 refs="gamlj"))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="modelnotes",
+                visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1821,6 +1865,12 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "contrast_custom_focus"),
                     columns=list(
                         list(
+                            `name`="response", 
+                            `title`="Response", 
+                            `type`="text", 
+                            `visible`="(model_type:multinomial)", 
+                            `combineBelow`=TRUE),
+                        list(
                             `name`="estimate", 
                             `title`="Mean", 
                             `type`="number"),
@@ -1870,7 +1920,9 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "plot_xoriginal",
                     "plot_black",
                     "plot_around",
-                    "plot_re"),
+                    "plot_re",
+                    "plot_re_method",
+                    "plot_scale"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",
@@ -1910,6 +1962,80 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
+                visible=FALSE))
+            self$add(jmvcore::Array$new(
+                options=options,
+                name="jnPlots",
+                title="Johnson-Neyman Plot",
+                visible="(plot_jn)",
+                refs="interactions",
+                clearWith=list(
+                    "dep",
+                    "factors",
+                    "covs",
+                    "covs_scale",
+                    "scale_missing",
+                    "model_terms",
+                    "fixed_intercept",
+                    "se_method",
+                    "mute",
+                    "re",
+                    "re_corr",
+                    "df_method",
+                    "relm",
+                    "contrasts",
+                    "covs_scale",
+                    "mute",
+                    "model_type",
+                    "contrast_custom_values",
+                    "ci_width",
+                    "ci_method",
+                    "boot_r",
+                    "plot_x",
+                    "plot_z",
+                    "plot_by",
+                    "plot_raw",
+                    "plot_yscale",
+                    "plot_xoriginal",
+                    "plot_black"),
+                template=jmvcore::Image$new(
+                    options=options,
+                    title="",
+                    renderFun=".jnPlot",
+                    width=700,
+                    height=400,
+                    clearWith=list(
+                        "dep",
+                        "factors",
+                        "covs",
+                        "covs_scale",
+                        "scale_missing",
+                        "model_terms",
+                        "fixed_intercept",
+                        "se_method",
+                        "mute",
+                        "re",
+                        "re_corr",
+                        "df_method",
+                        "relm",
+                        "contrasts",
+                        "covs_scale",
+                        "mute",
+                        "model_type",
+                        "contrast_custom_values",
+                        "ci_width",
+                        "ci_method",
+                        "boot_r",
+                        "plot_x",
+                        "plot_z",
+                        "plot_by",
+                        "plot_raw",
+                        "plot_yscale",
+                        "plot_xoriginal",
+                        "plot_black"))))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="jnplotnotes",
                 visible=FALSE))
             self$add(jmvcore::Output$new(
                 options=options,

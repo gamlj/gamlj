@@ -574,8 +574,9 @@ Runner <- R6::R6Class("Runner",
                               jinfo("MODULE: Estimating the model: running")
                           
                               results<-try_hard(eval(acall))
-  
-                              self$warning<-list(topic="info", message=results$warning)
+
+                              self$warning<-list(topic="modelnotes", message=results$warning, head="warning")
+                              self$warning<-list(topic="info", message=results$message, head="info")
 
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom")) {
@@ -587,26 +588,25 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              if (!isFALSE(results$warning)) {
-                                  disp<-Dispatch$new(self$analysis$results)
-                                  msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
-                                  msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
-                                  if (is.something(msg))
-                                        warning(msg)
-                              }
+                              # if (!isFALSE(results$warning)) {
+                              #     disp<-Dispatch$new(self$analysis$results)
+                              #     msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
+                              #     msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
+                              #     if (is.something(msg))
+                              #           self$warning<-list(topic="modelnotes",message=msg,head="warning")
+                              # }
                               
                               if (mf.aliased(results$obj))
-                                   self$warning<-list(topic="info",message=WARNS["aliased"])
+                                   self$warning<-list(topic="info",message=WARNS["aliased"], head="info")
 
                               .model<-mf.fixModel(results$obj,self,data)
                               
                               ### add custom info to the model
                               if (self$option("model_type","ordinal")) {
                                       msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses")
-                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg))
+                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses", head="info")
+                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg), head="info")
                                      }                              
-                              
                               return(.model)
 
 
@@ -756,14 +756,31 @@ estimate_lmer<-function(...) {
   opts<-list(...)
   data<-opts$data
   reml<-opts$reml
-  
+  good<- NULL
+  tried<-list()
   for (opt in opts$optimizers) {
-            model = lmerTest::lmer(formula=stats::as.formula(opts$formula), data=data,REML=reml,control=lme4::lmerControl(optimizer = eval(opt)))
-            if (mf.converged(model))
-            break()
+            model = lmerTest::lmer(formula=stats::as.formula(opts$formula),
+                                   data=data,
+                                   REML=reml,
+                                   control=lme4::lmerControl(optimizer = eval(opt),calc.derivs=FALSE))
+            ladd(tried)<-opt
+            jinfo("MODULE: trying optimizer", opt)
+            if (mf.converged(model)) {
+              good<-ifelse(is.null(good),opt,good)
+              if (!lme4::isSingular(model))
+                         break()
+           }
   }
+  if (lme4::isSingular(model) && !is.null(good))
+        model = lmerTest::lmer(formula=stats::as.formula(opts$formula), 
+                               data=data,
+                               REML=reml,
+                               control=lme4::lmerControl(optimizer = eval(good),calc.derivs=FALSE))
+  if (length(tried)>1)
+     message(paste("Optimizer ",paste(tried,collapse=", "), "have been tried to find a solution."))    
+  
 #  this is required for lmerTest::ranova to work
-  model@call$control<-lme4::lmerControl(optimizer=opt)
+  model@call$control<-lme4::lmerControl(optimizer=good)
   ### done
   return(model)
 }
@@ -788,6 +805,7 @@ estimate_lme<-function(...) {
    model$call[[1]]<-quote(nlme::lme.formula)
   return(model)
 }
+
 
 
 

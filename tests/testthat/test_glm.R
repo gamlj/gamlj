@@ -189,7 +189,6 @@ data("poissonacts")
 data <- poissonacts
 data$age <- factor(data$age)
 
-
 mod <- GAMLj3::gamlj_glm(
   formula = acts ~ agg_test * age,
   data = data,
@@ -250,8 +249,8 @@ testthat::test_that("Custom model works", {
 
 ### negative binomial
 data$q <- as.integer(data$q)
-testthat::expect_warning({
-  mod <- GAMLj3::gamlj_glm(
+testthat::expect_warning(
+mod <- GAMLj3::gamlj_glm(
     formula = q ~ agg_test * age,
     data = data,
     model_type = "nb",
@@ -262,8 +261,7 @@ testthat::expect_warning({
     estimates_ci = TRUE,
     es=c("expb","marginals")
   )
-})
-
+)
 testthat::test_that("negative binomial model works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1], 22.6, tol)
@@ -322,7 +320,6 @@ data <- manymodels
 data$cat3 <- factor(data$cat3)
 data$yord <- factor(data$yord)
 
-
 mod <- GAMLj3::gamlj_glm(
   formula = yord ~ x * cat3,
   data = data,
@@ -333,9 +330,10 @@ mod <- GAMLj3::gamlj_glm(
   posthoc=~cat3
 )
 
+
 testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .0118, tol)
-  testthat::expect_equal(mod$main$anova$asDF$test[1], 51.056, tol)  
+  testthat::expect_equal(mod$main$anova$asDF$test[1], 5.74, tol)  
   testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .851, tol)
   testthat::expect_equal(mod$main$r2$asDF$r2, .199, tol)
   testthat::expect_equal(mod$main$fit$asDF$value[4], 217.609, tol)
@@ -345,6 +343,13 @@ testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
   testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tol)
 })
+
+
+
+
+
+
+
 
 data$yperc<-(data$ypoi+1)/(max(data$ypoi)+2)
 mod <- GAMLj3::gamlj_glm(

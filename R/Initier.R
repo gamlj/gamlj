@@ -408,8 +408,7 @@ init_main_res_corr=function() {
         .simple<-self$options$simple_x
         .var64<-tob64(.simple)
         focal<-self$datamatic$variables[[.var64]]
-        focal$isFocal <- TRUE
-
+        mark("requires focus",focal$name,focal$requireFocus())
         ### moderators should be reverted in order to match emmeans 
         .term<-rev(self$options$simple_mods)
         n<-length(.term)
@@ -436,7 +435,7 @@ init_main_res_corr=function() {
           ## for coefficients
           .inters64<-tob64(.inters)
           neffects<-ntests*prod(unlist(lapply(.inters64,function(m) self$datamatic$variables[[m]]$neffects)))
-          if (focal$method == "custom") neffects <- neffects/focal$neffects
+          if (focal$requireFocus()) neffects <- neffects/focal$neffects
           
           df2<-data.frame(matrix(".",ncol=length(.names),nrow=neffects))
           names(df2)<-.names
