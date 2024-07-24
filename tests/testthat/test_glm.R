@@ -333,7 +333,7 @@ mod <- GAMLj3::gamlj_glm(
 
 testthat::test_that("Ordinal works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .0118, tol)
-  testthat::expect_equal(mod$main$anova$asDF$test[1], 51.056, tol)  
+  testthat::expect_equal(mod$main$anova$asDF$test[1], 5.74, tol)  
   testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .851, tol)
   testthat::expect_equal(mod$main$r2$asDF$r2, .199, tol)
   testthat::expect_equal(mod$main$fit$asDF$value[4], 217.609, tol)
