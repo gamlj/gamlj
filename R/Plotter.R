@@ -214,9 +214,9 @@ Plotter <- R6::R6Class(
                     breaks = c("Significant", "Insignificant"), drop = FALSE, guide = ggplot2::guide_legend(order = 2))
            p <- p + ggplot2::scale_color_manual(values = c(Significant = sig.color, Insignificant = insig.color)) 
 
-           p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept = 0))
+           p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept = datalist$intercept))
            p <- p + ggplot2::geom_segment(ggplot2::aes(x = datalist$modrange[1], 
-             xend = datalist$modrange[2], y = 0, yend = 0, linetype = "Range of\nobserved\ndata"), 
+             xend = datalist$modrange[2], y = datalist$intercept, yend = datalist$intercept, linetype = "Range of\nobserved\ndata"), 
             lineend = "square", size = 1.25)
            p <- p + ggplot2::scale_linetype_discrete(name = " ", guide = ggplot2::guide_legend(order = 1))
            
@@ -791,7 +791,8 @@ Plotter <- R6::R6Class(
       private$.results$jnplotnotes$setContent("")
       resultsgroup<-private$.results$get("jnPlots")
       
-     
+     expb<-FALSE
+     if (self$option("plot_jn_expb")) expb<-TRUE
    
       model<-private$.operator$model
       if (self$scatterXscale) {
@@ -805,13 +806,13 @@ Plotter <- R6::R6Class(
             models<-simple_models(model,tob64(self$scatterModerators),obj=private$.operator)
             for (i in seq_along(models)) {
                   mod<-models[[i]]
-                  datalist<-.johnson_neyman(mod,pred=self$scatterX,mod=self$scatterZ$name64,alpha=.05)
+                  datalist<-.johnson_neyman(mod,pred=self$scatterX,mod=self$scatterZ$name64,alpha=.05,expb=expb)
                   aplot<-resultsgroup$get(resultsgroup$itemKeys[[i]])
                   aplot$setState(datalist)
             }
       } else {
           aplot<-resultsgroup$get(resultsgroup$itemKeys[[1]])
-          datalist<-.johnson_neyman(model,pred=self$scatterX,mod=self$scatterZ$name64,alpha=.05)
+          datalist<-.johnson_neyman(model,pred=self$scatterX,mod=self$scatterZ$name64,alpha=.05,expb=expb)
           aplot$setState(datalist)
       }
      },
@@ -1225,7 +1226,7 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
     }
 
 
-.johnson_neyman = function(model, predobj, mod, alpha=.05) {
+.johnson_neyman = function(model, predobj, mod, alpha=.05, expb=FALSE) {
  
   pred<-predobj$name64
   if (predobj$type=="factor")
@@ -1295,7 +1296,36 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
     cbso1 <- cbs[cbs[, "z"] < bounds[1], ]
     cbso2 <- cbs[cbs[, "z"] > bounds[2], ]
     cbsi <- cbs[(cbs[, "z"] > bounds[1] & cbs[, "z"] < bounds[2]), ]
-    out <- list(cbso1=cbso1,cbso2=cbso2,cbsi=cbsi,inside = inside, failed = failed, all_sig = all_sig,bounds=bounds, obsrange=obsrange,modrange=modrange)
+    
+    ### this is the y of the straight line in the middle of the plot
+    intercept<-0
+    ## here we exp() everything for plotting odd-ratios
+    if (expb) {
+      cbsi$slopes<-exp(cbsi$slopes)
+      cbsi$Lower<-exp(cbsi$Lower)
+      cbsi$Upper<-exp(cbsi$Upper)
+    
+      cbso1$slopes<-exp(cbso1$slopes)
+      cbso1$Lower<-exp(cbso1$Lower)
+      cbso1$Upper<-exp(cbso1$Upper)
+
+      cbso2$slopes<-exp(cbso2$slopes)
+      cbso2$Lower<-exp(cbso2$Lower)
+      cbso2$Upper<-exp(cbso2$Upper)
+      
+      intercept<-1
+    }
+
+    out <- list(cbso1=cbso1,
+                cbso2=cbso2,
+                cbsi=cbsi,
+                inside = inside,
+                failed = failed, 
+                all_sig = all_sig,
+                bounds=bounds,
+                obsrange=obsrange,
+                modrange=modrange,
+                intercept=intercept)
     return(out)
    
 }

@@ -48,6 +48,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_black = FALSE,
             plot_around = "ci",
             plot_jn = FALSE,
+            plot_jn_expb = FALSE,
             covs_scale = NULL,
             scale_missing = "complete",
             offset = NULL,
@@ -320,6 +321,10 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plot_jn",
                 plot_jn,
                 default=FALSE)
+            private$..plot_jn_expb <- jmvcore::OptionBool$new(
+                "plot_jn_expb",
+                plot_jn_expb,
+                default=FALSE)
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -491,6 +496,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_jn)
+            self$.addOption(private$..plot_jn_expb)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..offset)
@@ -552,6 +558,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
         plot_jn = function() private$..plot_jn$value,
+        plot_jn_expb = function() private$..plot_jn_expb$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         offset = function() private$..offset$value,
@@ -612,6 +619,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_black = NA,
         ..plot_around = NA,
         ..plot_jn = NA,
+        ..plot_jn_expb = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..offset = NA,
@@ -1872,6 +1880,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "ci_width",
                     "ci_method",
                     "boot_r",
+                    "plot_jn_expb",
                     "plot_x",
                     "plot_z",
                     "plot_by",
