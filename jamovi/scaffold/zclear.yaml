@@ -1,35 +1,51 @@
-modeloptions:
+- type: scaffold
+  name: modeloptions
+  children:
+        - model_type
         - dep
+        - dep2
         - factors
         - covs
         - covs_scale
-        - dep_scale
         - scale_missing
-        - contrasts
         - model_terms
         - fixed_intercept
         - se_method
-        - robust_method
         - mute
+        - df_method
+        - contrasts
+        - covs_scale
+        - offset
+        - omnibus
+        - model_type
+        - custom_family
+        - custom_link  
         - contrast_custom_values
 
-nestedoptions:
+- type: scaffold
+  name: nestedoptions
+  children:
         - nested_terms
         - nested_intercept
         - comparison
         
-cioptions:
+- type: scaffold
+  name: cioptions
+  children:
         - ci_width
         - ci_method
         - boot_r
-
-simpleeffectsoptions:
-
+        
+- type: scaffold
+  name: esoptions
+  children:
+                 - es
+- type: scaffold
+  name: simpleeffectsoptions
+  children:
                  - simple_x
                  - simple_mods
                  - simple_scale
-covscalingoptions:
-
                  - ccm_value
                  - ccp_value
                  - ccra_steps
@@ -37,12 +53,8 @@ covscalingoptions:
                  - covs_conditioning
                  - contrast_custom_focus
 
-
-covscalingoptions:
-
-                 - ccm_value
-                 - ccp_value
-                 - ccra_steps
-                 - covs_scale_labels
-                 - covs_conditioning
+- type: scaffold
+  name: jnoptions
+  children:
+                 - plot_jn_expb
 

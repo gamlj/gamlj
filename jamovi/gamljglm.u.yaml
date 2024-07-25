@@ -534,7 +534,7 @@ children:
                 style: inline
                 children:
                 -       type: Label
-                        label: Johnson_Neyman
+                        label: Johnson-Neyman
                         children:
                         -       type: CheckBox
                                 name: plot_jn
