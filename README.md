@@ -4,82 +4,6 @@ General, Mixed, Generalized, and Generalized Mixed Models
 
 <em id="version">Version 3.3.5 </em>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <center>
 <img width="300" src="https://gamlj.github.io/commons/pics/ui.png" class="img-responsive" alt="">
 </center>
@@ -95,7 +19,7 @@ Estimates a General Linear Model, Mixed Linear Models, Generalized Linear Models
 * Simple slopes analysis
 * Simple effects
 * Polynomial effects
-* post-hoc analysis
+* Post-hoc analysis
 * Contrasts analysis
 * Plots up to three-way interactions
 * Automatic selection of best estimation methods and degrees of freedom selection
@@ -103,7 +27,7 @@ Estimates a General Linear Model, Mixed Linear Models, Generalized Linear Models
 
 # Docs
 
-More informations can be found at [GAMLj page](https://gamlj.github.io/)
+More information can be found at [GAMLj page](https://gamlj.github.io/)
 
 # Install in jamovi
 
