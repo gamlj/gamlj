@@ -428,10 +428,13 @@ children:
         style: inline
         children:
           - type: Label
-            label: Other Plots
+            label: Johnson-Neyman
             children:
-              -  type:  CheckBox
-                 name:  plot_jn
+                                    -  type:  CheckBox
+                                       name:  plot_jn
+                                    -  type:  CheckBox
+                                       name:  plot_jn_expb
+                                       enable: (plot_jn)  
 
                 
   - name: panel_simpleeffects

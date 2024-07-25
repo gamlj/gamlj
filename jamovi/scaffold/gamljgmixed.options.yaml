@@ -41,3 +41,6 @@ simpleeffectsoptions:
                  - covs_conditioning
                  - contrast_custom_focus
 
+jnoptions:
+                 - plot_jn_expb
+               

@@ -475,7 +475,16 @@ options:
         description:
                 R: |
                         `'FALSE'` (default), `'TRUE'` produces the Johnson-Neyman plot for simple slope significance.
-                ui: Produces the Johnson-Neyman plot for simple slopes significance.
+                ui: |
+                        Produces the Johnson-Neyman plot for simple slopes significance.
+-       name: plot_jn_expb
+        title: exp(B) scale
+        type: Bool
+        default: false
+        description:
+                R: |
+                        `'FALSE'` (default), `'TRUE'` plots the exp(B) (odd-ratio) in the Johnson-Neyman plot .
+                ui: plots the  the exp(B) (odd-ratio) in the Johnson-Neyman plot.
 -       name: plot_re
         title: Random effects
         type: Bool

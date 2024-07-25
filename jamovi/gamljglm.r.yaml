@@ -1170,6 +1170,9 @@ items:
               ### cioptions  ends
               ### covscalingoptions  begins
               ### covscalingoptions  ends
+              ### jnoptions  begins
+           -  plot_jn_expb                 
+              ### jnoptions  ends
            - plot_x
            - plot_z
            - plot_by

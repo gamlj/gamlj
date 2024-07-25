@@ -1,4 +1,4 @@
-j_DEBUG <- F
+j_DEBUG <- T
 j_INFO  <- F
 t_INFO  <- F
 

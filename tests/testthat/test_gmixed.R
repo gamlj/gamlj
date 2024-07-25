@@ -7,6 +7,7 @@ data$cluster<-factor(data$cluster)
 data$cat3<-factor(data$cat3)
 data$yord<-factor(data$yord)
 data$ybin<-factor(data$ybin)
+data$ycat<-factor(data$ycat)
 
 testthat::expect_warning(
 mod0 <- GAMLj3::gamlj_gmixed(
@@ -103,4 +104,31 @@ testthat::test_that("Poisson works", {
 })
 
 
+mod <- GAMLj3::gamlj_gmixed(
+  formula = ycat ~ x * cat3 +(1+x|cluster),
+  data = data,
+  model_type = "multinomial",
+  simple_x = x,
+  simple_mods = cat3,
+  posthoc = ~cat3,
+  emmeans = ~x,
+  es=c("expb","marginals")
+)
 
+testthat::test_that("multinomial works", {
+  testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 2.6, tol)
+#  testthat::expect_equal(mod$main$anova$asDF$test[1], 9.8702, tol)
+  testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], 1.008,tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2[1], 0.098, tol)
+  testthat::expect_equal(mod$main$fit$asDF$value[3], 3566.971, tol)
+  testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .251, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0225, tol)
+  testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
+  testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[1], .0161, tol)
+  testthat::expect_equal(mod$main$marginals$asDF[1,4],-0.0194,tol)
+  testthat::expect_equal(mod$main$marginals$asDF[1,5],.02383,tol)
+})
+
+mod0<-mclogit::mblogit( ycat ~ x + cat3, random= ~1+x|cluster,data=data)
+mod1<-mclogit::mblogit( ycat ~ x * cat3, random= ~1+x|cluster,data=data)
+anova(mod0,mod1)

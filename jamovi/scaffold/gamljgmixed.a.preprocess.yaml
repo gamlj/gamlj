@@ -306,6 +306,10 @@ options:
     - name: plot_jn
       type: scaffold
       file: plots.a.yaml
+      
+    - name: plot_jn_expb
+      type: scaffold
+      file: plots.a.yaml
 
 ####### end of plots #########
 

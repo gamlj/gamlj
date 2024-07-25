@@ -53,6 +53,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             plot_black = FALSE,
             plot_around = "ci",
             plot_jn = FALSE,
+            plot_jn_expb = FALSE,
             plot_re = FALSE,
             plot_re_method = "average",
             plot_scale = "response",
@@ -347,6 +348,10 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "plot_jn",
                 plot_jn,
                 default=FALSE)
+            private$..plot_jn_expb <- jmvcore::OptionBool$new(
+                "plot_jn_expb",
+                plot_jn_expb,
+                default=FALSE)
             private$..plot_re <- jmvcore::OptionBool$new(
                 "plot_re",
                 plot_re,
@@ -525,6 +530,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_jn)
+            self$.addOption(private$..plot_jn_expb)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..plot_scale)
@@ -589,6 +595,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
         plot_jn = function() private$..plot_jn$value,
+        plot_jn_expb = function() private$..plot_jn_expb$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
         plot_scale = function() private$..plot_scale$value,
@@ -652,6 +659,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..plot_black = NA,
         ..plot_around = NA,
         ..plot_jn = NA,
+        ..plot_jn_expb = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
         ..plot_scale = NA,
@@ -1991,6 +1999,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "ci_width",
                     "ci_method",
                     "boot_r",
+                    "plot_jn_expb",
                     "plot_x",
                     "plot_z",
                     "plot_by",

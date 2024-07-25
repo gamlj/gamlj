@@ -764,6 +764,7 @@ items:
            -  __modeloptions__
            -  __cioptions__
            -  __covscalingoptions__                 
+           -  __jnoptions__                 
            - plot_x
            - plot_z
            - plot_by

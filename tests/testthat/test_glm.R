@@ -345,12 +345,6 @@ testthat::test_that("Ordinal works", {
 })
 
 
-
-
-
-
-
-
 data$yperc<-(data$ypoi+1)/(max(data$ypoi)+2)
 mod <- GAMLj3::gamlj_glm(
   formula = yperc ~ x * cat3,
