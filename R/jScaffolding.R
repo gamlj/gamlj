@@ -13,7 +13,7 @@ Scaffold <- R6::R6Class("Scaffold",
                             },
                             option=function(val,spec=NULL) {
                               
-                              res<-utils::hasName(self$options,val)
+                              res<-is.joption(self$options,val)
                               if (res) {
                                 if (is.logical(self$options[[val]]))
                                   res<-self$options[[val]]
@@ -29,7 +29,7 @@ Scaffold <- R6::R6Class("Scaffold",
                             },
                             optionValue=function(val) {
                               
-                              test<-utils::hasName(self$options,val)
+                              test<-is.joption(self$options,val)
                               if (test) 
                                 return(self$options[[val]])
                               else

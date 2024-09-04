@@ -1,5 +1,5 @@
 j_DEBUG <- T
-j_INFO  <- F
+j_INFO  <- T
 t_INFO  <- F
 
 
@@ -26,11 +26,7 @@ jinfo <- function(...) {
 mark <- function(...) {
   if (!j_DEBUG) 
     return()
-  if (.Platform$OS.type=="windows") {
-    wosjscaf <- paste0(base::Sys.getenv("TEMP"),"\\wosjscaf.log")
-    sink(wosjscaf,append = TRUE)
-  }
-  
+
   if (missing(...))
     cat("Mark here\n")
   items<-list(...)
@@ -43,9 +39,6 @@ mark <- function(...) {
     print(a)
   if (length(items)>1)  cat("_____end_______\n\n")
 
-  if (.Platform$OS.type=="windows")
-    sink()
-  
 }
 
 
@@ -283,4 +276,9 @@ flat_apply<-function(x, fun) {
   
    unlist(lapply(x,function(e) fun(e)))
   
+}
+
+is.joption <- function(obj, option) {
+  
+  (option %in% obj$names)
 }

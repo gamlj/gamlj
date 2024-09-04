@@ -280,12 +280,14 @@ data$cat3<-factor(data$cat3)
 data$ybin<-factor(data$ybin)
 data$ycat<-factor(data$ycat)
 
+
 mod<-GAMLj3::gamlj_lm(
   data = data,
   formula=ycont~cat3*cat2+x,
   contrasts=c(cat3="custom"),
   contrast_custom_values=c(cat3="-1,2,2")
 )
+
 
 cont<-GAMLj3::test_contrasts(mod,contrasts=list(cat2=c(-1,1)))
 

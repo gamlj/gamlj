@@ -14,7 +14,8 @@ Dispatch <- R6::R6Class(
                         tables=NULL,
                         interface="jamovi",
                         initialize=function(results) { 
-                          if (utils::hasName(results$options,".interface"))
+
+                          if (is.joption(results$options,".interface"))
                                 self$interface<-results$options$.interface
                           self$tables<-results
                         },

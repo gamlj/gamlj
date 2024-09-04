@@ -1,12 +1,12 @@
 testthat::context("glm")
 data("hsbdemo")
 tol <- 0.001
+
 mod0 <- GAMLj3::gamlj_glm(
   formula = schtyp ~ write + honors + honors:write,
   data = hsbdemo,
   model_type = "logistic"
 )
-
 
 mod1 <- GAMLj3::gamlj_glm(
   data = hsbdemo,

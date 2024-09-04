@@ -97,3 +97,11 @@ epretty<-function(min,max,steps) {
         t(Xsvd$u[, Positive, drop = FALSE]))
 }
 
+## dealing with packages
+
+is.package<-function(what) {
+  
+  if (stringr::str_length(system.file(package=what))==0)
+               stop(what," package is required for the required analysis. Please install it.")  
+  
+}
