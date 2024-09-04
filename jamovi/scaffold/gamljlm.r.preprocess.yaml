@@ -21,9 +21,15 @@ items:
          title: ""
 
     clearWith:
-        -  __modeloptions__
-        -  __nestedoptions__
-        -  __cioptions__
+                   -  type: scaffold
+                      name: opts_model
+                      file: clear.yaml
+                   -  type: scaffold
+                      name: opts_nested
+                      file: clear.yaml
+                   -  type: scaffold
+                      name: opts_ci
+                      file: clear.yaml
 
     refs: gamlj
 
@@ -40,9 +46,16 @@ items:
              type: Table
              description: a table of R
              clearWith:
-                         -  __modeloptions__
-                         -  __nestedoptions__
-                         - omnibus
+                   -  type: scaffold
+                      name: opts_model
+                      file: clear.yaml
+                   -  type: scaffold
+                      name: opts_nested
+                      file: clear.yaml
+                   -  type: scaffold
+                      name: opts_ci
+                      file: clear.yaml
+                   - omnibus
              columns:
                     - name: model
                       title: Model
@@ -84,10 +97,17 @@ items:
              visible: (intercept_info)
              description: a table of information for the model intercept
              clearWith:
-                         -  __modeloptions__
-                         -  __cioptions__
-                         - es
-                         - intercept_info
+                   -  type: scaffold
+                      name: opts_model
+                      file: clear.yaml
+                   -  type: scaffold
+                      name: opts_ci
+                      file: clear.yaml
+                   -  type: scaffold
+                      name: opts_es
+                      file: clear.yaml
+ 
+                   -  intercept_info
                          
              rows: 1             
              columns:
@@ -125,8 +145,13 @@ items:
              type: Table
              description: a table of ANOVA results
              clearWith:
-                         -  __modeloptions__
-
+                  -  type: scaffold
+                     name: opts_model
+                     file: clear.yaml
+                  -  type: scaffold
+                     name: opts_es
+                     file: clear.yaml
+ 
              columns:
                     - name: source
                       title: ""
@@ -185,8 +210,12 @@ items:
              refs: es
 
              clearWith:
-                         -  __modeloptions__
-                         -  __cioptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
 
              columns:
                     - name: effect
@@ -211,9 +240,13 @@ items:
              title:  Parameter Estimates (Coefficients)
              type: Table
              clearWith:
-                    -  __modeloptions__
-                    -  __cioptions__
-                    - betas_ci
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  betas_ci
  
              columns:
                     - name: source
@@ -275,8 +308,12 @@ items:
              type: Table
              visible: false
              clearWith:
-                    -  __modeloptions__
-                    -  __cioptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
              columns:
                     - name: source
                       title: "Variable"
@@ -325,7 +362,9 @@ items:
              type: Table
              visible: (vcov)
              clearWith:
-                    -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
              columns:
                     - name: source
                       title: "Coefficient"
@@ -368,8 +407,12 @@ items:
         title:  "Post Hoc comparison:  ___key___"
         type: Table
         clearWith:
-              -  __modeloptions__
-              -  __cioptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
 
         columns:
         - name: estimate
@@ -437,10 +480,14 @@ items:
         title:  "Comparisons:  ___key___"
         type: Table
         clearWith:
-              -  __modeloptions__
-              -  __cioptions__
-              - posthoc_es
-              - d_ci
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  posthoc_es
+                    -  d_ci
         columns:
         - name: estimate
           title: Difference
@@ -507,9 +554,12 @@ items:
               description: a table of ANOVA for simple effects
               visible: false
               clearWith:
-                 -  __modeloptions__
-                 -  __simpleeffectsoptions__
-                 -  __covscalingoptions__                 
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
               columns:
                    - name: test
                      title: F
@@ -559,10 +609,18 @@ items:
               type: Table
               visible: false
               clearWith:
-                 -  __modeloptions__
-                 -  __cioptions__
-                 -  __simpleeffectsoptions__
-                 -  __covscalingoptions__                 
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_simple_effects
+                       file: clear.yaml
 
               columns:
                      - name: contrast
@@ -618,9 +676,15 @@ items:
              name: anova
              title: ANOVA 
              clearWith:
-                -  __modeloptions__
-                -  __covscalingoptions__                 
-                -  __simpleeffectsoptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_simple_effects
+                       file: clear.yaml
                 
              columns:
                    - name: effect
@@ -674,10 +738,18 @@ items:
              name: coefficients
              title: Parameter Estimates 
              clearWith:
-                -  __modeloptions__
-                -  __cioptions__
-                -  __simpleeffectsoptions__
-                - __covscalingoptions__                 
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_simple_effects
+                       file: clear.yaml
 
              columns:
                    - name: effect
@@ -722,10 +794,16 @@ items:
         title:  Estimate Marginal Means - ___key___
         type: Table
         clearWith:
-            -  __modeloptions__
-            -  __cioptions__
-            -  __covscalingoptions__            
-            - emmeans
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  emmeans
             
             
         columns:
@@ -756,17 +834,18 @@ items:
     type: Array
     description: an array of results plots
     clearWith:
-           -  __modeloptions__
-           -  __cioptions__
-           -  __covscalingoptions__                 
-           - plot_x
-           - plot_z
-           - plot_by
-           - plot_raw
-           - plot_yscale
-           - plot_xoriginal
-           - plot_black
-           - plot_around
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_plots
+                       file: clear.yaml
 
     template:
           title: ""
@@ -776,17 +855,18 @@ items:
           height: 400
 
           clearWith:
-           -  __modeloptions__
-           -  __cioptions__
-           -  __covscalingoptions__                 
-           - plot_x
-           - plot_z
-           - plot_by
-           - plot_raw
-           - plot_yscale
-           - plot_xoriginal
-           - plot_black
-           - plot_around
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_plots
+                       file: clear.yaml
 
   - name: plotnotes
     type: Html
@@ -799,16 +879,15 @@ items:
     visible: (plot_jn)
     refs: interactions
     clearWith:
-           -  __modeloptions__
-           -  __cioptions__
-           -  __covscalingoptions__                 
-           - plot_x
-           - plot_z
-           - plot_by
-           - plot_raw
-           - plot_yscale
-           - plot_xoriginal
-           - plot_black
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_plots
+                       file: clear.yaml
 
     template:
           title: ""
@@ -818,16 +897,15 @@ items:
           height: 400
 
           clearWith:
-           -  __modeloptions__
-           -  __cioptions__
-           -  __covscalingoptions__                 
-           - plot_x
-           - plot_z
-           - plot_by
-           - plot_raw
-           - plot_yscale
-           - plot_xoriginal
-           - plot_black
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_cov_scaling
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_plots
+                       file: clear.yaml
 
   - name: jnplotnotes
     type: Html
@@ -845,7 +923,9 @@ items:
           description: a table of homogeneity tests
           visible: (homo_test)
           clearWith:
-                 -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
           columns:
             - name: name
               type: text
@@ -868,7 +948,9 @@ items:
           description: a table of normality tests
           visible: (norm_test)
           clearWith:
-                 -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
           columns:
             - name: name
               title: Test
@@ -887,7 +969,9 @@ items:
           description: a table for collinearity statistics
           visible: (colli_test)
           clearWith:
-                 -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
           columns:
             - name: source
               type: text
@@ -909,7 +993,9 @@ items:
           renderFun: .qqPlot
           requiresData: true
           clearWith:
-                 -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
 
         - name: normPlot
           title: Residual histogram
@@ -921,7 +1007,9 @@ items:
           renderFun: .normPlot
           requiresData: true
           clearWith:
-                 -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
                  
         - name: residPlot
           title: Residual-Predicted Scatterplot
@@ -933,8 +1021,10 @@ items:
           renderFun: .residPlot
           requiresData: true
           clearWith:
-                 -  __modeloptions__
-                 -  plot_extremes
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  plot_extremes
 
 
 
@@ -945,7 +1035,9 @@ items:
     varTitle: '`LM_${ dep }_PRED`'
     varDescription: Predicted values
     clearWith:
-                 -  __modeloptions__
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
         
   - name: residuals
     title: Residuals Vales
@@ -953,5 +1045,6 @@ items:
     varTitle: '`LM_${ dep }_RES`'
     varDescription: Residuals values
     clearWith:
-                 -  __modeloptions__
-        
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml

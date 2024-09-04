@@ -9,6 +9,7 @@ mod0<-GAMLj3::gamlj_lm(
   covs="dose",
   model_terms = list("dose","supp",c("dose","supp")))
 
+
 mod1<-GAMLj3::gamlj_lm(
   data = ToothGrowth,
   dep = "len",
@@ -63,7 +64,6 @@ mod<-GAMLj3::gamlj_lm(
 )
 
 
-mod$simpleEffects$anova$asDF
 r.anova<-mod$main$anova$asDF
 
 testthat::test_that("glm anova is correct", {
@@ -111,7 +111,7 @@ mod<-GAMLj3::gamlj_lm(
   simple_mods  = list("math","write"),
   simple_interactions  = T
 )
-mod
+
 testthat::test_that("SE multiple moderators iv=categorical",{
   testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1],"public - private")
   testthat::expect_equal(mod$simpleEffects$anova$asDF$test[1],1.469,tol)
@@ -419,7 +419,6 @@ testthat::test_that("intercept model comparison", {
     ,tol)
 })
 
-library(GAMLj3)
 
 mod<-GAMLj3::gamlj_lm(
   data = hsbdemo,
@@ -429,7 +428,7 @@ mod<-GAMLj3::gamlj_lm(
   plot_by=c(prog,read)
 )
 object<-mod
- alist <- list()
+alist <- list()
         for (i in 1:length(object$mainPlots)) {
             title <- (object$mainPlots[[i]]$title)
             gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)

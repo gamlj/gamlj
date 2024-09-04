@@ -2,6 +2,8 @@
 readiness <- function(options) {
 
 
+   if (options$.interface == "R") {
+
    if (!check_package(options, "nlme", c(model_type="lmer",res_struct="!id"),"structured error covariances"))
     return(list(ready=FALSE,reason=FALSE,report=FALSE))
   
@@ -31,6 +33,7 @@ readiness <- function(options) {
 
   if (!check_package(options, "sandwich", c(se_method="robust"),"robust standard errors"))
     return(list(ready=FALSE,reason=FALSE,report=FALSE))
+   }
   
   result <- list(reason = NULL, ready = TRUE, report = FALSE)
 
@@ -48,7 +51,7 @@ if(!is.something(options$dep)) {
     return(result)
 } 
 
-if (utils::hasName(options,"cluster"))
+if (is.joption(options,"cluster"))
     if (!is.something(options$cluster))  
     {
       result$ready <- FALSE
@@ -57,7 +60,7 @@ if (utils::hasName(options,"cluster"))
       return(result)
     } 
   
-  if (utils::hasName(options,"re")) {
+  if (is.joption(options,"re")) {
        if (any(sapply(options$re,function(x) length(x)==0)))  
        {
          result$ready <- FALSE
@@ -66,7 +69,7 @@ if (utils::hasName(options,"cluster"))
          return(result)
        } 
   }
-  if (utils::hasName(options,"contrast_custom_values")) {
+  if (is.joption(options,"contrast_custom_values")) {
   
        ## is custom contrasts are defined but no codes are input we stop
        types <- unlist(lapply(options$contrasts, function(x) x$type))
@@ -92,7 +95,7 @@ check_package <- function(options, pkg,conditions, aim) {
      names<-names(conditions)
      conditions<-stringr::str_remove(conditions,"!")
      names(conditions)<-names
-     str1<- paste0("utils::hasName(options,",paste0("'",names(conditions),"'"),")", collapse=" && ")
+     str1<- paste0("is.joption(options,",paste0("'",names(conditions),"'"),")", collapse=" && ")
      str2<- paste("(",paste(paste0("'",conditions,"' "),paste0("options$",names(conditions)),sep=" %in% "),")")
      if (length(neg)>0) str2[[neg]]<-paste0("!",str2[[neg]])
      str2<-paste(str2,collapse=" && ")

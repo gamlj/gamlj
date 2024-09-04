@@ -129,6 +129,7 @@ testthat::test_that("multinomial works", {
   testthat::expect_equal(mod$main$marginals$asDF[1,5],.02383,tol)
 })
 
-mod0<-mclogit::mblogit( ycat ~ x + cat3, random= ~1+x|cluster,data=data)
-mod1<-mclogit::mblogit( ycat ~ x * cat3, random= ~1+x|cluster,data=data)
-anova(mod0,mod1)
+
+#mod0<-mclogit::mblogit( ycat ~ x + cat3, random= ~1+x|cluster,data=data)
+#mod1<-mclogit::mblogit( ycat ~ x * cat3, random= ~1+x|cluster,data=data)
+#anova(mod0,mod1)

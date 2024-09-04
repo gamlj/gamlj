@@ -408,7 +408,6 @@ init_main_res_corr=function() {
         .simple<-self$options$simple_x
         .var64<-tob64(.simple)
         focal<-self$datamatic$variables[[.var64]]
-        mark("requires focus",focal$name,focal$requireFocus())
         ### moderators should be reverted in order to match emmeans 
         .term<-rev(self$options$simple_mods)
         n<-length(.term)

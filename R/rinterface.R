@@ -164,7 +164,7 @@ jnplot <- function(x, formula = NULL, ...) {
 .extract_plots <- function(object, what) {
 
         alist <- list()
-        mark(what)
+      
         if (!utils::hasName(object,what)) {
           warning("The requested plots are not available. You can ask them with the passing the gamlj options to the funcion")
           return(FALSE)

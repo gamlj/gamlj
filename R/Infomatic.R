@@ -34,7 +34,7 @@ Infomatic <- R6::R6Class(
       if (options$model_type=="lmer" && options$res_struct!="id")
                     self$model_type<-"lme"
 
-      if (utils::hasName(options,"input_method")) {
+      if (is.joption(options,"input_method")) {
          if (options$model_type=="logistic" && options$input_method=="success")
                     self$model_type<-"logistic_success"
          if (options$model_type=="logistic" && options$input_method=="total")
@@ -51,7 +51,7 @@ Infomatic <- R6::R6Class(
       dep                    <- options$dep
       dlevs                  <- datamatic$variables[[tob64(dep)]]$levels_labels
       
-      if (utils::hasName(options,"omnibus"))
+      if (is.joption(options,"omnibus"))
           self$omnibus_test<-toupper(options$omnibus)
       
       if (self$caller=="glm") {

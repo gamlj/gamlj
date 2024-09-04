@@ -324,6 +324,11 @@ rFormula <- R6::R6Class(
 
       fformula <- lme4::nobars(aformula)
       if (!is.null(data)) {
+        
+        if (!is.data.frame(data))
+           stop("The input data is not a dataframe or it does not exist.")
+        
+        
         self$dep <- jmvcore::marshalFormula(fformula, data, from = "lhs", permitted = c("numeric", "factor"))
         self$factors <- jmvcore::marshalFormula(fformula, data, from = "rhs", permitted = "factor")
         self$covs <- jmvcore::marshalFormula(fformula, data, from = "rhs", permitted = "numeric")
