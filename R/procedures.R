@@ -597,7 +597,7 @@ procedure.simpleEffects<- function(x,...) UseMethod(".simpleEffects")
 
 }  
 
-.local.emmc<-function(levs, datamatic=NULL) {
+.local.emmc<-function(levs, datamatic=NULL, ...) {
 
   # get the contrast weights
   codes <- datamatic$contrast_values
