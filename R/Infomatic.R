@@ -114,7 +114,7 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Logistic Model","Model for success over failure")
         self$distribution  <-  "binomial"
         self$family        <-   "binomial"
-        self$call          <-   "acall"
+        self$call          <-   "glm"
         self$rcall         <-   "stats::glm"
         form               <-    paste("cbind(",tob64(dep1),",",tob64(dep2),") ",formulas$rhsfixed_formula64())
         self$calloptions   <-    list(formula=form,family=binomial())
@@ -135,7 +135,7 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Logistic Model","Model for success over totals")
         self$distribution  <-  "binomial"
         self$family        <-   "binomial"
-        self$call          <-   "acall"
+        self$call          <-   "glm"
         self$rcall         <-   "stats::glm"
         form               <-    paste(tob64(dep1),"/",tob64(dep2),formulas$rhsfixed_formula64())
         self$calloptions   <-    list(formula=form,family=binomial(),weights = str2lang(tob64(dep2)))
@@ -189,14 +189,14 @@ Infomatic <- R6::R6Class(
       if (self$model_type=="probit_success") {
         dep1               <-   options$dep
         dep2               <-   options$dep2
-        self$model         <-   c("Logistic Model","Model for success over failure")
+        self$model         <-   c("Probiy Model","Model for success over failure")
         self$distribution  <-  "binomial"
         self$family        <-   "binomial(link='probit')"
-        self$call          <-   "acall"
+        self$call          <-   "glm"
         self$rcall         <-   "stats::glm"
         form               <-    paste("cbind(",tob64(dep1),",",tob64(dep2),") ",formulas$rhsfixed_formula64())
         self$calloptions   <-    list(formula=form,family=binomial(link='probit'))
-        self$link          <-   "logit"
+        self$link          <-   "probit"
         self$emmeans       <-    "probabilities"
         self$comparison    <-  "OR"
         self$deptype       <-    "integer"
@@ -213,11 +213,11 @@ Infomatic <- R6::R6Class(
         self$model         <-   c("Logistic Model","Model for success over totals")
         self$distribution  <-  "binomial"
         self$family        <-   "binomial"
-        self$call          <-   "acall"
+        self$call          <-   "glm"
         self$rcall         <-   "stats::glm"
         form               <-    paste(tob64(dep1),"/",tob64(dep2),formulas$rhsfixed_formula64())
         self$calloptions   <-    list(formula=form,family=binomial(link="probit"),weights = str2lang(tob64(dep2)))
-        self$link          <-   "logit"
+        self$link          <-   "probit"
         self$emmeans       <-    "probabilities"
         self$comparison    <-  "OR"
         self$deptype       <-    "integer"
