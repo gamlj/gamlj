@@ -154,7 +154,7 @@ jnplot <- function(x, formula = NULL, ...) {
 
         plots <- .extract_plots(x,"jnPlots")
     }
-    mark(plots)
+
     if ("list" %in% class(plots) && length(plots) == 1) 
         plots <- plots[[1]]
     plots

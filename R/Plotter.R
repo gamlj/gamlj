@@ -1368,5 +1368,4 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
         result <- c(.x1, .x2)
         bounds <- sort(result, decreasing = FALSE)
     }
-   mark(bounds)
 }

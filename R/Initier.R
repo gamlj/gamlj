@@ -64,24 +64,26 @@ Initier <- R6::R6Class(
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
 
       ### confidence intervals
-
-      method<-switch(self$options$ci_method,
+      method<-self$options$ci_method
+      if (self$datamatic$has_weights)
+             method<-"wald"
+      ci_method<-switch(method,
                      wald="Wald",
                      profile="Profile",
                      quantile="Bootstrap percent",
                      bcai="Bootstrap BCa"
                     )
-      if (method != "Wald") 
+      if (ci_method != "Wald") 
           self$warning=list(topic="info",message=paste(method," method for C.I. may take a while, please be patient."),initOnly=TRUE)
       
-      info<-switch(self$options$ci_method,
+      info<-switch(method,
                      wald="",
                      profile="",
                      quantile=paste(self$options$boot_r, "bootstrap samples"),
                      bcai=paste(self$options$boot_r, "bootstrap samples")
       )
       
-      tab[["ci"]]<-list(info="C.I. method",value=method,specs=info)
+      tab[["ci"]]<-list(info="C.I. method",value=ci_method,specs=info)
       
       
       if (self$options$comparison) {
