@@ -23,6 +23,7 @@ Infomatic <- R6::R6Class(
     r2          =  NULL,
     optimized   =  FALSE,
     df          =   NULL,
+    has_weights =  FALSE,
     comparison  =  "Difference",
     posthoc_adjust   = c("bonferroni","holm","sidak","tukey","scheffe"),   
     omnibus_test=  NULL,
@@ -35,6 +36,7 @@ Infomatic <- R6::R6Class(
                     self$model_type<-"lme"
 
       if (is.joption(options,"input_method")) {
+        
          if (options$model_type=="logistic" && options$input_method=="success")
                     self$model_type<-"logistic_success"
          if (options$model_type=="logistic" && options$input_method=="total")
@@ -71,6 +73,7 @@ Infomatic <- R6::R6Class(
         self$call         <-  "lm"
         self$rcall        <-   "stats::lm"
         self$deptype      <-  c("numeric","integer")
+        self$has_weights   <-   TRUE
         self$r2 <-list(list(model=""))
         
       }
@@ -82,6 +85,7 @@ Infomatic <- R6::R6Class(
         self$link         <-  "identity"
         self$direction    <-   c("y","Dependent variable scores")
         self$deptype      <-   c("numeric","integer")
+        if (self$caller == "glm") self$has_weights   <-   TRUE
         
       }
       
@@ -99,13 +103,14 @@ Infomatic <- R6::R6Class(
         self$comparison    <-  "OR"
         self$deptype       <-    "factor"
         self$depnlevels    <-    2
-        
         ### compute directions ###
         dlevs              <-  datamatic$variables[[tob64(options$dep)]]$levels
         actual             <-  paste("P(",dep,"=",dlevs[2],") / P(",dep,"=",dlevs[1],")")
         theory             <-  "P(y=1)/P(y=0)"
         self$direction     <-  c(theory,actual)
-        
+        # weights
+        if (self$caller == "glm") self$has_weights   <-   TRUE
+
       }
       
       if (self$model_type=="logistic_success") {
@@ -169,6 +174,10 @@ Infomatic <- R6::R6Class(
         theory             <-   "P(y=1)"
         actual             <-   paste("P(",dep,"=",dlevs[2],")")
         self$direction     <-   c(theory,actual)
+                # weights
+        if (self$caller == "glm") self$has_weights   <-   TRUE
+
+        
       }
       if (self$model_type=="poisson") {
         
@@ -182,7 +191,9 @@ Infomatic <- R6::R6Class(
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
         self$comparison    <-    "Ratio"
-        
+        # weights
+        if (self$caller == "glm") self$has_weights   <-   TRUE
+
       }
 
       
@@ -247,6 +258,8 @@ Infomatic <- R6::R6Class(
         ### compute direction ###
         self$direction     <-   c("y","Dependent variable counts")
         self$deptype       <-   "integer"
+        # weights
+        if (self$caller == "glm") self$has_weights   <-   TRUE
         
       }
       if (self$model_type=="nb") {
@@ -310,6 +323,8 @@ Infomatic <- R6::R6Class(
         #########################
         self$deptype       <-   "factor"
         self$fit           <-   c("lik" , "aic",  "bic",  "dev")
+        # weights
+        if (self$caller == "glm") self$has_weights   <-   TRUE
         
       }
       
@@ -322,6 +337,8 @@ Infomatic <- R6::R6Class(
             self$call          <-    "nnet::multinom"
             self$rcall         <-    "nnet::multinom"
             self$calloptions   <-    list(model=TRUE,trace=FALSE)
+            self$has_weights   <-   TRUE
+            
         } 
         if (self$caller=="glmer") {
 

@@ -514,7 +514,6 @@ Runner <- R6::R6Class("Runner",
                               jinfo("MODULE: Estimating the model: checking")
                               ### check the dependent variable ####
 
-                            
                               if (!(self$datamatic$dep$type %in% self$infomatic$deptype)) {
 
                                     t2  <-  paste(self$infomatic$deptype,collapse = " or ")
@@ -568,6 +567,12 @@ Runner <- R6::R6Class("Runner",
                               
                               if (self$option("offset"))
                                  opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
+
+                            
+                              
+                            if (is.something(attr(data, "jmv.weights")) && self$infomatic$has_weights)
+                                   opts[["weights"]]<-as.numeric(attr(data, "jmv.weights"))      
+                        
 
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
@@ -805,7 +810,6 @@ estimate_lme<-function(...) {
    model$call[[1]]<-quote(nlme::lme.formula)
   return(model)
 }
-
 
 
 
