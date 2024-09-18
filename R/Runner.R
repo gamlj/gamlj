@@ -120,6 +120,8 @@ Runner <- R6::R6Class("Runner",
                               
                               prop <- 1/self$datamatic$dep$nlevels
                               tab  <- table(self$model$y,self$model$fitted.values>prop)
+                              mark(tab)
+                              
                               if (self$datamatic$has_weights) {
                                 tab<-round(self$datamatic$wN*tab/self$datamatic$N,digits=0)
                               }

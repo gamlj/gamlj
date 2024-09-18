@@ -480,6 +480,19 @@ const fun = {
               ui.precision.$el.hide();
             }
         }
+        
+        if (typeof ui.crosstab !== 'undefined' ) {
+          
+            const need=["logistic", "probit"];
+        
+           if (! need.includes(ui.model_type.getValue())) {
+             
+             ui.crosstab.setValue(false);
+
+            }
+        }
+
+        
         // model specific options 
         if (ui.model_type.getValue() === "multinomial" && ui['.caller'].value()=="glmer") {
           ui.simple_interactions.setValue(false);
