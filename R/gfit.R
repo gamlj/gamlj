@@ -210,15 +210,32 @@ r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.glm <- function(model,obj) {
   
-
   alist <- list()
-  # mcFadden and adjusted
-  alist$r2 <- 1 - (model$deviance / model$null.deviance)
-  alist$ar2 <- 1 - ((model$deviance +  (length(model$coefficients)-1)) / model$null.deviance)
+  model_type <- ifelse(obj$infomatic$model_type %in% c("logistic_success","logistic_total","probit_success","probit_total"),
+                       "cbind",
+                       obj$infomatic$model_type)
+  
+  switch(model_type,
+         
+         cbind={
+           dev<-model$null.deviance
+           y<-model.response(model.frame(model))
+           p<-mean(y[,1]/(y[,1]+y[,2]))
+           dp<--(p*log(p)+(1-p)*log(1-p))
+           alist$r2<-dev/(2*dp*sum(model$prior.weights))
+           alist$ar2<-NA
+           obj$warning<-list(topic="main_r2",message="R-squared is equivalent to the one obtained with unweighted data")
+         },
+         {
+                    # mcFadden and adjusted
+                    alist$r2 <- 1 - (model$deviance / model$null.deviance)
+                    alist$ar2 <- 1 - ((model$deviance +  (length(model$coefficients)-1)) / model$null.deviance)
+                    if (alist$ar2 < 0) {
+                          alist$ar2 <- 0
+                    }
+         }
+       )
 
-  if (alist$ar2 < 0) {
-    alist$ar2 <- 0
-  }
   results <- .gfit.compare_null_model(model)
   alist$test <- results$test
   alist$df1 <- results$df1
