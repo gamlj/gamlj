@@ -44,15 +44,11 @@ Datamatic <- R6::R6Class(
       data64 <- jmvcore::naOmit(data64)
 #      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
-      
-      if (is.something(attr(data, "jmv-weights-name")))
+     
+      if (is.something(attr(data, "jmv-weights-name"))) {
                    self$has_weights<-TRUE
-      
-          
-      if (is.something(attr(data, "jmv-weights"))) {
-                   w<-attr(data, "jmv-weights")
-                   self$wN<-sum(w)
-                   attr(data64, "jmv.weights") <-w 
+                   wname<-tob64(attr(data, "jmv-weights-name"))
+                   attr(data64, "jmv.weights") <- jmvcore::naOmit(attr(data,"jmv-weights"))
       }
     
       return(data64)
