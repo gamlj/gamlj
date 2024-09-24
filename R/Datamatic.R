@@ -10,7 +10,6 @@ Datamatic <- R6::R6Class(
     dep=NULL,
     labels=NULL,
     N=NULL,
-    wN=NULL,
     has_weights=FALSE,
     initialize=function(jmvobj) {
 
@@ -42,7 +41,6 @@ Datamatic <- R6::R6Class(
       }
       
       data64 <- jmvcore::naOmit(data64)
-#      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
      
       if (is.something(attr(data, "jmv-weights-name"))) {
@@ -81,6 +79,31 @@ Datamatic <- R6::R6Class(
       return(unlist(fromb64(labs)))
       
       
+    },
+    info_covs_scale=function(topic="info") {
+      
+        .fun<-function(type) {
+                 type_text<-switch (as.character(type),
+                 none           = "in the original scale",
+                 centered       = "centered to the mean",
+                 standardized   = "standardized",
+                 "something very dangerous"
+                 )
+                 type_text
+        }
+        
+        types<-sapply(tob64(self$options$covs), function(x) self$variables[[x]]$covs_scale, USE.NAMES=T, simplify=FALSE)
+        vars<-lapply(unique(types), function(x) fromb64(names(types[types == x])))
+        text<-lapply(vars, function(x) if (length(x)>1) c("Variables","are") else c("Variable","is"))
+        utypes<-unique(types)
+        
+        if (length(utypes)==1) {
+          self$warning<-list(topic="info", message=paste("All covariates are", .fun(utypes)))
+        } else {
+              for (i in seq_along(utypes)) {
+              self$warning<-list(topic=topic, message=paste(text[[i]][1],paste(vars[[i]], collapse=", "),text[[i]][2], .fun(utypes[[i]])))
+        }
+        }
     }
     
     

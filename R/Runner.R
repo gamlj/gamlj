@@ -20,13 +20,15 @@ Runner <- R6::R6Class("Runner",
                           estimate = function(data) {
                             
                             t<-Sys.time()
+                            mark("classes",class(self))
                             self$model<-private$.estimateModel(data)
+                            class(self$model)<-c(class(self$model),self$options$model_type)
                             self$etime<-as.numeric(Sys.time()-t)
-                            
+                            mark(str(self$model))
                             jinfo("RUNNER: initial estimation done, ",self$etime," secs")
                             
                             if (self$options$comparison) {
-                              obj<-try_hard(mf.update(self$model,formula=as.formula(self$nestedformulaobj$formula64())))
+                              obj<-try_hard(mf.update(self$model,formula=as.formula(self$nestedformulaobj$formula64(y=FALSE))))
                               self$nested_model<-obj$obj
                               if (!isFALSE(obj$warning))
                                     self$warning<-list(topic="main_r2",

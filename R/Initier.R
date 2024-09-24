@@ -45,9 +45,7 @@ Initier <- R6::R6Class(
             self$nestedformulaobj$random<-self$optionValue("nested_re")
             self$nestedformulaobj$offset<-self$optionValue("offset")
             self$nestedformulaobj$update_terms(self$datamatic$data_structure64)
-            
       }      
-      
       
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(self$options,datamatic,self$formulaobj)
@@ -63,6 +61,10 @@ Initier <- R6::R6Class(
       if (self$option("dep_scale"))
           tab[["dep"]]     <-  list(info="Y transform",value=self$options$dep_scale,specs="")
 
+      ### tell the user which centering is used
+      if (is.something(self$options$covs_scale)) {
+          self$datamatic$info_covs_scale()
+      }
       ### confidence intervals
       method<-self$options$ci_method
       if (self$datamatic$has_weights)

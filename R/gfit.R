@@ -218,11 +218,12 @@ r2 <- function(model, ...) UseMethod(".r2")
   switch(model_type,
          
          cbind={
-           dev<-model$null.deviance
+           dev<-model$null.deviance-model$deviance
            y<-model.response(model.frame(model))
            p<-mean(y[,1]/(y[,1]+y[,2]))
            dp<--(p*log(p)+(1-p)*log(1-p))
            alist$r2<-dev/(2*dp*sum(model$prior.weights))
+           if ( alist$r2 < 0 ) alist$r2<-0
            alist$ar2<-NA
            obj$warning<-list(topic="main_r2",message="R-squared is equivalent to the one obtained with unweighted data")
          },

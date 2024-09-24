@@ -61,9 +61,11 @@ items:
                 -       name: r2
                         title: R²
                         type: number
+                        format: zto                        
                 -       name: ar2
                         title: Adj. R²
                         type: number
+                        format: zto                        
                 -       name: df1
                         title: df
                         type: integer

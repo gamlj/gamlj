@@ -15,11 +15,13 @@ gFormula <- R6::R6Class(
     params_terms     = NULL,
     interface        = "standard",
     
-    fixed_formula = function() {
-      private$.buildfixed(self$dep, self$fixed)
+    fixed_formula = function(y=TRUE) {
+      dep<-ifelse(y,self$dep,".")
+      private$.buildfixed(dep, self$fixed)
     },
-    fixed_formula64 = function() {
-      private$.buildfixed(tob64(self$dep), tob64(self$fixed))
+    fixed_formula64 = function(y=TRUE) {
+      dep<-ifelse(y,tob64(self$dep),".")
+      private$.buildfixed(dep, tob64(self$fixed))
     },
     rhsfixed_formula=function() {
          private$.rhsfixed(self$fixed)      
@@ -57,9 +59,9 @@ gFormula <- R6::R6Class(
     formula = function() {
       paste(c(self$fixed_formula(), self$random_formula()),collapse = " + ")
     },
-    formula64 = function() {
+    formula64 = function(y=TRUE) {
 
-      paste(c(self$fixed_formula64(), self$random_formula64()),collapse = " + ")
+      paste(c(self$fixed_formula64(y=y), self$random_formula64()),collapse = " + ")
     },
     nested_tested_fixed = function(obj) {
       ## we need to sort the tems otherswize x:z will be considered different from z:x
