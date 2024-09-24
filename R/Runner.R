@@ -482,7 +482,7 @@ Runner <- R6::R6Class("Runner",
                           #### we need this here because emmeans needs a contrast that
                           ###  we can control in terms of variable type
                           
-                          interaction_contrast=function(levels,datamatic=NULL) {
+                          interaction_contrast=function(levels,datamatic=NULL,...) {
                             
                             nvar<-length(datamatic)
                             private$.contr_index<-private$.contr_index+1

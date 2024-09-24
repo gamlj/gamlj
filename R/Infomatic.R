@@ -140,7 +140,6 @@ Infomatic <- R6::R6Class(
         self$family        <-   "binomial"
         self$call          <-   "acall"
         self$rcall         <-   "stats::glm"
-#        form               <-    paste(tob64(dep1),"/",tob64(dep2),formulas$rhsfixed_formula64())
         self$calloptions   <-    list(weights = str2lang(tob64(dep2)))
         self$link          <-   "logit"
         self$emmeans       <-    "probabilities"

@@ -848,7 +848,6 @@ procedure.simpleInteractions<-function(obj) {
               type<-obj$options$robust_method
               grid_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type=type,...)
             }
-            
             if (varobj$type=="numeric") {
                 grid_list[["specs"]]<-term64
                 grid_list[["var"]]<-variable64
