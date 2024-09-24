@@ -11,6 +11,8 @@ Datamatic <- R6::R6Class(
     dep=NULL,
     labels=NULL,
     N=NULL,
+    wN=NULL,
+    has_weights=FALSE,
     initialize=function(jmvobj) {
 
       super$initialize(jmvobj)
@@ -43,6 +45,14 @@ Datamatic <- R6::R6Class(
       data64 <- jmvcore::naOmit(data64)
 #      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
+      
+      if (is.something(attr(data, "jmv-weights-name"))) {
+                   self$has_weights<-TRUE
+                   wname<-tob64(attr(data, "jmv-weights-name"))
+                   attr(data64, "jmv.weights") <- jmvcore::naOmit(attr(data,"jmv-weights"))
+                   self$wN<-sum(jmvcore::naOmit(attr(data,"jmv-weights")))
+      }
+      
       return(data64)
       
     },
@@ -113,9 +123,7 @@ Datamatic <- R6::R6Class(
         }
           
     }
-    
 
-    
     
 
   ), ### end of public
@@ -294,7 +302,6 @@ Variable <- R6::R6Class(
 
 
        vardata<-data[[self$name64]]
-       mark(self$name)
        if (nrow(data)>0 && all(is.na(vardata)))
            stop("Variable ",self$name," has no valid case.")
        

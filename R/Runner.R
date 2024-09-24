@@ -15,8 +15,10 @@ Runner <- R6::R6Class("Runner",
                           tab_simpleCoefficients=NULL,
                           tab_randomcov=NULL,
                           boot_variances=NULL,
+                          weights_exist=FALSE,
                           etime=0,
                           estimate = function(data) {
+                            
                             
                             t<-Sys.time()
                             self$model<-private$.estimateModel(data)
@@ -42,7 +44,9 @@ Runner <- R6::R6Class("Runner",
                           run_info=function() {
                                
                                 tab<-self$init_info()
-                                tab[["sample"]]$value<-self$datamatic$N
+                                Ns<-mf.sample_size(self$model, self)
+                                tab[["sample"]]$value<-Ns[["N"]]
+                                if ("wN" %in% names(Ns))  tab[["sample"]]$specs<-paste("Weighted N=",Ns[["wN"]])
                             
                           ## TODO: generalize if other models need an optimizer other than lmer
                                 if (isTRUE(self$infomatic$optimized))
@@ -115,8 +119,13 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_crosstab= function() {
                               
-                              prop <- 1/self$datamatic$dep$nlevels
-                              tab  <- table(self$model$y,self$model$fitted.values>prop)
+                              prop <- .5
+                              y<-stats::model.response(stats::model.frame(self$model))
+                             
+                              tab  <- table( y > prop, self$model$fitted.values > prop)
+                              if (self$weights_exist) {
+                                tab<-round(self$datamatic$wN*tab/self$datamatic$N,digits=0)
+                              }
                               marg <- round(100*diag(tab)/apply(tab,1,sum))
                               tab  <- lapply(1:nrow(tab), function(i) {
                                           t<-as.list(c(tab[i,],marg[i]))
@@ -569,6 +578,15 @@ Runner <- R6::R6Class("Runner",
                               if (self$option("offset"))
                                  opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
 
+                              ### check if there are weights and can be used
+                              if (is.something(attr(data, "jmv.weights")) ) {
+                                   if (self$infomatic$has_weights) {
+                                        self$weights_exist<-TRUE
+                                        opts[["weights"]]<-as.numeric(attr(data, "jmv.weights"))      
+                                   } else 
+                                      self$warning<-list(topic="weightsnotes",message=paste("However,",self$infomatic$model[[2]]," does not accept weights. This analysis used the data unweighted."))
+                                
+                              }
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
                               jinfo("MODULE: Estimating the model: running")
@@ -612,6 +630,11 @@ Runner <- R6::R6Class("Runner",
 
                           },
                           .bootstrap_model=function() {
+                            
+                            if (self$weights_exist) {
+                              self$warning<-list(topic="info",message="Bootstrap method not available with weighted data.")
+                              return()
+                            }
                             
                             ### Here is how the storage mechanism works:
                             ### In the .b.R file we assign a table to be the runner storage.

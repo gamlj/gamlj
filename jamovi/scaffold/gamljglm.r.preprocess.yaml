@@ -7,6 +7,9 @@ items:
     type: Property
     description: The underlying estimated model
 
+-   name: weightsnotes
+    type: Html
+    visible: false
 
   - name: info
     title: Model Info

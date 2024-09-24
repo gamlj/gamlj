@@ -233,3 +233,34 @@ mf.clean<- function(x,...) UseMethod(".clean")
 }
 
 .clean.glmerMod <- function(x) .clean.lmerModLmerTest(x)
+
+### effective sample size
+
+mf.sample_size<- function(model,...) UseMethod(".sample_size")
+
+.sample_size.default <- function(model,...) {
+  
+  results<-list(N=length(model.response(model.frame(model))))
+  w<-stats::model.weights(stats::model.frame(model))
+  if (is.something(w))
+         results[["wN"]]<-sum(w)
+  
+  return(results)
+}
+
+.sample_size.glm <- function(model, obj) {
+
+  data<-model$model  
+  results<-list(N=dim(data)[1])
+  
+  if (obj$infomatic$model_type %in% c("logistic_success","probit_success")) {
+        results[["wN"]]<-sum(model.response(model.frame(model)))
+    return(results)
+  } 
+  
+  w<-stats::model.weights(stats::model.frame(model))
+  if (is.something(w))
+         results[["wN"]]<-sum(w)
+  
+  return(results)
+}

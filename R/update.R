@@ -9,8 +9,7 @@ mf.update<- function(x,...) UseMethod(".update")
   jinfo("default update is used")
   .args<-list(...)
    if (!utils::hasName(.args,"data")) 
-       .args$data<-insight::get_data(model,source="frame")
-
+       .args$data<-mf.data(model)
   .args$object<-model
   do.call(stats::update,.args)
   

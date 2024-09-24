@@ -51,7 +51,11 @@ Initier <- R6::R6Class(
       
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(self$options,datamatic,self$formulaobj)
-      
+
+      ## clean some message tabs
+      if ("weightsnotes" %in% names(jmvobj$results)) jmvobj$results$weightsnotes$setContent(" ") 
+      if ("modelnotes"   %in% names(jmvobj$results)) jmvobj$results$modelnotes$setContent(" ") 
+
     }, # here initialize ends
     #### init functions #####
     

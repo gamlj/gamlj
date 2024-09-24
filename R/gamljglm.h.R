@@ -643,6 +643,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
         model = function() private$..model,
+        weightsnotes = function() private$.items[["weightsnotes"]],
         info = function() private$.items[["info"]],
         modelnotes = function() private$.items[["modelnotes"]],
         main = function() private$.items[["main"]],
@@ -665,6 +666,10 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="",
                 title="Generalized Linear Model")
             private$..model <- NULL
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="weightsnotes",
+                visible=FALSE))
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -2030,6 +2035,6 @@ gamljglmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 pause = NULL,
                 completeWhenFilled = FALSE,
                 requiresMissings = FALSE,
-                weightsSupport = 'none')
+                weightsSupport = 'full')
         }))
 
