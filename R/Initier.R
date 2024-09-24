@@ -109,6 +109,9 @@ Initier <- R6::R6Class(
       if (self$option("se_method","robust"))
          tab[["se_method"]]<-list(info="SE method",value="Robust")
       
+      ## check if we need to tell the users about the covs scale
+      self$datamatic$info_covs_scale()
+      
       tab
       
     },

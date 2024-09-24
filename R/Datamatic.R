@@ -7,6 +7,7 @@ Datamatic <- R6::R6Class(
     vars=NULL,
     variables=NULL,
     data_structure64=NULL,
+    clusters=NULL,
     dep=NULL,
     labels=NULL,
     N=NULL,
@@ -72,7 +73,48 @@ Datamatic <- R6::R6Class(
       return(unlist(fromb64(labs)))
       
       
+    },
+    get_vars = function(...) {
+
+        dots<-list(...)
+        if (length(dots)==0) return()
+        atest<-paste(paste0("x$",names(dots)),paste0("'",dots,"'"),sep="==",collapse=" && ")
+        results<-lapply(self$variables, function(x) if (eval(parse(text=atest))) return(x) else NULL)
+        return(results[!sapply(results, is.null)])
+    },
+
+    info_covs_scale=function(topic="info") {
+      
+      
+        if (length(self$options$covs) == 0)
+             return()
+
+        types<-sapply(tob64(self$options$covs), function(x) self$variables[[x]]$covs_scale, USE.NAMES=T, simplify=FALSE)
+        vars<-lapply(unique(types), function(x) fromb64(names(types[types == x])))
+        text<-lapply(vars, function(x) if (length(x)>1) c("Variables","are") else c("Variable","is"))
+        utypes<-unique(types)
+        
+        if (length(utypes)==1) {
+          self$warning<-list(topic="info",
+                             message=paste("All covariates are",
+                             COVS_SCALE[[as.character(utypes)]]))
+        } else {
+              for (i in seq_along(utypes)) {
+              self$warning<-list(topic=topic,
+                                 message=paste(text[[i]][1],paste(vars[[i]], collapse=", "),text[[i]][2], COVS_SCALE[[utypes[[i]]]]))
+        }
+        }
+     
+        if (any(utypes %in% c("clustermeans","clusterbasedcentered","clusterbasedstandardized"))) {
+              clusters<-self$get_vars(type="cluster")
+              if (length(clusters)>1)
+               self$warning<-list(topic=topic,
+                                 message=paste("Variables computed by cluster variable: ",clusters[[1]]$name))
+        }
+          
     }
+    
+
     
     
 
@@ -584,7 +626,6 @@ Variable <- R6::R6Class(
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[[self$name64]]
-        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
 
       }
       if (method=="clusterbasedstandardized") {    
@@ -613,7 +654,6 @@ Variable <- R6::R6Class(
         }
             
         vardata<-sdata[[self$name64]]
-        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
       }
 
       if (method=="clustermeans") {    
@@ -626,8 +666,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[["mean"]]
-        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
-        
+
       }
       cluster64<-tob64(self$hasCluster[1])
       
