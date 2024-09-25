@@ -8,7 +8,6 @@ items:
 -       name: weightsnotes
         type: Html
         visible: false
-
 -       name: info
         title: Model Info
         type: Table

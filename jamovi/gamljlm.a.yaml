@@ -4,8 +4,8 @@ menuGroup: Linear Models
 version: 3.0.0
 jas: '1.2'
 export: false
-completeWhenFilled: true
 weightsSupport: full
+completeWhenFilled: true
 description:
         main: "General Linear Model. Estimates models using `lm()` function and provides
                 options to facilitate estimation of \ninteractions, simple slopes,
