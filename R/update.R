@@ -10,12 +10,13 @@ mf.update<- function(x,...) UseMethod(".update")
   .args<-list(...)
  
   if (utils::hasName(.args,"formula")) {
-      ## we need to remove the dep because some glm model have wiered dep definition
+      ## we need to remove the dep because some glm model have weird dep definition
       rlang::f_lhs(.args[["formula"]])<-quote(.)
   }
       ## be sure the data are in, you never know
   if (!utils::hasName(.args,"data")) 
        .args$data<-mf.data(model)
+ 
   .args$object<-model
   do.call(stats::update,.args)
   

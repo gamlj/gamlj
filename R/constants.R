@@ -1,7 +1,6 @@
 
 IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"
 
-
 FACTOR_SYMBOL= "..f_f_f.."
 LEVEL_SYMBOL = "..l_l_l.."
 INTERACTION_SYMBOL=":"

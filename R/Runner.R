@@ -579,6 +579,15 @@ Runner <- R6::R6Class("Runner",
                                  opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
 
                               ### check if there are weights and can be used
+                              ### weights can come from jamovi or from a call in infomatic
+                              ### they should be passed as numeric, not a variable name
+                              
+                              ## if they arrive from the call, make it numeric
+                              if (is.something(opts$weights) && !is.numeric(opts$weights)) {
+                                 opts$weights<-data[[opts$weights]]
+                              }
+                              
+                              ## if they arrive from jamovi, plug them in
                               if (is.something(attr(data, "jmv.weights")) ) {
                                    if (self$infomatic$has_weights) {
                                         self$weights_exist<-TRUE
@@ -587,6 +596,7 @@ Runner <- R6::R6Class("Runner",
                                       self$warning<-list(topic="weightsnotes",message=paste("However,",self$infomatic$model[[2]]," does not accept weights. This analysis used the data unweighted."))
                                 
                               }
+                                 mark(class(opts$weights))
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
                               jinfo("MODULE: Estimating the model: running")
