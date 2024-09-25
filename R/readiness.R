@@ -44,23 +44,33 @@ readiness <- function(options) {
     return(result)
   } 
   
-if(!is.something(options$dep)) {
+ if(!is.something(options$dep)) {
     result$ready <- FALSE
     result$report <- TRUE
     result$reason <- "Please select the dependent variable"
     return(result)
-} 
+ } 
 
-if (is.joption(options,"cluster"))
+
+ if ( is.joption(options, "input_method") ) {
+      if (options$input_method != "standard" && !is.something(options$dep2)) {
+         result$ready <- FALSE
+         result$report <- TRUE
+         result$reason <- "Please define all dependent variable fields"
+         return(result)
+      }
+ }    
+
+ if (is.joption(options,"cluster"))
     if (!is.something(options$cluster))  
     {
       result$ready <- FALSE
       result$report <- TRUE
       result$reason <- "Please select a cluster variable"
       return(result)
-    } 
+ } 
   
-  if (is.joption(options,"re")) {
+ if ( is.joption(options,"re") ) {
        if (any(sapply(options$re,function(x) length(x)==0)))  
        {
          result$ready <- FALSE
@@ -68,8 +78,9 @@ if (is.joption(options,"cluster"))
          result$reason <- "Please define the random coefficients"
          return(result)
        } 
-  }
-  if (is.joption(options,"contrast_custom_values")) {
+ }
+ 
+ if ( is.joption(options,"contrast_custom_values") ) {
   
        ## is custom contrasts are defined but no codes are input we stop
        types <- unlist(lapply(options$contrasts, function(x) x$type))
@@ -84,6 +95,8 @@ if (is.joption(options,"cluster"))
          return(result)
        } 
   }
+
+  
 
   return(result)
 }
