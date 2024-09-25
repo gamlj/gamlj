@@ -121,11 +121,11 @@ Runner <- R6::R6Class("Runner",
                               
                               prop <- .5
                               y<-stats::model.response(stats::model.frame(self$model))
-                             
-                              tab  <- table( y > prop, self$model$fitted.values > prop)
+                              tab  <- table( y , self$model$fitted.values > prop)
                               if (self$weights_exist) {
                                 tab<-round(self$datamatic$wN*tab/self$datamatic$N,digits=0)
                               }
+                              mark(tab)
                               marg <- round(100*diag(tab)/apply(tab,1,sum))
                               tab  <- lapply(1:nrow(tab), function(i) {
                                           t<-as.list(c(tab[i,],marg[i]))
