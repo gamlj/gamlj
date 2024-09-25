@@ -259,7 +259,7 @@ gamlj_glm <- function(
       factors <- f$factors
     }
     if (missing(covs)) {
-      factors <- f$covs
+      covs <- f$covs
     }
   }
     
@@ -328,7 +328,7 @@ gamlj_glm <- function(
   }
 
   ### weights
-  mark(head(data))
+
   if (!is.null(weights)) {
     if (is.numeric(weights)) stop("weights should be a column name in the data.frame")
     attr(data,"jmv-weights-name")<-weights

@@ -262,7 +262,7 @@ gamlj_gmixed <- function(
      if (missing(factors))
        factors<-f$factors
      if (missing(covs))
-       factors<-f$covs
+       covs<-f$covs
      
    }
    

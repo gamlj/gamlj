@@ -219,7 +219,7 @@ r2 <- function(model, ...) UseMethod(".r2")
          
          cbind={
            dev<-model$null.deviance-model$deviance
-           y<-model.response(model.frame(model))
+           y<-stats::model.response(stats::model.frame(model))
            if ( is.matrix(y) ) y<-y[,1]/(y[,1]+y[,2])
            p<-mean(y)
            dp<--(p*log(p)+(1-p)*log(1-p))

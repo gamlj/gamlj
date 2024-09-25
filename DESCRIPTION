@@ -19,4 +19,4 @@ RoxygenNote: 7.3.0
 VignetteBuilder: knitr
 Suggests:   ordinal, sandwich, nnet, betareg, knitr, rmarkdown,  mclogit (>= 0.9.6), boot, MASS, marginaleffects, nlme
 Depends: 
-    R (>= 2.10)
+    R (>= 3.00)

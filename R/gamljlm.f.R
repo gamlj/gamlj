@@ -283,9 +283,9 @@ gamlj_lm <- function(
     if (missing(factors))
          factors<-f$factors
     if (missing(covs))
-      factors<-f$covs
+      covs<-f$covs
   }
-    
+
   if (!is.null(formula)) {
          f<-rFormula$new(formula,data)
          dep             <- f$dep
@@ -294,9 +294,10 @@ gamlj_lm <- function(
          fixed_intercept <- f$intercept
          model_terms     <- f$terms
   }
+
   # if no formula or no terms is passed, covs and factors are the terms
   if (is.null(model_terms)) model_terms<-as.list(c(factors,covs))
-  
+
   # nested terms
   comparison = FALSE
   

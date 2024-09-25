@@ -240,7 +240,7 @@ mf.sample_size<- function(model,...) UseMethod(".sample_size")
 
 .sample_size.default <- function(model,...) {
   
-  results<-list(N=length(model.response(model.frame(model))))
+  results<-list(N=length(stats::model.response(stats::model.frame(model))))
   w<-stats::model.weights(stats::model.frame(model))
   if (is.something(w))
          results[["wN"]]<-sum(w)
@@ -254,7 +254,7 @@ mf.sample_size<- function(model,...) UseMethod(".sample_size")
   results<-list(N=dim(data)[1])
   
   if (obj$infomatic$model_type %in% c("logistic_success","probit_success")) {
-        results[["wN"]]<-sum(model.response(model.frame(model)))
+        results[["wN"]]<-sum(stats::model.response(stats::model.frame(model)))
     return(results)
   } 
   

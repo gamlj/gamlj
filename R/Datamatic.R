@@ -41,7 +41,6 @@ Datamatic <- R6::R6Class(
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }
-      
       data64 <- jmvcore::naOmit(data64)
 #      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
