@@ -6,7 +6,6 @@ mf.update<- function(x,...) UseMethod(".update")
 
 .update.default<-function(model,...) {
   
-  jinfo("default update is used")
   .args<-list(...)
  
   if (utils::hasName(.args,"formula")) {
