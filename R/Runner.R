@@ -596,7 +596,6 @@ Runner <- R6::R6Class("Runner",
                                       self$warning<-list(topic="weightsnotes",message=paste("However,",self$infomatic$model[[2]]," does not accept weights. This analysis used the data unweighted."))
                                 
                               }
-                                 mark(class(opts$weights))
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
                               jinfo("MODULE: Estimating the model: running")

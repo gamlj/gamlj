@@ -12,6 +12,7 @@ gamlj_glm(
   factors = NULL,
   covs = NULL,
   offset = NULL,
+  weights = NULL,
   model_terms = NULL,
   fixed_intercept = TRUE,
   nested_intercept = NULL,
@@ -56,7 +57,11 @@ gamlj_glm(
 }
 \arguments{
 \item{formula}{(optional) the formula of the model compatible with \link[stats]{glm}. If not passed,
-model terms should be defined as a list in  \code{model_terms} option.}
+model terms should be defined as a list in  \code{model_terms} option.
+For logistic and probit models formula can be of the form `cbind(success,fail) ~ x ` where
+`success` is the counts of success (y=1) and fail is the counts of failure (y=0). It accepts
+also the the form `probabilities / totals ~ x ` where `probabilities` is the probability of success
+and `totals` is the number of cases.}
 
 \item{data}{the data as a data.frame}
 
@@ -74,6 +79,8 @@ variable must be numeric. Not needed if \code{formula} is used.}
 needed if \code{formula} is used.}
 
 \item{offset}{a vector of strings naming the offset variables.}
+
+\item{weights}{an optional variable name indicating the vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a variable name in the data.}
 
 \item{model_terms}{a list of character vectors describing fixed effects
 terms. Not needed if \code{formula} is used.}

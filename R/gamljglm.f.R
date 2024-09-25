@@ -14,6 +14,10 @@
 #'      
 #' @param formula (optional) the formula of the model compatible with \link[stats]{glm}. If not passed,
 #'                 model terms should be defined as a list in  \code{model_terms} option.
+#'                 For logistic and probit models formula can be of the form `cbind(success,fail) ~ x ` where
+#'                 `success` is the counts of success (y=1) and fail is the counts of failure (y=0). It accepts
+#'                 also the the form `probabilities / totals ~ x ` where `probabilities` is the probability of success
+#'                 and `totals` is the number of cases.
 #' @param data the data as a data.frame
 #' @param dep a string naming the dependent variable from \code{data}; the
 #'            variable must be numeric. Not needed if \code{formula} is used.
@@ -29,6 +33,7 @@
 #' @param covs a vector of strings naming the covariates from \code{data}. Not
 #'   needed if \code{formula} is used.
 #' @param offset a vector of strings naming the offset variables.
+#' @param weights an optional variable name indicating the vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a variable name in the data.
 #' @param model_terms a list of character vectors describing fixed effects
 #'   terms. Not needed if \code{formula} is used.
 #' @param fixed_intercept \code{TRUE} (default) or \code{FALSE}, estimates
@@ -163,6 +168,7 @@ gamlj_glm <- function(
     factors = NULL,
     covs = NULL,
     offset = NULL,
+    weights=NULL,
     model_terms = NULL,
     fixed_intercept = TRUE,
     nested_intercept = NULL,
@@ -213,18 +219,20 @@ gamlj_glm <- function(
   if (!missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
   if (!missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
   if (!missing(offset)) offset <- jmvcore::resolveQuo(jmvcore::enquo(offset))
+  if (!missing(weights)) weights <- jmvcore::resolveQuo(jmvcore::enquo(weights))
   if (!missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
   if (!missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
   if (!missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
   if (!missing(simple_x)) simple_x <- jmvcore::resolveQuo(jmvcore::enquo(simple_x))
   if (!missing(simple_mods)) simple_mods <- jmvcore::resolveQuo(jmvcore::enquo(simple_mods))
   if (missing(data)) {
-    data <- jmvcore::marshalData(
+  data <- jmvcore::marshalData(
       parent.frame(),
       `if`(!missing(dep), dep, NULL),
       `if`(!missing(factors), factors, NULL),
       `if`(!missing(covs), covs, NULL),
       `if`(!missing(offset), offset, NULL),
+      `if`(!missing(weights), weights, NULL),
       `if`(!missing(plot_x), plot_x, NULL),
       `if`(!missing(plot_z), plot_z, NULL),
       `if`(!missing(plot_by), plot_by, NULL),
@@ -238,6 +246,8 @@ gamlj_glm <- function(
   .caller <- "glm"
   .interface <- "R"
   donotrun <- FALSE
+  dep2     <- NULL
+  input_method<-"standard"
   ### model terms
   if (inherits(model_terms, "formula")) {
     f <- rFormula$new(model_terms, data)
@@ -260,6 +270,23 @@ gamlj_glm <- function(
     covs <- f$covs
     fixed_intercept <- f$intercept
     model_terms <- f$terms
+    
+    
+    y<-rlang::f_lhs(formula)
+    if (class(y) == "call") {
+          if (as.character(y[[1]])=="cbind") {
+              dep <- as.character(y[[2]])
+              dep2 <- as.character(y[[3]])
+              input_method="success"
+          }
+          if (as.character(y[[1]])=="/") {
+              dep <- as.character(y[[2]])
+              dep2 <- as.character(y[[3]])
+              input_method="total"
+          }
+      
+    }
+    
   }
   # if no formula or no terms is passed, covs and factors are the terms
   if (is.null(model_terms)) model_terms <- as.list(c(factors, covs))
@@ -300,6 +327,13 @@ gamlj_glm <- function(
      contrast_custom_values<-custom_values 
   }
 
+  ### weights
+  mark(head(data))
+  if (!is.null(weights)) {
+    if (is.numeric(weights)) stop("weights should be a column name in the data.frame")
+    attr(data,"jmv-weights-name")<-weights
+    attr(data,"jmv-weights")<-data[[weights]]
+  }
   
   ## end of custom code
 
@@ -307,9 +341,12 @@ gamlj_glm <- function(
     .caller = .caller,
     .interface = .interface,
     dep = dep,
+    dep2= dep2,
+    input_method= input_method,
     factors = factors,
     covs = covs,
     offset = offset,
+    weights = weights,
     model_terms = model_terms,
     fixed_intercept = fixed_intercept,
     nested_intercept = nested_intercept,

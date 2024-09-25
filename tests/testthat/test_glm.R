@@ -392,7 +392,7 @@ mod <- GAMLj3::gamlj_glm(
   nested_terms = ~write
 )
 
-testthat::test_that("multinomila comparison", {
+testthat::test_that("multinomial comparison", {
   testthat::expect_equal(mod$main$r2$asDF[3,2],.0061,tol)
 })
 
