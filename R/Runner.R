@@ -615,13 +615,7 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              # if (!isFALSE(results$warning)) {
-                              #     disp<-Dispatch$new(self$analysis$results)
-                              #     msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
-                              #     msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
-                              #     if (is.something(msg))
-                              #           self$warning<-list(topic="modelnotes",message=msg,head="warning")
-                              # }
+                             
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"], head="info")
