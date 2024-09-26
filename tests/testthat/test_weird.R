@@ -1,6 +1,6 @@
 tol<-.01
-data<-jmvReadWrite::read_omv("../gamlj.github.io/data/wlogistic_long.omv")
-data$Y<-factor(data$Y)
+
+data <- readRDS("data/wlogistic_long.rds")
 
 mod1<-GAMLj3::gamlj_glm(Y~X,model_type="logistic",data=data, weights=Counts)
 
@@ -11,7 +11,7 @@ testthat::test_that("weights", {
 
 })
 
-data<-jmvReadWrite::read_omv("../gamlj.github.io/data/wlogistic_wide.omv")
+data <- readRDS("data/wlogistic_wide.rds")
 
 mod2<-GAMLj3::gamlj_glm(cbind(Counts.1,Counts.0)~X,model_type="logistic",data=data)
 
