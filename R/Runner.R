@@ -21,6 +21,7 @@ Runner <- R6::R6Class("Runner",
                             
                             
                             t<-Sys.time()
+                            ## if datamatic is not ok, we do not do anything
                             if (!self$datamatic$ok) {
                               self$ok<-FALSE
                               return()
@@ -123,9 +124,13 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_crosstab= function() {
                               
-                              prop <- .5
+                            
                               y<-stats::model.response(stats::model.frame(self$model))
-                              tab  <- table( y , self$model$fitted.values > prop)
+                              mark(table(y))
+                              fitted<-stats::predict(self$model)
+                              mark(table(fitted))
+                              if (is.numeric(fitted)) fitted<-(exp(fitted)/(1+exp(fitted))) > .5
+                              tab  <- table( y , fitted)
                               if (self$weights_exist) {
                                 tab<-round(self$datamatic$wN*tab/self$datamatic$N,digits=0)
                               }
