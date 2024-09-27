@@ -36,17 +36,16 @@ Scaffold <- R6::R6Class("Scaffold",
                                 return(NULL)
                             },
                             
-                            stop=function(msg, return=TRUE) {
-                            
+                            stop=function(...) {
+                                msg<-paste(list(...), collapse=" ")
+                                mark("error message",msg)
                                 if (self$option(".interface","R")) stop(msg,call.=FALSE)
                                     
                                 if (exists("ERROR_TABLE")) {
                                  self$warning<-list(topic=ERROR_TABLE,message=msg,head="error")
                                  self$ok <- FALSE
-                                 if (return) {
-                                       call <- rlang::expr(return()) 
-                                       rlang::eval_bare(call, env = parent.frame())
-                                 }
+                                 call <- rlang::expr(return()) 
+                                 rlang::eval_bare(call, env = parent.frame())
                               } else
                                  stop(msg,call.=FALSE)
                               

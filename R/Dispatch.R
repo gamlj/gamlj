@@ -204,3 +204,10 @@ private = list(
 
 
 
+### this is for cleaning all html message widgets otherwise some message sticks
+
+dispatch_message_cleaner<-function(jmvobj) {
+  
+  lapply(jmvobj$results$items, function(x) if ("Html" %in% class(x)) x$setContent(" ")  )
+  
+}

@@ -19,7 +19,19 @@ Initier <- R6::R6Class(
     initialize=function(jmvobj,datamatic) {
       
       super$initialize(jmvobj)
+      ## clean some message tabs
+      if ("weightsnotes" %in% names(jmvobj$results)) jmvobj$results$weightsnotes$setContent(" ") 
+      if ("modelnotes"   %in% names(jmvobj$results)) jmvobj$results$modelnotes$setContent(" ") 
+#      if ("errortable"   %in% names(jmvobj$results)) jmvobj$results$errortable$setContent(" ") 
+
+      
+      ## check if data are ok
       self$datamatic<-datamatic
+
+      if (!self$datamatic$ok) {
+        self$ok<-FALSE
+        return()
+      }
       self$ciwidth <- self$options$ci_width/100
       self$subclass<-paste0("model_",self$options$model_type)
       x<-self$datamatic$data_structure64
@@ -52,9 +64,6 @@ Initier <- R6::R6Class(
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(self$options,datamatic,self$formulaobj)
 
-      ## clean some message tabs
-      if ("weightsnotes" %in% names(jmvobj$results)) jmvobj$results$weightsnotes$setContent(" ") 
-      if ("modelnotes"   %in% names(jmvobj$results)) jmvobj$results$modelnotes$setContent(" ") 
 
     }, # here initialize ends
     #### init functions #####

@@ -473,7 +473,6 @@ Plotter <- R6::R6Class(
                      moderators <- c(z,moderators)
                      z          <- self$options$dep
             }
-            
 
             dims<-unlist(lapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$nlevels))
 

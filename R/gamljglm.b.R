@@ -22,6 +22,7 @@ gamljglmClass <- R6::R6Class(
       }
 
       ### set up the R6 workhorse class
+      dispatch_message_cleaner(self)
       data_machine            <-  Datamatic$new(self)
       runner_machine          <-  Runner$new(self,data_machine)
       runner_machine$storage  <-  self$results$main$coefficients      

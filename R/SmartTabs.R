@@ -710,6 +710,7 @@ SmartArray <- R6::R6Class("SmartArray",
                                      obj$runSource<-rtables[[i]]
                                      obj$runTable()
                                  } else {
+                                   mark(private$.error)
                                    if (!private$.error)
                                          obj$table$setVisible(FALSE)
                                  }

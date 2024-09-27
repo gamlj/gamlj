@@ -7,6 +7,10 @@ items:
     type: Property
     description: The underlying estimated model
 
+  - name: errortable
+    type: Html
+    visible: false
+
   - name: weightsnotes
     type: Html
     visible: false

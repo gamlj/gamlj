@@ -21,6 +21,10 @@ Runner <- R6::R6Class("Runner",
                             
                             
                             t<-Sys.time()
+                            if (!self$datamatic$ok) {
+                              self$ok<-FALSE
+                              return()
+                            }
                             self$model<-private$.estimateModel(data)
                             self$etime<-as.numeric(Sys.time()-t)
                             
