@@ -290,6 +290,10 @@ SmartTable <- R6::R6Class("SmartTable",
                                 if (!(fun %in% names(private$.estimator)))
                                     return(NULL)
                                 
+                                if ("ok" %in% names(private$.estimator))
+                                    if (isFALSE(private$.estimator$ok))
+                                        return(NULL)
+                                
                                 output<-try_hard(private$.estimator[[fun]]())
                                 rtable<-output$obj
                                 error<-output$error

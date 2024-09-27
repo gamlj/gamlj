@@ -536,7 +536,8 @@ Runner <- R6::R6Class("Runner",
                                       
                                     }
                                     msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type: ",t2)
-                                    stop(msg)
+                                    self$stop(msg)
+                                    
                               }
 
                             ### when necessary, check the number of levels

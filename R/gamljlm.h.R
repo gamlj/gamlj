@@ -676,6 +676,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
         model = function() private$..model,
+        errortable = function() private$.items[["errortable"]],
         info = function() private$.items[["info"]],
         modelnotes = function() private$.items[["modelnotes"]],
         main = function() private$.items[["main"]],
@@ -700,6 +701,10 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="",
                 title="General Linear Model")
             private$..model <- NULL
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="errortable",
+                visible=FALSE))
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",

@@ -10,6 +10,8 @@ TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
 
+ERROR_TABLE="errortable"
+
 ######## options not in the R syntax #####
 NO_R_OPTS<-c(
             "model_terms",

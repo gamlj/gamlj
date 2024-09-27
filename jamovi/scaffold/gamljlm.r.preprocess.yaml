@@ -6,6 +6,10 @@ items:
   - name: model
     type: Property
 
+  - name: errortable
+    type: Html
+    visible: false
+
   - name: info
     title: Model Info
     type: Table
