@@ -71,8 +71,15 @@ Dispatch <- R6::R6Class(
                                 
                                 if (inherits(table,"Html")) {
                                   if (self$interface=="R") {
-                                       warning(obj$message,call. = FALSE) 
-                                       return()
+                                       switch (obj$head,
+                                         info = {
+                                                  message(obj$message)
+                                                  return()
+                                                 },
+                                         { warning(obj$message,call. = FALSE) 
+                                           return()
+                                         }
+                                       )
                                   } else {
                                        content<-private$.process_html(table$content,obj)
                                        content<-table$setContent(content)

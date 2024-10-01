@@ -19,12 +19,7 @@ Initier <- R6::R6Class(
     initialize=function(jmvobj,datamatic) {
       
       super$initialize(jmvobj)
-      ## clean some message tabs
-      if ("weightsnotes" %in% names(jmvobj$results)) jmvobj$results$weightsnotes$setContent(" ") 
-      if ("modelnotes"   %in% names(jmvobj$results)) jmvobj$results$modelnotes$setContent(" ") 
-#      if ("errortable"   %in% names(jmvobj$results)) jmvobj$results$errortable$setContent(" ") 
 
-      
       ## check if data are ok
       self$datamatic<-datamatic
 
@@ -244,6 +239,28 @@ Initier <- R6::R6Class(
         }
         alist
     },
+      #custom contrast effect sizes     
+    init_main_customEffectsizes=function() {
+
+        vars<-lapply(self$datamatic$variables, function(x) if (x$method == "custom") x$contrast_labels[[1]] else NULL)
+        vars<-vars[!sapply(vars,is.null)]
+        
+        if (length(vars)==0) return(NULL)      
+
+        alist<-list()
+        for (term in vars) {
+            ladd(alist) <-  list(effect=term,name=letter_eta2)
+            ladd(alist) <-  list(effect=term,name=letter_peta2)
+            ladd(alist) <-  list(effect=term,name=letter_omega2)
+            ladd(alist) <-  list(effect=term,name=letter_pomega2)
+            ladd(alist) <-  list(effect=term,name=letter_epsilon2)
+            ladd(alist) <-  list(effect=term,name=letter_pepsilon2)
+        }
+        
+        alist
+    },
+
+    
     ### intercept more info ###
     
     init_main_intercept=function() {

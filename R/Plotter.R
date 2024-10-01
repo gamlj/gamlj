@@ -512,8 +512,6 @@ Plotter <- R6::R6Class(
 
       jinfo("PLOTTER: checking main plot")
       
-      private$.results$plotnotes$setContent("")
-      
       resultsgroup<-private$.results$get("mainPlots")
       ### stop if it is filled from previous run ###
     
@@ -787,7 +785,6 @@ Plotter <- R6::R6Class(
         return()
       }
       
-      private$.results$jnplotnotes$setContent("")
       resultsgroup<-private$.results$get("jnPlots")
       
      expb<-FALSE

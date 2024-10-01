@@ -235,6 +235,12 @@ options:
                         content: $key
                 -       name: codes
                         type: String
+-       name: contrast_custom_es
+        type: Bool
+        title: Effect size indices
+        default: false
+        description:
+                R: "if TRUE, additional effect size indices for custom contrasts      \n"
 -       name: simple_x
         title: Simple effects variable
         type: Variable

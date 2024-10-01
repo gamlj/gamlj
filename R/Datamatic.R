@@ -411,7 +411,6 @@ Variable <- R6::R6Class(
                      if (is.null(custom)) self$datamatic$stop("Contrast weights are required for variable",self$name," defined as custom")
                      custom<-as.numeric(strsplit(custom,split="[,;]")[[1]])
                      custom<-custom[!is.na(custom)]
-                     mark("here is the error")
                      if (length(custom)!=nLevels)
                          self$datamatic$stop("Custom codes for variable ",self$name," are not correct: ",nLevels," codes are required.")
                      if (sum(custom)!=0)

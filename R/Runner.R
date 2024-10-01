@@ -200,6 +200,18 @@ Runner <- R6::R6Class("Runner",
                              return(tab)
                           },
 
+                         run_main_customEffectsizes=function()  {
+                            
+                            if (!self$option("ci_method","wald")) {
+                              warning("Bootstrap confidence intervals not available for custom contrasts. Standard method is used.")
+                            }
+                           if (self$options$.caller != "lm") {
+                              warning("Effect size indices for custom contrasts available only for lm models.")
+                              return()
+                           }
+                            es.custom_variances(self$model,self)
+                            
+                          },
                           ### this is for beta regression
                           run_main_phi=function() {
                             
@@ -311,7 +323,8 @@ Runner <- R6::R6Class("Runner",
                               jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
-                            
+                              ## this is a fix for aligning the column correctly. Do not remove yet
+                              results[[1]]$var1[[nrow(results[[1]])]]<-" "
 
                               return(results[[1]])
                               
@@ -635,8 +648,7 @@ Runner <- R6::R6Class("Runner",
                               ### add custom info to the model
                               if (self$option("model_type","ordinal")) {
                                       msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses", head="info")
-                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg), head="info")
+                                      self$warning<-list(topic="modelnotes",message=paste("Classes are:",msg), head="info")
                                      }                              
                               return(.model)
 

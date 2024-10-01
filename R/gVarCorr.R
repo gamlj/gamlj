@@ -84,8 +84,8 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   
   vmat$groups  <- fromb64(vmat$grp)
   vmat$var1    <- fromb64(vmat$var1)
-  vmat$var2    <- fromb64(vmat$var2)
-  
+  vmat$var2    <- NULL
+
   if (is.something(cmat)) {
     cmat$groups <-fromb64(cmat$grp)
     cmat$var1   <-fromb64(cmat$var1)
@@ -103,6 +103,7 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   varcov<-as.data.frame(varcov)
   varcov$vcov<-varcov$sdcor^2
   vmat<-varcov[is.na(varcov$var2),]
+ 
   cmat<-varcov[!is.na(varcov$var2),]
   if (nrow(cmat)==0) cmat<-NULL
   

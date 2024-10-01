@@ -56,6 +56,13 @@ gamljlmClass <- R6::R6Class(
       aSmartObj$activateOnData<-TRUE
       aSmartObj$ci("est",self$options$ci_width)
       ladd(private$.smartObjs)<-aSmartObj
+
+      ## custom_effectsizes      
+      
+      aSmartObj<-SmartTable$new(self$results$main$customEffectsizes,runner_machine)
+      aSmartObj$ci("est",self$options$ci_width)
+      ladd(private$.smartObjs)<-aSmartObj
+
       
       ### contrasts code tables
       aSmartObj<-SmartArray$new(self$results$main$contrastCodeTables,runner_machine)

@@ -209,6 +209,8 @@ children:
                                 label: Var
                                 template:
                                         type: TextBox
+                -       type: CheckBox
+                        name: contrast_custom_es
 -       name: panel_covs
         type: CollapseBox
         label: Covariates Scaling
