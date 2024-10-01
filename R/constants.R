@@ -1,7 +1,6 @@
 
 IMPROBABLE_SEQ<-"Xd2ludGVyaXNjb21pbmc;"
 
-
 FACTOR_SYMBOL= "..f_f_f.."
 LEVEL_SYMBOL = "..l_l_l.."
 INTERACTION_SYMBOL=":"
@@ -10,6 +9,8 @@ B64_REGEX="\\.\\.b_b_b\\.\\."
 TCONV<-list()
 TCONV[["glm.f"]]<-c("test","df","p")
 TCONV[["mixed.f"]]<-c("test","df1","df2","p")
+
+ERROR_TABLE="errortable"
 
 ######## options not in the R syntax #####
 NO_R_OPTS<-c(
@@ -109,6 +110,16 @@ TRANS_WARNS[[7]]<-list(original="contrasts dropped",new=NULL)
 TRANS_WARNS[[8]]<-list(original="Hessian is not positive",prepend="Valid estimates cannot be found. Please try to specify a different model. Reason: ")
 TRANS_WARNS[[9]]<-list(original="Inner iterations did not coverge",new=NULL)
 TRANS_WARNS[[10]]<-list(original="iteration limit reached",new="Iteration limit reached: a proper solution was not found. Results may be biased.")
+
+###########  list of verbose options  ############
+
+COVS_SCALE<-list()
+COVS_SCALE[["centered"]]                  <-"centered to the mean"
+COVS_SCALE[["standardized"]]              <-"standardized"
+COVS_SCALE[["clusterbasedcentered"]]      <-"centered to cluster mean"
+COVS_SCALE[["clusterbasedstandardized"]]  <-"standardized within clusters"
+COVS_SCALE[["none"]]                      <-"in the original scale"
+COVS_SCALE[["clustermeans"]]              <-" the means of the clusters"
 
 
 

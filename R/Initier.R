@@ -19,7 +19,14 @@ Initier <- R6::R6Class(
     initialize=function(jmvobj,datamatic) {
       
       super$initialize(jmvobj)
+
+      ## check if data are ok
       self$datamatic<-datamatic
+
+      if (!self$datamatic$ok) {
+        self$ok<-FALSE
+        return()
+      }
       self$ciwidth <- self$options$ci_width/100
       self$subclass<-paste0("model_",self$options$model_type)
       x<-self$datamatic$data_structure64
@@ -51,7 +58,8 @@ Initier <- R6::R6Class(
       
       ### infomatic class takes care of all info about different models
       self$infomatic<-Infomatic$new(self$options,datamatic,self$formulaobj)
-      
+
+
     }, # here initialize ends
     #### init functions #####
     
@@ -108,6 +116,9 @@ Initier <- R6::R6Class(
       
       if (self$option("se_method","robust"))
          tab[["se_method"]]<-list(info="SE method",value="Robust")
+      
+      ## check if we need to tell the users about the covs scale
+      self$datamatic$info_covs_scale()
       
       tab
       
@@ -228,6 +239,31 @@ Initier <- R6::R6Class(
         }
         alist
     },
+      #custom contrast effect sizes     
+    init_main_customEffectsizes=function() {
+
+        if (!self$option(".caller","lm") || !self$option("contrast_custom_es"))
+             return()
+      
+        vars<-lapply(self$datamatic$variables, function(x) if (x$method == "custom") x$contrast_labels[[1]] else NULL)
+        vars<-vars[!sapply(vars,is.null)]
+        
+        if (length(vars)==0) return(NULL)      
+
+        alist<-list()
+        for (term in vars) {
+            ladd(alist) <-  list(effect=term,name=letter_eta2)
+            ladd(alist) <-  list(effect=term,name=letter_peta2)
+            ladd(alist) <-  list(effect=term,name=letter_omega2)
+            ladd(alist) <-  list(effect=term,name=letter_pomega2)
+            ladd(alist) <-  list(effect=term,name=letter_epsilon2)
+            ladd(alist) <-  list(effect=term,name=letter_pepsilon2)
+        }
+        
+        alist
+    },
+
+    
     ### intercept more info ###
     
     init_main_intercept=function() {

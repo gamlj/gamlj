@@ -1,0 +1,147 @@
+---
+title: "Defining the model"
+author: Marcello Gallucci
+date: '`r Sys.Date()`'
+output: 
+     rmarkdown::html_vignette:
+          css: style.css
+     html_document:
+         toc: true
+         toc_float:
+             collapsed: false
+         css: style.css
+vignette: >
+  %\VignetteIndexEntry{Defining the model}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "",
+  fig.align = "center",
+  fig.height = 4,
+  fig.width = 6
+)
+options(digits=3)
+
+```
+
+```{r setup}
+library(GAMLj3)
+data("clustermanymodels")
+data<-clustermanymodels
+```
+
+# Main model
+
+## Model formula
+
+The easiest and recommended way to define a model is to pass a formula. Formula formats accepted by `stats:glm` and `lme4::lmer()` functions are accepted.
+
+For instance, a regression with interaction is passed as:
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+mod1<-gamlj_lm(formula = y~x*z, data=data)
+```
+
+For mixed and generalized mixed models the `lme4::lmer()` format is accepted:
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+mod2<-gamlj_lm(formula = y~x*z+(1+x|cluster), data=data)
+```
+
+For logistic models, a part from the standard format, one can pass the formula with two additional format: The first allows passing the counts of successes and the counts of failures as a combined array.
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+mod3<-gamlj_glm(formula = cbind(success,failure)~x*z, model_type="logistic",data=data)
+```
+
+Alternatively, one can pass the probability of success (with $0\le p \le 1$) and the counts of cases ($tot$) for each row in the data.frame. The format uses `/` to indicate `p over T`.
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+mod4<-gamlj_glm(formula = p / tot ~x*z, model_type="logistic", data=data)
+```
+
+In all models, polynomial terms can be passed using the `I()` format:
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+mod5<-gamlj_lm(formula = y ~x + I(x^2) , data=data)
+```
+
+Please notice that the `I()` is not interpreted literally, so the term is build after any manipulation of the variable takes places, such as centering or standardizing.   
+
+
+
+
+## Model terms
+
+Another way to define the model is to define the arguments `model_terms` and defining the dependent variable with the argument `dep`. `model_terms` can be passed as a right-hand formula or as a list.
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+gamlj_lm(dep=ycont,model_terms=~x*z , data=data)
+```
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+gamlj_lm(dep=ycont,model_terms=list("x","z",c("x","z")) , data=data)
+```
+
+When terms is passed as a list, each element is a term, and elements with more than 1 term, such as `c("x","z")` are interactions.
+
+For mixed and generalized mixed models, this method requires to define the random effects of the model with argument `re`. 
+
+For mixed and generalized mixed models, there are also the terms of the comparison model that can be defined as formula:
+
+* nested_re: define the random coefficients of a nested model to compare.
+* nested_terms: define the random coefficients of a nested model to compare.
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+gamlj_mixed(formula=ycont~x+(1+x|cluster),nested_terms=~1,nested_re=~1|cluster, data=data)
+```
+
+
+## List of variables
+
+Finally, one can simply specify the factors and the covariates. In this way, however, no higher terms can be defined.
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+gamlj_lm(dep=ycont,factors=c("cat2"),covs=c("x","z") , data=data)
+```
+
+For mixed and generalized mixed models, this method requires to define the random effects of the model with argument `re`
+
+# Passing other arguments
+
+Several arguments if gamlj_* functions can be passed either as formula or as a list. They are:
+
+* emmeans: estimate marginal means.
+* posthoc: make post-hoc comparisons.
+* nested_terms: define the terms of a nested model to compare.
+
+For both argument, either a right-hand formula or a list can be passed.
+
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+data$cat2<-factor(data$cat2)
+data$cat3<-factor(data$cat3)
+
+gamlj_lm(formula=ycont~cat2*cat3,posthoc=~cat2+cat2:cat3 , data=data)
+```
+
+This produces the comparisons only across cat2 levels and the comparison across the interaction $cat2*cat3$. For these arguments, we do not use the formula `cat2*cat3` because it is not expanded, so passing `cat2*cat3` would produce two tables of comparisons, one for the comparison across cat2 levels, and one across cat3 levels. 
+
+The equivalent argument as a list is:
+
+```{r warning=FALSE, message=FALSE, results='hide', eval=FALSE}
+gamlj_lm(formula=ycont~cat2*cat3,posthoc=list("cat2",c("cat2","cat3")) , data=data)
+```
+
+
+
+
+
+
+[back to top](#model-formula)

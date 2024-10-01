@@ -6,6 +6,10 @@ items:
   - name: model
     type: Property
 
+  - name: errortable
+    type: Html
+    visible: false
+
   - name: info
     title: Model Info
     type: Table
@@ -355,6 +359,37 @@ items:
                       type: number
                       format: zto,pvalue
 
+           - name: customEffectsizes
+             title: Custom Contrasts effect size indices
+             type: Table
+             visible: false
+             description: a table of effect size indeces
+             clearWith:
+                    -  type: scaffold
+                       name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_ci
+                       file: clear.yaml
+
+             columns:
+                    - name: effect
+                      title: Contrast
+                      combineBelow: true
+                      type: text
+                    - name: name
+                      title: Statistics
+                      type: text
+                    - name: estimate
+                      title: Estimate
+                      type: number
+                      format: zto
+                    - name: est.ci.lower
+                      title: Lower
+                      type: number
+                    - name: est.ci.upper
+                      title: Upper
+                      type: number
 
 
            - name: vcov

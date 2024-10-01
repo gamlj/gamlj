@@ -276,7 +276,7 @@ procedure.posthoc_effsize <- function(obj) {
   return(referenceGrid)
 }
 
-.posthoc.mmblogit <- function(model, term, adjust,ci=FALSE,vfun=NULL,df=NULL,mode=NULL) {
+.posthoc.mmblogit <- function(model, term, vfun=NULL,df=NULL,mode=NULL) {
   
   dep <- names(attr(stats::terms(model), "dataClass"))[1]
   dep <- jmvcore::composeTerm(dep)
@@ -848,7 +848,6 @@ procedure.simpleInteractions<-function(obj) {
               type<-obj$options$robust_method
               grid_list[["vcov."]]<-function(x,...) sandwich::vcovHC(x,type=type,...)
             }
-            
             if (varobj$type=="numeric") {
                 grid_list[["specs"]]<-term64
                 grid_list[["var"]]<-variable64

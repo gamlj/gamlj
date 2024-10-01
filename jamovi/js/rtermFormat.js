@@ -4,6 +4,26 @@ var rtermFormat = new Format ({
   
   default: null,
   
+  toAriaLabel: function(n) {
+            if (n.length === 1)
+                return s_("Variable {0}", n);
+            let t = n[0];
+            if (n.length > 2)
+                for (let i = 1; i < n.length - 1; i++)
+                    t = s_("{list}, {nextItem}", {
+                        list: t,
+                        nextItem: n[i]
+                    });
+            let e = n[n.length - 1];
+            return t = s_("{list} and {lastItem}", {
+                list: t,
+                lastItem: e
+            }),
+            s_("Variables {list}", {
+                list: t
+            })
+  },
+  
   toString: function(raw) {
     return rtermFormat._itemToString(raw, 0);
   },

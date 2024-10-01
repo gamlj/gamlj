@@ -473,7 +473,6 @@ Plotter <- R6::R6Class(
                      moderators <- c(z,moderators)
                      z          <- self$options$dep
             }
-            
 
             dims<-unlist(lapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$nlevels))
 
@@ -512,8 +511,6 @@ Plotter <- R6::R6Class(
         return()
 
       jinfo("PLOTTER: checking main plot")
-      
-      private$.results$plotnotes$setContent("")
       
       resultsgroup<-private$.results$get("mainPlots")
       ### stop if it is filled from previous run ###
@@ -788,7 +785,6 @@ Plotter <- R6::R6Class(
         return()
       }
       
-      private$.results$jnplotnotes$setContent("")
       resultsgroup<-private$.results$get("jnPlots")
       
      expb<-FALSE
@@ -1368,5 +1364,4 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
         result <- c(.x1, .x2)
         bounds <- sort(result, decreasing = FALSE)
     }
-   mark(bounds)
 }

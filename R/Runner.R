@@ -15,10 +15,17 @@ Runner <- R6::R6Class("Runner",
                           tab_simpleCoefficients=NULL,
                           tab_randomcov=NULL,
                           boot_variances=NULL,
+                          weights_exist=FALSE,
                           etime=0,
                           estimate = function(data) {
                             
+                            
                             t<-Sys.time()
+                            ## if datamatic is not ok, we do not do anything
+                            if (!self$datamatic$ok) {
+                              self$ok<-FALSE
+                              return()
+                            }
                             self$model<-private$.estimateModel(data)
                             self$etime<-as.numeric(Sys.time()-t)
                             
@@ -42,7 +49,9 @@ Runner <- R6::R6Class("Runner",
                           run_info=function() {
                                
                                 tab<-self$init_info()
-                                tab[["sample"]]$value<-self$datamatic$N
+                                Ns<-mf.sample_size(self$model, self)
+                                tab[["sample"]]$value<-Ns[["N"]]
+                                if ("wN" %in% names(Ns))  tab[["sample"]]$specs<-paste("Weighted N=",Ns[["wN"]])
                             
                           ## TODO: generalize if other models need an optimizer other than lmer
                                 if (isTRUE(self$infomatic$optimized))
@@ -115,8 +124,17 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_crosstab= function() {
                               
-                              prop <- 1/self$datamatic$dep$nlevels
-                              tab  <- table(self$model$y,self$model$fitted.values>prop)
+                            
+                              y<-stats::model.response(stats::model.frame(self$model))
+                              mark(table(y))
+                              fitted<-stats::predict(self$model)
+                              mark(table(fitted))
+                              if (is.numeric(fitted)) fitted<-(exp(fitted)/(1+exp(fitted))) > .5
+                              tab  <- table( y , fitted)
+                              if (self$weights_exist) {
+                                tab<-round(self$datamatic$wN*tab/self$datamatic$N,digits=0)
+                              }
+                           
                               marg <- round(100*diag(tab)/apply(tab,1,sum))
                               tab  <- lapply(1:nrow(tab), function(i) {
                                           t<-as.list(c(tab[i,],marg[i]))
@@ -182,6 +200,19 @@ Runner <- R6::R6Class("Runner",
                              return(tab)
                           },
 
+                         run_main_customEffectsizes=function()  {
+                            
+                            if (!self$option("ci_method","wald")) 
+                              warning("Bootstrap confidence intervals not available for custom contrasts. Standard method is used.")
+                          
+                            if (!self$option(".caller","lm") || !self$option("contrast_custom_es"))
+                              return()
+      
+
+
+                            es.custom_variances(self$model,self)
+                            
+                          },
                           ### this is for beta regression
                           run_main_phi=function() {
                             
@@ -293,7 +324,8 @@ Runner <- R6::R6Class("Runner",
                               jinfo("RUNNER: estimating variance components")
                               results<-gVarCorr(self$model,self)
                               self$tab_randomcov<-results[[2]]
-                            
+                              ## this is a fix for aligning the column correctly. Do not remove yet
+                              results[[1]]$var1[[nrow(results[[1]])]]<-" "
 
                               return(results[[1]])
                               
@@ -473,7 +505,7 @@ Runner <- R6::R6Class("Runner",
                           #### we need this here because emmeans needs a contrast that
                           ###  we can control in terms of variable type
                           
-                          interaction_contrast=function(levels,datamatic=NULL) {
+                          interaction_contrast=function(levels,datamatic=NULL,...) {
                             
                             nvar<-length(datamatic)
                             private$.contr_index<-private$.contr_index+1
@@ -527,7 +559,8 @@ Runner <- R6::R6Class("Runner",
                                       
                                     }
                                     msg<-paste("Dependent variable is of type",t1,".",m,"requires variable of type: ",t2)
-                                    stop(msg)
+                                    self$stop(msg)
+                                    
                               }
 
                             ### when necessary, check the number of levels
@@ -569,6 +602,24 @@ Runner <- R6::R6Class("Runner",
                               if (self$option("offset"))
                                  opts[["formula"]]<-paste(opts[["formula"]],"+offset(",tob64(self$options$offset),")")
 
+                              ### check if there are weights and can be used
+                              ### weights can come from jamovi or from a call in infomatic
+                              ### they should be passed as numeric, not a variable name
+                              
+                              ## if they arrive from the call, make it numeric
+                              if (is.something(opts$weights) && !is.numeric(opts$weights)) {
+                                 opts$weights<-data[[opts$weights]]
+                              }
+                              
+                              ## if they arrive from jamovi, plug them in
+                              if (is.something(attr(data, "jmv.weights")) ) {
+                                   if (self$infomatic$has_weights) {
+                                        self$weights_exist<-TRUE
+                                        opts[["weights"]]<-as.numeric(attr(data, "jmv.weights"))      
+                                   } else 
+                                      self$warning<-list(topic="weightsnotes",message=paste("However,",self$infomatic$model[[2]]," does not accept weights. This analysis used the data unweighted."))
+                                
+                              }
                               opts[["data"]]<-quote(data)
                               acall<-as.call(opts)
                               jinfo("MODULE: Estimating the model: running")
@@ -588,13 +639,7 @@ Runner <- R6::R6Class("Runner",
                                 else
                                   stop(fromb64(results$error))
                               }
-                              # if (!isFALSE(results$warning)) {
-                              #     disp<-Dispatch$new(self$analysis$results)
-                              #     msg<-lapply(fromb64(results$warning), function(x) disp$translate(x))
-                              #     msg<-msg[unlist(lapply(msg,function(x) !is.null(x)))]
-                              #     if (is.something(msg))
-                              #           self$warning<-list(topic="modelnotes",message=msg,head="warning")
-                              # }
+                             
                               
                               if (mf.aliased(results$obj))
                                    self$warning<-list(topic="info",message=WARNS["aliased"], head="info")
@@ -604,14 +649,18 @@ Runner <- R6::R6Class("Runner",
                               ### add custom info to the model
                               if (self$option("model_type","ordinal")) {
                                       msg<-paste(1:length(self$datamatic$dep$levels_labels),self$datamatic$dep$levels_labels,sep="=",collapse = ", ")
-                                      self$warning<-list(topic="emmeans",message=paste("Classes are:",msg),id="emclasses", head="info")
-                                      self$warning<-list(topic="plotnotes",message=paste("Classes are:",msg), head="info")
+                                      self$warning<-list(topic="modelnotes",message=paste("Classes are:",msg), head="info")
                                      }                              
                               return(.model)
 
 
                           },
                           .bootstrap_model=function() {
+                            
+                            if (self$weights_exist) {
+                              self$warning<-list(topic="info",message="Bootstrap method not available with weighted data.")
+                              return()
+                            }
                             
                             ### Here is how the storage mechanism works:
                             ### In the .b.R file we assign a table to be the runner storage.

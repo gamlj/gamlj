@@ -30,6 +30,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             show_contrastcodes = FALSE,
             contrast_custom_focus = FALSE,
             contrast_custom_values = list(),
+            contrast_custom_es = FALSE,
             simple_x = NULL,
             simple_mods = NULL,
             simple_interactions = FALSE,
@@ -234,6 +235,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         jmvcore::OptionString$new(
                             "codes",
                             NULL))))
+            private$..contrast_custom_es <- jmvcore::OptionBool$new(
+                "contrast_custom_es",
+                contrast_custom_es,
+                default=FALSE)
             private$..simple_x <- jmvcore::OptionVariable$new(
                 "simple_x",
                 simple_x,
@@ -494,6 +499,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..show_contrastcodes)
             self$.addOption(private$..contrast_custom_focus)
             self$.addOption(private$..contrast_custom_values)
+            self$.addOption(private$..contrast_custom_es)
             self$.addOption(private$..simple_x)
             self$.addOption(private$..simple_mods)
             self$.addOption(private$..simple_interactions)
@@ -561,6 +567,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         show_contrastcodes = function() private$..show_contrastcodes$value,
         contrast_custom_focus = function() private$..contrast_custom_focus$value,
         contrast_custom_values = function() private$..contrast_custom_values$value,
+        contrast_custom_es = function() private$..contrast_custom_es$value,
         simple_x = function() private$..simple_x$value,
         simple_mods = function() private$..simple_mods$value,
         simple_interactions = function() private$..simple_interactions$value,
@@ -627,6 +634,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..show_contrastcodes = NA,
         ..contrast_custom_focus = NA,
         ..contrast_custom_values = NA,
+        ..contrast_custom_es = NA,
         ..simple_x = NA,
         ..simple_mods = NA,
         ..simple_interactions = NA,
@@ -676,6 +684,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     inherit = jmvcore::Group,
     active = list(
         model = function() private$..model,
+        errortable = function() private$.items[["errortable"]],
         info = function() private$.items[["info"]],
         modelnotes = function() private$.items[["modelnotes"]],
         main = function() private$.items[["main"]],
@@ -700,6 +709,10 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="",
                 title="General Linear Model")
             private$..model <- NULL
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="errortable",
+                visible=FALSE))
             self$add(jmvcore::Table$new(
                 options=options,
                 name="info",
@@ -752,6 +765,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     effectsizes = function() private$.items[["effectsizes"]],
                     coefficients = function() private$.items[["coefficients"]],
                     contrasts = function() private$.items[["contrasts"]],
+                    customEffectsizes = function() private$.items[["customEffectsizes"]],
                     vcov = function() private$.items[["vcov"]],
                     contrastCodeTables = function() private$.items[["contrastCodeTables"]]),
                 private = list(),
@@ -1176,6 +1190,52 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
+                        self$add(jmvcore::Table$new(
+                            options=options,
+                            name="customEffectsizes",
+                            title="Custom Contrasts effect size indices",
+                            visible=FALSE,
+                            clearWith=list(
+                                "model_type",
+                                "dep",
+                                "factors",
+                                "covs",
+                                "covs_scale",
+                                "scale_missing",
+                                "model_terms",
+                                "fixed_intercept",
+                                "se_method",
+                                "mute",
+                                "df_method",
+                                "contrasts",
+                                "contrast_custom_values",
+                                "donotrun",
+                                "ci_width",
+                                "ci_method",
+                                "boot_r"),
+                            columns=list(
+                                list(
+                                    `name`="effect", 
+                                    `title`="Contrast", 
+                                    `combineBelow`=TRUE, 
+                                    `type`="text"),
+                                list(
+                                    `name`="name", 
+                                    `title`="Statistics", 
+                                    `type`="text"),
+                                list(
+                                    `name`="estimate", 
+                                    `title`="Estimate", 
+                                    `type`="number", 
+                                    `format`="zto"),
+                                list(
+                                    `name`="est.ci.lower", 
+                                    `title`="Lower", 
+                                    `type`="number"),
+                                list(
+                                    `name`="est.ci.upper", 
+                                    `title`="Upper", 
+                                    `type`="number"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="vcov",
@@ -2225,6 +2285,6 @@ gamljlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 pause = NULL,
                 completeWhenFilled = TRUE,
                 requiresMissings = FALSE,
-                weightsSupport = 'none')
+                weightsSupport = 'full')
         }))
 

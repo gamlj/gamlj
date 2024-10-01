@@ -79,8 +79,10 @@ es.relativerisk<-function(obj) {
 
 }      
 
+
 es.glm_variances<-function(model,obj) {
   
+        
     .anova         <-  car::Anova(model,type="III")
      atable        <-  as.data.frame(.anova[c(-1,-dim(.anova)[1]),])
      names(atable) <-  c("SS","df","test","p")
@@ -123,6 +125,58 @@ es.glm_variances<-function(model,obj) {
   return(alist)
 }
   
+  
+es.custom_variances<-function(model,obj) {
+  
+  
+     names64<-unlist(lapply(obj$datamatic$variables, function(x) if (x$method == "custom") x$paramsnames64[[1]] else NULL))
+     
+     if (length(names64)==0) return()
+     
+    .anova         <-  car::Anova(model,type="III")
+     atable        <-  as.data.frame(.anova[c(-1,-dim(.anova)[1]),])
+     names(atable) <-  c("SS","df","test","p")
+     dfres         <-  model$df.residual
+     sumr          <-  summary(model)
+     N             <-  dfres+sumr$fstatistic[[2]]+1
+     ssres         <-  stats::sigma(model)^2*dfres
+     ssmod         <-  sumr$fstatistic[[1]]*sumr$fstatistic[[2]]*ssres/dfres
+
+     ## CONTRASTS
+     eff            <-  stats::coef(model)[names64]
+     SS             <-  eff^2*N-1
+     df            <-  rep(1,length(SS))
+
+     es            <-  SS/(ssmod+ssres)
+     etaSq         <-  ci_effectsize(es,df,dfres,obj,"eta")
+     
+     es            <- SS/(SS+ssres)
+     etaSqP        <- ci_effectsize(es,df,dfres,obj,"etap")
+     
+     es            <- (SS-(ssres*df/dfres))/(ssmod+(ssres*(dfres+1)/dfres))
+     omegaSq       <- ci_effectsize(es,df,dfres,obj,"omega")
+     
+     es            <- (SS-(ssres*df/dfres))/(SS+(ssres*(N-df)/dfres))
+     omegaSqP      <- ci_effectsize(es,df,dfres,obj,"omegap")
+     
+     es            <- (SS-(ssres*df/dfres))/(ssmod+ssres)
+     epsilonSq     <- ci_effectsize(es,df,dfres,obj,"epsilon")
+     
+     es            <- (SS-(ssres*df/dfres))/(SS+ssres)
+     epsilonSqP    <- ci_effectsize(es,df,dfres,obj,"epsilonp")
+
+     alist<-list()
+     for (i in seq_along(etaSq$es)) {
+       ladd(alist)  <-  list(estimate=etaSq[i,1],     est.ci.lower=etaSq[i,2],      est.ci.upper=etaSq[i,3])
+       ladd(alist)  <-  list(estimate=etaSqP[i,1],    est.ci.lower=etaSqP[i,2],     est.ci.upper=etaSqP[i,3])
+       ladd(alist)  <-  list(estimate=omegaSq[i,1],   est.ci.lower=omegaSq[i,2],    est.ci.upper=omegaSq[i,3])
+       ladd(alist)  <-  list(estimate=omegaSqP[i,1],  est.ci.lower=omegaSqP[i,2],   est.ci.upper=omegaSqP[i,3])
+       ladd(alist)  <-  list(estimate=epsilonSq[i,1], est.ci.lower=epsilonSq[i,2],  est.ci.upper=epsilonSq[i,3])
+       ladd(alist)  <-  list(estimate=epsilonSqP[i,1],est.ci.lower=epsilonSqP[i,2], est.ci.upper=epsilonSqP[i,3])
+      }
+  
+  return(alist)
+}
   
 
 

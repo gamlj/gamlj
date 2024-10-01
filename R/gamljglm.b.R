@@ -22,6 +22,7 @@ gamljglmClass <- R6::R6Class(
       }
 
       ### set up the R6 workhorse class
+      dispatch_message_cleaner(self)
       data_machine            <-  Datamatic$new(self)
       runner_machine          <-  Runner$new(self,data_machine)
       runner_machine$storage  <-  self$results$main$coefficients      
@@ -68,7 +69,7 @@ gamljglmClass <- R6::R6Class(
 
       ### custom contrasts 
       aSmartObj<-SmartTable$new(self$results$main$contrasts,runner_machine)
-      aSmartObj$activateOnData<-TRUE
+      aSmartObj$activateOnData<-TRUE      
       aSmartObj$ci("est",self$options$ci_width)
       aSmartObj$ci("expb",width=self$options$ci_width,label="Exp(B)")
       aSmartObj$spaceBy<-"response"

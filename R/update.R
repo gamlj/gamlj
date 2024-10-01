@@ -6,11 +6,16 @@ mf.update<- function(x,...) UseMethod(".update")
 
 .update.default<-function(model,...) {
   
-  jinfo("default update is used")
   .args<-list(...)
-   if (!utils::hasName(.args,"data")) 
-       .args$data<-insight::get_data(model,source="frame")
-
+ 
+  if (utils::hasName(.args,"formula")) {
+      ## we need to remove the dep because some glm model have weird dep definition
+      rlang::f_lhs(.args[["formula"]])<-quote(.)
+  }
+      ## be sure the data are in, you never know
+  if (!utils::hasName(.args,"data")) 
+       .args$data<-mf.data(model)
+ 
   .args$object<-model
   do.call(stats::update,.args)
   
@@ -20,7 +25,7 @@ mf.update<- function(x,...) UseMethod(".update")
   
   .args<-list(...)
    if (!utils::hasName(.args,"data")) 
-       .args$data<-insight::get_data(model,source="frame")
+       .args$data<-mf.data(model)
   
   if (utils::hasName(.args,"formula")) {
     .formula<-stats::as.formula(.args$formula)

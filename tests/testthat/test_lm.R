@@ -311,12 +311,6 @@ testthat::test_that("glm contrasts", {
   testthat::expect_equal(round(res[1,3],2),51.96)
 })
 
-#plot<-mod$assumptions$qqplot$plot$fun()
-#testthat::test_that("glm assumptions plot", {
-#  testthat::expect_true(ggplot2::is.ggplot(plot))
-#})
-
-
 
 mod<-GAMLj3::gamlj_lm(
   formula = science ~ math + I(math^2),

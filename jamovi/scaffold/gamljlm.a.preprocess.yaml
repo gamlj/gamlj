@@ -5,6 +5,7 @@ menuGroup: Linear Models
 version: '3.0.0'
 jas: '1.2'
 export: false
+weightsSupport: full
 completeWhenFilled: true
 description:
     main: |
@@ -141,6 +142,15 @@ options:
     - name: contrast_custom_values
       type: scaffold
       file: commons.a.yaml
+
+    - name: contrast_custom_es
+      type: Bool
+      title: Effect size indices
+      default: false
+      description:
+         R: >
+             if TRUE, additional effect size indices for custom contrasts      
+      
 ###
 
 ### simple effects 

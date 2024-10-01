@@ -521,32 +521,44 @@ const fun = {
    },
     updateInputMethod: function(ui, context) {
       
-      
+       if (!["logistic","probit","multinomial"].includes(ui.model_type.getValue()) && ui[".caller"].getValue()=="glm") {
+         ui.crosstab.setValue(false);
+        ui.crosstab.setEnabled(false);
+        } 
+    
+
+       if (["logistic","probit","multinomial"].includes(ui.model_type.getValue()) && ui[".caller"].getValue()=="glm") {
+         ui.crosstab.setEnabled(true);
+       }      
+    
        
        if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
            ui.dep_box.$label.text("Dependent Variable");
            ui.dep2.setValue(null);
           return ;
-        }
-
-      
+        }   
+        
       if (ui.input_method.value() === "success") {
         ui.dep_box.$label.text("Successes/Failures");
         ui.dep2.$el.show();
+        ui.crosstab.setValue(false);
+        ui.crosstab.setEnabled(false);
 
       }
       if (ui.input_method.value() === "total") {
         ui.dep_box.$label.text("Successes/Totals");
         ui.dep2.$el.show();
-
+        ui.crosstab.setValue(false);
+        ui.crosstab.setEnabled(false);
       }
       if (ui.input_method.value() === "standard") {
         ui.dep_box.$label.text("Dependent Variable");
         ui.dep2.setValue(null);
-
         ui.dep2.$el.hide();
-
+        ui.crosstab.setEnabled(true);
       }
+      
+
 
       
     },

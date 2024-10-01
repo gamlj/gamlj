@@ -4,6 +4,9 @@ jrs: '1.0'
 items:
 -       name: model
         type: Property
+-       name: errortable
+        type: Html
+        visible: false
 -       name: info
         title: Model Info
         type: Table
@@ -406,6 +409,47 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+        -       name: customEffectsizes
+                title: Custom Contrasts effect size indices
+                type: Table
+                visible: false
+                description: a table of effect size indeces
+                clearWith:
+                - model_type
+                - dep
+                - factors
+                - covs
+                - covs_scale
+                - scale_missing
+                - model_terms
+                - fixed_intercept
+                - se_method
+                - mute
+                - df_method
+                - contrasts
+                - contrast_custom_values
+                - donotrun
+                - ci_width
+                - ci_method
+                - boot_r
+                columns:
+                -       name: effect
+                        title: Contrast
+                        combineBelow: true
+                        type: text
+                -       name: name
+                        title: Statistics
+                        type: text
+                -       name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                -       name: est.ci.lower
+                        title: Lower
+                        type: number
+                -       name: est.ci.upper
+                        title: Upper
+                        type: number
         -       name: vcov
                 title: Coefficients Covariances
                 type: Table

@@ -1,7 +1,6 @@
-j_DEBUG <- F
-j_INFO  <- F
+j_DEBUG = FALSE
+j_INFO = FALSE
 t_INFO  <- F
-
 
 #### Helper functions used by Scaffold (not exported)
 
@@ -118,6 +117,9 @@ transnames<-function(original,ref) {
     ifelse(length(i)>0,i,x)
   }))
 }
+
+
+
 
 is.listOfList<-function(obj) {
   if (length(obj)==0)

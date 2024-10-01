@@ -4,6 +4,7 @@ menuGroup: Linear Models
 version: 3.0.0
 jas: '1.2'
 export: false
+weightsSupport: full
 description:
         main: Generalized Linear Model
         R:

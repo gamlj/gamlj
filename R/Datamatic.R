@@ -7,9 +7,12 @@ Datamatic <- R6::R6Class(
     vars=NULL,
     variables=NULL,
     data_structure64=NULL,
+    clusters=NULL,
     dep=NULL,
     labels=NULL,
     N=NULL,
+    wN=NULL,
+    has_weights=FALSE,
     initialize=function(jmvobj) {
 
       super$initialize(jmvobj)
@@ -18,18 +21,21 @@ Datamatic <- R6::R6Class(
       if (is.joption(self$options,"cluster")) {
          if (is.joption(self$options,"re_nestedclusters") && self$options$re_nestedclusters)
              lapply(self$options$cluster, function(x) 
-                   if (length(grep("\\/",x))>0) stop("Cluster variables names cannot contain `/` when nesting by formula is used."))
+                   if (length(grep("\\/",x))>0) self$stop("Cluster variables names cannot contain `/` when nesting by formula is used."))
          self$vars<-c(self$options$cluster,self$vars)
       }
 
       if (is.joption(self$options,"offset"))
         self$vars<-c(self$options$offset,self$vars)
-      private$.inspect_data(self$analysis$data)
       
+      private$.inspect_data(self$analysis$data)
+ 
     },
     
     cleandata=function(data) {
-
+      
+      if (!self$ok) return()
+      
       data64          <-   data
       names(data64)   <-   tob64(names(data))
       
@@ -38,10 +44,16 @@ Datamatic <- R6::R6Class(
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }
-      
       data64 <- jmvcore::naOmit(data64)
 #      attr(data64, 'row.names') <- seq_len(dim(data64)[1])
       self$N<-dim(data64)[1]
+      
+      if (is.something(attr(data, "jmv-weights-name"))) {
+                   self$has_weights<-TRUE
+                   wname<-tob64(attr(data, "jmv-weights-name"))
+                   attr(data64, "jmv.weights") <- jmvcore::naOmit(attr(data,"jmv-weights"))
+                   self$wN<-sum(jmvcore::naOmit(attr(data,"jmv-weights")))
+      }
       return(data64)
       
     },
@@ -72,8 +84,47 @@ Datamatic <- R6::R6Class(
       return(unlist(fromb64(labs)))
       
       
+    },
+    get_vars = function(...) {
+
+        dots<-list(...)
+        if (length(dots)==0) return()
+        atest<-paste(paste0("x$",names(dots)),paste0("'",dots,"'"),sep="==",collapse=" && ")
+        results<-lapply(self$variables, function(x) if (eval(parse(text=atest))) return(x) else NULL)
+        return(results[!sapply(results, is.null)])
+    },
+
+    info_covs_scale=function(topic="info") {
+      
+      
+        if (length(self$options$covs) == 0)
+             return()
+
+        types<-sapply(tob64(self$options$covs), function(x) self$variables[[x]]$covs_scale, USE.NAMES=T, simplify=FALSE)
+        vars<-lapply(unique(types), function(x) fromb64(names(types[types == x])))
+        text<-lapply(vars, function(x) if (length(x)>1) c("Variables","are") else c("Variable","is"))
+        utypes<-unique(types)
+        
+        if (length(utypes)==1) {
+          self$warning<-list(topic="info",
+                             message=paste("All covariates are",
+                             COVS_SCALE[[as.character(utypes)]]))
+        } else {
+              for (i in seq_along(utypes)) {
+              self$warning<-list(topic=topic,
+                                 message=paste(text[[i]][1],paste(vars[[i]], collapse=", "),text[[i]][2], COVS_SCALE[[utypes[[i]]]]))
+        }
+        }
+     
+        if (any(utypes %in% c("clustermeans","clusterbasedcentered","clusterbasedstandardized"))) {
+              clusters<-self$get_vars(type="cluster")
+              if (length(clusters)>1)
+               self$warning<-list(topic=topic,
+                                 message=paste("Variables computed by cluster variable: ",clusters[[1]]$name))
+        }
+          
     }
-    
+
     
 
   ), ### end of public
@@ -151,7 +202,7 @@ Variable <- R6::R6Class(
         self$levels_labels<-levels(vardata)
         self$nlevels<-length(self$levels)
         if (self$nlevels==0)
-            stop("Variable ", var," has no valid level.")
+            self$datamatic$stop("Variable ", var," has no valid level.")
         self$neffects<-self$nlevels-1
         self$paramsnames<-paste0(var,1:(self$neffects))
         self$paramsnames64<-paste0(tob64(var),FACTOR_SYMBOL,1:(self$neffects))
@@ -171,7 +222,7 @@ Variable <- R6::R6Class(
         
            self$isDependent<-TRUE
            self$type=class(vardata)
-           if ("character" %in% self$type) stop("Character type not allowed. Please set variable ",self$name," as numeric or factor")
+           if ("character" %in% self$type) self$datamatic$stop("Character type not allowed. Please set variable ",self$name," as numeric or factor")
 
 
            if ("ordered" %in% self$type) {
@@ -220,7 +271,7 @@ Variable <- R6::R6Class(
       
       if (self$datamatic$option("cluster")) {
         if (self$name %in% self$datamatic$options$cluster) {
-            if (!is.factor(vardata)) stop("Cluster variable ",self$name," should be a nominal variable")
+            if (!is.factor(vardata)) self$datamatic$stop("Cluster variable ",self$name," should be a nominal variable")
             self$type="cluster"
             self$levels<-levels(vardata)
             self$levels_labels<-levels(vardata)
@@ -235,7 +286,7 @@ Variable <- R6::R6Class(
       if (self$datamatic$option("offset")) {
         if (var %in% self$datamatic$options$offset) {
             if (is.factor(vardata))
-               stop("Offset variable should be numeric")
+               self$datamatic$stop("Offset variable should be numeric")
             self$type="numeric"
         }
         }
@@ -252,9 +303,8 @@ Variable <- R6::R6Class(
 
 
        vardata<-data[[self$name64]]
-       mark(self$name)
        if (nrow(data)>0 && all(is.na(vardata)))
-           stop("Variable ",self$name," has no valid case.")
+           self$datametic$stop("Variable ",self$name," has no valid case.")
        
        if (self$type=="numeric" || self$type=="integer") {
           if (is.factor(vardata)) {
@@ -358,11 +408,11 @@ Variable <- R6::R6Class(
                      custom<-NULL
                      customs=self$datamatic$options$contrast_custom_values
                      for (cus in customs) if (cus$var==self$name) custom<-cus$codes
-                     if (is.null(custom)) stop("Contrast weights are required for variable",self$name," defined as custom")
+                     if (is.null(custom)) self$datamatic$stop("Contrast weights are required for variable",self$name," defined as custom")
                      custom<-as.numeric(strsplit(custom,split="[,;]")[[1]])
                      custom<-custom[!is.na(custom)]
                      if (length(custom)!=nLevels)
-                         stop("Custom codes for variable ",self$name," are not correct: ",nLevels," codes are required.")
+                         self$datamatic$stop("Custom codes for variable ",self$name," are not correct: ",nLevels," codes are required.")
                      if (sum(custom)!=0)
                            self$datamatic$warning<-list(topic="info",message=paste("Custom codes for variable ",self$name," do not sum up to zero. Results may be uninterpretable"))
                       x<-factor(1:nLevels)
@@ -459,90 +509,7 @@ Variable <- R6::R6Class(
       for (i in seq_len(nLevels-1)) labels[[i]]<-paste0("User",i)
       return(labels)
     },
-    # .contrast_label=function(levels, type) {
-    #   
-    #   nLevels <- length(levels)
-    #   labels <- list()
-    #   
-    #   if (is.null(type))
-    #     type<-"simple"
-    #   
-    #   if (type == 'simple') {
-    #     for (i in seq_len(nLevels-1))
-    #       labels[[i]] <- paste(levels[i+1], '-', levels[1])
-    #     return(labels)
-    #   } 
-    #   
-    #   if (type == 'dummy') {
-    #     for (i in seq_len(nLevels-1))
-    #       labels[[i]] <- paste(levels[i+1], '-', levels[1])
-    #     return(labels)
-    #   } 
-    #   
-    #   if (type == 'deviation') {
-    #     all <- paste(levels, collapse=', ')
-    #     for (i in seq_len(nLevels-1))
-    #       labels[[i]] <- paste(levels[i+1], '- (', all,")")
-    #     return(labels)
-    #     
-    #   } 
-    #   
-    #   if (type == 'difference') {
-    #     
-    #     for (i in seq_len(nLevels-1)) {
-    #       rhs <- paste0(levels[1:i], collapse=', ')
-    #       if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
-    #       labels[[i]] <- paste(levels[i + 1], '-', rhs)
-    #     }
-    #     return(labels)
-    #   }
-    #   
-    #   if (type == 'helmert') {
-    #     
-    #     for (i in seq_len(nLevels-1)) {
-    #       rhs <- paste(levels[(i+1):nLevels], collapse=', ')
-    #       if (nchar(rhs)>1) rhs<-paste0(" (",rhs,")")
-    #       labels[[i]] <- paste(levels[i], '-', rhs)
-    #     }
-    #     return(labels)
-    #   }
-    #   
-    #   
-    #   
-    #   if (type == 'repeated') {
-    #     
-    #     for (i in seq_len(nLevels-1))
-    #       labels[[i]] <- paste(levels[i], '-', levels[i+1])
-    #     return(labels)
-    #     
-    #   } 
-    #   if (type == 'polynomial') {
-    #     names <- c('linear', 'quadratic', 'cubic', 'quartic', 'quintic', 'sextic', 'septic', 'octic')
-    #     for (i in seq_len(nLevels-1)) {
-    #       if (i <= length(names)) {
-    #         labels[[i]] <- names[i]
-    #       } else {
-    #         labels[[i]] <- paste('degree', i, 'polynomial')
-    #       }
-    #     }
-    #     return(labels)
-    #   }
-    #   
-    #   if (type == 'custom') {
-    #         labels[[1]] <- "Custom" 
-    #         for (i in 2:(nLevels-1)) labels[[i]]<-"Orthogonal"
-    #         return(labels)
-    #     }
-    # 
-    #   
-    #   jinfo("no contrast definition met")
-    #   
-    #   all <- paste(levels, collapse=', ')
-    #   for (i in seq_len(nLevels-1))
-    #     labels[[i]] <- paste(levels[i+1], '- (', all,")")
-    #   return(labels)
-    # },
-    
+
     .continuous_values=function(data) {
 
       if (nrow(data)==0)
@@ -584,7 +551,6 @@ Variable <- R6::R6Class(
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[[self$name64]]
-        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been centered within clusters defined by",self$hasCluster[[1]]))
 
       }
       if (method=="clusterbasedstandardized") {    
@@ -613,7 +579,6 @@ Variable <- R6::R6Class(
         }
             
         vardata<-sdata[[self$name64]]
-        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"has been standardized within clusters defined by",self$hasCluster[[1]]))
       }
 
       if (method=="clustermeans") {    
@@ -626,8 +591,7 @@ Variable <- R6::R6Class(
         sdata<-merge(sdata,mdata,by=cluster64)
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[["mean"]]
-        self$datamatic$warning<-list(topic="info",message=paste("Variable",self$name,"represents means of clusters in",self$hasCluster[[1]]))
-        
+
       }
       cluster64<-tob64(self$hasCluster[1])
       
