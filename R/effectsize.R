@@ -130,6 +130,9 @@ es.custom_variances<-function(model,obj) {
   
   
      names64<-unlist(lapply(obj$datamatic$variables, function(x) if (x$method == "custom") x$paramsnames64[[1]] else NULL))
+     
+     if (length(names64)==0) return()
+     
     .anova         <-  car::Anova(model,type="III")
      atable        <-  as.data.frame(.anova[c(-1,-dim(.anova)[1]),])
      names(atable) <-  c("SS","df","test","p")
@@ -161,7 +164,7 @@ es.custom_variances<-function(model,obj) {
      
      es            <- (SS-(ssres*df/dfres))/(SS+ssres)
      epsilonSqP    <- ci_effectsize(es,df,dfres,obj,"epsilonp")
-mark(etaSq,epsilonSqP)
+
      alist<-list()
      for (i in seq_along(etaSq$es)) {
        ladd(alist)  <-  list(estimate=etaSq[i,1],     est.ci.lower=etaSq[i,2],      est.ci.upper=etaSq[i,3])

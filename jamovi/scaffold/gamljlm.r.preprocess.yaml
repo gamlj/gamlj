@@ -362,7 +362,7 @@ items:
            - name: customEffectsizes
              title: Custom Contrasts effect size indices
              type: Table
-             visible: (contrast_custom_es)
+             visible: false
              description: a table of effect size indeces
              clearWith:
                     -  type: scaffold

@@ -31,7 +31,7 @@ mod<-GAMLj3::gamlj_glm(
   simple_mods="cat2"
 
 )
-
+mod
 testthat::test_that("constrast in glm makes sense", {
   testthat::expect_equal(mod$main$contrasts$asDF[["se"]][1], 0.03414783,tolerance=tol)
   testthat::expect_equal(mod$main$contrasts$asDF[["label"]][1],"{ 2*-1, -1*0, -1*1 }")
@@ -71,10 +71,6 @@ testthat::test_that("constrast in mixed makes sense", {
   testthat::expect_equal(mod$main$contrasts$asDF[["label"]][1],"{ 2*-1, -1*0, -1*1 }")
 })
 
-
-
-
-library(lmerTest)
 
 mod<-GAMLj3::gamlj_gmixed(
   data = data,

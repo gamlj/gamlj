@@ -1194,7 +1194,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=options,
                             name="customEffectsizes",
                             title="Custom Contrasts effect size indices",
-                            visible="(contrast_custom_es)",
+                            visible=FALSE,
                             clearWith=list(
                                 "model_type",
                                 "dep",

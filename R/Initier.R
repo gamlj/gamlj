@@ -242,6 +242,9 @@ Initier <- R6::R6Class(
       #custom contrast effect sizes     
     init_main_customEffectsizes=function() {
 
+        if (!self$option(".caller","lm") || !self$option("contrast_custom_es"))
+             return()
+      
         vars<-lapply(self$datamatic$variables, function(x) if (x$method == "custom") x$contrast_labels[[1]] else NULL)
         vars<-vars[!sapply(vars,is.null)]
         

@@ -202,13 +202,14 @@ Runner <- R6::R6Class("Runner",
 
                          run_main_customEffectsizes=function()  {
                             
-                            if (!self$option("ci_method","wald")) {
+                            if (!self$option("ci_method","wald")) 
                               warning("Bootstrap confidence intervals not available for custom contrasts. Standard method is used.")
-                            }
-                           if (self$options$.caller != "lm") {
-                              warning("Effect size indices for custom contrasts available only for lm models.")
+                          
+                            if (!self$option(".caller","lm") || !self$option("contrast_custom_es"))
                               return()
-                           }
+      
+
+
                             es.custom_variances(self$model,self)
                             
                           },
