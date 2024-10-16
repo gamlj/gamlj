@@ -1037,6 +1037,7 @@ items:
         - plot_xoriginal
         - plot_black
         - plot_around
+        - plot_scale
         template:
                 title: ''
                 type: Image
@@ -1075,6 +1076,7 @@ items:
                 - plot_xoriginal
                 - plot_black
                 - plot_around
+                - plot_scale
 -       name: plotnotes
         type: Html
         visible: false
@@ -1113,6 +1115,7 @@ items:
         - plot_xoriginal
         - plot_black
         - plot_around
+        - plot_scale
         template:
                 title: ''
                 type: Image
@@ -1148,6 +1151,7 @@ items:
                 - plot_xoriginal
                 - plot_black
                 - plot_around
+                - plot_scale
 -       name: jnplotnotes
         type: Html
         visible: false

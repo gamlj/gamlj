@@ -27,6 +27,7 @@ Initier <- R6::R6Class(
         self$ok<-FALSE
         return()
       }
+      jinfo("INITIER: initialize ", self$.options$.caller)
       self$ciwidth <- self$options$ci_width/100
       self$subclass<-paste0("model_",self$options$model_type)
       x<-self$datamatic$data_structure64
@@ -189,12 +190,17 @@ Initier <- R6::R6Class(
       
       .terms<-colnames(model.matrix(as.formula(self$formulaobj$fixed_formula64()),self$datamatic$data_structure64))
       .len<-length(.terms)
+      
       if (self$options$model_type=="multinomial") 
         .len  <- .len * (self$datamatic$dep$nlevels-1)
       
       if (self$options$model_type=="ordinal") 
         .len  <- .len + (self$datamatic$dep$nlevels-2)
       
+      if (length(.len)==0 ) {
+        self$ok<-FALSE
+        return()
+      }      
       lapply(1:.len, function(t) list(source=""))
       
     },

@@ -44,6 +44,8 @@ Plotter <- R6::R6Class(
       preparePlots=function(image, ggtheme, theme, ...) {
         ## here are the plots that require some preparations. All plots 
         ## are  prepared 
+        if (isFALSE(private$.operator$ok))
+            return()
         
         private$.prepareMainPlot()
         private$.prepareQqplot()
@@ -60,8 +62,9 @@ Plotter <- R6::R6Class(
         
         ## debug: return this to see what error is in the plotter code ### 
         if (!is.something(image$state$plotData)) {
-           pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
-           return(pp)
+          # pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
+          # return(pp)
+          return()
         }
         
         ## collect the data 

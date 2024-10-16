@@ -1912,7 +1912,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "plot_yscale",
                     "plot_xoriginal",
                     "plot_black",
-                    "plot_around"),
+                    "plot_around",
+                    "plot_scale"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",
@@ -1950,7 +1951,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "plot_yscale",
                         "plot_xoriginal",
                         "plot_black",
-                        "plot_around"))))
+                        "plot_around",
+                        "plot_scale"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -1989,7 +1991,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "plot_yscale",
                     "plot_xoriginal",
                     "plot_black",
-                    "plot_around"),
+                    "plot_around",
+                    "plot_scale"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",
@@ -2024,7 +2027,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "plot_yscale",
                         "plot_xoriginal",
                         "plot_black",
-                        "plot_around"))))
+                        "plot_around",
+                        "plot_scale"))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="jnplotnotes",

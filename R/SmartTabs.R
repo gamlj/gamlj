@@ -265,7 +265,7 @@ SmartTable <- R6::R6Class("SmartTable",
                             
                           ), #end of active
                           private=list(
-                            .error=NULL,
+                            .error=FALSE,
                             .estimator=NULL,
                             .init_source=NULL,
                             .run_source=NULL,
@@ -293,7 +293,6 @@ SmartTable <- R6::R6Class("SmartTable",
                                 if ("ok" %in% names(private$.estimator))
                                     if (isFALSE(private$.estimator$ok))
                                         return(NULL)
-                                
                                 output<-try_hard(private$.estimator[[fun]]())
                                 rtable<-output$obj
                                 error<-output$error
