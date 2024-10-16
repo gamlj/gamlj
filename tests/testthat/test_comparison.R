@@ -94,7 +94,7 @@ testthat::test_that("test mixed comparison: random", {
 
 
 formula = ybin~x*cat2+(1+x|cluster)
-rmod<-  lme4::glmer(formula,data=data,family=binomial())
+suppressWarnings(rmod<-  lme4::glmer(formula,data=data,family=binomial()))
 
 
 testthat::expect_warning(

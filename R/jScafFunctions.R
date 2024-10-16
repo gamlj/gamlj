@@ -1,5 +1,5 @@
-j_DEBUG = TRUE
-j_INFO = TRUE
+j_DEBUG = FALSE
+j_INFO = FALSE
 t_INFO  <- F
 
 #### Helper functions used by Scaffold (not exported)
