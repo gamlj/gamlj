@@ -888,6 +888,7 @@ items:
         - plot_xoriginal
         - plot_black
         - plot_around
+        - plot_scale
         - plot_re
         - plot_re_method
         template:
@@ -930,6 +931,7 @@ items:
                 - plot_xoriginal
                 - plot_black
                 - plot_around
+                - plot_scale
                 - plot_re
                 - plot_re_method
 -       name: plotnotes
@@ -969,6 +971,7 @@ items:
         - plot_xoriginal
         - plot_black
         - plot_around
+        - plot_scale
         - plot_re
         - plot_re_method
         template:
@@ -1005,6 +1008,7 @@ items:
                 - plot_xoriginal
                 - plot_black
                 - plot_around
+                - plot_scale
                 - plot_re
                 - plot_re_method
 -       name: jnplotnotes

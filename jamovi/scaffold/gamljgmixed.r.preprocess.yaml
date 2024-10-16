@@ -903,7 +903,7 @@ items:
                       name: opts_plots
                       file: clear.yaml
                    -  type: scaffold
-                      name: opts_plots_r
+                      name: opts_plots_re
                       file: clear.yaml
 
     template:
@@ -930,7 +930,7 @@ items:
                       name: opts_plots
                       file: clear.yaml
                    -  type: scaffold
-                      name: opts_plots_r
+                      name: opts_plots_re
                       file: clear.yaml
 
 
@@ -961,7 +961,7 @@ items:
                       name: opts_plots
                       file: clear.yaml
                    -  type: scaffold
-                      name: opts_plots_r
+                      name: opts_plots_re
                       file: clear.yaml
 
     template:
@@ -988,7 +988,7 @@ items:
                       name: opts_plots
                       file: clear.yaml
                    -  type: scaffold
-                      name: opts_plots_r
+                      name: opts_plots_re
                       file: clear.yaml
                    -  type: scaffold
                       name: opts_jn_z

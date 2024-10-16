@@ -96,6 +96,7 @@
            - plot_xoriginal
            - plot_black
            - plot_around
+           - plot_scale
 
 - type: scaffold
   name: opts_plots_re

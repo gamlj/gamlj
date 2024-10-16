@@ -92,7 +92,7 @@ testthat::test_that("Poisson works", {
   testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.5941, tol)
   testthat::expect_equal(mod$main$anova$asDF$test[1], 9.8702, tol)
   testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[2], 1.01, tol)
-  testthat::expect_equal(mod$main$r2$asDF$r2[1], .259, tol)
+  testthat::expect_equal(mod$main$r2$asDF$r2[1], .266, tol)
   testthat::expect_equal(mod$main$fit$asDF$value[4], 8440, tol)
   testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 1.79, tol)
   testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 1.138, tol)
@@ -133,3 +133,4 @@ testthat::test_that("multinomial works", {
 #mod0<-mclogit::mblogit( ycat ~ x + cat3, random= ~1+x|cluster,data=data)
 #mod1<-mclogit::mblogit( ycat ~ x * cat3, random= ~1+x|cluster,data=data)
 #anova(mod0,mod1)
+

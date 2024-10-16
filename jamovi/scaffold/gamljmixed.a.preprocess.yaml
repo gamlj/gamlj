@@ -287,6 +287,7 @@ options:
                         effect in plot \n"
     -  name: plot_re_method
        type: List
+       title: Random effects       
        default: average
        options:
             -  name: average
