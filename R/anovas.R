@@ -14,6 +14,7 @@ ganova<- function(x,...) UseMethod(".anova")
   }
   
   anoobj        <-  try_hard(car::Anova(model,test=test,type=3,singular.ok=T))
+  mark(anoobj)
   ### LR is less lenient than Wald
   if (!isFALSE(anoobj$error)) {
     anoobj        <-  try_hard(car::Anova(model,test="Wald",type=3,singular.ok=T))
@@ -67,8 +68,29 @@ ganova<- function(x,...) UseMethod(".anova")
   
 }
 
-.anova.betareg<-function(model,obj) 
-  .anova.glm(model,obj,"Chisq")
+.anova.betareg<-function(model,obj) {
+  
+    if (!obj$formulaobj$hasTerms) {
+    obj$warning  <-  list(topic="main_anova",message="Omnibus tests cannot be computed")
+    return(NULL)
+  }
+  
+  anoobj        <-  try_hard(car::Anova(model,test="Chisq",type=3,singular.ok=T))
+  obj$error    <-  list(topic="main_anova",message=anoobj$error)
+  if (!isFALSE(anoobj$error))
+    return(NULL)
+
+  .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
+  .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
+  names(.anova)<-transnames(names(.anova),.transnames)
+  
+  .anova<-.anova[rownames(.anova)!="(Intercept)",]  
+ 
+  #### effect size 
+
+  .anova
+  
+}
 
 .anova.lm<-function(model,obj) {
   
