@@ -30,12 +30,15 @@ ganova<- function(x,...) UseMethod(".anova")
   .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
   names(.anova)<-transnames(names(.anova),.transnames)
   
-  .anova<-.anova[rownames(.anova)!="(Intercept)",]   
+  .anova<-.anova[rownames(.anova)!="(Intercept)",]  
+ 
+  #### effect size 
+
+   d0<-null.deviance(model)
+  .anova$etaSq<-.anova$test/d0
   .anova
   
 }
-
-
 
 .anova.multinom<-function(model,obj)
   .anova.glm(model,obj)
@@ -51,17 +54,16 @@ ganova<- function(x,...) UseMethod(".anova")
   obj$error    <-  list(topic="main_anova",message=anoobj$error)
   obj$warning  <-  list(topic="main_anova",message=anoobj$warning)
   
-  
   if (!isFALSE(anoobj$error))
     return(NULL)
 
   .anova           <-  as.data.frame(anoobj$obj,stringsAsFactors = F)
   .transnames<-list("test"=c("Chisq","LR Chisq"),df=c("Df","df1"),p=c("Pr(>Chisq)"))
   names(.anova)<-transnames(names(.anova),.transnames)
-  
+   d0<-null.deviance(model)
+   .anova$etaSq<-.anova$test/d0
   .anova<-.anova[rownames(.anova)!="(Intercept)",]   
   .anova
-  
   
 }
 
@@ -107,7 +109,7 @@ ganova<- function(x,...) UseMethod(".anova")
   tots<-list(ss=mods$ss+reds$ss,df=mdf+edf)
   
   #####
-  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indeces
+  # Here we need a correct to the computation of the effect sizes. To compute the non-partial indexes
   ## In unbalanced designs, the sum does not necessarily correspond to the model SS (plus residuals)
   ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
   ## and many properties of the non-partial indices are broken. 

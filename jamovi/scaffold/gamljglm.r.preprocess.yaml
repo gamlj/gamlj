@@ -137,6 +137,7 @@ items:
                    -  type: scaffold
                       name: opts_model_z
                       file: clear.yaml
+                   -  es    
 
              columns:
                     - name: source
@@ -152,6 +153,10 @@ items:
                       title: p
                       type: number
                       format: zto,pvalue
+                    - name: etaSq
+                      title: η²
+                      type: number
+                      visible: (es:eta)
 
 
            - name: coefficients

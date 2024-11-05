@@ -101,8 +101,7 @@ const fun = {
     
     var contrastsList = context.cloneArray(ui.contrasts.value(), []);
     var customList = context.cloneArray(ui.contrast_custom_values.value(), []);
-    console.log(customList)
-    
+
     contrastsList.forEach((item) => {
          var found=customList.find((e) => e.var===item.var)
          if (found===undefined) {
@@ -284,7 +283,7 @@ const fun = {
             var option=ui.re_corr.value();
             var oldOption = context.workspace.re_corr;
             context.workspace.re_corr=option;
-            console.log("in fun.fixRandomEffects");
+
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
@@ -330,8 +329,6 @@ const fun = {
         }
    context.setCustomVariable("Intercept", "none", "");
 
-
-    console.log("updating random supplier");
 // first we check if the update is needed    
     var clusterList = context.cloneArray(ui.cluster.value(), []);
     if (clusterList.length<1) {
@@ -446,6 +443,12 @@ const fun = {
                ui.expb_ci.setValue(true);
         }
 
+       if (["ordinal","poiover","nb"].includes(ui.model_type.getValue())) {
+            const es =   ui.es.value();
+            const newes = es.filter(e => e !== "eta");
+            ui.es.setValue(newes);
+       }        
+    
         if (typeof ui.es_expb !== 'undefined' ) {
           
             var odds=["logistic","probit","multinomial","ordinal"]
@@ -515,6 +518,7 @@ const fun = {
               this.updateInputMethod(ui,context);
             }
        }
+
 
 
 

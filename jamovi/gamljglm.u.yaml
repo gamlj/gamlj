@@ -159,6 +159,11 @@ children:
                         type: CheckBox
                         optionPart: expb
                         optionName: es
+                -       name: es_eta
+                        type: CheckBox
+                        optionPart: eta
+                        optionName: es
+                        enable: (!(model_type:ordinal || model_type:poiover ||  model_type:nb))
                 -       name: es_marginals
                         type: CheckBox
                         optionPart: marginals

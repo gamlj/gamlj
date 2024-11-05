@@ -174,6 +174,10 @@ mf.data<- function(x,...) UseMethod(".data")
 
 .data.lme<-function(model) model$data
 
+.data.plor<-function(model) model@frame
+
+
+
 
 mf.coef<- function(x,...) UseMethod(".coef")
 

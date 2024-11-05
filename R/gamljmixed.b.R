@@ -70,7 +70,7 @@ gamljmixedClass <- R6::R6Class(
       aSmartObj$ci("sd",self$options$ci_width)
       ladd(private$.smartObjs)<-aSmartObj
 
-      ### random variances table
+      ### random covvariances table
       aSmartObj<-SmartTable$new(self$results$main$randomcov,runner_machine)
       aSmartObj$ci("sd",self$options$ci_width)
       aSmartObj$activateOnData<-TRUE

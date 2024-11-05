@@ -401,6 +401,8 @@ options:
       options:
           - name: expb
             title: Odd Ratios (expB)
+          - name: eta
+            title: η²
           - name: RR
             title: Relative Risk (RR)
           - name: marginals
@@ -408,6 +410,7 @@ options:
             
       default:
           - expb
+          - eta
       description:
           R: >
             Effect size indices. `expb` (default) exponentiates the coefficients. For

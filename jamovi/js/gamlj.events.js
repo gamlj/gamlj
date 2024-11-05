@@ -212,16 +212,13 @@ const events = {
       fun.updateRandomSupplier(ui,this);
     },
     onEvent_corr: function(ui, data) {
-          console.log("Correlation structure changed");
           fun.fixRandomEffects(ui,this);
     },    
 
     onChange_nested_re_add: function(ui) {
-          console.log("I didn't do anything");
     },
     
     onEvent_addRandomTerm: function(ui) {
-        console.log("addRandomTerm does something");
         // first we fix possible null values 
         var re=this.cloneArray(ui.re.value(),[]);
         var newre=[];
@@ -242,8 +239,6 @@ const events = {
     },
     onEvent_addNestedRandomTerm: function(ui) {
       
-        console.log("addNestedRandomTerm does something");
-         
         var re=this.cloneArray(ui.nested_re.value(),[]);
         var newre=[];
         re.forEach( (e) => {
@@ -270,7 +265,6 @@ const events = {
      
    },
    onEvent_nothing: function(ui) {
-          console.log("I didn't do anything");
     } 
 
 };

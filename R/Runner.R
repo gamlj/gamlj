@@ -332,6 +332,11 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_randomcov=function() {
 
+                          if (!is.something(self$tab_randomcov)) {
+                                 results<-gVarCorr(self$model,self)
+                                 self$tab_randomcov<-results[[2]]
+                          }
+
                             if (is.something(self$tab_randomcov))
                                 return(self$tab_randomcov)
                           },
