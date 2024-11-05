@@ -176,6 +176,7 @@ items:
                 - custom_family
                 - custom_link
                 - dep2
+                - es
                 columns:
                 -       name: source
                         title: ''
@@ -190,6 +191,10 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+                -       name: etaSq
+                        title: η²
+                        type: number
+                        visible: (es:eta)
         -       name: coefficients
                 title: Parameter Estimates (Coefficients)
                 type: Table

@@ -59,7 +59,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ci_method = "wald",
             expb_ci = TRUE,
             es = list(
-                "expb"),
+                "expb",
+                "eta"),
             model_type = "linear",
             custom_family = "gaussian",
             custom_link = "identity",
@@ -395,10 +396,12 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 es,
                 options=list(
                     "expb",
+                    "eta",
                     "RR",
                     "marginals"),
                 default=list(
-                    "expb"))
+                    "expb",
+                    "eta"))
             private$..model_type <- jmvcore::OptionList$new(
                 "model_type",
                 model_type,
@@ -875,7 +878,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "omnibus",
                                 "custom_family",
                                 "custom_link",
-                                "dep2"),
+                                "dep2",
+                                "es"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -893,7 +897,12 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))
+                                    `format`="zto,pvalue"),
+                                list(
+                                    `name`="etaSq", 
+                                    `title`="\u03B7\u00B2", 
+                                    `type`="number", 
+                                    `visible`="(es:eta)"))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",

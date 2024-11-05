@@ -332,6 +332,11 @@ Runner <- R6::R6Class("Runner",
                           },
                           run_main_randomcov=function() {
 
+                          if (!is.something(self$tab_randomcov)) {
+                                 results<-gVarCorr(self$model,self)
+                                 self$tab_randomcov<-results[[2]]
+                          }
+
                             if (is.something(self$tab_randomcov))
                                 return(self$tab_randomcov)
                           },
@@ -627,7 +632,7 @@ Runner <- R6::R6Class("Runner",
                               results<-try_hard(eval(acall))
 
                               self$warning<-list(topic="modelnotes", message=results$warning, head="warning")
-                              self$warning<-list(topic="info", message=results$message, head="info")
+                              self$warning<-list(topic="modelnotes", message=results$message, head="info")
 
                               if (!isFALSE(results$error)) {
                                 if (self$option("model_type","custom")) {
@@ -642,7 +647,7 @@ Runner <- R6::R6Class("Runner",
                              
                               
                               if (mf.aliased(results$obj))
-                                   self$warning<-list(topic="info",message=WARNS["aliased"], head="info")
+                                   self$warning<-list(topic="modelnotes",message=WARNS["aliased"], head="warning")
 
                               .model<-mf.fixModel(results$obj,self,data)
                               

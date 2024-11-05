@@ -14,7 +14,7 @@ var fix_comparison=function(ui, context) {
               
 
             } else {
-              console.log(ui.nested_re.value());
+
               ui.nested_layout.$buttons.hide();
               ui.nested_layout.$label.hide();
               ui.nested_layout.container.$el.hide();
@@ -261,7 +261,6 @@ var containsCovariate = function(value, covariates) {
 
 var updateRandomSupplier = function(ui, context) {
 
-   console.log("updating random supplier");
 // first we check if the update is needed    
     var clusterList = context.cloneArray(ui.cluster.value(), []);
     if (clusterList.length<1) {

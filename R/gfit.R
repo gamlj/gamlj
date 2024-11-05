@@ -252,19 +252,23 @@ r2 <- function(model, ...) UseMethod(".r2")
   
   alist <- list()
   results <- .gfit.compare_null_model(model)
-
-  # mcFadden
-
   alist$r2 <- 1 - (results$deviance / results$null.deviance)
   alist$test <- results$test
   alist$df1 <- results$df1
-  alist$p <- results$p
+  alist$p <- results$p2
 
   return(list(alist))
 }
 
 .r2.clm <- function(model, obj) {
-  .r2.polr(model,obj)
+
+  alist <- list()
+  results <- .gfit.compare_null_model(model)
+  alist$r2 <- 1 - (results$deviance / results$null.deviance)
+  alist$test <- results$test
+  alist$df1 <- results$df
+  alist$p <- results$p
+  return(list(alist))
 }
 
 
@@ -504,7 +508,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 .compare_null_model.polr <- function(model) {
   
 
-  data <- insight::get_data(model,source="frame")
+  data <- mf.data(model)
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
   model0 <- stats::update(model, form, data = data, evaluate = T)
@@ -516,12 +520,17 @@ r2 <- function(model, ...) UseMethod(".r2")
   results[2, ]
 }
 
+.compare_null_model.clm <- function(model) .compare_null_model.polr(model)
+  
 
 
 null.deviance <- function(model) {
+
+  if ("null.deviance" %in% names(model))
+       return(model$null.deviance)
   int <- attr(stats::terms(model), "intercept")
   form <- stats::as.formula(paste("~", int))
-  model0 <- stats::update(model, form, evaluate = T)
+  model0 <- stats::update(model, form, data=mf.data(model),evaluate = T)
   stats::deviance(model0)
 }
 
