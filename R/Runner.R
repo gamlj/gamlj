@@ -558,7 +558,7 @@ Runner <- R6::R6Class("Runner",
                                     t1  <-  self$datamatic$dep$type
                                     m   <-   self$infomatic$model[1]
                                     if (self$options$.interface=="jamovi") {
-                                      t2<-gsub("numeric","Continuous",t2,fixed = TRUE)
+                                      t2<-gsub("numeric","Measurement type=`Continuous`, Data type=`Decimal`",t2,fixed = TRUE)
                                       t2<-gsub("factor","Nominal",t2,fixed=TRUE)
                                       t2<-gsub("integer","Measurement type=`Continuous`, Data type=`Integer`",t2,fixed=TRUE)
                                       
