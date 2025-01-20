@@ -493,8 +493,7 @@ options:
                         default: centered
         description:
                 R: |
-                        a list of lists specifying the covariates scaling, one of `'centered to the mean'`,
-                        `'standardized'`, `'clusterbasedcentered'`, `'clusterbasedstandardized'` or `'none'`. `'none'` leaves the variable as it is.
+                        a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
 -       name: dep_scale
         title: Scale
         type: List
@@ -507,8 +506,6 @@ options:
                 name: standardized
         -       title: Centered clusterwise
                 name: clusterbasedcentered
-        -       title: Clusters means
-                name: clustermeans
         -       title: multilevel z-scores
                 name: clusterbasedstandardized
         default: none

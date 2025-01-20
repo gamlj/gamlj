@@ -342,8 +342,6 @@ options:
                 name: standardized
              -  title: Centered clusterwise
                 name: clusterbasedcentered
-             -  title: Clusters means
-                name: clustermeans
              -  title: multilevel z-scores
                 name: clusterbasedstandardized
        default: none

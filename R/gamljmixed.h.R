@@ -398,7 +398,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "centered",
                     "standardized",
                     "clusterbasedcentered",
-                    "clustermeans",
                     "clusterbasedstandardized"),
                 default="none")
             private$..scale_missing <- jmvcore::OptionList$new(

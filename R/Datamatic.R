@@ -41,6 +41,7 @@ Datamatic <- R6::R6Class(
       
       if (self$option("scale_missing","complete"))
                  data64 <- jmvcore::naOmit(data64)
+      mark(dim(data64))
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }
@@ -348,7 +349,18 @@ Variable <- R6::R6Class(
         
         private$.contrast_values(self$levels,type)
         
+      },
+    
+      varHierarchy = function(var,cluster,data) {
+        
+              bv<-var(tapply(data[[var]],data[[cluster]],mean))
+              wv<-mean(tapply(data[[var]],data[[cluster]],sd))
+              if (wv<.001) return("bet")
+              if (bv/wv<.001) return("wit")
+              return("bot")
+              
       }
+
 
   
   ), # end of public
@@ -527,7 +539,7 @@ Variable <- R6::R6Class(
       method<-self$covs_scale
       
     
-
+mark("leng var",length(vardata))
       if (method=="centered") 
         vardata<-scale(vardata,scale = F)  
 
@@ -543,14 +555,16 @@ Variable <- R6::R6Class(
       if (method=="clusterbasedcentered") {   
         
         cluster64<-tob64(self$hasCluster[1])
+       
         sdata<-data[,c(cluster64,self$name64)]
         sdata$..id..<-1:nrow(sdata)
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
-        sdata<-merge(sdata,mdata,by=cluster64)
+        sdata<-merge(sdata,mdata,by=cluster64, all.x=T)
         sdata[[self$name64]]<-sdata[[self$name64]]-sdata[["mean"]]
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[[self$name64]]
+      
 
       }
       if (method=="clusterbasedstandardized") {    
@@ -559,7 +573,7 @@ Variable <- R6::R6Class(
         sdata$..id..<-1:nrow(sdata)
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
-        sdata<-merge(sdata,mdata,by=cluster64)
+        sdata<-merge(sdata,mdata,by=cluster64, all.x=TRUE)
         sdata<-sdata[order(sdata$..id..),]
         ddata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),sd,na.rm=TRUE)
         names(ddata)<-c(cluster64,"sd")
@@ -569,7 +583,7 @@ Variable <- R6::R6Class(
             self$datamatic$warning<-list(topic="info",message=paste("Cluster-standardized value with zero variance have been set to zero"))
         }
         ddata$sd[ddata$sd==0]<-1
-        sdata<-merge(sdata,ddata,by=cluster64)
+        sdata<-merge(sdata,ddata,by=cluster64,all.x=TRUE)
         sdata<-sdata[order(sdata$..id..),]
         sdata[[self$name64]]<-(sdata[[self$name64]]-sdata[["mean"]])/sdata[["sd"]]
         ## this is the beautiful clusterwise standardization for dep vars
@@ -588,7 +602,7 @@ Variable <- R6::R6Class(
         sdata$..id..<-1:nrow(sdata)
         mdata<-aggregate(sdata[,self$name64],list(sdata[[cluster64]]),mean,na.rm=TRUE)
         names(mdata)<-c(cluster64,"mean")
-        sdata<-merge(sdata,mdata,by=cluster64)
+        sdata<-merge(sdata,mdata,by=cluster64, all.x=T)
         sdata<-sdata[order(sdata$..id..),]
         vardata<-sdata[["mean"]]
 
@@ -599,6 +613,7 @@ Variable <- R6::R6Class(
       
       ## we then update levels the new levels (mean, sd etc)
       private$.update_levels(vardata)
+
       as.numeric(vardata)
       
     },
