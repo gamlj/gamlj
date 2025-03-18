@@ -593,6 +593,9 @@ items:
                        name: opts_model
                        file: clear.yaml
                     -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                    -  type: scaffold
                        name: opts_cov_scaling
                        file: clear.yaml
               columns:
@@ -647,6 +650,10 @@ items:
                     -  type: scaffold
                        name: opts_model
                        file: clear.yaml
+                    -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                       
                     -  type: scaffold
                        name: opts_ci
                        file: clear.yaml
@@ -715,6 +722,9 @@ items:
                        name: opts_model
                        file: clear.yaml
                     -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                    -  type: scaffold
                        name: opts_cov_scaling
                        file: clear.yaml
                     -  type: scaffold
@@ -777,6 +787,9 @@ items:
                        name: opts_model
                        file: clear.yaml
                     -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                    -  type: scaffold
                        name: opts_ci
                        file: clear.yaml
                     -  type: scaffold
@@ -833,6 +846,9 @@ items:
                        name: opts_model
                        file: clear.yaml
                     -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                    -  type: scaffold
                        name: opts_ci
                        file: clear.yaml
                     -  type: scaffold
@@ -873,6 +889,9 @@ items:
                        name: opts_model
                        file: clear.yaml
                     -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                    -  type: scaffold
                        name: opts_ci
                        file: clear.yaml
                     -  type: scaffold
@@ -892,6 +911,9 @@ items:
           clearWith:
                     -  type: scaffold
                        name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_model_lm
                        file: clear.yaml
                     -  type: scaffold
                        name: opts_ci
@@ -918,6 +940,9 @@ items:
                        name: opts_model
                        file: clear.yaml
                     -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+                    -  type: scaffold
                        name: opts_cov_scaling
                        file: clear.yaml
                     -  type: scaffold
@@ -934,6 +959,9 @@ items:
           clearWith:
                     -  type: scaffold
                        name: opts_model
+                       file: clear.yaml
+                    -  type: scaffold
+                       name: opts_model_lm
                        file: clear.yaml
                     -  type: scaffold
                        name: opts_cov_scaling
@@ -961,6 +989,10 @@ items:
                     -  type: scaffold
                        name: opts_model
                        file: clear.yaml
+                    -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+
           columns:
             - name: name
               type: text
@@ -986,6 +1018,10 @@ items:
                     -  type: scaffold
                        name: opts_model
                        file: clear.yaml
+                    -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+
           columns:
             - name: name
               title: Test
@@ -1007,6 +1043,10 @@ items:
                     -  type: scaffold
                        name: opts_model
                        file: clear.yaml
+                    -  type: scaffold
+                       name: opts_model_lm
+                       file: clear.yaml
+
           columns:
             - name: source
               type: text
