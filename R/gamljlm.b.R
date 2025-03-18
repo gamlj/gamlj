@@ -202,16 +202,12 @@ gamljlmClass <- R6::R6Class(
 
       private$.checkpoint()
       
-      #save model preds and resids            
-      private$.runner_machine$savePredRes(self$results) 
-      # 
       private$.plotter_machine$preparePlots()
-      # 
-      # if ("plot" %in% private$.plotter_machine$warning_topics) {
-      #     self$results$plotnotes$setContent(paste(private$.plotter_machine$warning[["plot"]],collapse = "; "))
-      #     self$results$plotnotes$setVisible(TRUE)
-      # }  
-      
+      #save stuff if necessary            
+      saver_machine <- Saver$new(self,private$.runner_machine,private$.plotter_machine) 
+      saver_machine$run()
+
+
 
      if (self$options$.interface=="R") 
        self$results$.setModel(private$.runner_machine$model)

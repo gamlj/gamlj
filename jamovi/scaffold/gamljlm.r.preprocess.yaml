@@ -1123,3 +1123,7 @@ items:
                     -  type: scaffold
                        name: opts_model
                        file: clear.yaml
+
+  - name: savenotes
+    type: Html
+    visible: false

@@ -40,6 +40,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
+            export_emm = FALSE,
+            export_plot = FALSE,
+            export = NULL,
             omnibus = "F",
             estimates_ci = TRUE,
             betas_ci = FALSE,
@@ -293,6 +296,17 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
+            private$..export_emm <- jmvcore::OptionBool$new(
+                "export_emm",
+                export_emm,
+                default=FALSE)
+            private$..export_plot <- jmvcore::OptionBool$new(
+                "export_plot",
+                export_plot,
+                default=FALSE)
+            private$..export <- jmvcore::OptionAction$new(
+                "export",
+                export)
             private$..omnibus <- jmvcore::OptionList$new(
                 "omnibus",
                 omnibus,
@@ -511,6 +525,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs_scale_labels)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
+            self$.addOption(private$..export_emm)
+            self$.addOption(private$..export_plot)
+            self$.addOption(private$..export)
             self$.addOption(private$..omnibus)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..betas_ci)
@@ -579,6 +596,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs_scale_labels = function() private$..covs_scale_labels$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
+        export_emm = function() private$..export_emm$value,
+        export_plot = function() private$..export_plot$value,
+        export = function() private$..export$value,
         omnibus = function() private$..omnibus$value,
         estimates_ci = function() private$..estimates_ci$value,
         betas_ci = function() private$..betas_ci$value,
@@ -646,6 +666,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs_scale_labels = NA,
         ..predicted = NA,
         ..residuals = NA,
+        ..export_emm = NA,
+        ..export_plot = NA,
+        ..export = NA,
         ..omnibus = NA,
         ..estimates_ci = NA,
         ..betas_ci = NA,
@@ -699,7 +722,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         jnplotnotes = function() private$.items[["jnplotnotes"]],
         assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
-        residuals = function() private$.items[["residuals"]]),
+        residuals = function() private$.items[["residuals"]],
+        savenotes = function() private$.items[["savenotes"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -2280,7 +2304,11 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "df_method",
                     "contrasts",
                     "contrast_custom_values",
-                    "donotrun")))},
+                    "donotrun")))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="savenotes",
+                visible=FALSE))},
         .setModel=function(x) private$..model <- x))
 
 gamljlmBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

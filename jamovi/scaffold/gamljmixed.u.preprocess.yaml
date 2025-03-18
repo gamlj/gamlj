@@ -552,7 +552,7 @@ children:
                                 -       type: CheckBox
                                         name: mute
 
--       name: panel_dave
+-       name: panel_save
         type: CollapseBox
         label: Save
         style: list
