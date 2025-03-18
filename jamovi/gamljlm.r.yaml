@@ -685,6 +685,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 - ccm_value
                 - ccp_value
                 - ccra_steps
@@ -753,6 +754,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -831,6 +833,7 @@ items:
                         - contrasts
                         - contrast_custom_values
                         - donotrun
+                        - robust_method
                         - ccm_value
                         - ccp_value
                         - ccra_steps
@@ -904,6 +907,7 @@ items:
                         - contrasts
                         - contrast_custom_values
                         - donotrun
+                        - robust_method
                         - ci_width
                         - ci_method
                         - boot_r
@@ -971,6 +975,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -1020,6 +1025,7 @@ items:
         - contrasts
         - contrast_custom_values
         - donotrun
+        - robust_method
         - ci_width
         - ci_method
         - boot_r
@@ -1059,6 +1065,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -1101,6 +1108,7 @@ items:
         - contrasts
         - contrast_custom_values
         - donotrun
+        - robust_method
         - ccm_value
         - ccp_value
         - ccra_steps
@@ -1137,6 +1145,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 - ccm_value
                 - ccp_value
                 - ccra_steps
@@ -1179,6 +1188,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 columns:
                 -       name: name
                         type: text
@@ -1213,6 +1223,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 columns:
                 -       name: name
                         title: Test
@@ -1243,6 +1254,7 @@ items:
                 - contrasts
                 - contrast_custom_values
                 - donotrun
+                - robust_method
                 columns:
                 -       name: source
                         type: text

@@ -40,6 +40,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             ccm_value = 1,
             ccp_value = 25,
             covs_scale_labels = "labels",
+            export_emm = FALSE,
+            export_re = FALSE,
+            export_plot = FALSE,
+            export = NULL,
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -300,6 +304,21 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "predicted")
             private$..residuals <- jmvcore::OptionOutput$new(
                 "residuals")
+            private$..export_emm <- jmvcore::OptionBool$new(
+                "export_emm",
+                export_emm,
+                default=FALSE)
+            private$..export_re <- jmvcore::OptionBool$new(
+                "export_re",
+                export_re,
+                default=FALSE)
+            private$..export_plot <- jmvcore::OptionBool$new(
+                "export_plot",
+                export_plot,
+                default=FALSE)
+            private$..export <- jmvcore::OptionAction$new(
+                "export",
+                export)
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
                 plot_x,
@@ -556,6 +575,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..covs_scale_labels)
             self$.addOption(private$..predicted)
             self$.addOption(private$..residuals)
+            self$.addOption(private$..export_emm)
+            self$.addOption(private$..export_re)
+            self$.addOption(private$..export_plot)
+            self$.addOption(private$..export)
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
@@ -631,6 +654,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         covs_scale_labels = function() private$..covs_scale_labels$value,
         predicted = function() private$..predicted$value,
         residuals = function() private$..residuals$value,
+        export_emm = function() private$..export_emm$value,
+        export_re = function() private$..export_re$value,
+        export_plot = function() private$..export_plot$value,
+        export = function() private$..export$value,
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
@@ -705,6 +732,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..covs_scale_labels = NA,
         ..predicted = NA,
         ..residuals = NA,
+        ..export_emm = NA,
+        ..export_re = NA,
+        ..export_plot = NA,
+        ..export = NA,
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
@@ -764,7 +795,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         jnplotnotes = function() private$.items[["jnplotnotes"]],
         assumptions = function() private$.items[["assumptions"]],
         predicted = function() private$.items[["predicted"]],
-        residuals = function() private$.items[["residuals"]]),
+        residuals = function() private$.items[["residuals"]],
+        savenotes = function() private$.items[["savenotes"]]),
     private = list(
         ..model = NA),
     public=list(
@@ -2132,7 +2164,11 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "cluster",
                     "re",
                     "re_corr",
-                    "res_struct")))},
+                    "res_struct")))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="savenotes",
+                visible=FALSE))},
         .setModel=function(x) private$..model <- x))
 
 gamljmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

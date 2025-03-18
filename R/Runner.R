@@ -485,28 +485,6 @@ Runner <- R6::R6Class("Runner",
                             
                           },
 
-                          savePredRes=function(results) {
-                            
-                            if (self$options$predicted && results$predicted$isNotFilled()) {
-                                jinfo("Saving predicted")
-
-                                
-                                pdf <- predicted(self$model,self)
-
-                                results$predicted$set(1:ncol(pdf),
-                                                      names(pdf),
-                                                      rep("Predicted",ncol(pdf)),
-                                                      rep("continuous",ncol(pdf)))
-                                results$predicted$setValues(pdf)
-                            }
-                            if (self$options$residuals && results$residuals$isNotFilled()) {
-                                jinfo("Saving residuals")
-                                p<-stats::residuals(self$model,type="response")
-                              # we need the rownames in case there are missing in the datasheet
-                              pdf <- data.frame(residuals=p, row.names=rownames(insight::get_data(self$model, source="frame")))
-                              results$residuals$setValues(pdf)
-                            }
-                          },
                           #### we need this here because emmeans needs a contrast that
                           ###  we can control in terms of variable type
                           

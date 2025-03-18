@@ -1192,3 +1192,6 @@ items:
         - re
         - re_corr
         - res_struct
+-       name: savenotes
+        type: Html
+        visible: false

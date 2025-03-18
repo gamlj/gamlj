@@ -27,19 +27,21 @@ Initier <- R6::R6Class(
         self$ok<-FALSE
         return()
       }
-      jinfo("INITIER: initialize ", self$.options$.caller)
-      self$ciwidth <- self$options$ci_width/100
-      self$subclass<-paste0("model_",self$options$model_type)
-      x<-self$datamatic$data_structure64
-      names(x)<-fromb64(names(x))
+      jinfo("INITIER: initialize ", self$options$.caller)
+      
+      self$ciwidth    <- self$options$ci_width/100
+      self$subclass   <- paste0("model_",self$options$model_type)
+      x               <- self$datamatic$data_structure64
+      names(x)        <- fromb64(names(x))
+      
       #### we prepare the model syntax
-      self$formulaobj<-gFormula$new()
-      self$formulaobj$fixed_intercept<-self$optionValue("fixed_intercept")
-      self$formulaobj$random_corr<-self$optionValue("re_corr")
-      self$formulaobj$dep<-self$options$dep
-      self$formulaobj$fixed<-self$options$model_terms
-      self$formulaobj$random<-self$optionValue("re")
-      self$formulaobj$offset<-self$optionValue("offset")
+      self$formulaobj                    <- gFormula$new()
+      self$formulaobj$fixed_intercept    <- self$optionValue("fixed_intercept")
+      self$formulaobj$random_corr        <- self$optionValue("re_corr")
+      self$formulaobj$dep                <- self$options$dep
+      self$formulaobj$fixed              <- self$options$model_terms
+      self$formulaobj$random             <- self$optionValue("re")
+      self$formulaobj$offset             <- self$optionValue("offset")
       self$formulaobj$update_terms(self$datamatic$data_structure64)
 
       #### we prepare the nested model syntax, if necessary

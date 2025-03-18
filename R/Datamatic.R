@@ -41,7 +41,7 @@ Datamatic <- R6::R6Class(
       
       if (self$option("scale_missing","complete"))
                  data64 <- jmvcore::naOmit(data64)
-      mark(dim(data64))
+
       for (var in self$variables) {
         data64[[var$name64]]   <-  var$get_values(data64)
       }
@@ -539,7 +539,7 @@ Variable <- R6::R6Class(
       method<-self$covs_scale
       
     
-mark("leng var",length(vardata))
+
       if (method=="centered") 
         vardata<-scale(vardata,scale = F)  
 
