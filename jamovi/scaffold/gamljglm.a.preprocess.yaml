@@ -207,6 +207,18 @@ options:
       type: scaffold
       file: commons.a.yaml
 
+    - name: export_emm
+      type: scaffold
+      file: commons.a.yaml
+
+    - name: export_plot
+      type: scaffold
+      file: commons.a.yaml
+            
+    - name: export
+      title: Export
+      type: Action
+
 
 ####
 
