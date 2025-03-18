@@ -208,11 +208,11 @@ gamljgmixedClass <- R6::R6Class(
         
         private$.checkpoint()
         
-        #save model preds and resids            
-        private$.runner_machine$savePredRes(self$results) 
-        
         ### do plots 
         private$.plotter_machine$preparePlots()
+        #save stuff if necessary            
+        saver_machine <- Saver$new(self,private$.runner_machine,private$.plotter_machine) 
+        saver_machine$run()
         
         
         ### save the model if we are in R ###

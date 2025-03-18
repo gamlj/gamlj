@@ -347,6 +347,35 @@ options:
                         not used in R
                 ui: |
                         Saves the residual values of the model. The response scale is used.
+-       name: export_emm
+        title: Estimated Marginal Means
+        type: Bool
+        default: false
+        description:
+                R: |
+                        not used in R
+                ui: |
+                        Export estimated marginal means in a new jamovi file
+-       name: export_re
+        title: Random coefficients
+        type: Bool
+        default: false
+        description:
+                R: |
+                        not used in R
+                ui: Export random coefficients
+-       name: export_plot
+        title: Plot data
+        type: Bool
+        default: false
+        description:
+                R: |
+                        not used in R
+                ui: |
+                        Export data displayed in the plots
+-       name: export
+        title: Export
+        type: Action
 -       name: plot_x
         title: Horizontal axis
         type: Variable
@@ -493,8 +522,7 @@ options:
                         default: centered
         description:
                 R: |
-                        a list of lists specifying the covariates scaling, one of `'centered to the mean'`,
-                        `'standardized'`, `'clusterbasedcentered'`, `'clusterbasedstandardized'` or `'none'`. `'none'` leaves the variable as it is.
+                        a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
 -       name: dep_scale
         title: Scale
         type: List
@@ -507,8 +535,6 @@ options:
                 name: standardized
         -       title: Centered clusterwise
                 name: clusterbasedcentered
-        -       title: Clusters means
-                name: clustermeans
         -       title: multilevel z-scores
                 name: clusterbasedstandardized
         default: none

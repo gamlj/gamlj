@@ -234,3 +234,13 @@ gVarCorr<- function(model,...) UseMethod(".VarCorr")
   
 }
   
+
+
+gRanef<- function(model,...) UseMethod(".ranef")
+
+.ranef.default<-function(model,obj) {
+  
+   tab<-lme4::ranef(model) 
+  
+}
+

@@ -17,8 +17,8 @@ predicted<- function(model,...) UseMethod(".predicted")
 .predicted.lmerModLmerTest<-function(model,obj) {
   
   root<-toupper(abbreviate(obj$options$model_type))
-  rpreds<-stats::predict(obj$model)
-  fpreds<-stats::predict(obj$model,re.form=NA)
+  rpreds<-stats::predict(model)
+  fpreds<-stats::predict(model,re.form=NA)
   pdf <- data.frame(RPRED=rpreds,FPRED=fpreds, row.names=rownames(insight::get_data(model, source="frame")))
   
   for (p in seq_len(ncol(pdf)))

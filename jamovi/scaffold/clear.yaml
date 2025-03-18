@@ -19,6 +19,11 @@
         - donotrun
 
 - type: scaffold
+  name: opts_model_lm
+  children:
+        - robust_method
+
+- type: scaffold
   name: opts_model_r
   children:
         - reml

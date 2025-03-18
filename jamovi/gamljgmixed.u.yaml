@@ -736,6 +736,26 @@ children:
                         style: inline
                         children:
                         -       type: Label
+                                label: Table
+                                children:
+                                -       type: CheckBox
+                                        name: mute
+-       name: panel_save
+        type: CollapseBox
+        label: Save
+        style: list
+        collapsed: true
+        stretchFactor: 1
+        children:
+        -       type: LayoutBox
+                margin: large
+                style: list
+                children:
+                -       type: LayoutBox
+                        margin: large
+                        style: inline
+                        children:
+                        -       type: Label
                                 label: Save
                                 children:
                                 -       type: Output
@@ -743,7 +763,17 @@ children:
                                 -       type: Output
                                         name: residuals
                         -       type: Label
-                                label: Table
+                                label: Export
                                 children:
                                 -       type: CheckBox
-                                        name: mute
+                                        name: export_emm
+                                -       type: CheckBox
+                                        name: export_plot
+                                -       type: CheckBox
+                                        name: export_re
+                -       type: LayoutBox
+                        margin: large
+                        style: inline
+                        children:
+                        -       type: ActionButton
+                                name: export

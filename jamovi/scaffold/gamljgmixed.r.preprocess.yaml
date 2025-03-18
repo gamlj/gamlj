@@ -1031,3 +1031,6 @@ items:
                       name: opts_model_z
                       file: clear.yaml
         
+  - name: savenotes
+    type: Html
+    visible: false

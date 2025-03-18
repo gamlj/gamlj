@@ -422,6 +422,16 @@ mod<-GAMLj3::gamlj_lm(
   plot_by=c(prog,read)
 )
 object<-mod
+
+pl<-mod$mainPlots[[1]]
+
+pl<-plot(mod)[[1]]
+npl<- pl + ggplot2::scale_x_continuous(
+    breaks = seq(1, 7, by = 1) - 10,  # Shift centered values back to original 1-7 scale
+    labels = seq(1, 7, by = 1)  # Ensure labels are 1 to 7
+  ) 
+npl
+
 alist <- list()
         for (i in 1:length(object$mainPlots)) {
             title <- (object$mainPlots[[i]]$title)

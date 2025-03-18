@@ -268,3 +268,10 @@ mf.sample_size<- function(model,...) UseMethod(".sample_size")
   
   return(results)
 }
+
+.sample_size.lme<-function(model,obj) {
+  
+    results<-list(N=model$dims[["N"]])
+}
+  
+  

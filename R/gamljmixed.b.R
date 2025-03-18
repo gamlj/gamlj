@@ -24,9 +24,11 @@ gamljmixedClass <- R6::R6Class(
       emmeans::emm_options(lmerTest.limit = 20000)  
       ### set up the R6 workhorse class
       dispatch_message_cleaner(self)
-      data_machine<-Datamatic$new(self)
-      runner_machine<-Runner$new(self,data_machine)
+      data_machine    <- Datamatic$new(self)
+      runner_machine  <- Runner$new(self,data_machine)
       runner_machine$storage  <-  self$results$main$coefficients      
+      
+      
       
       aSmartObj<-SmartTable$new(self$results$info,runner_machine)
       ladd(private$.smartObjs)<-aSmartObj
@@ -166,7 +168,7 @@ gamljmixedClass <- R6::R6Class(
       plotter_machine$initPlots()
       private$.plotter_machine<-plotter_machine
       self$results$plotnotes$setContent("")
-      
+
     },
     .run=function() {
       jinfo("MODULE:",self$options$.caller,"  #### phase run ####")
@@ -185,11 +187,11 @@ gamljmixedClass <- R6::R6Class(
 
       private$.checkpoint()
       
-       #save model preds and resids            
-       private$.runner_machine$savePredRes(self$results) 
        # plotting if necessary
        private$.plotter_machine$preparePlots()
-      
+       #save stuff if necessary            
+       saver_machine <- Saver$new(self,private$.runner_machine,private$.plotter_machine) 
+       saver_machine$run()
 
       private$.checkpoint()
       

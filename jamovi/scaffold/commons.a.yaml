@@ -361,3 +361,30 @@
           ui: >
             Saves the residual values of the model. The response scale is used.
 
+    - name: export_emm
+      title: Estimated Marginal Means
+      type: Bool
+      default: false
+      description:
+          R: >
+            not used in R
+          ui: >
+            Export estimated marginal means in a new jamovi file
+    - name: export_plot
+      title: Plot data
+      type: Bool
+      default: false
+      description:
+          R: >
+            not used in R
+          ui: >
+            Export data displayed in the plots
+    - name: export_re
+      title: Random coefficients
+      type: Bool
+      default: false
+      description:
+          R: >
+            not used in R
+          ui: >
+            Export random coefficients

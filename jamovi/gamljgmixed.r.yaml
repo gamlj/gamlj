@@ -1372,3 +1372,6 @@ items:
         - custom_family
         - custom_link
         - dep2
+-       name: savenotes
+        type: Html
+        visible: false
