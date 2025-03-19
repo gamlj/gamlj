@@ -1020,6 +1020,10 @@ items:
         - plot_black
         - plot_around
         - plot_scale
+        - plot_x_min
+        - plot_x_max
+        - plot_x_ticks
+        - plot_x_ticks_exact
         template:
                 title: ''
                 type: Image

@@ -419,6 +419,11 @@ children:
                                 name: plot_raw
                         -       type: CheckBox
                                 name: plot_yscale
+                        -       type: CheckBox
+                                name: plot_more_options
+                                events:
+                                        change: ./gamlj.events::plot_more_options_changed
+                                
                 -       type: Label
                         label: Use
                         children:
@@ -450,6 +455,43 @@ children:
                   children:
                     -  type:  CheckBox
                        name:  plot_jn
+
+
+        - type: LayoutBox
+          name: plot_more_option_box
+          margin: large
+          style: inline
+          children:
+                   - type: Label
+                     label: Y-axis
+                     children:
+                            -  type:  TextBox
+                               name:  plot_y_min
+                               format: string
+                            -  type:  TextBox
+                               name:  plot_y_max
+                               format: string
+                            -  type:  TextBox
+                               name:  plot_y_ticks
+                               format: string
+                            -  type:  CheckBox
+                               name:  plot_y_ticks_exact
+
+                   - type: Label
+                     label: X-axis
+                     children:
+                            -  type:  TextBox
+                               name:  plot_x_min
+                               format: string
+                            -  type:  TextBox
+                               name:  plot_x_max
+                               format: string
+                            -  type:  TextBox
+                               name:  plot_x_ticks
+                               format: string
+                            -  type:  CheckBox
+                               name:  plot_x_ticks_exact
+
 
 -       name: panel_simpleeffects
         type: scaffold

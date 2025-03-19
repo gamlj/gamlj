@@ -813,6 +813,9 @@ items:
                    -  type: scaffold
                       name: opts_plots
                       file: clear.yaml
+                   -  type: scaffold
+                      name: opts_plots_more_x
+                      file: clear.yaml
 
     template:
           title: ""

@@ -562,9 +562,36 @@ const fun = {
         ui.crosstab.setEnabled(true);
       }
       
-
-
+    },
+    fix_plots: function(ui, context) {
       
+        console.log("fixing plots");
+        if (typeof ui.plot_more_options == 'undefined')
+           return
+          
+        if (ui.plot_more_options.value() == true)   {
+           ui.plot_more_option_box.$el.show();
+        } else {
+           ui.plot_more_option_box.$el.hide();
+           if (typeof ui.plot_y_min !== 'undefined')
+                   ui.plot_y_min.setValue("");
+           if (typeof ui.plot_y_max !== 'undefined')
+                    ui.plot_y_max.setValue("");
+           if (typeof ui.plot_y_ticks !== 'undefined')
+                    ui.plot_y_ticks.setValue("");
+           if (typeof ui.plot_y_ticks_exact !== 'undefined')
+                    ui.plot_y_ticks_exact.setValue(false);
+           if (typeof ui.plot_x_min !== 'undefined')
+                    ui.plot_x_min.setValue("");
+           if (typeof ui.plot_x_max !== 'undefined')
+                    ui.plot_x_max.setValue("");
+           if (typeof ui.plot_x_ticks !== 'undefined')
+                    ui.plot_x_ticks.setValue("");
+           if (typeof ui.plot_x_ticks_exact !== 'undefined')
+                    ui.plot_x_ticks_exact.setValue(false);
+           
+        }
+
     },
     mark: function(obj) {
                console.log(obj);

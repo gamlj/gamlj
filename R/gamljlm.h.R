@@ -57,6 +57,15 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_around = "ci",
             plot_extremes = FALSE,
             plot_jn = FALSE,
+            plot_more_options = FALSE,
+            plot_y_min = "",
+            plot_y_max = NULL,
+            plot_y_ticks = NULL,
+            plot_y_ticks_exact = NULL,
+            plot_x_min = NULL,
+            plot_x_max = NULL,
+            plot_x_ticks = NULL,
+            plot_x_ticks_exact = NULL,
             covs_scale = NULL,
             scale_missing = "complete",
             posthoc_es = list(
@@ -370,6 +379,35 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plot_jn",
                 plot_jn,
                 default=FALSE)
+            private$..plot_more_options <- jmvcore::OptionBool$new(
+                "plot_more_options",
+                plot_more_options,
+                default=FALSE)
+            private$..plot_y_min <- jmvcore::OptionString$new(
+                "plot_y_min",
+                plot_y_min,
+                default="")
+            private$..plot_y_max <- jmvcore::OptionString$new(
+                "plot_y_max",
+                plot_y_max)
+            private$..plot_y_ticks <- jmvcore::OptionString$new(
+                "plot_y_ticks",
+                plot_y_ticks)
+            private$..plot_y_ticks_exact <- jmvcore::OptionBool$new(
+                "plot_y_ticks_exact",
+                plot_y_ticks_exact)
+            private$..plot_x_min <- jmvcore::OptionString$new(
+                "plot_x_min",
+                plot_x_min)
+            private$..plot_x_max <- jmvcore::OptionString$new(
+                "plot_x_max",
+                plot_x_max)
+            private$..plot_x_ticks <- jmvcore::OptionString$new(
+                "plot_x_ticks",
+                plot_x_ticks)
+            private$..plot_x_ticks_exact <- jmvcore::OptionBool$new(
+                "plot_x_ticks_exact",
+                plot_x_ticks_exact)
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -542,6 +580,15 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_extremes)
             self$.addOption(private$..plot_jn)
+            self$.addOption(private$..plot_more_options)
+            self$.addOption(private$..plot_y_min)
+            self$.addOption(private$..plot_y_max)
+            self$.addOption(private$..plot_y_ticks)
+            self$.addOption(private$..plot_y_ticks_exact)
+            self$.addOption(private$..plot_x_min)
+            self$.addOption(private$..plot_x_max)
+            self$.addOption(private$..plot_x_ticks)
+            self$.addOption(private$..plot_x_ticks_exact)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..posthoc_es)
@@ -613,6 +660,15 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_around = function() private$..plot_around$value,
         plot_extremes = function() private$..plot_extremes$value,
         plot_jn = function() private$..plot_jn$value,
+        plot_more_options = function() private$..plot_more_options$value,
+        plot_y_min = function() private$..plot_y_min$value,
+        plot_y_max = function() private$..plot_y_max$value,
+        plot_y_ticks = function() private$..plot_y_ticks$value,
+        plot_y_ticks_exact = function() private$..plot_y_ticks_exact$value,
+        plot_x_min = function() private$..plot_x_min$value,
+        plot_x_max = function() private$..plot_x_max$value,
+        plot_x_ticks = function() private$..plot_x_ticks$value,
+        plot_x_ticks_exact = function() private$..plot_x_ticks_exact$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         posthoc_es = function() private$..posthoc_es$value,
@@ -683,6 +739,15 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_around = NA,
         ..plot_extremes = NA,
         ..plot_jn = NA,
+        ..plot_more_options = NA,
+        ..plot_y_min = NA,
+        ..plot_y_max = NA,
+        ..plot_y_ticks = NA,
+        ..plot_y_ticks_exact = NA,
+        ..plot_x_min = NA,
+        ..plot_x_max = NA,
+        ..plot_x_ticks = NA,
+        ..plot_x_ticks_exact = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..posthoc_es = NA,
@@ -1943,7 +2008,15 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "plot_xoriginal",
                     "plot_black",
                     "plot_around",
-                    "plot_scale"),
+                    "plot_scale",
+                    "plot_y_min",
+                    "plot_y_max",
+                    "plot_y_ticks",
+                    "plot_y_ticks_exact",
+                    "plot_x_min",
+                    "plot_x_max",
+                    "plot_x_ticks",
+                    "plot_x_ticks_exact"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",

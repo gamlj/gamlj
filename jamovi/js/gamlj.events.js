@@ -45,6 +45,7 @@ const events = {
         // updates all options related with model_type
            fun.updateModelOptions(ui,this)
            
+           fun.fix_plots(ui,this);
 
 
     },
@@ -262,6 +263,11 @@ const events = {
    contrasts_changed: function(ui) {
      
      fun.updateCustom(ui,this);
+     
+   },
+   plot_more_options_changed: function(ui) {
+     
+     fun.fix_plots(ui,this);
      
    },
    onEvent_nothing: function(ui) {

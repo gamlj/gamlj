@@ -534,6 +534,29 @@ children:
                                 name: plot_xoriginal
                         -       type: CheckBox
                                 name: plot_black
+                        -       type: CheckBox
+                                name: plot_more_options
+                                events:
+                                        change: ./gamlj.events::plot_more_options_changed
+        -       type: LayoutBox
+                name: plot_more_option_box
+                margin: large
+                style: inline
+                children:
+                -       type: Label
+                        label: X-axis
+                        children:
+                        -       type: TextBox
+                                name: plot_x_min
+                                format: string
+                        -       type: TextBox
+                                name: plot_x_max
+                                format: string
+                        -       type: TextBox
+                                name: plot_x_ticks
+                                format: string
+                        -       type: CheckBox
+                                name: plot_x_ticks_exact
         -       type: LayoutBox
                 margin: large
                 style: inline

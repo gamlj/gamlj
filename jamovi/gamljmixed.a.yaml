@@ -363,7 +363,8 @@ options:
         description:
                 R: |
                         not used in R
-                ui: Export random coefficients, one dataset for each cluster
+                ui: |
+                        Export random coefficients, one dataset for each cluster
 -       name: export_plot
         title: Plot data
         type: Bool
@@ -454,6 +455,72 @@ options:
                         `TRUE` or `FALSE` (default), Indentify 1% and 99% extreme values in the plots by marking them with their rowname in the data.frame
                 ui: |
                         Indentify 1% and 99% extreme values in the plots by marking them with their rown number in the dataset
+-       name: plot_more_options
+        title: More options
+        type: Bool
+        default: false
+        description:
+                R: |
+                        not used in R
+                ui: |
+                        show more graphical options
+-       name: plot_y_min
+        title: Y-axis min
+        type: String
+        default: ''
+        description:
+                R: |
+                        set the minimum value of the Y-axis
+-       name: plot_y_max
+        title: Y-axis max
+        type: String
+        description:
+                R: |
+                        set the max value of the Y-axis
+-       name: plot_y_ticks
+        title: Y-axis ticks
+        type: String
+        description:
+                R: |
+                        set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic Y-axis scale.
+                ui: |
+                        set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Select `Exact ticks` to obtain an exact number of ticks.
+-       name: plot_y_ticks_exact
+        title: Exact ticks
+        type: Bool
+        description:
+                R: "set Y-axis ticks to exact values (min,..n.ticks..,max). `plot_x_ticks=TRUE`
+                        is required. \n"
+                ui: "set Y-axis ticks to exact values (min,..n.ticks..,max). `Y ticks`
+                        should be provided. \n"
+-       name: plot_x_min
+        title: X-axis min
+        type: String
+        description:
+                R: |
+                        set the minimum value of the Y-axis
+-       name: plot_x_max
+        title: X-axis max
+        type: String
+        description:
+                R: |
+                        set the max value of the Y-axis
+-       name: plot_x_ticks
+        title: X-axis ticks
+        type: String
+        description:
+                R: |
+                        set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic X-axis scale.
+                ui: |
+                        set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Select `Exact ticks` to obtain an exact number of ticks.
+-       name: plot_x_ticks_exact
+        title: Exact ticks
+        type: Bool
+        description:
+                R: "set X-axis ticks to exact values (min,..n.ticks..,max). `plot_x_ticks=TRUE`
+                        is required. \n"
+                ui: 'set X-axis ticks to exact values (min,..n.ticks..,max). `Y ticks`
+                        should be provided. '
 -       name: estimates_ci
         title: Fixed Parameters
         type: Bool

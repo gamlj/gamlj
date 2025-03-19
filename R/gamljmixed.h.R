@@ -53,6 +53,15 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_black = FALSE,
             plot_around = "ci",
             plot_extremes = FALSE,
+            plot_more_options = FALSE,
+            plot_y_min = "",
+            plot_y_max = NULL,
+            plot_y_ticks = NULL,
+            plot_y_ticks_exact = NULL,
+            plot_x_min = NULL,
+            plot_x_max = NULL,
+            plot_x_ticks = NULL,
+            plot_x_ticks_exact = NULL,
             estimates_ci = TRUE,
             re_ci = FALSE,
             ci_method = "wald",
@@ -359,6 +368,35 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plot_extremes",
                 plot_extremes,
                 default=FALSE)
+            private$..plot_more_options <- jmvcore::OptionBool$new(
+                "plot_more_options",
+                plot_more_options,
+                default=FALSE)
+            private$..plot_y_min <- jmvcore::OptionString$new(
+                "plot_y_min",
+                plot_y_min,
+                default="")
+            private$..plot_y_max <- jmvcore::OptionString$new(
+                "plot_y_max",
+                plot_y_max)
+            private$..plot_y_ticks <- jmvcore::OptionString$new(
+                "plot_y_ticks",
+                plot_y_ticks)
+            private$..plot_y_ticks_exact <- jmvcore::OptionBool$new(
+                "plot_y_ticks_exact",
+                plot_y_ticks_exact)
+            private$..plot_x_min <- jmvcore::OptionString$new(
+                "plot_x_min",
+                plot_x_min)
+            private$..plot_x_max <- jmvcore::OptionString$new(
+                "plot_x_max",
+                plot_x_max)
+            private$..plot_x_ticks <- jmvcore::OptionString$new(
+                "plot_x_ticks",
+                plot_x_ticks)
+            private$..plot_x_ticks_exact <- jmvcore::OptionBool$new(
+                "plot_x_ticks_exact",
+                plot_x_ticks_exact)
             private$..estimates_ci <- jmvcore::OptionBool$new(
                 "estimates_ci",
                 estimates_ci,
@@ -588,6 +626,15 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_black)
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_extremes)
+            self$.addOption(private$..plot_more_options)
+            self$.addOption(private$..plot_y_min)
+            self$.addOption(private$..plot_y_max)
+            self$.addOption(private$..plot_y_ticks)
+            self$.addOption(private$..plot_y_ticks_exact)
+            self$.addOption(private$..plot_x_min)
+            self$.addOption(private$..plot_x_max)
+            self$.addOption(private$..plot_x_ticks)
+            self$.addOption(private$..plot_x_ticks_exact)
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..re_ci)
             self$.addOption(private$..ci_method)
@@ -667,6 +714,15 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_black = function() private$..plot_black$value,
         plot_around = function() private$..plot_around$value,
         plot_extremes = function() private$..plot_extremes$value,
+        plot_more_options = function() private$..plot_more_options$value,
+        plot_y_min = function() private$..plot_y_min$value,
+        plot_y_max = function() private$..plot_y_max$value,
+        plot_y_ticks = function() private$..plot_y_ticks$value,
+        plot_y_ticks_exact = function() private$..plot_y_ticks_exact$value,
+        plot_x_min = function() private$..plot_x_min$value,
+        plot_x_max = function() private$..plot_x_max$value,
+        plot_x_ticks = function() private$..plot_x_ticks$value,
+        plot_x_ticks_exact = function() private$..plot_x_ticks_exact$value,
         estimates_ci = function() private$..estimates_ci$value,
         re_ci = function() private$..re_ci$value,
         ci_method = function() private$..ci_method$value,
@@ -745,6 +801,15 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_black = NA,
         ..plot_around = NA,
         ..plot_extremes = NA,
+        ..plot_more_options = NA,
+        ..plot_y_min = NA,
+        ..plot_y_max = NA,
+        ..plot_y_ticks = NA,
+        ..plot_y_ticks_exact = NA,
+        ..plot_x_min = NA,
+        ..plot_x_max = NA,
+        ..plot_x_ticks = NA,
+        ..plot_x_ticks_exact = NA,
         ..estimates_ci = NA,
         ..re_ci = NA,
         ..ci_method = NA,
@@ -1842,7 +1907,15 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "plot_around",
                     "plot_scale",
                     "plot_re",
-                    "plot_re_method"),
+                    "plot_re_method",
+                    "plot_y_min",
+                    "plot_y_max",
+                    "plot_y_ticks",
+                    "plot_y_ticks_exact",
+                    "plot_x_min",
+                    "plot_x_max",
+                    "plot_x_ticks",
+                    "plot_x_ticks_exact"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",

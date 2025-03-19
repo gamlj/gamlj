@@ -264,6 +264,27 @@ options:
     - name: plot_jn_expb
       type: scaffold
       file: plots.a.yaml
+      
+    - name: plot_more_options
+      type: scaffold
+      file: plots.a.yaml
+      
+    - name: plot_x_min
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_x_max
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_x_ticks
+      type: scaffold
+      file: plots.a.yaml
+
+    - name: plot_x_ticks_exact
+      type: scaffold
+      file: plots.a.yaml
+
 
 ####### end of plots #########
 
