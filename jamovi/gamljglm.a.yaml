@@ -448,7 +448,8 @@ options:
         description:
                 R: |
                         `'FALSE'` (default), `'TRUE'` plots the exp(B) (odd-ratio) in the Johnson-Neyman plot .
-                ui: plots the  the exp(B) (odd-ratio) in the Johnson-Neyman plot.
+                ui: |
+                        plots the  the exp(B) (odd-ratio) in the Johnson-Neyman plot.
 -       name: covs_scale
         title: Covariates Scaling
         type: Array

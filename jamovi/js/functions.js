@@ -562,9 +562,19 @@ const fun = {
         ui.crosstab.setEnabled(true);
       }
       
-
-
+    },
+    fix_plots: function(ui, context) {
       
+        console.log("fixing plots");
+        if (typeof ui.plot_more_options == 'undefined')
+           return
+          
+        if (ui.plot_more_options.value() == true)   {
+           ui.plot_more_option_box.$el.show();
+        } else {
+           ui.plot_more_option_box.$el.hide();
+        }
+
     },
     mark: function(obj) {
                console.log(obj);

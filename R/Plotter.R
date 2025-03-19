@@ -5,7 +5,6 @@ Plotter <- R6::R6Class(
   inherit = Scaffold,
   public=list(
       options=NULL,
-      scatterRange=NULL,
       scatterDodge=NULL,
       scatterClabel=NULL,
       scatterY=NULL,
@@ -94,9 +93,24 @@ Plotter <- R6::R6Class(
         p <- ggplot2::ggplot()
         
         # give a scale to the Y axis
-        if (is.something(image$state$scatterRange))
-              p <- p + ggplot2::scale_y_continuous(limits = image$state$scatterRange)
-        
+         p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ))
+         if (!is.na(image$state$y_range$ticks)) {
+             
+             if (self$option("plot_y_ticks_exact")) {
+               
+             if (any(sapply(image$state$y_range,is.na))) {
+                    self$warning<-list(topic="plotnotes",
+                                    message=paste("Exact ticking requires to set min and max"),
+                                    head="warning")
+               } else {
+                  p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ),breaks =seq(image$state$y_range$min,image$state$y_range$max, length.out=image$state$y_range$ticks))
+               }
+             } else
+                  p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ),n.breaks = image$state$y_range$ticks)
+
+           }
+         
+         
 
         #### plot the actual data if required 
 
@@ -168,12 +182,33 @@ Plotter <- R6::R6Class(
 
 
         ### plot the points for factors
-        if (self$scatterX$type=="factor")
+        if (self$scatterX$type=="factor") {
               p <- p +  ggplot2::geom_point(data = data,
                                             .aestetics,
                                             shape = 21, size = 4, fill="white",
                                             position = self$scatterDodge,show.legend = FALSE)
-
+        } else {
+          
+         # give a scale to the Z axis
+         p <- p + ggplot2::scale_x_continuous(limits =as.numeric(image$state$x_range ))
+         
+         if (!is.na(image$state$x_range$ticks)) {
+             
+             if (self$option("plot_x_ticks_exact")) {
+               
+             if (any(sapply(image$state$x_range,is.na))) {
+                    self$warning<-list(topic="plotnotes",
+                                    message=paste("Exact ticking for the X-axis requires to set min and max"),
+                                    head="warning")
+               } else {
+                  p <- p + ggplot2::scale_x_continuous(limits =as.numeric(image$state$x_range ),breaks =seq(image$state$x_range$min,image$state$x_range$max, length.out=image$state$x_range$ticks))
+               }
+             } else
+                  p <- p + ggplot2::scale_x_continuous(limits =as.numeric(image$state$x_range ),n.breaks = image$state$x_range$ticks)
+           }
+        } 
+        ### end of dealing with scales 
+         
         p<-p+ ggtheme
 
         p <- p + ggplot2::labs(x = self$scatterX$name, y = self$scatterY$name, 
@@ -582,9 +617,22 @@ Plotter <- R6::R6Class(
         dep64  <- self$scatterY$name64
 
         ### give a range to the y-axis, if needed
-        scatterRange<-NULL
+        y_range      <-list(min=NA,max=NA,ticks=NA)
+        
         if (self$options$plot_yscale)
-            scatterRange<-c(self$scatterY$descriptive$min,self$scatterY$descriptive$max)
+            y_range-list(min=self$scatterY$descriptive$min,max=self$scatterY$descriptive$max)
+ 
+        min<-as.numeric(self$optionValue("plot_y_min"))
+        if (is.something(min))
+             y_range$min <- min
+
+        max<-as.numeric(self$optionValue("plot_y_max"))
+        if (is.something(max))
+            y_range$max <- max
+
+        ticks<-as.numeric(self$optionValue("plot_y_ticks"))
+        if (is.something(ticks))
+            y_range$ticks <- ticks
 
       if (self$option("model_type","multinomial")) {
         self$scatterRaw<-FALSE
@@ -592,8 +640,18 @@ Plotter <- R6::R6Class(
 
       if (self$scatterType=="link") {
         self$scatterRaw<-FALSE
-        scatterRange<-NULL
+        y_range<-list(min=NA,max=NA)
       }
+        
+      if (self$option("model_type","multinomial")) {
+        self$scatterRaw<-FALSE
+      }
+
+      if (self$scatterType=="link") {
+        self$scatterRaw<-FALSE
+        y_range<-list(min=NA,max=NA)
+      }
+        
       
       ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
       
@@ -604,13 +662,14 @@ Plotter <- R6::R6Class(
         if (self$option("model_type","ordinal")) {
           rawData[[dep64]]<-rawData[[dep64]]+1
           if (self$option("plot_scale","mean.class"))
-                    scatterRange<-c(1,self$scatterY$nlevels)
+                    y_range<-list(min=1,max=self$scatterY$nlevels)
         }
       if (self$option("model_type",c("logistic","multinomial"))) {
         if (self$scatterType!="link") 
-            scatterRange<-c(0,1)
+            y_range<-list(min=0,max=1)
       }
 
+        
       
       #### deal with rescaling
       if (self$scatterXscale) {
@@ -632,6 +691,29 @@ Plotter <- R6::R6Class(
         if (is.something(randomData))
           randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
       }
+        
+        ### give a range to the x-axis, if needed
+        x_range      <-list(min=NA,max=NA,ticks=NA)
+        
+        min<-as.numeric(self$optionValue("plot_x_min"))
+        if (is.something(min))
+             x_range$min <- min
+
+        max<-as.numeric(self$optionValue("plot_x_max"))
+        if (is.something(max))
+            x_range$max <- max
+
+        ticks<-as.numeric(self$optionValue("plot_x_ticks"))
+        if (is.something(ticks))
+            x_range$ticks <- ticks
+
+        ################
+                
+        
+        
+        
+        
+        
       #### compute the levels combinations
       #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
       #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
@@ -639,7 +721,10 @@ Plotter <- R6::R6Class(
       ### continuous are retained
       #### TODO: this is abstruse, try changing it
 
-      state<-list(scatterRange=scatterRange)  
+      state<-list(y_range        =  y_range,
+                  x_range        =  x_range
+                  )
+      
       dims<-sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels,simplify = FALSE)
 
       if (is.something(dims))  {

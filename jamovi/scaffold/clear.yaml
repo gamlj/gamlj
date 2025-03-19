@@ -104,6 +104,22 @@
            - plot_scale
 
 - type: scaffold
+  name: opts_plots_more_y
+  children:
+           - plot_y_min
+           - plot_y_max
+           - plot_y_ticks
+           - plot_y_ticks_exact
+
+- type: scaffold
+  name: opts_plots_more_x
+  children:
+           - plot_x_min
+           - plot_x_max
+           - plot_x_ticks
+           - plot_x_ticks_exact
+
+- type: scaffold
   name: opts_plots_re
   children:
            - plot_re

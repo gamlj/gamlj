@@ -44,6 +44,8 @@ var fix_comparison=function(ui, context) {
 
 };
 
+
+
 var fixRandomEffects = function(ui, context) {
             var option=ui.re_corr.value();
             var oldOption = context.workspace.re_corr;

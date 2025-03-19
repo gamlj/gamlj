@@ -361,7 +361,8 @@ options:
         description:
                 R: |
                         not used in R
-                ui: Export random coefficients, one dataset for each cluster
+                ui: |
+                        Export random coefficients, one dataset for each cluster
 -       name: export_plot
         title: Plot data
         type: Bool
@@ -513,7 +514,8 @@ options:
         description:
                 R: |
                         `'FALSE'` (default), `'TRUE'` plots the exp(B) (odd-ratio) in the Johnson-Neyman plot .
-                ui: plots the  the exp(B) (odd-ratio) in the Johnson-Neyman plot.
+                ui: |
+                        plots the  the exp(B) (odd-ratio) in the Johnson-Neyman plot.
 -       name: plot_re
         title: Random effects
         type: Bool
