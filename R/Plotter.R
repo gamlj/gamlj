@@ -10,6 +10,7 @@ Plotter <- R6::R6Class(
       scatterY=NULL,
       scatterX=NULL,
       scatterXscale=FALSE,
+      x_range=list(),
       scatterZ=NULL,
       scatterCluster=NULL,
       scatterModerators=NULL,
@@ -93,7 +94,7 @@ Plotter <- R6::R6Class(
         p <- ggplot2::ggplot()
         
         # give a scale to the Y axis
-         p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ))
+         
          if (!is.na(image$state$y_range$ticks)) {
              
              if (self$option("plot_y_ticks_exact")) {
@@ -102,13 +103,16 @@ Plotter <- R6::R6Class(
                     self$warning<-list(topic="plotnotes",
                                     message=paste("Exact ticking requires to set min and max"),
                                     head="warning")
+                     p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ))
                } else {
-                  p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ),breaks =seq(image$state$y_range$min,image$state$y_range$max, length.out=image$state$y_range$ticks))
+                     p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ),breaks =seq(image$state$y_range$min,image$state$y_range$max, length.out=image$state$y_range$ticks))
                }
              } else
                   p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ),n.breaks = image$state$y_range$ticks)
 
-           }
+           } else
+               p <- p + ggplot2::scale_y_continuous(limits =as.numeric(image$state$y_range ))
+
          
          
 
@@ -218,7 +222,16 @@ Plotter <- R6::R6Class(
         
         if (self$options$plot_black)
           p <- p + ggplot2::theme(legend.key.width = ggplot2::unit(2,"cm"))
-        
+      
+        if (image$state$y_range$noticks) {
+          p <- p + ggplot2::theme(axis.ticks.y = ggplot2::element_blank())
+          p <- p + ggplot2::theme(axis.text.y  = ggplot2::element_blank())
+        }
+        if (image$state$x_range$noticks) {
+          p <- p + ggplot2::theme(axis.ticks.x = ggplot2::element_blank())
+          p <- p + ggplot2::theme(axis.text.x  = ggplot2::element_blank())
+        }
+
 
         return(p)        
       },
@@ -559,6 +572,46 @@ Plotter <- R6::R6Class(
 
       jinfo("PLOTTER: prepare main plot")
       
+        ### give a range to the x-axis, if needed
+        x_range      <-list(min=NA,max=NA,ticks=NA, noticks=FALSE)
+        
+        min<-as.numeric(self$optionValue("plot_x_min"))
+        if (!is.na(min))
+             x_range$min <- min
+
+        max<-as.numeric(self$optionValue("plot_x_max"))
+        if (!is.na(max))
+            x_range$max <- max
+
+        ticks<-as.numeric(self$optionValue("plot_x_ticks"))
+        if (!is.na(ticks)) {
+          x_range$ticks<-ticks
+
+          if (ticks<0) {
+            self$warning<-list(topic="plotnotes", message="Invalid number of ticks (<0). The value is ignored.",type="warning")
+            x_range$ticks <- NA
+          }
+          if (ticks==1) {
+            self$warning<-list(topic="plotnotes", message="Invalid number of ticks (1). The value is ignored.",type="warning")
+            x_range$ticks <- NA
+          }
+
+           if (ticks>20) {
+            self$warning<-list(topic="plotnotes", message="Invalid number of ticks (>20). The value is ignored.",type="warning")
+            x_range$ticks <- NA
+           }
+          if (ticks==0) {
+            x_range$ticks <- NA
+            x_range$noticks <- TRUE
+          }
+        }
+
+        
+        self$x_range<-x_range
+        ################
+
+      
+      
       moderators<-self$scatterModerators
       ### compute the expected values to be plotted ###
       data<-private$.estimate(self$scatterX$name,unlist(c(self$scatterZ$name,moderators)))
@@ -617,30 +670,51 @@ Plotter <- R6::R6Class(
         dep64  <- self$scatterY$name64
 
         ### give a range to the y-axis, if needed
-        y_range      <-list(min=NA,max=NA,ticks=NA)
+        y_range      <-list(min=NA,max=NA,ticks=NA, noticks=FALSE)
         
         if (self$options$plot_yscale)
-            y_range-list(min=self$scatterY$descriptive$min,max=self$scatterY$descriptive$max)
+            y_range-list(min=self$scatterY$descriptive$min,max=self$scatterY$descriptive$max,ticks=NA)
  
         min<-as.numeric(self$optionValue("plot_y_min"))
-        if (is.something(min))
+        if (!is.na(min))
              y_range$min <- min
 
         max<-as.numeric(self$optionValue("plot_y_max"))
-        if (is.something(max))
+        if (!is.na(max))
             y_range$max <- max
 
         ticks<-as.numeric(self$optionValue("plot_y_ticks"))
-        if (is.something(ticks))
-            y_range$ticks <- ticks
+        
+        if (!is.na(ticks)) {
+          y_range$ticks <- ticks
 
+          if (ticks==1) {
+            self$warning<-list(topic="plotnotes", message="Invalid number of ticks (1). The value is ignored.",head="warning")
+            y_range$ticks <- NA
+          }
+          if (ticks<0) {
+            self$warning<-list(topic="plotnotes", message="Invalid number of ticks (<0). The value is ignored.",head="warning")
+            y_range$ticks <- NA
+          }
+          
+          if (ticks>20) {
+            self$warning<-list(topic="plotnotes", message="Invalid number of ticks (>20). The value is ignored.",head="warning")
+            y_range$ticks <- NA
+          }
+          if (ticks==0) {
+            y_range$ticks <- NA
+            y_range$noticks <- TRUE
+          }
+          
+        }
+mark(y_range)
       if (self$option("model_type","multinomial")) {
         self$scatterRaw<-FALSE
       }
 
       if (self$scatterType=="link") {
         self$scatterRaw<-FALSE
-        y_range<-list(min=NA,max=NA)
+        y_range<-list(min=NA,max=NA,ticks=NA)
       }
         
       if (self$option("model_type","multinomial")) {
@@ -649,7 +723,7 @@ Plotter <- R6::R6Class(
 
       if (self$scatterType=="link") {
         self$scatterRaw<-FALSE
-        y_range<-list(min=NA,max=NA)
+        y_range<-list(min=NA,max=NA, ticks=NA)
       }
         
       
@@ -662,11 +736,11 @@ Plotter <- R6::R6Class(
         if (self$option("model_type","ordinal")) {
           rawData[[dep64]]<-rawData[[dep64]]+1
           if (self$option("plot_scale","mean.class"))
-                    y_range<-list(min=1,max=self$scatterY$nlevels)
+                    y_range<-list(min=1,max=self$scatterY$nlevels,ticks=NA)
         }
       if (self$option("model_type",c("logistic","multinomial"))) {
         if (self$scatterType!="link") 
-            y_range<-list(min=0,max=1)
+            y_range<-list(min=0,max=1,ticks=NA)
       }
 
         
@@ -692,26 +766,8 @@ Plotter <- R6::R6Class(
           randomData[[self$scatterX$name64]]<-private$.rescale(self$scatterX,randomData[[self$scatterX$name64]])
       }
         
-        ### give a range to the x-axis, if needed
-        x_range      <-list(min=NA,max=NA,ticks=NA)
-        
-        min<-as.numeric(self$optionValue("plot_x_min"))
-        if (is.something(min))
-             x_range$min <- min
-
-        max<-as.numeric(self$optionValue("plot_x_max"))
-        if (is.something(max))
-            x_range$max <- max
-
-        ticks<-as.numeric(self$optionValue("plot_x_ticks"))
-        if (is.something(ticks))
-            x_range$ticks <- ticks
-
-        ################
                 
-        
-        
-        
+
         
         
       #### compute the levels combinations
@@ -1167,12 +1223,24 @@ Plotter <- R6::R6Class(
       xobj<-private$.datamatic$variables[[x64]]
       
       if (xobj$type=="numeric") {
-           conditions[[x64]]<-pretty(c(xobj$descriptive$min,xobj$descriptive$max),n=30)
+        
+           min<-xobj$descriptive$min
+           max<-xobj$descriptive$max
+           
+           if (self$option("plot_extra")) {
+              if (!is.na(self$x_range$min))
+                min <- self$x_range$min
+              if (!is.na(self$x_range$max))
+                max <- self$x_range$max
+           }
+
+           conditions[[x64]]<-pretty(c(min,max),n=30)
            if (self$option("plot_xoriginal")) {
                  self$scatterXscale<-TRUE
                  self$warning<-list(topic="plotnotes",message="The X-axis is in the X-variable original scale", head="info")
            }
       }
+      mark(self$x_range,conditions)
       allterm64<-c(x64,term64)
 
       mode <- NULL
@@ -1188,7 +1256,7 @@ Plotter <- R6::R6Class(
       }
 
       ### now we get the estimated means #######
-      
+
       em_opts<-list(
         private$.operator$model,
         specs=allterm64,
@@ -1200,7 +1268,7 @@ Plotter <- R6::R6Class(
         data =  insight::get_data(private$.operator$model, source="frame")
 
       )
-
+      
       ### mmblogit model data are not recognized by emmeans. We need to pass them explicetely      
       if (self$option("model_type","multinomial") & self$option(".caller","glmer"))
            em_opts[["data"]]<-private$.operator$model$data
