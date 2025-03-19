@@ -355,7 +355,7 @@ options:
                 R: |
                         not used in R
                 ui: |
-                        Export estimated marginal means in a new jamovi file
+                        Export estimated marginal means in a new jamovi file, one dataset for each table
 -       name: export_re
         title: Random coefficients
         type: Bool
@@ -363,7 +363,7 @@ options:
         description:
                 R: |
                         not used in R
-                ui: Export random coefficients
+                ui: Export random coefficients, one dataset for each cluster
 -       name: export_plot
         title: Plot data
         type: Bool
@@ -372,7 +372,7 @@ options:
                 R: |
                         not used in R
                 ui: |
-                        Export data displayed in the plots
+                        Export data displayed in the plots, one dataset for each plot.
 -       name: export
         title: Export
         type: Action
