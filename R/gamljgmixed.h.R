@@ -58,6 +58,11 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             plot_around = "ci",
             plot_jn = FALSE,
             plot_jn_expb = FALSE,
+            plot_more_options = FALSE,
+            plot_x_min = NULL,
+            plot_x_max = NULL,
+            plot_x_ticks = NULL,
+            plot_x_ticks_exact = NULL,
             plot_re = FALSE,
             plot_re_method = "average",
             plot_scale = "response",
@@ -371,6 +376,22 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "plot_jn_expb",
                 plot_jn_expb,
                 default=FALSE)
+            private$..plot_more_options <- jmvcore::OptionBool$new(
+                "plot_more_options",
+                plot_more_options,
+                default=FALSE)
+            private$..plot_x_min <- jmvcore::OptionString$new(
+                "plot_x_min",
+                plot_x_min)
+            private$..plot_x_max <- jmvcore::OptionString$new(
+                "plot_x_max",
+                plot_x_max)
+            private$..plot_x_ticks <- jmvcore::OptionString$new(
+                "plot_x_ticks",
+                plot_x_ticks)
+            private$..plot_x_ticks_exact <- jmvcore::OptionBool$new(
+                "plot_x_ticks_exact",
+                plot_x_ticks_exact)
             private$..plot_re <- jmvcore::OptionBool$new(
                 "plot_re",
                 plot_re,
@@ -554,6 +575,11 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..plot_around)
             self$.addOption(private$..plot_jn)
             self$.addOption(private$..plot_jn_expb)
+            self$.addOption(private$..plot_more_options)
+            self$.addOption(private$..plot_x_min)
+            self$.addOption(private$..plot_x_max)
+            self$.addOption(private$..plot_x_ticks)
+            self$.addOption(private$..plot_x_ticks_exact)
             self$.addOption(private$..plot_re)
             self$.addOption(private$..plot_re_method)
             self$.addOption(private$..plot_scale)
@@ -623,6 +649,11 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         plot_around = function() private$..plot_around$value,
         plot_jn = function() private$..plot_jn$value,
         plot_jn_expb = function() private$..plot_jn_expb$value,
+        plot_more_options = function() private$..plot_more_options$value,
+        plot_x_min = function() private$..plot_x_min$value,
+        plot_x_max = function() private$..plot_x_max$value,
+        plot_x_ticks = function() private$..plot_x_ticks$value,
+        plot_x_ticks_exact = function() private$..plot_x_ticks_exact$value,
         plot_re = function() private$..plot_re$value,
         plot_re_method = function() private$..plot_re_method$value,
         plot_scale = function() private$..plot_scale$value,
@@ -691,6 +722,11 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..plot_around = NA,
         ..plot_jn = NA,
         ..plot_jn_expb = NA,
+        ..plot_more_options = NA,
+        ..plot_x_min = NA,
+        ..plot_x_max = NA,
+        ..plot_x_ticks = NA,
+        ..plot_x_ticks_exact = NA,
         ..plot_re = NA,
         ..plot_re_method = NA,
         ..plot_scale = NA,
@@ -2070,7 +2106,11 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "plot_around",
                     "plot_scale",
                     "plot_re",
-                    "plot_re_method"),
+                    "plot_re_method",
+                    "plot_x_min",
+                    "plot_x_max",
+                    "plot_x_ticks",
+                    "plot_x_ticks_exact"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",
