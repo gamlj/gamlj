@@ -57,6 +57,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_x_max = NULL,
             plot_x_ticks = NULL,
             plot_x_ticks_exact = NULL,
+            plot_extra = NULL,
             covs_scale = NULL,
             scale_missing = "complete",
             offset = NULL,
@@ -361,6 +362,9 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..plot_x_ticks_exact <- jmvcore::OptionBool$new(
                 "plot_x_ticks_exact",
                 plot_x_ticks_exact)
+            private$..plot_extra <- jmvcore::OptionBool$new(
+                "plot_extra",
+                plot_extra)
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -543,6 +547,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_x_max)
             self$.addOption(private$..plot_x_ticks)
             self$.addOption(private$..plot_x_ticks_exact)
+            self$.addOption(private$..plot_extra)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..offset)
@@ -613,6 +618,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_x_max = function() private$..plot_x_max$value,
         plot_x_ticks = function() private$..plot_x_ticks$value,
         plot_x_ticks_exact = function() private$..plot_x_ticks_exact$value,
+        plot_extra = function() private$..plot_extra$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         offset = function() private$..offset$value,
@@ -682,6 +688,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_x_max = NA,
         ..plot_x_ticks = NA,
         ..plot_x_ticks_exact = NA,
+        ..plot_extra = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..offset = NA,
@@ -1920,7 +1927,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "plot_x_min",
                     "plot_x_max",
                     "plot_x_ticks",
-                    "plot_x_ticks_exact"),
+                    "plot_x_ticks_exact",
+                    "plot_extra"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="",

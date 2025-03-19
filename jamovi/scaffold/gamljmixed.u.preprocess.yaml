@@ -491,6 +491,11 @@ children:
                                format: string
                             -  type:  CheckBox
                                name:  plot_x_ticks_exact
+                   - type: Label
+                     label: Features
+                     children:
+                     -  type:  CheckBox
+                        name:  plot_extra
 
 
 -       name: panel_simpleeffects

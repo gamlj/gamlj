@@ -285,6 +285,9 @@ options:
       type: scaffold
       file: plots.a.yaml
 
+    - name: plot_extra
+      type: scaffold
+      file: plots.a.yaml
 
 ####### end of plots #########
 

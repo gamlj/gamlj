@@ -1052,6 +1052,7 @@ items:
         - plot_x_max
         - plot_x_ticks
         - plot_x_ticks_exact
+        - plot_extra
         template:
                 title: ''
                 type: Image

@@ -194,3 +194,14 @@
             set X-axis ticks to exact values (min,..n.ticks..,max). `plot_x_ticks=TRUE` is required. 
           ui: >
             set X-axis ticks to exact values (min,..n.ticks..,max). `Y ticks` should be provided. 
+
+    - name: plot_extra
+      title: Extrapolate
+      type: Bool
+      description:
+          R: >
+            When `plot_x_min` is smaller than the x min or if `plot_x_max` is larger than the x max,
+            whether to extrapolate (to project) the predicted values in the plot beyond the observed values.
+          ui: >
+            When `X-axis` min is smaller than the x min in the data or if `X-axis` max is larger than the x max in the data,
+            whether to extrapolate (to project) the predicted values in the plot beyond the observed values.

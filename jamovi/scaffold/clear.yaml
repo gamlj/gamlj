@@ -118,6 +118,7 @@
            - plot_x_max
            - plot_x_ticks
            - plot_x_ticks_exact
+           - plot_extra
 
 - type: scaffold
   name: opts_plots_re
