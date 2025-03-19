@@ -573,6 +573,15 @@ const fun = {
            ui.plot_more_option_box.$el.show();
         } else {
            ui.plot_more_option_box.$el.hide();
+           ui.plot_y_min.setValue("");
+           ui.plot_y_max.setValue("");
+           ui.plot_y_ticks.setValue("");
+           ui.plot_y_ticks_exact.setValue(false);
+           ui.plot_x_min.setValue("");
+           ui.plot_x_max.setValue("");
+           ui.plot_x_ticks.setValue("");
+           ui.plot_x_ticks_exact.setValue(false);
+           
         }
 
     },

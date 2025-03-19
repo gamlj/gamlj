@@ -891,6 +891,14 @@ items:
         - plot_scale
         - plot_re
         - plot_re_method
+        - plot_y_min
+        - plot_y_max
+        - plot_y_ticks
+        - plot_y_ticks_exact
+        - plot_x_min
+        - plot_x_max
+        - plot_x_ticks
+        - plot_x_ticks_exact
         template:
                 title: ''
                 type: Image

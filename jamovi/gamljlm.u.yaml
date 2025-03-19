@@ -434,7 +434,6 @@ children:
                                 name: plot_more_options
                                 events:
                                         change: ./gamlj.events::plot_more_options_changed
-                                
                 -       type: Label
                         label: Use
                         children:
