@@ -3,92 +3,90 @@ name: gamljmixed
 jus: '2.0'
 compilerMode: tame
 events:
-        update: ./gamlj.events::update
+    update: ./gamlj.events::update
 children:
--       name: variablesupplier
+    -   name: variablesupplier
         type: VariableSupplier
         suggested:
-        - continuous
-        - nominal
-        - ordinal
+            - continuous
+            - nominal
+            - ordinal
         persistentItems: false
         stretchFactor: 1
         children:
-        -       type: TargetLayoutBox
+            -   type: TargetLayoutBox
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: dep
                         maxItemCount: 1
                         isTarget: true
                         itemDropBehaviour: overwrite
-        -       type: TargetLayoutBox
+            -   type: TargetLayoutBox
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: factors
                         isTarget: true
                         events:
-                                change: ./gamlj.events::onChange_factors
-        -       type: TargetLayoutBox
+                            change: ./gamlj.events::onChange_factors
+            -   type: TargetLayoutBox
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: covs
                         isTarget: true
                         events:
-                                change: ./gamlj.events::onChange_covariates
-        -       type: TargetLayoutBox
+                            change: ./gamlj.events::onChange_covariates
+            -   type: TargetLayoutBox
                 label: Cluster variables
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: cluster
                         height: small
                         isTarget: true
                         events:
-                                change: ./gamlj.events::onChange_cluster
-                                
--       name: panel_input
+                            change: ./gamlj.events::onChange_cluster
+    -   name: panel_input
         type: LayoutBox
         margin: large
         style: inline
         children:
-        -       type: Label
+            -   type: Label
                 label: Estimation
                 style: list
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: reml
-                -       name: donotrun
+                    -   name: donotrun
                         type: CheckBox
-        -       type: Label
+            -   type: Label
                 label: Confidence Intervals
                 margin: large
                 style: list
                 children:
-                -       name: estimates_ci
+                    -   name: estimates_ci
                         type: CheckBox
                         label: Fixed parameters
-                -       name: re_ci
+                    -   name: re_ci
                         type: CheckBox
                         label: Random variances
-                -       type: TextBox
+                    -   type: TextBox
                         name: ci_width
                         format: number
-        -       type: Label
+            -   type: Label
                 label: Model comparison
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: comparison
                         events:
-                                change: ./gamlj.events::onEvent_comparison
-                -       type: CheckBox
+                            change: ./gamlj.events::onEvent_comparison
+                    -   type: CheckBox
                         name: more_fit_indices
-                        
--       name: panel_fixed
+    -   name: panel_fixed
         type: CollapseBox
         label: Fixed Effects
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: Supplier
+            -   type: Supplier
                 name: modelSupplier
                 label: Components
                 persistentItems: true
@@ -96,543 +94,526 @@ children:
                 format: term
                 higherOrders: true
                 events:
-                        update: ./gamlj.events::onUpdate_modelSupplier
+                    update: ./gamlj.events::onUpdate_modelSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         transferAction: interactions
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: model_terms
                                 valueFilter: unique
                                 isTarget: true
                                 itemDropBehaviour: emptyspace
                                 events:
-                                        change: ./gamlj.events::onChange_model_terms
-                                        listItemRemoved: ./gamlj.events::onChange_model_remove
+                                    change: ./gamlj.events::onChange_model_terms
+                                    listItemRemoved: ./gamlj.events::onChange_model_remove
                                 template:
-                                        type: TermLabel
-                        -       type: CheckBox
+                                    type: TermLabel
+                            -   type: CheckBox
                                 name: fixed_intercept
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         name: nested_layout
                         transferAction: interactions
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: nested_terms
                                 valueFilter: unique
                                 isTarget: true
                                 itemDropBehaviour: emptyspace
                                 events:
-                                        change: ./gamlj.events::onChange_nested_add
+                                    change: ./gamlj.events::onChange_nested_add
                                 template:
-                                        type: TermLabel
-                        -       type: CheckBox
+                                    type: TermLabel
+                            -   type: CheckBox
                                 name: nested_intercept
                                 enable: (comparison)
-                                
--       name: panel_random
+    -   name: panel_random
         type: CollapseBox
         label: Random Effects
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: Supplier
+            -   type: Supplier
                 name: randomSupplier
                 label: Components
                 persistentItems: true
                 stretchFactor: 1
                 events:
-                        change: ./gamlj.events::onChange_randomSupplier
-                        update: ./gamlj.events::onUpdate_randomSupplier
+                    change: ./gamlj.events::onChange_randomSupplier
+                    update: ./gamlj.events::onUpdate_randomSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         transferAction: none
                         name: re_layout
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: re
                                 height: normal
                                 addButton: Add correlated effects block
                                 events:
-                                        listItemAdded: ./gamlj.events::onEvent_re_block_add
-                                        listItemRemoved: ./gamlj.events::onEvent_re_block_remove
+                                    listItemAdded: ./gamlj.events::onEvent_re_block_add
+                                    listItemRemoved: ./gamlj.events::onEvent_re_block_remove
                                 selectable: true
                                 templateName: linreg-block-template
                                 template:
-                                        type: LayoutBox
-                                        margin: normal
-                                        targetArea: true
-                                        children:
-                                        -       type: ListBox
-                                                name: randblockList
-                                                height: auto
-                                                isTarget: true
-                                                valueFilter: unique
-                                                ghostText: drag term here
-                                                events:
-                                                        change: ./gamlj.events::onEvent_addRandomTerm
-                                                template:
-                                                        type: TermLabel
-                                                        format: ./rtermFormat
-                -       type: TargetLayoutBox
+                                    type: LayoutBox
+                                    margin: normal
+                                    targetArea: true
+                                    children:
+                                        -   type: ListBox
+                                            name: randblockList
+                                            height: auto
+                                            isTarget: true
+                                            valueFilter: unique
+                                            ghostText: drag term here
+                                            events:
+                                                change: ./gamlj.events::onEvent_addRandomTerm
+                                            template:
+                                                type: TermLabel
+                                                format: ./rtermFormat
+                    -   type: TargetLayoutBox
                         transferAction: none
                         name: nested_re_layout
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: nested_re
                                 height: normal
                                 addButton: Add correlated effects block
                                 events:
-                                        listItemAdded: ./gamlj.events::onEvent_nothing
-                                        listItemRemoved: ./gamlj.events::onEvent_nothing
+                                    listItemAdded: ./gamlj.events::onEvent_nothing
+                                    listItemRemoved: ./gamlj.events::onEvent_nothing
                                 selectable: true
                                 templateName: linreg-block-template
                                 template:
-                                        type: LayoutBox
-                                        margin: normal
-                                        targetArea: true
-                                        children:
-                                        -       type: ListBox
-                                                name: re_randblockList
-                                                height: auto
-                                                isTarget: true
-                                                valueFilter: unique
-                                                ghostText: drag term here
-                                                itemDropBehaviour: emptyspace
-                                                events:
-                                                        change: ./gamlj.events::onEvent_addNestedRandomTerm
-                                                template:
-                                                        type: TermLabel
-                                                        format: ./rtermFormat
-        -       type: LayoutBox
+                                    type: LayoutBox
+                                    margin: normal
+                                    targetArea: true
+                                    children:
+                                        -   type: ListBox
+                                            name: re_randblockList
+                                            height: auto
+                                            isTarget: true
+                                            valueFilter: unique
+                                            ghostText: drag term here
+                                            itemDropBehaviour: emptyspace
+                                            events:
+                                                change: ./gamlj.events::onEvent_addNestedRandomTerm
+                                            template:
+                                                type: TermLabel
+                                                format: ./rtermFormat
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: List components
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: re_modelterms
                                 events:
-                                        change: ./gamlj.events::onEvent_re_list
-                        -       type: ComboBox
+                                    change: ./gamlj.events::onEvent_re_list
+                            -   type: ComboBox
                                 name: re_listing
                                 events:
-                                        change: ./gamlj.events::onEvent_re_list
-                        -       type: CheckBox
+                                    change: ./gamlj.events::onEvent_re_list
+                            -   type: CheckBox
                                 name: re_nestedclusters
                                 events:
-                                        change: ./gamlj.events::onEvent_re_list
-                        -       type: CheckBox
+                                    change: ./gamlj.events::onEvent_re_list
+                            -   type: CheckBox
                                 name: re_crossedclusters
                                 events:
-                                        change: ./gamlj.events::onEvent_re_list
-                -       type: Label
+                                    change: ./gamlj.events::onEvent_re_list
+                    -   type: Label
                         label: Effects correlation
                         children:
-                        -       type: LayoutBox
+                            -   type: LayoutBox
                                 margin: large
                                 style: list
                                 children:
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: re_corr_all
                                         optionName: re_corr
                                         optionPart: all
                                         events:
-                                                change: ./gamlj.events::onEvent_corr
-                                -       type: RadioButton
+                                            change: ./gamlj.events::onEvent_corr
+                                    -   type: RadioButton
                                         name: re_corr_none
                                         optionName: re_corr
                                         optionPart: none
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: re_corr_block
                                         optionName: re_corr
                                         optionPart: block
-                -       type: Label
+                    -   type: Label
                         label: Tests
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: re_lrt
-                                
--       name: panel_structure
+    -   name: panel_structure
         type: CollapseBox
         label: Residuals Structure
         style: list
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Repeated Measures
                         children:
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: res_struct_id
                                 optionName: res_struct
                                 optionPart: id
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: res_struct_cs
                                 optionName: res_struct
                                 optionPart: cs
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: res_struct_un
                                 optionName: res_struct
                                 optionPart: un
-                -       type: Label
+                    -   type: Label
                         label: Autoregressive
                         children:
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: res_struct_ar1
                                 optionName: res_struct
                                 optionPart: ar1
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: res_struct_arma
                                 optionName: res_struct
                                 optionPart: arma
-        
--       name: panel_factors
+    -   name: panel_factors
         type: scaffold
-        file: commons.u.yaml    
-        
--       name: panel_covs
+        file: commons.u.yaml
+    -   name: panel_covs
         type: scaffold
-        file: commons.u.yaml    
-
--       name: panel_posthoc
+        file: commons.u.yaml
+    -   name: panel_posthoc
         type: CollapseBox
         label: Post Hoc Tests
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: Supplier
+            -   type: Supplier
                 name: posthocSupplier
                 persistentItems: false
                 stretchFactor: 1
                 format: term
                 events:
-                        change: ./gamlj.events::onChange_posthocSupplier
-                        update: ./gamlj.events::onUpdate_posthocSupplier
+                    change: ./gamlj.events::onChange_posthocSupplier
+                    update: ./gamlj.events::onUpdate_posthocSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         label: ''
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: posthoc
                                 isTarget: true
                                 template:
-                                        type: TermLabel
-        -       type: LayoutBox
+                                    type: TermLabel
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Correction
                         children:
-                        -       name: adjust_none
+                            -   name: adjust_none
                                 type: CheckBox
                                 optionPart: none
                                 optionName: adjust
-                        -       name: adjust_bonf
+                            -   name: adjust_bonf
                                 type: CheckBox
                                 optionPart: bonf
                                 optionName: adjust
-                        -       name: adjust_tukey
+                            -   name: adjust_tukey
                                 type: CheckBox
                                 optionPart: tukey
                                 optionName: adjust
-                        -       name: adjust_holm
+                            -   name: adjust_holm
                                 type: CheckBox
                                 optionPart: holm
                                 optionName: adjust
-                        -       name: adjust_scheffe
+                            -   name: adjust_scheffe
                                 type: CheckBox
                                 optionName: adjust
                                 optionPart: scheffe
-                        -       name: adjust_sidak
+                            -   name: adjust_sidak
                                 type: CheckBox
                                 optionName: adjust
                                 optionPart: sidak
-                -       type: Label
+                    -   type: Label
                         label: Info
                         children:
-                        -       name: posthoc_ci
+                            -   name: posthoc_ci
                                 type: CheckBox
-                                
--       name: panel_plots
+    -   name: panel_plots
         type: CollapseBox
         label: Plots
-        
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: VariableSupplier
+            -   type: VariableSupplier
                 name: plotsSupplier
                 populate: manual
                 stretchFactor: 1
                 persistentItems: false
                 events:
-                        update: ./gamlj.events::onUpdate_plotsSupplier
-                        change: ./gamlj.events::onChange_plotsSupplier
+                    update: ./gamlj.events::onUpdate_plotsSupplier
+                    change: ./gamlj.events::onChange_plotsSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: plot_x
                                 isTarget: true
                                 maxItemCount: 1
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: plot_z
                                 isTarget: true
                                 maxItemCount: 1
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: plot_by
                                 isTarget: true
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Display
                         children:
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: errBarDef_none
                                 optionName: plot_around
                                 optionPart: none
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: errBarDef_ci
                                 optionName: plot_around
                                 optionPart: ci
-                        -       name: plotError_se
+                            -   name: plotError_se
                                 type: RadioButton
                                 optionName: plot_around
                                 optionPart: se
-                -       type: Label
+                    -   type: Label
                         label: Plot
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_raw
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_yscale
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_more_options
                                 events:
-                                        change: ./gamlj.events::plot_more_options_changed
-                                
-                -       type: Label
+                                    change: ./gamlj.events::plot_more_options_changed
+                    -   type: Label
                         label: Use
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_xoriginal
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_black
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Random Effects
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_re
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: plot_re_method_average
                                 optionName: plot_re_method
                                 optionPart: average
                                 enable: (plot_re)
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: plot_re_method_full
                                 optionName: plot_re_method
                                 optionPart: full
                                 enable: (plot_re)
-                - type: Label
-                  label: Other Plots
-                  children:
-                    -  type:  CheckBox
-                       name:  plot_jn
-
-
-        - type: LayoutBox
-          name: plot_more_option_box
-          margin: large
-          style: inline
-          children:
-                   - type: Label
-                     label: Y-axis
-                     children:
-                            -  type:  TextBox
-                               name:  plot_y_min
-                               format: string
-                            -  type:  TextBox
-                               name:  plot_y_max
-                               format: string
-                            -  type:  TextBox
-                               name:  plot_y_ticks
-                               format: string
-                            -  type:  CheckBox
-                               name:  plot_y_ticks_exact
-
-                   - type: Label
-                     label: X-axis
-                     children:
-                            -  type:  TextBox
-                               name:  plot_x_min
-                               format: string
-                            -  type:  TextBox
-                               name:  plot_x_max
-                               format: string
-                            -  type:  TextBox
-                               name:  plot_x_ticks
-                               format: string
-                            -  type:  CheckBox
-                               name:  plot_x_ticks_exact
-                   - type: Label
-                     label: Features
-                     children:
-                     -  type:  CheckBox
-                        name:  plot_extra
-
-
--       name: panel_simpleeffects
+                    -   type: Label
+                        label: Other Plots
+                        children:
+                            -   type: CheckBox
+                                name: plot_jn
+            -   type: LayoutBox
+                name: plot_more_option_box
+                margin: large
+                style: inline
+                children:
+                    -   type: Label
+                        label: Y-axis
+                        children:
+                            -   type: TextBox
+                                name: plot_y_min
+                                format: string
+                            -   type: TextBox
+                                name: plot_y_max
+                                format: string
+                            -   type: TextBox
+                                name: plot_y_ticks
+                                format: string
+                            -   type: CheckBox
+                                name: plot_y_ticks_exact
+                    -   type: Label
+                        label: X-axis
+                        children:
+                            -   type: TextBox
+                                name: plot_x_min
+                                format: string
+                            -   type: TextBox
+                                name: plot_x_max
+                                format: string
+                            -   type: TextBox
+                                name: plot_x_ticks
+                                format: string
+                            -   type: CheckBox
+                                name: plot_x_ticks_exact
+                    -   type: Label
+                        label: Features
+                        children:
+                            -   type: CheckBox
+                                name: plot_extra
+    -   name: panel_simpleeffects
         type: scaffold
-        file: commons.u.yaml    
-
--       name: panel_emmeans
+        file: commons.u.yaml
+    -   name: panel_emmeans
         type: scaffold
-        file: commons.u.yaml    
-
--       name: panel_assumptions
+        file: commons.u.yaml
+    -   name: panel_assumptions
         type: CollapseBox
         label: Assumption Checks
         collapsed: true
         stretchFactor: 1
         style: inline
         children:
-        -       type: Label
+            -   type: Label
                 label: Tests
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: norm_test
-        -       type: Label
+            -   type: Label
                 label: Residual Plots
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: qq_plot
                         label: QQ plot
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: norm_plot
                         label: histogram
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: resid_plot
                         label: Residuals-Predicted
-        -       type: Label
+            -   type: Label
                 label: By clusters
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: rand_hist
                         label: Random coeff. histogram
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: cluster_boxplot
                         label: Residuals boxplot
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: cluster_respred
                         label: Residuals-Predicted
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: cluster_respred_grid
                         label: Residuals-Predicted (grid)
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: plot_extremes
-                        
--       name: panel_options
+    -   name: panel_options
         type: CollapseBox
         label: Options
         style: list
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: list
                 children:
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: inline
                         children:
-                        -       type: Label
+                            -   type: Label
                                 label: CI Method
                                 children:
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: ci_method_wald
                                         optionName: ci_method
                                         optionPart: wald
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: ci_method_quantile
                                         optionName: ci_method
                                         optionPart: quantile
-                                -       type: TextBox
+                                    -   type: TextBox
                                         name: boot_r
                                         format: number
                                         enable: (ci_method_quantile)
-                        -       type: Label
+                            -   type: Label
                                 label: DF Method
                                 children:
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: df_method_satterthwaite
                                         optionName: df_method
                                         optionPart: Satterthwaite
-                                -       name: df_method_kenward_roger
+                                    -   name: df_method_kenward_roger
                                         type: RadioButton
                                         optionName: df_method
                                         optionPart: Kenward-Roger
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: inline
                         children:
-                        -       type: Label
+                            -   type: Label
                                 label: Table
                                 children:
-                                -       type: CheckBox
+                                    -   type: CheckBox
                                         name: mute
-
--       name: panel_save
+    -   name: panel_save
         type: CollapseBox
         label: Save
         style: list
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: list
                 children:
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: inline
                         children:
-                        -       type: Label
+                            -   type: Label
                                 label: Save
                                 children:
-                                -       type: Output
+                                    -   type: Output
                                         name: predicted
-                                -       type: Output
+                                    -   type: Output
                                         name: residuals
-                        -       type: Label
+                            -   type: Label
                                 label: Export
                                 children:
-                                -       type: CheckBox
+                                    -   type: CheckBox
                                         name: export_emm
-                                -       type: CheckBox
+                                    -   type: CheckBox
                                         name: export_plot
-                                -       type: CheckBox
+                                    -   type: CheckBox
                                         name: export_re
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: inline
                         children:
-                           - type: ActionButton
-                             name: export
+                            -   type: ActionButton
+                                name: export

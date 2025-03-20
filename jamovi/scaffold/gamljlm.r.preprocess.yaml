@@ -1,1135 +1,1057 @@
----
-name:  gamljlm
+name: gamljlm
 title: General Linear Model
 jrs: '1.0'
 items:
-  - name: model
-    type: Property
-
-  - name: errortable
-    type: Html
-    visible: false
-
-  - name: info
-    title: Model Info
-    type: Table
-    columns:
-       - name: info
-         type: text
-         title: "Info"
-       - name: value
-         type: text
-         title: ""
-       - name: specs
-         type: text
-         title: ""
-
-    clearWith:
-                   -  type: scaffold
-                      name: opts_model
-                      file: clear.yaml
-                   -  type: scaffold
-                      name: opts_nested
-                      file: clear.yaml
-                   -  type: scaffold
-                      name: opts_ci
-                      file: clear.yaml
-
-    refs: gamlj
-
-  - name: modelnotes
-    type: Html
-    visible: false
-     
-  - name: main
-    type: Group
-    title: Model Results
-    items:
-           - name: r2
-             title: Model Fit
-             type: Table
-             description: a table of R
-             clearWith:
-                   -  type: scaffold
-                      name: opts_model
-                      file: clear.yaml
-                   -  type: scaffold
-                      name: opts_nested
-                      file: clear.yaml
-                   -  type: scaffold
-                      name: opts_ci
-                      file: clear.yaml
-                   - omnibus
-             columns:
-                    - name: model
-                      title: Model
-                      visible: (comparison)
-                    - name: r2
-                      title: R²
-                      type: number
-                      format: zto
-                    - name: ar2
-                      title: Adj. R²
-                      type: number
-                      format: zto
-                    - name:  df1
-                      title: df
-                      type: integer
-                    - name:  df2
-                      title: df (res)
-                      type: integer
-                      visible: (omnibus:F)
-                    - name: f
-                      title: F
-                      type: number
-                      visible: (omnibus:F)
-                    - name: test
-                      title: LRT X²
-                      type: number
-                      visible: (omnibus:LRT)
-
-                    - name: p
-                      title: p
-                      type: number
-                      format: zto,pvalue
-             refs: goodness
-
-                      
-           - name: intercept
-             title: Intercept Information
-             type: Table
-             visible: (intercept_info)
-             description: a table of information for the model intercept
-             clearWith:
-                   -  type: scaffold
-                      name: opts_model
-                      file: clear.yaml
-                   -  type: scaffold
-                      name: opts_ci
-                      file: clear.yaml
-                   -  type: scaffold
-                      name: opts_es
-                      file: clear.yaml
- 
-                   -  intercept_info
-                         
-             rows: 1             
-             columns:
-                    - name: source
-                      title: ""
-                      type: text
-                    - name: f
-                      title: F
-                      type: number
-                    - name:  df
-                      title: df
-                      type: integer
-                    - name: p
-                      title: p
-                      type: number
-                      format: zto,pvalue
-                    - name: etaSqP
-                      title: η²p
-                      type: number
-                      visible: (es:etap)
-                      format: zto
-                    - name: omegaSqP
-                      title: ω²p
-                      type: number
-                      visible: (es:omegap)
-                      format: zto
-                    - name: epsilonSqP
-                      title: ε²p
-                      type: number
-                      visible: (es:epsilonp)
-                      format: zto
-
-           - name: anova
-             title: ANOVA Omnibus tests
-             type: Table
-             description: a table of ANOVA results
-             clearWith:
-                  -  type: scaffold
-                     name: opts_model
-                     file: clear.yaml
-                  -  type: scaffold
-                     name: opts_es
-                     file: clear.yaml
- 
-             columns:
-                    - name: source
-                      title: ""
-                      type: text
-                    - name: ss
-                      title: SS
-                      type: number
-                      format: zto
-                    - name: df
-                      title: df
-                      type: integer
-                    - name: f
-                      title: F
-                      type: number
-                      format: zto
-                    - name: p
-                      title: p
-                      type: number
-                      format: zto,pvalue
-                    - name: etaSq
-                      title: η²
-                      type: number
-                      visible: (es:eta)
-                    - name: etaSqP
-                      title: η²p
-                      type: number
-                      visible: (es:etap)
-                      format: zto
-                    - name: omegaSq
-                      title: ω²
-                      type: number
-                      visible: (es:omega)
-                      format: zto
-                    - name: omegaSqP
-                      title: ω²p
-                      type: number
-                      visible: (es:omegap)
-                      format: zto
-
-                    - name: epsilonSq
-                      title: ε²
-                      type: number
-                      visible: (es:epsilon)
-                      format: zto
-                    - name: epsilonSqP
-                      title: ε²p
-                      type: number
-                      visible: (es:epsilonp)
-                      format: zto
-
-           - name: effectsizes
-             title: Effect Size Indices
-             type: Table
-             visible: (es_info)
-             description: a table of effect size indeces
-             refs: es
-
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-
-             columns:
-                    - name: effect
-                      title: Effect
-                      combineBelow: true
-                      type: text
-                    - name: name
-                      title: Statistics
-                      type: text
-                    - name: estimate
-                      title: Estimate
-                      type: number
-                      format: zto
-                    - name: est.ci.lower
-                      title: Lower
-                      type: number
-                    - name: est.ci.upper
-                      title: Upper
-                      type: number
-
-           - name: coefficients
-             title:  Parameter Estimates (Coefficients)
-             type: Table
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  betas_ci
- 
-             columns:
-                    - name: source
-                      title: "Names"
-                      type: text
-                    - name: label
-                      title: "Effect"
-                      type: text
-                      visible: (show_contrastnames)
-                    - name: estimate
-                      title: "Estimate"
-                      type: number
-                      format: zto
-                    - name: se
-                      title: SE
-                      type: number
-                      format: zto
-                    - name: est.ci.lower
-                      type: number
-                      title: Lower
-                      format: zto
-                      visible: (estimates_ci)
-                    - name: est.ci.upper
-                      type: number
-                      title: Upper
-                      visible: (estimates_ci)
-                      format: zto
-                    - name: beta
-                      type: number
-                      title: β
-                      visible: (es:beta)
-                      format: zto
-                    - name: beta.ci.lower
-                      type: number
-                      title: Lower
-                      format: zto
-                      visible: (betas_ci)
-                    - name: beta.ci.upper
-                      type: number
-                      title: Upper
-                      format: zto
-                      visible: (betas_ci)
-                    - name: df
-                      title: "df"
-                      type: integer
-                    - name: test
-                      title: "t"
-                      type: number
-                      format: zto
-                    - name: p
-                      title: "p"
-                      type: number
-                      format: zto,pvalue
-
-             refs: parameters
-
-           - name: contrasts
-             title:  Custom Contrast Tests
-             type: Table
-             visible: false
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-             columns:
-                    - name: source
-                      title: "Variable"
-                      type: text
-                    - name: label
-                      title: "Contrast"
-                      type: text
-                    - name: estimate
-                      title: "Estimate"
-                      type: number
-                      format: zto
-                    - name: se
-                      title: SE
-                      type: number
-                      format: zto
-                    - name: est.ci.lower
-                      type: number
-                      title: Lower
-                      format: zto
-                      visible: (estimates_ci)
-                    - name: est.ci.upper
-                      type: number
-                      title: Upper
-                      visible: (estimates_ci)
-                      format: zto
-                    - name: d
-                      type: number
-                      title: d
-                      format: zto
-                    - name: df
-                      title: "df"
-                      type: integer
-                    - name: test
-                      title: "t"
-                      type: number
-                      format: zto
-                    - name: p
-                      title: "p"
-                      type: number
-                      format: zto,pvalue
-
-           - name: customEffectsizes
-             title: Custom Contrasts effect size indices
-             type: Table
-             visible: false
-             description: a table of effect size indeces
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-
-             columns:
-                    - name: effect
-                      title: Contrast
-                      combineBelow: true
-                      type: text
-                    - name: name
-                      title: Statistics
-                      type: text
-                    - name: estimate
-                      title: Estimate
-                      type: number
-                      format: zto
-                    - name: est.ci.lower
-                      title: Lower
-                      type: number
-                    - name: est.ci.upper
-                      title: Upper
-                      type: number
-
-
-           - name: vcov
-             title: Coefficients Covariances
-             type: Table
-             visible: (vcov)
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-             columns:
-                    - name: source
-                      title: "Coefficient"
-                      type: text
-                      visible: (show_contrastnames)
-
-
-
-           - name: contrastCodeTables
-             title: Contrast Coefficients 
-             type: Array
-             description: an array of contrast coefficients tables
-             visible: (show_contrastcodes)
-             items: (factors)
-             clearWith:
-                    - contrasts
-             template:
-                   title:  "Factor: ___key___"
-                   type: Table
-                   columns:
-                         - name: cname
-                           title: 'Name'
-                           type: text
-                           visible: (show_contrastnames)
-                         - name: clab
-                           title: 'Contrast'
-                           type: text
-                         - name: bogus
-                           title: 'bogus'
-                           type: text
-                           visible: false
-
-
-  - name: posthoc
-    title: Post Hoc Tests
-    type: Array
-    description: an array of post-hoc tables
-    items: (posthoc)
-    template:
-        title:  "Post Hoc comparison:  ___key___"
+    -   name: model
+        type: Property
+    -   name: errortable
+        type: Html
+        visible: false
+    -   name: info
+        title: Model Info
         type: Table
-        clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-
         columns:
-        - name: estimate
-          title: Difference
-          type: number
-          format: zto       
-        - name: se
-          title: SE
-          type: number
-          format: zto       
-        - name: est.ci.lower
-          type: number
-          title: Lower
-          format: zto          
-          visible: (posthoc_ci)
-        - name: est.ci.upper
-          type: number
-          title: Upper
-          format: zto       
-          visible: (posthoc_ci)
-        - name: test
-          title: t
-          type: number
-        - name: df
-          title: df
-          type: integer
-        - name: p
-          title: p
-          type: number
-          format: zto,pvalue
-          visible: (adjust:none)
-        - name: bonf
-          title: p<sub>bonferroni</sub>
-          type: number
-          format: zto,pvalue
-          visible: (adjust:bonf)
-        - name: tukey
-          title: p<sub>tukey</sub>
-          type: number
-          format: zto,pvalue
-          visible: (adjust:tukey)
-        - name: holm
-          title: p<sub>holm</sub>
-          type: number
-          format: zto,pvalue
-          visible: (adjust:holm)
-        - name: scheffe
-          title: p<sub>scheffe</sub>
-          type: number
-          format: zto,pvalue
-          visible: (adjust:scheffe)
-        - name: sidak
-          title: p<sub>sidak</sub>
-          type: number
-          format: zto,pvalue
-          visible: (adjust:sidak)
-
-  - name: posthocEffectSize
-    title: Comparisons effect size
-    type: Array
-    description: an array of post-hoc effect size
-    visible: false
-    items: (posthoc)
-    template:
-        title:  "Comparisons:  ___key___"
-        type: Table
+            -   name: info
+                type: text
+                title: Info
+            -   name: value
+                type: text
+                title: ''
+            -   name: specs
+                type: text
+                title: ''
         clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  posthoc_es
-                    -  d_ci
-        columns:
-        - name: estimate
-          title: Difference
-          type: number
-          format: zto       
-        - name: se
-          title: SE
-          type: number
-          format: zto       
-        - name: dm
-          title: d<sub>mod</sub>
-          type: number
-          visible: (posthoc_es:dm)
-          format: zto       
-        - name: dm.ci.lower
-          type: number
-          title: Lower
-          visible: (posthoc_es:dm && d_ci)
-          format: zto       
-        - name: dm.ci.upper
-          type: number
-          title: Upper
-          format: zto       
-          visible: (posthoc_es:dm && d_ci)
-        - name: ds
-          title: d<sub>sample</sub>
-          type: number
-          format: zto       
-          visible: (posthoc_es:ds)
-        - name: ds.ci.lower
-          type: number
-          title: Lower
-          format: zto       
-          visible: (posthoc_es:ds && d_ci)
-        - name: ds.ci.upper
-          type: number
-          title: Upper
-          format: zto       
-          visible: (posthoc_es:ds && d_ci)
-        - name: g
-          title: g<sub>sample</sub> 
-          type: number
-          format: zto       
-          visible: (posthoc_es:g)
-        - name: g.ci.lower
-          type: number
-          title: Lower
-          format: zto       
-          visible: (posthoc_es:g && d_ci)
-        - name: g.ci.upper
-          type: number
-          title: Upper
-          format: zto       
-          visible: (posthoc_es:g && d_ci)
-
-
-  - name: simpleEffects
-    title: Simple Effects 
-    type: Group
-    items:
-            - name: anova
-              title: ANOVA for Simple Effects  of ___key___
-              type: Table
-              description: a table of ANOVA for simple effects
-              visible: false
-              clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-              columns:
-                   - name: test
-                     title: F
-                     type: number
-                   - name: df1
-                     title: Num df
-                     type: integer
-                   - name: df2
-                     title: Den df
-                     type: integer
-                   - name: p
-                     title: p
-                     type: number
-                     format: zto,pvalue
-                   - name: etaSq
-                     title: η²
-                     type: number
-                     visible: (es:eta)
-                   - name: etaSqP
-                     title: η²p
-                     type: number
-                     visible: (es:etap)
-                     format: zto
-                   - name: omegaSq
-                     title: ω²
-                     type: number
-                     visible: (es:omega)
-                     format: zto
-                   - name: omegaSqP
-                     title: ω²p
-                     type: number
-                     visible: (es:omegap)
-                     format: zto
-                   - name: epsilonSq
-                     title: ε²
-                     type: number
-                     visible: (es:epsilon)
-                     format: zto
-                   - name: epsilonSqP
-                     title: ε²p
-                     type: number
-                     visible: (es:epsilonp)
-                     format: zto
-
-            - name: coefficients
-              title: Parameter Estimates for simple effects of ___key___
-              type: Table
-              visible: false
-              clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                       
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_simple_effects
-                       file: clear.yaml
-
-              columns:
-                     - name: contrast
-                       title: "Effect"
-                       type: text
-                     - name: estimate
-                       title: "Estimate"
-                       type: number
-                       format: zto
-                     - name: se
-                       title: SE
-                       type: number
-                       format: zto
-                     - name: est.ci.lower
-                       type: number
-                       title: Lower
-                       format: zto
-                       visible: (estimates_ci)
-                     - name: est.ci.upper
-                       type: number
-                       title: Upper
-                       format: zto
-                       visible: (estimates_ci)
-                     - name: beta
-                       type: number
-                       title: β
-                       visible: (es:beta)
-                       format: zto
-                     - name: df
-                       title: "df"
-                       type: integer
-                     - name: test
-                       title: "t"
-                       type: number
-                       format: zto
-                     - name: p
-                       title: "p"
-                       type: number
-                       format: zto,pvalue
-
-
-  - name: simpleInteractions
-    title: Simple Interactions 
-    type: Array
-    description: an array of simple interactions tables
-    visible: (simple_interactions)
-    template:
-        title:  "Interaction: ___key___"
+            -   type: scaffold
+                name: opts_model
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_nested
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_ci
+                file: clear.yaml
+        refs: gamlj
+    -   name: modelnotes
+        type: Html
+        visible: false
+    -   name: main
         type: Group
-        clearWith: []
+        title: Model Results
         items:
-           - type: Table
-             name: anova
-             title: ANOVA 
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_simple_effects
-                       file: clear.yaml
-                
-             columns:
-                   - name: effect
-                     title: 'Effect'
-                     type: text
-                   - name: test
-                     title: F
-                     type: number
-                   - name: df1
-                     title: df1
-                     type: integer
-                   - name: df2
-                     title: df2
-                     type: integer
-                   - name: p
-                     title: p
-                     type: number
-                     format: zto,pvalue
-                   - name: etaSq
-                     title: η²
-                     type: number
-                     visible: (es:eta)
-                   - name: etaSqP
-                     title: η²p
-                     type: number
-                     visible: (es:etap)
-                     format: zto
-                   - name: omegaSq
-                     title: ω²
-                     type: number
-                     visible: (es:omega)
-                     format: zto
-                   - name: omegaSqP
-                     title: ω²p
-                     type: number
-                     visible: (es:omegap)
-                     format: zto
-                   - name: epsilonSq
-                     title: ε²
-                     type: number
-                     visible: (es:epsilon)
-                     format: zto
-                   - name: epsilonSqP
-                     title: ε²p
-                     type: number
-                     visible: (es:epsilonp)
-                     format: zto
-
-
-           - type: Table
-             name: coefficients
-             title: Parameter Estimates 
-             clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_simple_effects
-                       file: clear.yaml
-
-             columns:
-                   - name: effect
-                     title: 'Effect'
-                     type: text
-                   - name: estimate
-                     title: Estimate
-                     type: number
-                     format: zto       
-                   - name: se
-                     title: SE
-                     type: number
-                     format: zto       
-                   - name: df
-                     title: df
-                     type: integer
-                   - name: est.ci.lower
-                     title: Lower 
-                     type: number
-                     format: zto       
-                   - name: est.ci.upper
-                     title: Upper
-                     type: number
-                     format: zto       
-                   - name: test
-                     title: t
-                     type: number
-                     format: zto       
-                   - name: p
-                     title: p
-                     type: number
-                     format: zto,pvalue
-
-
-  - name: emmeans
-    title: Estimated Marginal Means 
-    type: Array
-    description: an array of predicted means tables
-    visible: false
-    items: (emmeans)
-    template:
-        title:  Estimate Marginal Means - ___key___
-        type: Table
+            -   name: r2
+                title: Model Fit
+                type: Table
+                description: a table of R
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_nested
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                    - omnibus
+                columns:
+                    -   name: model
+                        title: Model
+                        visible: (comparison)
+                    -   name: r2
+                        title: R²
+                        type: number
+                        format: zto
+                    -   name: ar2
+                        title: Adj. R²
+                        type: number
+                        format: zto
+                    -   name: df1
+                        title: df
+                        type: integer
+                    -   name: df2
+                        title: df (res)
+                        type: integer
+                        visible: (omnibus:F)
+                    -   name: f
+                        title: F
+                        type: number
+                        visible: (omnibus:F)
+                    -   name: test
+                        title: LRT X²
+                        type: number
+                        visible: (omnibus:LRT)
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+                refs: goodness
+            -   name: intercept
+                title: Intercept Information
+                type: Table
+                visible: (intercept_info)
+                description: a table of information for the model intercept
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_es
+                        file: clear.yaml
+                    - intercept_info
+                rows: 1
+                columns:
+                    -   name: source
+                        title: ''
+                        type: text
+                    -   name: f
+                        title: F
+                        type: number
+                    -   name: df
+                        title: df
+                        type: integer
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+                    -   name: etaSqP
+                        title: η²p
+                        type: number
+                        visible: (es:etap)
+                        format: zto
+                    -   name: omegaSqP
+                        title: ω²p
+                        type: number
+                        visible: (es:omegap)
+                        format: zto
+                    -   name: epsilonSqP
+                        title: ε²p
+                        type: number
+                        visible: (es:epsilonp)
+                        format: zto
+            -   name: anova
+                title: ANOVA Omnibus tests
+                type: Table
+                description: a table of ANOVA results
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_es
+                        file: clear.yaml
+                columns:
+                    -   name: source
+                        title: ''
+                        type: text
+                    -   name: ss
+                        title: SS
+                        type: number
+                        format: zto
+                    -   name: df
+                        title: df
+                        type: integer
+                    -   name: f
+                        title: F
+                        type: number
+                        format: zto
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+                    -   name: etaSq
+                        title: η²
+                        type: number
+                        visible: (es:eta)
+                    -   name: etaSqP
+                        title: η²p
+                        type: number
+                        visible: (es:etap)
+                        format: zto
+                    -   name: omegaSq
+                        title: ω²
+                        type: number
+                        visible: (es:omega)
+                        format: zto
+                    -   name: omegaSqP
+                        title: ω²p
+                        type: number
+                        visible: (es:omegap)
+                        format: zto
+                    -   name: epsilonSq
+                        title: ε²
+                        type: number
+                        visible: (es:epsilon)
+                        format: zto
+                    -   name: epsilonSqP
+                        title: ε²p
+                        type: number
+                        visible: (es:epsilonp)
+                        format: zto
+            -   name: effectsizes
+                title: Effect Size Indices
+                type: Table
+                visible: (es_info)
+                description: a table of effect size indeces
+                refs: es
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                columns:
+                    -   name: effect
+                        title: Effect
+                        combineBelow: true
+                        type: text
+                    -   name: name
+                        title: Statistics
+                        type: text
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        title: Lower
+                        type: number
+                    -   name: est.ci.upper
+                        title: Upper
+                        type: number
+            -   name: coefficients
+                title: Parameter Estimates (Coefficients)
+                type: Table
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                    - betas_ci
+                columns:
+                    -   name: source
+                        title: Names
+                        type: text
+                    -   name: label
+                        title: Effect
+                        type: text
+                        visible: (show_contrastnames)
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: se
+                        title: SE
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        type: number
+                        title: Lower
+                        format: zto
+                        visible: (estimates_ci)
+                    -   name: est.ci.upper
+                        type: number
+                        title: Upper
+                        visible: (estimates_ci)
+                        format: zto
+                    -   name: beta
+                        type: number
+                        title: β
+                        visible: (es:beta)
+                        format: zto
+                    -   name: beta.ci.lower
+                        type: number
+                        title: Lower
+                        format: zto
+                        visible: (betas_ci)
+                    -   name: beta.ci.upper
+                        type: number
+                        title: Upper
+                        format: zto
+                        visible: (betas_ci)
+                    -   name: df
+                        title: df
+                        type: integer
+                    -   name: test
+                        title: t
+                        type: number
+                        format: zto
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+                refs: parameters
+            -   name: contrasts
+                title: Custom Contrast Tests
+                type: Table
+                visible: false
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                columns:
+                    -   name: source
+                        title: Variable
+                        type: text
+                    -   name: label
+                        title: Contrast
+                        type: text
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: se
+                        title: SE
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        type: number
+                        title: Lower
+                        format: zto
+                        visible: (estimates_ci)
+                    -   name: est.ci.upper
+                        type: number
+                        title: Upper
+                        visible: (estimates_ci)
+                        format: zto
+                    -   name: d
+                        type: number
+                        title: d
+                        format: zto
+                    -   name: df
+                        title: df
+                        type: integer
+                    -   name: test
+                        title: t
+                        type: number
+                        format: zto
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+            -   name: customEffectsizes
+                title: Custom Contrasts effect size indices
+                type: Table
+                visible: false
+                description: a table of effect size indeces
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                columns:
+                    -   name: effect
+                        title: Contrast
+                        combineBelow: true
+                        type: text
+                    -   name: name
+                        title: Statistics
+                        type: text
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        title: Lower
+                        type: number
+                    -   name: est.ci.upper
+                        title: Upper
+                        type: number
+            -   name: vcov
+                title: Coefficients Covariances
+                type: Table
+                visible: (vcov)
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                columns:
+                    -   name: source
+                        title: Coefficient
+                        type: text
+                        visible: (show_contrastnames)
+            -   name: contrastCodeTables
+                title: Contrast Coefficients
+                type: Array
+                description: an array of contrast coefficients tables
+                visible: (show_contrastcodes)
+                items: (factors)
+                clearWith: contrasts
+                template:
+                    title: 'Factor: ___key___'
+                    type: Table
+                    columns:
+                        -   name: cname
+                            title: Name
+                            type: text
+                            visible: (show_contrastnames)
+                        -   name: clab
+                            title: Contrast
+                            type: text
+                        -   name: bogus
+                            title: bogus
+                            type: text
+                            visible: false
+    -   name: posthoc
+        title: Post Hoc Tests
+        type: Array
+        description: an array of post-hoc tables
+        items: (posthoc)
+        template:
+            title: 'Post Hoc comparison:  ___key___'
+            type: Table
+            clearWith:
+                -   type: scaffold
+                    name: opts_model
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_ci
+                    file: clear.yaml
+            columns:
+                -   name: estimate
+                    title: Difference
+                    type: number
+                    format: zto
+                -   name: se
+                    title: SE
+                    type: number
+                    format: zto
+                -   name: est.ci.lower
+                    type: number
+                    title: Lower
+                    format: zto
+                    visible: (posthoc_ci)
+                -   name: est.ci.upper
+                    type: number
+                    title: Upper
+                    format: zto
+                    visible: (posthoc_ci)
+                -   name: test
+                    title: t
+                    type: number
+                -   name: df
+                    title: df
+                    type: integer
+                -   name: p
+                    title: p
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:none)
+                -   name: bonf
+                    title: p<sub>bonferroni</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:bonf)
+                -   name: tukey
+                    title: p<sub>tukey</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:tukey)
+                -   name: holm
+                    title: p<sub>holm</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:holm)
+                -   name: scheffe
+                    title: p<sub>scheffe</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:scheffe)
+                -   name: sidak
+                    title: p<sub>sidak</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:sidak)
+    -   name: posthocEffectSize
+        title: Comparisons effect size
+        type: Array
+        description: an array of post-hoc effect size
+        visible: false
+        items: (posthoc)
+        template:
+            title: 'Comparisons:  ___key___'
+            type: Table
+            clearWith:
+                -   type: scaffold
+                    name: opts_model
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_ci
+                    file: clear.yaml
+                - posthoc_es
+                - d_ci
+            columns:
+                -   name: estimate
+                    title: Difference
+                    type: number
+                    format: zto
+                -   name: se
+                    title: SE
+                    type: number
+                    format: zto
+                -   name: dm
+                    title: d<sub>mod</sub>
+                    type: number
+                    visible: (posthoc_es:dm)
+                    format: zto
+                -   name: dm.ci.lower
+                    type: number
+                    title: Lower
+                    visible: (posthoc_es:dm && d_ci)
+                    format: zto
+                -   name: dm.ci.upper
+                    type: number
+                    title: Upper
+                    format: zto
+                    visible: (posthoc_es:dm && d_ci)
+                -   name: ds
+                    title: d<sub>sample</sub>
+                    type: number
+                    format: zto
+                    visible: (posthoc_es:ds)
+                -   name: ds.ci.lower
+                    type: number
+                    title: Lower
+                    format: zto
+                    visible: (posthoc_es:ds && d_ci)
+                -   name: ds.ci.upper
+                    type: number
+                    title: Upper
+                    format: zto
+                    visible: (posthoc_es:ds && d_ci)
+                -   name: g
+                    title: g<sub>sample</sub>
+                    type: number
+                    format: zto
+                    visible: (posthoc_es:g)
+                -   name: g.ci.lower
+                    type: number
+                    title: Lower
+                    format: zto
+                    visible: (posthoc_es:g && d_ci)
+                -   name: g.ci.upper
+                    type: number
+                    title: Upper
+                    format: zto
+                    visible: (posthoc_es:g && d_ci)
+    -   name: simpleEffects
+        title: Simple Effects
+        type: Group
+        items:
+            -   name: anova
+                title: ANOVA for Simple Effects  of ___key___
+                type: Table
+                description: a table of ANOVA for simple effects
+                visible: false
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_model_lm
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_cov_scaling
+                        file: clear.yaml
+                columns:
+                    -   name: test
+                        title: F
+                        type: number
+                    -   name: df1
+                        title: Num df
+                        type: integer
+                    -   name: df2
+                        title: Den df
+                        type: integer
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+                    -   name: etaSq
+                        title: η²
+                        type: number
+                        visible: (es:eta)
+                    -   name: etaSqP
+                        title: η²p
+                        type: number
+                        visible: (es:etap)
+                        format: zto
+                    -   name: omegaSq
+                        title: ω²
+                        type: number
+                        visible: (es:omega)
+                        format: zto
+                    -   name: omegaSqP
+                        title: ω²p
+                        type: number
+                        visible: (es:omegap)
+                        format: zto
+                    -   name: epsilonSq
+                        title: ε²
+                        type: number
+                        visible: (es:epsilon)
+                        format: zto
+                    -   name: epsilonSqP
+                        title: ε²p
+                        type: number
+                        visible: (es:epsilonp)
+                        format: zto
+            -   name: coefficients
+                title: Parameter Estimates for simple effects of ___key___
+                type: Table
+                visible: false
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_model_lm
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_cov_scaling
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_simple_effects
+                        file: clear.yaml
+                columns:
+                    -   name: contrast
+                        title: Effect
+                        type: text
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: se
+                        title: SE
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        type: number
+                        title: Lower
+                        format: zto
+                        visible: (estimates_ci)
+                    -   name: est.ci.upper
+                        type: number
+                        title: Upper
+                        format: zto
+                        visible: (estimates_ci)
+                    -   name: beta
+                        type: number
+                        title: β
+                        visible: (es:beta)
+                        format: zto
+                    -   name: df
+                        title: df
+                        type: integer
+                    -   name: test
+                        title: t
+                        type: number
+                        format: zto
+                    -   name: p
+                        title: p
+                        type: number
+                        format: zto,pvalue
+    -   name: simpleInteractions
+        title: Simple Interactions
+        type: Array
+        description: an array of simple interactions tables
+        visible: (simple_interactions)
+        template:
+            title: 'Interaction: ___key___'
+            type: Group
+            clearWith: []
+            items:
+                -   type: Table
+                    name: anova
+                    title: ANOVA
+                    clearWith:
+                        -   type: scaffold
+                            name: opts_model
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_model_lm
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_cov_scaling
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_simple_effects
+                            file: clear.yaml
+                    columns:
+                        -   name: effect
+                            title: Effect
+                            type: text
+                        -   name: test
+                            title: F
+                            type: number
+                        -   name: df1
+                            title: df1
+                            type: integer
+                        -   name: df2
+                            title: df2
+                            type: integer
+                        -   name: p
+                            title: p
+                            type: number
+                            format: zto,pvalue
+                        -   name: etaSq
+                            title: η²
+                            type: number
+                            visible: (es:eta)
+                        -   name: etaSqP
+                            title: η²p
+                            type: number
+                            visible: (es:etap)
+                            format: zto
+                        -   name: omegaSq
+                            title: ω²
+                            type: number
+                            visible: (es:omega)
+                            format: zto
+                        -   name: omegaSqP
+                            title: ω²p
+                            type: number
+                            visible: (es:omegap)
+                            format: zto
+                        -   name: epsilonSq
+                            title: ε²
+                            type: number
+                            visible: (es:epsilon)
+                            format: zto
+                        -   name: epsilonSqP
+                            title: ε²p
+                            type: number
+                            visible: (es:epsilonp)
+                            format: zto
+                -   type: Table
+                    name: coefficients
+                    title: Parameter Estimates
+                    clearWith:
+                        -   type: scaffold
+                            name: opts_model
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_model_lm
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_ci
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_cov_scaling
+                            file: clear.yaml
+                        -   type: scaffold
+                            name: opts_simple_effects
+                            file: clear.yaml
+                    columns:
+                        -   name: effect
+                            title: Effect
+                            type: text
+                        -   name: estimate
+                            title: Estimate
+                            type: number
+                            format: zto
+                        -   name: se
+                            title: SE
+                            type: number
+                            format: zto
+                        -   name: df
+                            title: df
+                            type: integer
+                        -   name: est.ci.lower
+                            title: Lower
+                            type: number
+                            format: zto
+                        -   name: est.ci.upper
+                            title: Upper
+                            type: number
+                            format: zto
+                        -   name: test
+                            title: t
+                            type: number
+                            format: zto
+                        -   name: p
+                            title: p
+                            type: number
+                            format: zto,pvalue
+    -   name: emmeans
+        title: Estimated Marginal Means
+        type: Array
+        description: an array of predicted means tables
+        visible: false
+        items: (emmeans)
+        template:
+            title: Estimate Marginal Means - ___key___
+            type: Table
+            clearWith:
+                -   type: scaffold
+                    name: opts_model
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_model_lm
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_ci
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_cov_scaling
+                    file: clear.yaml
+                - emmeans
+            columns:
+                -   name: estimate
+                    title: Mean
+                    type: number
+                    format: zto
+                -   name: se
+                    title: SE
+                    type: number
+                    format: zto
+                -   name: df
+                    title: df
+                    type: integer
+                -   name: est.ci.lower
+                    title: Lower
+                    type: number
+                    format: zto
+                -   name: est.ci.upper
+                    title: Upper
+                    type: number
+                    format: zto
+    -   name: mainPlots
+        title: Results Plots
+        type: Array
+        description: an array of results plots
         clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  emmeans
-            
-            
-        columns:
-        - name: estimate
-          title: 'Mean'
-          type: number
-          format: zto       
-        - name: se
-          title: SE
-          type: number
-          format: zto       
-        - name: df
-          title: df
-          type: integer
-        - name: est.ci.lower
-          title: Lower 
-          type: number
-          format: zto       
-        - name: est.ci.upper
-          title: Upper
-          type: number
-          format: zto       
-
-
-
-  - name: mainPlots
-    title: Results Plots
-    type: Array
-    description: an array of results plots
-    clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_plots
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_plots_more_y
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_plots_more_x
-                       file: clear.yaml
-
-    template:
-          title: ""
-          type: Image
-          renderFun: .mainPlot
-          width: 700
-          height: 400
-
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_ci
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_plots
-                       file: clear.yaml
-
-  - name: plotnotes
-    type: Html
-    visible: false
-
-  - name: jnPlots
-    title: Johnson-Neyman Plot
-    type: Array
-    description: an array of plots
-    visible: (plot_jn)
-    refs: interactions
-    clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_plots
-                       file: clear.yaml
-
-    template:
-          title: ""
-          type: Image
-          renderFun: .jnPlot
-          width: 700
-          height: 400
-
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_cov_scaling
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_plots
-                       file: clear.yaml
-
-  - name: jnplotnotes
-    type: Html
-    visible: false
-
-
-
-  - name: assumptions
-    title: Assumption Checks
-    type: Group
-    items:
-        - name: homotest
-          title: Test for Homogeneity of Residual Variance
-          type: Table
-          description: a table of homogeneity tests
-          visible: (homo_test)
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-
-          columns:
-            - name: name
-              type: text
-              title: Test
-            - name: test
-              type: number
-              title: Statistics
-            - name: df1
-              type: integer
-            - name: df2
-              type: integer
-
-            - name: p
-              type: number
-              format: zto,pvalue
-              
-        - name: normtest
-          title: Test for Normality of residuals
-          type: Table
-          description: a table of normality tests
-          visible: (norm_test)
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-
-          columns:
-            - name: name
-              title: Test
-              type: number
-
-            - name: test
-              title: Statistics
-              type: number
-            - name: p
-              type: number
-              format: zto,pvalue
-
-        - name: collitest
-          title: Collinearity statistics
-          type: Table
-          description: a table for collinearity statistics
-          visible: (colli_test)
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  type: scaffold
-                       name: opts_model_lm
-                       file: clear.yaml
-
-          columns:
-            - name: source
-              type: text
-              title: Term
-            - name: vif
-              type: number
-              title: VIF
-            - name: tol
-              type: number
-              title: Tollerance
-
-        - name: qqplot
-          title: Q-Q Plot
-          visible: (qq_plot)
-          type: Image
-          description: a q-q plot
-          width: 450
-          height: 400
-          renderFun: .qqPlot
-          requiresData: true
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-
-        - name: normPlot
-          title: Residual histogram
-          visible: (norm_plot)
-          type: Image
-          description: Residual histogram
-          width: 450
-          height: 400
-          renderFun: .normPlot
-          requiresData: true
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                 
-        - name: residPlot
-          title: Residual-Predicted Scatterplot
-          visible: (resid_plot)
-          type: Image
-          description: Residual Predicted plot
-          width: 700
-          height: 700
-          renderFun: .residPlot
-          requiresData: true
-          clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-                    -  plot_extremes
-
-
-
-
-  - name: predicted
-    title: Predicted Vales
-    type: Output            
-    varTitle: '`LM_${ dep }_PRED`'
-    varDescription: Predicted values
-    clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-        
-  - name: residuals
-    title: Residuals Vales
-    type: Output            
-    varTitle: '`LM_${ dep }_RES`'
-    varDescription: Residuals values
-    clearWith:
-                    -  type: scaffold
-                       name: opts_model
-                       file: clear.yaml
-
-  - name: savenotes
-    type: Html
-    visible: false
+            -   type: scaffold
+                name: opts_model
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_model_lm
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_ci
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_cov_scaling
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_plots
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_plots_more_y
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_plots_more_x
+                file: clear.yaml
+        template:
+            title: ''
+            type: Image
+            renderFun: .mainPlot
+            width: 700
+            height: 400
+            clearWith:
+                -   type: scaffold
+                    name: opts_model
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_model_lm
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_ci
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_cov_scaling
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_plots
+                    file: clear.yaml
+    -   name: plotnotes
+        type: Html
+        visible: false
+    -   name: jnPlots
+        title: Johnson-Neyman Plot
+        type: Array
+        description: an array of plots
+        visible: (plot_jn)
+        refs: interactions
+        clearWith:
+            -   type: scaffold
+                name: opts_model
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_model_lm
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_cov_scaling
+                file: clear.yaml
+            -   type: scaffold
+                name: opts_plots
+                file: clear.yaml
+        template:
+            title: ''
+            type: Image
+            renderFun: .jnPlot
+            width: 700
+            height: 400
+            clearWith:
+                -   type: scaffold
+                    name: opts_model
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_model_lm
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_cov_scaling
+                    file: clear.yaml
+                -   type: scaffold
+                    name: opts_plots
+                    file: clear.yaml
+    -   name: jnplotnotes
+        type: Html
+        visible: false
+    -   name: assumptions
+        title: Assumption Checks
+        type: Group
+        items:
+            -   name: homotest
+                title: Test for Homogeneity of Residual Variance
+                type: Table
+                description: a table of homogeneity tests
+                visible: (homo_test)
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_model_lm
+                        file: clear.yaml
+                columns:
+                    -   name: name
+                        type: text
+                        title: Test
+                    -   name: test
+                        type: number
+                        title: Statistics
+                    -   name: df1
+                        type: integer
+                    -   name: df2
+                        type: integer
+                    -   name: p
+                        type: number
+                        format: zto,pvalue
+            -   name: normtest
+                title: Test for Normality of residuals
+                type: Table
+                description: a table of normality tests
+                visible: (norm_test)
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_model_lm
+                        file: clear.yaml
+                columns:
+                    -   name: name
+                        title: Test
+                        type: number
+                    -   name: test
+                        title: Statistics
+                        type: number
+                    -   name: p
+                        type: number
+                        format: zto,pvalue
+            -   name: collitest
+                title: Collinearity statistics
+                type: Table
+                description: a table for collinearity statistics
+                visible: (colli_test)
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_model_lm
+                        file: clear.yaml
+                columns:
+                    -   name: source
+                        type: text
+                        title: Term
+                    -   name: vif
+                        type: number
+                        title: VIF
+                    -   name: tol
+                        type: number
+                        title: Tollerance
+            -   name: qqplot
+                title: Q-Q Plot
+                visible: (qq_plot)
+                type: Image
+                description: a q-q plot
+                width: 450
+                height: 400
+                renderFun: .qqPlot
+                requiresData: true
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+            -   name: normPlot
+                title: Residual histogram
+                visible: (norm_plot)
+                type: Image
+                description: Residual histogram
+                width: 450
+                height: 400
+                renderFun: .normPlot
+                requiresData: true
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+            -   name: residPlot
+                title: Residual-Predicted Scatterplot
+                visible: (resid_plot)
+                type: Image
+                description: Residual Predicted plot
+                width: 700
+                height: 700
+                renderFun: .residPlot
+                requiresData: true
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    - plot_extremes
+    -   name: predicted
+        title: Predicted Vales
+        type: Output
+        varTitle: '`LM_${ dep }_PRED`'
+        varDescription: Predicted values
+        clearWith:
+            -   type: scaffold
+                name: opts_model
+                file: clear.yaml
+    -   name: residuals
+        title: Residuals Vales
+        type: Output
+        varTitle: '`LM_${ dep }_RES`'
+        varDescription: Residuals values
+        clearWith:
+            -   type: scaffold
+                name: opts_model
+                file: clear.yaml
+    -   name: savenotes
+        type: Html
+        visible: false

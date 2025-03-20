@@ -6,568 +6,456 @@ jas: '1.2'
 completeWhenFilled: true
 export: false
 description:
-        main: |
-                Generalized Mixed  Model
-        R:
-                dontrun: false
-                usage: |
-                        data(schoolexam)
-                        gamlj::gamljGlmMixed(
-                               formula = pass ~ 1 + math+( 1|school ),
-                               data = schoolexam)
+    main: |
+        Generalized Mixed  Model
+    R:
+        dontrun: false
+        usage: |
+            data(schoolexam)
+            gamlj::gamljGlmMixed(
+                   formula = pass ~ 1 + math+( 1|school ),
+                   data = schoolexam)
 formula:
-        dep:
-                custom: true
-        factors:
-                custom: true
-        covs:
-                custom: true
-        cluster:
-                custom: true
-        re:
-                custom: true
-        model_terms:
-                custom: true
+    dep:
+        custom: true
+    factors:
+        custom: true
+    covs:
+        custom: true
+    cluster:
+        custom: true
+    re:
+        custom: true
+    model_terms:
+        custom: true
 options:
-    -  name: data
-       type: Data
-       description:
-                R: the data as a data frame
-
-### constants setting
-                
-    -  name: .caller
-       type: String
-       default: glmer
-       hidden: true
-    -  name: .interface
-       type: String
-       default: jamovi
-       hidden: true
-
-### dependent variable
-        
-    -  name: dep
-       title: Dependent Variable
-       type: Variable
-       default: ~
-       permitted:
-         - factor
-         - numeric
-       description:
-                R: |
-                        a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
-
-
-
-### standard input
-
-    - name: factors
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: model_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: comparison
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: fixed_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ci_width
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: boot_r
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: donotrun
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: mute
-      type: scaffold
-      file: commons.a.yaml
-
-### posthoc
-    -  name: posthoc
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: posthoc_ci
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: adjust
-       type: scaffold
-       file: commons.a.yaml
-
-####
-
-### contrasts
-
-    - name: contrasts
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastnames
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastcodes
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: contrast_custom_focus
-      type: scaffold
-      file: commons.a.yaml
-      
-    - name: contrast_custom_values
-      type: scaffold
-      file: commons.a.yaml
-###
-
-### simple effects 
-
-    - name: simple_x
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_mods
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_interactions
-      type: scaffold
-      file: commons.a.yaml
-###
-
-### emmeans
-    - name: emmeans
-      type: scaffold
-      file: commons.a.yaml
-
-###
-
-### covariate scaling (without covs_scale: put it below)
-
-    - name: covs_conditioning
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccra_steps
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: ccm_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccp_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs_scale_labels
-      type: scaffold
-      file: commons.a.yaml
-
-
-
-#### output 
-
-
-    - name: predicted
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: residuals
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_emm
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_re
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_plot
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: export
-      title: Export
-      type: Action
-
-
-####
-
-#### other options
-
-    -  name: es
-       title: Effect Size
-       type: NMXList
-       options:
-             -  name: expb
+    -   name: data
+        type: Data
+        description:
+            R: the data as a data frame
+    -   name: .caller
+        type: String
+        default: glmer
+        hidden: true
+    -   name: .interface
+        type: String
+        default: jamovi
+        hidden: true
+    -   name: dep
+        title: Dependent Variable
+        type: Variable
+        default: ~
+        permitted:
+            - factor
+            - numeric
+        description:
+            R: |
+                a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
+    -   name: factors
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs
+        type: scaffold
+        file: commons.a.yaml
+    -   name: model_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: comparison
+        type: scaffold
+        file: commons.a.yaml
+    -   name: fixed_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ci_width
+        type: scaffold
+        file: commons.a.yaml
+    -   name: boot_r
+        type: scaffold
+        file: commons.a.yaml
+    -   name: donotrun
+        type: scaffold
+        file: commons.a.yaml
+    -   name: mute
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc_ci
+        type: scaffold
+        file: commons.a.yaml
+    -   name: adjust
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrasts
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastnames
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastcodes
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_focus
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_values
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_x
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_mods
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_interactions
+        type: scaffold
+        file: commons.a.yaml
+    -   name: emmeans
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_conditioning
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccra_steps
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccm_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccp_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_scale_labels
+        type: scaffold
+        file: commons.a.yaml
+    -   name: predicted
+        type: scaffold
+        file: commons.a.yaml
+    -   name: residuals
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_emm
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_re
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_plot
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export
+        title: Export
+        type: Action
+    -   name: es
+        title: Effect Size
+        type: NMXList
+        options:
+            -   name: expb
                 title: Odd Ratios (expB)
-             -  name: RR
+            -   name: RR
                 title: Relative Risk (RR)
-             -  name: marginals
+            -   name: marginals
                 title: Marginal Effects
-       default: 
-          - expb
-       description:
-                R: |
-                        Effect size indices. `expb` (default) exponentiates the coefficients. For dichotomous dependent variables relative risk indices (RR) can be obtained. `marginals` computes the marginal effects.
-                ui: |
-                        Effect size indices. `Odd Rations` (default) exponentiates the coefficients. For dichotomous dependent variables `Relative Risk ` indices  can be obtained. `Marginal Effects` computes the marginal effects (if the model allows).
-
-    -  name: expb_ci
-       title: For exp(B)
-       type: Bool
-       default: true
-       description:
-                R: |
-                        `TRUE` (default) or `FALSE` , exp(B) CI in table
-                        
-    -  name: estimates_ci
-       title: Coefficients
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` (default) or `FALSE` , parameters CI in table
-    -  name: re_ci
-       title: Random Variances C.I.
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE`  or `FALSE` (default), random effects CI in table. It could be very slow.
-                        
-    -  name: ci_method
-       title: CI Method
-       type: List
-       default: wald
-       options:
-             -  name: wald
+        default: expb
+        description:
+            R: |
+                Effect size indices. `expb` (default) exponentiates the coefficients. For dichotomous dependent variables relative risk indices (RR) can be obtained. `marginals` computes the marginal effects.
+            ui: |
+                Effect size indices. `Odd Rations` (default) exponentiates the coefficients. For dichotomous dependent variables `Relative Risk ` indices  can be obtained. `Marginal Effects` computes the marginal effects (if the model allows).
+    -   name: expb_ci
+        title: For exp(B)
+        type: Bool
+        default: true
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , exp(B) CI in table
+    -   name: estimates_ci
+        title: Coefficients
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , parameters CI in table
+    -   name: re_ci
+        title: Random Variances C.I.
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE`  or `FALSE` (default), random effects CI in table. It could be very slow.
+    -   name: ci_method
+        title: CI Method
+        type: List
+        default: wald
+        options:
+            -   name: wald
                 title: Standard
-             -  name: profile
+            -   name: profile
                 title: Profile
-             -  name: quantile
+            -   name: quantile
                 title: Bootstrap (Parametric)
-       description:
-                R: |
-                        Method to compute the confidence intervals. It accepts `wald` for Wald method, `profile` for LL profiling method, `quantile` for bootstrap  method.
-                ui: |
-                        The method used to compute the confidence intervals.  Standard uses the Wald method to compute standard errors and confidence intervals. Profile computes Profile Likelihood Based Confidence Interval,  in which the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate.  Bootstrap performs parametric bootstrap, with Bootstrap rep repetitions.
-
-
-
-
-### Plots options
-
-    - name: plot_x
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_z
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_by
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_raw
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_yscale
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_xoriginal
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_black
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_around
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_jn
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_jn_expb
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_more_options
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_min
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_max
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks_exact
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_extra
-      type: scaffold
-      file: plots.a.yaml
-
-####### end of plots #########
-
-
-    -  name: plot_re
-       title: Random effects
-       type: Bool
-       default: false
-       description:
-                R: "`TRUE` or `FALSE` (default), add predicted values based on random
-                        effect in plot \n"
-    -  name: plot_re_method
-       type: List
-       title: Random effects       
-       default: average
-       options:
-             -  name: average
+        description:
+            R: |
+                Method to compute the confidence intervals. It accepts `wald` for Wald method, `profile` for LL profiling method, `quantile` for bootstrap  method.
+            ui: |
+                The method used to compute the confidence intervals.  Standard uses the Wald method to compute standard errors and confidence intervals. Profile computes Profile Likelihood Based Confidence Interval,  in which the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate.  Bootstrap performs parametric bootstrap, with Bootstrap rep repetitions.
+    -   name: plot_x
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_z
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_by
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_raw
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_yscale
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_xoriginal
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_black
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_around
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_jn
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_jn_expb
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_more_options
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_min
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_max
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks_exact
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_extra
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_re
+        title: Random effects
+        type: Bool
+        default: false
+        description:
+            R: "`TRUE` or `FALSE` (default), add predicted values based on random
+                effect in plot \n"
+    -   name: plot_re_method
+        type: List
+        title: Random effects
+        default: average
+        options:
+            -   name: average
                 title: Average method
-             -  name: full
+            -   name: full
                 title: Full predicted method
-
-    -  name: plot_scale
-       title: Y-axis scale
-       type: List
-       options:
-             -  name: response
+    -   name: plot_scale
+        title: Y-axis scale
+        type: List
+        options:
+            -   name: response
                 title: Response
-             -  name: link
+            -   name: link
                 title: Linear predictor
-             -  name: mean.class
+            -   name: mean.class
                 title: Mean class
-       default: response
-       description:
-                R: |
-                        Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
-
-
-    -  name: model_type
-       title: Model Selection
-       type: List
-       options:
-             -  name: logistic
+        default: response
+        description:
+            R: |
+                Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
+    -   name: model_type
+        title: Model Selection
+        type: List
+        options:
+            -   name: logistic
                 title: Logistic
-             -  name: probit
+            -   name: probit
                 title: Probit
-             -  name: poisson
+            -   name: poisson
                 title: Poisson
-             -  name: nb
+            -   name: nb
                 title: Negative Binomial
-             -  name: ordinal
+            -   name: ordinal
                 title: Ordinal (proportional odds)
-             -  name: multinomial
+            -   name: multinomial
                 title: Multinomial
-             -  name: custom
+            -   name: custom
                 title: Custom
-                
-       default: logistic
-       description:
-                R: |
-                        Select the generalized linear model: `poisson`,`logistic`,`multinomial`, `nb`,`ordinal`
-
-
+        default: logistic
+        description:
+            R: |
+                Select the generalized linear model: `poisson`,`logistic`,`multinomial`, `nb`,`ordinal`
     -   name: custom_family
         title: Distribution
         type: List
         options:
-        -       title: Binomial
+            -   title: Binomial
                 name: binomial
-        -       title: Poisson
+            -   title: Poisson
                 name: poisson
-        -       title: Inverse gaussian
+            -   title: Inverse gaussian
                 name: inverse.gaussian
-        -       title: Gamma
+            -   title: Gamma
                 name: Gamma
         default: binomial
         description:
-                R: |
-                        Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
+            R: |
+                Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
     -   name: custom_link
         title: Link Function
         type: List
         options:
-        -       title: Identity
+            -   title: Identity
                 name: identity
-        -       title: Logit
+            -   title: Logit
                 name: logit
-        -       title: Log
+            -   title: Log
                 name: log
-        -       title: Inverse
+            -   title: Inverse
                 name: inverse
-        -       title: Inverse squared
+            -   title: Inverse squared
                 name: 1/mu^2
-        -       title: Square root
+            -   title: Square root
                 name: sqrt
         default: identity
         description:
-                R: |
-                        Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
-
-
-    -  name: covs_scale
-       title: Covariates Scaling
-       type: Array
-       items: (covs)
-       default: ~
-       template:
-                type: Group
-                elements:
-                     -  name: var
-                        type: Variable
-                        content: $key
-                     -  name: type
-                        type: List
-                        options:
-                             -  title: Centered
-                                name: centered
-                             -  title: z-scores
-                                name: standardized
-                             -  title: Centered clusterwise
-                                name: clusterbasedcentered
-                             -  title: Clusters means
-                                name: clustermeans
-                             -  title: z-scores clusterwise
-                                name: clusterbasedstandardized
-                             -  title: None
-                                name: none
-                        default: centered
-       description:
-                R: |
-                        a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
-    -  name: scale_missing
-       title: Scale on
-       type: List
-       options:
-             -  title: Columnwise
+            R: |
+                Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
+    -   name: covs_scale
+        title: Covariates Scaling
+        type: Array
+        items: (covs)
+        default: ~
+        template:
+            type: Group
+            elements:
+                -   name: var
+                    type: Variable
+                    content: $key
+                -   name: type
+                    type: List
+                    options:
+                        -   title: Centered
+                            name: centered
+                        -   title: z-scores
+                            name: standardized
+                        -   title: Centered clusterwise
+                            name: clusterbasedcentered
+                        -   title: Clusters means
+                            name: clustermeans
+                        -   title: z-scores clusterwise
+                            name: clusterbasedstandardized
+                        -   title: None
+                            name: none
+                    default: centered
+        description:
+            R: |
+                a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+    -   name: scale_missing
+        title: Scale on
+        type: List
+        options:
+            -   title: Columnwise
                 name: colwise
-             -  title: Complete cases
+            -   title: Complete cases
                 name: complete
-       default: colwise
-       
-    -  name: cluster
-       title: Cluster variables
-       type: Variables
-       default: ~
-       suggested:
-         - nominal
-       description:
-                R: a vector of strings naming the clustering variables from `data`
-                
-    -  name: re
-       title: Random Coefficients
-       type: Array
-       default:
-                 - []
-       template:
-                type: Terms
-       description:
-                R: "a list of lists specifying the models random effects.          \n"
-    -  name: nested_re
-       title: Nested Model Random Coefficients
-       type: Array
-       default:
-           - []
-       template:
-                type: Terms
-       description:
-                R: "a list of lists specifying the models random effects.          \n"
-    -  name: re_corr
-       title: Effects correlation
-       type: List
-       options:
-             -  name: all
+        default: colwise
+    -   name: cluster
+        title: Cluster variables
+        type: Variables
+        default: ~
+        suggested: nominal
+        description:
+            R: a vector of strings naming the clustering variables from `data`
+    -   name: re
+        title: Random Coefficients
+        type: Array
+        default:
+            - []
+        template:
+            type: Terms
+        description:
+            R: "a list of lists specifying the models random effects.          \n"
+    -   name: nested_re
+        title: Nested Model Random Coefficients
+        type: Array
+        default:
+            - []
+        template:
+            type: Terms
+        description:
+            R: "a list of lists specifying the models random effects.          \n"
+    -   name: re_corr
+        title: Effects correlation
+        type: List
+        options:
+            -   name: all
                 title: Correlated
-             -  name: none
+            -   name: none
                 title: Not correlated
-             -  name: block
+            -   name: block
                 title: Correlated by block
-       default: all
-       description:
-                R: |
-                        `'all'`, `'none'` (default), or `'block'`. When random effects are passed as list of length 1, it decides whether the effects should be correlated,  non correlated. If `'re'` is a list of  lists of length > 1, the option is automatially set to `'block'`. The option is ignored if the model is passed using `formula`.
-                ui: |
-                        Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`). If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated within block and independent between blocks.
-    -  name: re_modelterms
-       title: Model terms
-       type: Bool
-       default: true
-       description:
-                R: |
-                        Not in R interface
-                ui: |
-                        List in the random coefficients supplier the terms included as fixed effects
-    -  name: re_listing
-       type: List
-       title: Add
-       options:
-             -  name: none
+        default: all
+        description:
+            R: |
+                `'all'`, `'none'` (default), or `'block'`. When random effects are passed as list of length 1, it decides whether the effects should be correlated,  non correlated. If `'re'` is a list of  lists of length > 1, the option is automatially set to `'block'`. The option is ignored if the model is passed using `formula`.
+            ui: |
+                Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`). If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated within block and independent between blocks.
+    -   name: re_modelterms
+        title: Model terms
+        type: Bool
+        default: true
+        description:
+            R: |
+                Not in R interface
+            ui: |
+                List in the random coefficients supplier the terms included as fixed effects
+    -   name: re_listing
+        type: List
+        title: Add
+        options:
+            -   name: none
                 title: None
-             -  name: main
+            -   name: main
                 title: Main effects
-             -  name: way2
+            -   name: way2
                 title: Up to 2-way
-             -  name: way3
+            -   name: way3
                 title: Up to 3-way
-             -  name: all
+            -   name: all
                 title: All possible
-       default: none
-       description:
-                R: |
-                        Not in R interface
-                ui: "Listing of random coefficients in the supplier: `none` do not
-                        add any term, otherwise add the selected terms. \n"
-    -  name: re_lrt
-       title: LRT for Random Effects
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), LRT for the random effects
-                ui: |
-                        Compute LRT for the random effects
+        default: none
+        description:
+            R: |
+                Not in R interface
+            ui: "Listing of random coefficients in the supplier: `none` do not add
+                any term, otherwise add the selected terms. \n"
+    -   name: re_lrt
+        title: LRT for Random Effects
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), LRT for the random effects
+            ui: Compute LRT for the random effects

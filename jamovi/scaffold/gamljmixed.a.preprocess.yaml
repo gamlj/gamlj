@@ -5,607 +5,492 @@ version: 3.0.0
 jas: '1.2'
 export: false
 description:
-        main: |
-                Mixed Linear Model
-        R:
-                dontrun: false
-                usage: |
-                        data(subjects_by_stimuli)
-                        gamlj::gaml_mixed(
-                               formula = y ~ 1 + cond+( 1|subj ),
-                               data = subjects_by_stimuli)
+    main: |
+        Mixed Linear Model
+    R:
+        dontrun: false
+        usage: |
+            data(subjects_by_stimuli)
+            gamlj::gaml_mixed(
+                   formula = y ~ 1 + cond+( 1|subj ),
+                   data = subjects_by_stimuli)
 options:
-
-
-    -  name: data
-       type: Data
-       description:
-                R: the data as a data frame
-### constants setting
-                
-    -  name: .caller
-       type: String
-       default: lmer
-       hidden: true
-    -  name: .interface
-       type: String
-       default: jamovi
-       hidden: true
-    -  name: model_type
-       type: List
-       hidden: true
-       options:
-             -  name: lmer
-       default: lmer
-       
-### dependent variable
-
-    -  name: dep
-       title: Dependent Variable
-       type: Variable
-       default: ~
-       suggested: 
-         - continuous
-       permitted: 
-         - numeric
-       description:
-                R: |
-                        a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
-
-### standard input
-
-
-    - name: factors
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: model_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: comparison
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: fixed_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ci_width
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: boot_r
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: donotrun
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: mute
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: plot_jn
-      type: scaffold
-      file: plots.a.yaml
-
-### posthoc
-    -  name: posthoc
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: posthoc_ci
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: adjust
-       type: scaffold
-       file: commons.a.yaml
-
-####
-
-### contrasts
-
-    - name: contrasts
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastnames
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastcodes
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: contrast_custom_focus
-      type: scaffold
-      file: commons.a.yaml
-      
-    - name: contrast_custom_values
-      type: scaffold
-      file: commons.a.yaml
-###
-
-### simple effects 
-
-    - name: simple_x
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_mods
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_interactions
-      type: scaffold
-      file: commons.a.yaml
-###
-
-### emmeans
-    - name: emmeans
-      type: scaffold
-      file: commons.a.yaml
-
-###
-
-
-### covariate scaling (without covs_scale: put it below)
-
-    - name: covs_conditioning
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccra_steps
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: ccm_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccp_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs_scale_labels
-      type: scaffold
-      file: commons.a.yaml
-
-
-
-#### output 
-
-
-    - name: predicted
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: residuals
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_emm
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_re
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_plot
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: export
-      title: Export
-      type: Action
-
-####
-
-
-### Plots options
-
-    - name: plot_x
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_z
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_by
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_raw
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_yscale
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_xoriginal
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_black
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_around
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_extremes
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_more_options
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_y_min
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_y_max
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_y_ticks
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_y_ticks_exact
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_min
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_max
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks_exact
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_extra
-      type: scaffold
-      file: plots.a.yaml
-
-####### end of plots #########
-
-
-###  other options
-
-    -  name: estimates_ci
-       title: Fixed Parameters
-       type: Bool
-       default: true
-       description:
-                R: |
-                        `TRUE` (default) or `FALSE` , parameters CI in table
-    -  name: re_ci
-       title: Random Variances C.I.
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE`  or `FALSE` (default), random effects CI in table. It could be very slow.
-
-    -  name: ci_method
-       title: CI Method
-       type: List
-       default: wald
-       options:
-             -  name: wald
+    -   name: data
+        type: Data
+        description:
+            R: the data as a data frame
+    -   name: .caller
+        type: String
+        default: lmer
+        hidden: true
+    -   name: .interface
+        type: String
+        default: jamovi
+        hidden: true
+    -   name: model_type
+        type: List
+        hidden: true
+        options:
+            -   name: lmer
+        default: lmer
+    -   name: dep
+        title: Dependent Variable
+        type: Variable
+        default: ~
+        suggested: continuous
+        permitted: numeric
+        description:
+            R: |
+                a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
+    -   name: factors
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs
+        type: scaffold
+        file: commons.a.yaml
+    -   name: model_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: comparison
+        type: scaffold
+        file: commons.a.yaml
+    -   name: fixed_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ci_width
+        type: scaffold
+        file: commons.a.yaml
+    -   name: boot_r
+        type: scaffold
+        file: commons.a.yaml
+    -   name: donotrun
+        type: scaffold
+        file: commons.a.yaml
+    -   name: mute
+        type: scaffold
+        file: commons.a.yaml
+    -   name: plot_jn
+        type: scaffold
+        file: plots.a.yaml
+    -   name: posthoc
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc_ci
+        type: scaffold
+        file: commons.a.yaml
+    -   name: adjust
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrasts
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastnames
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastcodes
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_focus
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_values
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_x
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_mods
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_interactions
+        type: scaffold
+        file: commons.a.yaml
+    -   name: emmeans
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_conditioning
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccra_steps
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccm_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccp_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_scale_labels
+        type: scaffold
+        file: commons.a.yaml
+    -   name: predicted
+        type: scaffold
+        file: commons.a.yaml
+    -   name: residuals
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_emm
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_re
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_plot
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export
+        title: Export
+        type: Action
+    -   name: plot_x
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_z
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_by
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_raw
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_yscale
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_xoriginal
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_black
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_around
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_extremes
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_more_options
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_min
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_max
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_ticks
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_ticks_exact
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_min
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_max
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks_exact
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_extra
+        type: scaffold
+        file: plots.a.yaml
+    -   name: estimates_ci
+        title: Fixed Parameters
+        type: Bool
+        default: true
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , parameters CI in table
+    -   name: re_ci
+        title: Random Variances C.I.
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE`  or `FALSE` (default), random effects CI in table. It could be very slow.
+    -   name: ci_method
+        title: CI Method
+        type: List
+        default: wald
+        options:
+            -   name: wald
                 title: Standard (fast)
-             -  name: quantile
+            -   name: quantile
                 title: Bootstrap (Parametric)
-
-
-
-###  plot
-
-    -  name: plot_re
-       title: Random effects
-       type: Bool
-       default: false
-       description:
-                R: "`TRUE` or `FALSE` (default), add predicted values based on random
-                        effect in plot \n"
-    -  name: plot_re_method
-       type: List
-       title: Random effects       
-       default: average
-       options:
-            -  name: average
-               title: Average method
-            -  name: full
-               title: Full predicted method
-
-
-
-
-## covariate scaling 
-
-    -  name: covs_scale
-       title: Covariates Scaling
-       type: Array
-       items: (covs)
-       default: ~
-       template:
-                type: Group
-                elements:
-                     -  name: var
-                        type: Variable
-                        content: $key
-                     -  name: type
-                        type: List
-                        options:
-                             -  title: Centered
-                                name: centered
-                             -  title: z-scores
-                                name: standardized
-                             -  title: Centered clusterwise
-                                name: clusterbasedcentered
-                             -  title: Clusters means
-                                name: clustermeans
-                             -  title: z-scores clusterwise
-                                name: clusterbasedstandardized
-                             -  title: None
-                                name: none
-                        default: centered
-       description:
-                R: |
-                        a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
-    -  name: dep_scale
-       title: Scale
-       type: List
-       options:
-             -  title: Original
+    -   name: plot_re
+        title: Random effects
+        type: Bool
+        default: false
+        description:
+            R: "`TRUE` or `FALSE` (default), add predicted values based on random
+                effect in plot \n"
+    -   name: plot_re_method
+        type: List
+        title: Random effects
+        default: average
+        options:
+            -   name: average
+                title: Average method
+            -   name: full
+                title: Full predicted method
+    -   name: covs_scale
+        title: Covariates Scaling
+        type: Array
+        items: (covs)
+        default: ~
+        template:
+            type: Group
+            elements:
+                -   name: var
+                    type: Variable
+                    content: $key
+                -   name: type
+                    type: List
+                    options:
+                        -   title: Centered
+                            name: centered
+                        -   title: z-scores
+                            name: standardized
+                        -   title: Centered clusterwise
+                            name: clusterbasedcentered
+                        -   title: Clusters means
+                            name: clustermeans
+                        -   title: z-scores clusterwise
+                            name: clusterbasedstandardized
+                        -   title: None
+                            name: none
+                    default: centered
+        description:
+            R: |
+                a list of lists specifying the covariates scaling, one of `'centered to the mean'`, `'standardized'`, or `'none'`. `'none'` leaves the variable as it is
+    -   name: dep_scale
+        title: Scale
+        type: List
+        options:
+            -   title: Original
                 name: none
-             -  title: Centered
+            -   title: Centered
                 name: centered
-             -  title: z-scores
+            -   title: z-scores
                 name: standardized
-             -  title: Centered clusterwise
+            -   title: Centered clusterwise
                 name: clusterbasedcentered
-             -  title: multilevel z-scores
+            -   title: multilevel z-scores
                 name: clusterbasedstandardized
-       default: none
-       description:
-                R: |
-                        Re-scale the dependent variable.
-    -  name: scale_missing
-       title: Scale on
-       type: List
-       options:
-             -  title: Columnwise
+        default: none
+        description:
+            R: |
+                Re-scale the dependent variable.
+    -   name: scale_missing
+        title: Scale on
+        type: List
+        options:
+            -   title: Columnwise
                 name: colwise
-             -  title: Complete cases
+            -   title: Complete cases
                 name: complete
-       default: colwise
-       
-    -  name: norm_test
-       title: Normality of residuals
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), provide a test for normality of residuals
-    -  name: cluster
-       title: Cluster variables
-       type: Variables
-       default: ~
-       suggested: nominal
-       description:
-                R: a vector of strings naming the clustering variables from `data`
-    -  name: re
-       title: Random Coefficients
-       type: Array
-       default:
-         - []
-       template:
-                type: Terms
-       description:
-                R: "a list of lists specifying the models random effects.          \n"
-    -  name: nested_re
-       title: Nested Model Random Coefficients
-       type: Array
-       default:
-         - []
-       template:
-                type: Terms
-       description:
-                R: "a list of lists specifying the models random effects.          \n"
-    -  name: re_corr
-       title: Effects correlation
-       type: List
-       options:
-             -  name: all
+        default: colwise
+    -   name: norm_test
+        title: Normality of residuals
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a test for normality of residuals
+    -   name: cluster
+        title: Cluster variables
+        type: Variables
+        default: ~
+        suggested: nominal
+        description:
+            R: a vector of strings naming the clustering variables from `data`
+    -   name: re
+        title: Random Coefficients
+        type: Array
+        default:
+            - []
+        template:
+            type: Terms
+        description:
+            R: "a list of lists specifying the models random effects.          \n"
+    -   name: nested_re
+        title: Nested Model Random Coefficients
+        type: Array
+        default:
+            - []
+        template:
+            type: Terms
+        description:
+            R: "a list of lists specifying the models random effects.          \n"
+    -   name: re_corr
+        title: Effects correlation
+        type: List
+        options:
+            -   name: all
                 title: Correlated
-             -  name: none
+            -   name: none
                 title: Not correlated
-             -  name: block
+            -   name: block
                 title: Correlated by block
-       default: all
-       description:
-                R: |
-                        `'all'`, `'none'` (default), or `'block'`. When random effects are passed as list of length 1, it decides whether the effects should be correlated,  non correlated. If `'re'` is a list of  lists of length > 1, the option is automatially set to `'block'`. The option is ignored if the model is passed using `formula`.
-                ui: |
-                        Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`). If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated within block and independent between blocks.
-    -  name: re_modelterms
-       title: Model terms
-       type: Bool
-       default: true
-       description:
-                R: |
-                        Not in R interface
-                ui: |
-                        Show the fixed effects defined in the model in the list of potential random coefficients
-    -  name: re_crossedclusters
-       title: Crossing by formula
-       type: Bool
-       default: false
-       description:
-                R: |
-                        Not in R interface
-                ui: |
-                        Show the clusters in crossed formulation (cluster1:cluster2)
-    -  name: re_nestedclusters
-       title: Nesting by formula
-       type: Bool
-       default: false
-       description:
-                R: |
-                        Not in R interface
-                ui: |
-                        Show the clusters in nested formulation (cluster1/cluster2)
-    -  name: re_listing
-       type: List
-       title: Add
-       options:
-             -  name: none
+        default: all
+        description:
+            R: |
+                `'all'`, `'none'` (default), or `'block'`. When random effects are passed as list of length 1, it decides whether the effects should be correlated,  non correlated. If `'re'` is a list of  lists of length > 1, the option is automatially set to `'block'`. The option is ignored if the model is passed using `formula`.
+            ui: |
+                Random effects are assumed to be correlated (`Correlated`) or independent (`Not correlated`). If `Correlated by block` is selected, additional fields are shown to create blocks of coefficients correlated within block and independent between blocks.
+    -   name: re_modelterms
+        title: Model terms
+        type: Bool
+        default: true
+        description:
+            R: |
+                Not in R interface
+            ui: |
+                Show the fixed effects defined in the model in the list of potential random coefficients
+    -   name: re_crossedclusters
+        title: Crossing by formula
+        type: Bool
+        default: false
+        description:
+            R: |
+                Not in R interface
+            ui: |
+                Show the clusters in crossed formulation (cluster1:cluster2)
+    -   name: re_nestedclusters
+        title: Nesting by formula
+        type: Bool
+        default: false
+        description:
+            R: |
+                Not in R interface
+            ui: |
+                Show the clusters in nested formulation (cluster1/cluster2)
+    -   name: re_listing
+        type: List
+        title: Add
+        options:
+            -   name: none
                 title: None
-             -  name: main
+            -   name: main
                 title: Main effects
-             -  name: way2
+            -   name: way2
                 title: Up to 2-way
-             -  name: way3
+            -   name: way3
                 title: Up to 3-way
-             -  name: all
+            -   name: all
                 title: All possible
-       default: none
-       description:
-                R: |
-                        Not in R interface
-                ui: "Show potential random effects in the `Components` field. `None`
-                        nothing (more than the fixed effects), the other can be `Main
-                        Effects`, `Up to 2-way` interactions, `Up to 3-way` interactions,
-                        `All possible` means showing in the `Components` list all
-                        possible potential random coefficients. \n"
-    -  name: reml
-       title: REML
-       type: Bool
-       default: true
-       description:
-                R: |
-                        `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
-    -  name: re_lrt
-       title: LRT for Random Effects
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), LRT for the random effects
-    -  name: res_struct
-       title: Structure
-       type: List
-       default: id
-       options:
-             -  name: id
+        default: none
+        description:
+            R: |
+                Not in R interface
+            ui: "Show potential random effects in the `Components` field. `None` nothing
+                (more than the fixed effects), the other can be `Main Effects`, `Up
+                to 2-way` interactions, `Up to 3-way` interactions, `All possible`
+                means showing in the `Components` list all possible potential random
+                coefficients. \n"
+    -   name: reml
+        title: REML
+        type: Bool
+        default: true
+        description:
+            R: |
+                `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
+    -   name: re_lrt
+        title: LRT for Random Effects
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), LRT for the random effects
+    -   name: res_struct
+        title: Structure
+        type: List
+        default: id
+        options:
+            -   name: id
                 title: Identity
-             -  name: cs
+            -   name: cs
                 title: Compound Symmetry
-             -  name: un
+            -   name: un
                 title: Unstructured
-             -  name: ar1
-                title: "AR(1)"
-             -  name:  arma
-                title: "ARMA(1,1)"
-
-    -  name: df_method
-       title: DF Method
-       type: List
-       default: Satterthwaite
-       options:
-             -  name: Satterthwaite
+            -   name: ar1
+                title: AR(1)
+            -   name: arma
+                title: ARMA(1,1)
+    -   name: df_method
+        title: DF Method
+        type: List
+        default: Satterthwaite
+        options:
+            -   name: Satterthwaite
                 title: Satterthwaite
-             -  name: Kenward-Roger
+            -   name: Kenward-Roger
                 title: Kenward-Roger  (slow)
-       description:
-                R: |
-                        The method for computing the denominator degrees of freedom and F-statistics. "Satterthwaite" (default) uses Satterthwaite’s method; "Kenward-Roger" uses Kenward-Roger’s method, "lme4" returns the lme4-anova table, i.e., using the anova method for lmerMod objects as defined in the lme4-package
-    -  name: norm_plot
-       title: Histogram of residuals
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
-    -  name: qq_plot
-       title: Q-Q plot of residuals
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
-    -  name: resid_plot
-       title: Residuals-Predicted scatterplot
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
-    -  name: cluster_boxplot
-       title: Residuals by cluster boxplot
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), provide a boxplot of random effects by the  clusters
-    -  name: cluster_respred
-       title: Residuals vs Predicted
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), residuals vs predicted by  cluster
-    -  name: cluster_respred_grid
-       title: Residuals vs Predicted (grid)
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), residuals vs predicted for each cluster
-    -  name: rand_hist
-       title: Histogram of random Coefficients
-       type: Bool
-       default: false
-       description:
-                R: |
-                        `TRUE` or `FALSE` (default), provide histogram of random Coefficients
-
-    -  name: more_fit_indices
-       title: More Fit Indices
-       type: Bool
-       default: false
-       description:
-                R: |
-                        shows AIC and BIC indices for the estimated model
+        description:
+            R: |
+                The method for computing the denominator degrees of freedom and F-statistics. "Satterthwaite" (default) uses Satterthwaite’s method; "Kenward-Roger" uses Kenward-Roger’s method, "lme4" returns the lme4-anova table, i.e., using the anova method for lmerMod objects as defined in the lme4-package
+    -   name: norm_plot
+        title: Histogram of residuals
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+    -   name: qq_plot
+        title: Q-Q plot of residuals
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+    -   name: resid_plot
+        title: Residuals-Predicted scatterplot
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+    -   name: cluster_boxplot
+        title: Residuals by cluster boxplot
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a boxplot of random effects by the  clusters
+    -   name: cluster_respred
+        title: Residuals vs Predicted
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), residuals vs predicted by  cluster
+    -   name: cluster_respred_grid
+        title: Residuals vs Predicted (grid)
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), residuals vs predicted for each cluster
+    -   name: rand_hist
+        title: Histogram of random Coefficients
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide histogram of random Coefficients
+    -   name: more_fit_indices
+        title: More Fit Indices
+        type: Bool
+        default: false
+        description:
+            R: shows AIC and BIC indices for the estimated model

@@ -1,6 +1,6 @@
-- type: scaffold
-  name: modeloptions
-  children:
+-   type: scaffold
+    name: modeloptions
+    children:
         - model_type
         - dep
         - dep2
@@ -19,42 +19,35 @@
         - omnibus
         - model_type
         - custom_family
-        - custom_link  
+        - custom_link
         - contrast_custom_values
-
-- type: scaffold
-  name: nestedoptions
-  children:
+-   type: scaffold
+    name: nestedoptions
+    children:
         - nested_terms
         - nested_intercept
         - comparison
-        
-- type: scaffold
-  name: cioptions
-  children:
+-   type: scaffold
+    name: cioptions
+    children:
         - ci_width
         - ci_method
         - boot_r
-        
-- type: scaffold
-  name: esoptions
-  children:
-                 - es
-- type: scaffold
-  name: simpleeffectsoptions
-  children:
-                 - simple_x
-                 - simple_mods
-                 - simple_scale
-                 - ccm_value
-                 - ccp_value
-                 - ccra_steps
-                 - covs_scale_labels
-                 - covs_conditioning
-                 - contrast_custom_focus
-
-- type: scaffold
-  name: jnoptions
-  children:
-                 - plot_jn_expb
-
+-   type: scaffold
+    name: esoptions
+    children: es
+-   type: scaffold
+    name: simpleeffectsoptions
+    children:
+        - simple_x
+        - simple_mods
+        - simple_scale
+        - ccm_value
+        - ccp_value
+        - ccra_steps
+        - covs_scale_labels
+        - covs_conditioning
+        - contrast_custom_focus
+-   type: scaffold
+    name: jnoptions
+    children: plot_jn_expb

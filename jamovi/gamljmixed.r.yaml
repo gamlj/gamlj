@@ -2,504 +2,504 @@ name: gamljMixed
 title: Mixed Model
 jrs: '1.0'
 items:
--       name: model
+    -   name: model
         type: Property
--       name: errortable
+    -   name: errortable
         type: Html
         visible: false
--       name: info
+    -   name: info
         title: Model Info
         type: Table
         columns:
-        -       name: info
+            -   name: info
                 type: text
                 title: Info
-        -       name: value
+            -   name: value
                 type: text
                 title: ''
-        -       name: specs
+            -   name: specs
                 type: text
                 title: ''
         refs: gamlj
--       name: modelnotes
+    -   name: modelnotes
         type: Html
         visible: false
--       name: main
+    -   name: main
         type: Group
         title: Model Results
         items:
-        -       name: r2
+            -   name: r2
                 title: Model Fit
                 type: Table
                 description: a table of R
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - nested_terms
-                - nested_intercept
-                - comparison
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - nested_terms
+                    - nested_intercept
+                    - comparison
                 columns:
-                -       name: model
+                    -   name: model
                         title: Model
                         visible: (comparison)
-                -       name: type
+                    -   name: type
                         type: text
                         title: Type
-                -       name: r2
+                    -   name: r2
                         title: R²
                         type: number
                         format: zto
-                -       name: df1
+                    -   name: df1
                         title: df
                         type: integer
-                -       name: test
+                    -   name: test
                         title: LRT X²
                         type: number
                         format: zto
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
                 refs: goodness
-        -       name: fit
+            -   name: fit
                 title: Additional Indices
                 type: Table
                 visible: (more_fit_indices)
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - nested_terms
-                - nested_intercept
-                - comparison
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - nested_terms
+                    - nested_intercept
+                    - comparison
                 columns:
-                -       name: info
+                    -   name: info
                         type: text
                         title: Info
-                -       name: value
+                    -   name: value
                         type: text
                         title: Model Value
-                -       name: nested
+                    -   name: nested
                         type: text
                         title: Nested Model
                         visible: (comparison)
-                -       name: diff
+                    -   name: diff
                         type: text
                         title: Δ
                         visible: (comparison)
                         format: zto
-                -       name: specs
+                    -   name: specs
                         type: text
                         title: Comment
-        -       name: anova
+            -   name: anova
                 title: Fixed Effects Omnibus Tests
                 type: Table
                 description: a table of ANOVA results
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
                 columns:
-                -       name: source
+                    -   name: source
                         title: ''
                         type: text
-                -       name: f
+                    -   name: f
                         title: F
                         type: number
-                -       name: df1
+                    -   name: df1
                         title: df
                         type: number
-                -       name: df2
+                    -   name: df2
                         title: df (res)
                         type: number
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
-        -       name: coefficients
+            -   name: coefficients
                 title: Parameter Estimates (Fixed coefficients)
                 type: Table
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - ci_width
-                - ci_method
-                - boot_r
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - ci_width
+                    - ci_method
+                    - boot_r
                 columns:
-                -       name: source
+                    -   name: source
                         title: Names
                         type: text
-                -       name: label
+                    -   name: label
                         title: Effect
                         type: text
                         visible: (show_contrastnames)
-                -       name: estimate
+                    -   name: estimate
                         title: Estimate
                         type: number
-                -       name: se
+                    -   name: se
                         title: SE
                         type: number
-                -       name: est.ci.lower
+                    -   name: est.ci.lower
                         type: number
                         title: Lower
                         visible: (estimates_ci)
-                -       name: est.ci.upper
+                    -   name: est.ci.upper
                         type: number
                         title: Upper
                         visible: (estimates_ci)
-                -       name: df
+                    -   name: df
                         title: df
                         type: number
-                -       name: test
+                    -   name: test
                         title: t
                         type: number
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
                 refs: parameters
-        -       name: contrasts
+            -   name: contrasts
                 title: Custom Contrast Tests
                 type: Table
                 visible: false
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - ci_width
-                - ci_method
-                - boot_r
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - ci_width
+                    - ci_method
+                    - boot_r
                 columns:
-                -       name: source
+                    -   name: source
                         title: Names
                         type: text
-                -       name: label
+                    -   name: label
                         title: Effect
                         type: text
-                -       name: estimate
+                    -   name: estimate
                         title: Estimate
                         type: number
-                -       name: se
+                    -   name: se
                         title: SE
                         type: number
-                -       name: est.ci.lower
+                    -   name: est.ci.lower
                         type: number
                         title: Lower
                         visible: (estimates_ci)
-                -       name: est.ci.upper
+                    -   name: est.ci.upper
                         type: number
                         title: Upper
                         visible: (estimates_ci)
-                -       name: df
+                    -   name: df
                         title: df
                         type: number
-                -       name: test
+                    -   name: test
                         title: t
                         type: number
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
-        -       name: contrastCodeTables
+            -   name: contrastCodeTables
                 title: Contrast Coefficients
                 type: Array
                 description: an array of contrast coefficients tables
                 visible: (show_contrastcodes)
                 items: (factors)
                 clearWith:
-                - contrasts
+                    - contrasts
                 template:
-                        title: 'Factor: ___key___'
-                        type: Table
-                        columns:
-                        -       name: cname
-                                title: Name
-                                type: text
-                                visible: (show_contrastnames)
-                        -       name: clab
-                                title: Contrast
-                                type: text
-                        -       name: bogus
-                                title: bogus
-                                type: text
-                                visible: false
-        -       name: random
+                    title: 'Factor: ___key___'
+                    type: Table
+                    columns:
+                        -   name: cname
+                            title: Name
+                            type: text
+                            visible: (show_contrastnames)
+                        -   name: clab
+                            title: Contrast
+                            type: text
+                        -   name: bogus
+                            title: bogus
+                            type: text
+                            visible: false
+            -   name: random
                 title: Random Components
                 type: Table
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - ci_width
-                - ci_method
-                - boot_r
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - ci_width
+                    - ci_method
+                    - boot_r
                 columns:
-                -       name: groups
+                    -   name: groups
                         title: Groups
                         type: text
                         combineBelow: true
-                -       name: var1
+                    -   name: var1
                         title: Name
                         type: text
-                -       name: vcov
+                    -   name: vcov
                         title: Variance
                         type: number
-                -       name: sdcor
+                    -   name: sdcor
                         title: SD
                         type: number
-                -       name: sd.ci.lower
+                    -   name: sd.ci.lower
                         type: number
                         title: Lower
                         visible: (re_ci)
-                -       name: sd.ci.upper
+                    -   name: sd.ci.upper
                         type: number
                         title: Upper
                         visible: (re_ci)
-                -       name: icc
+                    -   name: icc
                         title: ICC
                         type: number
-                -       name: phi
+                    -   name: phi
                         title: Phi
                         type: number
                         visible: (res_struct:ar1)
-                -       name: rho
+                    -   name: rho
                         title: rho
                         type: number
                         visible: (res_struct:cs)
-        -       name: randomcov
+            -   name: randomcov
                 title: Random Parameters correlations
                 type: Table
                 visible: false
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - ci_width
-                - ci_method
-                - boot_r
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - ci_width
+                    - ci_method
+                    - boot_r
                 columns:
-                -       name: groups
+                    -   name: groups
                         title: Groups
                         combineBelow: true
                         type: text
-                -       name: var1
+                    -   name: var1
                         title: param1
                         type: text
-                -       name: var2
+                    -   name: var2
                         title: param2
                         type: text
-                -       name: vcov
+                    -   name: vcov
                         title: Cov.
                         type: number
-                -       name: sdcor
+                    -   name: sdcor
                         title: Corr.
                         type: number
-                -       name: sd.ci.lower
+                    -   name: sd.ci.lower
                         type: number
                         title: Lower
                         visible: (re_ci)
                         superTitle: Confidence Intervals
-                -       name: sd.ci.upper
+                    -   name: sd.ci.upper
                         type: number
                         title: Upper
                         visible: (re_ci)
                         superTitle: Confidence Intervals
-        -       name: ranova
+            -   name: ranova
                 title: Random Effect LRT
                 type: Table
                 visible: (re_lrt)
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
                 columns:
-                -       name: test
+                    -   name: test
                         title: Test
                         combineBelow: true
                         type: text
-                -       name: npar
+                    -   name: npar
                         title: N. par
                         type: number
-                -       name: AIC
+                    -   name: AIC
                         title: AIC
                         type: number
-                -       name: LRT
+                    -   name: LRT
                         title: LRT
                         type: number
-                -       name: df
+                    -   name: df
                         title: df
                         type: number
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
-        -       name: res_corr
+            -   name: res_corr
                 title: Residual correlations
                 type: Table
                 visible: (res_struct:un)
                 clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
                 columns:
-                -       name: index
+                    -   name: index
                         title: Index
                         type: text
--       name: posthoc
+    -   name: posthoc
         title: Post Hoc Tests
         type: Array
         description: an array of post-hoc tables
         items: (posthoc)
         template:
-                title: 'Post Hoc comparison:  ___key___'
-                type: Table
-                clearWith:
+            title: 'Post Hoc comparison:  ___key___'
+            type: Table
+            clearWith:
                 - model_type
                 - dep
                 - factors
@@ -523,184 +523,184 @@ items:
                 - ci_method
                 - boot_r
                 - adjust
-                columns:
-                -       name: estimate
-                        title: Difference
-                        type: number
-                -       name: se
-                        title: SE
-                        type: number
-                -       name: est.ci.lower
-                        type: number
-                        title: Lower
-                        visible: (posthoc_ci)
-                -       name: est.ci.upper
-                        type: number
-                        title: Upper
-                        visible: (posthoc_ci)
-                -       name: test
-                        title: t
-                        type: number
-                -       name: df
-                        title: df
-                        type: number
-                -       name: p
-                        title: p
-                        type: number
-                        format: zto,pvalue
-                        visible: (adjust:none)
-                -       name: bonf
-                        title: p<sub>bonferroni</sub>
-                        type: number
-                        format: zto,pvalue
-                        visible: (adjust:bonf)
-                -       name: tukey
-                        title: p<sub>tukey</sub>
-                        type: number
-                        format: zto,pvalue
-                        visible: (adjust:tukey)
-                -       name: holm
-                        title: p<sub>holm</sub>
-                        type: number
-                        format: zto,pvalue
-                        visible: (adjust:holm)
-                -       name: scheffe
-                        title: p<sub>scheffe</sub>
-                        type: number
-                        format: zto,pvalue
-                        visible: (adjust:scheffe)
-                -       name: sidak
-                        title: p<sub>sidak</sub>
-                        type: number
-                        format: zto,pvalue
-                        visible: (adjust:sidak)
--       name: simpleEffects
+            columns:
+                -   name: estimate
+                    title: Difference
+                    type: number
+                -   name: se
+                    title: SE
+                    type: number
+                -   name: est.ci.lower
+                    type: number
+                    title: Lower
+                    visible: (posthoc_ci)
+                -   name: est.ci.upper
+                    type: number
+                    title: Upper
+                    visible: (posthoc_ci)
+                -   name: test
+                    title: t
+                    type: number
+                -   name: df
+                    title: df
+                    type: number
+                -   name: p
+                    title: p
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:none)
+                -   name: bonf
+                    title: p<sub>bonferroni</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:bonf)
+                -   name: tukey
+                    title: p<sub>tukey</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:tukey)
+                -   name: holm
+                    title: p<sub>holm</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:holm)
+                -   name: scheffe
+                    title: p<sub>scheffe</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:scheffe)
+                -   name: sidak
+                    title: p<sub>sidak</sub>
+                    type: number
+                    format: zto,pvalue
+                    visible: (adjust:sidak)
+    -   name: simpleEffects
         title: Simple Effects
         type: Group
         items:
-        -       name: anova
+            -   name: anova
                 title: ANOVA for Simple Effects  of ___key___
                 type: Table
                 description: a table of ANOVA for simple effects
                 visible: false
                 clearWith:
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - simple_x
-                - simple_mods
-                - simple_scale
-                - ccm_value
-                - ccp_value
-                - ccra_steps
-                - covs_scale_labels
-                - covs_conditioning
-                - contrast_custom_focus
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - simple_x
+                    - simple_mods
+                    - simple_scale
+                    - ccm_value
+                    - ccp_value
+                    - ccra_steps
+                    - covs_scale_labels
+                    - covs_conditioning
+                    - contrast_custom_focus
                 columns:
-                -       name: test
+                    -   name: test
                         title: F
                         type: number
-                -       name: df1
+                    -   name: df1
                         title: Num df
                         type: number
-                -       name: df2
+                    -   name: df2
                         title: Den df
                         type: number
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
-        -       name: coefficients
+            -   name: coefficients
                 title: Parameter Estimates for simple effects of ___key___
                 type: Table
                 visible: false
                 clearWith:
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - simple_x
-                - simple_mods
-                - simple_scale
-                - ccm_value
-                - ccp_value
-                - ccra_steps
-                - covs_scale_labels
-                - covs_conditioning
-                - contrast_custom_focus
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - contrast_custom_values
+                    - donotrun
+                    - simple_x
+                    - simple_mods
+                    - simple_scale
+                    - ccm_value
+                    - ccp_value
+                    - ccra_steps
+                    - covs_scale_labels
+                    - covs_conditioning
+                    - contrast_custom_focus
                 columns:
-                -       name: contrast
+                    -   name: contrast
                         title: Effect
                         type: text
-                -       name: estimate
+                    -   name: estimate
                         title: Estimate
                         type: number
-                -       name: se
+                    -   name: se
                         title: SE
                         type: number
-                -       name: est.ci.lower
+                    -   name: est.ci.lower
                         type: number
                         title: Lower
                         visible: (estimates_ci)
-                -       name: est.ci.upper
+                    -   name: est.ci.upper
                         type: number
                         title: Upper
                         visible: (estimates_ci)
-                -       name: df
+                    -   name: df
                         title: df
                         type: number
-                -       name: test
+                    -   name: test
                         title: t
                         type: number
-                -       name: p
+                    -   name: p
                         title: p
                         type: number
                         format: zto,pvalue
--       name: simpleInteractions
+    -   name: simpleInteractions
         title: Simple Interactions
         type: Array
         description: an array of simple interactions tables
         visible: (simple_interactions)
         template:
-                title: 'Interaction: ___key___'
-                type: Group
-                clearWith: []
-                items:
-                -       type: Table
-                        name: anova
-                        title: ANOVA
-                        clearWith:
+            title: 'Interaction: ___key___'
+            type: Group
+            clearWith: []
+            items:
+                -   type: Table
+                    name: anova
+                    title: ANOVA
+                    clearWith:
                         - reml
                         - cluster
                         - re
@@ -729,27 +729,27 @@ items:
                         - covs_scale_labels
                         - covs_conditioning
                         - contrast_custom_focus
-                        columns:
-                        -       name: effect
-                                title: Effect
-                                type: text
-                        -       name: test
-                                title: F
-                                type: number
-                        -       name: df1
-                                title: df1
-                                type: number
-                        -       name: df2
-                                title: df2
-                                type: number
-                        -       name: p
-                                title: p
-                                type: number
-                                format: zto,pvalue
-                -       type: Table
-                        name: coefficients
-                        title: Parameter Estimates
-                        clearWith:
+                    columns:
+                        -   name: effect
+                            title: Effect
+                            type: text
+                        -   name: test
+                            title: F
+                            type: number
+                        -   name: df1
+                            title: df1
+                            type: number
+                        -   name: df2
+                            title: df2
+                            type: number
+                        -   name: p
+                            title: p
+                            type: number
+                            format: zto,pvalue
+                -   type: Table
+                    name: coefficients
+                    title: Parameter Estimates
+                    clearWith:
                         - reml
                         - cluster
                         - re
@@ -778,42 +778,42 @@ items:
                         - covs_scale_labels
                         - covs_conditioning
                         - contrast_custom_focus
-                        columns:
-                        -       name: effect
-                                title: Effect
-                                type: text
-                        -       name: estimate
-                                title: Estimate
-                                type: number
-                        -       name: se
-                                title: SE
-                                type: number
-                        -       name: df
-                                title: df
-                                type: number
-                        -       name: est.ci.lower
-                                title: Lower
-                                type: number
-                        -       name: est.ci.upper
-                                title: Upper
-                                type: number
-                        -       name: test
-                                title: t
-                                type: number
-                        -       name: p
-                                title: p
-                                type: number
-                                format: zto,pvalue
--       name: emmeans
+                    columns:
+                        -   name: effect
+                            title: Effect
+                            type: text
+                        -   name: estimate
+                            title: Estimate
+                            type: number
+                        -   name: se
+                            title: SE
+                            type: number
+                        -   name: df
+                            title: df
+                            type: number
+                        -   name: est.ci.lower
+                            title: Lower
+                            type: number
+                        -   name: est.ci.upper
+                            title: Upper
+                            type: number
+                        -   name: test
+                            title: t
+                            type: number
+                        -   name: p
+                            title: p
+                            type: number
+                            format: zto,pvalue
+    -   name: emmeans
         title: Estimated Marginal Means
         type: Array
         description: an array of predicted means tables
         visible: false
         items: (emmeans)
         template:
-                title: Estimate Marginal Means - ___key___
-                type: Table
-                clearWith:
+            title: Estimate Marginal Means - ___key___
+            type: Table
+            clearWith:
                 - reml
                 - cluster
                 - re
@@ -839,74 +839,74 @@ items:
                 - covs_scale_labels
                 - covs_conditioning
                 - contrast_custom_focus
-                columns:
-                -       name: estimate
-                        title: Mean
-                        type: number
-                -       name: se
-                        title: SE
-                        type: number
-                -       name: df
-                        title: df
-                        type: number
-                -       name: est.ci.lower
-                        title: Lower
-                        type: number
-                -       name: est.ci.upper
-                        title: Upper
-                        type: number
--       name: mainPlots
+            columns:
+                -   name: estimate
+                    title: Mean
+                    type: number
+                -   name: se
+                    title: SE
+                    type: number
+                -   name: df
+                    title: df
+                    type: number
+                -   name: est.ci.lower
+                    title: Lower
+                    type: number
+                -   name: est.ci.upper
+                    title: Upper
+                    type: number
+    -   name: mainPlots
         title: Results Plots
         type: Array
         description: an array of results plots
         clearWith:
-        - model_type
-        - dep
-        - factors
-        - covs
-        - covs_scale
-        - scale_missing
-        - model_terms
-        - fixed_intercept
-        - se_method
-        - mute
-        - df_method
-        - contrasts
-        - contrast_custom_values
-        - donotrun
-        - ccm_value
-        - ccp_value
-        - ccra_steps
-        - covs_scale_labels
-        - covs_conditioning
-        - contrast_custom_focus
-        - plot_x
-        - plot_z
-        - plot_by
-        - plot_raw
-        - plot_yscale
-        - plot_xoriginal
-        - plot_black
-        - plot_around
-        - plot_scale
-        - plot_re
-        - plot_re_method
-        - plot_y_min
-        - plot_y_max
-        - plot_y_ticks
-        - plot_y_ticks_exact
-        - plot_x_min
-        - plot_x_max
-        - plot_x_ticks
-        - plot_x_ticks_exact
-        - plot_extra
+            - model_type
+            - dep
+            - factors
+            - covs
+            - covs_scale
+            - scale_missing
+            - model_terms
+            - fixed_intercept
+            - se_method
+            - mute
+            - df_method
+            - contrasts
+            - contrast_custom_values
+            - donotrun
+            - ccm_value
+            - ccp_value
+            - ccra_steps
+            - covs_scale_labels
+            - covs_conditioning
+            - contrast_custom_focus
+            - plot_x
+            - plot_z
+            - plot_by
+            - plot_raw
+            - plot_yscale
+            - plot_xoriginal
+            - plot_black
+            - plot_around
+            - plot_scale
+            - plot_re
+            - plot_re_method
+            - plot_y_min
+            - plot_y_max
+            - plot_y_ticks
+            - plot_y_ticks_exact
+            - plot_x_min
+            - plot_x_max
+            - plot_x_ticks
+            - plot_x_ticks_exact
+            - plot_extra
         template:
-                title: ''
-                type: Image
-                renderFun: .mainPlot
-                width: 700
-                height: 400
-                clearWith:
+            title: ''
+            type: Image
+            renderFun: .mainPlot
+            width: 700
+            height: 400
+            clearWith:
                 - model_type
                 - dep
                 - factors
@@ -943,53 +943,53 @@ items:
                 - plot_scale
                 - plot_re
                 - plot_re_method
--       name: plotnotes
+    -   name: plotnotes
         type: Html
         visible: false
--       name: jnPlots
+    -   name: jnPlots
         title: Johnson-Neyman Plot
         type: Array
         description: an array of plots
         visible: (plot_jn)
         refs: interactions
         clearWith:
-        - model_type
-        - dep
-        - factors
-        - covs
-        - covs_scale
-        - scale_missing
-        - model_terms
-        - fixed_intercept
-        - se_method
-        - mute
-        - df_method
-        - contrasts
-        - contrast_custom_values
-        - donotrun
-        - reml
-        - cluster
-        - re
-        - re_corr
-        - res_struct
-        - plot_x
-        - plot_z
-        - plot_by
-        - plot_raw
-        - plot_yscale
-        - plot_xoriginal
-        - plot_black
-        - plot_around
-        - plot_scale
-        - plot_re
-        - plot_re_method
+            - model_type
+            - dep
+            - factors
+            - covs
+            - covs_scale
+            - scale_missing
+            - model_terms
+            - fixed_intercept
+            - se_method
+            - mute
+            - df_method
+            - contrasts
+            - contrast_custom_values
+            - donotrun
+            - reml
+            - cluster
+            - re
+            - re_corr
+            - res_struct
+            - plot_x
+            - plot_z
+            - plot_by
+            - plot_raw
+            - plot_yscale
+            - plot_xoriginal
+            - plot_black
+            - plot_around
+            - plot_scale
+            - plot_re
+            - plot_re_method
         template:
-                title: ''
-                type: Image
-                renderFun: .jnPlot
-                width: 700
-                height: 400
-                clearWith:
+            title: ''
+            type: Image
+            renderFun: .jnPlot
+            width: 700
+            height: 400
+            clearWith:
                 - model_type
                 - dep
                 - factors
@@ -1020,34 +1020,34 @@ items:
                 - plot_scale
                 - plot_re
                 - plot_re_method
--       name: jnplotnotes
+    -   name: jnplotnotes
         type: Html
         visible: false
--       name: assumptions
+    -   name: assumptions
         title: Assumption Checks
         type: Group
         items:
-        -       name: normtest
+            -   name: normtest
                 title: Test for Normality of residuals
                 type: Table
                 description: a table of normality tests
                 visible: (norm_test)
                 clearWith:
-                - model_terms
-                - dep
-                - reml
-                - re
+                    - model_terms
+                    - dep
+                    - reml
+                    - re
                 columns:
-                -       name: name
+                    -   name: name
                         title: Test
                         type: number
-                -       name: test
+                    -   name: test
                         title: Statistics
                         type: number
-                -       name: p
+                    -   name: p
                         type: number
                         format: zto,pvalue
-        -       name: qqplot
+            -   name: qqplot
                 title: Q-Q Plot
                 visible: (qq_plot)
                 type: Image
@@ -1057,10 +1057,10 @@ items:
                 renderFun: .qqPlot
                 requiresData: true
                 clearWith:
-                - dep
-                - model_terms
-                - dep_scale
-        -       name: normPlot
+                    - dep
+                    - model_terms
+                    - dep_scale
+            -   name: normPlot
                 title: Residual histogram
                 visible: (norm_plot)
                 type: Image
@@ -1070,11 +1070,11 @@ items:
                 renderFun: .normPlot
                 requiresData: true
                 clearWith:
-                - dep
-                - dep_scale
-                - model_terms
-                - plot_extremes
-        -       name: residPlot
+                    - dep
+                    - dep_scale
+                    - model_terms
+                    - plot_extremes
+            -   name: residPlot
                 title: Residual-Predicted Scatterplot
                 visible: (resid_plot)
                 type: Image
@@ -1084,123 +1084,123 @@ items:
                 renderFun: .residPlot
                 requiresData: true
                 clearWith:
-                - dep
-                - model_terms
-                - dep_scale
-                - plot_extremes
-        -       name: clusterBoxplot
+                    - dep
+                    - model_terms
+                    - dep_scale
+                    - plot_extremes
+            -   name: clusterBoxplot
                 title: Residuals by cluster boxplot
                 type: Array
                 description: Residuals boxplot by cluster
                 visible: (cluster_boxplot)
                 clearWith:
-                - dep
-                - dep_scale
-                - model_terms
-                - plot_extremes
+                    - dep
+                    - dep_scale
+                    - model_terms
+                    - plot_extremes
                 template:
-                        title: $key
-                        type: Image
-                        renderFun: .clusterBoxplot
-                        width: 700
-                        height: 900
-        -       name: clusterResPred
+                    title: $key
+                    type: Image
+                    renderFun: .clusterBoxplot
+                    width: 700
+                    height: 900
+            -   name: clusterResPred
                 title: Residuals-Predicted by cluster
                 type: Array
                 description: an array of random coefficients histograms
                 visible: (cluster_respred)
                 clearWith:
-                - dep
-                - dep_scale
-                - model_terms
-                - plot_extremes
+                    - dep
+                    - dep_scale
+                    - model_terms
+                    - plot_extremes
                 template:
-                        title: $key
-                        type: Image
-                        renderFun: .clusterResPred
-                        width: 700
-                        height: 700
-        -       name: clusterResPredGrid
+                    title: $key
+                    type: Image
+                    renderFun: .clusterResPred
+                    width: 700
+                    height: 700
+            -   name: clusterResPredGrid
                 title: Residuals-Predicted Grid
                 type: Array
                 description: an grid of PredRes plots
                 visible: (cluster_respred_grid)
                 clearWith:
-                - dep
-                - dep_scale
-                - model_terms
-                - plot_extremes
+                    - dep
+                    - dep_scale
+                    - model_terms
+                    - plot_extremes
                 template:
-                        title: $key
-                        type: Image
-                        renderFun: .clusterResPredGrid
-                        width: 700
-                        height: 900
-        -       name: randHist
+                    title: $key
+                    type: Image
+                    renderFun: .clusterResPredGrid
+                    width: 700
+                    height: 900
+            -   name: randHist
                 title: Random coefficients histogram
                 type: Array
                 description: an array of random coefficients histograms
                 visible: (rand_hist)
                 clearWith:
-                - dep
-                - dep_scale
-                - model_terms
+                    - dep
+                    - dep_scale
+                    - model_terms
                 template:
-                        title: $key
-                        type: Image
-                        renderFun: .randHist
-                        width: 700
-                        height: 500
--       name: predicted
+                    title: $key
+                    type: Image
+                    renderFun: .randHist
+                    width: 700
+                    height: 500
+    -   name: predicted
         title: Predicted Vales
         type: Output
         varTitle: '`MIXED_PRED_${ dep }`'
         varDescription: Predicted values
         clearWith:
-        - model_type
-        - dep
-        - factors
-        - covs
-        - covs_scale
-        - scale_missing
-        - model_terms
-        - fixed_intercept
-        - se_method
-        - mute
-        - df_method
-        - contrasts
-        - contrast_custom_values
-        - donotrun
-        - reml
-        - cluster
-        - re
-        - re_corr
-        - res_struct
--       name: residuals
+            - model_type
+            - dep
+            - factors
+            - covs
+            - covs_scale
+            - scale_missing
+            - model_terms
+            - fixed_intercept
+            - se_method
+            - mute
+            - df_method
+            - contrasts
+            - contrast_custom_values
+            - donotrun
+            - reml
+            - cluster
+            - re
+            - re_corr
+            - res_struct
+    -   name: residuals
         title: Residuals Vales
         type: Output
         varTitle: '`MIXED_RES_${ dep }`'
         varDescription: Residuals values
         clearWith:
-        - model_type
-        - dep
-        - factors
-        - covs
-        - covs_scale
-        - scale_missing
-        - model_terms
-        - fixed_intercept
-        - se_method
-        - mute
-        - df_method
-        - contrasts
-        - contrast_custom_values
-        - donotrun
-        - reml
-        - cluster
-        - re
-        - re_corr
-        - res_struct
--       name: savenotes
+            - model_type
+            - dep
+            - factors
+            - covs
+            - covs_scale
+            - scale_missing
+            - model_terms
+            - fixed_intercept
+            - se_method
+            - mute
+            - df_method
+            - contrasts
+            - contrast_custom_values
+            - donotrun
+            - reml
+            - cluster
+            - re
+            - re_corr
+            - res_struct
+    -   name: savenotes
         type: Html
         visible: false
