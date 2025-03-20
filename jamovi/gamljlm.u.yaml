@@ -3,105 +3,105 @@ name: gamljlm
 jus: '2.0'
 compilerMode: tame
 events:
-        update: ./gamlj.events::update
+    update: ./gamlj.events::update
 children:
--       name: variablesupplier
+    -   name: variablesupplier
         type: VariableSupplier
         suggested:
-        - continuous
-        - nominal
-        - ordinal
+            - continuous
+            - nominal
+            - ordinal
         persistentItems: false
         stretchFactor: 1
         children:
-        -       type: TargetLayoutBox
+            -   type: TargetLayoutBox
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: dep
                         maxItemCount: 1
                         isTarget: true
                         itemDropBehaviour: overwrite
-        -       type: TargetLayoutBox
+            -   type: TargetLayoutBox
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: factors
                         isTarget: true
                         events:
-                                change: ./gamlj.events::onChange_factors
-        -       type: TargetLayoutBox
+                            change: ./gamlj.events::onChange_factors
+            -   type: TargetLayoutBox
                 children:
-                -       type: VariablesListBox
+                    -   type: VariablesListBox
                         name: covs
                         isTarget: true
                         events:
-                                change: ./gamlj.events::onChange_covariates
--       name: panel_input
+                            change: ./gamlj.events::onChange_covariates
+    -   name: panel_input
         type: LayoutBox
         margin: large
         style: list
         children:
-        -       type: Label
+            -   type: Label
                 label: Effect Size
                 margin: large
                 style: list-inline
                 children:
-                -       name: es_beta
+                    -   name: es_beta
                         type: CheckBox
                         optionName: es
                         optionPart: beta
-                -       name: es_eta
+                    -   name: es_eta
                         type: CheckBox
                         optionName: es
                         optionPart: eta
-                -       name: es_etap
+                    -   name: es_etap
                         type: CheckBox
                         optionName: es
                         optionPart: etap
-                -       name: es_omega
+                    -   name: es_omega
                         type: CheckBox
                         optionName: es
                         optionPart: omega
-                -       name: es_omegap
+                    -   name: es_omegap
                         type: CheckBox
                         optionName: es
                         optionPart: omegap
-                -       name: es_epsilon
+                    -   name: es_epsilon
                         type: CheckBox
                         optionName: es
                         optionPart: epsilon
-                -       name: es_epsilonp
+                    -   name: es_epsilonp
                         type: CheckBox
                         optionName: es
                         optionPart: epsilonp
-        -       type: Label
+            -   type: Label
                 label: Confidence Intervals
                 margin: large
                 style: list-inline
                 children:
-                -       name: estimates_ci
+                    -   name: estimates_ci
                         type: CheckBox
-                -       name: betas_ci
+                    -   name: betas_ci
                         type: CheckBox
-                -       type: TextBox
+                    -   type: TextBox
                         name: ci_width
                         label: Interval
                         suffix: '%'
                         format: number
                         enable: (estimates_ci || betas_ci)
-        -       type: Label
+            -   type: Label
                 label: Estimation
                 margin: large
                 style: list-inline
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: donotrun
--       name: panel_model
+    -   name: panel_model
         type: CollapseBox
         label: Model
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: Supplier
+            -   type: Supplier
                 name: modelSupplier
                 label: Components
                 persistentItems: true
@@ -109,577 +109,577 @@ children:
                 format: term
                 higherOrders: true
                 events:
-                        update: ./gamlj.events::onUpdate_modelSupplier
+                    update: ./gamlj.events::onUpdate_modelSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         transferAction: interactions
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: model_terms
                                 valueFilter: unique
                                 isTarget: true
                                 itemDropBehaviour: emptyspace
                                 events:
-                                        change: ./gamlj.events::onChange_model_terms
-                                        listItemRemoved: ./gamlj.events::onChange_model_remove
+                                    change: ./gamlj.events::onChange_model_terms
+                                    listItemRemoved: ./gamlj.events::onChange_model_remove
                                 template:
-                                        type: TermLabel
-                        -       type: CheckBox
+                                    type: TermLabel
+                            -   type: CheckBox
                                 name: fixed_intercept
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         name: nested_layout
                         transferAction: interactions
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: nested_terms
                                 valueFilter: unique
                                 isTarget: true
                                 itemDropBehaviour: emptyspace
                                 events:
-                                        change: ./gamlj.events::onChange_nested_add
+                                    change: ./gamlj.events::onChange_nested_add
                                 template:
-                                        type: TermLabel
-                        -       type: CheckBox
+                                    type: TermLabel
+                            -   type: CheckBox
                                 name: nested_intercept
                                 enable: (comparison)
-        -       type: LayoutBox
+            -   type: LayoutBox
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Model comparison
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: comparison
                                 events:
-                                        change: ./gamlj.events::onEvent_comparison
-                -       type: Label
+                                    change: ./gamlj.events::onEvent_comparison
+                    -   type: Label
                         label: Omnibus test
                         children:
-                        -       name: omnibus_F
+                            -   name: omnibus_F
                                 type: RadioButton
                                 optionName: omnibus
                                 optionPart: F
-                        -       name: omnibus_LRT
+                            -   name: omnibus_LRT
                                 type: RadioButton
                                 optionName: omnibus
                                 optionPart: LRT
--       name: panel_factors
+    -   name: panel_factors
         type: CollapseBox
         label: Factors Coding
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: ListBox
+            -   type: ListBox
                 name: contrasts
                 stretchFactor: 1
                 events:
-                        change: ./gamlj.events::contrasts_changed
+                    change: ./gamlj.events::contrasts_changed
                 showColumnHeaders: false
                 columns:
-                -       name: var
+                    -   name: var
                         label: ~
                         selectable: false
                         stretchFactor: 1
                         maxWidth: 300
                         template:
-                                type: VariableLabel
-                -       name: type
+                            type: VariableLabel
+                    -   name: type
                         label: ~
                         selectable: false
                         stretchFactor: 0.5
                         template:
-                                type: ComboBox
-        -       type: CheckBox
+                            type: ComboBox
+            -   type: CheckBox
                 name: show_contrastnames
-        -       type: CheckBox
+            -   type: CheckBox
                 name: show_contrastcodes
-        -       type: Label
+            -   type: Label
                 label: Contrast Codes
                 name: custom_values
                 children:
-                -       type: ListBox
+                    -   type: ListBox
                         name: contrast_custom_values
                         showColumnHeaders: false
                         columns:
-                        -       name: var
+                            -   name: var
                                 label: Var
                                 template:
-                                        type: Label
-                        -       name: codes
+                                    type: Label
+                            -   name: codes
                                 label: Var
                                 template:
-                                        type: TextBox
-                -       type: CheckBox
+                                    type: TextBox
+                    -   type: CheckBox
                         name: contrast_custom_es
--       name: panel_covs
+    -   name: panel_covs
         type: CollapseBox
         label: Covariates Scaling
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: ListBox
+            -   type: ListBox
                 name: covs_scale
                 stretchFactor: 1
                 showColumnHeaders: false
                 columns:
-                -       name: var
+                    -   name: var
                         label: ~
                         selectable: false
                         stretchFactor: 1
                         maxWidth: 300
                         template:
-                                type: VariableLabel
-                -       name: type
+                            type: VariableLabel
+                    -   name: type
                         label: ~
                         selectable: false
                         stretchFactor: 0.5
                         template:
-                                type: ComboBox
-        -       type: LayoutBox
+                            type: ComboBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Covariates conditioning
                         children:
-                        -       type: LayoutBox
+                            -   type: LayoutBox
                                 margin: large
                                 style: list
                                 children:
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: covs_conditioning_mean_sd
                                         optionName: covs_conditioning
                                         optionPart: mean_sd
                                         children:
-                                        -       type: TextBox
+                                            -   type: TextBox
                                                 name: ccm_value
                                                 format: number
                                                 enable: (covs_conditioning_mean_sd)
-                                -       name: covs_conditioning_percent
+                                    -   name: covs_conditioning_percent
                                         type: RadioButton
                                         optionName: covs_conditioning
                                         optionPart: percent
                                         children:
-                                        -       type: TextBox
+                                            -   type: TextBox
                                                 name: ccp_value
                                                 label: ~
                                                 suffix: '%'
                                                 format: number
                                                 enable: (covs_conditioning_percent)
-                                -       type: RadioButton
+                                    -   type: RadioButton
                                         name: covs_conditioning_range
                                         optionName: covs_conditioning
                                         optionPart: range
                                         children:
-                                        -       type: TextBox
+                                            -   type: TextBox
                                                 label: Steps
                                                 name: ccra_steps
                                                 format: number
                                                 enable: (covs_conditioning_range)
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: list
                         children:
-                        -       type: Label
+                            -   type: Label
                                 label: Covariates labeling
                                 children:
-                                -       type: ComboBox
+                                    -   type: ComboBox
                                         name: covs_scale_labels
-                        -       type: Label
+                            -   type: Label
                                 label: Dependent variable
                                 children:
-                                -       type: ComboBox
+                                    -   type: ComboBox
                                         name: dep_scale
-                        -       type: Label
+                            -   type: Label
                                 label: Scaling on
                                 children:
-                                -       type: ComboBox
+                                    -   type: ComboBox
                                         name: scale_missing
                                         label: ''
--       type: CollapseBox
+    -   type: CollapseBox
         name: panel_posthocs
         label: Post Hoc Tests
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: Supplier
+            -   type: Supplier
                 name: posthocSupplier
                 persistentItems: false
                 stretchFactor: 1
                 format: term
                 events:
-                        change: ./gamlj.events::onChange_posthocSupplier
-                        update: ./gamlj.events::onUpdate_posthocSupplier
+                    change: ./gamlj.events::onChange_posthocSupplier
+                    update: ./gamlj.events::onUpdate_posthocSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         label: ''
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: posthoc
                                 isTarget: true
                                 template:
-                                        type: TermLabel
-        -       type: LayoutBox
+                                    type: TermLabel
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Correction
                         children:
-                        -       name: adjust_none
+                            -   name: adjust_none
                                 type: CheckBox
                                 optionPart: none
                                 optionName: adjust
-                        -       name: adjust_bonf
+                            -   name: adjust_bonf
                                 type: CheckBox
                                 optionPart: bonf
                                 optionName: adjust
-                        -       name: adjust_tukey
+                            -   name: adjust_tukey
                                 type: CheckBox
                                 optionPart: tukey
                                 optionName: adjust
-                        -       name: adjust_holm
+                            -   name: adjust_holm
                                 type: CheckBox
                                 optionPart: holm
                                 optionName: adjust
-                        -       name: adjust_scheffe
+                            -   name: adjust_scheffe
                                 type: CheckBox
                                 optionName: adjust
                                 optionPart: scheffe
-                        -       name: adjust_sidak
+                            -   name: adjust_sidak
                                 type: CheckBox
                                 optionName: adjust
                                 optionPart: sidak
-                -       type: Label
+                    -   type: Label
                         label: Effect size
                         children:
-                        -       name: posthoc_es_dm
+                            -   name: posthoc_es_dm
                                 type: CheckBox
                                 optionPart: dm
                                 optionName: posthoc_es
-                        -       name: posthoc_es_ds
+                            -   name: posthoc_es_ds
                                 type: CheckBox
                                 optionPart: ds
                                 optionName: posthoc_es
-                        -       name: posthoc_es_g
+                            -   name: posthoc_es_g
                                 type: CheckBox
                                 optionPart: g
                                 optionName: posthoc_es
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: d_ci
-                -       type: Label
+                    -   type: Label
                         label: Info
                         children:
-                        -       name: posthoc_ci
+                            -   name: posthoc_ci
                                 type: CheckBox
--       name: panel_plots
+    -   name: panel_plots
         type: CollapseBox
         label: Plots
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: VariableSupplier
+            -   type: VariableSupplier
                 name: plotsSupplier
                 populate: manual
                 stretchFactor: 1
                 persistentItems: false
                 events:
-                        update: ./gamlj.events::onUpdate_plotsSupplier
-                        change: ./gamlj.events::onChange_plotsSupplier
+                    update: ./gamlj.events::onUpdate_plotsSupplier
+                    change: ./gamlj.events::onChange_plotsSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: plot_x
                                 isTarget: true
                                 maxItemCount: 1
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: plot_z
                                 isTarget: true
                                 maxItemCount: 1
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: plot_by
                                 isTarget: true
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Display
                         children:
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: plot_around_none
                                 optionName: plot_around
                                 optionPart: none
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: plot_around_ci
                                 optionName: plot_around
                                 optionPart: ci
-                        -       name: plot_around_se
+                            -   name: plot_around_se
                                 type: RadioButton
                                 optionName: plot_around
                                 optionPart: se
-                -       type: Label
+                    -   type: Label
                         label: Plot
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_raw
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_yscale
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_more_options
                                 events:
-                                        change: ./gamlj.events::plot_more_options_changed
-                -       type: Label
+                                    change: ./gamlj.events::plot_more_options_changed
+                    -   type: Label
                         label: Use
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_xoriginal
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_black
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Other Plots
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_jn
-        -       type: LayoutBox
+            -   type: LayoutBox
                 name: plot_more_option_box
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Y-axis
                         children:
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: plot_y_min
                                 format: string
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: plot_y_max
                                 format: string
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: plot_y_ticks
                                 format: string
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_y_ticks_exact
-                -       type: Label
+                    -   type: Label
                         label: X-axis
                         children:
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: plot_x_min
                                 format: string
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: plot_x_max
                                 format: string
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: plot_x_ticks
                                 format: string
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_x_ticks_exact
-                -       type: Label
+                    -   type: Label
                         label: Features
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: plot_extra
--       name: panel_simpleeffects
+    -   name: panel_simpleeffects
         type: CollapseBox
         label: Simple Effects
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: VariableSupplier
+            -   type: VariableSupplier
                 name: simpleSupplier
                 label: Variables
                 populate: manual
                 stretchFactor: 1
                 persistentItems: false
                 events:
-                        change: ./gamlj.events::onChange_simpleSupplier
-                        update: ./gamlj.events::onUpdate_simpleSupplier
+                    change: ./gamlj.events::onChange_simpleSupplier
+                    update: ./gamlj.events::onUpdate_simpleSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: simple_x
                                 isTarget: true
                                 maxItemCount: 1
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         children:
-                        -       type: VariablesListBox
+                            -   type: VariablesListBox
                                 name: simple_mods
                                 isTarget: true
-        -       type: Label
+            -   type: Label
                 name: simple_options
                 label: Additional Tests
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: simple_interactions
                         label: Simple interactions
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         name: contrast_focus_box
                         margin: large
                         style: list
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: contrast_custom_focus
--       name: panel_emmeans
+    -   name: panel_emmeans
         type: CollapseBox
         label: Estimated Marginal Means
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: Supplier
+            -   type: Supplier
                 name: emmeansSupplier
                 persistentItems: false
                 stretchFactor: 1
                 format: term
                 events:
-                        change: ./gamlj.events::onChange_emmeansSupplier
-                        update: ./gamlj.events::onUpdate_emmeansSupplier
+                    change: ./gamlj.events::onChange_emmeansSupplier
+                    update: ./gamlj.events::onUpdate_emmeansSupplier
                 children:
-                -       type: TargetLayoutBox
+                    -   type: TargetLayoutBox
                         label: ''
                         children:
-                        -       type: ListBox
+                            -   type: ListBox
                                 name: emmeans
                                 isTarget: true
                                 template:
-                                        type: TermLabel
--       type: CollapseBox
+                                    type: TermLabel
+    -   type: CollapseBox
         name: panel_assumptions
         label: Assumption Checks
         collapsed: true
         stretchFactor: 1
         style: inline
         children:
-        -       type: Label
+            -   type: Label
                 label: Tests
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: homo_test
                         label: Homogeneity tests
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: norm_test
                         label: Test normality of residuals
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: colli_test
                         label: Collinearity statistics
-        -       type: Label
+            -   type: Label
                 label: Plots
                 children:
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: qq_plot
                         label: Q-Q plot of residuals
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: norm_plot
                         label: Residuals histogram
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: resid_plot
                         label: Residuals-Predicted plot
-                -       type: CheckBox
+                    -   type: CheckBox
                         name: plot_extremes
                         enable: (resid_plot)
--       type: CollapseBox
+    -   type: CollapseBox
         label: Options
         name: panel_options
         style: list
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: CI Method
                         children:
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: ci_method_wald
                                 optionName: ci_method
                                 optionPart: wald
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: ci_method_quantile
                                 optionName: ci_method
                                 optionPart: quantile
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: ci_method_bcai
                                 optionName: ci_method
                                 optionPart: bcai
-                        -       type: TextBox
+                            -   type: TextBox
                                 name: boot_r
                                 format: number
                                 enable: (ci_method_quantile || ci_method_bcai)
-                -       type: Label
+                    -   type: Label
                         label: SE Method
                         children:
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: se_method_standard
                                 optionName: se_method
                                 optionPart: standard
-                        -       type: RadioButton
+                            -   type: RadioButton
                                 name: se_method_robust
                                 optionName: se_method
                                 optionPart: robust
-                        -       type: ComboBox
+                            -   type: ComboBox
                                 name: robust_method
                                 enable: (se_method_robust)
-                -       type: Label
+                    -   type: Label
                         label: Additional Info
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: intercept_info
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: es_info
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: vcov
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: inline
                 children:
-                -       type: Label
+                    -   type: Label
                         label: Table
                         children:
-                        -       type: CheckBox
+                            -   type: CheckBox
                                 name: mute
--       name: panel_save
+    -   name: panel_save
         type: CollapseBox
         label: Save
         style: list
         collapsed: true
         stretchFactor: 1
         children:
-        -       type: LayoutBox
+            -   type: LayoutBox
                 margin: large
                 style: list
                 children:
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: inline
                         children:
-                        -       type: Label
+                            -   type: Label
                                 label: Save
                                 children:
-                                -       type: Output
+                                    -   type: Output
                                         name: predicted
-                                -       type: Output
+                                    -   type: Output
                                         name: residuals
-                        -       type: Label
+                            -   type: Label
                                 label: Export
                                 children:
-                                -       type: CheckBox
+                                    -   type: CheckBox
                                         name: export_emm
-                                -       type: CheckBox
+                                    -   type: CheckBox
                                         name: export_plot
-                -       type: LayoutBox
+                    -   type: LayoutBox
                         margin: large
                         style: inline
                         children:
-                        -       type: ActionButton
+                            -   type: ActionButton
                                 name: export
