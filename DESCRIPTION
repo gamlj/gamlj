@@ -15,8 +15,8 @@ Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car,
          rlang, stringr, ggplot2, 
          effectsize, insight, parameters ,performance,
          lme4, lmerTest, lmtest
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
-Suggests:   ordinal, sandwich, nnet, betareg, knitr, rmarkdown,  mclogit (>= 0.9.6), boot, MASS, marginaleffects, nlme, jmvReadWrite
+Suggests: ordinal, sandwich, nnet, betareg, knitr, rmarkdown,  mclogit (>= 0.9.6), boot, MASS, marginaleffects, nlme, jmvReadWrite
 Depends: 
     R (>= 3.00)

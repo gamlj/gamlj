@@ -55,6 +55,11 @@ is.something <- function(x, ...) UseMethod(".is.something")
 
 is.there<-function(pattern,string) length(grep(pattern,string,fixed=T))>0
 
+
+### test whether something coerced to numeric return a usable number
+
+is.number <- function(obj) (length(obj)>0 && is.numeric(obj) && !is.na(obj))
+
 #### This function run an expression and returns any warnings or errors without stopping the execution.
 try_hard<-function(exp,max_warn=5) {
   
