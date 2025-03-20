@@ -96,7 +96,7 @@ Plotter <- R6::R6Class(
 
             if (is.number(image$state$y_range$ticks)) {
                 if (self$option("plot_y_ticks_exact")) {
-                    if (any(sapply(image$state$y_range["min","max","ticks"], is.number))) {
+                    if (any(sapply(image$state$y_range["min", "max", "ticks"], is.number))) {
                         self$warning <- list(
                             topic = "plotnotes",
                             message = paste("Exact ticking requires to set min and max"),
@@ -207,7 +207,7 @@ Plotter <- R6::R6Class(
 
                 if (is.number(image$state$x_range$ticks)) {
                     if (self$option("plot_x_ticks_exact")) {
-                        if (any(sapply(image$state$x_range["min","max","ticks"], is.number))) {
+                        if (any(sapply(image$state$x_range["min", "max", "ticks"], is.number))) {
                             self$warning <- list(
                                 topic = "plotnotes",
                                 message = paste("Exact ticking for the X-axis requires to set min and max"),
@@ -770,8 +770,8 @@ Plotter <- R6::R6Class(
             if (self$option("model_type", "ordinal")) {
                 rawData[[dep64]] <- rawData[[dep64]] + 1
                 if (self$option("plot_scale", "mean.class")) {
-                    y_range$min   <- NA
-                    y_range$max   <- NA
+                    y_range$min <- NA
+                    y_range$max <- NA
                     y_range$ticks <- NA
                 }
             }
@@ -779,7 +779,7 @@ Plotter <- R6::R6Class(
                 if (self$scatterType != "link") {
                     y_range$min <- NA
                 }
-                y_range$max   <- NA
+                y_range$max <- NA
                 y_range$ticks <- NA
             }
 
