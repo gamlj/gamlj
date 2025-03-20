@@ -94,9 +94,9 @@ Plotter <- R6::R6Class(
 
             # give a scale to the Y axis
 
-            if (!is.na(image$state$y_range$ticks)) {
+            if (is.number(image$state$y_range$ticks)) {
                 if (self$option("plot_y_ticks_exact")) {
-                    if (any(sapply(image$state$y_range, is.na))) {
+                    if (any(sapply(image$state$y_range["min","max","ticks"], is.number))) {
                         self$warning <- list(
                             topic = "plotnotes",
                             message = paste("Exact ticking requires to set min and max"),
@@ -205,9 +205,9 @@ Plotter <- R6::R6Class(
                 # give a scale to the Z axis
                 p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range))
 
-                if (!is.na(image$state$x_range$ticks)) {
+                if (is.number(image$state$x_range$ticks)) {
                     if (self$option("plot_x_ticks_exact")) {
-                        if (any(sapply(image$state$x_range, is.na))) {
+                        if (any(sapply(image$state$x_range["min","max","ticks"], is.number))) {
                             self$warning <- list(
                                 topic = "plotnotes",
                                 message = paste("Exact ticking for the X-axis requires to set min and max"),
@@ -598,17 +598,17 @@ Plotter <- R6::R6Class(
             x_range <- list(min = NA, max = NA, ticks = NA, noticks = FALSE)
 
             min <- as.numeric(self$optionValue("plot_x_min"))
-            if (!is.na(min)) {
+            if (is.number(min)) {
                 x_range$min <- min
             }
 
             max <- as.numeric(self$optionValue("plot_x_max"))
-            if (!is.na(max)) {
+            if (is.number(max)) {
                 x_range$max <- max
             }
 
             ticks <- as.numeric(self$optionValue("plot_x_ticks"))
-            if (!is.na(ticks)) {
+            if (is.number(ticks)) {
                 x_range$ticks <- ticks
 
                 if (ticks < 0) {
