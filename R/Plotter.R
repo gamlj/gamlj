@@ -672,20 +672,21 @@ Plotter <- R6::R6Class(
         ### give a range to the y-axis, if needed
         y_range      <-list(min=NA,max=NA,ticks=NA, noticks=FALSE)
         
-        if (self$options$plot_yscale)
+        if (self$option("plot_yscale"))
             y_range-list(min=self$scatterY$descriptive$min,max=self$scatterY$descriptive$max,ticks=NA)
- 
+
         min<-as.numeric(self$optionValue("plot_y_min"))
-        if (!is.na(min))
+
+        if (is.number(min))
              y_range$min <- min
 
         max<-as.numeric(self$optionValue("plot_y_max"))
-        if (!is.na(max))
+        if (is.number(max))
             y_range$max <- max
 
         ticks<-as.numeric(self$optionValue("plot_y_ticks"))
         
-        if (!is.na(ticks)) {
+        if (is.number(ticks)) {
           y_range$ticks <- ticks
 
           if (ticks==1) {
@@ -707,7 +708,7 @@ Plotter <- R6::R6Class(
           }
           
         }
-mark(y_range)
+
       if (self$option("model_type","multinomial")) {
         self$scatterRaw<-FALSE
       }
@@ -1228,9 +1229,9 @@ mark(y_range)
            max<-xobj$descriptive$max
            
            if (self$option("plot_extra")) {
-              if (!is.na(self$x_range$min))
+              if (is.number(self$x_range$min))
                 min <- self$x_range$min
-              if (!is.na(self$x_range$max))
+              if (is.number(self$x_range$max))
                 max <- self$x_range$max
            }
 
@@ -1240,7 +1241,6 @@ mark(y_range)
                  self$warning<-list(topic="plotnotes",message="The X-axis is in the X-variable original scale", head="info")
            }
       }
-      mark(self$x_range,conditions)
       allterm64<-c(x64,term64)
 
       mode <- NULL
