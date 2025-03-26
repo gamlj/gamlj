@@ -859,7 +859,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "dep2",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparison"),
+                                "comparison",
+                                "nested_re"),
                             columns=list(
                                 list(
                                     `name`="model", 
@@ -922,7 +923,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "dep2",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparison"),
+                                "comparison",
+                                "nested_re"),
                             columns=list(
                                 list(
                                     `name`="info", 

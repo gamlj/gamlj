@@ -43,6 +43,11 @@
         - nested_intercept
         - comparison
 -   type: scaffold
+    name: opts_nested_r
+    children:
+        - nested_re
+
+-   type: scaffold
     name: opts_ci
     children:
         - ci_width

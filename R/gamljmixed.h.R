@@ -950,7 +950,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparison"),
+                                "comparison",
+                                "nested_re"),
                             columns=list(
                                 list(
                                     `name`="model", 
@@ -1007,7 +1008,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparison"),
+                                "comparison",
+                                "nested_re"),
                             columns=list(
                                 list(
                                     `name`="info", 

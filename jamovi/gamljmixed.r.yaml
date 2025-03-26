@@ -55,6 +55,7 @@ items:
                     - nested_terms
                     - nested_intercept
                     - comparison
+                    - nested_re
                 columns:
                     -   name: model
                         title: Model
@@ -105,6 +106,7 @@ items:
                     - nested_terms
                     - nested_intercept
                     - comparison
+                    - nested_re
                 columns:
                     -   name: info
                         type: text

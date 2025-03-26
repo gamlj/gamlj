@@ -383,11 +383,6 @@ children:
                                     -   type: ComboBox
                                         name: covs_scale_labels
                             -   type: Label
-                                label: Dependent variable
-                                children:
-                                    -   type: ComboBox
-                                        name: dep_scale
-                            -   type: Label
                                 label: Scaling on
                                 children:
                                     -   type: ComboBox

@@ -42,6 +42,10 @@ items:
                     -   type: scaffold
                         name: opts_nested
                         file: clear.yaml
+                    -   type: scaffold
+                        name: opts_nested_r
+                        file: clear.yaml
+
                 columns:
                     -   name: model
                         title: Model
@@ -79,6 +83,10 @@ items:
                     -   type: scaffold
                         name: opts_nested
                         file: clear.yaml
+                    -   type: scaffold
+                        name: opts_nested_r
+                        file: clear.yaml
+                        
                 columns:
                     -   name: info
                         type: text
