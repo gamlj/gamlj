@@ -360,8 +360,7 @@ options:
         description:
             R: |
                 not used in R
-            ui: |
-                Export random coefficients, one dataset for each cluster
+            ui: Export random coefficients, one dataset for each cluster
     -   name: export_plot
         title: Plot data
         type: Bool

@@ -777,5 +777,6 @@ options:
                 title: HC0
         description:
             R: not present in T
-            ui: |
-                `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf) for deatils.
+            ui: '`HC1` to `HC3` sets the heteroschedasticity-consistent robust standard
+                error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf)
+                for deatils.'

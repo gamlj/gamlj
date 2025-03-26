@@ -712,5 +712,5 @@ options:
                 title: Mean class
         default: response
         description:
-            R: |
-                Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
+            R: Plot ordinal model predicted values in as probabilities (`response`)
+                or predicted class (`mean.class`)
