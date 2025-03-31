@@ -211,6 +211,8 @@ gparameters <- function(x, ...) UseMethod(".parameters")
 
 
 .parameters.lmerModLmerTest <- function(model, obj) {
+  
+     jinfo("RUNNER: estimating parameters for lmerMod")
     .bootstrap <- obj$options$ci_method %in% c("quantile", "bcai")
     .iterations <- obj$options$boot_r
     .ci_method <- obj$options$ci_method
@@ -220,24 +222,31 @@ gparameters <- function(x, ...) UseMethod(".parameters")
         "Kenward-Roger" = "kenward"
     )
 
-    .coefficients <- as.data.frame(parameters::parameters(
-        model,
-        ci = NULL,
-        effects = "fixed",
-        ci_method = .df_method
-    ), stringAsFactors = FALSE)
+    ss<-summary(model,ddf=obj$options$df_method)
+    
+    .coefficients<-as.data.frame(ss$coefficients)
+    .coefficients=cbind(source=rownames(.coefficients),.coefficients)
+  
+    ## parameters::parameters fails with non-identifiable models
+    
+#    .coefficients <- as.data.frame(parameters::parameters(
+#        model,
+#        ci = NULL,
+#        effects = "fixed",
+#        ci_method = .df_method
+#    ), stringAsFactors = FALSE)
+    
+   
 
-    names(.coefficients) <- c("source", "estimate", "se", "test", "df", "p")
+    names(.coefficients) <- c("source", "estimate", "se", "df", "test", "p")
 
     if (obj$option("estimates_ci")) {
         if (is.something(obj$boot_model)) .model <- obj$boot_model else .model <- model
-
-
+        
         cidata <- as.data.frame(parameters::ci(.model,
             ci = .ci_width,
             ci_method = .ci_method
         ))
-
 
         .coefficients$est.ci.lower <- cidata$CI_low
         .coefficients$est.ci.upper <- cidata$CI_high

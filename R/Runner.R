@@ -127,9 +127,7 @@ Runner <- R6::R6Class("Runner",
         },
         run_main_crosstab = function() {
             y <- stats::model.response(stats::model.frame(self$model))
-            mark(table(y))
             fitted <- stats::predict(self$model)
-            mark(table(fitted))
             if (is.numeric(fitted)) fitted <- (exp(fitted) / (1 + exp(fitted))) > .5
             tab <- table(y, fitted)
             if (self$weights_exist) {
@@ -169,6 +167,7 @@ Runner <- R6::R6Class("Runner",
             tab <- NULL
             if (self$formulaobj$isProper) {
                 tab <- gparameters(self$model, self)
+                
                 tab <- private$.fix_names(tab)
             }
             private$.coefficientstab <- tab
@@ -323,10 +322,12 @@ Runner <- R6::R6Class("Runner",
                 self$tab_randomcov <- results[[2]]
             }
 
+     
             if (is.something(self$tab_randomcov)) {
                 return(self$tab_randomcov)
             }
         },
+        #### random table for multinomial models
         run_main_multirandom = function() {
             tab <- self$model$VarCov
             tab <- lapply(tab, function(x) {
@@ -754,6 +755,7 @@ Runner <- R6::R6Class("Runner",
 ### additional functions useful for estimation of some model ###
 
 estimate_lmer <- function(...) {
+  
     opts <- list(...)
     data <- opts$data
     reml <- opts$reml
@@ -764,7 +766,7 @@ estimate_lmer <- function(...) {
             formula = stats::as.formula(opts$formula),
             data = data,
             REML = reml,
-            control = lme4::lmerControl(optimizer = eval(opt), calc.derivs = FALSE)
+            control = lme4::lmerControl(optimizer = eval(opt), calc.derivs = TRUE,check.nobs.vs.nRE = "warning")
         )
         ladd(tried) <- opt
         jinfo("MODULE: trying optimizer", opt)
@@ -780,7 +782,7 @@ estimate_lmer <- function(...) {
             formula = stats::as.formula(opts$formula),
             data = data,
             REML = reml,
-            control = lme4::lmerControl(optimizer = eval(good), calc.derivs = FALSE)
+            control = lme4::lmerControl(optimizer = eval(good), calc.derivs = TRUE,check.nobs.vs.nRE = "warning")
         )
     }
     if (length(tried) > 1) {
@@ -795,6 +797,8 @@ estimate_lmer <- function(...) {
 
 estimate_lme <- function(...) {
     opts <- list(...)
+    q<-opts
+    q$data<-NULL
     data <- opts$data
     coropts <- list(form = stats::formula(opts$form))
     if (utils::hasName(opts, "coropts")) coropts <- c(coropts, opts$coropts)
@@ -811,5 +815,7 @@ estimate_lme <- function(...) {
     model$call$random <- opts$random
     model$call$method <- opts$method
     model$call[[1]] <- quote(nlme::lme.formula)
+    if ("character" %in% class(model$apVar))
+       warning("Random-effects parameters and residual variance are probably unidentifiable.")
     return(model)
 }

@@ -76,6 +76,7 @@ gamljmixedClass <- R6::R6Class(
             ### random covvariances table
             aSmartObj <- SmartTable$new(self$results$main$randomcov, runner_machine)
             aSmartObj$ci("sd", self$options$ci_width)
+            aSmartObj$hideOn <- list(vcov = NA)
             aSmartObj$activateOnData <- TRUE
             ladd(private$.smartObjs) <- aSmartObj
 

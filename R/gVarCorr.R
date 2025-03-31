@@ -95,7 +95,9 @@ gVarCorr <- function(model, ...) UseMethod(".VarCorr")
 
 .VarCorr.lme <- function(model, obj) {
     varcov <- lme4::VarCorr(model)
+    
     varcov <- as.data.frame(varcov)
+
     varcov$vcov <- varcov$sdcor^2
     vmat <- varcov[is.na(varcov$var2), ]
 
@@ -103,47 +105,45 @@ gVarCorr <- function(model, ...) UseMethod(".VarCorr")
     if (nrow(cmat) == 0) cmat <- NULL
 
     if (obj$option("re_ci")) {
-        method <- switch(obj$options$ci_method,
-            wald = {
-                obj$warning <- list(topic = "main_random", message = "C.I are computed with the profile method.")
-                "profile"
-            },
-            profile = "profile",
-            quantile = "boot",
-            bcai = {
-                obj$warning <- list(topic = "main_random", message = "C.I are computed with the bootstrap percent method.")
-                "boot"
+      
+        check <- switch(obj$options$ci_method,
+            quantile = {
+                obj$warning <- list(topic = "main_random", message = "bootstrap method for C.I is not available for this type of model.")
             }
-        )
-        opts <- list(
-            object = model,
-            method = method,
-            parm = "theta_",
-            oldNames = FALSE
-        )
-        if (method == "boot") {
-            opts[["nsim"]] <- obj$options$boot_r
-            opts[["boot.type"]] <- "perc"
-        }
-        if (method == "profile") {
-            opts[["prof.scale"]] <- c("sdcor")
-        }
+           )
 
-        results <- try_hard(do.call(stats::confint, opts))
+        results <- try_hard(nlme::intervals(model,which="var-cov"))
 
         if (!isFALSE(results$error)) {
             obj$warning <- list(topic = "main_random", message = "C.I cannot be computed.")
+            if (grep("Non-positive definite approximate",results$error)>0)
+                      obj$warning <- list(topic = "main_random", message = "Random-effects are probably unidentifiable")
+              
+            
         } else {
             x <- try_hard({
-                cidata <- as.data.frame(results$obj)
-                names(cidata) <- c("sd.ci.lower", "sd.ci.upper")
-                varci <- rbind(cidata[grep("sd_", rownames(cidata)), ], c(NA, NA))
-                covci <- cidata[grep("cor_", rownames(cidata)), ]
+                cidata <- do.call(rbind,lapply(names(results$obj$reStruct),function(x) {
+                    dat<-results$obj$reStruct[[x]]
+                    names(dat)<-c("sd.ci.lower", "sdcor", "sd.ci.upper")
+                    dat$grp<-x
+                    dat
+                }))
+
+                varci <- rbind(cidata[grep("sd", rownames(cidata)), ], c(NA, NA))
+                covci <- cidata[grep("cor", rownames(cidata)), ]
                 vmat <- cbind(vmat, varci)
 
                 if (is.something(cmat)) {
-                    cmat$sd.ci.lower <- covci$sd.ci.lower
-                    cmat$sd.ci.upper <- covci$sd.ci.upper
+                   .names<-lapply(rownames(covci),function(x) {
+                     x<-gsub("cor","",gsub("[\\(\\)]","",x),fixed=TRUE)
+                     res<-strsplit(x,",",fixed=T)[[1]]
+                     res
+                   })
+                   .names<-as.data.frame(do.call(rbind,.names))
+                   names(.names)<-c("var1","var2")
+                   covci<-cbind(.names,covci)
+                   mark(covci)
+                    cmat<-covci
                 }
             })
         }
@@ -153,6 +153,7 @@ gVarCorr <- function(model, ...) UseMethod(".VarCorr")
     .names <- names(model$groups)
     ngrp <- model$dims$ngrps[.names]
     ## icc
+    
     int <- which(vmat$var1 %in% "(Intercept)")
     vmat$icc <- NA
     for (i in int) {

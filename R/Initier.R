@@ -306,6 +306,7 @@ Initier <- R6::R6Class(
 
         # random effect variances for lmer
         init_main_random = function() {
+          
             if (self$option("re_ci")) {
                 self$warning <- list(
                     topic = "main_random",
