@@ -188,6 +188,7 @@ const fun = {
         }
         varList=context.valuesToItems(varList, FormatDef.variable);
         ui.plotsSupplier.setValue(varList);
+        ui.multiplotsSupplier.setValue(varList);
     
     },
 

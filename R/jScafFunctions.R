@@ -195,6 +195,7 @@ ebind_square <- function(...) {
 sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
 
 .sourcifyOption.default <- function(option, def = NULL) {
+  
     if (option$name == "data") {
         return("data = data")
     }
@@ -233,6 +234,7 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
 }
 
 .sourcifyOption.OptionArray <- function(option, def = NULL) {
+  
     alist <- option$value
     if (length(alist) == 0) {
         return("")
@@ -246,6 +248,11 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
     what <- "type"
     for (a in alist) {
         what <- ifelse(utils::hasName(a, "codes"), "codes", what)
+        what <- ifelse(!utils::hasName(a, "var"), "onedim", what)
+        
+    }
+    if (what=="onedim") {
+       return(paste0(option$name, "=c(",paste0(alist, collapse=","),")"))
     }
 
     paste0(option$name, "=c(", paste(sapply(alist, function(a) paste0(sourcifyName(a$var), ' = \"', a[[what]], '\"')), collapse = ", "), ")")
@@ -256,6 +263,11 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
     if (length(option$value) == 0) {
         return("")
     }
+  
+    if (jmvcore::endsWith(option$name, "_mode")) {
+        return("")
+    }
+   
     if (option$value == option$default) {
         return("")
     }
