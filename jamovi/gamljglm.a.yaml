@@ -360,7 +360,6 @@ options:
     -   name: export
         title: Export
         type: Action
-
     -   name: plot_x
         title: Horizontal axis
         type: Variable
@@ -368,8 +367,6 @@ options:
         description:
             R: |
                 a string naming the variable placed on the horizontal axis of the plot
-
-
     -   name: plot_z
         title: Separate lines
         type: Variable
@@ -377,8 +374,6 @@ options:
         description:
             R: |
                 a string naming the variable represented as separate lines in the plot
-
-
     -   name: plot_by
         title: Separate plots
         type: Variables
@@ -386,31 +381,6 @@ options:
         description:
             R: |
                 a list of variables defining the levels at which a separate plot should be produced.
-
-    -   name: plot_mode
-        title: Mode
-        type: List
-        options:
-            -   name: monoplot
-                title: One plot
-            -   name: multiplot
-                title: Multiple
-
-    - name: plot_terms
-      title: Plot terms
-      type: Array
-      default:
-        - []
-      template:
-        type: Variables
-      description:
-          ui: >
-            the terms to meke  plots. Here you can specify
-            multiple terms for multiple plots.
-          R: >
-            not present in R
-
-
     -   name: plot_raw
         title: Observed scores
         type: Bool
@@ -523,6 +493,25 @@ options:
             ui: When `X-axis` min is smaller than the x min in the data or if `X-axis`
                 max is larger than the x max in the data, whether to extrapolate (to
                 project) the predicted values in the plot beyond the observed values.
+    -   name: plot_mode
+        title: Mode
+        type: List
+        options:
+            -   name: monoplot
+                title: One plot
+            -   name: multiplot
+                title: Multiple
+    -   name: plot_terms
+        title: Plot terms
+        type: Array
+        default:
+            - []
+        template:
+            type: Variables
+        description:
+            ui: |
+                the terms to meke  plots. Here you can specify multiple terms for multiple plots.
+            R: not present in R
     -   name: covs_scale
         title: Covariates Scaling
         type: Array

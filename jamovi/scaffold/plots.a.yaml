@@ -169,3 +169,28 @@
         ui: When `X-axis` min is smaller than the x min in the data or if `X-axis`
             max is larger than the x max in the data, whether to extrapolate (to project)
             the predicted values in the plot beyond the observed values.
+
+
+
+-   name: plot_mode
+    title: Mode
+    type: List
+    options:
+            -   name: monoplot
+                title: One plot
+            -   name: multiplot
+                title: Multiple
+
+-   name: plot_terms
+    title: Plot terms
+    type: Array
+    default:
+        - []
+    template:
+        type: Variables
+    description:
+          ui: >
+            the terms to meke  plots. Here you can specify
+            multiple terms for multiple plots.
+          R: >
+            not present in R

@@ -45,9 +45,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
-            plot_mode = NULL,
-            plot_terms = list(
-                list()),
             plot_raw = FALSE,
             plot_yscale = FALSE,
             plot_xoriginal = FALSE,
@@ -61,6 +58,9 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_x_ticks = NULL,
             plot_x_ticks_exact = NULL,
             plot_extra = NULL,
+            plot_mode = NULL,
+            plot_terms = list(
+                list()),
             covs_scale = NULL,
             scale_missing = "complete",
             offset = NULL,
@@ -317,20 +317,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "plot_by",
                 plot_by,
                 default=NULL)
-            private$..plot_mode <- jmvcore::OptionList$new(
-                "plot_mode",
-                plot_mode,
-                options=list(
-                    "monoplot",
-                    "multiplot"))
-            private$..plot_terms <- jmvcore::OptionArray$new(
-                "plot_terms",
-                plot_terms,
-                default=list(
-                    list()),
-                template=jmvcore::OptionVariables$new(
-                    "plot_terms",
-                    NULL))
             private$..plot_raw <- jmvcore::OptionBool$new(
                 "plot_raw",
                 plot_raw,
@@ -382,6 +368,20 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..plot_extra <- jmvcore::OptionBool$new(
                 "plot_extra",
                 plot_extra)
+            private$..plot_mode <- jmvcore::OptionList$new(
+                "plot_mode",
+                plot_mode,
+                options=list(
+                    "monoplot",
+                    "multiplot"))
+            private$..plot_terms <- jmvcore::OptionArray$new(
+                "plot_terms",
+                plot_terms,
+                default=list(
+                    list()),
+                template=jmvcore::OptionVariables$new(
+                    "plot_terms",
+                    NULL))
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -552,8 +552,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
-            self$.addOption(private$..plot_mode)
-            self$.addOption(private$..plot_terms)
             self$.addOption(private$..plot_raw)
             self$.addOption(private$..plot_yscale)
             self$.addOption(private$..plot_xoriginal)
@@ -567,6 +565,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_x_ticks)
             self$.addOption(private$..plot_x_ticks_exact)
             self$.addOption(private$..plot_extra)
+            self$.addOption(private$..plot_mode)
+            self$.addOption(private$..plot_terms)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..offset)
@@ -625,8 +625,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
-        plot_mode = function() private$..plot_mode$value,
-        plot_terms = function() private$..plot_terms$value,
         plot_raw = function() private$..plot_raw$value,
         plot_yscale = function() private$..plot_yscale$value,
         plot_xoriginal = function() private$..plot_xoriginal$value,
@@ -640,6 +638,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_x_ticks = function() private$..plot_x_ticks$value,
         plot_x_ticks_exact = function() private$..plot_x_ticks_exact$value,
         plot_extra = function() private$..plot_extra$value,
+        plot_mode = function() private$..plot_mode$value,
+        plot_terms = function() private$..plot_terms$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         offset = function() private$..offset$value,
@@ -697,8 +697,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
-        ..plot_mode = NA,
-        ..plot_terms = NA,
         ..plot_raw = NA,
         ..plot_yscale = NA,
         ..plot_xoriginal = NA,
@@ -712,6 +710,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_x_ticks = NA,
         ..plot_x_ticks_exact = NA,
         ..plot_extra = NA,
+        ..plot_mode = NA,
+        ..plot_terms = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..offset = NA,

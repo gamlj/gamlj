@@ -525,6 +525,7 @@ Plotter <- R6::R6Class(
         .results = NULL,
         .operator = NULL,
         .initMainPlot = function() {
+          
             if (!is.something(self$options$plot_x)) {
                 return()
             }
@@ -577,6 +578,7 @@ Plotter <- R6::R6Class(
                 self$scatterClabel <- self$scatterZ$name
             }
         },
+        
         .prepareMainPlot = function() {
             if (!is.something(self$options$plot_x)) {
                 return()

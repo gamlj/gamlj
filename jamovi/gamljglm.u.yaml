@@ -82,7 +82,6 @@ children:
                                 optionPart: multinomial
                                 events:
                                     change: ./gamlj.events::onChange_model
-
                     -   type: Label
                         label: Custom Model
                         children:
@@ -462,77 +461,75 @@ children:
                 name: plot_mode
                 stretchFactor: 1
                 children:
-                -   type: Content
-                    name: monoplot
-                    children:
-                     -   type: VariableSupplier
-                         name: plotsSupplier
-                         populate: manual
-                         stretchFactor: 1
-                         persistentItems: false
-                         events:
-                            update: ./gamlj.events::onUpdate_plotsSupplier
-                            change: ./gamlj.events::onChange_plotsSupplier
-                         children:
-                         -   type: TargetLayoutBox
-                             children:
-                                -   type: VariablesListBox
-                                    name: plot_x
-                                    isTarget: true
-                                    maxItemCount: 1
-                         -   type: TargetLayoutBox
-                             children:
-                                -   type: VariablesListBox
-                                    name: plot_z
-                                    isTarget: true
-                                    maxItemCount: 1
-                         -   type: TargetLayoutBox
-                             children:
-                                -   type: VariablesListBox
-                                    name: plot_by
-                                    isTarget: true
-
-
-                -   type: Content
-                    name: multiplot
-                    children:
-                     -   type: VariableSupplier
-                         name: multiplotsSupplier
-                         populate: manual
-                         stretchFactor: 1
-                         persistentItems: true
-                         events:
-                            update: ./gamlj.events::onUpdate_multiplotsSupplier
-                            change: ./gamlj.events::onChange_multiplotsSupplier
-                         children:
-                                      - type: TargetLayoutBox
+                    -   type: Content
+                        name: monoplot
+                        children:
+                            -   type: VariableSupplier
+                                name: plotsSupplier
+                                populate: manual
+                                stretchFactor: 1
+                                persistentItems: false
+                                events:
+                                    update: ./gamlj.events::onUpdate_plotsSupplier
+                                    change: ./gamlj.events::onChange_plotsSupplier
+                                children:
+                                    -   type: TargetLayoutBox
                                         children:
-                                          - type: ListBox
-                                            name: plot_terms
-                                            height: large
-                                            addButton: Add New Term
-                                            events:
-                                                listItemAdded: ./gamlj.events::onUpdate_plotsSupplier
-                                                listItemRemoved: ./gamlj.events::onUpdate_plotsSupplier
-                                            selectable: true
-                                            templateName: linreg-block-template
-                                            template:
-                                                type: LayoutBox
-                                                margin: normal
-                                                targetArea: true
-                                                children:
-                                                        - type: Label
-                                                          label: Term 1
-                                                          name: blockName
-                                                          stretchFactor: 1
-                                                          margin: normal
-                                                        - type: VariablesListBox
-                                                          name: blockList
-                                                          isTarget: true
-                                                          valueFilter: unique
-                                                          height: auto
-                                                          ghostText: drag variables here
-
+                                            -   type: VariablesListBox
+                                                name: plot_x
+                                                isTarget: true
+                                                maxItemCount: 1
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: VariablesListBox
+                                                name: plot_z
+                                                isTarget: true
+                                                maxItemCount: 1
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: VariablesListBox
+                                                name: plot_by
+                                                isTarget: true
+                    -   type: Content
+                        name: multiplot
+                        children:
+                            -   type: VariableSupplier
+                                name: multiplotsSupplier
+                                populate: manual
+                                stretchFactor: 1
+                                persistentItems: true
+                                events:
+                                    update: ./gamlj.events::onUpdate_multiplotsSupplier
+                                    change: ./gamlj.events::onChange_multiplotsSupplier
+                                children:
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: ListBox
+                                                name: plot_terms
+                                                height: large
+                                                addButton: Add New Term
+                                                events:
+                                                    listItemAdded: ./gamlj.events::onUpdate_plotsSupplier
+                                                    listItemRemoved: ./gamlj.events::onUpdate_plotsSupplier
+                                                selectable: true
+                                                templateName: linreg-block-template
+                                                template:
+                                                    type: LayoutBox
+                                                    margin: normal
+                                                    targetArea: true
+                                                    children:
+                                                        -   type: Label
+                                                            label: Term 1
+                                                            name: blockName
+                                                            stretchFactor: 1
+                                                            margin: normal
+                                                        -   type: VariablesListBox
+                                                            name: blockList
+                                                            isTarget: true
+                                                            valueFilter: unique
+                                                            height: auto
+                                                            ghostText: drag variables
+                                                                here
             -   type: LayoutBox
                 margin: large
                 style: inline

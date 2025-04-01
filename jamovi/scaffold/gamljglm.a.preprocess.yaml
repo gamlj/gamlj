@@ -195,6 +195,18 @@ options:
     -   name: plot_extra
         type: scaffold
         file: plots.a.yaml
+
+
+    -   name: plot_mode
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_terms
+        type: scaffold
+        file: plots.a.yaml
+
+
+#### specifics
+
     -   name: covs_scale
         title: Covariates Scaling
         type: Array
