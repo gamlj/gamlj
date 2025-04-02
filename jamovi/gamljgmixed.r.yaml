@@ -1161,6 +1161,7 @@ items:
             - plot_black
             - plot_around
             - plot_scale
+            - plot_terms
             - plot_re
             - plot_re_method
             - plot_x_min
@@ -1214,6 +1215,7 @@ items:
                 - plot_black
                 - plot_around
                 - plot_scale
+                - plot_terms
                 - plot_re
                 - plot_re_method
     -   name: plotnotes
@@ -1265,6 +1267,7 @@ items:
             - plot_black
             - plot_around
             - plot_scale
+            - plot_terms
             - plot_re
             - plot_re_method
         template:
@@ -1313,6 +1316,7 @@ items:
                 - plot_black
                 - plot_around
                 - plot_scale
+                - plot_terms
                 - plot_re
                 - plot_re_method
                 - plot_jn_expb

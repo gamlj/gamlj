@@ -2114,6 +2114,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "plot_black",
                     "plot_around",
                     "plot_scale",
+                    "plot_terms",
                     "plot_re",
                     "plot_re_method",
                     "plot_x_min",
@@ -2167,6 +2168,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "plot_black",
                         "plot_around",
                         "plot_scale",
+                        "plot_terms",
                         "plot_re",
                         "plot_re_method"))))
             self$add(jmvcore::Html$new(
@@ -2219,6 +2221,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "plot_black",
                     "plot_around",
                     "plot_scale",
+                    "plot_terms",
                     "plot_re",
                     "plot_re_method"),
                 template=jmvcore::Image$new(
@@ -2267,6 +2270,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "plot_black",
                         "plot_around",
                         "plot_scale",
+                        "plot_terms",
                         "plot_re",
                         "plot_re_method",
                         "plot_jn_expb"))))

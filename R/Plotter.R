@@ -521,18 +521,46 @@ Plotter <- R6::R6Class(
         }
     ), # end of public
     private = list(
+      
         .datamatic = FALSE,
         .results = NULL,
         .operator = NULL,
         .initMainPlot = function() {
           
-            if (!is.something(self$options$plot_x)) {
+            plot_terms<-list()
+            main_terms   <-  NULL
+            if (self$option("plot_x")) {
+                main_terms <- self$options$plot_x
+              if (self$option("plot_z")) {
+                 main_terms<-c(main_terms,self$options$plot_z)
+                 if (self$option("plot_by")) {
+                      main_terms<-c(main_terms,self$options$plot_by)
+                 }
+              }
+            ladd(plot_terms)<-main_terms    
+            }
+            
+            
+          
+            for (i in seq_along(self$options$plot_terms)) {
+              
+              if (is.something(self$options$plot_terms[[i]]))
+                              ladd(plot_terms)<-self$options$plot_terms[[i]]  
+            }
+            mark(plot_terms)
+            
+            if (!is.something(plot_terms)) {
                 return()
             }
 
             jinfo("PLOTTER: init main plot")
 
             resultsgroup <- private$.results$get("mainPlots")
+            for (i in seq_along(plot_terms)) {
+                   resultsgroup$addItem(key = i)
+              
+              
+            }
             y <- self$options$dep
             x <- self$options$plot_x
             z <- self$options$plot_z
@@ -580,6 +608,7 @@ Plotter <- R6::R6Class(
         },
         
         .prepareMainPlot = function() {
+          
             if (!is.something(self$options$plot_x)) {
                 return()
             }

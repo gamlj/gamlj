@@ -92,6 +92,7 @@
         - plot_black
         - plot_around
         - plot_scale
+        - plot_terms
 -   type: scaffold
     name: opts_plots_more_y
     children:

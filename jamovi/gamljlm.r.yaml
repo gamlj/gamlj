@@ -1044,6 +1044,7 @@ items:
             - plot_black
             - plot_around
             - plot_scale
+            - plot_terms
             - plot_y_min
             - plot_y_max
             - plot_y_ticks
@@ -1093,6 +1094,7 @@ items:
                 - plot_black
                 - plot_around
                 - plot_scale
+                - plot_terms
     -   name: plotnotes
         type: Html
         visible: false
@@ -1133,6 +1135,7 @@ items:
             - plot_black
             - plot_around
             - plot_scale
+            - plot_terms
         template:
             title: ''
             type: Image
@@ -1170,6 +1173,7 @@ items:
                 - plot_black
                 - plot_around
                 - plot_scale
+                - plot_terms
     -   name: jnplotnotes
         type: Html
         visible: false
