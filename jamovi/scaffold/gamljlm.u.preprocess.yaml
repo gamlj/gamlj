@@ -296,32 +296,10 @@ children:
         collapsed: true
         stretchFactor: 1
         children:
-            -   type: VariableSupplier
-                name: plotsSupplier
-                populate: manual
-                stretchFactor: 1
-                persistentItems: false
-                events:
-                    update: ./gamlj.events::onUpdate_plotsSupplier
-                    change: ./gamlj.events::onChange_plotsSupplier
-                children:
-                    -   type: TargetLayoutBox
-                        children:
-                            -   type: VariablesListBox
-                                name: plot_x
-                                isTarget: true
-                                maxItemCount: 1
-                    -   type: TargetLayoutBox
-                        children:
-                            -   type: VariablesListBox
-                                name: plot_z
-                                isTarget: true
-                                maxItemCount: 1
-                    -   type: TargetLayoutBox
-                        children:
-                            -   type: VariablesListBox
-                                name: plot_by
-                                isTarget: true
+            -   type: scaffold
+                name: plot_mode
+                file: plots.u.yaml
+                
             -   type: LayoutBox
                 margin: large
                 style: inline

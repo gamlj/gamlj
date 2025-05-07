@@ -190,7 +190,7 @@
         type: Variables
     description:
           ui: >
-            the terms to meke  plots. Here you can specify
+            the terms to make  plots. Here you can specify
             multiple terms for multiple plots.
           R: >
             not present in R

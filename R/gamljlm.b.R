@@ -209,7 +209,6 @@ gamljlmClass <- R6::R6Class(
             saver_machine$run()
 
 
-
             if (self$options$.interface == "R") {
                 self$results$.setModel(private$.runner_machine$model)
             }
@@ -223,6 +222,7 @@ gamljlmClass <- R6::R6Class(
             return()
         },
         .mainPlot = function(image, ggtheme, theme, ...) {
+
             plot <- private$.plotter_machine$scatterPlot(image, ggtheme, theme)
             return(plot)
         },

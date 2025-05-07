@@ -189,6 +189,18 @@ options:
         description:
             R: |
                 `TRUE` or `FALSE` (default), shows coefficients covariances
+                
+                
+#### plot
+
+## multimode plot
+    -   name: plot_mode
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_terms
+        type: scaffold
+        file: plots.a.yaml
+        
     -   name: plot_x
         type: scaffold
         file: plots.a.yaml
@@ -249,6 +261,9 @@ options:
     -   name: plot_extra
         type: scaffold
         file: plots.a.yaml
+        
+
+        
     -   name: covs_scale
         title: Covariates Scaling
         type: Array

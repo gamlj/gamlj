@@ -45,6 +45,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -96,6 +97,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -143,6 +145,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -183,6 +186,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -243,6 +247,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -323,6 +328,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -383,6 +389,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -437,6 +444,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -482,6 +490,7 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - reml
@@ -514,6 +523,7 @@ items:
                 - mute
                 - df_method
                 - contrasts
+                - covs_scale
                 - contrast_custom_values
                 - donotrun
                 - reml
@@ -603,11 +613,18 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - simple_x
                     - simple_mods
                     - simple_scale
+                    - ccm_value
+                    - ccp_value
+                    - ccra_steps
+                    - covs_scale_labels
+                    - covs_conditioning
+                    - contrast_custom_focus
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -650,11 +667,18 @@ items:
                     - mute
                     - df_method
                     - contrasts
+                    - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - simple_x
                     - simple_mods
                     - simple_scale
+                    - ccm_value
+                    - ccp_value
+                    - ccra_steps
+                    - covs_scale_labels
+                    - covs_conditioning
+                    - contrast_custom_focus
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -720,11 +744,18 @@ items:
                         - mute
                         - df_method
                         - contrasts
+                        - covs_scale
                         - contrast_custom_values
                         - donotrun
                         - simple_x
                         - simple_mods
                         - simple_scale
+                        - ccm_value
+                        - ccp_value
+                        - ccra_steps
+                        - covs_scale_labels
+                        - covs_conditioning
+                        - contrast_custom_focus
                         - ccm_value
                         - ccp_value
                         - ccra_steps
@@ -769,11 +800,18 @@ items:
                         - mute
                         - df_method
                         - contrasts
+                        - covs_scale
                         - contrast_custom_values
                         - donotrun
                         - simple_x
                         - simple_mods
                         - simple_scale
+                        - ccm_value
+                        - ccp_value
+                        - ccra_steps
+                        - covs_scale_labels
+                        - covs_conditioning
+                        - contrast_custom_focus
                         - ccm_value
                         - ccp_value
                         - ccra_steps
@@ -833,6 +871,7 @@ items:
                 - mute
                 - df_method
                 - contrasts
+                - covs_scale
                 - contrast_custom_values
                 - donotrun
                 - ccm_value
@@ -860,93 +899,63 @@ items:
     -   name: mainPlots
         title: Results Plots
         type: Array
-        description: an array of results plots
-        clearWith:
-            - model_type
-            - dep
-            - factors
-            - covs
-            - covs_scale
-            - scale_missing
-            - model_terms
-            - fixed_intercept
-            - se_method
-            - mute
-            - df_method
-            - contrasts
-            - contrast_custom_values
-            - donotrun
-            - ccm_value
-            - ccp_value
-            - ccra_steps
-            - covs_scale_labels
-            - covs_conditioning
-            - contrast_custom_focus
-            - plot_x
-            - plot_z
-            - plot_by
-            - plot_raw
-            - plot_yscale
-            - plot_xoriginal
-            - plot_black
-            - plot_around
-            - plot_scale
-            - plot_terms
-            - plot_re
-            - plot_re_method
-            - plot_y_min
-            - plot_y_max
-            - plot_y_ticks
-            - plot_y_ticks_exact
-            - plot_x_min
-            - plot_x_max
-            - plot_x_ticks
-            - plot_x_ticks_exact
-            - plot_extra
+        description: an array of main plots
         template:
-            title: ''
-            type: Image
-            renderFun: .mainPlot
-            width: 700
-            height: 400
-            clearWith:
-                - model_type
-                - dep
-                - factors
-                - covs
-                - covs_scale
-                - scale_missing
-                - model_terms
-                - fixed_intercept
-                - se_method
-                - mute
-                - df_method
-                - contrasts
-                - contrast_custom_values
-                - donotrun
-                - reml
-                - cluster
-                - re
-                - re_corr
-                - res_struct
-                - ccm_value
-                - ccp_value
-                - ccra_steps
-                - covs_scale_labels
-                - covs_conditioning
-                - contrast_custom_focus
-                - plot_x
-                - plot_z
-                - plot_by
-                - plot_raw
-                - plot_yscale
-                - plot_xoriginal
-                - plot_black
-                - plot_around
-                - plot_scale
-                - plot_terms
-                - plot_re
-                - plot_re_method
+            type: Array
+            description: an array of individual plots
+            template:
+                title: ''
+                type: Image
+                renderFun: .mainPlot
+                width: 700
+                height: 400
+                clearWith:
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - covs_scale
+                    - contrast_custom_values
+                    - donotrun
+                    - simple_x
+                    - simple_mods
+                    - simple_scale
+                    - ccm_value
+                    - ccp_value
+                    - ccra_steps
+                    - covs_scale_labels
+                    - covs_conditioning
+                    - contrast_custom_focus
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - plot_x
+                    - plot_z
+                    - plot_by
+                    - plot_raw
+                    - plot_yscale
+                    - plot_xoriginal
+                    - plot_black
+                    - plot_around
+                    - plot_scale
+                    - plot_terms
+                    - plot_x_min
+                    - plot_x_max
+                    - plot_x_ticks
+                    - plot_x_ticks_exact
+                    - plot_extra
+                    - plot_y_min
+                    - plot_y_max
+                    - plot_y_ticks
+                    - plot_y_ticks_exact
     -   name: plotnotes
         type: Html
         visible: false
@@ -969,6 +978,7 @@ items:
             - mute
             - df_method
             - contrasts
+            - covs_scale
             - contrast_custom_values
             - donotrun
             - reml
@@ -1007,6 +1017,7 @@ items:
                 - mute
                 - df_method
                 - contrasts
+                - covs_scale
                 - contrast_custom_values
                 - donotrun
                 - reml
@@ -1175,6 +1186,7 @@ items:
             - mute
             - df_method
             - contrasts
+            - covs_scale
             - contrast_custom_values
             - donotrun
             - reml
@@ -1200,6 +1212,7 @@ items:
             - mute
             - df_method
             - contrasts
+            - covs_scale
             - contrast_custom_values
             - donotrun
             - reml

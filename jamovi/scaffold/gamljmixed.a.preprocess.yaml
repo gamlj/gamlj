@@ -147,6 +147,19 @@ options:
     -   name: export
         title: Export
         type: Action
+
+#### plot
+
+## multimode plot
+    -   name: plot_mode
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_terms
+        type: scaffold
+        file: plots.a.yaml
+
+
+
     -   name: plot_x
         type: scaffold
         file: plots.a.yaml

@@ -138,6 +138,8 @@ Datamatic <- R6::R6Class(
     ), ### end of public
     private = list(
         .inspect_data = function(data) {
+          
+            jinfo("DATAMATIC: checking variables")
             self$variables <- lapply(self$vars, function(var) Variable$new(var, self)$checkVariable(data))
             names(self$variables) <- unlist(lapply(self$variables, function(var) var$name64))
 
@@ -190,7 +192,9 @@ Variable <- R6::R6Class(
             self$name64 <- tob64(var)
         },
         checkVariable = function(data) {
+          
             var <- self$name
+
             if (inherits(data, "data.frame")) {
                 vardata <- data[[var]]
             } else {
@@ -229,12 +233,11 @@ Variable <- R6::R6Class(
                 self$isDependent <- TRUE
                 self$type <- class(vardata)
                 if ("character" %in% self$type) self$datamatic$stop("Character type not allowed. Please set variable ", self$name, " as numeric or factor")
-
-
                 if ("ordered" %in% self$type) {
                     self$type <- "factor"
                 }
 
+            ### check factors ###
 
                 if (self$type == "factor") {
                     self$descriptive <- list(min = 0, max = 1)
@@ -254,6 +257,7 @@ Variable <- R6::R6Class(
                 }
             }
 
+            ### check numeric variables ###
 
             if (var %in% self$datamatic$options$covs) {
                 self$type <- "numeric"
@@ -267,11 +271,8 @@ Variable <- R6::R6Class(
                 self$contrast_labels <- self$name
                 self$paramsnames <- var
                 self$paramsnames64 <- tob64(var)
-                self$nlevels <- 3
-                self$neffects <- 1
-                if (self$datamatic$options$covs_conditioning == "range") {
-                    self$nlevels <- as.numeric(self$datamatic$options$ccra_steps) + 1
-                }
+                private$.update_levels(vardata)
+
             }
             ### end covs ####
 
@@ -299,8 +300,6 @@ Variable <- R6::R6Class(
             }
 
             ### end offset ####
-
-            ## this is for special treatments of variables
 
 
             return(self)
@@ -520,6 +519,7 @@ Variable <- R6::R6Class(
             return(labels)
         },
         .continuous_values = function(data) {
+          
             if (nrow(data) == 0) {
                 return(jmvcore::toNumeric(data[[self$name64]]))
             }
@@ -613,14 +613,14 @@ Variable <- R6::R6Class(
             as.numeric(vardata)
         },
         .update_levels = function(vardata) {
+          
             self$original_levels <- self$levels
             self$original_descriptive <- self$descriptive
             labels_type <- ifelse(is.null(self$datamatic$options$covs_scale_labels), "values", self$datamatic$options$covs_scale_labels)
-            ### when called by init, force labels because we cannot compute the values
-            ### if not, we can compute the descriptive
-            if (length(vardata) == 0) {
-                labels_type <- "labels"
-            } else {
+            self$neffects <- 1
+
+            if (length(vardata) > 0) {
+              
                 self$descriptive <- list(
                     min = min(vardata, na.rm = TRUE),
                     max = max(vardata, na.rm = TRUE),
@@ -631,36 +631,56 @@ Variable <- R6::R6Class(
 
 
             if (self$datamatic$options$covs_conditioning == "mean_sd") {
+              
+                 self$method <- "mean_sd"
                 .span <- ifelse(is.null(self$datamatic$options$ccm_value), 1, self$datamatic$options$ccm_value)
                 .labs <- c(paste0("Mean-", .span, "\u00B7", "SD"), "Mean", paste0("Mean+", .span, "\u00B7", "SD"))
-                .mean <- mean(vardata, na.rm = T)
-                .sd <- sd(vardata, na.rm = T)
-                self$levels <- round(c(.mean - (.span * .sd), .mean, .mean + (.span * .sd)), digits = 3)
-                self$method <- "mean_sd"
+                 self$nlevels<-3
+                 if (self$datamatic$options$covs_conditioning == "range") {
+                    self$nlevels <- as.numeric(self$datamatic$options$ccra_steps) + 1
+                 }                 
+                if (length(vardata)>0) {
+                   .mean <- mean(vardata, na.rm = T)
+                   .sd <- sd(vardata, na.rm = T)
+                   self$levels <- round(c(.mean - (.span * .sd), .mean, .mean + (.span * .sd)), digits = 3)
+                }
             }
+            
             if (self$datamatic$options$covs_conditioning == "percent") {
+                 self$method <- "percent"
                 .lspan <- ifelse(is.null(self$datamatic$options$ccp_value), 25, self$datamatic$options$ccp_value)
                 .span <- .lspan / 100
-
                 .labs <- c(paste0("50-", .lspan, "\u0025"), "50\u0025", paste0("50+", .lspan, "\u0025"))
+                 self$nlevels<-3
+                 if (self$datamatic$options$covs_conditioning == "range") {
+                    self$nlevels <- as.numeric(self$datamatic$options$ccra_steps) + 1
+                 }                 
 
-                self$levels <- round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span), na.rm = TRUE), digits = 3)
-
-                self$method <- "percent"
+                if (length(vardata)>0) {
+                  self$levels <- round(quantile(vardata, c(0.5 - .span, 0.5, 0.5 + .span), na.rm = TRUE), digits = 3)
+                }
             }
 
             if (self$datamatic$options$covs_conditioning == "range") {
+                self$method <- "range"
                 steps <- ifelse(is.null(self$datamatic$options$ccra_steps), 1, self$datamatic$options$ccra_steps)
-                min <- min(vardata, na.rm = TRUE)
-                max <- max(vardata, na.rm = TRUE)
-                self$levels <- round(epretty(min, max, steps), digits = 3)
-                .labs <- rep("", length(self$levels))
+                if (length(vardata)>0) {
+                     min <- min(vardata, na.rm = TRUE)
+                     max <- max(vardata, na.rm = TRUE)
+                     self$levels <- round(epretty(min, max, steps), digits = 3)
+                } else {
+                     self$levels <- 0:(steps+1)
+                }
+                .labs <- paste("value",self$levels,sep="")
                 .labs[1] <- "Min"
                 .labs[length(.labs)] <- "Max"
-                self$method <- "range"
             }
+            
+            ### when called by init, force labels because we cannot compute the values
+            ### if not, we can compute the descriptive
+            if (length(vardata)==0) labels_type="labels"
 
-            if (self$method == "range") {
+            if (self$method == "range" && length(vardata)>0) {
                 if (labels_type == "labels") {
                     labels_type <- "values_labels"
                 }

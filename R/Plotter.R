@@ -1,34 +1,571 @@
+        ## plot should be inited and prepared storing all information needed to produce the plot in
+        ## the image (Image object) state. It does not matter if the state is set in init() or run()
+        ## as long as the plot does not require the model to be re-estimated
+        ## Info present at .init() (number of variables, variables names, etc) me be omitted from the
+        ## information contained in the image$state
+
+aPlot <- R6::R6Class(
+    "aPlot",
+    cloneable = FALSE,
+    class = TRUE,
+    inherit = Scaffold,
+    public = list(
+        key          = NULL,  
+        subkeys      = NULL,
+        operator     = NULL,
+        datamatic    = NULL,
+        plotarray    = NULL,
+        plot         = NULL,
+        type         = NULL,
+        subtype      = NULL,
+        terms        = NULL,
+        dep          = NULL,
+        y            = NULL,
+        x            = NULL,
+        z            = NULL,
+        moderators   = NULL,
+        cluster      = NULL,
+        x_scale      = FALSE,
+        x_range      = list(),
+        plot_bars    = FALSE,
+        plot_raw     = FALSE,
+        plot_dodge   = NULL,
+        plot_label   = NULL,
+        largedata    = NULL,
+        
+        init = function() {
+
+            # collect the terms as datamatic objects
+            self$y <- self$datamatic$variables[[tob64(self$dep)]]
+            self$x <- self$datamatic$variables[[tob64(self$terms[[1]])]]
+            if (length(self$terms)>1)
+                   self$z <- self$datamatic$variables[[tob64(self$terms[[2]])]]
+            
+            if (length(self$terms)>2)
+                for (t in self$terms[3:length(self$terms)])
+                     self$moderators<-c(self$moderators,self$datamatic$variables[[tob64(t)]])
+     
+            ### fix dimensions for special models 
+            
+            if (self$options$model_type == "multinomial") {
+                self$moderators <- c(self$z, self$moderators)
+                self$z <- self$y
+                self$subtype <- "response"
+            }
+
+            if (self$options$model_type == "ordinal" & self$subtype != "mean.class") {
+                self$moderators <- c(self$z, self$moderators)
+                self$z <- self$y
+            }
+            
+            ### set the title for one plot array
+            title<-paste("Plot: ",paste(self$dep,"~",jmvcore::stringifyTerm(c(self$x$name, self$z$name))))
+            self$plotarray$setTitle(title)
+
+            dims <- unlist(lapply(self$moderators, function(mod) mod$levels))
+
+            if (!is.something(self$moderators)) {
+                self$subkeys <- 1
+                self$plotarray$addItem(key = 1)
+            }
+            else {
+               ldims <- lapply(self$moderators, function(mod) mod$levels_labels)
+               grid  <- expand.grid(ldims,stringsAsFactors=FALSE)
+               names(grid)<-unlist(lapply(self$moderators,function(mod) mod$name ))
+               for (i in seq_len(nrow(grid))) {
+                        self$plotarray$addItem(key = i)
+                        title<-paste(names(grid),grid[i,],sep="=",collapse=" - ")
+                        self$plotarray$get(key = i)$setTitle(title)
+                 
+               }
+               self$subkeys<-seq_len(nrow(grid))
+            }
+
+
+            ### some options here
+
+            if (self$options$plot_around != "none") {
+                self$plot_bars <- TRUE
+                self$plot_dodge <- ggplot2::position_dodge(0.2)
+                self$plot_label <- paste(self$z$name, paste0("(", toupper(self$options$plot_around), ")"), sep = "\n")
+            } else {
+                self$plot_dodge <- ggplot2::position_dodge(0)
+                self$plot_label <- self$z$name
+            }
+            
+            if (self$option("plot_xoriginal")) {
+                    self$x_scale <- TRUE
+                    self$warning <- list(topic = "plotnotes", message = "The X-axis is in the X-variable original scale", head = "info")
+            }
+
+
+        
+            }, ## end of init
+        prepare= function() {
+              
+            ### stop if it is filled from previous run ###
+            jinfo("PLOTTER Plot: checking main plot", self$key)
+            test <- any(unlist(sapply(self$plotarray$items, function(i) !i$isNotFilled())))
+            if (test) {
+                return()
+            }
+
+            jinfo("PLOTTER Plot: prepare main plot", self$key)
+            
+            ## this is done for each plot. At the moment, all main
+            ## plots share the same customization, but in the 
+            ## future we can envisage a different customization per plot
+
+            ### give a range to the x-axis, if needed
+            x_range <- list(min = NA, max = NA, ticks = NA, noticks = FALSE)
+
+            min <- as.numeric(self$optionValue("plot_x_min"))
+            if (is.number(min)) {
+                x_range$min <- min
+            }
+
+            max <- as.numeric(self$optionValue("plot_x_max"))
+            if (is.number(max)) {
+                x_range$max <- max
+            }
+
+            ticks <- as.numeric(self$optionValue("plot_x_ticks"))
+            if (is.number(ticks)) {
+                x_range$ticks <- ticks
+
+                if (ticks < 0) {
+                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (<0). The value is ignored.", type = "warning")
+                    x_range$ticks <- NA
+                }
+                if (ticks == 1) {
+                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (1). The value is ignored.", type = "warning")
+                    x_range$ticks <- NA
+                }
+
+                if (ticks > 20) {
+                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (>20). The value is ignored.", type = "warning")
+                    x_range$ticks <- NA
+                }
+                if (ticks == 0) {
+                    x_range$ticks <- NA
+                    x_range$noticks <- TRUE
+                }
+            }
+
+
+            
+            ################
+
+
+
+            self$x_range <- x_range 
+            ### compute the expected values to be plotted ###
+            data <- private$.estimate(self$x, unlist(c(self$z, self$moderators)))
+
+            ### prepare rawData if needed
+            rawData <- mf.clean(mf.data(self$operator$model))
+            for (var in intersect(names(rawData), names(self$datamatic$variables))) {
+                varobj <- self$datamatic$variables[[var]]
+                if (varobj$type == "factor") {
+                    levels(rawData[[var]]) <- varobj$levels_labels
+                }
+            }
+
+            ### here we deal with plotting random effects, if needed
+            randomData <- NULL
+
+            if (self$option("plot_re") &&
+                !self$option("model_type", "ordinal") &&
+                !self$option("model_type", "multinomial")) {
+                ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works
+
+                rawData <- private$.fix_clusters(rawData)
+
+                .model <- self$operator$model
+
+                if (self$option("plot_re_method", "average")) {
+                    formula <- self$operator$formulaobj$keep(self$x$name)
+                    res <- try_hard(mf.update(.model, formula = formula))
+                    if (!isFALSE(res$error)) {
+                        self$warning <- list(
+                            topic = "plotnotes",
+                            message = paste("Random effects cannot be plotted for", self$x$name, " with the averaging method."),
+                            head = "warning"
+                        )
+                    } else {
+                        .model <- res$obj
+                    }
+                }
+                y <- stats::predict(.model, type = self$subtype)
+                randomData <- as.data.frame(cbind(y, rawData))
+                if (self$x$type == "factor") {
+                    levels(randomData[[self$x$name64]]) <- self$x$levels_labels
+                }
+
+                self$warning <- list(topic = "plotnotes", message = paste("Random effects are plotted across", self$scatterCluster$name), head = "info")
+                # prepare a test for between variables to plot dots for random effects
+
+                xbetween <- FALSE
+                test <- tapply(as.numeric(rawData[[self$x$name64]]), rawData[[self$cluster$name64]], sd)
+                test <- sum(sapply(test, function(x) as.numeric(is.na(x) || x == 0)))
+                nc <- self$cluster$nlevels
+                if ((test / nc) > .30) xbetween <- TRUE
+            }
+            ### end of random ###
+
+
+            ### deal with Y ####
+            dep64 <- self$y$name64
+
+            ### give a range to the y-axis, if needed
+            y_range <- list(min = NA, max = NA, ticks = NA, noticks = FALSE)
+
+            if (self$option("plot_yscale")) {
+                y_range$min <- self$y$descriptive$min
+                y_range$min <- self$y$descriptive$max
+            }
+
+            min <- as.numeric(self$optionValue("plot_y_min"))
+
+            if (is.number(min)) {
+                y_range$min <- min
+            }
+
+            max <- as.numeric(self$optionValue("plot_y_max"))
+            if (is.number(max)) {
+                y_range$max <- max
+            }
+
+            ticks <- as.numeric(self$optionValue("plot_y_ticks"))
+
+            if (is.number(ticks)) {
+                y_range$ticks <- ticks
+
+                if (ticks == 1) {
+                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (1). The value is ignored.", head = "warning")
+                    y_range$ticks <- NA
+                }
+                if (ticks < 0) {
+                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (<0). The value is ignored.", head = "warning")
+                    y_range$ticks <- NA
+                }
+
+                if (ticks > 20) {
+                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (>20). The value is ignored.", head = "warning")
+                    y_range$ticks <- NA
+                }
+                if (ticks == 0) {
+                    y_range$ticks <- NA
+                    y_range$noticks <- TRUE
+                }
+            }
+
+            if (self$option("model_type", "multinomial")) {
+                self$plot_raw <- FALSE
+            }
+
+            if (self$subtype == "link") {
+                self$plot_raw <- FALSE
+                y_range$min <- NA
+                y_range$max <- NA
+                y_range$ticks <- NA
+            }
+
+            if (self$option("model_type", "multinomial")) {
+                self$plot_raw <- FALSE
+            }
+
+            if (self$subtype == "link") {
+                self$plot_raw <- FALSE
+                y_range$min <- NA
+                y_range$max <- NA
+                y_range$ticks <- NA
+            }
+
+
+            ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
+
+            if (self$y$type == "factor") {
+                levels(rawData[[dep64]]) <- 0:(self$y$nlevels - 1)
+                rawData[[dep64]] <- as.numeric(as.character(rawData[[dep64]]))
+            }
+            if (self$option("model_type", "ordinal")) {
+                rawData[[dep64]] <- rawData[[dep64]] + 1
+                if (self$option("plot_scale", "mean.class")) {
+                    y_range$min <- NA
+                    y_range$max <- NA
+                    y_range$ticks <- NA
+                }
+            }
+            if (self$option("model_type", c("logistic", "multinomial"))) {
+                if (self$subtype != "link") {
+                    y_range$min <- NA
+                }
+                y_range$max <- NA
+                y_range$ticks <- NA
+            }
+
+
+
+            #### deal with rescaling
+            if (self$x_scale) {
+                if (self$x$covs_scale == "clusterbasedcentered") {
+                    self$warning <- list(
+                        topic = "plotnotes",
+                        message = "Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.",
+                        head = "warning"
+                    )
+                }
+
+                if (self$x$covs_scale == "clusterbasedstandardized") {
+                    self$warning <- list(
+                        topic   = "plotnotes",
+                        message = "Rescaling cluster-wise standardized variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.",
+                        head    = "warning"
+                    )
+                }
+
+                data[[self$x$name64]] <- private$.rescale(self$x, data[[self$x$name64]])
+
+                if (is.something(rawData)) {
+                    rawData[[self$x$name64]] <- private$.rescale(self$x, rawData[[self$x$name64]])
+                }
+                if (is.something(randomData)) {
+                    randomData[[self$x$name64]] <- private$.rescale(self$x, randomData[[self$x$name64]])
+                }
+            }
+
+
+
+
+
+            #### compute the levels combinations
+            #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
+            #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
+            ### for the raw data, it selects only if the moderator is a factor, whereas all data for the
+            ### continuous are retained
+            #### TODO: this is abstruse, try changing it
+
+            state <- list(
+                key     = self$key,
+                y_range = y_range,
+                x_range = x_range
+            )
+
+            dims <- sapply(self$moderators, function(mod) mod$levels_labels, simplify = FALSE)
+
+            if (is.something(dims)) {
+              
+                grid <- expand.grid(dims, stringsAsFactors = FALSE)
+                .names <- unlist(sapply(self$moderators, function(mod) mod$name, simplify = FALSE))
+                names(grid)<-.names
+                .names64 <- tob64(.names)
+                selectable <- intersect(.names, self$options$factors)
+                selgrid <- as.data.frame(grid[, selectable])
+                .sel64 <- tob64(selectable)
+
+                for (i in 1:nrow(grid)) {
+                    label <- paste(.names, grid[i, ], sep = "=", collapse = " , ")
+                    aplot <- self$plotarray$get(key = i)
+                    aplot$setTitle(label)
+                    sel <- paste(paste0("data$", .names64, sep = ""), paste0('"', grid[i, ], '"'), sep = "==", collapse = " & ")
+                    localdata <- data[eval(parse(text = sel)), ]
+                    state[["plotData"]] <- localdata
+
+                    if (self$plot_raw) {
+                        if (length(selectable) > 0) {
+                            sel <- paste(paste0("rawData$", .sel64, sep = ""), paste0('"', selgrid[i, ], '"'), sep = "==", collapse = " & ")
+                            raw <- rawData[eval(parse(text = sel)), ]
+                        } else {
+                            raw <- rawData
+                        }
+
+                        state[["rawData"]] <- raw
+                    }
+
+                    if (!is.null(randomData)) {
+                        if (length(selectable) > 0) {
+                            sel <- paste(paste0("randomData$", .sel64, sep = ""), paste0('"', selgrid[i, ], '"'), sep = "==", collapse = " & ")
+                            rdata <- randomData[eval(parse(text = sel)), ]
+                        } else {
+                            rdata <- randomData
+                        }
+
+                        selectorlist <- list(rdata[[self$cluster$name64]], rdata[[self$x$name64]])
+                        .rnames <- c("cluster", "x", "y")
+                        rdata <- stats::aggregate(rdata$y, selectorlist, mean)
+                        names(rdata) <- .rnames
+                        attr(rdata, "xbetween") <- xbetween
+                        state[["randomData"]] <- rdata
+                    }
+                    aplot$setState(state)
+                }
+            } else {
+
+                aplot <- self$plotarray$get(key = 1)
+                state[["plotData"]] <- data
+                if (self$plot_raw) {
+                    state[["rawData"]] <- rawData
+                }
+
+                if (!is.null(randomData)) {
+                    rdata <- randomData
+                    selectorlist <- list(rdata[[self$cluster$name64]], rdata[[self$x$name64]])
+                    .rnames <- c("cluster", "x", "y")
+                    rdata <- stats::aggregate(rdata$y, selectorlist, mean)
+                    names(rdata) <- .rnames
+                    attr(rdata, "xbetween") <- xbetween
+                    state[["randomData"]] <- rdata
+                }
+                aplot$setState(state)
+            }
+          } # end of prepare
+    ), # end of public
+    private=list(
+      
+        .estimate     = function(x, terms) {
+          
+            conditions <- list()
+            labels <- list()
+            for (var in terms) {
+                if (var$type == "numeric") {
+                    conditions[[var$name64]] <- var$levels
+                    labels[[var$name64]] <- var$levels_labels
+                }
+            }
+
+            if (x$type == "numeric") {
+                min <- x$descriptive$min
+                max <- x$descriptive$max
+
+                if (self$option("plot_extra")) {
+                    if (is.number(self$x_range$min)) {
+                        min <- self$x_range$min
+                    }
+                    if (is.number(self$x_range$max)) {
+                        max <- self$x_range$max
+                    }
+                }
+
+                conditions[[self$x$name64]] <- pretty(c(min, max), n = 30)
+                if (self$option("plot_xoriginal")) {
+                    self$x_scale <- TRUE
+                    self$warning <- list(topic = "plotnotes", message = "The X-axis is in the X-variable original scale", head = "info")
+                }
+            }
+            allterm64 <- c(x$name64, unlist(sapply(terms, function(x) x$name64)))
+
+            mode <- NULL
+
+
+            if (self$option("model_type", "ordinal")) {
+                if (self$option("plot_scale", "mean.class")) {
+                    mode <- "mean.class"
+                } else {
+                    mode <- "prob"
+                    self$plot_raw <- FALSE
+                }
+            }
+
+            ### now we get the estimated means #######
+
+            em_opts <- list(
+                self$operator$model,
+                specs = allterm64,
+                at = conditions,
+                type = self$subtype,
+                mode = mode,
+                nesting = NULL,
+                options = list(level = self$operator$ciwidth),
+                data = insight::get_data(self$operator$model, source = "frame")
+            )
+
+            ### mmblogit model data are not recognized by emmeans. We need to pass them explicetely
+            if (self$option("model_type", "multinomial") & self$option(".caller", "glmer")) {
+                em_opts[["data"]] <- self$operator$model$data
+            }
+
+            if (self$option("df_method")) {
+                em_opts[["lmer.df"]] <- self$options$df_method
+            }
+
+            results <- try_hard(do.call(emmeans::emmeans, em_opts))
+            self$warning <- list("topic" = "plotnotes", message = results$warning)
+            self$error <- list("topic" = "plotnotes", message = results$error)
+            referenceGrid <- results$obj
+            tableData <- as.data.frame(referenceGrid)
+            ### rename the columns ####
+            names(tableData) <- c(allterm64, "estimate", "se", "df", "lower", "upper")
+
+            if (self$options$plot_around == "se") {
+                tableData$lower <- tableData$estimate - tableData$se
+                tableData$upper <- tableData$estimate + tableData$se
+            }
+            if (self$options$plot_around == "none") {
+                tableData$lower <- NULL
+                tableData$upper <- NULL
+            }
+            if (x$type == "factor") {
+                tableData[[x$name64]] <- factor(tableData[[x$name64]])
+                levels(tableData[[x$name64]]) <- x$levels_labels
+            }
+
+            for (var in terms) {
+                tableData[[var$name64]] <- factor(tableData[[var$name64]])
+                levels(tableData[[var$name64]]) <- var$levels_labels
+            }
+            tableData
+        },
+        .rescale      = function(varobj, values) {
+            #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
+            #      len <- max(min(len,na.rm = T),0)
+            if (varobj$covs_scale == "centered") {
+                values <- values + varobj$original_descriptive$mean
+            }
+            if (varobj$covs_scale == "standardized") {
+                values <- varobj$original_descriptive$sd * values + varobj$original_descriptive$mean
+            }
+            if (varobj$covs_scale == "log") {
+                values <- exp(values)
+            }
+
+            values
+        },
+        .fix_clusters = function(data) {
+            test <- grep("[\\:\\/]", private$.operator$formulaobj$clusters)
+            if (length(test) > 0) {
+                cluster <- private$.operator$formulaobj$clusters[[test]]
+                .clustervars <- stringr::str_split(cluster, "[\\:\\/]")[[1]]
+                name64 <- tob64(cluster)
+                sel <- paste0("data$", name64, "=", "paste0(", paste0("data$", tob64(.clustervars), collapse = ","), ",sep='_')")
+                eval(parse(text = sel))
+                data[[name64]] <- factor(data[[name64]])
+                self$scatterCluster <- list(name = cluster, name64 = name64, nlevels = nlevels(data[[name64]]))
+            } else {
+                self$scatterCluster <- private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
+            }
+            return(data)
+        }
+      
+    ) #end of private
+ ) # end of class
+
+### this class handles the plots
+
 Plotter <- R6::R6Class(
     "Plotter",
     cloneable = FALSE,
-    class = FALSE,
+    class = TRUE,
     inherit = Scaffold,
     public = list(
-        options = NULL,
-        scatterDodge = NULL,
-        scatterClabel = NULL,
-        scatterY = NULL,
-        scatterX = NULL,
-        scatterXscale = FALSE,
-        x_range = list(),
-        scatterZ = NULL,
-        scatterCluster = NULL,
-        scatterModerators = NULL,
-        scatterBars = FALSE,
-        scatterRaw = FALSE,
-        scatterType = NULL,
-        largedata = NULL,
+        results = NULL,
+        plots   = NULL,
         initialize = function(jmvobj, operator) {
             super$initialize(jmvobj)
             private$.results <- jmvobj$results
             private$.operator <- operator
             private$.datamatic <- operator$datamatic
-            self$scatterRaw <- self$options$plot_raw
-            if (self$option("plot_scale")) {
-                self$scatterType <- self$options$plot_scale
-            } else {
-                self$scatterType <- "response"
-            }
+          
         },
         ## plot should be inited and prepared storing all information needed to produce the plot in
         ## the image (Image object) state. It does not matter if the state is set in init() or run()
@@ -59,20 +596,25 @@ Plotter <- R6::R6Class(
             private$.prepareJnPlot()
         },
         scatterPlot = function(image, ggtheme, theme) {
+          
+          
             ## debug: return this to see what error is in the plotter code ###
             if (!is.something(image$state$plotData)) {
                 # pp<-ggplot2::ggplot(data.frame(1:3))+ggplot2::ggtitle(image$key)
                 # return(pp)
                 return()
             }
-
+          
+            key <- image$state$key
+            plotobj<-self$plots[[key]]
             ## collect the data
             data <- image$state$plotData
+           
 
             linesdiff <- (theme$bw || self$options$plot_black)
             ### prepare aestetics for one or two way scatterplot
-            if (is.null(self$scatterZ)) {
-                names(data)[1] <- "x"
+            if (is.null(plotobj$z)) {
+                 names(data)[1] <- "x"
                 .aestetics <- ggplot2::aes(x = x, y = estimate, group = 1)
                 .aesbar <- ggplot2::aes(x = x, ymin = lower, ymax = upper)
             } else {
@@ -118,11 +660,11 @@ Plotter <- R6::R6Class(
 
             #### plot the actual data if required
 
-            if (self$scatterRaw) {
+            if (plotobj$plot_raw) {
                 rawdata <- image$state$rawData
-                y <- self$scatterY$name64
-                x <- self$scatterX$name64
-                z <- self$scatterZ$name64
+                y <- plotobj$y$name64
+                x <- plotobj$x$name64
+                z <- plotobj$z$name64
                 #
                 .aesraw <- ggplot2::aes(x = .data[[x]], y = .data[[y]])
 
@@ -174,9 +716,9 @@ Plotter <- R6::R6Class(
             }
 
             ######### fix the bars ##########
-            if (self$scatterBars) {
-                if (self$scatterX$type == "factor") {
-                    p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width = .3, position = self$scatterDodge, show.legend = FALSE)
+            if (plotobj$plot_bars) {
+                if (plotobj$x$type == "factor") {
+                    p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width = .3, position = plotobj$plot_dodge, show.legend = FALSE)
                 } else {
                     p <- p + ggplot2::geom_ribbon(data = data, .aesbar, linetype = 0, show.legend = F, alpha = 0.2)
                 }
@@ -189,17 +731,17 @@ Plotter <- R6::R6Class(
                 data = data,
                 .aestetics,
                 linewidth = 1.2,
-                position = self$scatterDodge
+                position = plotobj$plot_dodge
             )
 
 
             ### plot the points for factors
-            if (self$scatterX$type == "factor") {
+            if (plotobj$x$type == "factor") {
                 p <- p + ggplot2::geom_point(
                     data = data,
                     .aestetics,
                     shape = 21, size = 4, fill = "white",
-                    position = self$scatterDodge, show.legend = FALSE
+                    position = plotobj$plot_dodge, show.legend = FALSE
                 )
             } else {
                 # give a scale to the Z axis
@@ -226,10 +768,10 @@ Plotter <- R6::R6Class(
             p <- p + ggtheme
 
             p <- p + ggplot2::labs(
-                x = self$scatterX$name, y = self$scatterY$name,
-                colour = self$scatterClabel,
-                shape = self$scatterClabel,
-                linetype = self$scatterClabel
+                x = plotobj$x$name, y = plotobj$y$name,
+                colour = plotobj$label,
+                shape = plotobj$label,
+                linetype = plotobj$label
             )
 
             if (self$options$plot_black) {
@@ -301,7 +843,7 @@ Plotter <- R6::R6Class(
             }
             p <- p + ggplot2::xlim(datalist$modrange)
             p <- p + ggplot2::theme(legend.key.size = ggplot2::unit(1, "lines"))
-            p <- p + ggplot2::ylab(paste("Slope of ", self$scatterX$name))
+            p <- p + ggplot2::ylab(paste("Slope of ", self$x$name))
             p <- p + ggplot2::xlab(self$scatterZ$name)
             #  suppressMessages(p <- p + ggtheme)
             p <- p + ggplot2::labs(fill = NULL) + ggplot2::guides(colour = "none")
@@ -527,6 +1069,8 @@ Plotter <- R6::R6Class(
         .operator = NULL,
         .initMainPlot = function() {
           
+            
+            # first we determine how many main plots we need and which are the terms
             plot_terms<-list()
             main_terms   <-  NULL
             if (self$option("plot_x")) {
@@ -540,393 +1084,49 @@ Plotter <- R6::R6Class(
             ladd(plot_terms)<-main_terms    
             }
             
-            
-          
             for (i in seq_along(self$options$plot_terms)) {
               
               if (is.something(self$options$plot_terms[[i]]))
                               ladd(plot_terms)<-self$options$plot_terms[[i]]  
             }
-            mark(plot_terms)
-            
-            if (!is.something(plot_terms)) {
+
+            if (length(plot_terms)==0)
                 return()
-            }
 
-            jinfo("PLOTTER: init main plot")
-
-            resultsgroup <- private$.results$get("mainPlots")
-            for (i in seq_along(plot_terms)) {
-                   resultsgroup$addItem(key = i)
-              
-              
-            }
-            y <- self$options$dep
-            x <- self$options$plot_x
-            z <- self$options$plot_z
-            moderators <- self$options$plot_by
-            if (self$options$model_type == "multinomial") {
-                moderators <- c(z, moderators)
-                z <- self$options$dep
-                self$scatterType <- "response"
-            }
-
-            if (self$options$model_type == "ordinal" & self$scatterType != "mean.class") {
-                moderators <- c(z, moderators)
-                z <- self$options$dep
-            }
-
-            dims <- unlist(lapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$nlevels))
-
-            if (!is.something(dims)) {
-                dims <- 1
-            }
-
-            n <- prod(dims)
-            for (i in seq_len(n)) {
-                resultsgroup$addItem(key = i)
-            }
-
-            ### some options here
-            self$scatterX <- private$.datamatic$variables[[tob64(x)]]
-            self$scatterY <- private$.datamatic$variables[[tob64(y)]]
-            self$scatterModerators <- moderators
-
-            if (is.something(z)) {
-                self$scatterZ <- private$.datamatic$variables[[tob64(z)]]
-            }
-
-
-            if (self$options$plot_around != "none") {
-                self$scatterBars <- TRUE
-                self$scatterDodge <- ggplot2::position_dodge(0.2)
-                self$scatterClabel <- paste(self$scatterZ$name, paste0("(", toupper(self$options$plot_around), ")"), sep = "\n")
-            } else {
-                self$scatterDodge <- ggplot2::position_dodge(0)
-                self$scatterClabel <- self$scatterZ$name
-            }
+            jinfo("PLOTTER: init main plots")
+           
+            results<-private$.results$get("mainPlots")
+            
+            self$plots<-lapply(seq_along(plot_terms), function(i) {
+                  aplot<-aPlot$new(self)
+                  aplot$key<-i
+                  aplot$type<-"scatter"
+                  aplot$subtype <- "response"
+                  aplot$operator<-private$.operator
+                  aplot$datamatic<-private$.datamatic
+                  aplot$dep<-self$options$dep
+                  aplot$terms<-plot_terms[[i]]
+                  results$addItem(key = i)
+                  aplot$plotarray<-results$get(key=i)
+                  aplot$init()
+                  aplot
+            })
+           
         },
         
         .prepareMainPlot = function() {
           
-            if (!is.something(self$options$plot_x)) {
+        
+            if (!is.something(self$plots)) {
                 return()
             }
 
             jinfo("PLOTTER: checking main plot")
-
-            resultsgroup <- private$.results$get("mainPlots")
-            ### stop if it is filled from previous run ###
-
-            test <- any(unlist(sapply(resultsgroup$items, function(i) !i$isNotFilled())))
-            if (test) {
-                return()
-            }
-
-            jinfo("PLOTTER: prepare main plot")
-
-            ### give a range to the x-axis, if needed
-            x_range <- list(min = NA, max = NA, ticks = NA, noticks = FALSE)
-
-            min <- as.numeric(self$optionValue("plot_x_min"))
-            if (is.number(min)) {
-                x_range$min <- min
-            }
-
-            max <- as.numeric(self$optionValue("plot_x_max"))
-            if (is.number(max)) {
-                x_range$max <- max
-            }
-
-            ticks <- as.numeric(self$optionValue("plot_x_ticks"))
-            if (is.number(ticks)) {
-                x_range$ticks <- ticks
-
-                if (ticks < 0) {
-                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (<0). The value is ignored.", type = "warning")
-                    x_range$ticks <- NA
-                }
-                if (ticks == 1) {
-                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (1). The value is ignored.", type = "warning")
-                    x_range$ticks <- NA
-                }
-
-                if (ticks > 20) {
-                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (>20). The value is ignored.", type = "warning")
-                    x_range$ticks <- NA
-                }
-                if (ticks == 0) {
-                    x_range$ticks <- NA
-                    x_range$noticks <- TRUE
-                }
-            }
+  
+            lapply(self$plots, function(plot) plot$prepare())
+                
 
 
-            self$x_range <- x_range
-            ################
-
-
-
-            moderators <- self$scatterModerators
-            ### compute the expected values to be plotted ###
-            data <- private$.estimate(self$scatterX$name, unlist(c(self$scatterZ$name, moderators)))
-
-            ### prepare rawData if needed
-            rawData <- mf.clean(mf.data(private$.operator$model))
-            for (var in intersect(names(rawData), names(private$.datamatic$variables))) {
-                varobj <- private$.datamatic$variables[[var]]
-                if (varobj$type == "factor") {
-                    levels(rawData[[var]]) <- varobj$levels_labels
-                }
-            }
-
-            ### here we deal with plotting random effects, if needed
-            randomData <- NULL
-
-            if (self$option("plot_re") &&
-                !self$option("model_type", "ordinal") &&
-                !self$option("model_type", "multinomial")) {
-                ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works
-
-                rawData <- private$.fix_clusters(rawData)
-
-                .model <- private$.operator$model
-
-                if (self$option("plot_re_method", "average")) {
-                    formula <- private$.operator$formulaobj$keep(self$scatterX$name)
-                    res <- try_hard(mf.update(private$.operator$model, formula = formula))
-                    if (!isFALSE(res$error)) {
-                        self$warning <- list(
-                            topic = "plotnotes",
-                            message = paste("Random effects cannot be plotted for", self$scatterX$name, " with the averaging method."),
-                            head = "warning"
-                        )
-                    } else {
-                        .model <- res$obj
-                    }
-                }
-                y <- stats::predict(.model, type = self$scatterType)
-                randomData <- as.data.frame(cbind(y, rawData))
-                if (self$scatterX$type == "factor") {
-                    levels(randomData[[self$scatterX$name64]]) <- self$scatterX$levels_labels
-                }
-
-                self$warning <- list(topic = "plotnotes", message = paste("Random effects are plotted across", self$scatterCluster$name), head = "info")
-                # prepare a test for between variables to plot dots for random effects
-
-                xbetween <- FALSE
-                test <- tapply(as.numeric(rawData[[self$scatterX$name64]]), rawData[[self$scatterCluster$name64]], sd)
-                test <- sum(sapply(test, function(x) as.numeric(is.na(x) || x == 0)))
-                nc <- self$scatterCluster$nlevels
-                if ((test / nc) > .30) xbetween <- TRUE
-            }
-            ### end of random ###
-
-
-            ### deal with Y ####
-            dep64 <- self$scatterY$name64
-
-            ### give a range to the y-axis, if needed
-            y_range <- list(min = NA, max = NA, ticks = NA, noticks = FALSE)
-
-            if (self$option("plot_yscale")) {
-                y_range$min <- self$scatterY$descriptive$min
-                y_range$min <- self$scatterY$descriptive$max
-            }
-
-            min <- as.numeric(self$optionValue("plot_y_min"))
-
-            if (is.number(min)) {
-                y_range$min <- min
-            }
-
-            max <- as.numeric(self$optionValue("plot_y_max"))
-            if (is.number(max)) {
-                y_range$max <- max
-            }
-
-            ticks <- as.numeric(self$optionValue("plot_y_ticks"))
-
-            if (is.number(ticks)) {
-                y_range$ticks <- ticks
-
-                if (ticks == 1) {
-                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (1). The value is ignored.", head = "warning")
-                    y_range$ticks <- NA
-                }
-                if (ticks < 0) {
-                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (<0). The value is ignored.", head = "warning")
-                    y_range$ticks <- NA
-                }
-
-                if (ticks > 20) {
-                    self$warning <- list(topic = "plotnotes", message = "Invalid number of ticks (>20). The value is ignored.", head = "warning")
-                    y_range$ticks <- NA
-                }
-                if (ticks == 0) {
-                    y_range$ticks <- NA
-                    y_range$noticks <- TRUE
-                }
-            }
-
-            if (self$option("model_type", "multinomial")) {
-                self$scatterRaw <- FALSE
-            }
-
-            if (self$scatterType == "link") {
-                self$scatterRaw <- FALSE
-                y_range$min <- NA
-                y_range$max <- NA
-                y_range$ticks <- NA
-            }
-
-            if (self$option("model_type", "multinomial")) {
-                self$scatterRaw <- FALSE
-            }
-
-            if (self$scatterType == "link") {
-                self$scatterRaw <- FALSE
-                y_range$min <- NA
-                y_range$max <- NA
-                y_range$ticks <- NA
-            }
-
-
-            ### we need to be sure that the dependent variable is a continuous variable to plot the raw data ##
-
-            if (self$scatterY$type == "factor") {
-                levels(rawData[[dep64]]) <- 0:(self$scatterY$nlevels - 1)
-                rawData[[dep64]] <- as.numeric(as.character(rawData[[dep64]]))
-            }
-            if (self$option("model_type", "ordinal")) {
-                rawData[[dep64]] <- rawData[[dep64]] + 1
-                if (self$option("plot_scale", "mean.class")) {
-                    y_range$min <- NA
-                    y_range$max <- NA
-                    y_range$ticks <- NA
-                }
-            }
-            if (self$option("model_type", c("logistic", "multinomial"))) {
-                if (self$scatterType != "link") {
-                    y_range$min <- NA
-                }
-                y_range$max <- NA
-                y_range$ticks <- NA
-            }
-
-
-
-            #### deal with rescaling
-            if (self$scatterXscale) {
-                if (self$scatterX$covs_scale == "clusterbasedcentered") {
-                    self$warning <- list(
-                        topic = "plotnotes",
-                        message = "Rescaling cluster-wise centered variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.",
-                        head = "warning"
-                    )
-                }
-
-                if (self$scatterX$covs_scale == "clusterbasedstandardized") {
-                    self$warning <- list(
-                        topic   = "plotnotes",
-                        message = "Rescaling cluster-wise standardized variables may be misleading. Use `Covariates Scaling=None` if the original scale is necessary.",
-                        head    = "warning"
-                    )
-                }
-
-                data[[self$scatterX$name64]] <- private$.rescale(self$scatterX, data[[self$scatterX$name64]])
-
-                if (is.something(rawData)) {
-                    rawData[[self$scatterX$name64]] <- private$.rescale(self$scatterX, rawData[[self$scatterX$name64]])
-                }
-                if (is.something(randomData)) {
-                    randomData[[self$scatterX$name64]] <- private$.rescale(self$scatterX, randomData[[self$scatterX$name64]])
-                }
-            }
-
-
-
-
-
-            #### compute the levels combinations
-            #### first, gets all levels of factors and covs. Then create the combinations and select the rows of the
-            #### emmeans estimates needed for it. It selects the rows using the levels found in datamatic
-            ### for the raw data, it selects only if the moderator is a factor, whereas all data for the
-            ### continuous are retained
-            #### TODO: this is abstruse, try changing it
-
-            state <- list(
-                y_range = y_range,
-                x_range = x_range
-            )
-
-            dims <- sapply(moderators, function(mod) private$.datamatic$variables[[tob64(mod)]]$levels_labels, simplify = FALSE)
-
-            if (is.something(dims)) {
-                grid <- expand.grid(dims, stringsAsFactors = FALSE)
-                .names <- names(grid)
-                .names64 <- tob64(.names)
-                selectable <- intersect(.names, self$options$factors)
-                selgrid <- as.data.frame(grid[, selectable])
-                .sel64 <- tob64(selectable)
-
-                for (i in 1:nrow(grid)) {
-                    label <- paste(.names, grid[i, ], sep = "=", collapse = " , ")
-                    aplot <- resultsgroup$get(key = i)
-                    aplot$setTitle(label)
-                    sel <- paste(paste0("data$", .names64, sep = ""), paste0('"', grid[i, ], '"'), sep = "==", collapse = " & ")
-                    localdata <- data[eval(parse(text = sel)), ]
-                    state[["plotData"]] <- localdata
-
-                    if (self$scatterRaw) {
-                        if (length(selectable) > 0) {
-                            sel <- paste(paste0("rawData$", .sel64, sep = ""), paste0('"', selgrid[i, ], '"'), sep = "==", collapse = " & ")
-                            raw <- rawData[eval(parse(text = sel)), ]
-                        } else {
-                            raw <- rawData
-                        }
-
-                        state[["rawData"]] <- raw
-                    }
-
-                    if (!is.null(randomData)) {
-                        if (length(selectable) > 0) {
-                            sel <- paste(paste0("randomData$", .sel64, sep = ""), paste0('"', selgrid[i, ], '"'), sep = "==", collapse = " & ")
-                            rdata <- randomData[eval(parse(text = sel)), ]
-                        } else {
-                            rdata <- randomData
-                        }
-
-                        selectorlist <- list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
-                        .rnames <- c("cluster", "x", "y")
-                        rdata <- stats::aggregate(rdata$y, selectorlist, mean)
-                        names(rdata) <- .rnames
-                        attr(rdata, "xbetween") <- xbetween
-                        state[["randomData"]] <- rdata
-                    }
-                    aplot$setState(state)
-                }
-            } else {
-                aplot <- resultsgroup$get(key = resultsgroup$itemKeys[[1]])
-                aplot$setTitle(jmvcore::stringifyTerm(c(self$scatterX$name, self$scatterZ$name)))
-                state[["plotData"]] <- data
-
-                if (self$scatterRaw) {
-                    state[["rawData"]] <- rawData
-                }
-
-                if (!is.null(randomData)) {
-                    rdata <- randomData
-                    selectorlist <- list(rdata[[self$scatterCluster$name64]], rdata[[self$scatterX$name64]])
-                    .rnames <- c("cluster", "x", "y")
-                    rdata <- stats::aggregate(rdata$y, selectorlist, mean)
-                    names(rdata) <- .rnames
-                    attr(rdata, "xbetween") <- xbetween
-                    state[["randomData"]] <- rdata
-                }
-
-                aplot$setState(state)
-            }
         },
         .initJnPlot = function() {
             if (!self$option("plot_jn")) {
@@ -1300,132 +1500,6 @@ Plotter <- R6::R6Class(
                     resultsgroup$get(key = id)$setState(list(data = data))
                 }
             }
-        },
-        .estimate = function(x, term) {
-            x64 <- tob64(x)
-            term64 <- tob64(term)
-            conditions <- list()
-            labels <- list()
-            for (.term in term64) {
-                var <- private$.datamatic$variables[[.term]]
-                if (var$type == "numeric") {
-                    conditions[[.term]] <- var$levels
-                    labels[[.term]] <- var$levels_labels
-                }
-            }
-            xobj <- private$.datamatic$variables[[x64]]
-
-            if (xobj$type == "numeric") {
-                min <- xobj$descriptive$min
-                max <- xobj$descriptive$max
-
-                if (self$option("plot_extra")) {
-                    if (is.number(self$x_range$min)) {
-                        min <- self$x_range$min
-                    }
-                    if (is.number(self$x_range$max)) {
-                        max <- self$x_range$max
-                    }
-                }
-
-                conditions[[x64]] <- pretty(c(min, max), n = 30)
-                if (self$option("plot_xoriginal")) {
-                    self$scatterXscale <- TRUE
-                    self$warning <- list(topic = "plotnotes", message = "The X-axis is in the X-variable original scale", head = "info")
-                }
-            }
-            allterm64 <- c(x64, term64)
-
-            mode <- NULL
-
-
-            if (self$option("model_type", "ordinal")) {
-                if (self$option("plot_scale", "mean.class")) {
-                    mode <- "mean.class"
-                } else {
-                    mode <- "prob"
-                    self$scatterRaw <- FALSE
-                }
-            }
-
-            ### now we get the estimated means #######
-
-            em_opts <- list(
-                private$.operator$model,
-                specs = allterm64,
-                at = conditions,
-                type = self$scatterType,
-                mode = mode,
-                nesting = NULL,
-                options = list(level = private$.operator$ciwidth),
-                data = insight::get_data(private$.operator$model, source = "frame")
-            )
-
-            ### mmblogit model data are not recognized by emmeans. We need to pass them explicetely
-            if (self$option("model_type", "multinomial") & self$option(".caller", "glmer")) {
-                em_opts[["data"]] <- private$.operator$model$data
-            }
-
-            if (self$option("df_method")) {
-                em_opts[["lmer.df"]] <- self$options$df_method
-            }
-
-            results <- try_hard(do.call(emmeans::emmeans, em_opts))
-            self$warning <- list("topic" = "plotnotes", message = results$warning)
-            self$error <- list("topic" = "plotnotes", message = results$error)
-            referenceGrid <- results$obj
-            tableData <- as.data.frame(referenceGrid)
-            ### rename the columns ####
-            names(tableData) <- c(allterm64, "estimate", "se", "df", "lower", "upper")
-
-            if (self$options$plot_around == "se") {
-                tableData$lower <- tableData$estimate - tableData$se
-                tableData$upper <- tableData$estimate + tableData$se
-            }
-            if (self$options$plot_around == "none") {
-                tableData$lower <- NULL
-                tableData$upper <- NULL
-            }
-            if (xobj$type == "factor") {
-                tableData[[xobj$name64]] <- factor(tableData[[xobj$name64]])
-                levels(tableData[[xobj$name64]]) <- private$.datamatic$variables[[xobj$name64]]$levels_labels
-            }
-
-            for (term in term64) {
-                tableData[[term]] <- factor(tableData[[term]])
-                levels(tableData[[term]]) <- private$.datamatic$variables[[term]]$levels_labels
-            }
-            tableData
-        },
-        .rescale = function(varobj, values) {
-            #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
-            #      len <- max(min(len,na.rm = T),0)
-            if (varobj$covs_scale == "centered") {
-                values <- values + varobj$original_descriptive$mean
-            }
-            if (varobj$covs_scale == "standardized") {
-                values <- varobj$original_descriptive$sd * values + varobj$original_descriptive$mean
-            }
-            if (varobj$covs_scale == "log") {
-                values <- exp(values)
-            }
-
-            values
-        },
-        .fix_clusters = function(data) {
-            test <- grep("[\\:\\/]", private$.operator$formulaobj$clusters)
-            if (length(test) > 0) {
-                cluster <- private$.operator$formulaobj$clusters[[test]]
-                .clustervars <- stringr::str_split(cluster, "[\\:\\/]")[[1]]
-                name64 <- tob64(cluster)
-                sel <- paste0("data$", name64, "=", "paste0(", paste0("data$", tob64(.clustervars), collapse = ","), ",sep='_')")
-                eval(parse(text = sel))
-                data[[name64]] <- factor(data[[name64]])
-                self$scatterCluster <- list(name = cluster, name64 = name64, nlevels = nlevels(data[[name64]]))
-            } else {
-                self$scatterCluster <- private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
-            }
-            return(data)
         }
     ) # end of private
 ) # end of class

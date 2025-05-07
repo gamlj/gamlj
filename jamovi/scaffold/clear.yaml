@@ -14,12 +14,12 @@
         - df_method
         - contrasts
         - covs_scale
-        - model_type
         - contrast_custom_values
         - donotrun
 -   type: scaffold
     name: opts_model_lm
-    children: robust_method
+    children: 
+        - robust_method
 -   type: scaffold
     name: opts_model_r
     children:
@@ -55,10 +55,12 @@
         - boot_r
 -   type: scaffold
     name: opts_es
-    children: es
+    children: 
+           - es
 -   type: scaffold
     name: opts_posthoc
-    children: adjust
+    children: 
+       - adjust
 -   type: scaffold
     name: opts_simple_effects
     children:
@@ -115,4 +117,5 @@
         - plot_re_method
 -   type: scaffold
     name: opts_jn_z
-    children: plot_jn_expb
+    children: 
+        - plot_jn_expb

@@ -38,7 +38,6 @@ options:
     -   name: dep
         title: Dependent Variable
         type: Variable
-        default: ~
         permitted:
             - factor
             - numeric
@@ -52,7 +51,6 @@ options:
             - nominal
         permitted:
             - factor
-        default: ~
         description:
             R: a vector of strings naming the fixed factors from `data`. Not needed
                 if `formula` is used.
@@ -64,21 +62,18 @@ options:
             - ordinal
         permitted:
             - numeric
-        default: ~
         description:
             R: a vector of strings naming the covariates from `data`. Not needed if
                 `formula` is used.
     -   name: model_terms
         title: Model Terms
         type: Terms
-        default: ~
         description:
             R: |
                 a list of character vectors describing fixed effects terms. Not needed if `formula` is used.
     -   name: nested_terms
         title: Nested Model
         type: Terms
-        default: ~
         description:
             R: |
                 a list of character vectors describing effects terms for nestet. It can be passed as right-hand formula.
@@ -143,7 +138,6 @@ options:
     -   name: posthoc
         title: Post Hoc Tests
         type: Terms
-        default: ~
         description:
             R: a rhs formula with the terms specifying the table to apply the comparisons
                 (of the form `'~x+x:z'`). The formula is not expanded, so '`x*z`'
@@ -183,7 +177,6 @@ options:
         title: Factors Coding
         type: Array
         items: (factors)
-        default: ~
         template:
             type: Group
             elements:
@@ -244,14 +237,12 @@ options:
     -   name: simple_x
         title: Simple effects variable
         type: Variable
-        default: ~
         description:
             R: |
                 The variable for which the simple effects (slopes) are computed
     -   name: simple_mods
         title: Moderators
         type: Variables
-        default: ~
         description:
             R: |
                 the variable that provides the levels at which the simple effects are computed
@@ -265,7 +256,6 @@ options:
     -   name: emmeans
         title: Estimated Marginal Means
         type: Terms
-        default: ~
         description:
             R: a rhs formula with the terms specifying the marginal means to estimate
                 (of the form `'~x+x:z'`)
@@ -402,24 +392,40 @@ options:
         description:
             R: |
                 `TRUE` or `FALSE` (default), shows coefficients covariances
+    -   name: plot_mode
+        title: Mode
+        type: List
+        options:
+            -   name: monoplot
+                title: One plot
+            -   name: multiplot
+                title: Multiple
+    -   name: plot_terms
+        title: Plot terms
+        type: Array
+        default:
+            - []
+        template:
+            type: Variables
+        description:
+            ui: |
+                the terms to make  plots. Here you can specify multiple terms for multiple plots.
+            R: not present in R
     -   name: plot_x
         title: Horizontal axis
         type: Variable
-        default: ~
         description:
             R: |
                 a string naming the variable placed on the horizontal axis of the plot
     -   name: plot_z
         title: Separate lines
         type: Variable
-        default: ~
         description:
             R: |
                 a string naming the variable represented as separate lines in the plot
     -   name: plot_by
         title: Separate plots
         type: Variables
-        default: ~
         description:
             R: |
                 a list of variables defining the levels at which a separate plot should be produced.
@@ -568,7 +574,6 @@ options:
         title: Covariates Scaling
         type: Array
         items: (covs)
-        default: ~
         template:
             type: Group
             elements:

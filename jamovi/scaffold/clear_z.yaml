@@ -1,3 +1,4 @@
 -   type: scaffold
     name: opts_jn
-    children: plot_jn_expb
+    children: 
+       - plot_jn_expb

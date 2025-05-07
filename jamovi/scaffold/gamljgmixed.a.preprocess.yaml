@@ -206,6 +206,18 @@ options:
                 Method to compute the confidence intervals. It accepts `wald` for Wald method, `profile` for LL profiling method, `quantile` for bootstrap  method.
             ui: |
                 The method used to compute the confidence intervals.  Standard uses the Wald method to compute standard errors and confidence intervals. Profile computes Profile Likelihood Based Confidence Interval,  in which the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate.  Bootstrap performs parametric bootstrap, with Bootstrap rep repetitions.
+
+#### plot
+
+## multimode plot
+    -   name: plot_mode
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_terms
+        type: scaffold
+        file: plots.a.yaml
+
+
     -   name: plot_x
         type: scaffold
         file: plots.a.yaml
@@ -254,6 +266,11 @@ options:
     -   name: plot_extra
         type: scaffold
         file: plots.a.yaml
+
+
+
+
+
     -   name: plot_re
         title: Random effects
         type: Bool

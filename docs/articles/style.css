@@ -1,0 +1,49 @@
+.title {
+  color: #000066;
+  font-size: 1.5em;
+}
+
+h1 {
+  color: #000066;
+  font-size: 1.3em;
+}
+
+h2 {
+  font-size: 1.0em;
+}
+
+body {
+  max-width: 1200px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+pre.jamovitable {
+  color:black;
+  background-color: white;
+  margin-bottom: 35px;  
+}
+
+
+pre.sourceCode {
+  display: block;
+  position: relative;
+  background-color: #f8f8f8;
+  color: #212529;
+  padding: 5px;
+  margin-top: 10px;
+  margin-bottom: 1px;
+  border-radius: 15px;
+}
+
+pre code {
+  display: block;
+  position: relative;
+  background-color: #f8f8f8;
+  color: #212529;
+  padding: 20px;
+  margin-top: 1px;
+  margin-bottom: 10px;
+  border-radius: 15px;
+}

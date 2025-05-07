@@ -196,7 +196,7 @@ options:
         type: scaffold
         file: plots.a.yaml
 
-
+## multimode plot
     -   name: plot_mode
         type: scaffold
         file: plots.a.yaml

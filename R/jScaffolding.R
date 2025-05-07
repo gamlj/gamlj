@@ -6,8 +6,14 @@ Scaffold <- R6::R6Class("Scaffold",
         options = NULL,
         ok = TRUE, # can be used to halt the process without calling stop()
         initialize = function(object) {
+          
+            if ("Scaffold" %in% class(object)) {
+            self$analysis <- object$analysis
+            } else {
             self$analysis <- object
+            }
             self$options <- object$options
+
         },
         option = function(val, spec = NULL) {
             res <- is.joption(self$options, val)

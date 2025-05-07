@@ -828,54 +828,40 @@ items:
                     title: Upper
                     type: number
                     format: zto
+
     -   name: mainPlots
         title: Results Plots
         type: Array
-        description: an array of results plots
-        clearWith:
-            -   type: scaffold
-                name: opts_model
-                file: clear.yaml
-            -   type: scaffold
-                name: opts_model_lm
-                file: clear.yaml
-            -   type: scaffold
-                name: opts_ci
-                file: clear.yaml
-            -   type: scaffold
-                name: opts_cov_scaling
-                file: clear.yaml
-            -   type: scaffold
-                name: opts_plots
-                file: clear.yaml
-            -   type: scaffold
-                name: opts_plots_more_y
-                file: clear.yaml
-            -   type: scaffold
-                name: opts_plots_more_x
-                file: clear.yaml
+        description: an array of main plots
         template:
-            title: ''
-            type: Image
-            renderFun: .mainPlot
-            width: 700
-            height: 400
-            clearWith:
-                -   type: scaffold
-                    name: opts_model
-                    file: clear.yaml
-                -   type: scaffold
-                    name: opts_model_lm
-                    file: clear.yaml
-                -   type: scaffold
-                    name: opts_ci
-                    file: clear.yaml
-                -   type: scaffold
-                    name: opts_cov_scaling
-                    file: clear.yaml
-                -   type: scaffold
-                    name: opts_plots
-                    file: clear.yaml
+                        type: Array
+                        description: an array of individual plots
+                        template:
+                            title: ''
+                            type: Image
+                            renderFun: .mainPlot
+                            width: 700
+                            height: 400
+                            clearWith:
+                                -   type: scaffold
+                                    name: opts_model
+                                    file: clear.yaml
+                                -   type: scaffold
+                                    name: opts_simple_effects
+                                    file: clear.yaml
+                                -   type: scaffold
+                                    name: opts_ci
+                                    file: clear.yaml
+                                -   type: scaffold
+                                    name: opts_plots
+                                    file: clear.yaml
+                                -   type: scaffold
+                                    name: opts_plots_more_x
+                                    file: clear.yaml
+                                -   type: scaffold
+                                    name: opts_plots_more_y
+                                    file: clear.yaml
+
     -   name: plotnotes
         type: Html
         visible: false
