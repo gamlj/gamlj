@@ -1102,12 +1102,16 @@ Plotter <- R6::R6Class(
             jinfo("PLOTTER: init main plots")
            
             results<-private$.results$get("mainPlots")
+            ## subtype is the response type
+            subtype<-self$optionValue("plot_scale")
+            if (is.null(subtype)) subtype="response"
             
+            ## initialize all the main plots
             self$plots<-lapply(seq_along(plot_terms), function(i) {
                   aplot<-aPlot$new(self)
                   aplot$key<-i
                   aplot$type<-"scatter"
-                  aplot$subtype <- "response"
+                  aplot$subtype <- subtype
                   aplot$operator<-private$.operator
                   aplot$datamatic<-private$.datamatic
                   aplot$dep<-self$options$dep

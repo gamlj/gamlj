@@ -1896,7 +1896,13 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "dep2",
                         "ci_width",
                         "ci_method",
-                        "boot_r"),
+                        "boot_r",
+                        "ccm_value",
+                        "ccp_value",
+                        "ccra_steps",
+                        "covs_scale_labels",
+                        "covs_conditioning",
+                        "contrast_custom_focus"),
                     columns=list(
                         list(
                             `name`="response", 

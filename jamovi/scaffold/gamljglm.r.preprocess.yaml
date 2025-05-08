@@ -728,6 +728,10 @@ items:
                 -   type: scaffold
                     name: opts_ci
                     file: clear.yaml
+                -   type: scaffold
+                    name: opts_cov_scaling
+                    file: clear.yaml
+                    
             columns:
                 -   name: response
                     title: Response
