@@ -1,49 +1,44 @@
 modeloptions:
-        - dep
-        - reml
-        - factors
-        - covs
-        - cluster
-        - covs_scale
-        - dep_scale
-        - scale_missing
-        - model_terms
-        - fixed_intercept
-        - se_method
-        - mute
-        - re
-        - re_corr
-        - df_method
-        - relm
-        - contrasts
-        - covs_scale
-        - mute
-        - donotrun
-        - res_struct
-        - contrast_custom_values
-        
+    - dep
+    - reml
+    - factors
+    - covs
+    - cluster
+    - covs_scale
+    - dep_scale
+    - scale_missing
+    - model_terms
+    - fixed_intercept
+    - se_method
+    - mute
+    - re
+    - re_corr
+    - df_method
+    - relm
+    - contrasts
+    - covs_scale
+    - mute
+    - donotrun
+    - res_struct
+    - contrast_custom_values
 nestedoptions:
-        - nested_terms
-        - nested_intercept
-        - comparison
-        - nested_re        
+    - nested_terms
+    - nested_intercept
+    - comparison
+    - nested_re
 cioptions:
-        - ci_width
-        - ci_method
-        - boot_r
-        - re_ci
-        
+    - ci_width
+    - ci_method
+    - boot_r
+    - re_ci
 simpleeffectsoptions:
-
-                 - simple_x
-                 - simple_mods
-                 - simple_scale
-
+    - simple_x
+    - simple_mods
+    - simple_scale
 covscalingoptions:
-
-                 - ccm_value
-                 - ccp_value
-                 - ccra_steps
-                 - covs_scale_labels
-                 - covs_conditioning
-                 - contrast_custom_focus
+    - ccm_value
+    - ccp_value
+    - ccra_steps
+    - covs_scale_labels
+    - covs_conditioning
+    - contrast_custom_focus

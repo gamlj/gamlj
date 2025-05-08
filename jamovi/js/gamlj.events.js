@@ -118,6 +118,14 @@ const events = {
         fun.updatePlotsSupplier(ui, this);
     },
     
+    onChange_multiplotsSupplier: function(ui) {
+      
+    },
+    onUpdate_multiplotsSupplier: function(ui) {
+        fun.updatePlotsSupplier(ui, this);
+    },
+
+    
     onChange_simpleSupplier: function(ui) {
         let values = this.itemsToValues(ui.simpleSupplier.value());
         this.checkValue(ui.simple_x, false, values, FormatDef.variable);

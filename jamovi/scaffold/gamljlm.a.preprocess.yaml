@@ -1,631 +1,480 @@
----
 name: gamljlm
 title: General Linear Model
 menuGroup: Linear Models
-version: '3.0.0'
+version: 3.0.0
 jas: '1.2'
 export: false
 weightsSupport: full
 completeWhenFilled: true
 description:
-    main: |
-           General Linear Model. Estimates models using `lm()` function and provides options to facilitate estimation of 
-           interactions, simple slopes, simple effects, post-hoc tests, contrast analysis, effect size indexes and visualization of the results.
+    main: "General Linear Model. Estimates models using `lm()` function and provides
+        options to facilitate estimation of \ninteractions, simple slopes, simple
+        effects, post-hoc tests, contrast analysis, effect size indexes and visualization
+        of the results.\n"
     R:
         dontrun: false
         usage: |
             data('ToothGrowth')
             gamlj::gamljGlm(formula = len ~ supp,  data = ToothGrowth)
-
 options:
-    - name: data
-      type: Data
-      description:
-          R: the data as a data frame
-
-### constants setting
-
-    - name: .caller
-      type: String
-      default: "lm"
-      hidden: true
-
-    - name: .interface
-      type: String
-      default: "jamovi"
-      hidden: true
-
-    - name: model_type
-      type: List
-      hidden: true
-      options:
-        - name: lm
-      default: lm
-
-##################
-
-### dep variable 
-
-    - name: dep
-      title: Dependent Variable
-      type: Variable
-      default:
-      permitted:
-        - factor
-        - numeric
-      description:
-          R: >
-            a string naming the dependent variable from `data`; the variable
-            must be numeric. Not needed if `formula` is used.
-
-
-### standard input
-
-    - name: factors
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: model_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: comparison
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: fixed_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ci_width
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: boot_r
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: donotrun
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: mute
-      type: scaffold
-      file: commons.a.yaml
-
-### posthoc
-    -  name: posthoc
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: posthoc_ci
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: adjust
-       type: scaffold
-       file: commons.a.yaml
-
-####
-
-### contrasts
-
-    - name: contrasts
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastnames
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastcodes
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: contrast_custom_focus
-      type: scaffold
-      file: commons.a.yaml
-      
-    - name: contrast_custom_values
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: contrast_custom_es
-      type: Bool
-      title: Effect size indices
-      default: false
-      description:
-         R: >
-             if TRUE, additional effect size indices for custom contrasts      
-      
-###
-
-### simple effects 
-
-    - name: simple_x
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_mods
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_interactions
-      type: scaffold
-      file: commons.a.yaml
-###
-
-### emmeans
-    - name: emmeans
-      type: scaffold
-      file: commons.a.yaml
-
-###
-
-### covariate scaling (without covs_scale: put it below)
-
-    - name: covs_conditioning
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccra_steps
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: ccm_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccp_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs_scale_labels
-      type: scaffold
-      file: commons.a.yaml
-
-
-
-#### output 
-
-
-    - name: predicted
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: residuals
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_emm
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_plot
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: export
-      title: Export
-      type: Action
-
-
-####
-
-
-### other options
-
-    - name: omnibus
-      title: Test
-      type: List
-      default: F
-      options:
-        - name:  F
-          title: F-test
-        - name: LRT
-          title: LRT
-
-      description:
-          R: >
-             Omnibus test of the model is based on F-test `F` (default) or loglikelihood ration test `LRT`.
-          ui: >
-             Omnibus test of the model is based on F-test  (default) or loglikelihood ration test `LRT`.
-
-    - name: estimates_ci
-      title: Estimates C.I.
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
-          ui: >
-             Non standardized coefficients (estimastes) CI in tables if flagged
-
-    - name: betas_ci
-      title: β C.I.
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` (default) or `FALSE` , parameters CI in table
-          ui: >
-             Standardized coefficients CI in tables if flagged
-
-
-    - name: vcov
-      title: Coefficients Covariances
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), shows coefficients covariances
-
-
-### Plots options
-
-    - name: plot_x
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_z
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_by
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_raw
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_yscale
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_xoriginal
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_black
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_around
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_extremes
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_jn
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_more_options
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_y_min
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_y_max
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_y_ticks
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_y_ticks_exact
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_min
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_max
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks_exact
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_extra
-      type: scaffold
-      file: plots.a.yaml
-
-####### end of plots #########
-
-######### NON COMMON OPTIONS #########
-
-### covariate scaling 
-
-    - name: covs_scale
-      title: Covariates Scaling
-      type: Array
-      items: (covs)
-      default:
-      template:
-          type: Group
-          elements:
-              - name: var
-                type: Variable
-                content: $key
-              - name: type
-                type: List
-                options:
-                    - title: Centered
-                      name:  centered
-                    - title: z-scores
-                      name: standardized
-                    - title: Original
-                      name: 'none'
-
-                default: centered 
-      description:
-          R: >
-             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
-             one of `'centered'` to the mean, `'standardized'` or  `'none'`. `'none'` leaves the variable as it is.
-
-    - name: scale_missing
-      title: Scale on 
-      type: List
-      options:
-          - title: Complete cases
-            name: 'complete'
-          - title: Columnwise 
-            name: colwise
-      default: 'complete'
-
-
-
-
-############ generic with some specs ###########
-
-    - name: posthoc_es
-      title: Effect size 
-      type: NMXList
-      options:
-          - name: dm
-            title: Cohen's d (model SD)
-          - name: ds
-            title: Cohen's d (sample SD)
-          - name: g
-            title: Hedge's g (sample SD)
-      description:
-          R: >
-            effect size indices for mean comparisons. One or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD ) 
-            or Hedge's g
-      default:
-          - dm
-
-    - name: d_ci
-      title: Confidence intervals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), d confidence intervals
-
-
-    - name: es
-      title: Effect Size
-      type: NMXList
-      options:
-          - name: beta
-            title: β  
-          - name: eta
-            title: η²
-          - name: etap
-            title: partial η²
-          - name: omega
-            title:  ω²
-          - name: omegap
-            title:  partial ω²
-          - name: epsilon
-            title: ε²
-          - name: epsilonp
-            title: partial ε²
-            
-      default:
-          - beta
-          - etap
-      description:
-          R: >
-              a list of effect sizes to print out. They can be:
-              `"eta"` for eta-squared, `'etap'` for partial eta-squared,
-              `'omega'` for omega-squared, `'omegap'` for partial omega-squared,
-              `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared
-              and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
-          ui: >
-              The effect size to show in tables. They can be:
-              `"eta"` for eta-squared, ` partial eta'` for partial eta-squared,
-              `'omega'` for omega-squared, `'omega partial'` for partial omega-squared,
-              `'epsilon'` for epsilon-squared, `'epsilon partial'` for partial epsilon-squared
-               and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"eta partial"`.
-          
-    - name: homo_test
-      title: Homogeneity tests
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), performs Levene's homogeneity tests on residuals for categorical independent variables
-          ui: >
-            Provides [Levene's test](https://biostats.w.uib.no/test-for-homogeneity-of-variances-levenes-test/){target="_blank"} 
-            for equal variances across groups defined by factors  (homoschedasticity).
-
-    - name: colli_test
-      title: Collinearity tests
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), computes VIF and tollerance for the model
-          ui: >
-            Computes VIF and tollerance for the model term of the model
-
-    - name: qq_plot
-      title: Q-Q plot of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
-          ui: >
-            Outputs a Q-Q plot (observed residual quantiles on expected residual quantiles). More general info [here](https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot){target="_blank"}
-
-    - name: norm_test
-      title: Normality of residuals
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a test for normality of residuals
-          ui: >
-            Provides [Kolmogorov-Smirnov](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test){target="_blank"} and [Shapiro-Wilk](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test#Interpretation){target="_blank"} tests for normality of residuals.
-
-    - name: norm_plot
-      title: Residuals Histogram
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
-          ui: > 
-            Outputs the histogram of the distribution of the residuals, with an overlaying ideal normal distribution with mean and variance equal to the residuals distribution parameters.
-
-    - name: resid_plot
-      title: Residuals-Predicted plot
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
-          ui: >
-            Produces a scatterplot with the residuals on the Y-axis and the predicted in the X-axis. It can be usufull to assess heteroschdasticity.
-
-    - name: intercept_info
-      title: On intercept
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provides ìnformation about the intercept (F test, effect size indexes)
-          ui: >
-            If selected provides ìnformation about the intercept (F test, effect size indexes)
-
-    - name: es_info
-      title: On Effect sizes
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
-          ui: >
-            If selected, provides ìnformation about the effect size indexes
-
-
-    - name: dep_scale
-      title: Scale
-      type: List
-      options:
-          - title: Original
-            name: 'none'
-          - title: Centered
-            name:  centered
-          - title: z-scores
-            name:  standardized
-
-      default: 'none'
-      description:
-         R: >
-           Re-scale the dependent variable.
-
-
-    - name: se_method
-      title: SE Method
-      type: List
-      default: standard
-      options:
-        - name:  standard
-          title: Standard 
-        - name:  robust
-          title: Robust
-      description:
-         R: >
-           The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3`
-           sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC}
-           for deatils.
-         ui: >
-           The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for
-           robust method.
-           
-
-    - name: ci_method
-      title: CI Method
-      type: List
-      default: wald
-      options:
-        - name:  wald
-          title: Standard (fast)
-        - name:  quantile
-          title: Bootstrap (Percent)
-        - name:  bcai
-          title: Bootstrap (BCa)
-      description:
-         R: >
-            The method to estimate the confidence intervals. Standard method (`wald`) or bootstrap methods. For
-            bootstrap, `quantile` compute the confidence intervals based on the bootstrap distribution, whereas
-            `bcai` computes the bootstrap bias corrected accelerated intervals.
-         ui: >
-            The method to estimate the confidence intervals. Standard method (`Wald`) or bootstrap methods. For
-            bootstrap, `Quantile` computes the confidence intervals based on the bootstrap distribution, whereas
-            `BCAi` computes the bootstrap bias corrected accelerated intervals.
-           
-
-    - name: robust_method
-      title: Method
-      type: List
-      default: HC3
-      options:
-        - name:  HC3
-          title: HC3 
-        - name:  HC2
-          title: HC2
-        - name:  HC1
-          title: HC1
-        - name:  HC0
-          title: HC0 
-      description:
-         R: not present in T
-         ui: >
-           `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. 
-           See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf)
-           for deatils.
-
-...
-
+    -   name: data
+        type: Data
+        description:
+            R: the data as a data frame
+    -   name: .caller
+        type: String
+        default: lm
+        hidden: true
+    -   name: .interface
+        type: String
+        default: jamovi
+        hidden: true
+    -   name: model_type
+        type: List
+        hidden: true
+        options:
+            -   name: lm
+        default: lm
+    -   name: dep
+        title: Dependent Variable
+        type: Variable
+        default: ~
+        permitted:
+            - factor
+            - numeric
+        description:
+            R: |
+                a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
+    -   name: factors
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs
+        type: scaffold
+        file: commons.a.yaml
+    -   name: model_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: comparison
+        type: scaffold
+        file: commons.a.yaml
+    -   name: fixed_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ci_width
+        type: scaffold
+        file: commons.a.yaml
+    -   name: boot_r
+        type: scaffold
+        file: commons.a.yaml
+    -   name: donotrun
+        type: scaffold
+        file: commons.a.yaml
+    -   name: mute
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc_ci
+        type: scaffold
+        file: commons.a.yaml
+    -   name: adjust
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrasts
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastnames
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastcodes
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_focus
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_values
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_es
+        type: Bool
+        title: Effect size indices
+        default: false
+        description:
+            R: "if TRUE, additional effect size indices for custom contrasts      \n"
+    -   name: simple_x
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_mods
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_interactions
+        type: scaffold
+        file: commons.a.yaml
+    -   name: emmeans
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_conditioning
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccra_steps
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccm_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccp_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_scale_labels
+        type: scaffold
+        file: commons.a.yaml
+    -   name: predicted
+        type: scaffold
+        file: commons.a.yaml
+    -   name: residuals
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_emm
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_plot
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export
+        title: Export
+        type: Action
+    -   name: omnibus
+        title: Test
+        type: List
+        default: F
+        options:
+            -   name: F
+                title: F-test
+            -   name: LRT
+                title: LRT
+        description:
+            R: |
+                Omnibus test of the model is based on F-test `F` (default) or loglikelihood ration test `LRT`.
+            ui: |
+                Omnibus test of the model is based on F-test  (default) or loglikelihood ration test `LRT`.
+    -   name: estimates_ci
+        title: Estimates C.I.
+        type: Bool
+        default: true
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , parameters CI in table
+            ui: |
+                Non standardized coefficients (estimastes) CI in tables if flagged
+    -   name: betas_ci
+        title: β C.I.
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , parameters CI in table
+            ui: |
+                Standardized coefficients CI in tables if flagged
+    -   name: vcov
+        title: Coefficients Covariances
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), shows coefficients covariances
+                
+                
+#### plot
+
+## multimode plot
+    -   name: plot_mode
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_terms
+        type: scaffold
+        file: plots.a.yaml
+        
+    -   name: plot_x
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_z
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_by
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_raw
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_yscale
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_xoriginal
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_black
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_around
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_extremes
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_jn
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_more_options
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_min
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_max
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_ticks
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_y_ticks_exact
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_min
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_max
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks_exact
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_extra
+        type: scaffold
+        file: plots.a.yaml
+        
+
+        
+    -   name: covs_scale
+        title: Covariates Scaling
+        type: Array
+        items: (covs)
+        default: ~
+        template:
+            type: Group
+            elements:
+                -   name: var
+                    type: Variable
+                    content: $key
+                -   name: type
+                    type: List
+                    options:
+                        -   title: Centered
+                            name: centered
+                        -   title: z-scores
+                            name: standardized
+                        -   title: Original
+                            name: none
+                    default: centered
+        description:
+            R: |
+                a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates, one of `'centered'` to the mean, `'standardized'` or  `'none'`. `'none'` leaves the variable as it is.
+    -   name: scale_missing
+        title: Scale on
+        type: List
+        options:
+            -   title: Complete cases
+                name: complete
+            -   title: Columnwise
+                name: colwise
+        default: complete
+    -   name: posthoc_es
+        title: Effect size
+        type: NMXList
+        options:
+            -   name: dm
+                title: Cohen's d (model SD)
+            -   name: ds
+                title: Cohen's d (sample SD)
+            -   name: g
+                title: Hedge's g (sample SD)
+        description:
+            R: |
+                effect size indices for mean comparisons. One or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g
+        default: dm
+    -   name: d_ci
+        title: Confidence intervals
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), d confidence intervals
+    -   name: es
+        title: Effect Size
+        type: NMXList
+        options:
+            -   name: beta
+                title: β
+            -   name: eta
+                title: η²
+            -   name: etap
+                title: partial η²
+            -   name: omega
+                title: ω²
+            -   name: omegap
+                title: partial ω²
+            -   name: epsilon
+                title: ε²
+            -   name: epsilonp
+                title: partial ε²
+        default:
+            - beta
+            - etap
+        description:
+            R: |
+                a list of effect sizes to print out. They can be: `"eta"` for eta-squared, `'etap'` for partial eta-squared, `'omega'` for omega-squared, `'omegap'` for partial omega-squared, `'epsilon'` for epsilon-squared, `'epsilonp'` for partial epsilon-squared and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"parEta"`.
+            ui: |
+                The effect size to show in tables. They can be: `"eta"` for eta-squared, ` partial eta'` for partial eta-squared, `'omega'` for omega-squared, `'omega partial'` for partial omega-squared, `'epsilon'` for epsilon-squared, `'epsilon partial'` for partial epsilon-squared
+                 and `'beta'` for standardized  coefficients (betas). Default is `"beta"` and `"eta partial"`.
+    -   name: homo_test
+        title: Homogeneity tests
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), performs Levene's homogeneity tests on residuals for categorical independent variables
+            ui: |
+                Provides [Levene's test](https://biostats.w.uib.no/test-for-homogeneity-of-variances-levenes-test/){target="_blank"}  for equal variances across groups defined by factors  (homoschedasticity).
+    -   name: colli_test
+        title: Collinearity tests
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), computes VIF and tollerance for the model
+            ui: |
+                Computes VIF and tollerance for the model term of the model
+    -   name: qq_plot
+        title: Q-Q plot of residuals
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a Q-Q plot of residuals
+            ui: |
+                Outputs a Q-Q plot (observed residual quantiles on expected residual quantiles). More general info [here](https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot){target="_blank"}
+    -   name: norm_test
+        title: Normality of residuals
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a test for normality of residuals
+            ui: |
+                Provides [Kolmogorov-Smirnov](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test){target="_blank"} and [Shapiro-Wilk](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test#Interpretation){target="_blank"} tests for normality of residuals.
+    -   name: norm_plot
+        title: Residuals Histogram
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a histogram of residuals superimposed by a normal distribution
+            ui: |
+                Outputs the histogram of the distribution of the residuals, with an overlaying ideal normal distribution with mean and variance equal to the residuals distribution parameters.
+    -   name: resid_plot
+        title: Residuals-Predicted plot
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide a scatterplot of the residuals against predicted
+            ui: |
+                Produces a scatterplot with the residuals on the Y-axis and the predicted in the X-axis. It can be usufull to assess heteroschdasticity.
+    -   name: intercept_info
+        title: On intercept
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provides ìnformation about the intercept (F test, effect size indexes)
+            ui: |
+                If selected provides ìnformation about the intercept (F test, effect size indexes)
+    -   name: es_info
+        title: On Effect sizes
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
+            ui: |
+                If selected, provides ìnformation about the effect size indexes
+    -   name: dep_scale
+        title: Scale
+        type: List
+        options:
+            -   title: Original
+                name: none
+            -   title: Centered
+                name: centered
+            -   title: z-scores
+                name: standardized
+        default: none
+        description:
+            R: |
+                Re-scale the dependent variable.
+    -   name: se_method
+        title: SE Method
+        type: List
+        default: standard
+        options:
+            -   name: standard
+                title: Standard
+            -   name: robust
+                title: Robust
+        description:
+            R: |
+                The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC} for deatils.
+            ui: |
+                The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for robust method.
+    -   name: ci_method
+        title: CI Method
+        type: List
+        default: wald
+        options:
+            -   name: wald
+                title: Standard (fast)
+            -   name: quantile
+                title: Bootstrap (Percent)
+            -   name: bcai
+                title: Bootstrap (BCa)
+        description:
+            R: |
+                The method to estimate the confidence intervals. Standard method (`wald`) or bootstrap methods. For bootstrap, `quantile` compute the confidence intervals based on the bootstrap distribution, whereas `bcai` computes the bootstrap bias corrected accelerated intervals.
+            ui: |
+                The method to estimate the confidence intervals. Standard method (`Wald`) or bootstrap methods. For bootstrap, `Quantile` computes the confidence intervals based on the bootstrap distribution, whereas `BCAi` computes the bootstrap bias corrected accelerated intervals.
+    -   name: robust_method
+        title: Method
+        type: List
+        default: HC3
+        options:
+            -   name: HC3
+                title: HC3
+            -   name: HC2
+                title: HC2
+            -   name: HC1
+                title: HC1
+            -   name: HC0
+                title: HC0
+        description:
+            R: not present in T
+            ui: |
+                `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf) for deatils.

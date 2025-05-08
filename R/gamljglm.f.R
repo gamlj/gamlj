@@ -1,17 +1,18 @@
 #' Generalized Linear Model
-#' 
-#' Generalized Linear Model with options to estimate logistic, probit, 
+#'
+#' Generalized Linear Model with options to estimate logistic, probit,
 #' ordinal, multinomial and custum link function models. Provides options
 #' to estimate posthoc, simple effects and slopes, plots of main effects and
 #' interaction. Model comparison is also an option.
-#' 
+#'
 #' @examples
-#'    data <- emmeans::neuralgia
-#'    GAMLj3::gamlj_glm(formula = Pain ~ Duration,
-#'                     data = data,
-#'                     model_type = "logistic"
-#'                     )
-#'      
+#' data <- emmeans::neuralgia
+#' GAMLj3::gamlj_glm(
+#'     formula = Pain ~ Duration,
+#'     data = data,
+#'     model_type = "logistic"
+#' )
+#'
 #' @param formula (optional) the formula of the model compatible with \link[stats]{glm}. If not passed,
 #'                 model terms should be defined as a list in  \code{model_terms} option.
 #'                 For logistic and probit models formula can be of the form `cbind(success,fail) ~ x ` where
@@ -45,8 +46,8 @@
 #' @param omnibus Whether the omnibus test for the model should be \code{wald} or \code{LRT}.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
 #'   in tables
-#' @param ci_method   The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
-#'    errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+#' @param ci_method   The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
+#'    errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which
 #'    the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
 #'    estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
 #'    the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
@@ -60,14 +61,14 @@
 #'   \code{helmert}, \code{repeated} or \code{'polynomial'}. If NULL,
 #'   \code{simple} is used. Can also be passed as a list of list of the form
 #'   list(list(var="var1",type="type1")).
-#'   
+#'
 #' @param contrast_custom_focus if any factor is coded with \code{'custom'}, when \code{TRUE} or \code{NULL } (default) the coefficients, simple effects and simple interactions
 #'                               are focused on the custom contrast. If \code{FALSE} , variables are coded accordingly to the passed contrast, but
-#'                               no special table or test is devoted to the contrast.    
+#'                               no special table or test is devoted to the contrast.
 
 #' @param contrast_custom_values a named list with the custom contrast weights, of the form \code{list(factorname=numeric vector)}, for instance \code{list(factorname=c(1,1,-2))}.
-#'        only one constrast per variable is allowed.    
-#'   
+#'        only one constrast per variable is allowed.
+#'
 #' @param show_contrastnames \code{TRUE} or \code{FALSE} (default), shows raw
 #'   names of the contrasts variables in tables
 #' @param show_contrastcodes \code{TRUE} or \code{FALSE} (default), shows
@@ -159,7 +160,7 @@
 #' \code{as.data.frame(results$info)}
 #'
 #' @export
-#' 
+#'
 gamlj_glm <- function(
     formula = NULL,
     data,
@@ -168,7 +169,7 @@ gamlj_glm <- function(
     factors = NULL,
     covs = NULL,
     offset = NULL,
-    weights=NULL,
+    weights = NULL,
     model_terms = NULL,
     fixed_intercept = TRUE,
     nested_intercept = NULL,
@@ -182,7 +183,7 @@ gamlj_glm <- function(
     ci_width = 95,
     contrasts = NULL,
     contrast_custom_values = NULL,
-    contrast_custom_focus = NULL,    
+    contrast_custom_focus = NULL,
     show_contrastnames = TRUE,
     show_contrastcodes = FALSE,
     vcov = FALSE,
@@ -204,199 +205,197 @@ gamlj_glm <- function(
     ccp_value = 25,
     covs_scale_labels = "labels",
     adjust = list(
-      "bonf"
+        "bonf"
     ),
     covs_scale = NULL,
     expb_ci = TRUE,
     es = list("expb"),
     propodds_test = FALSE,
     plot_scale = "response") {
-  if (!requireNamespace("jmvcore", quietly = TRUE)) {
-    stop("gamljGzlm requires jmvcore to be installed (restart may be required)")
-  }
+    if (!requireNamespace("jmvcore", quietly = TRUE)) {
+        stop("gamljGzlm requires jmvcore to be installed (restart may be required)")
+    }
 
-  if (!missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
-  if (!missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
-  if (!missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
-  if (!missing(offset)) offset <- jmvcore::resolveQuo(jmvcore::enquo(offset))
-  if (!missing(weights)) weights <- jmvcore::resolveQuo(jmvcore::enquo(weights))
-  if (!missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
-  if (!missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
-  if (!missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
-  if (!missing(simple_x)) simple_x <- jmvcore::resolveQuo(jmvcore::enquo(simple_x))
-  if (!missing(simple_mods)) simple_mods <- jmvcore::resolveQuo(jmvcore::enquo(simple_mods))
-  if (missing(data)) {
-  data <- jmvcore::marshalData(
-      parent.frame(),
-      `if`(!missing(dep), dep, NULL),
-      `if`(!missing(factors), factors, NULL),
-      `if`(!missing(covs), covs, NULL),
-      `if`(!missing(offset), offset, NULL),
-      `if`(!missing(weights), weights, NULL),
-      `if`(!missing(plot_x), plot_x, NULL),
-      `if`(!missing(plot_z), plot_z, NULL),
-      `if`(!missing(plot_by), plot_by, NULL),
-      `if`(!missing(simple_x), simple_x, NULL),
-      `if`(!missing(simple_mods), simple_mods, NULL)
+    if (!missing(dep)) dep <- jmvcore::resolveQuo(jmvcore::enquo(dep))
+    if (!missing(factors)) factors <- jmvcore::resolveQuo(jmvcore::enquo(factors))
+    if (!missing(covs)) covs <- jmvcore::resolveQuo(jmvcore::enquo(covs))
+    if (!missing(offset)) offset <- jmvcore::resolveQuo(jmvcore::enquo(offset))
+    if (!missing(weights)) weights <- jmvcore::resolveQuo(jmvcore::enquo(weights))
+    if (!missing(plot_x)) plot_x <- jmvcore::resolveQuo(jmvcore::enquo(plot_x))
+    if (!missing(plot_z)) plot_z <- jmvcore::resolveQuo(jmvcore::enquo(plot_z))
+    if (!missing(plot_by)) plot_by <- jmvcore::resolveQuo(jmvcore::enquo(plot_by))
+    if (!missing(simple_x)) simple_x <- jmvcore::resolveQuo(jmvcore::enquo(simple_x))
+    if (!missing(simple_mods)) simple_mods <- jmvcore::resolveQuo(jmvcore::enquo(simple_mods))
+    if (missing(data)) {
+        data <- jmvcore::marshalData(
+            parent.frame(),
+            `if`(!missing(dep), dep, NULL),
+            `if`(!missing(factors), factors, NULL),
+            `if`(!missing(covs), covs, NULL),
+            `if`(!missing(offset), offset, NULL),
+            `if`(!missing(weights), weights, NULL),
+            `if`(!missing(plot_x), plot_x, NULL),
+            `if`(!missing(plot_z), plot_z, NULL),
+            `if`(!missing(plot_by), plot_by, NULL),
+            `if`(!missing(simple_x), simple_x, NULL),
+            `if`(!missing(simple_mods), simple_mods, NULL)
+        )
+    }
+
+    for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
+    ##### custom code
+    .caller <- "glm"
+    .interface <- "R"
+    donotrun <- FALSE
+    dep2 <- NULL
+    input_method <- "standard"
+    ### model terms
+    if (inherits(model_terms, "formula")) {
+        f <- rFormula$new(model_terms, data)
+        model_terms <- f$terms
+        if (missing(fixed_intercept)) {
+            fixed_intercept <- f$intercept
+        }
+        if (missing(factors)) {
+            factors <- f$factors
+        }
+        if (missing(covs)) {
+            covs <- f$covs
+        }
+    }
+
+    if (!is.null(formula)) {
+        f <- rFormula$new(formula, data)
+        dep <- f$dep
+        factors <- f$factors
+        covs <- f$covs
+        fixed_intercept <- f$intercept
+        model_terms <- f$terms
+
+
+        y <- rlang::f_lhs(formula)
+        if (class(y) == "call") {
+            if (as.character(y[[1]]) == "cbind") {
+                dep <- as.character(y[[2]])
+                dep2 <- as.character(y[[3]])
+                input_method <- "success"
+            }
+            if (as.character(y[[1]]) == "/") {
+                dep <- as.character(y[[2]])
+                dep2 <- as.character(y[[3]])
+                input_method <- "total"
+            }
+        }
+    }
+    # if no formula or no terms is passed, covs and factors are the terms
+    if (is.null(model_terms)) model_terms <- as.list(c(factors, covs))
+
+    # nested terms
+    comparison <- FALSE
+
+    if (inherits(nested_terms, "formula")) {
+        f <- rFormula$new(nested_terms)
+        nested_intercept <- f$intercept
+        nested_terms <- f$terms
+    }
+
+    if (is.something(nested_terms) || !is.null(nested_intercept)) {
+        comparison <- TRUE
+    }
+
+    ### other from formula to list
+    if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
+    if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
+
+    ### fix some options when passed by R ####
+    if (is.something(names(covs_scale))) {
+        covs_scale <- lapply(names(covs_scale), function(a) list(var = a, type = covs_scale[[a]]))
+    }
+
+    if (is.something(names(contrasts))) {
+        contrasts <- lapply(names(contrasts), function(a) list(var = a, type = contrasts[[a]]))
+    }
+
+    if (is.something(contrast_custom_values)) {
+        custom_values <- list()
+        if (is.null(contrast_custom_focus)) contrast_custom_focus <- TRUE
+
+        for (name in names(contrast_custom_values)) {
+            ladd(custom_values) <- list(var = name, codes = paste0(contrast_custom_values[[name]], collapse = ","))
+        }
+        contrast_custom_values <- custom_values
+    }
+
+    ### weights
+
+    if (!is.null(weights)) {
+        if (is.numeric(weights)) stop("weights should be a column name in the data.frame")
+        attr(data, "jmv-weights-name") <- weights
+        attr(data, "jmv-weights") <- data[[weights]]
+    }
+
+    ## end of custom code
+
+    options <- gamljglmOptions$new(
+        .caller = .caller,
+        .interface = .interface,
+        dep = dep,
+        dep2 = dep2,
+        input_method = input_method,
+        factors = factors,
+        covs = covs,
+        offset = offset,
+        weights = weights,
+        model_terms = model_terms,
+        fixed_intercept = fixed_intercept,
+        nested_intercept = nested_intercept,
+        nested_terms = nested_terms,
+        comparison = comparison,
+        omnibus = omnibus,
+        estimates_ci = estimates_ci,
+        ci_method = ci_method,
+        boot_r = boot_r,
+        ci_width = ci_width,
+        contrasts = contrasts,
+        contrast_custom_values = contrast_custom_values,
+        contrast_custom_focus = contrast_custom_focus,
+        show_contrastnames = show_contrastnames,
+        show_contrastcodes = show_contrastcodes,
+        vcov = vcov,
+        plot_x = plot_x,
+        plot_z = plot_z,
+        plot_by = plot_by,
+        plot_raw = plot_raw,
+        plot_yscale = plot_yscale,
+        plot_xoriginal = plot_xoriginal,
+        plot_black = plot_black,
+        plot_around = plot_around,
+        emmeans = emmeans,
+        posthoc = posthoc,
+        simple_x = simple_x,
+        simple_mods = simple_mods,
+        simple_interactions = simple_interactions,
+        covs_conditioning = covs_conditioning,
+        ccm_value = ccm_value,
+        ccp_value = ccp_value,
+        covs_scale_labels = covs_scale_labels,
+        adjust = adjust,
+        covs_scale = covs_scale,
+        expb_ci = expb_ci,
+        es = es,
+        model_type = model_type,
+        custom_family = custom_family,
+        custom_link = custom_link,
+        propodds_test = propodds_test,
+        plot_scale = plot_scale
     )
-  }
 
-  for (v in factors) if (v %in% names(data)) data[[v]] <- as.factor(data[[v]])
-  ##### custom code
-  .caller <- "glm"
-  .interface <- "R"
-  donotrun <- FALSE
-  dep2     <- NULL
-  input_method<-"standard"
-  ### model terms
-  if (inherits(model_terms, "formula")) {
-    f <- rFormula$new(model_terms, data)
-    model_terms <- f$terms
-    if (missing(fixed_intercept)) {
-      fixed_intercept <- f$intercept
-    }
-    if (missing(factors)) {
-      factors <- f$factors
-    }
-    if (missing(covs)) {
-      covs <- f$covs
-    }
-  }
-    
-  if (!is.null(formula)) {
-    f <- rFormula$new(formula, data)
-    dep <- f$dep
-    factors <- f$factors
-    covs <- f$covs
-    fixed_intercept <- f$intercept
-    model_terms <- f$terms
-    
-    
-    y<-rlang::f_lhs(formula)
-    if (class(y) == "call") {
-          if (as.character(y[[1]])=="cbind") {
-              dep <- as.character(y[[2]])
-              dep2 <- as.character(y[[3]])
-              input_method="success"
-          }
-          if (as.character(y[[1]])=="/") {
-              dep <- as.character(y[[2]])
-              dep2 <- as.character(y[[3]])
-              input_method="total"
-          }
-      
-    }
-    
-  }
-  # if no formula or no terms is passed, covs and factors are the terms
-  if (is.null(model_terms)) model_terms <- as.list(c(factors, covs))
+    analysis <- gamljglmClass$new(
+        options = options,
+        data = data
+    )
 
-  # nested terms
-  comparison <- FALSE
+    analysis$run()
 
-  if (inherits(nested_terms, "formula")) {
-    f <- rFormula$new(nested_terms)
-    nested_intercept <- f$intercept
-    nested_terms <- f$terms
-  }
-
-  if (is.something(nested_terms) || !is.null(nested_intercept)) {
-    comparison <- TRUE
-  }
-
-  ### other from formula to list
-  if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
-  if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
-
-  ### fix some options when passed by R ####
-  if (is.something(names(covs_scale))) {
-    covs_scale <- lapply(names(covs_scale), function(a) list(var = a, type = covs_scale[[a]]))
-  }
-
-  if (is.something(names(contrasts))) {
-    contrasts <- lapply(names(contrasts), function(a) list(var = a, type = contrasts[[a]]))
-  }
-  
-  if (is.something(contrast_custom_values)) {
-     custom_values=list()
-     if (is.null(contrast_custom_focus)) contrast_custom_focus<-TRUE
-
-    for (name in names(contrast_custom_values)) {
-       ladd(custom_values)<-list(var=name,codes=paste0(contrast_custom_values[[name]], collapse=","))       
-    }
-     contrast_custom_values<-custom_values 
-  }
-
-  ### weights
-
-  if (!is.null(weights)) {
-    if (is.numeric(weights)) stop("weights should be a column name in the data.frame")
-    attr(data,"jmv-weights-name")<-weights
-    attr(data,"jmv-weights")<-data[[weights]]
-  }
-  
-  ## end of custom code
-
-  options <- gamljglmOptions$new(
-    .caller = .caller,
-    .interface = .interface,
-    dep = dep,
-    dep2= dep2,
-    input_method= input_method,
-    factors = factors,
-    covs = covs,
-    offset = offset,
-    weights = weights,
-    model_terms = model_terms,
-    fixed_intercept = fixed_intercept,
-    nested_intercept = nested_intercept,
-    nested_terms = nested_terms,
-    comparison = comparison,
-    omnibus = omnibus,
-    estimates_ci = estimates_ci,
-    ci_method = ci_method,
-    boot_r = boot_r,
-    ci_width = ci_width,
-    contrasts = contrasts,
-    contrast_custom_values=contrast_custom_values,    
-    contrast_custom_focus=contrast_custom_focus,        
-    show_contrastnames = show_contrastnames,
-    show_contrastcodes = show_contrastcodes,
-    vcov = vcov,
-    plot_x = plot_x,
-    plot_z = plot_z,
-    plot_by = plot_by,
-    plot_raw = plot_raw,
-    plot_yscale = plot_yscale,
-    plot_xoriginal = plot_xoriginal,
-    plot_black = plot_black,
-    plot_around = plot_around,
-    emmeans = emmeans,
-    posthoc = posthoc,
-    simple_x = simple_x,
-    simple_mods = simple_mods,
-    simple_interactions = simple_interactions,
-    covs_conditioning = covs_conditioning,
-    ccm_value = ccm_value,
-    ccp_value = ccp_value,
-    covs_scale_labels = covs_scale_labels,
-    adjust = adjust,
-    covs_scale = covs_scale,
-    expb_ci = expb_ci,
-    es = es,
-    model_type = model_type,
-    custom_family = custom_family,
-    custom_link = custom_link,
-    propodds_test = propodds_test,
-    plot_scale = plot_scale
-  )
-
-  analysis <- gamljglmClass$new(
-    options = options,
-    data = data
-  )
-
-  analysis$run()
-
-  analysis$results
+    analysis$results
 }

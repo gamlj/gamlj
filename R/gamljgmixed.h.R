@@ -48,6 +48,9 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             estimates_ci = FALSE,
             re_ci = FALSE,
             ci_method = "wald",
+            plot_mode = NULL,
+            plot_terms = list(
+                list()),
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -101,7 +104,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             private$..dep <- jmvcore::OptionVariable$new(
                 "dep",
                 dep,
-                default=NULL,
                 permitted=list(
                     "factor",
                     "numeric"))
@@ -111,8 +113,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 suggested=list(
                     "nominal"),
                 permitted=list(
-                    "factor"),
-                default=NULL)
+                    "factor"))
             private$..covs <- jmvcore::OptionVariables$new(
                 "covs",
                 covs,
@@ -120,16 +121,13 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "continuous",
                     "ordinal"),
                 permitted=list(
-                    "numeric"),
-                default=NULL)
+                    "numeric"))
             private$..model_terms <- jmvcore::OptionTerms$new(
                 "model_terms",
-                model_terms,
-                default=NULL)
+                model_terms)
             private$..nested_terms <- jmvcore::OptionTerms$new(
                 "nested_terms",
-                nested_terms,
-                default=NULL)
+                nested_terms)
             private$..comparison <- jmvcore::OptionBool$new(
                 "comparison",
                 comparison,
@@ -163,8 +161,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 default=FALSE)
             private$..posthoc <- jmvcore::OptionTerms$new(
                 "posthoc",
-                posthoc,
-                default=NULL)
+                posthoc)
             private$..posthoc_ci <- jmvcore::OptionBool$new(
                 "posthoc_ci",
                 posthoc_ci,
@@ -185,7 +182,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "contrasts",
                 contrasts,
                 items="(factors)",
-                default=NULL,
                 template=jmvcore::OptionGroup$new(
                     "contrasts",
                     NULL,
@@ -237,20 +233,17 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                             NULL))))
             private$..simple_x <- jmvcore::OptionVariable$new(
                 "simple_x",
-                simple_x,
-                default=NULL)
+                simple_x)
             private$..simple_mods <- jmvcore::OptionVariables$new(
                 "simple_mods",
-                simple_mods,
-                default=NULL)
+                simple_mods)
             private$..simple_interactions <- jmvcore::OptionBool$new(
                 "simple_interactions",
                 simple_interactions,
                 default=FALSE)
             private$..emmeans <- jmvcore::OptionTerms$new(
                 "emmeans",
-                emmeans,
-                default=NULL)
+                emmeans)
             private$..covs_conditioning <- jmvcore::OptionList$new(
                 "covs_conditioning",
                 covs_conditioning,
@@ -333,18 +326,29 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "wald",
                     "profile",
                     "quantile"))
+            private$..plot_mode <- jmvcore::OptionList$new(
+                "plot_mode",
+                plot_mode,
+                options=list(
+                    "monoplot",
+                    "multiplot"))
+            private$..plot_terms <- jmvcore::OptionArray$new(
+                "plot_terms",
+                plot_terms,
+                default=list(
+                    list()),
+                template=jmvcore::OptionVariables$new(
+                    "plot_terms",
+                    NULL))
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
-                plot_x,
-                default=NULL)
+                plot_x)
             private$..plot_z <- jmvcore::OptionVariable$new(
                 "plot_z",
-                plot_z,
-                default=NULL)
+                plot_z)
             private$..plot_by <- jmvcore::OptionVariables$new(
                 "plot_by",
-                plot_by,
-                default=NULL)
+                plot_by)
             private$..plot_raw <- jmvcore::OptionBool$new(
                 "plot_raw",
                 plot_raw,
@@ -451,7 +455,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "covs_scale",
                 covs_scale,
                 items="(covs)",
-                default=NULL,
                 template=jmvcore::OptionGroup$new(
                     "covs_scale",
                     NULL,
@@ -481,7 +484,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             private$..cluster <- jmvcore::OptionVariables$new(
                 "cluster",
                 cluster,
-                default=NULL,
                 suggested=list(
                     "nominal"))
             private$..re <- jmvcore::OptionArray$new(
@@ -569,6 +571,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..estimates_ci)
             self$.addOption(private$..re_ci)
             self$.addOption(private$..ci_method)
+            self$.addOption(private$..plot_mode)
+            self$.addOption(private$..plot_terms)
             self$.addOption(private$..plot_x)
             self$.addOption(private$..plot_z)
             self$.addOption(private$..plot_by)
@@ -644,6 +648,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         estimates_ci = function() private$..estimates_ci$value,
         re_ci = function() private$..re_ci$value,
         ci_method = function() private$..ci_method$value,
+        plot_mode = function() private$..plot_mode$value,
+        plot_terms = function() private$..plot_terms$value,
         plot_x = function() private$..plot_x$value,
         plot_z = function() private$..plot_z$value,
         plot_by = function() private$..plot_by$value,
@@ -718,6 +724,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..estimates_ci = NA,
         ..re_ci = NA,
         ..ci_method = NA,
+        ..plot_mode = NA,
+        ..plot_terms = NA,
         ..plot_x = NA,
         ..plot_z = NA,
         ..plot_by = NA,
@@ -845,6 +853,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -859,7 +868,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "dep2",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparison"),
+                                "comparison",
+                                "nested_re"),
                             columns=list(
                                 list(
                                     `name`="model", 
@@ -908,6 +918,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -922,7 +933,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "dep2",
                                 "nested_terms",
                                 "nested_intercept",
-                                "comparison"),
+                                "comparison",
+                                "nested_re"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -967,6 +979,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1014,6 +1027,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1105,6 +1119,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1221,6 +1236,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1294,6 +1310,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1364,6 +1381,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1432,6 +1450,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1496,6 +1515,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1534,6 +1554,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1594,6 +1615,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "mute",
                         "df_method",
                         "contrasts",
+                        "covs_scale",
                         "contrast_custom_values",
                         "donotrun",
                         "reml",
@@ -1702,6 +1724,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1758,6 +1781,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "mute",
                                 "df_method",
                                 "contrasts",
+                                "covs_scale",
                                 "contrast_custom_values",
                                 "donotrun",
                                 "reml",
@@ -1870,6 +1894,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "mute",
                                     "df_method",
                                     "contrasts",
+                                    "covs_scale",
                                     "contrast_custom_values",
                                     "donotrun",
                                     "reml",
@@ -1926,6 +1951,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "mute",
                                     "df_method",
                                     "contrasts",
+                                    "covs_scale",
                                     "contrast_custom_values",
                                     "donotrun",
                                     "reml",
@@ -2021,6 +2047,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "mute",
                         "df_method",
                         "contrasts",
+                        "covs_scale",
                         "contrast_custom_values",
                         "donotrun",
                         "reml",
@@ -2072,101 +2099,62 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 options=options,
                 name="mainPlots",
                 title="Results Plots",
-                clearWith=list(
-                    "model_type",
-                    "dep",
-                    "factors",
-                    "covs",
-                    "covs_scale",
-                    "scale_missing",
-                    "model_terms",
-                    "fixed_intercept",
-                    "se_method",
-                    "mute",
-                    "df_method",
-                    "contrasts",
-                    "contrast_custom_values",
-                    "donotrun",
-                    "reml",
-                    "cluster",
-                    "re",
-                    "re_corr",
-                    "res_struct",
-                    "offset",
-                    "omnibus",
-                    "custom_family",
-                    "custom_link",
-                    "dep2",
-                    "ccm_value",
-                    "ccp_value",
-                    "ccra_steps",
-                    "covs_scale_labels",
-                    "covs_conditioning",
-                    "contrast_custom_focus",
-                    "plot_x",
-                    "plot_z",
-                    "plot_by",
-                    "plot_raw",
-                    "plot_yscale",
-                    "plot_xoriginal",
-                    "plot_black",
-                    "plot_around",
-                    "plot_scale",
-                    "plot_re",
-                    "plot_re_method",
-                    "plot_x_min",
-                    "plot_x_max",
-                    "plot_x_ticks",
-                    "plot_x_ticks_exact",
-                    "plot_extra"),
-                template=jmvcore::Image$new(
+                template=jmvcore::Array$new(
                     options=options,
-                    title="",
-                    renderFun=".mainPlot",
-                    width=700,
-                    height=400,
-                    clearWith=list(
-                        "model_type",
-                        "dep",
-                        "factors",
-                        "covs",
-                        "covs_scale",
-                        "scale_missing",
-                        "model_terms",
-                        "fixed_intercept",
-                        "se_method",
-                        "mute",
-                        "df_method",
-                        "contrasts",
-                        "contrast_custom_values",
-                        "donotrun",
-                        "reml",
-                        "cluster",
-                        "re",
-                        "re_corr",
-                        "res_struct",
-                        "offset",
-                        "omnibus",
-                        "custom_family",
-                        "custom_link",
-                        "dep2",
-                        "ccm_value",
-                        "ccp_value",
-                        "ccra_steps",
-                        "covs_scale_labels",
-                        "covs_conditioning",
-                        "contrast_custom_focus",
-                        "plot_x",
-                        "plot_z",
-                        "plot_by",
-                        "plot_raw",
-                        "plot_yscale",
-                        "plot_xoriginal",
-                        "plot_black",
-                        "plot_around",
-                        "plot_scale",
-                        "plot_re",
-                        "plot_re_method"))))
+                    template=jmvcore::Image$new(
+                        options=options,
+                        title="",
+                        renderFun=".mainPlot",
+                        width=700,
+                        height=400,
+                        clearWith=list(
+                            "model_type",
+                            "dep",
+                            "factors",
+                            "covs",
+                            "covs_scale",
+                            "scale_missing",
+                            "model_terms",
+                            "fixed_intercept",
+                            "se_method",
+                            "mute",
+                            "df_method",
+                            "contrasts",
+                            "covs_scale",
+                            "contrast_custom_values",
+                            "donotrun",
+                            "offset",
+                            "omnibus",
+                            "custom_family",
+                            "custom_link",
+                            "dep2",
+                            "simple_x",
+                            "simple_mods",
+                            "simple_scale",
+                            "ccm_value",
+                            "ccp_value",
+                            "ccra_steps",
+                            "covs_scale_labels",
+                            "covs_conditioning",
+                            "contrast_custom_focus",
+                            "ci_width",
+                            "ci_method",
+                            "boot_r",
+                            "plot_x",
+                            "plot_z",
+                            "plot_by",
+                            "plot_raw",
+                            "plot_yscale",
+                            "plot_xoriginal",
+                            "plot_black",
+                            "plot_around",
+                            "plot_scale",
+                            "plot_terms",
+                            "plot_x_min",
+                            "plot_x_max",
+                            "plot_x_ticks",
+                            "plot_x_ticks_exact",
+                            "plot_extra")))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",
@@ -2190,6 +2178,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "mute",
                     "df_method",
                     "contrasts",
+                    "covs_scale",
                     "contrast_custom_values",
                     "donotrun",
                     "reml",
@@ -2217,6 +2206,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "plot_black",
                     "plot_around",
                     "plot_scale",
+                    "plot_terms",
                     "plot_re",
                     "plot_re_method"),
                 template=jmvcore::Image$new(
@@ -2238,6 +2228,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "mute",
                         "df_method",
                         "contrasts",
+                        "covs_scale",
                         "contrast_custom_values",
                         "donotrun",
                         "reml",
@@ -2265,6 +2256,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "plot_black",
                         "plot_around",
                         "plot_scale",
+                        "plot_terms",
                         "plot_re",
                         "plot_re_method",
                         "plot_jn_expb"))))
@@ -2291,6 +2283,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "mute",
                     "df_method",
                     "contrasts",
+                    "covs_scale",
                     "contrast_custom_values",
                     "donotrun",
                     "reml",
@@ -2322,6 +2315,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     "mute",
                     "df_method",
                     "contrasts",
+                    "covs_scale",
                     "contrast_custom_values",
                     "donotrun",
                     "reml",

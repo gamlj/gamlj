@@ -1,8 +1,7 @@
----
 name: gamljglm
 title: Generalized Linear Model
 menuGroup: Linear Models
-version: '3.0.0'
+version: 3.0.0
 jas: '1.2'
 export: false
 weightsSupport: full
@@ -11,565 +10,421 @@ description:
     R:
         dontrun: false
         usage: |
-                 data<-emmeans::neuralgia
-                  gamlj::gamljGzlm(
-                            formula = Pain ~ Duration,
-                            data = data,
-                             model_type = "logistic")
-
+            data<-emmeans::neuralgia
+             gamlj::gamljGzlm(
+                       formula = Pain ~ Duration,
+                       data = data,
+                        model_type = "logistic")
 options:
-
-    - name: data
-      type: Data
-      description:
-          R: the data as a data frame
-
-### constants setting
-
-    - name: .caller
-      type: String
-      default: "glm"
-      hidden: true
-
-    - name: .interface
-      type: String
-      default: "jamovi"
-      hidden: true
-
-### dependent variable
-
-    - name: dep
-      title: Dependent Variable
-      type: Variable
-      default:
-      permitted:
-        - factor
-        - numeric
-      description:
-          R: >
-            a string naming the dependent variable from `data`; the variable
-            must be numeric. Not needed if `formula` is used.
-
-    - name: dep2
-      title: Failures
-      type: Variable
-      default:
-      permitted:
-        - factor
-        - numeric
-      description:
-          R: >
-            not present in R
-
-### standard input
-
-    - name: factors
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: model_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_terms
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: comparison
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: fixed_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: nested_intercept
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ci_width
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: boot_r
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: donotrun
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: mute
-      type: scaffold
-      file: commons.a.yaml
-
-### posthoc
-    -  name: posthoc
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: posthoc_ci
-       type: scaffold
-       file: commons.a.yaml
-
-    -  name: adjust
-       type: scaffold
-       file: commons.a.yaml
-
-####
-
-### contrasts
-
-    - name: contrasts
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastnames
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: show_contrastcodes
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: contrast_custom_focus
-      type: scaffold
-      file: commons.a.yaml
-      
-    - name: contrast_custom_values
-      type: scaffold
-      file: commons.a.yaml
-      
-
-      
-###
-
-### simple effects 
-
-    - name: simple_x
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_mods
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: simple_interactions
-      type: scaffold
-      file: commons.a.yaml
-###
-
-### emmeans
-    - name: emmeans
-      type: scaffold
-      file: commons.a.yaml
-
-###
-
-### covariate scaling (without covs_scale: put it below)
-
-    - name: covs_conditioning
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccra_steps
-      type: scaffold
-      file: commons.a.yaml
-
-
-    - name: ccm_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: ccp_value
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: covs_scale_labels
-      type: scaffold
-      file: commons.a.yaml
-
-
-
-#### output 
-
-
-    - name: predicted
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: residuals
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_emm
-      type: scaffold
-      file: commons.a.yaml
-
-    - name: export_plot
-      type: scaffold
-      file: commons.a.yaml
-            
-    - name: export
-      title: Export
-      type: Action
-
-
-####
-
-
-### Plots options
-
-    - name: plot_x
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_z
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_by
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_raw
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_yscale
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_xoriginal
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_black
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_around
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_jn
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_jn_expb
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_more_options
-      type: scaffold
-      file: plots.a.yaml
-      
-    - name: plot_x_min
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_max
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_x_ticks_exact
-      type: scaffold
-      file: plots.a.yaml
-
-    - name: plot_extra
-      type: scaffold
-      file: plots.a.yaml
-
-####### end of plots #########
-
-
-##### end of common #########
-
-
-
-############ generic with some specs ###########
-
-
-    - name: covs_scale
-      title: Covariates Scaling
-      type: Array
-      items: (covs)
-      default:
-      template:
-          type: Group
-          elements:
-              - name: var
-                type: Variable
-                content: $key
-              - name: type
-                type: List
-                options:
-                    - title: Centered
-                      name:  centered
-                    - title: z-scores
-                      name: standardized
-                    - title: None
-                      name: 'none'
-
-                default: centered 
-      description:
-          R: >
-             a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates,
-             one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
-
-    - name: scale_missing
-      title: Scale on 
-      type: List
-      options:
-          - title: Complete cases
-            name: 'complete'
-          - title: Columnwise 
-            name: colwise
-      default: 'complete'
-
-
-######### specs here ##########
-
-    - name: offset
-      title: Offset
-      type: Variable
-      default: ~
-      description:
-                R: a vector of strings naming the offset variables.
-                
-    - name: estimates_ci
-      title: For estimates
-      type: Bool
-      default: false
-      description:
-                R: |
-                        `TRUE`  or `FALSE` (default), coefficients CI in tables                
-    - name: vcov
-      title: Coefficients Covariances
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), shows coefficients covariances
-
-    - name: crosstab
-      title: Classification Table
-      type: Bool
-      default: false
-      description:
-          R: >
-            `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
-          ui: >
-            Produces a classification table (predicted vs observed)
-
-
-    - name: input_method
-      title: Input Method
-      type: List
-      default: standard
-      options:
-        -       name: standard
-                title: 'Responses'
-        -       name: success
-                title: 'Success/Failure'
-        -       name:  total
-                title: 'P(success)/Totals'
-
-      description:
-                R: |
-                        notpresent
-                ui: |
-                        The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
-                        `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
-                          and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
-                          of each proportion.
-                        
-
-    - name: ci_method
-      title: CI Method
-      type: List
-      default: wald
-      options:
-        - name:  wald
-          title: Standard 
-        - name:  profile
-          title: Profile 
-        - name:  quantile
-          title: Bootstrap Percent 
-        - name:  bcai
-          title: Bootstrap BCa
-      description:
-          R: >
-              The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
-              errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
-              the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
-              estimate. `quantile` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute
-              the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
-          ui: > 
-              The method used to compute the confidence intervals. `Standard` uses the Wald method to compute standard
-              errors and confidence intervals. `Profile` computes Profile Likelihood Based Confidence Interval, in which 
-              the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
-              estimate. `Bootstrap percent` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute
-              the CI based on the percentiles of the boostrap distribution. The `BCa` implements the bias-corrected bootstrap method.
-
-
-
-    - name: expb_ci
-      title: For exp(B)
-      type: Bool
-      default: true
-      description:
-          R: >
-            `TRUE` (default) or `FALSE` , exp(B) CI in table
-
-    - name: es
-      title: Effect Size
-      type: NMXList
-      options:
-          - name: expb
-            title: Odd Ratios (expB)
-          - name: eta
-            title: η²
-          - name: RR
-            title: Relative Risk (RR)
-          - name: marginals
-            title: Marginal Effects
-            
-      default:
-          - expb
-          - eta
-      description:
-          R: >
-            Effect size indices. `expb` (default) exponentiates the coefficients. For
-            dichotomous dependent variables relative risk indices (RR) can be obtained.
-            `marginals` computes the marginal effects.
-          ui: >
-            Effect size indices. `Odd Rations` (default) exponentiates the coefficients. For
-            dichotomous dependent variables `Relative Risk ` indices  can be obtained.
-            `Marginal Effects` computes the marginal effects (if the model allows).
-          
-    - name: model_type
-      title: Model Selection
-      type: List
-      options:
-        - name: linear
-          title: Linear
-        - name: poisson
-          title: Poisson
-        - name: poiover
-          title: Poisson (overdispersion)
-        - name : nb
-          title: Negative Binomial
-        - name: logistic
-          title: Logistic
-        - name: probit
-          title: Probit
-        - name: probit
-          title: Probit 
-        - name: beta
-          title: Beta
-        - name: ordinal
-          title: Ordinal (proportional odds)
-        - name: multinomial
-          title: Multinomial
-        - name: custom
-          title: Custom
-
-      default: linear
-      description:
-          R: >
-            Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
-
-
-    - name: custom_family
-      title: Distribution
-      type: List
-      options:
-          - title: Gaussian
-            name: 'gaussian'
-          - title: Binomial
-            name:  'binomial'
-          - title: Poisson
-            name:  'poisson'
-          - title: Inverse gaussian
-            name: 'inverse.gaussian'
-          - title: Gamma
-            name: 'Gamma'
-
-      default: "gaussian"
-      description:
-         R: >
-           Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
-
-    - name: custom_link
-      title: Link Function
-      type: List
-      options:
-          - title: Identity
-            name: 'identity'
-          - title: Logit
-            name:  'logit'
-          - title: Log
-            name:  'log'
-          - title: Inverse
-            name: 'inverse'
-          - title: Inverse squared
-            name: '1/mu^2'
-          - title: Square root
-            name: 'sqrt'
-
-      default: "identity"
-      description:
-         R: >
-           Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
-           
-
-### this is only for ordinal models
-    - name: propodds_test
-      title: Parallel lines test
-      type: Bool
-      default: false
-      description:
-          R: >
-             Test parallel lines assumptions in cumulative link model (ordinal regression)
-###
-
-
-### this is only for beta models
-    - name: preds_phi
-      title: Predictors in precision model
-      type: Bool
-      default: false
-      description:
-          R: >
-             Include the predictors also for the precision phi (beta regression)
-###
-
-
-    - name: plot_scale
-      title: Y-axis scale
-      type: List
-      options:
-        - name: response
-          title: Response
-        - name:  link
-          title: Linear predictor
-        - name:  mean.class
-          title: Mean class
-          
-      default: response
-      description:
-          R: >
-            Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)
-
-...
-
+    -   name: data
+        type: Data
+        description:
+            R: the data as a data frame
+    -   name: .caller
+        type: String
+        default: glm
+        hidden: true
+    -   name: .interface
+        type: String
+        default: jamovi
+        hidden: true
+    -   name: dep
+        title: Dependent Variable
+        type: Variable
+        default: ~
+        permitted:
+            - factor
+            - numeric
+        description:
+            R: |
+                a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
+    -   name: dep2
+        title: Failures
+        type: Variable
+        default: ~
+        permitted:
+            - factor
+            - numeric
+        description:
+            R: |
+                not present in R
+    -   name: factors
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs
+        type: scaffold
+        file: commons.a.yaml
+    -   name: model_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_terms
+        type: scaffold
+        file: commons.a.yaml
+    -   name: comparison
+        type: scaffold
+        file: commons.a.yaml
+    -   name: fixed_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: nested_intercept
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ci_width
+        type: scaffold
+        file: commons.a.yaml
+    -   name: boot_r
+        type: scaffold
+        file: commons.a.yaml
+    -   name: donotrun
+        type: scaffold
+        file: commons.a.yaml
+    -   name: mute
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc
+        type: scaffold
+        file: commons.a.yaml
+    -   name: posthoc_ci
+        type: scaffold
+        file: commons.a.yaml
+    -   name: adjust
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrasts
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastnames
+        type: scaffold
+        file: commons.a.yaml
+    -   name: show_contrastcodes
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_focus
+        type: scaffold
+        file: commons.a.yaml
+    -   name: contrast_custom_values
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_x
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_mods
+        type: scaffold
+        file: commons.a.yaml
+    -   name: simple_interactions
+        type: scaffold
+        file: commons.a.yaml
+    -   name: emmeans
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_conditioning
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccra_steps
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccm_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: ccp_value
+        type: scaffold
+        file: commons.a.yaml
+    -   name: covs_scale_labels
+        type: scaffold
+        file: commons.a.yaml
+    -   name: predicted
+        type: scaffold
+        file: commons.a.yaml
+    -   name: residuals
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_emm
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export_plot
+        type: scaffold
+        file: commons.a.yaml
+    -   name: export
+        title: Export
+        type: Action
+    -   name: plot_x
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_z
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_by
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_raw
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_yscale
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_xoriginal
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_black
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_around
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_jn
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_jn_expb
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_more_options
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_min
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_max
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_x_ticks_exact
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_extra
+        type: scaffold
+        file: plots.a.yaml
+
+## multimode plot
+    -   name: plot_mode
+        type: scaffold
+        file: plots.a.yaml
+    -   name: plot_terms
+        type: scaffold
+        file: plots.a.yaml
+
+
+#### specifics
+
+    -   name: covs_scale
+        title: Covariates Scaling
+        type: Array
+        items: (covs)
+        default: ~
+        template:
+            type: Group
+            elements:
+                -   name: var
+                    type: Variable
+                    content: $key
+                -   name: type
+                    type: List
+                    options:
+                        -   title: Centered
+                            name: centered
+                        -   title: z-scores
+                            name: standardized
+                        -   title: None
+                            name: none
+                    default: centered
+        description:
+            R: |
+                a named vector of the form \code{c(var1='type', var2='type2')} specifying the transformation to apply to covariates, one of `'centered'` to the mean, `'standardized'`,`'log'` or  `'none'`. `'none'` leaves the variable as it is.
+    -   name: scale_missing
+        title: Scale on
+        type: List
+        options:
+            -   title: Complete cases
+                name: complete
+            -   title: Columnwise
+                name: colwise
+        default: complete
+    -   name: offset
+        title: Offset
+        type: Variable
+        default: ~
+        description:
+            R: a vector of strings naming the offset variables.
+    -   name: estimates_ci
+        title: For estimates
+        type: Bool
+        default: false
+        description:
+            R: "`TRUE`  or `FALSE` (default), coefficients CI in tables                \n"
+    -   name: vcov
+        title: Coefficients Covariances
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), shows coefficients covariances
+    -   name: crosstab
+        title: Classification Table
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), produces a classification table (predicted vs observed)
+            ui: |
+                Produces a classification table (predicted vs observed)
+    -   name: input_method
+        title: Input Method
+        type: List
+        default: standard
+        options:
+            -   name: standard
+                title: Responses
+            -   name: success
+                title: Success/Failure
+            -   name: total
+                title: P(success)/Totals
+        description:
+            R: |
+                notpresent
+            ui: |
+                The method in which the data are organized. `Responses` is the standard method, in which the dependent variable is a dichotomous variable with two levels.
+                `Success/Failure` expect the data to be a table in which two columns are defined, one indicating success frequencies (level 1)
+                  and the other level 0 frequencies (failure frequencies). `P(Success)/Totals` expect a columnt of proportions of success and the weights (Totals)
+                  of each proportion.
+    -   name: ci_method
+        title: CI Method
+        type: List
+        default: wald
+        options:
+            -   name: wald
+                title: Standard
+            -   name: profile
+                title: Profile
+            -   name: quantile
+                title: Bootstrap Percent
+            -   name: bcai
+                title: Bootstrap BCa
+        description:
+            R: |
+                The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which  the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. `quantile` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.
+            ui: |
+                The method used to compute the confidence intervals. `Standard` uses the Wald method to compute standard errors and confidence intervals. `Profile` computes Profile Likelihood Based Confidence Interval, in which  the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood estimate. `Bootstrap percent` performs a non-parametric boostrap, with `Bootstrap rep` repetitions, and compute the CI based on the percentiles of the boostrap distribution. The `BCa` implements the bias-corrected bootstrap method.
+    -   name: expb_ci
+        title: For exp(B)
+        type: Bool
+        default: true
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , exp(B) CI in table
+    -   name: es
+        title: Effect Size
+        type: NMXList
+        options:
+            -   name: expb
+                title: Odd Ratios (expB)
+            -   name: eta
+                title: η²
+            -   name: RR
+                title: Relative Risk (RR)
+            -   name: marginals
+                title: Marginal Effects
+        default:
+            - expb
+            - eta
+        description:
+            R: |
+                Effect size indices. `expb` (default) exponentiates the coefficients. For dichotomous dependent variables relative risk indices (RR) can be obtained. `marginals` computes the marginal effects.
+            ui: |
+                Effect size indices. `Odd Rations` (default) exponentiates the coefficients. For dichotomous dependent variables `Relative Risk ` indices  can be obtained. `Marginal Effects` computes the marginal effects (if the model allows).
+    -   name: model_type
+        title: Model Selection
+        type: List
+        options:
+            -   name: linear
+                title: Linear
+            -   name: poisson
+                title: Poisson
+            -   name: poiover
+                title: Poisson (overdispersion)
+            -   name: nb
+                title: Negative Binomial
+            -   name: logistic
+                title: Logistic
+            -   name: probit
+                title: Probit
+            -   name: probit
+                title: Probit
+            -   name: beta
+                title: Beta
+            -   name: ordinal
+                title: Ordinal (proportional odds)
+            -   name: multinomial
+                title: Multinomial
+            -   name: custom
+                title: Custom
+        default: linear
+        description:
+            R: |
+                Select the generalized linear model: `linear`,`poisson`,`logistic`,`multinomial`
+    -   name: custom_family
+        title: Distribution
+        type: List
+        options:
+            -   title: Gaussian
+                name: gaussian
+            -   title: Binomial
+                name: binomial
+            -   title: Poisson
+                name: poisson
+            -   title: Inverse gaussian
+                name: inverse.gaussian
+            -   title: Gamma
+                name: Gamma
+        default: gaussian
+        description:
+            R: |
+                Distribution family for the custom model, accepts gaussian, binomial, gamma and inverse_gaussian .
+    -   name: custom_link
+        title: Link Function
+        type: List
+        options:
+            -   title: Identity
+                name: identity
+            -   title: Logit
+                name: logit
+            -   title: Log
+                name: log
+            -   title: Inverse
+                name: inverse
+            -   title: Inverse squared
+                name: 1/mu^2
+            -   title: Square root
+                name: sqrt
+        default: identity
+        description:
+            R: |
+                Distribution family for the custom model, accepts  identity, log and inverse, onemu2 (for 1/mu^2).
+    -   name: propodds_test
+        title: Parallel lines test
+        type: Bool
+        default: false
+        description:
+            R: |
+                Test parallel lines assumptions in cumulative link model (ordinal regression)
+    -   name: preds_phi
+        title: Predictors in precision model
+        type: Bool
+        default: false
+        description:
+            R: |
+                Include the predictors also for the precision phi (beta regression)
+    -   name: plot_scale
+        title: Y-axis scale
+        type: List
+        options:
+            -   name: response
+                title: Response
+            -   name: link
+                title: Linear predictor
+            -   name: mean.class
+                title: Mean class
+        default: response
+        description:
+            R: |
+                Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)

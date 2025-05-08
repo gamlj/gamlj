@@ -1,6 +1,6 @@
-- type: scaffold
-  name: opts_model
-  children:
+-   type: scaffold
+    name: opts_model
+    children:
         - model_type
         - dep
         - factors
@@ -14,119 +14,108 @@
         - df_method
         - contrasts
         - covs_scale
-        - model_type
         - contrast_custom_values
         - donotrun
-
-- type: scaffold
-  name: opts_model_lm
-  children:
+-   type: scaffold
+    name: opts_model_lm
+    children: 
         - robust_method
-
-- type: scaffold
-  name: opts_model_r
-  children:
+-   type: scaffold
+    name: opts_model_r
+    children:
         - reml
         - cluster
         - re
         - re_corr
         - res_struct
-
-
-- type: scaffold
-  name: opts_model_z
-  children:
+-   type: scaffold
+    name: opts_model_z
+    children:
         - offset
         - omnibus
         - custom_family
-        - custom_link  
+        - custom_link
         - dep2
-
-- type: scaffold
-  name: opts_nested
-  children:
+-   type: scaffold
+    name: opts_nested
+    children:
         - nested_terms
         - nested_intercept
         - comparison
-        
-- type: scaffold
-  name: opts_ci
-  children:
+-   type: scaffold
+    name: opts_nested_r
+    children:
+        - nested_re
+
+-   type: scaffold
+    name: opts_ci
+    children:
         - ci_width
         - ci_method
         - boot_r
-        
-- type: scaffold
-  name: opts_es
-  children:
-                 - es
-
-- type: scaffold
-  name: opts_posthoc
-  children:
-                 - adjust
-
-- type: scaffold
-  name: opts_simple_effects
-  children:
-                 - simple_x
-                 - simple_mods
-                 - simple_scale
-                 - ccm_value
-                 - ccp_value
-                 - ccra_steps
-                 - covs_scale_labels
-                 - covs_conditioning
-                 - contrast_custom_focus
-
-- type: scaffold
-  name: opts_cov_scaling
-  children:
-                 - ccm_value
-                 - ccp_value
-                 - ccra_steps
-                 - covs_scale_labels
-                 - covs_conditioning
-                 - contrast_custom_focus
-
-
-- type: scaffold
-  name: opts_plots
-  children:
-           - plot_x
-           - plot_z
-           - plot_by
-           - plot_raw
-           - plot_yscale
-           - plot_xoriginal
-           - plot_black
-           - plot_around
-           - plot_scale
-
-- type: scaffold
-  name: opts_plots_more_y
-  children:
-           - plot_y_min
-           - plot_y_max
-           - plot_y_ticks
-           - plot_y_ticks_exact
-
-- type: scaffold
-  name: opts_plots_more_x
-  children:
-           - plot_x_min
-           - plot_x_max
-           - plot_x_ticks
-           - plot_x_ticks_exact
-           - plot_extra
-
-- type: scaffold
-  name: opts_plots_re
-  children:
-           - plot_re
-           - plot_re_method           
-
-- type: scaffold
-  name: opts_jn_z
-  children:
-     - plot_jn_expb
+-   type: scaffold
+    name: opts_es
+    children: 
+           - es
+-   type: scaffold
+    name: opts_posthoc
+    children: 
+       - adjust
+-   type: scaffold
+    name: opts_simple_effects
+    children:
+        - simple_x
+        - simple_mods
+        - simple_scale
+        - ccm_value
+        - ccp_value
+        - ccra_steps
+        - covs_scale_labels
+        - covs_conditioning
+        - contrast_custom_focus
+-   type: scaffold
+    name: opts_cov_scaling
+    children:
+        - ccm_value
+        - ccp_value
+        - ccra_steps
+        - covs_scale_labels
+        - covs_conditioning
+        - contrast_custom_focus
+-   type: scaffold
+    name: opts_plots
+    children:
+        - plot_x
+        - plot_z
+        - plot_by
+        - plot_raw
+        - plot_yscale
+        - plot_xoriginal
+        - plot_black
+        - plot_around
+        - plot_scale
+        - plot_terms
+-   type: scaffold
+    name: opts_plots_more_y
+    children:
+        - plot_y_min
+        - plot_y_max
+        - plot_y_ticks
+        - plot_y_ticks_exact
+-   type: scaffold
+    name: opts_plots_more_x
+    children:
+        - plot_x_min
+        - plot_x_max
+        - plot_x_ticks
+        - plot_x_ticks_exact
+        - plot_extra
+-   type: scaffold
+    name: opts_plots_re
+    children:
+        - plot_re
+        - plot_re_method
+-   type: scaffold
+    name: opts_jn_z
+    children: 
+        - plot_jn_expb

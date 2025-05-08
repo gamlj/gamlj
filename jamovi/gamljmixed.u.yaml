@@ -301,14 +301,12 @@ children:
                 showColumnHeaders: false
                 columns:
                     -   name: var
-                        label: ~
                         selectable: false
                         stretchFactor: 1
                         maxWidth: 300
                         template:
                             type: VariableLabel
                     -   name: type
-                        label: ~
                         selectable: false
                         stretchFactor: 0.5
                         template:
@@ -345,14 +343,12 @@ children:
                 showColumnHeaders: false
                 columns:
                     -   name: var
-                        label: ~
                         selectable: false
                         stretchFactor: 1
                         maxWidth: 300
                         template:
                             type: VariableLabel
                     -   name: type
-                        label: ~
                         selectable: false
                         stretchFactor: 0.5
                         template:
@@ -384,7 +380,6 @@ children:
                                         children:
                                             -   type: TextBox
                                                 name: ccp_value
-                                                label: ~
                                                 suffix: '%'
                                                 format: number
                                                 enable: (covs_conditioning_percent)
@@ -483,32 +478,74 @@ children:
         collapsed: true
         stretchFactor: 1
         children:
-            -   type: VariableSupplier
-                name: plotsSupplier
-                populate: manual
+            -   type: ModeSelector
+                name: plot_mode
                 stretchFactor: 1
-                persistentItems: false
-                events:
-                    update: ./gamlj.events::onUpdate_plotsSupplier
-                    change: ./gamlj.events::onChange_plotsSupplier
                 children:
-                    -   type: TargetLayoutBox
+                    -   type: Content
+                        name: monoplot
                         children:
-                            -   type: VariablesListBox
-                                name: plot_x
-                                isTarget: true
-                                maxItemCount: 1
-                    -   type: TargetLayoutBox
+                            -   type: VariableSupplier
+                                name: plotsSupplier
+                                populate: manual
+                                stretchFactor: 1
+                                persistentItems: false
+                                events:
+                                    update: ./gamlj.events::onUpdate_plotsSupplier
+                                    change: ./gamlj.events::onChange_plotsSupplier
+                                children:
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: VariablesListBox
+                                                name: plot_x
+                                                isTarget: true
+                                                maxItemCount: 1
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: VariablesListBox
+                                                name: plot_z
+                                                isTarget: true
+                                                maxItemCount: 1
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: VariablesListBox
+                                                name: plot_by
+                                                isTarget: true
+                    -   type: Content
+                        name: multiplot
                         children:
-                            -   type: VariablesListBox
-                                name: plot_z
-                                isTarget: true
-                                maxItemCount: 1
-                    -   type: TargetLayoutBox
-                        children:
-                            -   type: VariablesListBox
-                                name: plot_by
-                                isTarget: true
+                            -   type: VariableSupplier
+                                name: multiplotsSupplier
+                                populate: manual
+                                stretchFactor: 1
+                                persistentItems: true
+                                events:
+                                    update: ./gamlj.events::onUpdate_multiplotsSupplier
+                                    change: ./gamlj.events::onChange_multiplotsSupplier
+                                children:
+                                    -   type: TargetLayoutBox
+                                        children:
+                                            -   type: ListBox
+                                                name: plot_terms
+                                                height: large
+                                                addButton: Add New Term
+                                                events:
+                                                    listItemAdded: ./gamlj.events::onUpdate_plotsSupplier
+                                                    listItemRemoved: ./gamlj.events::onUpdate_plotsSupplier
+                                                selectable: true
+                                                templateName: linreg-block-template
+                                                template:
+                                                    type: LayoutBox
+                                                    margin: normal
+                                                    targetArea: true
+                                                    children:
+                                                        -   type: VariablesListBox
+                                                            name: blockList
+                                                            isTarget: true
+                                                            valueFilter: unique
+                                                            height: auto
+                                                            ghostText: drag variables
+                                                                here
             -   type: LayoutBox
                 margin: large
                 style: inline
