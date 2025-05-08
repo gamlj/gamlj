@@ -359,6 +359,38 @@ Variable <- R6::R6Class(
                 return("wit")
             }
             return("bot")
+        },
+        scale = function(values) {
+
+          
+            if (self$covs_scale == "centered") {
+                values <- values - self$original_descriptive$mean
+            }
+            if (self$covs_scale == "standardized") {
+                values <-  (values - self$original_descriptive$mean)/self$original_descriptive$sd
+            }
+            if (self$covs_scale == "log") {
+                values <- log(values)
+            }
+         
+            values
+          
+        },
+        rescale = function(values) {
+
+          
+            if (self$covs_scale == "centered") {
+                values <- values + self$original_descriptive$mean
+            }
+            if (self$covs_scale == "standardized") {
+                values <- self$original_descriptive$sd * values + self$original_descriptive$mean
+            }
+            if (self$covs_scale == "log") {
+                values <- exp(values)
+            }
+         
+            values
+          
         }
     ), # end of public
     private = list(

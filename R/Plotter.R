@@ -32,7 +32,7 @@ aPlot <- R6::R6Class(
         plot_dodge   = NULL,
         plot_label   = NULL,
         largedata    = NULL,
-        
+        title        = NULL,
         init = function() {
 
             # collect the terms as datamatic objects
@@ -59,8 +59,8 @@ aPlot <- R6::R6Class(
             }
             
             ### set the title for one plot array
-            title<-paste("Plot: ",paste(self$dep,"~",jmvcore::stringifyTerm(c(self$x$name, self$z$name))))
-            self$plotarray$setTitle(title)
+            self$title<-paste("Plot: ",paste(self$dep,"~",jmvcore::stringifyTerm(c(self$x$name, self$z$name))))
+            self$plotarray$setTitle(self$title)
 
             dims <- unlist(lapply(self$moderators, function(mod) mod$levels))
 
@@ -93,11 +93,6 @@ aPlot <- R6::R6Class(
                 self$plot_label <- self$z$name
             }
             
-            if (self$option("plot_xoriginal")) {
-                    self$x_scale <- TRUE
-                    self$warning <- list(topic = "plotnotes", message = "The X-axis is in the X-variable original scale", head = "info")
-            }
-
 
         
             }, ## end of init
@@ -180,7 +175,7 @@ aPlot <- R6::R6Class(
                 ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works
 
                 rawData <- private$.fix_clusters(rawData)
-
+mark(self$cluster)
                 .model <- self$operator$model
 
                 if (self$option("plot_re_method", "average")) {
@@ -202,7 +197,7 @@ aPlot <- R6::R6Class(
                     levels(randomData[[self$x$name64]]) <- self$x$levels_labels
                 }
 
-                self$warning <- list(topic = "plotnotes", message = paste("Random effects are plotted across", self$scatterCluster$name), head = "info")
+                self$warning <- list(topic = "plotnotes", message = paste("In",self$title,"random effects are plotted across", self$cluster$name), head = "info")
                 # prepare a test for between variables to plot dots for random effects
 
                 xbetween <- FALSE
@@ -325,17 +320,15 @@ aPlot <- R6::R6Class(
                     )
                 }
 
-                data[[self$x$name64]] <- private$.rescale(self$x, data[[self$x$name64]])
+                data[[self$x$name64]] <- self$x$rescale(data[[self$x$name64]])
 
                 if (is.something(rawData)) {
-                    rawData[[self$x$name64]] <- private$.rescale(self$x, rawData[[self$x$name64]])
+                    rawData[[self$x$name64]] <- self$x$rescale(rawData[[self$x$name64]])
                 }
                 if (is.something(randomData)) {
-                    randomData[[self$x$name64]] <- private$.rescale(self$x, randomData[[self$x$name64]])
+                    randomData[[self$x$name64]] <- self$x$rescale(randomData[[self$x$name64]])
                 }
             }
-
-
 
 
 
@@ -425,6 +418,7 @@ aPlot <- R6::R6Class(
       
         .estimate     = function(x, terms) {
           
+           # here we estimate the plot data based on the predicted values of the model
             conditions <- list()
             labels <- list()
             for (var in terms) {
@@ -435,23 +429,48 @@ aPlot <- R6::R6Class(
             }
 
             if (x$type == "numeric") {
-                min <- x$descriptive$min
-                max <- x$descriptive$max
+              
+              ### min max should always be in the scale of the variables used to 
+              ## estimate the model. Rescaling should be done afterwards
+              min <- x$descriptive$min
+              max <- x$descriptive$max
+              
+              if (self$option("plot_xoriginal")) {
+                    self$x_scale <- TRUE
+                    self$warning <- list(topic = "plotnotes", 
+                                         message = paste("In", self$title,"variable",x$name," is in the original scale"), 
+                                         head = "info")
+              } 
+                
 
-                if (self$option("plot_extra")) {
+              if (self$option("plot_extra")) {
+                
+                    # if extraploation is required we pass the user min and max
+                    # but if the original scale is also required,
+                    #  the user min and max should be first scaled to the actual scale of the
+                    #  model variables
+                    
                     if (is.number(self$x_range$min)) {
-                        min <- self$x_range$min
+                        if (self$option("plot_xoriginal"))
+                             min <- x$scale(self$x_range$min)
+                        else
+                             min <- self$x_range$min
+                          
                     }
                     if (is.number(self$x_range$max)) {
-                        max <- self$x_range$max
-                    }
-                }
+                      
+                        if (self$option("plot_xoriginal"))
+                             max <- x$scale(self$x_range$max)
+                        else
+                             max <- self$x_range$max
 
-                conditions[[self$x$name64]] <- pretty(c(min, max), n = 30)
-                if (self$option("plot_xoriginal")) {
-                    self$x_scale <- TRUE
-                    self$warning <- list(topic = "plotnotes", message = "The X-axis is in the X-variable original scale", head = "info")
+                    }
+                  
                 }
+                
+                conditions[[self$x$name64]] <- pretty(c(min, max), n = 30)
+               
+                
             }
             allterm64 <- c(x$name64, unlist(sapply(terms, function(x) x$name64)))
 
@@ -516,33 +535,19 @@ aPlot <- R6::R6Class(
             }
             tableData
         },
-        .rescale      = function(varobj, values) {
-            #      len <- sapply(values,function(x)   nchar(as.character(x))-nchar(as.character(trunc(x)))-1)
-            #      len <- max(min(len,na.rm = T),0)
-            if (varobj$covs_scale == "centered") {
-                values <- values + varobj$original_descriptive$mean
-            }
-            if (varobj$covs_scale == "standardized") {
-                values <- varobj$original_descriptive$sd * values + varobj$original_descriptive$mean
-            }
-            if (varobj$covs_scale == "log") {
-                values <- exp(values)
-            }
-
-            values
-        },
         .fix_clusters = function(data) {
-            test <- grep("[\\:\\/]", private$.operator$formulaobj$clusters)
+          
+            test <- grep("[\\:\\/]", self$operator$formulaobj$clusters)
             if (length(test) > 0) {
-                cluster <- private$.operator$formulaobj$clusters[[test]]
+                cluster <- self$operator$formulaobj$clusters[[test]]
                 .clustervars <- stringr::str_split(cluster, "[\\:\\/]")[[1]]
                 name64 <- tob64(cluster)
                 sel <- paste0("data$", name64, "=", "paste0(", paste0("data$", tob64(.clustervars), collapse = ","), ",sep='_')")
                 eval(parse(text = sel))
                 data[[name64]] <- factor(data[[name64]])
-                self$scatterCluster <- list(name = cluster, name64 = name64, nlevels = nlevels(data[[name64]]))
+                self$cluster <- list(name = cluster, name64 = name64, nlevels = nlevels(data[[name64]]))
             } else {
-                self$scatterCluster <- private$.datamatic$variables[[tob64(private$.operator$formulaobj$clusters[[1]])]]
+                self$cluster <- self$datamatic$variables[[tob64(self$operator$formulaobj$clusters[[1]])]]
             }
             return(data)
         }
@@ -638,10 +643,10 @@ Plotter <- R6::R6Class(
 
             if (is.number(image$state$y_range$ticks)) {
                 if (self$option("plot_y_ticks_exact")) {
-                    if (any(sapply(image$state$y_range["min", "max", "ticks"], is.number))) {
+                    if (any(sapply(image$state$y_range[c("min", "max", "ticks")], is.na))) {
                         self$warning <- list(
                             topic = "plotnotes",
-                            message = paste("Exact ticking requires to set min and max"),
+                            message = paste("Exact ticking requires to set min and max and number of ticks"),
                             head = "warning"
                         )
                         p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range))
@@ -749,7 +754,7 @@ Plotter <- R6::R6Class(
 
                 if (is.number(image$state$x_range$ticks)) {
                     if (self$option("plot_x_ticks_exact")) {
-                        if (any(sapply(image$state$x_range["min", "max", "ticks"], is.number))) {
+                        if (any(sapply(image$state$x_range[c("min", "max", "ticks")], is.na))) {
                             self$warning <- list(
                                 topic = "plotnotes",
                                 message = paste("Exact ticking for the X-axis requires to set min and max"),
@@ -791,6 +796,7 @@ Plotter <- R6::R6Class(
             return(p)
         },
         jnPlot = function(image, ggtheme, theme) {
+          
             if (is.null(image$state)) {
                 return()
             }
@@ -843,8 +849,8 @@ Plotter <- R6::R6Class(
             }
             p <- p + ggplot2::xlim(datalist$modrange)
             p <- p + ggplot2::theme(legend.key.size = ggplot2::unit(1, "lines"))
-            p <- p + ggplot2::ylab(paste("Slope of ", self$x$name))
-            p <- p + ggplot2::xlab(self$scatterZ$name)
+            p <- p + ggplot2::ylab(paste("Slope of ", datalist$xname))
+            p <- p + ggplot2::xlab(datalist$zname)
             #  suppressMessages(p <- p + ggtheme)
             p <- p + ggplot2::labs(fill = NULL) + ggplot2::guides(colour = "none")
             return(p)
@@ -1129,15 +1135,15 @@ Plotter <- R6::R6Class(
 
         },
         .initJnPlot = function() {
+          
             if (!self$option("plot_jn")) {
                 return()
             }
-            if (is.null(self$scatterX)) {
-                return()
-            }
-            if (is.null(self$scatterZ)) {
-                return()
-            }
+            if (!is.something(self$options$plot_x))
+              return()
+            if (!is.something(self$options$plot_z))
+              return()
+          
 
             if (self$option("model_type", "ordinal") || self$option("model_type", "multinomial")) {
                 self$warning <- list(
@@ -1147,12 +1153,13 @@ Plotter <- R6::R6Class(
                 )
                 return()
             }
+          
 
             jinfo("PLOTTER: init johnson-neyman plot")
             resultsgroup <- private$.results$get("jnPlots")
 
-            if (is.something(self$scatterModerators)) {
-                plots <- simple_models_labels(self$scatterModerators, private$.operator)
+            if (is.something(self$options$plot_by)) {
+                plots <- simple_models_labels(self$options$plot_by, private$.operator)
                 for (i in 1:nrow(plots)) {
                     resultsgroup$addItem(key = i)
                     resultsgroup$get(key = i)$setTitle(paste(names(plots), plots[i, ], sep = "=", collapse = ","))
@@ -1162,6 +1169,7 @@ Plotter <- R6::R6Class(
             }
         },
         .prepareJnPlot = function() {
+          
             if (!self$option("plot_jn")) {
                 return()
             }
@@ -1172,29 +1180,30 @@ Plotter <- R6::R6Class(
 
             jinfo("PLOTTER: prepare johnson-neyman plot")
 
-            if (is.null(self$scatterX)) {
-                return()
-            }
-
-            if (is.null(self$scatterZ)) {
-                return()
-            }
+            if (!is.something(self$options$plot_x))
+              return()
+            if (!is.something(self$options$plot_z))
+              return()
+            
+            xobj<-private$.datamatic$variables[[tob64(self$options$plot_x)]]
+            zobj<-private$.datamatic$variables[[tob64(self$options$plot_z)]]
+            
 
             ### JN has no meaning if z or x is a factor
 
-            if (self$scatterZ$type == "factor") {
+            if (zobj$type == "factor") {
                 self$warning <- list(
                     topic = "jnplotnotes",
-                    message = paste("Variable", self$scatterZ$name, "is a factor, the Johnson-Neyman plot cannot be computed."),
+                    message = paste("Variable", zobj$name, "is a factor, the Johnson-Neyman plot cannot be computed."),
                     head = "warning"
                 )
                 return()
             }
 
-            if (self$scatterX$type == "factor" && self$scatterX$nlevels > 2) {
+            if (xobj$type == "factor" && xobj$nlevels > 2) {
                 self$warning <- list(
                     topic = "jnplotnotes",
-                    message = paste("Variable", self$scatterX$name, "is a factor with more than 2 levels. The Johnson-Neyman can be be computed
+                    message = paste("Variable", xobj$name, "is a factor with more than 2 levels. The Johnson-Neyman can be be computed
                                            for continuous or dichotomous predictors"),
                     head = "warning"
                 )
@@ -1203,7 +1212,7 @@ Plotter <- R6::R6Class(
 
 
             ### JN fails if there is no interaction between x and z
-            .all <- c(self$scatterZ$name64, self$scatterX$name64)
+            .all <- c(zobj$name64, xobj$name64)
             test <- unlist(sapply(.all, function(x) !(.is.scaleDependent(private$.operator$model, x))))
             .issues <- .all[test]
             if (is.something(.issues)) {
@@ -1221,26 +1230,29 @@ Plotter <- R6::R6Class(
             if (self$option("plot_jn_expb")) expb <- TRUE
 
             model <- private$.operator$model
-            if (self$scatterXscale) {
+            ## deal with rescaling
+            if (self$options$plot_xoriginal) {
                 data <- insight::get_data(model, source = "frame")
-                data[[self$scatterZ$name64]] <- private$.rescale(self$scatterZ, data[[self$scatterZ$name64]])
+                data[[zobj$name64]] <- zobj$rescale(data[[zobj$name64]])
                 self$warning <- list(
                     topic = "jnplotnotes",
-                    message = paste("Variable", self$scatterZ$name, " is in the original scale."), head = "info"
+                    message = paste("Variable", zobj$name, " is in the original scale."), head = "info"
                 )
                 model <- mf.update(model, data = data)
             }
-            if (is.something(self$scatterModerators)) {
-                models <- simple_models(model, tob64(self$scatterModerators), obj = private$.operator)
+             
+            # deal with moderators
+            if (is.something(self$options$plot_by)) {
+                models <- simple_models(model, tob64(self$options$plot_by), obj = private$.operator)
                 for (i in seq_along(models)) {
                     mod <- models[[i]]
-                    datalist <- .johnson_neyman(mod, pred = self$scatterX, mod = self$scatterZ$name64, alpha = .05, expb = expb)
+                    datalist <- .johnson_neyman(mod, pred = xobj, mod = zobj$name64, alpha = .05, expb = expb)
                     aplot <- resultsgroup$get(resultsgroup$itemKeys[[i]])
                     aplot$setState(datalist)
                 }
             } else {
                 aplot <- resultsgroup$get(resultsgroup$itemKeys[[1]])
-                datalist <- .johnson_neyman(model, pred = self$scatterX, mod = self$scatterZ$name64, alpha = .05, expb = expb)
+                datalist <- .johnson_neyman(model, pred = xobj, mod = zobj$name64, alpha = .05, expb = expb)
                 aplot$setState(datalist)
             }
         },
@@ -1541,6 +1553,7 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
 
 
 .johnson_neyman <- function(model, predobj, mod, alpha = .05, expb = FALSE) {
+  
     pred <- predobj$name64
     if (predobj$type == "factor") {
         pred <- predobj$paramsnames64
@@ -1638,7 +1651,9 @@ cbands <- function(x2, y1, y3, covy1, covy3, covy1y3, tcrit) {
         bounds = bounds,
         obsrange = obsrange,
         modrange = modrange,
-        intercept = intercept
+        intercept = intercept,
+        xname=predobj$name,
+        zname=fromb64(mod)
     )
     return(out)
 }
