@@ -1986,7 +1986,9 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             "plot_y_min",
                             "plot_y_max",
                             "plot_y_ticks",
-                            "plot_y_ticks_exact")))))
+                            "plot_y_ticks_exact",
+                            "plot_re",
+                            "plot_re_method")))))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="plotnotes",

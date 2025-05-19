@@ -64,19 +64,21 @@ Saver <- R6::R6Class(
             ######### plot data ##############
 
             if (self$option("export_plot")) {
-                plotgroup <- self$analysis$results$get("mainPlots")
+                plotarray <- self$analysis$results$get("mainPlots")
 
-                if (is.something(plotgroup$items)) {
-                    for (i in seq_along(plotgroup$items)) {
-                        plot <- plotgroup$items[[i]]
+                if (is.something(plotarray$items)) {
+                    for (i in seq_along(plotarray$items)) {
+                      for(j in seq_along(plotarray$items[[i]]$items)) {
+                        plot <- plotarray$items[[i]]$items[[j]]
                         plotdata <- data.frame(plot$state$plotData)
                         names(plotdata) <- fromb64(names(plotdata))
-                        jmvReadWrite:::jmvOpn(dtaFrm = plotdata, dtaTtl = paste0("plotdata", i))
+                        jmvReadWrite:::jmvOpn(dtaFrm = plotdata, dtaTtl = paste0("plotdata", i,"_",j))
                         if ("randomData" %in% names(plot$state)) {
                             rdata <- plot$state$randomData
                             names(rdata)[2] <- names(plotdata)[1]
-                            jmvReadWrite:::jmvOpn(dtaFrm = rdata, dtaTtl = paste0("plotrandom", i))
+                            jmvReadWrite:::jmvOpn(dtaFrm = rdata, dtaTtl = paste0("plotrandom", i,"_",j))
                         }
+                      }
                     }
                 } else {
                     self$warning <- list(

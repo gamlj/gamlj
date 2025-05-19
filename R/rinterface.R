@@ -169,7 +169,6 @@ jnplot <- function(x, formula = NULL, ...) {
 
         plots <- .extract_plots(x, "jnPlots")
     }
-    mark(plots)
     if ("list" %in% class(plots) && length(plots) == 1) {
         plots <- plots[[1]]
     }
@@ -189,10 +188,12 @@ jnplot <- function(x, formula = NULL, ...) {
         return(FALSE)
     }
 
-
-    for (i in 1:length(object[[what]])) {
-        title <- (object[[what]][[i]]$title)
-        gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
+    object<-object[[what]]
+    if (what=="mainPlots") object<-object[[1]]
+    
+    for (i in 1:length(object)) {
+        title <- (object[[i]]$title)
+        gplot <- object[[i]]$plot$fun() + ggplot2::ggtitle(title)
         alist[[i]] <- gplot
     }
     return(alist)

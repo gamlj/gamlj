@@ -175,7 +175,7 @@ aPlot <- R6::R6Class(
                 ### here we want to be sure that clusters passed as cluster1/cluster2 or cluster1:cluster2 works
 
                 rawData <- private$.fix_clusters(rawData)
-mark(self$cluster)
+    
                 .model <- self$operator$model
 
                 if (self$option("plot_re_method", "average")) {
@@ -1110,6 +1110,7 @@ Plotter <- R6::R6Class(
             self$plots<-lapply(seq_along(plot_terms), function(i) {
                   aplot<-aPlot$new(self)
                   aplot$key<-i
+                  aplot$plot_raw<-self$options$plot_raw
                   aplot$type<-"scatter"
                   aplot$subtype <- subtype
                   aplot$operator<-private$.operator

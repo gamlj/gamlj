@@ -353,18 +353,22 @@ options:
         title: Horizontal axis
         type: Variable
         description:
+            ui: "the variable in the horizontal axis of the plot \n"
             R: |
                 a string naming the variable placed on the horizontal axis of the plot
     -   name: plot_z
         title: Separate lines
         type: Variable
         description:
+            ui: "the variable represented as separate lines in the plot  \n"
             R: |
                 a string naming the variable represented as separate lines in the plot
     -   name: plot_by
         title: Separate plots
         type: Variables
         description:
+            ui: |
+                variables defining the levels at which a separate plot should be produced
             R: |
                 a list of variables defining the levels at which a separate plot should be produced.
     -   name: plot_raw
@@ -447,38 +451,43 @@ options:
         type: String
         description:
             R: |
+                not used in R
+            ui: |
                 set the minimum value of the Y-axis
     -   name: plot_x_max
         title: X-axis max
         type: String
         description:
             R: |
+                not used in R
+            ui: |
                 set the max value of the Y-axis
     -   name: plot_x_ticks
         title: X-axis ticks
         type: String
         description:
             R: |
-                set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic X-axis scale.
+                not used in R
             ui: |
-                set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Select `Exact ticks` to obtain an exact number of ticks.
+                set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic X-axis scale.
     -   name: plot_x_ticks_exact
         title: Exact ticks
         type: Bool
         description:
-            R: "set X-axis ticks to exact values (min,..n.ticks..,max). `plot_x_ticks=TRUE`
-                is required. \n"
-            ui: "set X-axis ticks to exact values (min,..n.ticks..,max). `Y ticks`
-                should be provided. \n"
+            R: |
+                not used in R
+            ui: set X-axis ticks to exact values (min,..n.ticks..,max). `X ticks`
+                should be provided
     -   name: plot_extra
         title: Extrapolate
         type: Bool
         description:
             R: |
-                When `plot_x_min` is smaller than the x min or if `plot_x_max` is larger than the x max, whether to extrapolate (to project) the predicted values in the plot beyond the observed values.
-            ui: When `X-axis` min is smaller than the x min in the data or if `X-axis`
-                max is larger than the x max in the data, whether to extrapolate (to
-                project) the predicted values in the plot beyond the observed values.
+                not used in R
+            ui: |
+                When `X-axis` min is smaller than the x min in the data or if `X-axis`
+                max is larger than the x max in the data, whether to extrapolate (to project)
+                the predicted values in the plot beyond the observed values.
     -   name: plot_mode
         title: Mode
         type: List
@@ -495,9 +504,10 @@ options:
         template:
             type: Variables
         description:
-            ui: |
-                the terms to make  plots. Here you can specify multiple terms for multiple plots.
-            R: not present in R
+            R: |
+                not used in R
+            ui: In multiplot tab, the terms to make  plots. Here you can specify multiple
+                terms for multiple plots.
     -   name: covs_scale
         title: Covariates Scaling
         type: Array
