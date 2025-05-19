@@ -415,27 +415,3 @@ testthat::test_that("intercept model comparison", {
 })
 
 
-mod <- GAMLj3::gamlj_lm(
-    data = hsbdemo,
-    formula = science ~ 1 + math * write * read * prog,
-    plot_x = math,
-    plot_z = write,
-    plot_by = c(prog, read)
-)
-object <- mod
-
-pl <- mod$mainPlots[[1]]
-
-pl <- plot(mod)[[1]]
-npl <- pl + ggplot2::scale_x_continuous(
-    breaks = seq(1, 7, by = 1) - 10, # Shift centered values back to original 1-7 scale
-    labels = seq(1, 7, by = 1) # Ensure labels are 1 to 7
-)
-npl
-
-alist <- list()
-for (i in 1:length(object$mainPlots)) {
-    title <- (object$mainPlots[[i]]$title)
-    gplot <- object$mainPlots[[i]]$plot$fun() + ggplot2::ggtitle(title)
-    alist[[i]] <- gplot
-}

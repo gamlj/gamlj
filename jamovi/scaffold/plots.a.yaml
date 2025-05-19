@@ -3,6 +3,8 @@
     type: Variable
     default: ~
     description:
+        ui: |
+            the variable in the horizontal axis of the plot 
         R: |
             a string naming the variable placed on the horizontal axis of the plot
 -   name: plot_z
@@ -10,6 +12,9 @@
     type: Variable
     default: ~
     description:
+        ui: |
+            the variable represented as separate lines in the plot  
+
         R: |
             a string naming the variable represented as separate lines in the plot
 -   name: plot_by
@@ -17,8 +22,11 @@
     type: Variables
     default: ~
     description:
+        ui: |
+              variables defining the levels at which a separate plot should be produced
         R: |
             a list of variables defining the levels at which a separate plot should be produced.
+
 -   name: plot_raw
     title: Observed scores
     type: Bool
@@ -108,7 +116,9 @@
     type: String
     default: ''
     description:
-        R: |
+        R:  |
+            not used in R
+        ui: |
             set the minimum value of the Y-axis
 -   name: plot_y_max
     title: Y-axis max
@@ -120,8 +130,8 @@
     title: Y-axis ticks
     type: String
     description:
-        R: |
-            set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic Y-axis scale.
+        R:  |
+            not used in R
         ui: |
             set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Select `Exact ticks` to obtain an exact number of ticks.
 -   name: plot_y_ticks_exact
@@ -136,37 +146,45 @@
     title: X-axis min
     type: String
     description:
-        R: |
+        R:  |
+            not used in R
+        ui: |
             set the minimum value of the Y-axis
 -   name: plot_x_max
     title: X-axis max
     type: String
     description:
-        R: |
+        R:  |
+            not used in R
+
+        ui: |
             set the max value of the Y-axis
 -   name: plot_x_ticks
     title: X-axis ticks
     type: String
     description:
-        R: |
-            set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic X-axis scale.
+        R:  |
+            not used in R
+
         ui: |
-            set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Select `Exact ticks` to obtain an exact number of ticks.
+            set the number of Y-axis ticks. Number of ticks is only approximate, because the algorithm may choose a slightly different number to ensure nice break labels.  Use `plot_y_ticks=TRUE` to obtain an exact number of ticks. Leave empty for  automatic X-axis scale.
+
 -   name: plot_x_ticks_exact
     title: Exact ticks
     type: Bool
     description:
-        R: "set X-axis ticks to exact values (min,..n.ticks..,max). `plot_x_ticks=TRUE`
-            is required. \n"
-        ui: "set X-axis ticks to exact values (min,..n.ticks..,max). `Y ticks` should
-            be provided. \n"
+        R:  |
+            not used in R
+        ui: "set X-axis ticks to exact values (min,..n.ticks..,max). `X ticks` should be provided"
 -   name: plot_extra
     title: Extrapolate
     type: Bool
     description:
-        R: |
-            When `plot_x_min` is smaller than the x min or if `plot_x_max` is larger than the x max, whether to extrapolate (to project) the predicted values in the plot beyond the observed values.
-        ui: When `X-axis` min is smaller than the x min in the data or if `X-axis`
+        R:  |
+            not used in R
+
+        ui: |
+            When `X-axis` min is smaller than the x min in the data or if `X-axis`
             max is larger than the x max in the data, whether to extrapolate (to project)
             the predicted values in the plot beyond the observed values.
 
@@ -180,7 +198,7 @@
                 title: One plot
             -   name: multiplot
                 title: Multiple
-
+  
 -   name: plot_terms
     title: Plot terms
     type: Array
@@ -189,8 +207,8 @@
     template:
         type: Variables
     description:
-          ui: >
-            the terms to make  plots. Here you can specify
+        R:  |
+            not used in R
+        ui: >
+            In multiplot tab, the terms to make  plots. Here you can specify
             multiple terms for multiple plots.
-          R: >
-            not present in R

@@ -107,7 +107,7 @@ testthat::test_that("glm contrasts", {
 })
 
 testthat::test_that("gzlm plot", {
-    testthat::expect_is(mod$mainPlots[[1]], "Image")
+    testthat::expect_is(mod$mainPlots[[1]][[1]], "Image")
 })
 
 testthat::test_that("gzlm CI width", {
@@ -393,3 +393,4 @@ mod <- GAMLj3::gamlj_glm(
 testthat::test_that("multinomial comparison", {
     testthat::expect_equal(mod$main$r2$asDF[3, 2], .0061, tol)
 })
+

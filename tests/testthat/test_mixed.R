@@ -135,7 +135,7 @@ testthat::test_that("ranova works", {
 })
 
 testthat::test_that("mixed plot works", {
-    testthat::expect_true(ggplot2::is.ggplot(model$mainPlots[[1]]$plot$fun()))
+    testthat::expect_true(ggplot2::is.ggplot(model$mainPlots[[1]][[1]]$plot$fun()))
     testthat::expect_true(ggplot2::is.ggplot(plot(model)))
 })
 
@@ -301,13 +301,16 @@ testthat::test_that("order does not count", {
     testthat::expect_equal(gobj$main$anova$asDF[1, 2], gobj2$main$anova$asDF[1, 2])
 })
 
+testthat::expect_warning(
 gobj <- GAMLj3::gamlj_mixed(
     formula = dv ~ 1 + group + time + group:time + (1 | subj),
     data = data,
     res_struct = "un"
+)
 )
 
 testthat::test_that("unstructured covariances", {
     testthat::expect_equal(gobj$main$anova$asDF$f[2], 27.784, tol)
     testthat::expect_equal(gobj$main$res_corr$asDF[2, 2], .185, tol)
 })
+
