@@ -8,7 +8,12 @@ const events = {
         console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
 
-      
+        const desktop = window.origin.includes("127.0.0.1")
+        
+        if (!desktop) {
+          ui.panel_save.$el.hide();
+        }
+
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
