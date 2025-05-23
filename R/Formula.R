@@ -27,6 +27,7 @@ gFormula <- R6::R6Class(
             private$.rhsfixed(tob64(self$fixed))
         },
         random_formula = function() {
+       
             alist <- private$.buildrandom(self$random, self$random_corr, "plain")
             if (is.something(alist)) {
                 paste("(", alist, ")", collapse = " + ")
@@ -156,7 +157,9 @@ gFormula <- R6::R6Class(
             # remove empty sublists
             alist <- alist[sapply(alist, function(a) !is.null(unlist(a)))]
             # get clusters
+
             self$clusters <- unique(unlist(lapply(alist, function(z) lapply(z, function(x) x[length(x)]))))
+            mark(self$clusters)
             ## this is for R. It overrides the re_corr option
 
             if (length(alist) > 1) {
@@ -171,11 +174,14 @@ gFormula <- R6::R6Class(
             }
             ## we want to be sure that each cluster has its own list
             r <- list()
-            for (x in alist) {
-                for (cluster in self$clusters) {
+            alist64<-tob64(alist)
+            clusters64<-tob64(self$clusters)
+            for (x in alist64) {
+                for (cluster in clusters64) {
+                  mark(cluster,x)
                     w <- grep(cluster, x)
                     if (length(w) > 0) {
-                        ladd(r) <- x[w]
+                        ladd(r) <- fromb64(x[w])
                     }
                 }
             }
@@ -183,6 +189,7 @@ gFormula <- R6::R6Class(
 
             ## we want to be sure that the terms are ordered by order
             alist <- lapply(alist, function(x) x[order(sapply(x, length))])
+           
             private$.random <- alist
         },
         random_corr = function(avalue) {
@@ -214,6 +221,7 @@ gFormula <- R6::R6Class(
             gsub("`0`", 0, gsub("`1`", 1, jmvcore::composeFormula(NULL, terms)))
         },
         .buildrandom = function(terms, correl, encoding) {
+        
             .intercept <- "Intercept"
             if (encoding == "b64") {
                 terms <- lapply(terms, function(term) {

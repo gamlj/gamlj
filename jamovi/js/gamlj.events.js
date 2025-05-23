@@ -3,12 +3,19 @@ var rtermFormat = require('./rtermFormat');
 var fun=require('./functions');
 
 const events = {
+  
+  
+  
     update: function(ui) {
       
         console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
 
-      
+        
+        if (fun.isCloud(window)) {
+          ui.panel_save.$el.hide();
+        }
+
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
