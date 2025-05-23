@@ -3,6 +3,34 @@ var rtermFormat = require('./rtermFormat');
 
 const fun = {
 
+
+    isCloud: function(window) {
+      
+        let detectedEnvironment = 'unknown'; // Default to 'unknown'
+
+        if (typeof window !== 'undefined' && window.origin) {
+            const origin = window.origin;
+
+            // Simple protocol-based detection
+            if (origin.startsWith('https://')) {
+                detectedEnvironment = 'cloud'; // Assume HTTPS implies cloud
+            } else if (origin.startsWith('http://')) {
+                detectedEnvironment = 'desktop'; // Assume HTTP implies desktop/local
+            }
+            // For any other protocol (e.g., file://, or non-standard)
+            else {
+                detectedEnvironment = 'other_protocol';
+            }
+        } else {
+            detectedEnvironment = 'no_browser_context'; // 'window' or 'window.origin' not available
+        }
+        console.log('Detected Environment:', detectedEnvironment);
+        return(detectedEnvironment === "cloud")
+
+      },
+
+
+
     calcModelTerms: function(ui, context) {
     var variableList = context.cloneArray(ui.factors.value(), []);
     var covariatesList = context.cloneArray(ui.covs.value(), []);

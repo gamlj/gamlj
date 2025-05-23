@@ -3,14 +3,16 @@ var rtermFormat = require('./rtermFormat');
 var fun=require('./functions');
 
 const events = {
+  
+  
+  
     update: function(ui) {
       
         console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
 
-        const desktop = window.origin.includes("127.0.0.1")
         
-        if (!desktop) {
+        if (fun.isCloud(window)) {
           ui.panel_save.$el.hide();
         }
 
