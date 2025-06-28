@@ -90,10 +90,9 @@ aPlot <- R6::R6Class(
                 self$plot_label <- paste(self$z$name, paste0("(", toupper(self$options$plot_around), ")"), sep = "\n")
             } else {
                 self$plot_dodge <- ggplot2::position_dodge(0)
-                self$plot_label <- self$z$name
             }
             
-
+            self$plot_label <- self$z$name
         
             }, ## end of init
         prepare= function() {
@@ -410,6 +409,7 @@ aPlot <- R6::R6Class(
                     attr(rdata, "xbetween") <- xbetween
                     state[["randomData"]] <- rdata
                 }
+               
                 aplot$setState(state)
             }
           } # end of prepare
@@ -614,7 +614,7 @@ Plotter <- R6::R6Class(
             plotobj<-self$plots[[key]]
             ## collect the data
             data <- image$state$plotData
-           
+            plotobj_label<-NULL
 
             linesdiff <- (theme$bw || self$options$plot_black)
             ### prepare aestetics for one or two way scatterplot
@@ -624,6 +624,7 @@ Plotter <- R6::R6Class(
                 .aesbar <- ggplot2::aes(x = x, ymin = lower, ymax = upper)
             } else {
                 names(data)[1:2] <- c("x", "z")
+                plotobj_label<-plotobj$z$name
                 if (isFALSE(linesdiff)) {
                     .aestetics <- ggplot2::aes(x = x, y = estimate, group = z, colour = z)
                     .aesbar <- ggplot2::aes(x = x, ymin = lower, ymax = upper, group = z, color = z, fill = z)
@@ -774,9 +775,9 @@ Plotter <- R6::R6Class(
 
             p <- p + ggplot2::labs(
                 x = plotobj$x$name, y = plotobj$y$name,
-                colour = plotobj$label,
-                shape = plotobj$label,
-                linetype = plotobj$label
+                colour = plotobj_label,
+                shape = plotobj_label,
+                linetype = plotobj_label
             )
 
             if (self$options$plot_black) {

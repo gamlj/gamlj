@@ -1,7 +1,7 @@
 ---
 title: General Analyses for Linear Models (v3)
 name: GAMLj3
-version: 3.6.0
+version: 3.6.1
 jms: '1.0'
 authors:
   - Marcello Gallucci
@@ -31,6 +31,7 @@ analyses:
 
       interactions, simple slopes, simple effects, post-hoc tests, contrast
       analysis, effect size indexes and visualization of the results.
+    category: analyses
   - title: Linear Mixed Model
     name: gamljmixed
     ns: GAMLj3
@@ -39,6 +40,7 @@ analyses:
     menuTitle: Linear Mixed Model
     description: |
       Mixed Linear Model
+    category: analyses
   - title: Generalized Linear Model
     name: gamljglm
     ns: GAMLj3
@@ -46,6 +48,7 @@ analyses:
     menuSubgroup: GAMLj3
     menuTitle: Generalized Linear Model
     description: Generalized Linear Model
+    category: analyses
   - title: Generalized Mixed Model
     name: gamljgmixed
     ns: GAMLj3
@@ -54,6 +57,7 @@ analyses:
     menuTitle: Generalized Mixed Model
     description: |
       Generalized Mixed  Model
+    category: analyses
 datasets:
   - name: qsport
     path: qsport.csv
