@@ -10,7 +10,6 @@ const events = {
       
         console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
-
         
         if (fun.isCloud(window)) {
           ui.panel_save.$el.hide();

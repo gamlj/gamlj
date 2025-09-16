@@ -16,18 +16,20 @@ get_data(object, ...)
 a dataset
 }
 \description{
-This function returns a dataset with the variables in the GAMLj model 
-transformed according to GAMLj options. It is usefull to run additional 
+This function returns a dataset with the variables in the GAMLj model
+transformed according to GAMLj options. It is usefull to run additional
 models with other R packages with the same setup used by GAMLj
 }
 \examples{
-data('qsport')
-gmod<-GAMLj3::gamlj_lm(formula = performance ~ hours,
-                data = qsport,
-                covs_scale = c(hours='standardized'))
+data("qsport")
+gmod <- GAMLj3::gamlj_lm(
+    formula = performance ~ hours,
+    data = qsport,
+    covs_scale = c(hours = "standardized")
+)
 
-gdata<-get_data(gmod)
-lm(performance ~ hours,data=gdata)
+gdata <- get_data(gmod)
+lm(performance ~ hours, data = gdata)
 }
 \author{
 Marcello Gallucci

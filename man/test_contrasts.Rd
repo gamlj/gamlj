@@ -23,12 +23,13 @@ custom contrast.
 }
 \examples{
 data(fivegroups)
-fivegroups$Group<-factor(fivegroups$Group)
-gmod<-GAMLj3::gamlj_lm(
-  formula = Score ~Group,
-  data = fivegroups)
+fivegroups$Group <- factor(fivegroups$Group)
+gmod <- GAMLj3::gamlj_lm(
+    formula = Score ~ Group,
+    data = fivegroups
+)
 
-em_means(gmod,formula =~Group)
+em_means(gmod, formula = ~Group)
 }
 \author{
 Marcello Gallucci

@@ -105,8 +105,8 @@ for nested model. It can be passed as right-hand formula.}
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , coefficients CI
 in tables}
 
-\item{ci_method}{The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard 
-errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+\item{ci_method}{The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
+errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which
 the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
 estimate. `quantile` performs a non-parametric boostrap, with `boot_r` repetitions, and compute
 the CI based on the percentiles of the boostrap distribution. `bcai` implements the bias-corrected bootstrap method.}
@@ -248,16 +248,17 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Generalized Linear Model with options to estimate logistic, probit, 
+Generalized Linear Model with options to estimate logistic, probit,
 ordinal, multinomial and custum link function models. Provides options
 to estimate posthoc, simple effects and slopes, plots of main effects and
 interaction. Model comparison is also an option.
 }
 \examples{
-   data <- emmeans::neuralgia
-   GAMLj3::gamlj_glm(formula = Pain ~ Duration,
-                    data = data,
-                    model_type = "logistic"
-                    )
-     
+data <- emmeans::neuralgia
+GAMLj3::gamlj_glm(
+    formula = Pain ~ Duration,
+    data = data,
+    model_type = "logistic"
+)
+
 }

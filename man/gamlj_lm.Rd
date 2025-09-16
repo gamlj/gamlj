@@ -193,7 +193,7 @@ simple effects and plots. Used if \code{covs_conditioning}=\code{'mean_sd'}}
 condition simple effects and plots. Used if
 \code{simpleScale}=\code{'percent'}}
 
-\item{ccra_steps}{Covariate condition  steps from min to max: 
+\item{ccra_steps}{Covariate condition  steps from min to max:
 At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
 
 \item{covs_scale_labels}{how the levels of a continuous moderator should
@@ -221,7 +221,7 @@ for epsilon-squared, \code{'epsilonp'} for partial epsilon-squared  and
 \item{homo_test}{\code{TRUE} or \code{FALSE} (default), performs homogeneity
 tests}
 
-\item{colli_test}{\code{TRUE} or \code{FALSE} (default), computes VIF and Tollerance 
+\item{colli_test}{\code{TRUE} or \code{FALSE} (default), computes VIF and Tollerance
 for the terms in the model}
 
 \item{qq_plot}{\code{TRUE} or \code{FALSE} (default), provide a Q-Q plot of
@@ -244,9 +244,9 @@ about the effect size indexes}
 
 \item{dep_scale}{Re-scale the dependent variable.}
 
-\item{se_method}{Method to compute the standard error. 
-Classical standard errors is the default \code{standard}. 
-Four methods for  heteroschedasticy-consistent 
+\item{se_method}{Method to compute the standard error.
+Classical standard errors is the default \code{standard}.
+Four methods for  heteroschedasticy-consistent
 standard errors are available: \code{HC0},
 \code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
 See \code{\link[sandwich]{vcovHC}} for details.}
@@ -287,12 +287,12 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-General Linear Model. Estimates models using \code{lm()} function and 
-provides options to facilitate estimation of 
-interactions, simple slopes, simple effects, post-hoc tests, contrast 
+General Linear Model. Estimates models using \code{lm()} function and
+provides options to facilitate estimation of
+interactions, simple slopes, simple effects, post-hoc tests, contrast
 analysis, effect size indexes and visualization of the results.
 }
 \examples{
-data('ToothGrowth')
-GAMLj3::gamlj_lm(formula = len ~ supp,  data = ToothGrowth)
+data("ToothGrowth")
+GAMLj3::gamlj_lm(formula = len ~ supp, data = ToothGrowth)
 }

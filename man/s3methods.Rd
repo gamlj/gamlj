@@ -53,17 +53,19 @@ and print them in R style.
 }
 \examples{
 data(fivegroups)
-fivegroups$Group<-factor(fivegroups$Group)
-gmod<-GAMLj3::gamlj_lm(
-  formula = Score ~Group,
-  data = fivegroups)
+fivegroups$Group <- factor(fivegroups$Group)
+gmod <- GAMLj3::gamlj_lm(
+    formula = Score ~ Group,
+    data = fivegroups
+)
 
 summary(gmod)
 data(fivegroups)
-fivegroups$Group<-factor(fivegroups$Group)
-gmod<-GAMLj3::gamlj_lm(
-  formula = Score ~Group,
-  data = fivegroups)
+fivegroups$Group <- factor(fivegroups$Group)
+gmod <- GAMLj3::gamlj_lm(
+    formula = Score ~ Group,
+    data = fivegroups
+)
 
 summary(gmod)
 }

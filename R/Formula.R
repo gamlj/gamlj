@@ -159,7 +159,6 @@ gFormula <- R6::R6Class(
             # get clusters
 
             self$clusters <- unique(unlist(lapply(alist, function(z) lapply(z, function(x) x[length(x)]))))
-            mark(self$clusters)
             ## this is for R. It overrides the re_corr option
 
             if (length(alist) > 1) {
