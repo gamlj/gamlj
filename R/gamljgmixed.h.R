@@ -65,8 +65,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             plot_x_min = NULL,
             plot_x_max = NULL,
             plot_x_ticks = NULL,
-            plot_x_ticks_exact = NULL,
-            plot_extra = NULL,
+            plot_x_ticks_exact = FALSE,
+            plot_extra = FALSE,
             plot_re = FALSE,
             plot_re_method = "average",
             plot_scale = "response",
@@ -396,10 +396,12 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 plot_x_ticks)
             private$..plot_x_ticks_exact <- jmvcore::OptionBool$new(
                 "plot_x_ticks_exact",
-                plot_x_ticks_exact)
+                plot_x_ticks_exact,
+                default=FALSE)
             private$..plot_extra <- jmvcore::OptionBool$new(
                 "plot_extra",
-                plot_extra)
+                plot_extra,
+                default=FALSE)
             private$..plot_re <- jmvcore::OptionBool$new(
                 "plot_re",
                 plot_re,

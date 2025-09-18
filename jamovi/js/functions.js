@@ -266,17 +266,17 @@ const fun = {
    fix_comparison:function(ui, context) {
   
             if (ui.comparison.getValue()===true) {
-              
-              ui.nested_layout.$buttons.show();
-              ui.nested_layout.$label.show();
-              ui.nested_layout.container.$el.show();
-              ui.model_terms.$el.height("113px");
+               ui.nested_layout.buttons.style.display='';
+               ui.nested_layout.label.style.display='';
+               ui.nested_layout.container.el.style.display='';
+               ui.model_terms.el.style.height = '113px';
              
-             if (ui.nested_re !== undefined) { 
-                 ui.nested_re_layout.$buttons.show();
-                 ui.nested_re_layout.$label.show();
-                 ui.nested_re_layout.container.$el.show();
-                 ui.re.$el.height("113px");
+               if (ui.nested_re !== undefined) { 
+                  ui.nested_re_layout.buttons.style.display='';
+                  ui.nested_re_layout.label.style.display='';
+                  ui.nested_re_layout.container.el.style.display='';
+                  ui.re.el.style.height = '113px';
+                 
                  var renested=context.cloneArray(ui.nested_re.value(), [[]]);
                  if (renested[0].length === 0) {
                          var relist=context.cloneArray(ui.re.value(), [[]]);
@@ -285,19 +285,20 @@ const fun = {
              }
 
             } else {
-              ui.nested_layout.$buttons.hide();
-              ui.nested_layout.$label.hide();
-              ui.nested_layout.container.$el.hide();
+              
+              ui.nested_layout.buttons.style.display='none';
+              ui.nested_layout.label.style.display='none';
+              ui.nested_layout.container.el.style.display='none';
+              ui.model_terms.el.style.height = '246.315px';
               ui.nested_terms.setValue([]);
-              ui.model_terms.$el.height("246.315px");
-
+              
               if (ui.nested_re !== undefined) { 
              
                   ui.nested_re.setValue([[]]);
-                  ui.nested_re_layout.$buttons.hide();
-                  ui.nested_re_layout.$label.hide();
-                  ui.nested_re_layout.container.$el.hide();
-                  ui.re.$el.height("243.315px");
+                  ui.nested_re_layout.buttons.style.display='none';
+                  ui.nested_re_layout.label.style.display='none';
+                  ui.nested_re_layout.container.el.style.display='none';
+                  ui.re.el.style.height = '243.315px';
                   
               }
 

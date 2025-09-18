@@ -77,7 +77,7 @@ mplots <- plot(mod)
 
 testthat::test_that("plot ok", {
     testthat::expect_true(is.list(mplots))
-    testthat::expect_true(ggplot2::is.ggplot(mplots[[1]]))
+    testthat::expect_true(ggplot2::is_ggplot(mplots[[1]]))
 })
 
 data("subjects_by_stimuli")
@@ -116,7 +116,7 @@ mplot <- plot(mod1)
 
 testthat::test_that(
     "plot ok",
-    testthat::expect_true(ggplot2::is.ggplot(mplot))
+    testthat::expect_true(ggplot2::is_ggplot(mplot))
 )
 data("wicksell")
 wicksell$time <- factor(wicksell$time)
