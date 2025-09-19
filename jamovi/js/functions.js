@@ -146,12 +146,12 @@ const fun = {
     ui.contrast_custom_values.setValue(customList);
     
     if (customList.length>0) {
-        ui.custom_values.$el.show();
-        ui.contrast_focus_box.$el.show();
+        ui.custom_values.el.style.display='';
+        ui.contrast_focus_box.el.style.display='';
     } else {
-        ui.custom_values.$el.hide();
+        ui.custom_values.el.style.display='none';
         ui.contrast_custom_focus.setValue(false);
-        ui.contrast_focus_box.$el.hide();
+        ui.contrast_focus_box.el.style.display='none';
 
     }
     
@@ -343,7 +343,7 @@ const fun = {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
                  var button= ui.re.addButton;
-                     button.style.visibility="hidden";
+                     button.style.display="hidden";
                  const target= ui.re;
                        target.setValue(Array(one));
                  const cell = target.el.querySelectorAll("jmv-layoutcell")[1];
@@ -466,8 +466,8 @@ const fun = {
 
         // restore in case users used logistic second dep field
         if (typeof ui.dep2 !== 'undefined' ) {
-             ui.dep_box.$label.text("Dependent Variable");
-             ui.dep2.$el.hide();
+             ui.dep_box.label.textContent="Dependent Variable";
+             ui.dep2.el.style.display='none';
           
         }
         
@@ -516,9 +516,9 @@ const fun = {
 
         if (typeof ui.propodds_test !== 'undefined') {
               if (ui.model_type.getValue()==="ordinal") {
-                  ui.propodds_test.$el.show();
+                  ui.propodds_test.el.style.display='';
               } else {
-                  ui.propodds_test.$el.hide();
+                  ui.propodds_test.el.style.display='none';;
               }
         }
 
@@ -526,9 +526,9 @@ const fun = {
         if (typeof ui.preds_phi !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="beta") {
-              ui.precision.$el.show();
+              ui.precision.el.style.display='';
             } else {
-              ui.precision.$el.hide();
+              ui.precision.el.style.display='none';
             }
         }
         // model specific options 
@@ -541,7 +541,7 @@ const fun = {
         
       // deal with extra field of logistic by tables
        if (typeof ui.dep_box !== 'undefined' ) {
-              ui.dep_box.$label.textContent="Dependent Variable";
+              ui.dep_box.label.textContent="Dependent Variable";
        }
        
        if (typeof ui.input_method !== 'undefined' ) {
@@ -551,16 +551,16 @@ const fun = {
               const models=["logistic","probit"];
               
               if (models.includes(ui.model_type.getValue())) {
-              
-                   ui.input_method.$input.show();
-                   ui.input_method.$label.show();
+              console.log(ui.input_method)
+                   ui.input_method.input.style.display='';
+                   ui.input_method.$label.style.display='';
                    if (["success","total"].includes(ui.input_method.value()))
-                           ui.dep2.$el.show();
+                           ui.dep2.el.style.display='';
 
               } else {
-                   ui.input_method.$input.hide();
-                   ui.input_method.$label.hide();
-                   ui.dep2.$el.hide();
+                   ui.input_method.input.style.display='none';
+                   ui.input_method.label.style.display='none';
+                   ui.dep2.el.style.display='none';
 
               }
               this.updateInputMethod(ui,context);
@@ -585,28 +585,28 @@ const fun = {
     
        
        if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
-           ui.dep_box.$label.text("Dependent Variable");
+           ui.dep_box.label.textContent="Dependent Variable";
            ui.dep2.setValue(null);
           return ;
         }   
         
       if (ui.input_method.value() === "success") {
-        ui.dep_box.$label.text("Successes/Failures");
-        ui.dep2.$el.show();
+        ui.dep_box.label.textContent="Successes/Failures";
+        ui.dep2.el.style.display='';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
 
       }
       if (ui.input_method.value() === "total") {
-        ui.dep_box.$label.text("Successes/Totals");
-        ui.dep2.$el.show();
+        ui.dep_box.label.textContent="Successes/Totals";
+        ui.dep2.el.style.display='';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
       }
       if (ui.input_method.value() === "standard") {
-        ui.dep_box.$label.text("Dependent Variable");
+        ui.dep_box.label.textContent="Dependent Variable";
         ui.dep2.setValue(null);
-        ui.dep2.$el.hide();
+        ui.dep2.el.style.display='none';
         ui.crosstab.setEnabled(true);
       }
       
@@ -618,9 +618,9 @@ const fun = {
            return
           
         if (ui.plot_more_options.value() == true)   {
-           ui.plot_more_option_box.$el.show();
+           ui.plot_more_option_box.el.el.style.display='';
         } else {
-           ui.plot_more_option_box.$el.hide();
+           ui.plot_more_option_box.el.style.display='none';
            if (typeof ui.plot_y_min !== 'undefined')
                    ui.plot_y_min.setValue("");
            if (typeof ui.plot_y_max !== 'undefined')

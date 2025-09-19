@@ -12,7 +12,7 @@ const events = {
         this.setCustomVariable("Intercept", "none", "");
         
         if (fun.isCloud(window)) {
-          ui.panel_save.$el.hide();
+          ui.panel_save.el.style.display='none';
         }
 
         fun.calcModelTerms(ui, this);
@@ -41,9 +41,9 @@ const events = {
         if (typeof ui.preds_phi !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="beta") {
-              ui.precision.$el.show();
+              ui.precision.el.style.display='';
             } else {
-              ui.precision.$el.hide();
+              ui.precision.el.style.display='none';
             }
         }
         
@@ -187,14 +187,14 @@ const events = {
       var clusters=this.cloneArray(ui.cluster.value(), []);
       if (clusters.length>1) {
         if (ui.re_nested !== undefined) {
-         ui.re_nestedclusters.$el.show();
-         ui.re_crossedclusters.$el.show();
+         ui.re_nestedclusters.el.style.display='';
+         ui.re_crossedclusters.el.style.display='';
         }
 
       } else {
         if (ui.re_nested !== undefined) {
-           ui.re_nestedclusters.$el.hide();
-           ui.re_crossedclusters.$el.hide();
+           ui.re_nestedclusters.el.style.display='none';
+           ui.re_crossedclusters.el.style.display='none';
         }
       }
         fun.updateRandomSupplier(ui,this);
