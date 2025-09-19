@@ -278,7 +278,6 @@ const fun = {
                   ui.re.el.style.height = '113px';
                   // remove possibility to kill the first row
                   const borderGrid = ui.nested_re.controls[0].el;
-                  console.log(borderGrid)
                   const button = borderGrid.querySelector("button.list-item-delete-button");
                         button.style.visibility="hidden";
 
@@ -343,7 +342,7 @@ const fun = {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
                  var button= ui.re.addButton;
-                     button.style.display="hidden";
+                     button.style.visibility="hidden";
                  const target= ui.re;
                        target.setValue(Array(one));
                  const cell = target.el.querySelectorAll("jmv-layoutcell")[1];
