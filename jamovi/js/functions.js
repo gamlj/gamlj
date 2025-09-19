@@ -501,13 +501,13 @@ const fun = {
           
             var odds=["logistic","probit","multinomial","ordinal"]
             var irr=["poisson","poiover","nb"]
-            ui.es_expb.$label.text("Exp(B)") 
+            ui.es_expb.label.textContent="Exp(B)"; 
             
             if (odds.includes(ui.model_type.getValue())) {
-               ui.es_expb.$label.text("Odd Rations (expB)") 
+               ui.es_expb.label.textContent="Odd Rations (expB)"; 
             } 
             if (irr.includes(ui.model_type.getValue())) {
-               ui.es_expb.$label.text("Incidence rate ratios (expB)") 
+               ui.es_expb.label.textContent="Incidence rate ratios (expB)"; 
             } 
 
         }
@@ -551,9 +551,9 @@ const fun = {
               const models=["logistic","probit"];
               
               if (models.includes(ui.model_type.getValue())) {
-              console.log(ui.input_method)
+             
                    ui.input_method.input.style.display='';
-                   ui.input_method.$label.style.display='';
+                   ui.input_method.label.style.display='';
                    if (["success","total"].includes(ui.input_method.value()))
                            ui.dep2.el.style.display='';
 

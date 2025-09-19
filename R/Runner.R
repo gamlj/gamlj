@@ -126,6 +126,7 @@ Runner <- R6::R6Class("Runner",
             return(tab)
         },
         run_main_crosstab = function() {
+          
             y <- stats::model.response(stats::model.frame(self$model))
             fitted <- stats::predict(self$model)
             if (is.numeric(fitted)) fitted <- (exp(fitted) / (1 + exp(fitted))) > .5
