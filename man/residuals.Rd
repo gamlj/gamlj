@@ -32,12 +32,13 @@ a R object of the class of the estimated model
 Returns residuals values from the estimated model
 }
 \examples{
-data('qsport')
-gmod<-GAMLj3::gamlj_lm(
-   formula = performance ~ hours,
-   data = qsport)
- preds<-residuals(gmod)
- 
+data("qsport")
+gmod <- GAMLj3::gamlj_lm(
+    formula = performance ~ hours,
+    data = qsport
+)
+preds <- residuals(gmod)
+
 }
 \author{
 Marcello Gallucci

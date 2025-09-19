@@ -18,17 +18,18 @@ It can be passed also as a a right-hand side formula specifying terms of the nes
 a list of tables of class `ResultsElement`
 }
 \description{
-This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no option is passed, extracts the 
+This is a convenience function to extract the ANOVA table (omnibus tests) from a GAMLj model. If no option is passed, extracts the
 ANOVA tests table already in the model results (if any). If two GAMLj models are provided, a model comparison is produces. Any option
 accepted by gamlj model can be passed.
 are returned.
 }
 \examples{
 data(fivegroups)
-fivegroups$Group<-factor(fivegroups$Group)
-gmod<-GAMLj3::gamlj_lm(
-  formula = Score ~Group,
-  data = fivegroups)
+fivegroups$Group <- factor(fivegroups$Group)
+gmod <- GAMLj3::gamlj_lm(
+    formula = Score ~ Group,
+    data = fivegroups
+)
 
 anova(gmod)
 }

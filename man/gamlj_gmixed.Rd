@@ -118,8 +118,8 @@ coefficients. For dichotomous dependent variables relative risk indices
 \item{estimates_ci}{\code{TRUE}  or \code{FALSE} (default), parameters CI
 in table}
 
-\item{ci_method}{The method used to compute the confidence intervals. \code{'wald'} uses the Wald method to compute standard 
-errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which 
+\item{ci_method}{The method used to compute the confidence intervals. \code{'wald'} uses the Wald method to compute standard
+errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which
 the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
 estimate. \code{'quantile'} performs a non-parametric boostrap, with \code{boot_r} repetitions, and compute
 the CI based on the percentiles of the boostrap distribution. \code{'bcai'} implements the bias-corrected bootstrap method.}
@@ -209,7 +209,7 @@ Used if \code{covs_conditioning}=\code{'mean_sd'}}
 percentiles around the median used to condition simple effects and plots.
 Used if \code{covs_conditioning}=\code{'percent'}}
 
-\item{ccra_steps}{Covariate condition  steps from min to max: 
+\item{ccra_steps}{Covariate condition  steps from min to max:
 At how many values between min and max should the covariate be conditioned \code{simpleScale}=\code{'range'}}
 
 \item{covs_scale_labels}{how the levels of a continuous moderator should
@@ -268,10 +268,11 @@ Generalized Mixed  Model
 }
 \examples{
 data(clustermanymodels)
-clustermanymodels$ybin<-factor(clustermanymodels$ybin)
-GAMLj3::gamlj_gmixed(formula = ybin ~ 1 + x+( 1|cluster ),
-                     data = clustermanymodels,
-                     model_type="logistic"
-                     )
-       
+clustermanymodels$ybin <- factor(clustermanymodels$ybin)
+GAMLj3::gamlj_gmixed(
+    formula = ybin ~ 1 + x + (1 | cluster),
+    data = clustermanymodels,
+    model_type = "logistic"
+)
+
 }

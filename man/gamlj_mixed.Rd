@@ -293,14 +293,15 @@ Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.f
 \code{as.data.frame(results$info)}
 }
 \description{
-Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTest]{lmer} functions and 
-provides options to facilitate estimation of 
-interactions, simple slopes, simple effects, post-hoc tests, contrast 
+Mixed Linear Model. Estimates models using \link[lme4]{lmer} and \link[lmerTest]{lmer} functions and
+provides options to facilitate estimation of
+interactions, simple slopes, simple effects, post-hoc tests, contrast
 analysis, effect size indexes and visualization of the results.
 }
 \examples{
 data(clustermanymodels)
-GAMLj3::gamlj_mixed(formula = ycont ~ 1 + x+( 1|cluster ),
-                     data = clustermanymodels
-                     )
+GAMLj3::gamlj_mixed(
+    formula = ycont ~ 1 + x + (1 | cluster),
+    data = clustermanymodels
+)
 }

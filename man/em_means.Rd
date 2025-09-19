@@ -17,18 +17,19 @@ em_means(object, formula, ...)
 an object of class
 }
 \description{
-This is a convenience function to extract the estimated marginal means table from a GAMLj model. If no option is passed, extracts the 
+This is a convenience function to extract the estimated marginal means table from a GAMLj model. If no option is passed, extracts the
 emmeans table already in the model results (if any). If a formula is passed, the estimated marginal means for the defined
 factors are displayed.
 }
 \examples{
 data(fivegroups)
-fivegroups$Group<-factor(fivegroups$Group)
-gmod<-GAMLj3::gamlj_lm(
-  formula = Score ~Group,
-  data = fivegroups)
+fivegroups$Group <- factor(fivegroups$Group)
+gmod <- GAMLj3::gamlj_lm(
+    formula = Score ~ Group,
+    data = fivegroups
+)
 
-em_means(gmod,formula =~Group)
+em_means(gmod, formula = ~Group)
 }
 \author{
 Marcello Gallucci

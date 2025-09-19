@@ -283,23 +283,30 @@ gamljmixedClass <- R6::R6Class(
             private$.runner_machine$formulaobj$formula()
         },
         .sourcifyOption = function(option) {
+          
             if (self$options$donotrun) {
                 return("")
             }
-
+            if (!is.something(option$value))
+              return('')
+          
             if (option$name == "nested_terms") {
-                if (self$options$comparison) {
+              
+                if (!is.something(private$.runner_machine$nestedformulaobj))
+                  return()
+                if (self$options$comparison) 
                     return(paste("nested_terms =", private$.runner_machine$nestedformulaobj$rhsfixed_formula()))
-                }
             }
 
 
             if (option$name == "nested_re") {
-                if (self$options$comparison) {
+              
+              if (!is.something(private$.runner_machine$nestedformulaobj))
+                return('')
+              
+              if (self$options$comparison) 
                     return(paste("nested_re = ~", private$.runner_machine$nestedformulaobj$random_formula()))
-                } else {
-                    return("")
-                }
+              return('')
             }
 
             defaults <- c(covs_scale = "centered", contrasts = "simple", scale_missing = "complete")

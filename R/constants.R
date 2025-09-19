@@ -26,8 +26,14 @@ NO_R_OPTS <- c(
     "re_nestedclusters",
     "re_crossedclusters",
     "re_corr",
-    "duplicate"
+    "duplicate",
+    "export",
+    'export_emm',
+    'export_plot'
 )
+
+##### Options default
+
 
 
 ######### warning ######################
@@ -108,6 +114,7 @@ TRANS_WARNS[[7]] <- list(original = "contrasts dropped", new = NULL)
 TRANS_WARNS[[8]] <- list(original = "Hessian is not positive", prepend = "Valid estimates cannot be found. Please try to specify a different model. Reason: ")
 TRANS_WARNS[[9]] <- list(original = "Inner iterations did not coverge", new = NULL)
 TRANS_WARNS[[10]] <- list(original = "iteration limit reached", new = "Iteration limit reached: a proper solution was not found. Results may be biased.")
+TRANS_WARNS[[11]] <- list(original = "compute random effect variances", new = "Random variances cannot be computed. Some variance components equal zero.")
 
 ###########  list of verbose options  ############
 

@@ -14,7 +14,7 @@ a list of lists with titles and ggplot objects
 }
 \description{
 This function returns a list of plots as a ggplot objects produced by the assumptions checking options, such
-as `qq_plot`, `resid_plot` and `norm_plot` for continuous dependent variable models, 
+as `qq_plot`, `resid_plot` and `norm_plot` for continuous dependent variable models,
 `cluster_boxplot`, `cluster_respred` and `rand_hist` for mixed models.
 }
 \author{

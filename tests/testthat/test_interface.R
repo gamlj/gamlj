@@ -19,6 +19,7 @@ testthat::test_that("test glm", {
 
 sums <- summary(obj)
 
+
 testthat::test_that("summary glm", {
     testthat::expect_equal(sums[[1]]$info[2], "Model")
     testthat::expect_equal(sums[[2]]$ar2, .408, tol)
@@ -77,7 +78,7 @@ mplots <- plot(mod)
 
 testthat::test_that("plot ok", {
     testthat::expect_true(is.list(mplots))
-    testthat::expect_true(ggplot2::is.ggplot(mplots[[1]]))
+    testthat::expect_true(ggplot2::is_ggplot(mplots[[1]]))
 })
 
 data("subjects_by_stimuli")
@@ -90,7 +91,6 @@ mod <- GAMLj3::gamlj_mixed(
 
 p0 <- predict(mod)
 p1 <- predict(mod, random.only = T)
-
 
 
 testthat::test_that("Mixed dots work", {
@@ -116,7 +116,7 @@ mplot <- plot(mod1)
 
 testthat::test_that(
     "plot ok",
-    testthat::expect_true(ggplot2::is.ggplot(mplot))
+    testthat::expect_true(ggplot2::is_ggplot(mplot))
 )
 data("wicksell")
 wicksell$time <- factor(wicksell$time)
@@ -169,7 +169,7 @@ res <- GAMLj3::assumptions(mod1)
 testthat::test_that("assumptions plots are there", {
     testthat::expect_equal(length(res), 2)
     testthat::expect_equal(res[[1]]$name, "randHist1")
-    testthat::expect_true(ggplot2::is.ggplot(res[[1]]$plot))
+    testthat::expect_true(ggplot2::is_ggplot(res[[1]]$plot))
 })
 
 

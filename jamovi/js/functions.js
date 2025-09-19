@@ -146,12 +146,12 @@ const fun = {
     ui.contrast_custom_values.setValue(customList);
     
     if (customList.length>0) {
-        ui.custom_values.$el.show();
-        ui.contrast_focus_box.$el.show();
+        ui.custom_values.el.style.display='';
+        ui.contrast_focus_box.el.style.display='';
     } else {
-        ui.custom_values.$el.hide();
+        ui.custom_values.el.style.display='none';
         ui.contrast_custom_focus.setValue(false);
-        ui.contrast_focus_box.$el.hide();
+        ui.contrast_focus_box.el.style.display='none';
 
     }
     
@@ -266,17 +266,23 @@ const fun = {
    fix_comparison:function(ui, context) {
   
             if (ui.comparison.getValue()===true) {
-              
-              ui.nested_layout.$buttons.show();
-              ui.nested_layout.$label.show();
-              ui.nested_layout.container.$el.show();
-              ui.model_terms.$el.height("113px");
+               ui.nested_layout.buttons.style.display='';
+               ui.nested_layout.label.style.display='';
+               ui.nested_layout.container.el.style.display='';
+               ui.model_terms.el.style.height = '113px';
              
-             if (ui.nested_re !== undefined) { 
-                 ui.nested_re_layout.$buttons.show();
-                 ui.nested_re_layout.$label.show();
-                 ui.nested_re_layout.container.$el.show();
-                 ui.re.$el.height("113px");
+               if (ui.nested_re !== undefined) { 
+                  ui.nested_re_layout.buttons.style.display='';
+                  ui.nested_re_layout.label.style.display='';
+                  ui.nested_re_layout.container.el.style.display='';
+                  ui.re.el.style.height = '113px';
+                  // remove possibility to kill the first row
+                  const borderGrid = ui.nested_re.controls[0].el;
+                  console.log(borderGrid)
+                  const button = borderGrid.querySelector("button.list-item-delete-button");
+                        button.style.visibility="hidden";
+
+                 
                  var renested=context.cloneArray(ui.nested_re.value(), [[]]);
                  if (renested[0].length === 0) {
                          var relist=context.cloneArray(ui.re.value(), [[]]);
@@ -285,19 +291,20 @@ const fun = {
              }
 
             } else {
-              ui.nested_layout.$buttons.hide();
-              ui.nested_layout.$label.hide();
-              ui.nested_layout.container.$el.hide();
+              
+              ui.nested_layout.buttons.style.display='none';
+              ui.nested_layout.label.style.display='none';
+              ui.nested_layout.container.el.style.display='none';
+              ui.model_terms.el.style.height = '246.315px';
               ui.nested_terms.setValue([]);
-              ui.model_terms.$el.height("246.315px");
-
+              
               if (ui.nested_re !== undefined) { 
              
                   ui.nested_re.setValue([[]]);
-                  ui.nested_re_layout.$buttons.hide();
-                  ui.nested_re_layout.$label.hide();
-                  ui.nested_re_layout.container.$el.hide();
-                  ui.re.$el.height("243.315px");
+                  ui.nested_re_layout.buttons.style.display='none';
+                  ui.nested_re_layout.label.style.display='none';
+                  ui.nested_re_layout.container.el.style.display='none';
+                  ui.re.el.style.height = '243.315px';
                   
               }
 
@@ -316,37 +323,49 @@ const fun = {
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
+                 const cell = ui.re.el.querySelectorAll("jmv-layoutcell")[1];
+                 // unset the border of the cell so it responds to class change
+                       cell.style.borderLeft = "";
+                       cell.style.borderBottom = "";  
                   // make sure the add button is visible                      
-                  var button= ui.re.$addButton;
-                  button[0].style.visibility="visible";
+                  var button= ui.re.addButton;
+                      ui.re.addButton.style.visibility='visible';
                   // get the re field to manipulate the children
-                  var target= ui.re;
-                  target.$el[0].lastElementChild.style.borderColor=null;
-                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+//                  const target= ui.re;
+                  
+//                      target.$el[0].lastElementChild.style.borderColor=null;
+//                      target.controls[0].$el[0].childNodes[0].style.visibility="visible";
                   // remove possibility to kill the first row
-                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+//                      target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
                   
 
              } else {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
-                 var button= ui.re.$addButton;
-                 button[0].style.visibility="hidden";
-                 var target= ui.re;
-                 target.setValue(Array(one));
-                 var one = target.controls[0];
-                 target.$el[0].lastElementChild.style.borderColor="transparent";
-                 one.$el[0].childNodes[0].style.visibility="hidden";
-                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+                 var button= ui.re.addButton;
+                     button.style.display="hidden";
+                 const target= ui.re;
+                       target.setValue(Array(one));
+                 const cell = target.el.querySelectorAll("jmv-layoutcell")[1];
+                       cell.style.borderLeft = "4px solid transparent";
+                       cell.style.borderBottom = "1px solid transparent";  
+
+                 const borderGrid = target.controls[0].el;
+
+                       borderGrid.style.border = "none";
+                       button = borderGrid.querySelector("button.list-item-delete-button");
+                       button.style.visibility = "hidden";
+
+                 const selectGrid = borderGrid.querySelector("jmv-selectgrid");
+                       selectGrid.style.border = "none";
+                       
              }
              
              // handle the nested random effects
                  // be sure there's at least one slot available
-                 if (ui.nested_re.value().length===0)
+                 if (ui.nested_re.value().length===0) {
                          ui.nested_re.setValue([[]]);
-                  // remove possibility to kill the first row
-                  ui.nested_re.controls[0].$el[0].childNodes[0].style.visibility="hidden";
-
+                  }
 
   
 },
@@ -447,8 +466,8 @@ const fun = {
 
         // restore in case users used logistic second dep field
         if (typeof ui.dep2 !== 'undefined' ) {
-             ui.dep_box.$label.text("Dependent Variable");
-             ui.dep2.$el.hide();
+             ui.dep_box.label.textContent="Dependent Variable";
+             ui.dep2.el.style.display='none';
           
         }
         
@@ -482,13 +501,13 @@ const fun = {
           
             var odds=["logistic","probit","multinomial","ordinal"]
             var irr=["poisson","poiover","nb"]
-            ui.es_expb.$label.text("Exp(B)") 
+            ui.es_expb.label.textContent="Exp(B)"; 
             
             if (odds.includes(ui.model_type.getValue())) {
-               ui.es_expb.$label.text("Odd Rations (expB)") 
+               ui.es_expb.label.textContent="Odd Rations (expB)"; 
             } 
             if (irr.includes(ui.model_type.getValue())) {
-               ui.es_expb.$label.text("Incidence rate ratios (expB)") 
+               ui.es_expb.label.textContent="Incidence rate ratios (expB)"; 
             } 
 
         }
@@ -497,9 +516,9 @@ const fun = {
 
         if (typeof ui.propodds_test !== 'undefined') {
               if (ui.model_type.getValue()==="ordinal") {
-                  ui.propodds_test.$el.show();
+                  ui.propodds_test.el.style.display='';
               } else {
-                  ui.propodds_test.$el.hide();
+                  ui.propodds_test.el.style.display='none';;
               }
         }
 
@@ -507,9 +526,9 @@ const fun = {
         if (typeof ui.preds_phi !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="beta") {
-              ui.precision.$el.show();
+              ui.precision.el.style.display='';
             } else {
-              ui.precision.$el.hide();
+              ui.precision.el.style.display='none';
             }
         }
         // model specific options 
@@ -522,7 +541,7 @@ const fun = {
         
       // deal with extra field of logistic by tables
        if (typeof ui.dep_box !== 'undefined' ) {
-              ui.dep_box.$label.text("Dependent Variable");
+              ui.dep_box.label.textContent="Dependent Variable";
        }
        
        if (typeof ui.input_method !== 'undefined' ) {
@@ -532,16 +551,16 @@ const fun = {
               const models=["logistic","probit"];
               
               if (models.includes(ui.model_type.getValue())) {
-              
-                   ui.input_method.$input.show();
-                   ui.input_method.$label.show();
+             
+                   ui.input_method.input.style.display='';
+                   ui.input_method.label.style.display='';
                    if (["success","total"].includes(ui.input_method.value()))
-                           ui.dep2.$el.show();
+                           ui.dep2.el.style.display='';
 
               } else {
-                   ui.input_method.$input.hide();
-                   ui.input_method.$label.hide();
-                   ui.dep2.$el.hide();
+                   ui.input_method.input.style.display='none';
+                   ui.input_method.label.style.display='none';
+                   ui.dep2.el.style.display='none';
 
               }
               this.updateInputMethod(ui,context);
@@ -566,28 +585,28 @@ const fun = {
     
        
        if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
-           ui.dep_box.$label.text("Dependent Variable");
+           ui.dep_box.label.textContent="Dependent Variable";
            ui.dep2.setValue(null);
           return ;
         }   
         
       if (ui.input_method.value() === "success") {
-        ui.dep_box.$label.text("Successes/Failures");
-        ui.dep2.$el.show();
+        ui.dep_box.label.textContent="Successes/Failures";
+        ui.dep2.el.style.display='';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
 
       }
       if (ui.input_method.value() === "total") {
-        ui.dep_box.$label.text("Successes/Totals");
-        ui.dep2.$el.show();
+        ui.dep_box.label.textContent="Successes/Totals";
+        ui.dep2.el.style.display='';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
       }
       if (ui.input_method.value() === "standard") {
-        ui.dep_box.$label.text("Dependent Variable");
+        ui.dep_box.label.textContent="Dependent Variable";
         ui.dep2.setValue(null);
-        ui.dep2.$el.hide();
+        ui.dep2.el.style.display='none';
         ui.crosstab.setEnabled(true);
       }
       
@@ -599,9 +618,9 @@ const fun = {
            return
           
         if (ui.plot_more_options.value() == true)   {
-           ui.plot_more_option_box.$el.show();
+           ui.plot_more_option_box.el.el.style.display='';
         } else {
-           ui.plot_more_option_box.$el.hide();
+           ui.plot_more_option_box.el.style.display='none';
            if (typeof ui.plot_y_min !== 'undefined')
                    ui.plot_y_min.setValue("");
            if (typeof ui.plot_y_max !== 'undefined')

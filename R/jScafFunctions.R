@@ -200,6 +200,7 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
         return("data = data")
     }
 
+  
     if (startsWith(option$name, "results/")) {
         return("")
     }
@@ -207,13 +208,20 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
     value <- option$value
     def <- option$default
 
+    if ("OptionAction" %in% class(option$name)) 
+      return('')
+
     if (!((is.numeric(value) && isTRUE(all.equal(value, def))) || base::identical(value, def))) {
         valueAsSource <- option$valueAsSource
-        if (!identical(valueAsSource, "")) {
+        valueAsSource <- trimws(valueAsSource)
+        valueAsSource <- gsub('^"+$', '', valueAsSource) 
+        
+        if (length(valueAsSource)==0 || is.null(valueAsSource))
+            return('')
+        if (nzchar(valueAsSource))     
             return(paste0(option$name, " = ", valueAsSource))
-        }
     }
-    ""
+    return("")
 }
 .sourcifyOption.OptionVariables <- function(option, def = NULL) {
     if (is.null(option$value)) {
@@ -236,7 +244,8 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
 .sourcifyOption.OptionArray <- function(option, def = NULL) {
   
     alist <- option$value
-    if (length(alist) == 0) {
+
+    if (length(unlist(alist)) == 0) {
         return("")
     }
     if (is.something(def) & option$name %in% names(def)) {

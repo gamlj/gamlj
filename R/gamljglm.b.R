@@ -259,6 +259,7 @@ gamljglmClass <- R6::R6Class(
             jmvcore:::composeFormula(self$options$dep, self$options$model_terms)
         },
         .sourcifyOption = function(option) {
+          
             if (option$name == "custom_family" && self$options$model_type != "custom") {
                 return("")
             }
@@ -267,11 +268,10 @@ gamljglmClass <- R6::R6Class(
             }
 
 
-            skip <- c("model_terms", "factors", "covs", "dep")
+           if (option$name %in% NO_R_OPTS) {
+             return("")
+           }
             defaults <- c(covs_scale = "centered", contrasts = "simple")
-            if (option$name %in% skip) {
-                return("")
-            }
             sourcifyOption(option, defaults)
         }
     )

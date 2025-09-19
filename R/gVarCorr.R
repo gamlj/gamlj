@@ -142,8 +142,7 @@ gVarCorr <- function(model, ...) UseMethod(".VarCorr")
                    .names<-as.data.frame(do.call(rbind,.names))
                    names(.names)<-c("var1","var2")
                    covci<-cbind(.names,covci)
-                   mark(covci)
-                    cmat<-covci
+                   cmat<-covci
                 }
             })
         }

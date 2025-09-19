@@ -44,27 +44,27 @@ testthat::test_that("p-table is ok", {
 p <- plot(model)
 
 testthat::test_that("a mainplot is produced", {
-    testthat::expect_true(ggplot2::is.ggplot(p))
+    testthat::expect_true(ggplot2::is_ggplot(p))
 })
 
 
 testthat::test_that("a  residplot is produced", {
-    testthat::expect_true(ggplot2::is.ggplot(model$assumptions$residPlot$plot$fun()))
+    testthat::expect_true(ggplot2::is_ggplot(model$assumptions$residPlot$plot$fun()))
 })
 
 
 testthat::test_that("a  normplot is produced", {
-    testthat::expect_true(ggplot2::is.ggplot(model$assumptions$normPlot$plot$fun()))
+    testthat::expect_true(ggplot2::is_ggplot(model$assumptions$normPlot$plot$fun()))
 })
 
 
 testthat::test_that("a  resid boxplot is produced", {
-    testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterBoxplot[[1]]$plot$fun()))
+    testthat::expect_true(ggplot2::is_ggplot(model$assumptions$clusterBoxplot[[1]]$plot$fun()))
 })
 
 testthat::test_that("a randhist is produced", {
-    testthat::expect_true(ggplot2::is.ggplot(model$assumptions$randHist[[1]]$plot$fun()))
-    testthat::expect_true(ggplot2::is.ggplot(model$assumptions$clusterResPred[[1]]$plot$fun()))
+    testthat::expect_true(ggplot2::is_ggplot(model$assumptions$randHist[[1]]$plot$fun()))
+    testthat::expect_true(ggplot2::is_ggplot(model$assumptions$clusterResPred[[1]]$plot$fun()))
 })
 
 
@@ -135,8 +135,8 @@ testthat::test_that("ranova works", {
 })
 
 testthat::test_that("mixed plot works", {
-    testthat::expect_true(ggplot2::is.ggplot(model$mainPlots[[1]][[1]]$plot$fun()))
-    testthat::expect_true(ggplot2::is.ggplot(plot(model)))
+    testthat::expect_true(ggplot2::is_ggplot(model$mainPlots[[1]][[1]]$plot$fun()))
+    testthat::expect_true(ggplot2::is_ggplot(plot(model)))
 })
 
 
@@ -251,7 +251,7 @@ testthat::test_that(
 )
 
 testthat::test_that("plot works", {
-    testthat::expect_true(ggplot2::is.ggplot(plot(model)))
+    testthat::expect_true(ggplot2::is_ggplot(plot(model)))
 })
 
 

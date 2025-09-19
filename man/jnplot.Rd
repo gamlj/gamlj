@@ -9,28 +9,29 @@ jnplot(x, formula = NULL, ...)
 \arguments{
 \item{x}{a gamlj results object of the class `gamlj`}
 
-\item{formula}{a right hand side formula specifying the effect to plot, of the form `~x*z` or `~x*z*w`. 
+\item{formula}{a right hand side formula specifying the effect to plot, of the form `~x*z` or `~x*z*w`.
 It has prevalence on other options defining a plot.}
 
-\item{...}{all options accepted by a gamlj model function. 
+\item{...}{all options accepted by a gamlj model function.
 Relevant for new plots are \code{plot_x}, \code{plot_z} and \code{plot_by}}
 }
 \value{
 an object of class ggplot or a list of ggplot objects
 }
 \description{
-This function re-estimates a GAMLj model adding a Johnson-Nayman plot, if not available already. If no option is passed, extracts the 
+This function re-estimates a GAMLj model adding a Johnson-Nayman plot, if not available already. If no option is passed, extracts the
 plots present in the `gamlj*Results` object. If JN plot is present, it is returned as a ggplot2 object,
  if more than one is present, a list of plots is returned. FALSE is returned if no plot is present or defined.
 }
 \examples{
 data(qsport)
-gmod<-GAMLj3::gamlj_lm(
-  formula = performance ~ hours,
-  data = qsport)
+gmod <- GAMLj3::gamlj_lm(
+    formula = performance ~ hours,
+    data = qsport
+)
 
-plot(gmod,plot_x = 'hours')
-plot(gmod,formula=~hours)
+plot(gmod, plot_x = "hours")
+plot(gmod, formula = ~hours)
 }
 \author{
 Marcello Gallucci

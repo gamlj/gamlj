@@ -12,29 +12,30 @@ posthoc(object, ...)
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}
 
-\item{...}{all options accepted by a gamlj model function. Relevant for new tests are 
+\item{...}{all options accepted by a gamlj model function. Relevant for new tests are
 `post_hoc` (a list of list of terms), `adjust`, a list of correction to apply:
  one or more of \code{none}, \code{bonf},  \code{holm}, \code{scheffe} or \code{sidak}.}
 
-\item{formula}{a right hand side formula specifying the factors or factors combinations to test, of the form `~x+z`, `~x:z` or `~x*z`. 
+\item{formula}{a right hand side formula specifying the factors or factors combinations to test, of the form `~x+z`, `~x:z` or `~x*z`.
 It has prevalence on other options defining a post-hoc test via character options.}
 }
 \value{
 a list of tables of class `ResultsElement`
 }
 \description{
-This is a convenience function to re-estimates a GAMLj model adding posthoc tests. If no option is passed, extracts the 
-post-hoc tests tables already in the model results (if any). If new post-hoc are defined, the post-hoc tests tables 
+This is a convenience function to re-estimates a GAMLj model adding posthoc tests. If no option is passed, extracts the
+post-hoc tests tables already in the model results (if any). If new post-hoc are defined, the post-hoc tests tables
 are returned.
 }
 \examples{
 data(fivegroups)
-fivegroups$Group<-factor(fivegroups$Group)
-gmod<-GAMLj3::gamlj_lm(
-  formula = Score ~Group,
-  data = fivegroups)
+fivegroups$Group <- factor(fivegroups$Group)
+gmod <- GAMLj3::gamlj_lm(
+    formula = Score ~ Group,
+    data = fivegroups
+)
 
-posthoc(gmod,formula =~Group)
+posthoc(gmod, formula = ~Group)
 }
 \author{
 Marcello Gallucci

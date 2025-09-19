@@ -12,11 +12,11 @@ simple_effects(object, ...)
 \arguments{
 \item{object}{a gamlj results object of the class `gamlj`}
 
-\item{...}{all options accepted by a gamlj model function. Relevant for new tests are 
+\item{...}{all options accepted by a gamlj model function. Relevant for new tests are
 `simple_x` (the simple effect variable), \code{`simple_mods`}, the moderator(s). Both are overriden by the formula option.}
 
-\item{formula}{a right hand side formula specifying the variables to test, of the form `~x:z`, `~x:z:w` or `~x*z`. 
-The formula is not expanded, so the first variable is the simple effect variable, the second is the moderator, 
+\item{formula}{a right hand side formula specifying the variables to test, of the form `~x:z`, `~x:z:w` or `~x*z`.
+The formula is not expanded, so the first variable is the simple effect variable, the second is the moderator,
 the third an optional additional moderator, an so on.
 It has prevalence on other options defining a simple effects test via character options.}
 }
@@ -24,15 +24,15 @@ It has prevalence on other options defining a simple effects test via character 
 a list of tables of class `ResultsElement`
 }
 \description{
-This is a convenience function to re-estimates a GAMLj model adding simple effect analysis. If no option is passed, extracts the 
-simple effects tables already in the model results (if any). If new tests are defined, the simple effects tests tables 
+This is a convenience function to re-estimates a GAMLj model adding simple effect analysis. If no option is passed, extracts the
+simple effects tables already in the model results (if any). If new tests are defined, the simple effects tests tables
 are returned.
 }
 \examples{
 data(wicksell)
-wicksell$time<-factor(wicksell$time)
-wicksell$group<-factor(wicksell$group) 
-wicksell$subj<-factor(wicksell$subj) 
+wicksell$time <- factor(wicksell$time)
+wicksell$group <- factor(wicksell$group)
+wicksell$subj <- factor(wicksell$subj)
 gmod<-GAMLj3::gamlj_mixed(
    formula = dv ~ 1 +group+ time:group+ time+( 1 | subj ),
    data = wicksell)
