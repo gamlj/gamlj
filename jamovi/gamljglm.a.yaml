@@ -449,6 +449,7 @@ options:
     -   name: plot_x_min
         title: X-axis min
         type: String
+        default: ''
         description:
             R: |
                 not used in R
@@ -457,6 +458,7 @@ options:
     -   name: plot_x_max
         title: X-axis max
         type: String
+        default: ''
         description:
             R: |
                 not used in R
@@ -465,6 +467,7 @@ options:
     -   name: plot_x_ticks
         title: X-axis ticks
         type: String
+        default: ''
         description:
             R: |
                 not used in R
@@ -473,6 +476,7 @@ options:
     -   name: plot_x_ticks_exact
         title: Exact ticks
         type: Bool
+        default: false
         description:
             R: |
                 not used in R
@@ -481,6 +485,7 @@ options:
     -   name: plot_extra
         title: Extrapolate
         type: Bool
+        default: false
         description:
             R: |
                 not used in R

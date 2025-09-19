@@ -129,6 +129,7 @@
 -   name: plot_y_ticks
     title: Y-axis ticks
     type: String
+    default: ''
     description:
         R:  |
             not used in R
@@ -137,6 +138,7 @@
 -   name: plot_y_ticks_exact
     title: Exact ticks
     type: Bool
+    default: false
     description:
         R: "set Y-axis ticks to exact values (min,..n.ticks..,max). `plot_x_ticks=TRUE`
             is required. \n"
@@ -145,6 +147,7 @@
 -   name: plot_x_min
     title: X-axis min
     type: String
+    default: ''
     description:
         R:  |
             not used in R
@@ -153,6 +156,7 @@
 -   name: plot_x_max
     title: X-axis max
     type: String
+    default: ''
     description:
         R:  |
             not used in R
@@ -162,6 +166,7 @@
 -   name: plot_x_ticks
     title: X-axis ticks
     type: String
+    default: ''
     description:
         R:  |
             not used in R
@@ -172,6 +177,7 @@
 -   name: plot_x_ticks_exact
     title: Exact ticks
     type: Bool
+    default: false
     description:
         R:  |
             not used in R
@@ -179,6 +185,7 @@
 -   name: plot_extra
     title: Extrapolate
     type: Bool
+    default: false
     description:
         R:  |
             not used in R

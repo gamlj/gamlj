@@ -177,7 +177,6 @@ gFormula <- R6::R6Class(
             clusters64<-tob64(self$clusters)
             for (x in alist64) {
                 for (cluster in clusters64) {
-                  mark(cluster,x)
                     w <- grep(cluster, x)
                     if (length(w) > 0) {
                         ladd(r) <- fromb64(x[w])

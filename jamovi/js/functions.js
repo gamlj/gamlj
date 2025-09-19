@@ -276,6 +276,12 @@ const fun = {
                   ui.nested_re_layout.label.style.display='';
                   ui.nested_re_layout.container.el.style.display='';
                   ui.re.el.style.height = '113px';
+                  // remove possibility to kill the first row
+                  const borderGrid = ui.nested_re.controls[0].el;
+                  console.log(borderGrid)
+                  const button = borderGrid.querySelector("button.list-item-delete-button");
+                        button.style.visibility="hidden";
+
                  
                  var renested=context.cloneArray(ui.nested_re.value(), [[]]);
                  if (renested[0].length === 0) {
@@ -317,37 +323,49 @@ const fun = {
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
+                 const cell = ui.re.el.querySelectorAll("jmv-layoutcell")[1];
+                 // unset the border of the cell so it responds to class change
+                       cell.style.borderLeft = "";
+                       cell.style.borderBottom = "";  
                   // make sure the add button is visible                      
-                  var button= ui.re.$addButton;
-                  button[0].style.visibility="visible";
+                  var button= ui.re.addButton;
+                      ui.re.addButton.style.visibility='visible';
                   // get the re field to manipulate the children
-                  var target= ui.re;
-                  target.$el[0].lastElementChild.style.borderColor=null;
-                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+//                  const target= ui.re;
+                  
+//                      target.$el[0].lastElementChild.style.borderColor=null;
+//                      target.controls[0].$el[0].childNodes[0].style.visibility="visible";
                   // remove possibility to kill the first row
-                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+//                      target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
                   
 
              } else {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
-                 var button= ui.re.$addButton;
-                 button[0].style.visibility="hidden";
-                 var target= ui.re;
-                 target.setValue(Array(one));
-                 var one = target.controls[0];
-                 target.$el[0].lastElementChild.style.borderColor="transparent";
-                 one.$el[0].childNodes[0].style.visibility="hidden";
-                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+                 var button= ui.re.addButton;
+                     button.style.visibility="hidden";
+                 const target= ui.re;
+                       target.setValue(Array(one));
+                 const cell = target.el.querySelectorAll("jmv-layoutcell")[1];
+                       cell.style.borderLeft = "4px solid transparent";
+                       cell.style.borderBottom = "1px solid transparent";  
+
+                 const borderGrid = target.controls[0].el;
+
+                       borderGrid.style.border = "none";
+                       button = borderGrid.querySelector("button.list-item-delete-button");
+                       button.style.visibility = "hidden";
+
+                 const selectGrid = borderGrid.querySelector("jmv-selectgrid");
+                       selectGrid.style.border = "none";
+                       
              }
              
              // handle the nested random effects
                  // be sure there's at least one slot available
-                 if (ui.nested_re.value().length===0)
+                 if (ui.nested_re.value().length===0) {
                          ui.nested_re.setValue([[]]);
-                  // remove possibility to kill the first row
-                  ui.nested_re.controls[0].$el[0].childNodes[0].style.visibility="hidden";
-
+                  }
 
   
 },
@@ -523,7 +541,7 @@ const fun = {
         
       // deal with extra field of logistic by tables
        if (typeof ui.dep_box !== 'undefined' ) {
-              ui.dep_box.$label.text("Dependent Variable");
+              ui.dep_box.$label.textContent="Dependent Variable";
        }
        
        if (typeof ui.input_method !== 'undefined' ) {

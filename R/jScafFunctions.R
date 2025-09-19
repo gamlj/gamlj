@@ -207,15 +207,17 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
 
     value <- option$value
     def <- option$default
-    
-    if ( (is.na(def) || !is.something(def)) && (is.na(value) || !is.something(value)))
-        return('')
-    
-    
+
+    if ("OptionAction" %in% class(option$name)) 
+      return('')
+
     if (!((is.numeric(value) && isTRUE(all.equal(value, def))) || base::identical(value, def))) {
         valueAsSource <- option$valueAsSource
         valueAsSource <- trimws(valueAsSource)
-        valueAsSource <- gsub('^"+$', '', valueAsSource)   
+        valueAsSource <- gsub('^"+$', '', valueAsSource) 
+        if (option$name=="plot_x_min") mark(valueAsSource,str(valueAsSource),length(valueAsSource),nzchar(valueAsSource))
+        if (length(valueAsSource)==0 || is.null(valueAsSource))
+            return('')
         if (nzchar(valueAsSource))     
             return(paste0(option$name, " = ", valueAsSource))
     }

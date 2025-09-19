@@ -595,9 +595,9 @@ Runner <- R6::R6Class("Runner",
                     msg1 <- "No solution has been found for the combination of link function and distribution. \n\n"
                     msg2 <- results$error
                     if (length(grep("valid starting values", msg2)) > 0) msg2 <- ""
-                    stop(msg1, msg2)
+                    self$stop(msg1, msg2)
                 } else {
-                    stop(fromb64(results$error))
+                    self$stop(fromb64(results$error))
                 }
             }
 

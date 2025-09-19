@@ -27,7 +27,9 @@ NO_R_OPTS <- c(
     "re_crossedclusters",
     "re_corr",
     "duplicate",
-    "export"
+    "export",
+    'export_emm',
+    'export_plot'
 )
 
 ##### Options default
