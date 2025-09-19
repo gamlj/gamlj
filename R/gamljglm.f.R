@@ -274,7 +274,7 @@ gamlj_glm <- function(
 
 
         y <- rlang::f_lhs(formula)
-        if (class(y) == "call") {
+        if ("call" %in% class(y)) {
             if (as.character(y[[1]]) == "cbind") {
                 dep <- as.character(y[[2]])
                 dep2 <- as.character(y[[3]])

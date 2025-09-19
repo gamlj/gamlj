@@ -660,10 +660,8 @@ summary.gamlj_list <- function(object, ...) {
 print.jmvrtable <- function(x, ...) {
     cat(attr(x, "title"), "\n\n")
     for (var in names(x)) {
-        if (is.character(x[[var]])) {
             x[is.na(x[[var]]), var] <- ""
         }
-    }
     print.data.frame(x)
 }
 

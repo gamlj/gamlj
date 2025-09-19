@@ -215,7 +215,7 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
         valueAsSource <- option$valueAsSource
         valueAsSource <- trimws(valueAsSource)
         valueAsSource <- gsub('^"+$', '', valueAsSource) 
-        if (option$name=="plot_x_min") mark(valueAsSource,str(valueAsSource),length(valueAsSource),nzchar(valueAsSource))
+        
         if (length(valueAsSource)==0 || is.null(valueAsSource))
             return('')
         if (nzchar(valueAsSource))     

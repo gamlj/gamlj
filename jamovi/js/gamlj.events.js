@@ -33,9 +33,9 @@ const events = {
         if (typeof ui.propodds_test !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="ordinal") {
-              ui.propodds_test.$el.show();
+              ui.propodds_test.el.style.display='';
             } else {
-              ui.propodds_test.$el.hide();
+              ui.propodds_test.el.style.display='none';
             }
         }
         if (typeof ui.preds_phi !== 'undefined' ) {

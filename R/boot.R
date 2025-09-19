@@ -14,7 +14,7 @@ gboot <- function(x, obj) UseMethod(".gboot")
   if (!obj$hasTerms) {
      stop("Bootstrap method for intercept-only models is not available for models of class:", class(model)[1])
   }
-      
+  opts<-.gboot_options(obj)
   return(do.call(parameters::bootstrap_model,opts))
   
   

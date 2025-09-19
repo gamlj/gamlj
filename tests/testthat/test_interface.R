@@ -19,6 +19,7 @@ testthat::test_that("test glm", {
 
 sums <- summary(obj)
 
+
 testthat::test_that("summary glm", {
     testthat::expect_equal(sums[[1]]$info[2], "Model")
     testthat::expect_equal(sums[[2]]$ar2, .408, tol)
@@ -90,7 +91,6 @@ mod <- GAMLj3::gamlj_mixed(
 
 p0 <- predict(mod)
 p1 <- predict(mod, random.only = T)
-
 
 
 testthat::test_that("Mixed dots work", {
