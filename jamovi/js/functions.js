@@ -329,32 +329,28 @@ const fun = {
                   // make sure the add button is visible                      
                   var button= ui.re.addButton;
                       ui.re.addButton.style.visibility='visible';
-                  // get the re field to manipulate the children
-//                  const target= ui.re;
-                  
-//                      target.$el[0].lastElementChild.style.borderColor=null;
-//                      target.controls[0].$el[0].childNodes[0].style.visibility="visible";
-                  // remove possibility to kill the first row
-//                      target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
-                  
+
 
              } else {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
+                 // remove the add button
                  var button= ui.re.addButton;
                      button.style.visibility="hidden";
                  const target= ui.re;
                        target.setValue(Array(one));
+                 // make the borders transparent so it look nice when one cell is visible
                  const cell = target.el.querySelectorAll("jmv-layoutcell")[1];
                        cell.style.borderLeft = "4px solid transparent";
                        cell.style.borderBottom = "1px solid transparent";  
 
                  const borderGrid = target.controls[0].el;
-
+                      // make the blue borders not visible so it look nice when one cell is visible
                        borderGrid.style.border = "none";
+                       // remove the x to kill the cell 
                        button = borderGrid.querySelector("button.list-item-delete-button");
                        button.style.visibility = "hidden";
-
+                      // make the blue borders not visible so it look nice when one cell is visible
                  const selectGrid = borderGrid.querySelector("jmv-selectgrid");
                        selectGrid.style.border = "none";
                        
