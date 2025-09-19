@@ -1,5 +1,5 @@
 #### here we deal with bootstrap. The code relies on parameters:bootstrap_model, but it
-#### override it for simple models because parameters:bootstrap_model does not work for
+#### overrides it for simple models because parameters:bootstrap_model does not work for
 #### intercept-only models
 
 

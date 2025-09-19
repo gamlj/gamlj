@@ -169,7 +169,7 @@ res <- GAMLj3::assumptions(mod1)
 testthat::test_that("assumptions plots are there", {
     testthat::expect_equal(length(res), 2)
     testthat::expect_equal(res[[1]]$name, "randHist1")
-    testthat::expect_true(ggplot2::is.ggplot(res[[1]]$plot))
+    testthat::expect_true(ggplot2::is_ggplot(res[[1]]$plot))
 })
 
 
