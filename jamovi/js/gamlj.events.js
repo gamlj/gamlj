@@ -4,8 +4,6 @@ var fun=require('./functions');
 
 const events = {
   
-  
-  
     update: function(ui) {
       
         console.log("Updating analysis")
