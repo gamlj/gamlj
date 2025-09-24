@@ -610,10 +610,10 @@ const fun = {
       
         console.log("fixing plots");
         if (typeof ui.plot_more_options == 'undefined')
-           return
+           return;
           
         if (ui.plot_more_options.value() == true)   {
-           ui.plot_more_option_box.el.el.style.display='';
+           ui.plot_more_option_box.el.style.display='';
         } else {
            ui.plot_more_option_box.el.style.display='none';
            if (typeof ui.plot_y_min !== 'undefined')
