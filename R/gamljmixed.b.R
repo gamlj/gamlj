@@ -284,13 +284,14 @@ gamljmixedClass <- R6::R6Class(
         },
         .sourcifyOption = function(option) {
           
-            if (self$options$donotrun) {
-                return("")
-            }
+          
             if (!is.something(option$value))
               return('')
           
-            if (option$name == "nested_terms") {
+          if (option$name %in% NO_R_OPTS) 
+            return("")
+          
+          if (option$name == "nested_terms") {
               
                 if (!is.something(private$.runner_machine$nestedformulaobj))
                   return()
@@ -309,10 +310,8 @@ gamljmixedClass <- R6::R6Class(
               return('')
             }
 
-            defaults <- c(covs_scale = "centered", contrasts = "simple", scale_missing = "complete")
-            if (option$name %in% NO_R_OPTS) {
-                return("")
-            }
+            if (option$name == "cov_scale")
+                defaults <- c(covs_scale = "centered", contrasts = "simple", scale_missing = "complete")
 
             sourcifyOption(option, defaults)
         }

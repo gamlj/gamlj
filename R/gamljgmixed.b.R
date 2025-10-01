@@ -295,10 +295,9 @@ gamljgmixedClass <- R6::R6Class(
         },
         .sourcifyOption = function(option) {
           
-            if (self$options$donotrun) {
-                return("")
-            }
-
+          if (option$name %in% NO_R_OPTS) 
+            return("")
+          
             if (option$name == "custom_family" && self$options$model_type != "custom") {
                 return("")
             }
@@ -327,11 +326,9 @@ gamljgmixedClass <- R6::R6Class(
                 }
             }
           if (option$name=="covs_scale")
-
             defaults <- c(covs_scale = "centered", contrasts = "simple", scale_missing = "complete")
-            if (option$name %in% NO_R_OPTS) {
-                return("")
-            }
+          
+            
             sourcifyOption(option, defaults)
         }
     )

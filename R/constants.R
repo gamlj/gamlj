@@ -29,7 +29,8 @@ NO_R_OPTS <- c(
     "duplicate",
     "export",
     'export_emm',
-    'export_plot'
+    'export_plot',
+    'donotrun'
 )
 
 ##### Options default
