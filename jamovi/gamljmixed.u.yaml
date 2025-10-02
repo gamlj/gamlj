@@ -528,7 +528,7 @@ children:
                                             -   type: ListBox
                                                 name: plot_terms
                                                 height: large
-                                                addButton: Add New Term
+                                                addButton: Add New Plot
                                                 events:
                                                     listItemAdded: ./gamlj.events::onUpdate_plotsSupplier
                                                     listItemRemoved: ./gamlj.events::onUpdate_plotsSupplier

@@ -65,6 +65,10 @@
 #'   the plot
 #' @param plot_by a list of variables defining the levels at which a separate
 #'   plot should be produced.
+#' @param plot_terms a RHS formulas. It is an alternative way to
+#'   produce plots. \code{plot_terms=~x+z:x} produces two plots, one with
+#'   `x` as x-axis and one with z as x-axis and x defining different lines.
+#'     
 #' @param plot_raw \code{TRUE} or \code{FALSE} (default), plot raw data along
 #'   the predicted values
 #' @param plot_yscale \code{TRUE} or \code{FALSE} (default), set the Y-axis
@@ -208,6 +212,7 @@ gamlj_lm <- function(
     plot_x = NULL,
     plot_z = NULL,
     plot_by = NULL,
+    plot_terms=NULL,
     plot_raw = FALSE,
     plot_yscale = FALSE,
     plot_xoriginal = FALSE,
@@ -322,7 +327,8 @@ gamlj_lm <- function(
     ### other from formula to list
     if (inherits(emmeans, "formula")) emmeans <- jmvcore::decomposeFormula(emmeans)
     if (inherits(posthoc, "formula")) posthoc <- jmvcore::decomposeFormula(posthoc)
-
+    if (inherits(plot_terms, "formula")) posthoc <- jmvcore::decomposeFormula(plot_terms)
+    
     ### fix some options when passed by R ####
     if (is.something(names(covs_scale))) {
         covs_scale <- lapply(names(covs_scale), function(a) list(var = a, type = covs_scale[[a]]))
@@ -377,6 +383,7 @@ gamlj_lm <- function(
         plot_x = plot_x,
         plot_z = plot_z,
         plot_by = plot_by,
+        plot_terms=plot_terms,
         plot_raw = plot_raw,
         plot_yscale = plot_yscale,
         plot_xoriginal = plot_xoriginal,

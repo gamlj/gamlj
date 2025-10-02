@@ -197,10 +197,7 @@ gamljglmClass <- R6::R6Class(
 
             jinfo("MODULE:  #### phase run ####")
 
-            if (self$options$donotrun) {
-                return()
-            }
-
+           
             #      private$.ready<-readiness(self$options)
             if (!private$.ready$ready) {
                 return()
@@ -260,19 +257,21 @@ gamljglmClass <- R6::R6Class(
         },
         .sourcifyOption = function(option) {
           
-            if (option$name == "custom_family" && self$options$model_type != "custom") {
+            if (option$name == "custom_family" && self$options$model_type != "custom") 
                 return("")
-            }
-            if (option$name == "custom_LINK" && self$options$model_type != "custom") {
+            
+            if (option$name == "custom_LINK" && self$options$model_type != "custom") 
                 return("")
-            }
+            
 
 
-           if (option$name %in% NO_R_OPTS) {
+           if (option$name %in% NO_R_OPTS) 
              return("")
-           }
-            defaults <- c(covs_scale = "centered", contrasts = "simple")
-            sourcifyOption(option, defaults)
+           
+          # since OptionsArray has not embedded default, we pass them as ARRAY_DEFAULTS defined
+          # in constants.R. Other option classes ignore it.
+          
+          sourcifyOption(option, ARRAY_DEFAULTS)
         }
     )
 )

@@ -11,6 +11,8 @@ TCONV[["mixed.f"]] <- c("test", "df1", "df2", "p")
 
 ERROR_TABLE <- "errortable"
 
+### some constant for sourcifyOption
+
 ######## options not in the R syntax #####
 NO_R_OPTS <- c(
     "model_terms",
@@ -30,10 +32,13 @@ NO_R_OPTS <- c(
     "export",
     'export_emm',
     'export_plot',
-    'donotrun'
+    'donotrun',
+    'plot_more_options'
 )
 
-##### Options default
+##### since OptionsArray has not embedded default, we pass their defaults to custom sourcifyOption() in jmvScafFunction.R
+
+ARRAY_DEFAULTS <- c(covs_scale = "centered", contrasts = "simple")
 
 
 
