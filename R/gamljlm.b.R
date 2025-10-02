@@ -264,6 +264,8 @@ gamljlmClass <- R6::R6Class(
             private$.runner_machine$formulaobj$formula()
         },
         .sourcifyOption = function(option) {
+          
+
             defaults <- c(covs_scale = "centered", contrasts = "simple")
 
             if (option$name == "nested_terms") {
@@ -281,8 +283,11 @@ gamljlmClass <- R6::R6Class(
             if (option$name %in% NO_R_OPTS) {
                 return("")
             }
-
-            sourcifyOption(option, defaults)
+            
+            # since OptionsArray has not embedded default, we pass them as ARRAY_DEFAULTS defined
+            # in constants.R. Other option classes ignore it.
+            
+            sourcifyOption(option, ARRAY_DEFAULTS)
         }
     )
 )

@@ -1,44 +1,43 @@
 refs:
-   gamlj:
-      type: 'software'
-      author: Gallucci, M.
-      year: 2019
-      title: "GAMLj: General analyses for linear models"
-      publisher: '[jamovi module]. Retrieved from https://gamlj.github.io/'
-      url: https://gamlj.github.io/
-   effectsize:
-      type: 'software'
-      author: Ben-Shachar, Makowski & Lüdecke
-      year: 2020
-      title: "Compute and interpret indices of effect size"
-      publisher: 'CRAN'
-      url: https://github.com/easystats/effectsize
-   parameters:
-      type: 'software'
-      author: Lüdecke, Ben-Shachar, Patil &  Makowski
-      year: 2020
-      title: "Extracting, Computing and Exploring the Parameters of Statistical Models using R"
-      publisher: 'CRAN'
-      url: https://github.com/easystats/parameters
-      
-   goodness:
-      type: 'software'
-      author: Gallucci, M.
-      year: 2020
-      title: "Model goodness of fit in GAMLj"
-      url: https://gamlj.github.io/details_goodness.html
-      
-
-   interactions:
-     type: 'software'
-     title: 'interactions: Comprehensive, User-Friendly Toolkit for Probing Interactions. R package version 1.1.0'
-     author :  Jacob A. Long
-     year :  2019
-     url  : https://cran.r-project.org/package=interactions
-  
-   margins:
-     type: 'software'
-     title: 'Marginal Effects Zoo'
-     author :  Arel-Bundock V, Greifer N, Heiss A
-     year :  2024
-     url  : https://marginaleffects.com/
+    gamlj:
+        type: software
+        author: Gallucci, M.
+        year: 2019
+        title: 'GAMLj: General analyses for linear models (Version 3.6.2)'
+        publisher: '[jamovi module]. Retrieved from https://gamlj.github.io/'
+        url: https://gamlj.github.io/
+        versioning: 'GAMLj: General analyses for linear models'
+    effectsize:
+        type: software
+        author: Ben-Shachar, Makowski & Lüdecke
+        year: 2020
+        title: Compute and interpret indices of effect size
+        publisher: CRAN
+        url: https://github.com/easystats/effectsize
+    parameters:
+        type: software
+        author: Lüdecke, Ben-Shachar, Patil &  Makowski
+        year: 2020
+        title: Extracting, Computing and Exploring the Parameters of Statistical Models
+            using R
+        publisher: CRAN
+        url: https://github.com/easystats/parameters
+    goodness:
+        type: software
+        author: Gallucci, M.
+        year: 2020
+        title: Model goodness of fit in GAMLj
+        url: https://gamlj.github.io/details_goodness.html
+    interactions:
+        type: software
+        title: 'interactions: Comprehensive, User-Friendly Toolkit for Probing Interactions.
+            R package version 1.1.0'
+        author: Jacob A. Long
+        year: 2019
+        url: https://cran.r-project.org/package=interactions
+    margins:
+        type: software
+        title: Marginal Effects Zoo
+        author: Arel-Bundock V, Greifer N, Heiss A
+        year: 2024
+        url: https://marginaleffects.com/

@@ -301,3 +301,6 @@ testthat::test_that("test_contrasts works ", {
     testthat::expect_equal(cont$cat2$asDF$label, "{ -1*-1, 1*1 }")
     testthat::expect_equal(cont$cat2$asDF$estimate, 1.58198, tol)
 })
+
+
+

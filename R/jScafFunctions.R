@@ -233,6 +233,7 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
     if (length(values) == 1) {
         return(paste0(option$name, "=", values))
     } else {
+       
         return(paste0(option$name, "=c(", paste0(values, collapse = ","), ")"))
     }
 }
@@ -257,11 +258,11 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
     what <- "type"
     for (a in alist) {
         what <- ifelse(utils::hasName(a, "codes"), "codes", what)
-        what <- ifelse(!utils::hasName(a, "var"), "onedim", what)
+        what <- ifelse(!utils::hasName(a, "var"), "novar", what)
         
     }
-    if (what=="onedim") {
-       return(paste0(option$name, "=c(",paste0(alist, collapse=","),")"))
+    if (what=="novar") {
+       return(.sourcifyOption.default(option, def))
     }
 
     paste0(option$name, "=c(", paste(sapply(alist, function(a) paste0(sourcifyName(a$var), ' = \"', a[[what]], '\"')), collapse = ", "), ")")
@@ -280,6 +281,7 @@ sourcifyOption <- function(x, ...) UseMethod(".sourcifyOption")
     if (option$value == option$default) {
         return("")
     }
+
     paste0(option$name, "='", option$value, "'")
 }
 

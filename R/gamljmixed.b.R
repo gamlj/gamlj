@@ -284,13 +284,14 @@ gamljmixedClass <- R6::R6Class(
         },
         .sourcifyOption = function(option) {
           
-            if (self$options$donotrun) {
-                return("")
-            }
-            if (!is.something(option$value))
+          
+          if (!is.something(option$value))
               return('')
           
-            if (option$name == "nested_terms") {
+          if (option$name %in% NO_R_OPTS) 
+            return("")
+          
+          if (option$name == "nested_terms") {
               
                 if (!is.something(private$.runner_machine$nestedformulaobj))
                   return()
@@ -308,13 +309,10 @@ gamljmixedClass <- R6::R6Class(
                     return(paste("nested_re = ~", private$.runner_machine$nestedformulaobj$random_formula()))
               return('')
             }
-
-            defaults <- c(covs_scale = "centered", contrasts = "simple", scale_missing = "complete")
-            if (option$name %in% NO_R_OPTS) {
-                return("")
-            }
-
-            sourcifyOption(option, defaults)
+          # since OptionsArray has not embedded default, we pass them as ARRAY_DEFAULTS defined
+          # in constants.R. Other option classes ignore it.
+         
+          sourcifyOption(option, ARRAY_DEFAULTS)
         }
     )
 )

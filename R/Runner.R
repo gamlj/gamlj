@@ -24,6 +24,11 @@ Runner <- R6::R6Class("Runner",
                 self$ok <- FALSE
                 return()
             }
+            if (self$option("donotrun")) {
+              self$ok <- FALSE
+              return()
+            }
+            
             self$model <- private$.estimateModel(data)
             self$etime <- as.numeric(Sys.time() - t)
 

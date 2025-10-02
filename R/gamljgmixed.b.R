@@ -295,10 +295,9 @@ gamljgmixedClass <- R6::R6Class(
         },
         .sourcifyOption = function(option) {
           
-            if (self$options$donotrun) {
-                return("")
-            }
-
+          if (option$name %in% NO_R_OPTS) 
+            return("")
+          
             if (option$name == "custom_family" && self$options$model_type != "custom") {
                 return("")
             }
@@ -326,13 +325,17 @@ gamljgmixedClass <- R6::R6Class(
                     return("")
                 }
             }
-          if (option$name=="covs_scale")
-
-            defaults <- c(covs_scale = "centered", contrasts = "simple", scale_missing = "complete")
-            if (option$name %in% NO_R_OPTS) {
-                return("")
-            }
-            sourcifyOption(option, defaults)
+          
+          ## keep it for debugging # 
+          ## if (option$name=="plot_terms") mark(str(option))
+          ## if ("OptionArray" %in% class(option)) mark(str(option))
+            
+            
+          # since OptionsArray has not embedded default, we pass them as ARRAY_DEFAULTS defined
+          # in constants.R. Other option classes ignore it.
+          
+          sourcifyOption(option, ARRAY_DEFAULTS)
+          
         }
     )
 )
