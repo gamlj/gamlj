@@ -147,6 +147,7 @@ options:
     -   name: export
         title: Export
         type: Action
+        default: false
     -   name: plot_x
         type: scaffold
         file: plots.a.yaml

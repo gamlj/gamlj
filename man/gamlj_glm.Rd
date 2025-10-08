@@ -32,6 +32,7 @@ gamlj_glm(
   vcov = FALSE,
   plot_x = NULL,
   plot_z = NULL,
+  plot_terms = NULL,
   plot_by = NULL,
   plot_raw = FALSE,
   plot_yscale = FALSE,
@@ -144,6 +145,10 @@ the plot}
 
 \item{plot_z}{a string naming the variable represented as separate lines in
 the plot}
+
+\item{plot_terms}{a RHS formulas. It is an alternative way to
+produce plots. \code{plot_terms=~x+z:x} produces two plots, one with
+`x` as x-axis and one with z as x-axis and x defining different lines.}
 
 \item{plot_by}{a list of variables defining the levels at which a separate
 plot should be produced.}

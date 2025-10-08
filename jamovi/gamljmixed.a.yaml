@@ -363,6 +363,7 @@ options:
     -   name: export
         title: Export
         type: Action
+        default: false
     -   name: plot_mode
         title: Mode
         type: List

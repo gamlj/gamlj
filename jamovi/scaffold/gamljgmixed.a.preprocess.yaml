@@ -153,6 +153,7 @@ options:
     -   name: export
         title: Export
         type: Action
+        default: false
     -   name: es
         title: Effect Size
         type: NMXList

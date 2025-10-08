@@ -35,6 +35,7 @@ gamlj_gmixed(
   plot_x = NULL,
   plot_z = NULL,
   plot_by = NULL,
+  plot_terms = NULL,
   plot_raw = FALSE,
   plot_yscale = FALSE,
   plot_xoriginal = FALSE,
@@ -149,14 +150,18 @@ names of the contrasts variables in tables}
 \item{show_contrastcodes}{\code{TRUE} or \code{FALSE} (default), shows
 contrast coefficients tables}
 
-\item{plot_x}{a string naming the variable placed on the horizontal axis of
+\item{plot_x}{a variable name for the variable placed on the horizontal axis of
 the plot}
 
-\item{plot_z}{a string naming the variable represented as separate lines in
+\item{plot_z}{a variable name the variable represented as separate lines in
 the plot}
 
 \item{plot_by}{a list of string naming the variables defining the levels
 for multiple plots}
+
+\item{plot_terms}{a RHS formulas. It is an alternative way to
+produce plots. \code{plot_terms=~x+z:x} produces two plots, one with
+`x` as x-axis and one with z as x-axis and x defining different lines.}
 
 \item{plot_raw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
 the predicted values}
