@@ -266,7 +266,6 @@ const fun = {
    fix_comparison:function(ui, context) {
   
             if (ui.comparison.getValue()===true) {
-              
               ui.nested_layout.$buttons[0].style.display = '';
               ui.nested_layout.$label[0].style.display = '';
               ui.nested_layout.container.$el[0].style.display = '';
@@ -278,7 +277,7 @@ const fun = {
                  ui.nested_re_layout.container.$el[0].style.display = '';
                  ui.re.$el[0].style.height = "113px";
                  // remove possibility to kill the first row
-                const borderGrid = ui.nested_re.$controls[0].el;
+                const borderGrid = ui.nested_re.$controls[0].$el[0];
                 const button = borderGrid.querySelector("button.list-item-delete-button");
                 button.style.visibility="hidden";
 
@@ -321,38 +320,46 @@ const fun = {
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
+                        
+                  const cell = ui.re.$el[0].querySelectorAll("jmv-layoutcell")[1];
+                  // unset the border of the cell so it responds to class change
+                  cell.style.borderLeft = "";
+                  cell.style.borderBottom = "";
+                  
                   // make sure the add button is visible                      
                   var button= ui.re.$addButton;
                   button[0].style.visibility="visible";
-                  // get the re field to manipulate the children
-                  var target= ui.re;
-                  target.$el[0].lastElementChild.style.borderColor=null;
-                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
-                  // remove possibility to kill the first row
-                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
-                  
 
              } else {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
+                 // remove the add button
                  var button= ui.re.$addButton;
                  button[0].style.visibility="hidden";
-                 var target= ui.re;
+                 const target= ui.re;
                  target.setValue(Array(one));
-                 var one = target.controls[0];
-                 target.$el[0].lastElementChild.style.borderColor="transparent";
-                 one.$el[0].childNodes[0].style.visibility="hidden";
-                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
+                 
+                 // make the borders transparent so it look nice when one cell is visible
+                 const cell = target.$el[0].querySelectorAll("jmv-layoutcell")[1];
+                       cell.style.borderLeft = "4px solid transparent";
+                       cell.style.borderBottom = "1px solid transparent";  
+
+                 const borderGrid = target.$controls[0].$el[0];
+                      // make the blue borders not visible so it look nice when one cell is visible
+                       borderGrid.style.border = "none";
+                       // remove the x to kill the cell 
+                       button = borderGrid.querySelector("button.list-item-delete-button");
+                       button.style.visibility = "hidden";
+                      // make the blue borders not visible so it look nice when one cell is visible
+                 const selectGrid = borderGrid.querySelector("jmv-selectgrid");
+                       selectGrid.style.border = "none";
+                 
              }
              
              // handle the nested random effects
                  // be sure there's at least one slot available
                  if (ui.nested_re.value().length===0)
                          ui.nested_re.setValue([[]]);
-                  // remove possibility to kill the first row
-                  ui.nested_re.controls[0].$el[0].childNodes[0].style.visibility="hidden";
-
-
   
 },
 
@@ -452,7 +459,7 @@ const fun = {
 
         // restore in case users used logistic second dep field
         if (typeof ui.dep2 !== 'undefined' ) {
-             ui.dep_box.$label.text("Dependent Variable");
+             ui.dep_box.$label[0].textContent = "Dependent Variable";
              ui.dep2.$el[0].style.display = 'none';
           
         }
@@ -487,13 +494,13 @@ const fun = {
           
             var odds=["logistic","probit","multinomial","ordinal"]
             var irr=["poisson","poiover","nb"]
-            ui.es_expb.$label.text("Exp(B)") 
+            ui.es_expb.$label[0].textContent = "Exp(B)"; 
             
             if (odds.includes(ui.model_type.getValue())) {
-               ui.es_expb.$label.text("Odd Rations (expB)") 
+               ui.es_expb.$label[0].textContent = "Odd Rations (expB)"; 
             } 
             if (irr.includes(ui.model_type.getValue())) {
-               ui.es_expb.$label.text("Incidence rate ratios (expB)") 
+               ui.es_expb.$label[0].textContent = "Incidence rate ratios (expB)";
             } 
 
         }
@@ -527,7 +534,7 @@ const fun = {
         
       // deal with extra field of logistic by tables
        if (typeof ui.dep_box !== 'undefined' ) {
-              ui.dep_box.$label.text("Dependent Variable");
+              ui.dep_box.$label[0].textContent = "Dependent Variable";
        }
        
        if (typeof ui.input_method !== 'undefined' ) {
@@ -571,26 +578,26 @@ const fun = {
     
        
        if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
-           ui.dep_box.$label.text("Dependent Variable");
+           ui.dep_box.$label[0].textContent = "Dependent Variable";
            ui.dep2.setValue(null);
           return ;
         }   
         
       if (ui.input_method.value() === "success") {
-        ui.dep_box.$label.text("Successes/Failures");
+        ui.dep_box.$label[0].textContent = "Successes/Failures";
         ui.dep2.$el[0].style.display = '';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
 
       }
       if (ui.input_method.value() === "total") {
-        ui.dep_box.$label.text("Successes/Totals");
+        ui.dep_box.$label[0].textContent = "Successes/Totals";
         ui.dep2.$el[0].style.display = '';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
       }
       if (ui.input_method.value() === "standard") {
-        ui.dep_box.$label.text("Dependent Variable");
+        ui.dep_box.$label[0].textContent = "Dependent Variable";
         ui.dep2.setValue(null);
         ui.dep2.$el[0].style.display = 'none';
         ui.crosstab.setEnabled(true);
@@ -601,7 +608,7 @@ const fun = {
       
         console.log("fixing plots");
         if (typeof ui.plot_more_options == 'undefined')
-           return
+           return;
           
         if (ui.plot_more_options.value() == true)   {
            ui.plot_more_option_box.$el[0].style.display = '';
