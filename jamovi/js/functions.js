@@ -269,13 +269,13 @@ const fun = {
               ui.nested_layout.$buttons[0].style.display = '';
               ui.nested_layout.$label[0].style.display = '';
               ui.nested_layout.container.$el[0].style.display = '';
-              ui.model_terms.$el[0].style.height = "113px";
+              ui.model_terms.$el[0].style.height = '113px';
              
              if (ui.nested_re !== undefined) { 
                  ui.nested_re_layout.$buttons[0].style.display = '';
                  ui.nested_re_layout.$label[0].style.display = '';
                  ui.nested_re_layout.container.$el[0].style.display = '';
-                 ui.re.$el[0].style.height = "113px";
+                 ui.re.$el[0].style.height = '113px';
                  // remove possibility to kill the first row
                 const borderGrid = ui.nested_re.$controls[0].$el[0];
                 const button = borderGrid.querySelector("button.list-item-delete-button");
@@ -293,7 +293,7 @@ const fun = {
               ui.nested_layout.$label[0].style.display = 'none';
               ui.nested_layout.container.$el[0].style.display = 'none';
               ui.nested_terms.setValue([]);
-              ui.model_terms.$el[0].style.height = "246.315px";
+              ui.model_terms.$el[0].style.height = '246.315px';
 
               if (ui.nested_re !== undefined) { 
              
@@ -301,7 +301,7 @@ const fun = {
                   ui.nested_re_layout.$buttons[0].style.display = 'none';
                   ui.nested_re_layout.$label[0].style.display = 'none';
                   ui.nested_re_layout.container.$el[0].style.display = 'none';
-                  ui.re.$el[0].style.height = "246.315px";
+                  ui.re.$el[0].style.height = '246.315px';
                   
               }
 
