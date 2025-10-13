@@ -1523,7 +1523,10 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
-                        "adjust"),
+                        "adjust",
+                        "posthoc_ci",
+                        "ci_width",
+                        "ci_method"),
                     columns=list(
                         list(
                             `name`="estimate", 

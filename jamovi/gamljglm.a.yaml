@@ -599,8 +599,6 @@ options:
         options:
             -   name: wald
                 title: Standard
-            -   name: profile
-                title: Profile
             -   name: quantile
                 title: Bootstrap Percent
             -   name: bcai

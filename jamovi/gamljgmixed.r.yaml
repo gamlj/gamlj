@@ -744,6 +744,9 @@ items:
                 - custom_link
                 - dep2
                 - adjust
+                - posthoc_ci
+                - ci_width
+                - ci_method
             columns:
                 -   name: response
                     title: Response

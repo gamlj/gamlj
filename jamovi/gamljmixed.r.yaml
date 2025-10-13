@@ -545,6 +545,9 @@ items:
                 - ci_method
                 - boot_r
                 - adjust
+                - posthoc_ci
+                - ci_width
+                - ci_method
             columns:
                 -   name: estimate
                     title: Difference

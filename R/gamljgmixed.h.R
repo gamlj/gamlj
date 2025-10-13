@@ -325,7 +325,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 default="wald",
                 options=list(
                     "wald",
-                    "profile",
                     "quantile"))
             private$..plot_mode <- jmvcore::OptionList$new(
                 "plot_mode",
@@ -1646,7 +1645,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "custom_family",
                         "custom_link",
                         "dep2",
-                        "adjust"),
+                        "adjust",
+                        "posthoc_ci",
+                        "ci_width",
+                        "ci_method"),
                     columns=list(
                         list(
                             `name`="response", 
