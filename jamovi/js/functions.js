@@ -24,7 +24,7 @@ const fun = {
         } else {
             detectedEnvironment = 'no_browser_context'; // 'window' or 'window.origin' not available
         }
-        console.log('Detected Environment:', detectedEnvironment);
+        console.log('Detect Environment:', detectedEnvironment);
         return(detectedEnvironment === "cloud")
 
       },
@@ -311,55 +311,47 @@ const fun = {
 
          },
          
-  fixRandomEffects: function(ui, context) {
+fixRandomEffects: function(ui, context) {
          
             var option=ui.re_corr.value();
             var oldOption = context.workspace.re_corr;
             context.workspace.re_corr=option;
-
+            console.log("in fun.fixRandomEffects");
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
-                        
-                  const cell = ui.re.$el[0].querySelectorAll("jmv-layoutcell")[1];
-                  // unset the border of the cell so it responds to class change
-                  cell.style.borderLeft = "";
-                  cell.style.borderBottom = "";
-                  
                   // make sure the add button is visible                      
                   var button= ui.re.$addButton;
                   button[0].style.visibility="visible";
+                  // get the re field to manipulate the children
+                  var target= ui.re;
+                  target.$el[0].lastElementChild.style.borderColor=null;
+                  target.controls[0].$el[0].childNodes[0].style.visibility="visible";
+                  // remove possibility to kill the first row
+                  target.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+                  
 
              } else {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
-                 // remove the add button
                  var button= ui.re.$addButton;
                  button[0].style.visibility="hidden";
-                 const target= ui.re;
+                 var target= ui.re;
                  target.setValue(Array(one));
-                 
-                 // make the borders transparent so it look nice when one cell is visible
-                 const cell = target.$el[0].querySelectorAll("jmv-layoutcell")[1];
-                       cell.style.borderLeft = "4px solid transparent";
-                       cell.style.borderBottom = "1px solid transparent";  
-
-                 const borderGrid = target.controls[0].$el[0];
-                      // make the blue borders not visible so it look nice when one cell is visible
-                       borderGrid.style.border = "none";
-                       // remove the x to kill the cell 
-                       button = borderGrid.querySelector("button.list-item-delete-button");
-                       button.style.visibility = "hidden";
-                      // make the blue borders not visible so it look nice when one cell is visible
-                 const selectGrid = borderGrid.querySelector("jmv-selectgrid");
-                       selectGrid.style.border = "none";
-                 
+                 var one = target.controls[0];
+                 target.$el[0].lastElementChild.style.borderColor="transparent";
+                 one.$el[0].childNodes[0].style.visibility="hidden";
+                 one.$el[0].childNodes[1].childNodes[0].style.borderStyle="unset";
              }
              
              // handle the nested random effects
                  // be sure there's at least one slot available
                  if (ui.nested_re.value().length===0)
                          ui.nested_re.setValue([[]]);
+                  // remove possibility to kill the first row
+                  ui.nested_re.controls[0].$el[0].childNodes[0].style.visibility="hidden";
+
+
   
 },
 
