@@ -146,12 +146,12 @@ const fun = {
     ui.contrast_custom_values.setValue(customList);
     
     if (customList.length>0) {
-        ui.custom_values.el.style.display='';
-        ui.contrast_focus_box.el.style.display='';
+        ui.custom_values.$el[0].style.display = '';
+        ui.contrast_focus_box.$el[0].style.display = '';
     } else {
-        ui.custom_values.el.style.display='none';
+        ui.custom_values.$el[0].style.display = 'none';
         ui.contrast_custom_focus.setValue(false);
-        ui.contrast_focus_box.el.style.display='none';
+        ui.contrast_focus_box.$el[0].style.display = 'none';
 
     }
     
@@ -266,22 +266,21 @@ const fun = {
    fix_comparison:function(ui, context) {
   
             if (ui.comparison.getValue()===true) {
-               ui.nested_layout.buttons.style.display='';
-               ui.nested_layout.label.style.display='';
-               ui.nested_layout.container.el.style.display='';
-               ui.model_terms.el.style.height = '113px';
+              ui.nested_layout.$buttons[0].style.display = '';
+              ui.nested_layout.$label[0].style.display = '';
+              ui.nested_layout.container.$el[0].style.display = '';
+              ui.model_terms.$el[0].style.height = '113px';
              
-               if (ui.nested_re !== undefined) { 
-                  ui.nested_re_layout.buttons.style.display='';
-                  ui.nested_re_layout.label.style.display='';
-                  ui.nested_re_layout.container.el.style.display='';
-                  ui.re.el.style.height = '113px';
-                  // remove possibility to kill the first row
-                  const borderGrid = ui.nested_re.controls[0].el;
-                  const button = borderGrid.querySelector("button.list-item-delete-button");
-                        button.style.visibility="hidden";
+             if (ui.nested_re !== undefined) { 
+                 ui.nested_re_layout.$buttons[0].style.display = '';
+                 ui.nested_re_layout.$label[0].style.display = '';
+                 ui.nested_re_layout.container.$el[0].style.display = '';
+                 ui.re.$el[0].style.height = '113px';
+                 // remove possibility to kill the first row
+                const borderGrid = ui.nested_re.$controls[0].$el[0];
+                const button = borderGrid.querySelector("button.list-item-delete-button");
+                button.style.visibility="hidden";
 
-                 
                  var renested=context.cloneArray(ui.nested_re.value(), [[]]);
                  if (renested[0].length === 0) {
                          var relist=context.cloneArray(ui.re.value(), [[]]);
@@ -290,20 +289,19 @@ const fun = {
              }
 
             } else {
-              
-              ui.nested_layout.buttons.style.display='none';
-              ui.nested_layout.label.style.display='none';
-              ui.nested_layout.container.el.style.display='none';
-              ui.model_terms.el.style.height = '246.315px';
+              ui.nested_layout.$buttons[0].style.display = 'none';
+              ui.nested_layout.$label[0].style.display = 'none';
+              ui.nested_layout.container.$el[0].style.display = 'none';
               ui.nested_terms.setValue([]);
-              
+              ui.model_terms.$el[0].style.height = '246.315px';
+
               if (ui.nested_re !== undefined) { 
              
                   ui.nested_re.setValue([[]]);
-                  ui.nested_re_layout.buttons.style.display='none';
-                  ui.nested_re_layout.label.style.display='none';
-                  ui.nested_re_layout.container.el.style.display='none';
-                  ui.re.el.style.height = '243.315px';
+                  ui.nested_re_layout.$buttons[0].style.display = 'none';
+                  ui.nested_re_layout.$label[0].style.display = 'none';
+                  ui.nested_re_layout.container.$el[0].style.display = 'none';
+                  ui.re.$el[0].style.height = '246.315px';
                   
               }
 
@@ -322,29 +320,31 @@ const fun = {
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
-                 const cell = ui.re.el.querySelectorAll("jmv-layoutcell")[1];
-                 // unset the border of the cell so it responds to class change
-                       cell.style.borderLeft = "";
-                       cell.style.borderBottom = "";  
+                        
+                  const cell = ui.re.$el[0].querySelectorAll("jmv-layoutcell")[1];
+                  // unset the border of the cell so it responds to class change
+                  cell.style.borderLeft = "";
+                  cell.style.borderBottom = "";
+                  
                   // make sure the add button is visible                      
-                  var button= ui.re.addButton;
-                      ui.re.addButton.style.visibility='visible';
-
+                  var button= ui.re.$addButton;
+                  button[0].style.visibility="visible";
 
              } else {
                  var data = context.cloneArray(ui.re.value(),[]);
                  var one = flatMulti(data,context);
                  // remove the add button
-                 var button= ui.re.addButton;
-                     button.style.visibility="hidden";
+                 var button= ui.re.$addButton;
+                 button[0].style.visibility="hidden";
                  const target= ui.re;
-                       target.setValue(Array(one));
+                 target.setValue(Array(one));
+                 
                  // make the borders transparent so it look nice when one cell is visible
-                 const cell = target.el.querySelectorAll("jmv-layoutcell")[1];
+                 const cell = target.$el[0].querySelectorAll("jmv-layoutcell")[1];
                        cell.style.borderLeft = "4px solid transparent";
                        cell.style.borderBottom = "1px solid transparent";  
 
-                 const borderGrid = target.controls[0].el;
+                 const borderGrid = target.$controls[0].$el[0];
                       // make the blue borders not visible so it look nice when one cell is visible
                        borderGrid.style.border = "none";
                        // remove the x to kill the cell 
@@ -353,15 +353,13 @@ const fun = {
                       // make the blue borders not visible so it look nice when one cell is visible
                  const selectGrid = borderGrid.querySelector("jmv-selectgrid");
                        selectGrid.style.border = "none";
-                       
+                 
              }
              
              // handle the nested random effects
                  // be sure there's at least one slot available
-                 if (ui.nested_re.value().length===0) {
+                 if (ui.nested_re.value().length===0)
                          ui.nested_re.setValue([[]]);
-                  }
-
   
 },
 
@@ -461,8 +459,8 @@ const fun = {
 
         // restore in case users used logistic second dep field
         if (typeof ui.dep2 !== 'undefined' ) {
-             ui.dep_box.label.textContent="Dependent Variable";
-             ui.dep2.el.style.display='none';
+             ui.dep_box.$label[0].textContent = "Dependent Variable";
+             ui.dep2.$el[0].style.display = 'none';
           
         }
         
@@ -496,13 +494,13 @@ const fun = {
           
             var odds=["logistic","probit","multinomial","ordinal"]
             var irr=["poisson","poiover","nb"]
-            ui.es_expb.label.textContent="Exp(B)"; 
+            ui.es_expb.$label[0].textContent = "Exp(B)"; 
             
             if (odds.includes(ui.model_type.getValue())) {
-               ui.es_expb.label.textContent="Odd Rations (expB)"; 
+               ui.es_expb.$label[0].textContent = "Odd Rations (expB)"; 
             } 
             if (irr.includes(ui.model_type.getValue())) {
-               ui.es_expb.label.textContent="Incidence rate ratios (expB)"; 
+               ui.es_expb.$label[0].textContent = "Incidence rate ratios (expB)";
             } 
 
         }
@@ -511,9 +509,9 @@ const fun = {
 
         if (typeof ui.propodds_test !== 'undefined') {
               if (ui.model_type.getValue()==="ordinal") {
-                  ui.propodds_test.el.style.display='';
+                  ui.propodds_test.$el[0].style.display = '';
               } else {
-                  ui.propodds_test.el.style.display='none';;
+                  ui.propodds_test.$el[0].style.display = 'none';
               }
         }
 
@@ -521,9 +519,9 @@ const fun = {
         if (typeof ui.preds_phi !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="beta") {
-              ui.precision.el.style.display='';
+              ui.precision.$el[0].style.display = '';
             } else {
-              ui.precision.el.style.display='none';
+              ui.precision.$el[0].style.display = 'none';
             }
         }
         // model specific options 
@@ -536,7 +534,7 @@ const fun = {
         
       // deal with extra field of logistic by tables
        if (typeof ui.dep_box !== 'undefined' ) {
-              ui.dep_box.label.textContent="Dependent Variable";
+              ui.dep_box.$label[0].textContent = "Dependent Variable";
        }
        
        if (typeof ui.input_method !== 'undefined' ) {
@@ -546,16 +544,16 @@ const fun = {
               const models=["logistic","probit"];
               
               if (models.includes(ui.model_type.getValue())) {
-             
-                   ui.input_method.input.style.display='';
-                   ui.input_method.label.style.display='';
+              
+                   ui.input_method.$input[0].style.display = '';
+                   ui.input_method.$label[0].style.display = '';
                    if (["success","total"].includes(ui.input_method.value()))
-                           ui.dep2.el.style.display='';
+                           ui.dep2.$el[0].style.display = '';
 
               } else {
-                   ui.input_method.input.style.display='none';
-                   ui.input_method.label.style.display='none';
-                   ui.dep2.el.style.display='none';
+                   ui.input_method.$input[0].style.display = 'none';
+                   ui.input_method.$label[0].style.display = 'none';
+                   ui.dep2.$el[0].style.display = 'none';
 
               }
               this.updateInputMethod(ui,context);
@@ -580,28 +578,28 @@ const fun = {
     
        
        if (!["logistic","probit"].includes(ui.model_type.getValue()) || !ui[".caller"].getValue()=="glm") {
-           ui.dep_box.label.textContent="Dependent Variable";
+           ui.dep_box.$label[0].textContent = "Dependent Variable";
            ui.dep2.setValue(null);
           return ;
         }   
         
       if (ui.input_method.value() === "success") {
-        ui.dep_box.label.textContent="Successes/Failures";
-        ui.dep2.el.style.display='';
+        ui.dep_box.$label[0].textContent = "Successes/Failures";
+        ui.dep2.$el[0].style.display = '';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
 
       }
       if (ui.input_method.value() === "total") {
-        ui.dep_box.label.textContent="Successes/Totals";
-        ui.dep2.el.style.display='';
+        ui.dep_box.$label[0].textContent = "Successes/Totals";
+        ui.dep2.$el[0].style.display = '';
         ui.crosstab.setValue(false);
         ui.crosstab.setEnabled(false);
       }
       if (ui.input_method.value() === "standard") {
-        ui.dep_box.label.textContent="Dependent Variable";
+        ui.dep_box.$label[0].textContent = "Dependent Variable";
         ui.dep2.setValue(null);
-        ui.dep2.el.style.display='none';
+        ui.dep2.$el[0].style.display = 'none';
         ui.crosstab.setEnabled(true);
       }
       
@@ -613,9 +611,9 @@ const fun = {
            return;
           
         if (ui.plot_more_options.value() == true)   {
-           ui.plot_more_option_box.el.style.display='';
+           ui.plot_more_option_box.$el[0].style.display = '';
         } else {
-           ui.plot_more_option_box.el.style.display='none';
+           ui.plot_more_option_box.$el[0].style.display = 'none';
            if (typeof ui.plot_y_min !== 'undefined')
                    ui.plot_y_min.setValue("");
            if (typeof ui.plot_y_max !== 'undefined')
