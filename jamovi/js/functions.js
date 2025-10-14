@@ -277,7 +277,7 @@ const fun = {
                  ui.nested_re_layout.container.$el[0].style.display = '';
                  ui.re.$el[0].style.height = '113px';
                  // remove possibility to kill the first row
-                const borderGrid = ui.nested_re.$controls[0].$el[0];
+                const borderGrid = ui.nested_re.controls[0].$el[0];
                 const button = borderGrid.querySelector("button.list-item-delete-button");
                 button.style.visibility="hidden";
 
@@ -344,7 +344,7 @@ const fun = {
                        cell.style.borderLeft = "4px solid transparent";
                        cell.style.borderBottom = "1px solid transparent";  
 
-                 const borderGrid = target.$controls[0].$el[0];
+                 const borderGrid = target.controls[0].$el[0];
                       // make the blue borders not visible so it look nice when one cell is visible
                        borderGrid.style.border = "none";
                        // remove the x to kill the cell 
