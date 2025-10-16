@@ -349,6 +349,7 @@ options:
     -   name: export
         title: Export
         type: Action
+        default: false
     -   name: plot_x
         title: Horizontal axis
         type: Variable
@@ -598,8 +599,6 @@ options:
         options:
             -   name: wald
                 title: Standard
-            -   name: profile
-                title: Profile
             -   name: quantile
                 title: Bootstrap Percent
             -   name: bcai

@@ -35,6 +35,7 @@ gamlj_mixed(
   plot_x = NULL,
   plot_z = NULL,
   plot_by = NULL,
+  plot_terms = NULL,
   plot_raw = FALSE,
   plot_yscale = FALSE,
   plot_xoriginal = FALSE,
@@ -161,6 +162,10 @@ the plot}
 
 \item{plot_by}{a list of string naming the variables defining the levels
 for multiple plots}
+
+\item{plot_terms}{a RHS formulas. It is an alternative way to
+ produce plots. \code{plot_terms=~x+z:x} produces two plots, one with
+`x` as x-axis and one with z as x-axis and x defining different lines.}
 
 \item{plot_raw}{\code{TRUE} or \code{FALSE} (default), plot raw data along
 the predicted values}

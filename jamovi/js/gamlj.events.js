@@ -10,7 +10,7 @@ const events = {
         this.setCustomVariable("Intercept", "none", "");
         
         if (fun.isCloud(window)) {
-          ui.panel_save.el.style.display='none';
+          ui.panel_save.$el[0].style.display='none';
         }
 
         fun.calcModelTerms(ui, this);
@@ -31,17 +31,17 @@ const events = {
         if (typeof ui.propodds_test !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="ordinal") {
-              ui.propodds_test.el.style.display='';
+              ui.propodds_test.$el[0].style.display='';
             } else {
-              ui.propodds_test.el.style.display='none';
+              ui.propodds_test.$el[0].style.display='none';
             }
         }
         if (typeof ui.preds_phi !== 'undefined' ) {
           
             if (ui.model_type.getValue()==="beta") {
-              ui.precision.el.style.display='';
+              ui.precision.$el[0].style.display='';
             } else {
-              ui.precision.el.style.display='none';
+              ui.precision.$el[0].style.display='none';
             }
         }
         
@@ -185,14 +185,14 @@ const events = {
       var clusters=this.cloneArray(ui.cluster.value(), []);
       if (clusters.length>1) {
         if (ui.re_nested !== undefined) {
-         ui.re_nestedclusters.el.style.display='';
-         ui.re_crossedclusters.el.style.display='';
+         ui.re_nestedclusters.$el[0].style.display='';
+         ui.re_crossedclusters.$el[0].style.display='';
         }
 
       } else {
         if (ui.re_nested !== undefined) {
-           ui.re_nestedclusters.el.style.display='none';
-           ui.re_crossedclusters.el.style.display='none';
+           ui.re_nestedclusters.$el[0].style.display='none';
+           ui.re_crossedclusters.$el[0].style.display='none';
         }
       }
         fun.updateRandomSupplier(ui,this);

@@ -293,11 +293,10 @@ procedure.posthoc_effsize <- function(obj) {
 .posthoc_ci <- function(x, ...) UseMethod(".posthoc_ci")
 
 .posthoc_ci.default <- function(model, term, width, method, vfun = NULL, mode = NULL) {
+  
     termf <- stats::as.formula(paste("pairwise ~", term))
-
     data <- insight::get_data(model, source = "frame")
-
-    opts_list <- list(object = model, specs = termf, type = "response", data = data)
+    opts_list <- list(object = model, specs = termf, type = "response")
 
     if (is.something(mode)) {
         opts_list[["mode"]] <- mode
@@ -306,10 +305,18 @@ procedure.posthoc_effsize <- function(obj) {
     if (is.something(vfun)) {
         opts_list[["vcov."]] <- vfun
     }
-
     referenceGrid <- do.call(emmeans::emmeans, opts_list)
-    results <- as.data.frame(parameters::parameters(referenceGrid$contrasts, ci = width, ci_method = method))
-    results <- as.data.frame(cbind(results$CI_low, results$CI_high))
+
+    if (inherits(model, "bootstrap_model")) {
+
+          results <- as.data.frame(parameters::parameters(referenceGrid$contrasts, ci = width, ci_method=method))
+          results <- as.data.frame(cbind(results$CI_low, results$CI_high))
+
+    } else {
+         results <- as.data.frame(stats::confint(referenceGrid$contrasts,level=width))
+         rows<-dim(results)[2]
+         results <- as.data.frame(results[,c(rows-1,rows)])
+    }
     names(results) <- c("est.ci.lower", "est.ci.upper")
     results
 }
@@ -317,6 +324,8 @@ procedure.posthoc_effsize <- function(obj) {
 .posthoc_ci.clm <- function(model, term, width, method, vfun = NULL, mode = NULL) {
     .posthoc_ci.default(model, term, width, method, vfun = vfun, mode = "linear.predictor")
 }
+
+
 
 .posthoc_ci.clmm <- function(model, term, width, method, vfun = NULL, mode = NULL) {
     .posthoc_ci.default(model, term, width, method, vfun = vfun, mode = "linear.predictor")

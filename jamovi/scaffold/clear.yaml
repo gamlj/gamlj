@@ -62,6 +62,9 @@
     name: opts_posthoc
     children: 
        - adjust
+       - posthoc_ci
+       - ci_width
+       - ci_method
 -   type: scaffold
     name: opts_simple_effects
     children:

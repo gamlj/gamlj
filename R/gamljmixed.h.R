@@ -43,7 +43,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             export_emm = FALSE,
             export_re = FALSE,
             export_plot = FALSE,
-            export = NULL,
+            export = FALSE,
             plot_mode = NULL,
             plot_terms = list(
                 list()),
@@ -321,7 +321,8 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                export)
+                export,
+                default=FALSE)
             private$..plot_mode <- jmvcore::OptionList$new(
                 "plot_mode",
                 plot_mode,
@@ -1522,7 +1523,10 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
-                        "adjust"),
+                        "adjust",
+                        "posthoc_ci",
+                        "ci_width",
+                        "ci_method"),
                     columns=list(
                         list(
                             `name`="estimate", 

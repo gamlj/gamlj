@@ -153,6 +153,7 @@ options:
     -   name: export
         title: Export
         type: Action
+        default: false
     -   name: es
         title: Effect Size
         type: NMXList
@@ -197,8 +198,6 @@ options:
         options:
             -   name: wald
                 title: Standard
-            -   name: profile
-                title: Profile
             -   name: quantile
                 title: Bootstrap (Parametric)
         description:

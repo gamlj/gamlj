@@ -2,6 +2,15 @@ testthat::context("lm")
 tol <- .001
 
 
+
+mod0 <- GAMLj3::gamljlm(
+  data = ToothGrowth,
+  dep = "len",
+  factors = "supp",
+  covs = "dose",
+  model_terms = list("dose", "supp", c("dose", "supp"))
+)
+
 mod0 <- GAMLj3::gamlj_lm(
     data = ToothGrowth,
     dep = "len",
