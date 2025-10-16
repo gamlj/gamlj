@@ -1,3 +1,5 @@
+// this should be ok with 2.6 and 2.7
+
 var rtermFormat = require('./rtermFormat');
 
 
