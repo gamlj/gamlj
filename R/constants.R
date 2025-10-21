@@ -56,7 +56,8 @@ WARNS["means.noemms"] <- "Estimated marginal means cannot be estimated. Please t
 
 ### standard error #############
 
-WARNS["stde.robust_test"] <- "Inferential tests and p-values of the effects are adjusted for heteroschedasticity."
+WARNS["stde.robust_test"] <- "Inferential tests and p-values are based on robust estimation."
+WARNS["norobustanova"] <- "robust estimation not available for the omnibus tests."
 
 ### simple effects #############
 WARNS["se.interactions"] <- "Simple effects are estimated setting higher order

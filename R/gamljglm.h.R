@@ -61,6 +61,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_mode = NULL,
             plot_terms = list(
                 list()),
+            robust_method = "HC1",
+            se_method = "standard",
             covs_scale = NULL,
             scale_missing = "complete",
             offset = NULL,
@@ -374,6 +376,22 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 template=jmvcore::OptionVariables$new(
                     "plot_terms",
                     NULL))
+            private$..robust_method <- jmvcore::OptionList$new(
+                "robust_method",
+                robust_method,
+                default="HC1",
+                options=list(
+                    "HC3",
+                    "HC2",
+                    "HC1",
+                    "HC0"))
+            private$..se_method <- jmvcore::OptionList$new(
+                "se_method",
+                se_method,
+                default="standard",
+                options=list(
+                    "standard",
+                    "robust"))
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -556,6 +574,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_extra)
             self$.addOption(private$..plot_mode)
             self$.addOption(private$..plot_terms)
+            self$.addOption(private$..robust_method)
+            self$.addOption(private$..se_method)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..offset)
@@ -629,6 +649,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_extra = function() private$..plot_extra$value,
         plot_mode = function() private$..plot_mode$value,
         plot_terms = function() private$..plot_terms$value,
+        robust_method = function() private$..robust_method$value,
+        se_method = function() private$..se_method$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         offset = function() private$..offset$value,
@@ -701,6 +723,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_extra = NA,
         ..plot_mode = NA,
         ..plot_terms = NA,
+        ..robust_method = NA,
+        ..se_method = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..offset = NA,

@@ -514,6 +514,37 @@ options:
                 not used in R
             ui: In multiplot tab, the terms to make  plots. Here you can specify multiple
                 terms for multiple plots.
+    -   name: robust_method
+        title: Method
+        type: List
+        default: HC1
+        options:
+            -   name: HC3
+                title: HC3
+            -   name: HC2
+                title: HC2
+            -   name: HC1
+                title: HC1
+            -   name: HC0
+                title: HC0
+        description:
+            R: not present in T
+            ui: |
+                `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf) for deatils.
+    -   name: se_method
+        title: SE Method
+        type: List
+        default: standard
+        options:
+            -   name: standard
+                title: Standard
+            -   name: robust
+                title: Robust
+        description:
+            R: |
+                The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC} for deatils.
+            ui: |
+                The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for robust method.
     -   name: covs_scale
         title: Covariates Scaling
         type: Array
@@ -729,5 +760,5 @@ options:
                 title: Mean class
         default: response
         description:
-            R: Plot ordinal model predicted values in as probabilities (`response`)
-                or predicted class (`mean.class`)
+            R: |
+                Plot ordinal model predicted values in as probabilities (`response`) or predicted class (`mean.class`)

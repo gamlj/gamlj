@@ -627,14 +627,14 @@ options:
         type: NMXList
         options:
             -   name: dm
-                title: Cohen's d (model SD)
+                title: Cohen`s d (model SD)
             -   name: ds
-                title: Cohen's d (sample SD)
+                title: Cohen`s d (sample SD)
             -   name: g
-                title: Hedge's g (sample SD)
+                title: Hedge`s g (sample SD)
         description:
             R: |
-                effect size indices for mean comparisons. One or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g
+                effect size indices for mean comparisons. One or more of `dm`,  `ds`,`g` for Cohen s d (dm=model SD,ds=sample SD )  or Hedge s g
         default:
             - dm
     -   name: d_ci
@@ -757,20 +757,6 @@ options:
         description:
             R: |
                 Re-scale the dependent variable.
-    -   name: se_method
-        title: SE Method
-        type: List
-        default: standard
-        options:
-            -   name: standard
-                title: Standard
-            -   name: robust
-                title: Robust
-        description:
-            R: |
-                The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC} for deatils.
-            ui: |
-                The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for robust method.
     -   name: ci_method
         title: CI Method
         type: List
@@ -790,7 +776,7 @@ options:
     -   name: robust_method
         title: Method
         type: List
-        default: HC3
+        default: HC1
         options:
             -   name: HC3
                 title: HC3
@@ -802,6 +788,19 @@ options:
                 title: HC0
         description:
             R: not present in T
-            ui: '`HC1` to `HC3` sets the heteroschedasticity-consistent robust standard
-                error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf)
-                for deatils.'
+            ui: |
+                `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf) for deatils.
+    -   name: se_method
+        title: SE Method
+        type: List
+        default: standard
+        options:
+            -   name: standard
+                title: Standard
+            -   name: robust
+                title: Robust
+        description:
+            R: |
+                The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC} for deatils.
+            ui: |
+                The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for robust method.

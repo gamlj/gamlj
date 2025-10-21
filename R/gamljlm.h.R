@@ -87,9 +87,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             intercept_info = FALSE,
             es_info = FALSE,
             dep_scale = "none",
-            se_method = "standard",
             ci_method = "wald",
-            robust_method = "HC3", ...) {
+            robust_method = "HC1",
+            se_method = "standard", ...) {
 
             super$initialize(
                 package="GAMLj3",
@@ -518,13 +518,6 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "centered",
                     "standardized"),
                 default="none")
-            private$..se_method <- jmvcore::OptionList$new(
-                "se_method",
-                se_method,
-                default="standard",
-                options=list(
-                    "standard",
-                    "robust"))
             private$..ci_method <- jmvcore::OptionList$new(
                 "ci_method",
                 ci_method,
@@ -536,12 +529,19 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..robust_method <- jmvcore::OptionList$new(
                 "robust_method",
                 robust_method,
-                default="HC3",
+                default="HC1",
                 options=list(
                     "HC3",
                     "HC2",
                     "HC1",
                     "HC0"))
+            private$..se_method <- jmvcore::OptionList$new(
+                "se_method",
+                se_method,
+                default="standard",
+                options=list(
+                    "standard",
+                    "robust"))
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
@@ -621,9 +621,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..intercept_info)
             self$.addOption(private$..es_info)
             self$.addOption(private$..dep_scale)
-            self$.addOption(private$..se_method)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..robust_method)
+            self$.addOption(private$..se_method)
         }),
     active = list(
         .caller = function() private$...caller$value,
@@ -704,9 +704,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         intercept_info = function() private$..intercept_info$value,
         es_info = function() private$..es_info$value,
         dep_scale = function() private$..dep_scale$value,
-        se_method = function() private$..se_method$value,
         ci_method = function() private$..ci_method$value,
-        robust_method = function() private$..robust_method$value),
+        robust_method = function() private$..robust_method$value,
+        se_method = function() private$..se_method$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
@@ -786,9 +786,9 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..intercept_info = NA,
         ..es_info = NA,
         ..dep_scale = NA,
-        ..se_method = NA,
         ..ci_method = NA,
-        ..robust_method = NA)
+        ..robust_method = NA,
+        ..se_method = NA)
 )
 
 gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

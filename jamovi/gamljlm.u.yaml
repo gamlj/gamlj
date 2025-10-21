@@ -654,6 +654,7 @@ children:
                                 format: number
                                 enable: (ci_method_quantile || ci_method_bcai)
                     -   type: Label
+                        name: se_method
                         label: SE Method
                         children:
                             -   type: RadioButton

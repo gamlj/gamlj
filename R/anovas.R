@@ -7,16 +7,31 @@ ganova <- function(x, ...) UseMethod(".anova")
 
 
 .anova.glm <- function(model, obj, test = "LR") {
+ 
+    norobust<-c("multinomial")
     if (!obj$formulaobj$hasTerms) {
         obj$warning <- list(topic = "main_anova", message = "Omnibus tests cannot be computed")
         return(NULL)
     }
-
-    anoobj <- try_hard(car::Anova(model, test = test, type = 3, singular.ok = T))
+  
+    opts<-list(model, test = test, type = 3, singular.ok = T)
+    
+    if (obj$option("se_method", "robust")) {
+     if (obj$options$model_type %in% norobust)
+       warning("Robust estimation not available for omnibus tests of ",obj$options$model_type)
+      else {
+         opts$vcov<-sandwich::vcovHC(model,type=obj$options$robust_method)
+         opts$test<-"Wald"
+         warning(WARNS[["stde.robust_test"]])
+      }
+    }
+   
+    anoobj <- try_hard(do.call(car::Anova,opts))
 
     ### LR is less lenient than Wald
     if (!isFALSE(anoobj$error)) {
-        anoobj <- try_hard(car::Anova(model, test = "Wald", type = 3, singular.ok = T))
+        opts$test<-"Wald"
+        anoobj <- try_hard(do.call(car::Anova,opts))
         obj$warning <- list(topic = "main_anova", message = "Wald test was used because LRT failed")
     }
     obj$error <- list(topic = "main_anova", message = anoobj$error)
@@ -26,13 +41,14 @@ ganova <- function(x, ...) UseMethod(".anova")
     if (!isFALSE(anoobj$error)) {
         return(NULL)
     }
-
+    
     .anova <- as.data.frame(anoobj$obj, stringsAsFactors = F)
     .transnames <- list("test" = c("Chisq", "LR Chisq"), df = c("Df", "df1"), p = c("Pr(>Chisq)"))
     names(.anova) <- transnames(names(.anova), .transnames)
 
     .anova <- .anova[rownames(.anova) != "(Intercept)", ]
 
+    
     #### effect size
 
     d0 <- null.deviance(model)
@@ -49,6 +65,8 @@ ganova <- function(x, ...) UseMethod(".anova")
         obj$warning <- list(topic = "main_anova", message = "Omnibus tests cannot be computed")
         return(NULL)
     }
+  
+    if (obj$options$se_method=="robust") warning(WARNS["norobustanova"])
 
     anoobj <- try_hard(stats::anova(model, type = 3))
     obj$error <- list(topic = "main_anova", message = anoobj$error)

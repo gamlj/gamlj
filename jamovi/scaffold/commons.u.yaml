@@ -195,3 +195,19 @@
                                 type: TermLabel
 
 
+-   type: Label
+    name: se_method
+    label: SE Method
+    children:
+                -   type: RadioButton
+                    name: se_method_standard
+                    optionName: se_method
+                    optionPart: standard
+                -   type: RadioButton
+                    name: se_method_robust
+                    optionName: se_method
+                    optionPart: robust
+                -   type: ComboBox
+                    name: robust_method
+                    enable: (se_method_robust)
+
