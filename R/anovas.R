@@ -8,7 +8,7 @@ ganova <- function(x, ...) UseMethod(".anova")
 
 .anova.glm <- function(model, obj, test = "LR") {
  
-    norobust<-c("multinomial")
+   
     if (!obj$formulaobj$hasTerms) {
         obj$warning <- list(topic = "main_anova", message = "Omnibus tests cannot be computed")
         return(NULL)
@@ -16,6 +16,7 @@ ganova <- function(x, ...) UseMethod(".anova")
   
     opts<-list(model, test = test, type = 3, singular.ok = T)
     
+    norobust<-c("multinomial") 
     if (obj$option("se_method", "robust")) {
      if (obj$options$model_type %in% norobust)
        warning("Robust estimation not available for omnibus tests of ",obj$options$model_type)
@@ -86,12 +87,20 @@ ganova <- function(x, ...) UseMethod(".anova")
 }
 
 .anova.betareg <- function(model, obj) {
+  
     if (!obj$formulaobj$hasTerms) {
         obj$warning <- list(topic = "main_anova", message = "Omnibus tests cannot be computed")
         return(NULL)
     }
 
-    anoobj <- try_hard(car::Anova(model, test = "Chisq", type = 3, singular.ok = T))
+  opts<-list(mod=model,test = "Chisq", type = 3, singular.ok = T)
+  
+  if (obj$option("se_method", "robust")) {
+      warning(WARNS[["norobustanova"]])
+    }
+  
+  
+    anoobj <- try_hard(do.call(car::Anova,opts))
     obj$error <- list(topic = "main_anova", message = anoobj$error)
     if (!isFALSE(anoobj$error)) {
         return(NULL)

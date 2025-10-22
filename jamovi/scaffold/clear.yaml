@@ -37,6 +37,7 @@
         - custom_family
         - custom_link
         - dep2
+        - robust_method
 -   type: scaffold
     name: opts_nested
     children:
