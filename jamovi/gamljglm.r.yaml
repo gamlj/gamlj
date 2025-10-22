@@ -58,6 +58,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - nested_terms
                     - nested_intercept
                     - comparison
@@ -109,6 +110,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                 columns:
                     -   name: info
                         type: text
@@ -154,6 +156,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                 columns:
                     -   name: obs
                         title: Observed
@@ -184,6 +187,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - es
                 columns:
                     -   name: source
@@ -228,6 +232,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - ci_width
                     - ci_method
                     - boot_r
@@ -303,6 +308,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - ci_width
                     - ci_method
                     - boot_r
@@ -377,6 +383,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - ci_width
                     - ci_method
                     - boot_r
@@ -433,6 +440,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                 columns:
                     -   name: source
                         title: Coefficient
@@ -487,6 +495,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - simple_x
                     - simple_mods
                     - simple_scale
@@ -557,6 +566,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                 columns:
                     -   name: source
                         title: Name
@@ -612,6 +622,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - propodds_test
                 columns:
                     -   name: source
@@ -660,6 +671,7 @@ items:
             - custom_family
             - custom_link
             - dep2
+            - robust_method
             - ci_width
             - ci_method
             - boot_r
@@ -690,6 +702,7 @@ items:
                 - custom_family
                 - custom_link
                 - dep2
+                - robust_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -753,6 +766,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - model_type
                     - dep
                     - factors
@@ -821,6 +835,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - simple_x
                     - simple_mods
                     - simple_scale
@@ -899,6 +914,7 @@ items:
             - custom_family
             - custom_link
             - dep2
+            - robust_method
             - simple_x
             - simple_mods
             - simple_scale
@@ -1005,6 +1021,7 @@ items:
                 - custom_family
                 - custom_link
                 - dep2
+                - robust_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -1067,6 +1084,7 @@ items:
                     - custom_family
                     - custom_link
                     - dep2
+                    - robust_method
                     - simple_x
                     - simple_mods
                     - simple_scale
@@ -1125,11 +1143,13 @@ items:
             - custom_family
             - custom_link
             - dep2
+            - robust_method
             - offset
             - omnibus
             - custom_family
             - custom_link
             - dep2
+            - robust_method
             - ccm_value
             - ccp_value
             - ccra_steps
@@ -1165,6 +1185,7 @@ items:
                 - custom_family
                 - custom_link
                 - dep2
+                - robust_method
                 - plot_x
                 - plot_z
                 - plot_by
@@ -1205,6 +1226,7 @@ items:
             - custom_family
             - custom_link
             - dep2
+            - robust_method
     -   name: residuals
         title: Residuals Vales
         type: Output
@@ -1232,6 +1254,7 @@ items:
             - custom_family
             - custom_link
             - dep2
+            - robust_method
     -   name: savenotes
         type: Html
         visible: false
