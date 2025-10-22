@@ -592,7 +592,7 @@ Variable <- R6::R6Class(
             if (method == "squeeze") {
               test <- any(vardata==0 | vardata==1)
               if (test) {
-                self$datamatic$warning <- list(topic = "info", message = paste("Dependent variables contains 0 or 1. Smithson & Verkuilen squeeze transformation has been applied."))
+                self$datamatic$warning <- list(topic = "info", message = paste("Dependent variable contains 0 or 1. Smithson & Verkuilen squeeze transformation has been applied."))
                 n <- length(vardata)
                 vardata <- (vardata * (n - 1) + 0.5) / n
               }

@@ -133,6 +133,13 @@
 #'   model (ordinal regression)
 #' @param plot_scale Chi-squared computation method. \code{'lrt'} (default)
 #'   gives LogLikelihood ration test,  \code{'wald'} gives the Wald Chi-squared.
+#' @param se_method Method to compute the standard error.
+#'                  Classical standard errors is the default \code{standard}.
+#'                  Four methods for  heteroschedasticy-consistent
+#'                  standard errors are available: \code{HC0},
+#'                  \code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
+#'                  See \code{\link[sandwich]{vcovHC}} for details.
+
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$model} \tab \tab \tab \tab \tab The underlying estimated model \cr
@@ -209,14 +216,14 @@ gamlj_glm <- function(
     ccm_value = 1,
     ccp_value = 25,
     covs_scale_labels = "labels",
-    adjust = list(
-        "bonf"
-    ),
+    adjust = list("bonf"),
     covs_scale = NULL,
     expb_ci = TRUE,
     es = list("expb"),
     propodds_test = FALSE,
-    plot_scale = "response") {
+    plot_scale = "response",
+    se_method = "standard"
+    ) {
     if (!requireNamespace("jmvcore", quietly = TRUE)) {
         stop("gamljGzlm requires jmvcore to be installed (restart may be required)")
     }
@@ -340,6 +347,14 @@ gamlj_glm <- function(
         attr(data, "jmv-weights") <- data[[weights]]
     }
 
+    robust_method<-"HC3"
+    if (se_method != "standard") {
+      robust_method <- se_method
+      se_method <- "robust"
+    }
+    
+    
+
     ## end of custom code
 
     options <- gamljglmOptions$new(
@@ -394,7 +409,9 @@ gamlj_glm <- function(
         custom_family = custom_family,
         custom_link = custom_link,
         propodds_test = propodds_test,
-        plot_scale = plot_scale
+        plot_scale = plot_scale,
+        se_method = se_method,
+        robust_method=robust_method
     )
 
     analysis <- gamljglmClass$new(
