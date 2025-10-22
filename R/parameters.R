@@ -174,7 +174,8 @@ gparameters <- function(x, ...) UseMethod(".parameters")
 }
 
 .parameters.betareg <- function(model, obj) {
-  print(sessionInfo())
+
+     mark(summary(model)) 
     .coefficients <- .parameters.glm(model, obj)
     .coefficients
 }

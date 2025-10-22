@@ -250,12 +250,16 @@ Variable <- R6::R6Class(
                     self$method <- "dummy"
                 }
                 if (self$type %in% c("numeric", "integer")) {
+                    self$contrast_labels <- self$name
                     if (self$datamatic$option("dep_scale")) {
                         self$covs_scale <- self$datamatic$options$dep_scale
                     }
-                    self$contrast_labels <- self$name
+                    if (self$datamatic$option("model_type","beta")) {
+                      self$covs_scale <- "squeeze"
+                    }
+                    
                 }
-            }
+            } ### end of dependent var checks
 
             ### check numeric variables ###
 
@@ -305,6 +309,7 @@ Variable <- R6::R6Class(
             return(self)
         },
         get_values = function(data) {
+          
             vardata <- data[[self$name64]]
             if (nrow(data) > 0 && all(is.na(vardata))) {
                 self$datametic$stop("Variable ", self$name, " has no valid case.")
@@ -372,7 +377,7 @@ Variable <- R6::R6Class(
             if (self$covs_scale == "log") {
                 values <- log(values)
             }
-         
+          
             values
           
         },
@@ -584,6 +589,15 @@ Variable <- R6::R6Class(
                     self$datamatic$error <- list(topic = "info", message = paste("Negative values found in variable", self$name, ". Log transform not applicable."))
                 }
             }
+            if (method == "squeeze") {
+              test <- any(vardata==0 | vardata==1)
+              if (test) {
+                self$datamatic$warning <- list(topic = "info", message = paste("Dependent variables contains 0 or 1. Smithson & Verkuilen squeeze transformation has been applied."))
+                n <- length(vardata)
+                vardata <- (vardata * (n - 1) + 0.5) / n
+              }
+            }
+            
 
             if (method == "clusterbasedcentered") {
                 cluster64 <- tob64(self$hasCluster[1])
