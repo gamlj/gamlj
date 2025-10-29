@@ -53,7 +53,8 @@ gamlj_glm(
   expb_ci = TRUE,
   es = list("expb"),
   propodds_test = FALSE,
-  plot_scale = "response"
+  plot_scale = "response",
+  se_method = "standard"
 )
 }
 \arguments{
@@ -220,6 +221,13 @@ model (ordinal regression)}
 
 \item{plot_scale}{Chi-squared computation method. \code{'lrt'} (default)
 gives LogLikelihood ration test,  \code{'wald'} gives the Wald Chi-squared.}
+
+\item{se_method}{Method to compute the standard error.
+Classical standard errors is the default \code{standard}.
+Four methods for  heteroschedasticy-consistent
+standard errors are available: \code{HC0},
+\code{HC1},\code{HC2},\code{HC3}, from package \code{sandwich} .
+See \code{\link[sandwich]{vcovHC}} for details.}
 }
 \value{
 A results object containing:

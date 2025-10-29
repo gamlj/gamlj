@@ -856,6 +856,9 @@ items:
                                     name: opts_model
                                     file: clear.yaml
                                 -   type: scaffold
+                                    name: opts_model_r
+                                    file: clear.yaml
+                                -   type: scaffold
                                     name: opts_model_z
                                     file: clear.yaml
                                 -   type: scaffold

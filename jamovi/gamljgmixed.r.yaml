@@ -1201,6 +1201,11 @@ items:
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
                     - offset
                     - omnibus
                     - custom_family
