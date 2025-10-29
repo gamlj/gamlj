@@ -710,6 +710,21 @@ children:
                 format: number
                 enable: (ci_method_quantile || ci_method_bcai)
           - type: Label
+            name: se_method
+            label: SE Method
+            children:
+              - type: RadioButton
+                name: se_method_standard
+                optionName: se_method
+                optionPart: standard
+              - type: RadioButton
+                name: se_method_robust
+                optionName: se_method
+                optionPart: robust
+              - type: ComboBox
+                name: robust_method
+                enable: (se_method_robust)
+          - type: Label
             name: add_info
             label: Additional info
             children:

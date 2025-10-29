@@ -61,6 +61,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             plot_mode = NULL,
             plot_terms = list(
                 list()),
+            robust_method = "HC1",
+            se_method = "standard",
             covs_scale = NULL,
             scale_missing = "complete",
             offset = NULL,
@@ -374,6 +376,22 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 template=jmvcore::OptionVariables$new(
                     "plot_terms",
                     NULL))
+            private$..robust_method <- jmvcore::OptionList$new(
+                "robust_method",
+                robust_method,
+                default="HC1",
+                options=list(
+                    "HC3",
+                    "HC2",
+                    "HC1",
+                    "HC0"))
+            private$..se_method <- jmvcore::OptionList$new(
+                "se_method",
+                se_method,
+                default="standard",
+                options=list(
+                    "standard",
+                    "robust"))
             private$..covs_scale <- jmvcore::OptionArray$new(
                 "covs_scale",
                 covs_scale,
@@ -556,6 +574,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..plot_extra)
             self$.addOption(private$..plot_mode)
             self$.addOption(private$..plot_terms)
+            self$.addOption(private$..robust_method)
+            self$.addOption(private$..se_method)
             self$.addOption(private$..covs_scale)
             self$.addOption(private$..scale_missing)
             self$.addOption(private$..offset)
@@ -629,6 +649,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         plot_extra = function() private$..plot_extra$value,
         plot_mode = function() private$..plot_mode$value,
         plot_terms = function() private$..plot_terms$value,
+        robust_method = function() private$..robust_method$value,
+        se_method = function() private$..se_method$value,
         covs_scale = function() private$..covs_scale$value,
         scale_missing = function() private$..scale_missing$value,
         offset = function() private$..offset$value,
@@ -701,6 +723,8 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..plot_extra = NA,
         ..plot_mode = NA,
         ..plot_terms = NA,
+        ..robust_method = NA,
+        ..se_method = NA,
         ..covs_scale = NA,
         ..scale_missing = NA,
         ..offset = NA,
@@ -827,6 +851,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison"),
@@ -884,7 +909,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "omnibus",
                                 "custom_family",
                                 "custom_link",
-                                "dep2"),
+                                "dep2",
+                                "robust_method"),
                             columns=list(
                                 list(
                                     `name`="info", 
@@ -934,7 +960,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "omnibus",
                                 "custom_family",
                                 "custom_link",
-                                "dep2"),
+                                "dep2",
+                                "robust_method"),
                             columns=list(
                                 list(
                                     `name`="obs", 
@@ -966,6 +993,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "es"),
                             columns=list(
                                 list(
@@ -1016,6 +1044,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1104,6 +1133,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1191,6 +1221,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1255,7 +1286,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "omnibus",
                                 "custom_family",
                                 "custom_link",
-                                "dep2"),
+                                "dep2",
+                                "robust_method"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1315,6 +1347,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1394,7 +1427,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "omnibus",
                                 "custom_family",
                                 "custom_link",
-                                "dep2"),
+                                "dep2",
+                                "robust_method"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1459,6 +1493,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "propodds_test"),
                             columns=list(
                                 list(
@@ -1513,6 +1548,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "custom_family",
                     "custom_link",
                     "dep2",
+                    "robust_method",
                     "ci_width",
                     "ci_method",
                     "boot_r",
@@ -1543,6 +1579,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "dep2",
+                        "robust_method",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1624,6 +1661,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "model_type",
                                 "dep",
                                 "factors",
@@ -1696,6 +1734,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "custom_family",
                                 "custom_link",
                                 "dep2",
+                                "robust_method",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1785,6 +1824,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "custom_family",
                     "custom_link",
                     "dep2",
+                    "robust_method",
                     "simple_x",
                     "simple_mods",
                     "simple_scale",
@@ -1916,6 +1956,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "dep2",
+                        "robust_method",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1982,6 +2023,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             "custom_family",
                             "custom_link",
                             "dep2",
+                            "robust_method",
                             "simple_x",
                             "simple_mods",
                             "simple_scale",
@@ -2041,11 +2083,13 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "custom_family",
                     "custom_link",
                     "dep2",
+                    "robust_method",
                     "offset",
                     "omnibus",
                     "custom_family",
                     "custom_link",
                     "dep2",
+                    "robust_method",
                     "ccm_value",
                     "ccp_value",
                     "ccra_steps",
@@ -2081,6 +2125,7 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "custom_family",
                         "custom_link",
                         "dep2",
+                        "robust_method",
                         "plot_x",
                         "plot_z",
                         "plot_by",
@@ -2122,7 +2167,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "omnibus",
                     "custom_family",
                     "custom_link",
-                    "dep2")))
+                    "dep2",
+                    "robust_method")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -2150,7 +2196,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "omnibus",
                     "custom_family",
                     "custom_link",
-                    "dep2")))
+                    "dep2",
+                    "robust_method")))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="savenotes",

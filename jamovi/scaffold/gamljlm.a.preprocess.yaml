@@ -303,15 +303,16 @@ options:
         type: NMXList
         options:
             -   name: dm
-                title: Cohen's d (model SD)
+                title: Cohen`s d (model SD)
             -   name: ds
-                title: Cohen's d (sample SD)
+                title: Cohen`s d (sample SD)
             -   name: g
-                title: Hedge's g (sample SD)
+                title: Hedge`s g (sample SD)
         description:
             R: |
-                effect size indices for mean comparisons. One or more of `'dm'`,  `'ds'`,`'g'` for Cohen's d (dm=model SD,ds=sample SD )  or Hedge's g
+                effect size indices for mean comparisons. One or more of `dm`,  `ds`,`g` for Cohen s d (dm=model SD,ds=sample SD )  or Hedge s g
         default: dm
+        
     -   name: d_ci
         title: Confidence intervals
         type: Bool
@@ -432,20 +433,6 @@ options:
         description:
             R: |
                 Re-scale the dependent variable.
-    -   name: se_method
-        title: SE Method
-        type: List
-        default: standard
-        options:
-            -   name: standard
-                title: Standard
-            -   name: robust
-                title: Robust
-        description:
-            R: |
-                The method to estimate the standard errors. `standard` for Wald's, `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error. See \[sandwich]{vcovHC} for deatils.
-            ui: |
-                The method to estimate the standard errors. `Standard` for Wald's method or `Robust` for robust method.
     -   name: ci_method
         title: CI Method
         type: List
@@ -462,20 +449,10 @@ options:
                 The method to estimate the confidence intervals. Standard method (`wald`) or bootstrap methods. For bootstrap, `quantile` compute the confidence intervals based on the bootstrap distribution, whereas `bcai` computes the bootstrap bias corrected accelerated intervals.
             ui: |
                 The method to estimate the confidence intervals. Standard method (`Wald`) or bootstrap methods. For bootstrap, `Quantile` computes the confidence intervals based on the bootstrap distribution, whereas `BCAi` computes the bootstrap bias corrected accelerated intervals.
+
     -   name: robust_method
-        title: Method
-        type: List
-        default: HC3
-        options:
-            -   name: HC3
-                title: HC3
-            -   name: HC2
-                title: HC2
-            -   name: HC1
-                title: HC1
-            -   name: HC0
-                title: HC0
-        description:
-            R: not present in T
-            ui: |
-                `HC1` to `HC3` sets the heteroschedasticity-consistent robust standard error.  See [sandwich R package](https://cran.r-project.org/web/packages/sandwich/sandwich.pdf) for deatils.
+        type: scaffold
+        file: commons.a.yaml
+    -   name: se_method
+        type: scaffold
+        file: commons.a.yaml

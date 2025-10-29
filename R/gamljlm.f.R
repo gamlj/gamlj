@@ -339,10 +339,10 @@ gamlj_lm <- function(
     }
 
 
-
+    robust_method<-"HC3"
     if (se_method != "standard") {
-        se_method <- "robust"
         robust_method <- se_method
+        se_method <- "robust"
     }
 
 
@@ -415,7 +415,8 @@ gamlj_lm <- function(
         intercept_info = intercept_info,
         es_info = es_info,
         dep_scale = dep_scale,
-        se_method = se_method
+        se_method = se_method,
+        robust_method=robust_method 
     )
 
     analysis <- gamljlmClass$new(

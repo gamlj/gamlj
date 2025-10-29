@@ -468,6 +468,9 @@ children:
                                 name: boot_r
                                 format: number
                                 enable: (ci_method_quantile || ci_method_bcai)
+                    -   type: scaffold
+                        name: se_method
+                        file: commons.u.yaml                                
                     -   type: Label
                         name: add_info
                         label: Additional info

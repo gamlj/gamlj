@@ -7,13 +7,13 @@
 \alias{update.gamljgmixedResults}
 \title{Update a GAMLj model}
 \usage{
-update.gamljlmResults(object, ...)
+\method{update}{gamljlmResults}(object, ...)
 
-update.gamljglmResults(object, ...)
+\method{update}{gamljglmResults}(object, ...)
 
-update.gamljmixedResults(object, ...)
+\method{update}{gamljmixedResults}(object, ...)
 
-update.gamljgmixedResults(object, ...)
+\method{update}{gamljgmixedResults}(object, ...)
 }
 \arguments{
 \item{object}{of class `gamlj*Results`}

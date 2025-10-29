@@ -1,7 +1,7 @@
 Package: GAMLj3
 Type: Package
 Title: GAMLj Suite for Linear Models
-Version: 3.6.3
+Version: 3.6.4
 Author: Marcello Gallucci
 Maintainer: Marcello Gallucci <mcfanda@gmail.com>
 Description: A suite for estimating linear models, such as the general linear model, linear mixed models,
@@ -14,9 +14,10 @@ LazyData: true
 Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, 
          rlang, stringr, ggplot2, 
          effectsize, insight, parameters ,performance,
-         lme4, lmerTest, lmtest
+         lme4, lmerTest, sandwich
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
-Suggests: ordinal, sandwich, nnet, betareg, knitr, rmarkdown,  mclogit (>= 0.9.6), boot, MASS, marginaleffects, nlme, jmvReadWrite
+Suggests: ordinal , nnet, statmod, betareg, knitr, rmarkdown,  mclogit (>= 0.9.6), 
+          boot, MASS, marginaleffects, nlme, jmvReadWrite,lmtest
 Depends: 
     R (>= 3.00)

@@ -944,6 +944,11 @@ items:
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
+                    - reml
+                    - cluster
+                    - re
+                    - re_corr
+                    - res_struct
                     - simple_x
                     - simple_mods
                     - simple_scale

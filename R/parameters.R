@@ -35,7 +35,8 @@ gparameters <- function(x, ...) UseMethod(".parameters")
     if (obj$option("estimates_ci")) {
         cidata <- as.data.frame(parameters::ci(.model,
             ci = .ci_width,
-            ci_method = .ci_method
+            ci_method = .ci_method,
+            vcov=.se_method
         ))
 
         .coefficients$est.ci.lower <- cidata$CI_low
@@ -90,19 +91,32 @@ gparameters <- function(x, ...) UseMethod(".parameters")
 
 .parameters.glm <- function(model, obj) {
   
-    .bootstrap <- obj$options$ci_method %in% c("quantile", "bcai")
+    .bootstrap  <- obj$options$ci_method %in% c("quantile", "bcai")
     .iterations <- obj$options$boot_r
-    .ci_method <- obj$options$ci_method
-    .ci_width <- obj$ciwidth
+    .ci_method  <- obj$options$ci_method
+    .ci_width   <- obj$ciwidth
+    .se_method  <- NULL
   
+    norobust<-c("ordinal")
+   
+    if (obj$option("se_method", "robust")) {
+      if (obj$options$model_type %in% norobust)
+           warning("Robust estimation not available for parameters of ",obj$options$model_type)
+       else {
+         .se_method <- obj$options$robust_method
+          warning(WARNS[["stde.robust_test"]])
+       }
+    }  
 
     if (is.something(obj$boot_model)) .model <- obj$boot_model else .model <- model
 
     .coefficients <- as.data.frame(parameters::parameters(
         model,
+        vcov = .se_method,
         ci = NULL,
         effects = "fixed"
     ), stringAsFactors = FALSE)
+
 
     .transnames <- list(
         source = "Parameter",
@@ -143,7 +157,8 @@ gparameters <- function(x, ...) UseMethod(".parameters")
     if (obj$option("estimates_ci")) {
         cidata <- as.data.frame(parameters::ci(.model,
             ci = .ci_width,
-            ci_method = .ci_method
+            ci_method = .ci_method,
+            vcov=.se_method
         ))
 
         .coefficients$est.ci.lower <- cidata$CI_low
@@ -159,6 +174,7 @@ gparameters <- function(x, ...) UseMethod(".parameters")
 }
 
 .parameters.betareg <- function(model, obj) {
+
     .coefficients <- .parameters.glm(model, obj)
     .coefficients
 }
