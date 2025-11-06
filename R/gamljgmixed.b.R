@@ -95,8 +95,6 @@ gamljgmixedClass <- R6::R6Class(
             aSmartObj$expandFrom <- 3
             ladd(private$.smartObjs) <- aSmartObj
 
-
-
             ### random covariances table
             aSmartObj <- SmartTable$new(self$results$main$randomcov, runner_machine)
             aSmartObj$activateOnData <- TRUE
@@ -108,7 +106,12 @@ gamljgmixedClass <- R6::R6Class(
             aSmartObj <- SmartTable$new(self$results$main$ranova, runner_machine)
             ladd(private$.smartObjs) <- aSmartObj
 
-
+            ## random coefficients table #####
+            aSmartObj <- SmartArray$new(self$results$main$re_tables, runner_machine)
+            aSmartObj$expandOnRun <- TRUE
+            aSmartObj$expandFrom <- 2
+            ladd(private$.smartObjs) <- aSmartObj
+            
             ### estimate marginal means
 
             aSmartObj <- SmartArray$new(self$results$emmeans, runner_machine)

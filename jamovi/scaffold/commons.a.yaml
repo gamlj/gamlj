@@ -349,3 +349,6 @@
             not used in R
         ui: |
             Export random coefficients, one dataset for each cluster
+-   name: export
+    title: Export
+    type: Action

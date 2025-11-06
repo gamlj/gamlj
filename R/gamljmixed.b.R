@@ -73,7 +73,7 @@ gamljmixedClass <- R6::R6Class(
             aSmartObj$ci("sd", self$options$ci_width)
             ladd(private$.smartObjs) <- aSmartObj
 
-            ### random covvariances table
+            ### random covariances table
             aSmartObj <- SmartTable$new(self$results$main$randomcov, runner_machine)
             aSmartObj$ci("sd", self$options$ci_width)
             aSmartObj$hideOn <- list(vcov = NA)
@@ -85,6 +85,12 @@ gamljmixedClass <- R6::R6Class(
             aSmartObj$hideOn <- list(df = NA)
             ladd(private$.smartObjs) <- aSmartObj
 
+            ## random coefficients table #####
+            aSmartObj <- SmartArray$new(self$results$main$re_tables, runner_machine)
+            aSmartObj$expandOnRun <- TRUE
+            aSmartObj$expandFrom <- 2
+            ladd(private$.smartObjs) <- aSmartObj
+            
             ### residual correlations for res_struct=un
             aSmartObj <- SmartTable$new(self$results$main$res_corr, runner_machine)
             aSmartObj$expandOnRun <- TRUE

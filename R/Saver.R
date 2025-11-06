@@ -44,6 +44,26 @@ Saver <- R6::R6Class(
             if (!self$option("export")) {
                 return()
             }
+            ### define the performer function based on jamovi version
+            option<-self$options$option("export")
+         
+            if (is.null(option$perform)) {
+              ## old style
+              .saverfun <- function(data,title) {
+                jmvReadWrite:::jmvOpn(dtaFrm = data, dtaTtl = title)
+              }
+            } else {
+              # new style
+              .saverfun <- function(data,title) {
+                
+                  option$perform(function(action) {
+                    list(
+                      data = data,
+                      title = title)
+                  })
+              }
+            } ### end
+
 
             ##### estimated marginal means ##########
 
@@ -51,7 +71,7 @@ Saver <- R6::R6Class(
                 emm <- procedure.emmeans(private$.runner)
                 if (is.something(emm)) {
                     for (i in seq_along(emm)) {
-                        jmvReadWrite:::jmvOpn(dtaFrm = data.frame(emm[[i]]), dtaTtl = paste0("emmean", i))
+                      .saverfun(data.frame(emm[[i]]), paste0("emmean", i))
                     }
                 } else {
                     self$warning <- list(
@@ -72,11 +92,11 @@ Saver <- R6::R6Class(
                         plot <- plotarray$items[[i]]$items[[j]]
                         plotdata <- data.frame(plot$state$plotData)
                         names(plotdata) <- fromb64(names(plotdata))
-                        jmvReadWrite:::jmvOpn(dtaFrm = plotdata, dtaTtl = paste0("plotdata", i,"_",j))
+                        .saverfun(plotdata, paste0("plotdata", i,"_",j))
                         if ("randomData" %in% names(plot$state)) {
                             rdata <- plot$state$randomData
                             names(rdata)[2] <- names(plotdata)[1]
-                            jmvReadWrite:::jmvOpn(dtaFrm = rdata, dtaTtl = paste0("plotrandom", i,"_",j))
+                            .saverfun(rdata, paste0("plotrandom", i,"_",j))
                         }
                       }
                     }
@@ -100,7 +120,7 @@ Saver <- R6::R6Class(
                     data <- data.frame(re[[i]])
                     names(data) <- fromb64(names(data))
                     data[[goodname]] <- rownames(data)
-                    jmvReadWrite:::jmvOpn(dtaFrm = data, dtaTtl = paste0("ranef", i))
+                    .saverfun(data, paste0("ranef", i))
                 }
             }
         }

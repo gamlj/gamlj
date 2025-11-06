@@ -325,13 +325,15 @@ children:
                                         optionName: re_corr
                                         optionPart: block
                     -   type: Label
-                        label: Tests
+                        label: Tables
                         children:
                             -   type: LayoutBox
                                 margin: large
                                 children:
                                     -   type: CheckBox
                                         name: re_lrt
+                                    -   type: CheckBox
+                                        name: re_table                                        
     -   name: panel_factors
         type: scaffold
         file: commons.u.yaml

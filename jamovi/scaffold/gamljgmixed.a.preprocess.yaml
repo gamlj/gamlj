@@ -151,9 +151,8 @@ options:
         type: scaffold
         file: commons.a.yaml
     -   name: export
-        title: Export
-        type: Action
-        default: false
+        type: scaffold
+        file: commons.a.yaml
     -   name: es
         title: Effect Size
         type: NMXList
@@ -404,6 +403,9 @@ options:
         suggested: nominal
         description:
             R: a vector of strings naming the clustering variables from `data`
+
+## panel Random Effects
+
     -   name: re
         title: Random Coefficients
         type: Array
@@ -475,3 +477,10 @@ options:
             R: |
                 `TRUE` or `FALSE` (default), LRT for the random effects
             ui: Compute LRT for the random effects
+    -   name: re_table
+        title: Random coefficients
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), output a table with the estimated random coefficients

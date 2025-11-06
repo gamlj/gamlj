@@ -41,7 +41,6 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             export_emm = FALSE,
             export_re = FALSE,
             export_plot = FALSE,
-            export = FALSE,
             es = list(
                 "expb"),
             expb_ci = TRUE,
@@ -83,7 +82,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             re_corr = "all",
             re_modelterms = TRUE,
             re_listing = "none",
-            re_lrt = FALSE, ...) {
+            re_lrt = FALSE,
+            re_table = FALSE, ...) {
 
             super$initialize(
                 package="GAMLj3",
@@ -296,8 +296,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                export,
-                default=FALSE)
+                FALSE)
             private$..es <- jmvcore::OptionNMXList$new(
                 "es",
                 es,
@@ -533,6 +532,10 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 "re_lrt",
                 re_lrt,
                 default=FALSE)
+            private$..re_table <- jmvcore::OptionBool$new(
+                "re_table",
+                re_table,
+                default=FALSE)
 
             self$.addOption(private$...caller)
             self$.addOption(private$...interface)
@@ -609,6 +612,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$.addOption(private$..re_modelterms)
             self$.addOption(private$..re_listing)
             self$.addOption(private$..re_lrt)
+            self$.addOption(private$..re_table)
         }),
     active = list(
         .caller = function() private$...caller$value,
@@ -685,7 +689,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         re_corr = function() private$..re_corr$value,
         re_modelterms = function() private$..re_modelterms$value,
         re_listing = function() private$..re_listing$value,
-        re_lrt = function() private$..re_lrt$value),
+        re_lrt = function() private$..re_lrt$value,
+        re_table = function() private$..re_table$value),
     private = list(
         ...caller = NA,
         ...interface = NA,
@@ -761,7 +766,8 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         ..re_corr = NA,
         ..re_modelterms = NA,
         ..re_listing = NA,
-        ..re_lrt = NA)
+        ..re_lrt = NA,
+        ..re_table = NA)
 )
 
 gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -833,7 +839,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     random = function() private$.items[["random"]],
                     randomcov = function() private$.items[["randomcov"]],
                     multirandom = function() private$.items[["multirandom"]],
-                    ranova = function() private$.items[["ranova"]]),
+                    ranova = function() private$.items[["ranova"]],
+                    re_tables = function() private$.items[["re_tables"]]),
                 private = list(),
                 public=list(
                     initialize=function(options) {
@@ -1620,7 +1627,21 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))}))$new(options=options))
+                                    `format`="zto,pvalue"))))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="re_tables",
+                            title="Random Coefficients Estimates",
+                            visible="(re_table)",
+                            items="(cluster)",
+                            template=jmvcore::Table$new(
+                                options=options,
+                                title="Random coeffcients across:  ___key___",
+                                columns=list(
+                                    list(
+                                        `name`="cluster", 
+                                        `title`="Cluster", 
+                                        `type`="text")))))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="posthoc",

@@ -246,10 +246,12 @@ children:
                                         optionName: re_corr
                                         optionPart: block
                     -   type: Label
-                        label: Tests
+                        label: Tables
                         children:
                             -   type: CheckBox
                                 name: re_lrt
+                            -   type: CheckBox
+                                name: re_table
     -   name: panel_structure
         type: CollapseBox
         label: Residuals Structure

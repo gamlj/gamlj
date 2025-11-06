@@ -332,6 +332,8 @@ children:
                 children:
                   - type: CheckBox
                     name: re_lrt
+                  - type: CheckBox
+                    name: re_table
   - name: panel_factors
     type: CollapseBox
     label: Factors Coding

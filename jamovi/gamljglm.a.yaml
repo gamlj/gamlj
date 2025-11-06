@@ -349,7 +349,6 @@ options:
     -   name: export
         title: Export
         type: Action
-        default: false
     -   name: plot_x
         title: Horizontal axis
         type: Variable
