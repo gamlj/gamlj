@@ -348,7 +348,8 @@ options:
         description:
             R: |
                 not used in R
-            ui: Export random coefficients, one dataset for each cluster
+            ui: |
+                Export random coefficients, one dataset for each cluster
     -   name: export_plot
         title: Plot data
         type: Bool
@@ -361,7 +362,6 @@ options:
     -   name: export
         title: Export
         type: Action
-        default: false
     -   name: es
         title: Effect Size
         type: NMXList
@@ -782,3 +782,10 @@ options:
             R: |
                 `TRUE` or `FALSE` (default), LRT for the random effects
             ui: Compute LRT for the random effects
+    -   name: re_table
+        title: Random coefficients
+        type: Bool
+        default: false
+        description:
+            R: '`TRUE` or `FALSE` (default), output a table with the estimated random
+                coefficients'

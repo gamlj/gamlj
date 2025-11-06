@@ -355,6 +355,20 @@ Runner <- R6::R6Class("Runner",
             jinfo("RUNNER: ranova")
             anovas.ranova(self$model, self)
         },
+        run_main_re_tables = function() {
+          
+          re <- gRanef(self$model, self)
+          names(re) <- fromb64(names(re))
+          for (i in seq_along(re)) {
+            .names<-fromb64(names(re[[i]]))
+            .names[.names=="(Intercept)"]<-"Intercept"
+            names(re[[i]]) <- .names
+            re[[i]]$cluster<-self$datamatic$variables[[tob64(names(re)[i])]]$levels
+          }
+        
+          re
+          
+        },
         run_posthoc = function() {
             if (length(self$options$posthoc) == 0) {
                 return()

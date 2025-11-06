@@ -43,7 +43,6 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             export_emm = FALSE,
             export_re = FALSE,
             export_plot = FALSE,
-            export = FALSE,
             plot_mode = NULL,
             plot_terms = list(
                 list()),
@@ -87,6 +86,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             re_listing = "none",
             reml = TRUE,
             re_lrt = FALSE,
+            re_table = FALSE,
             res_struct = "id",
             df_method = "Satterthwaite",
             norm_plot = FALSE,
@@ -321,8 +321,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                export,
-                default=FALSE)
+                FALSE)
             private$..plot_mode <- jmvcore::OptionList$new(
                 "plot_mode",
                 plot_mode,
@@ -542,6 +541,10 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "re_lrt",
                 re_lrt,
                 default=FALSE)
+            private$..re_table <- jmvcore::OptionBool$new(
+                "re_table",
+                re_table,
+                default=FALSE)
             private$..res_struct <- jmvcore::OptionList$new(
                 "res_struct",
                 res_struct,
@@ -671,6 +674,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..re_listing)
             self$.addOption(private$..reml)
             self$.addOption(private$..re_lrt)
+            self$.addOption(private$..re_table)
             self$.addOption(private$..res_struct)
             self$.addOption(private$..df_method)
             self$.addOption(private$..norm_plot)
@@ -762,6 +766,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         re_listing = function() private$..re_listing$value,
         reml = function() private$..reml$value,
         re_lrt = function() private$..re_lrt$value,
+        re_table = function() private$..re_table$value,
         res_struct = function() private$..res_struct$value,
         df_method = function() private$..df_method$value,
         norm_plot = function() private$..norm_plot$value,
@@ -852,6 +857,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..re_listing = NA,
         ..reml = NA,
         ..re_lrt = NA,
+        ..re_table = NA,
         ..res_struct = NA,
         ..df_method = NA,
         ..norm_plot = NA,
@@ -932,6 +938,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     random = function() private$.items[["random"]],
                     randomcov = function() private$.items[["randomcov"]],
                     ranova = function() private$.items[["ranova"]],
+                    re_tables = function() private$.items[["re_tables"]],
                     res_corr = function() private$.items[["res_corr"]]),
                 private = list(),
                 public=list(
@@ -1458,6 +1465,20 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue"))))
+                        self$add(jmvcore::Array$new(
+                            options=options,
+                            name="re_tables",
+                            title="Random Coefficients Estimates",
+                            visible="(re_table)",
+                            items="(cluster)",
+                            template=jmvcore::Table$new(
+                                options=options,
+                                title="Random coeffcients across:  ___key___",
+                                columns=list(
+                                    list(
+                                        `name`="cluster", 
+                                        `title`="Cluster", 
+                                        `type`="text")))))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="res_corr",

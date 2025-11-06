@@ -148,9 +148,8 @@ options:
         type: scaffold
         file: commons.a.yaml
     -   name: export
-        title: Export
-        type: Action
-        default: false
+        type: scaffold
+        file: commons.a.yaml
     -   name: omnibus
         title: Test
         type: List

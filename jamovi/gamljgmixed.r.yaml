@@ -719,6 +719,18 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+            -   name: re_tables
+                title: Random Coefficients Estimates
+                type: Array
+                visible: (re_table)
+                items: (cluster)
+                template:
+                    title: 'Random coeffcients across:  ___key___'
+                    type: Table
+                    columns:
+                        -   name: cluster
+                            title: Cluster
+                            type: text
     -   name: posthoc
         title: Post Hoc Tests
         type: Array

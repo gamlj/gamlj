@@ -350,7 +350,8 @@ options:
         description:
             R: |
                 not used in R
-            ui: Export random coefficients, one dataset for each cluster
+            ui: |
+                Export random coefficients, one dataset for each cluster
     -   name: export_plot
         title: Plot data
         type: Bool
@@ -363,7 +364,6 @@ options:
     -   name: export
         title: Export
         type: Action
-        default: false
     -   name: plot_mode
         title: Mode
         type: List
@@ -678,7 +678,7 @@ options:
         template:
             type: Terms
         description:
-            R: "a list of lists specifying the models random effects.          \n"
+            R: "a list of lists specifying the nested model random effects.          \n"
     -   name: re_corr
         title: Effects correlation
         type: List
@@ -753,12 +753,19 @@ options:
             R: |
                 `TRUE` (default) or `FALSE`, should the Restricted ML be used rather than ML
     -   name: re_lrt
-        title: LRT for Random Effects
+        title: LRT for Random effects
         type: Bool
         default: false
         description:
             R: |
                 `TRUE` or `FALSE` (default), LRT for the random effects
+    -   name: re_table
+        title: Random coefficients
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` or `FALSE` (default), output a table with the estimated random coefficients
     -   name: res_struct
         title: Structure
         type: List

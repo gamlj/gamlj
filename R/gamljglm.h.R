@@ -41,7 +41,6 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale_labels = "labels",
             export_emm = FALSE,
             export_plot = FALSE,
-            export = FALSE,
             plot_x = NULL,
             plot_z = NULL,
             plot_by = NULL,
@@ -295,8 +294,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                export,
-                default=FALSE)
+                FALSE)
             private$..plot_x <- jmvcore::OptionVariable$new(
                 "plot_x",
                 plot_x)

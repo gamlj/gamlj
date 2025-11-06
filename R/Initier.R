@@ -331,9 +331,16 @@ Initier <- R6::R6Class(
             list(list(var = "."))
         },
 
+        init_main_re_tables = function() {
+          re <- self$formulaobj$random
+          lapply(self$options$cluster, function(x) list(list(cluster=".")))
+        },
+        
+
         ### posthoc means ###
 
         init_posthoc = function() {
+          
             lapply(self$options$posthoc, function(.term) {
                 p <- prod(unlist(lapply(.term, function(t) self$datamatic$variables[[tob64(t)]]$nlevels)))
                 nrow <- p * (p - 1) / 2
