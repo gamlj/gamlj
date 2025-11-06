@@ -50,12 +50,13 @@ Saver <- R6::R6Class(
             if (is.null(option$perform)) {
               ## old style
               .saverfun <- function(data,title) {
+                jinfo("SAVER: saving old style")
                 jmvReadWrite:::jmvOpn(dtaFrm = data, dtaTtl = title)
               }
             } else {
               # new style
               .saverfun <- function(data,title) {
-                
+                  jinfo("SAVER: saving new style")
                   option$perform(function(action) {
                     list(
                       data = data,

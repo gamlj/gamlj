@@ -325,7 +325,7 @@ children:
                     optionName: re_corr
                     optionPart: block
           - type: Label
-            label: Tests
+            label: Tables
             children:
               - type: LayoutBox
                 margin: large
