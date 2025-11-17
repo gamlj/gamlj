@@ -2220,6 +2220,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                             "plot_around",
                             "plot_scale",
                             "plot_terms",
+                            "plot_re",
+                            "plot_re_method",
                             "plot_x_min",
                             "plot_x_max",
                             "plot_x_ticks",
