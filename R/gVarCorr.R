@@ -66,9 +66,13 @@ gVarCorr <- function(model, ...) UseMethod(".VarCorr")
     ## icc
     int <- which(vmat$var1 %in% "(Intercept)")
     vmat$icc <- NA
-    mark("vmat",vmat,insight::get_variance_distribution(model, verbose = FALSE))
+   
     for (i in int) {
-        vmat$icc[i] <- vmat$vcov[i] / (vmat$vcov[i] + insight::get_variance_distribution(model, verbose = FALSE))
+        err <-  insight::get_variance_distribution(model, verbose = FALSE)
+        if (is.null(err)) 
+            obj$warning<-list(topic="main_random",message="ICC cannot be computed")
+         else
+            vmat$icc[i] <- vmat$vcov[i] / (vmat$vcov[i] +  err)
     }
 
 

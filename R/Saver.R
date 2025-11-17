@@ -49,14 +49,16 @@ Saver <- R6::R6Class(
          
             if (is.null(option$perform)) {
               ## old style
-              .saverfun <- function(data,title) {
+              .saverfun <- function(data,title,msg) {
                 jinfo("SAVER: saving old style")
                 jmvReadWrite:::jmvOpn(dtaFrm = data, dtaTtl = title)
+              }
+              .failfun <- function(msg) {
+                self$warning=list(topic="modelnotes",message=msg,head="warning")
               }
             } else {
               # new style
               .saverfun <- function(data,title,msg) {
-                  
                   jinfo("SAVER: saving new style")
                   option$perform(function(action) {
                     list(
@@ -64,7 +66,12 @@ Saver <- R6::R6Class(
                       title = title)
                   })
               }
+              .failfun <- function(msg) {
+                option$perform(function(action) stop(msg))
+              }      
+              
             } ### end
+            
 
 
             ##### estimated marginal means ##########
@@ -72,13 +79,13 @@ Saver <- R6::R6Class(
             if (self$option("export_emm")) {
                 emm <- procedure.emmeans(private$.runner)
                 if (is.something(emm)) {
+                    message = paste("Estimated marginal means cannot be exported")
                     for (i in seq_along(emm)) {
-                       message = paste("Estimated marginal means were not requested")
                       .saverfun(data.frame(emm[[i]]), paste0("emmean", i),message)
                     }
                 } else {
                   message = paste("Estimated marginal means were not requested")
-                  option$perform(function(action) stop(message))
+                   .failfun(message)
                 }
             }
             ######### plot data ##############
@@ -101,13 +108,11 @@ Saver <- R6::R6Class(
                       }
                     }
                 } else {
-                  option$perform(function(action) {
                     message = paste("No plot was requested")
-                    option$perform(function(action) stop(message))
-                  })
-                  
+                    .failfun(message)
                 }
-            }
+              }
+            
             ####### random effects ########
 
             if (self$option("export_re")) {
