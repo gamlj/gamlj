@@ -55,7 +55,8 @@ Saver <- R6::R6Class(
               }
             } else {
               # new style
-              .saverfun <- function(data,title) {
+              .saverfun <- function(data,title,msg) {
+                  
                   jinfo("SAVER: saving new style")
                   option$perform(function(action) {
                     list(
@@ -72,14 +73,12 @@ Saver <- R6::R6Class(
                 emm <- procedure.emmeans(private$.runner)
                 if (is.something(emm)) {
                     for (i in seq_along(emm)) {
-                      .saverfun(data.frame(emm[[i]]), paste0("emmean", i))
+                       message = paste("Estimated marginal means were not requested")
+                      .saverfun(data.frame(emm[[i]]), paste0("emmean", i),message)
                     }
                 } else {
-                    self$warning <- list(
-                        topic = "savenotes",
-                        message = paste("Estimated marginal means were not requested. File cannot be exported."),
-                        head = "warning"
-                    )
+                  message = paste("Estimated marginal means were not requested")
+                  option$perform(function(action) stop(message))
                 }
             }
             ######### plot data ##############
@@ -102,11 +101,11 @@ Saver <- R6::R6Class(
                       }
                     }
                 } else {
-                    self$warning <- list(
-                        topic = "savenotes",
-                        message = paste("No plot was requested. File cannot be exported."),
-                        head = "warning"
-                    )
+                  option$perform(function(action) {
+                    message = paste("No plot was requested")
+                    option$perform(function(action) stop(message))
+                  })
+                  
                 }
             }
             ####### random effects ########
@@ -115,7 +114,6 @@ Saver <- R6::R6Class(
                 model <- private$.runner$model
                 re <- gRanef(model, self)
                 names(re) <- fromb64(names(re))
-
                 for (i in seq_along(re)) {
                     goodname <- make.names(names(re)[i])
                     data <- data.frame(re[[i]])
