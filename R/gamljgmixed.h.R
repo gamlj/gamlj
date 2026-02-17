@@ -778,6 +778,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         errortable = function() private$.items[["errortable"]],
         info = function() private$.items[["info"]],
         modelnotes = function() private$.items[["modelnotes"]],
+        weightsnotes = function() private$.items[["weightsnotes"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
@@ -824,6 +825,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$add(jmvcore::Html$new(
                 options=options,
                 name="modelnotes",
+                visible=FALSE))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="weightsnotes",
                 visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,

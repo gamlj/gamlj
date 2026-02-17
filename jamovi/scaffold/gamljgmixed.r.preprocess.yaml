@@ -24,6 +24,10 @@ items:
     -   name: modelnotes
         type: Html
         visible: false
+    -   name: weightsnotes
+        type: Html
+        visible: false
+        
     -   name: main
         type: Group
         title: Model Results
