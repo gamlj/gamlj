@@ -9,3 +9,5 @@ local$
 docs$
 ^doc$
 ^Meta$
+^\.positai$
+^\.claude$

@@ -294,7 +294,7 @@ ganova <- function(x, ...) UseMethod(".anova")
     } else {
         test <- "F"
     }
-    .anova <- car::Anova(model, type = 3, test = test)
+    .anova <- car::Anova(model, type = 3, test.statistic = test)
     if (attr(stats::terms(model), "intercept") == 1) {
         .anova <- .anova[-1, ]
     }

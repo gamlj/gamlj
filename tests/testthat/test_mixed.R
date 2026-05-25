@@ -260,7 +260,7 @@ data("wicksell")
 data <- wicksell
 data$subj <- factor(data$subj)
 data$time <- factor(data$time)
-data$group <- factor(data$group)
+
 
 gobj <- GAMLj3::gamlj_mixed(
     formula = dv ~ 1 + group + time + group:time + (1 | subj),

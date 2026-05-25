@@ -292,7 +292,7 @@ gparameters <- function(x, ...) UseMethod(".parameters")
     if (is.something(obj$boot_model)) .model <- obj$boot_model else .model <- model
 
     if (obj$option("expb_ci") | obj$option("estimates_ci")) {
-        cidata <- as.data.frame(parameters::ci(.model))
+        cidata <- as.data.frame(parameters::ci(.model,ci=.ci_width))
         .coefficients$expb <- exp(.coefficients$estimate)
         .coefficients$expb.ci.lower <- exp(cidata$CI_low)
         .coefficients$expb.ci.upper <- exp(cidata$CI_high)
