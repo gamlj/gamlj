@@ -8,6 +8,20 @@ es.marginals <- function(x, ...) UseMethod(".margins")
     ciWidth <- obj$ciwidth
     results <- try_hard(marginaleffects::avg_slopes(model))
     params <- results$obj
+    if (!isFALSE(results$error) && inherits(model, "glm")) {
+        formula <- stats::as.formula(fromb64(paste(deparse(stats::formula(model)), collapse = "")))
+        data <- insight::get_data(model, source = "frame")
+        names(data) <- fromb64(names(data))
+        for (name in names(data)) {
+            if (is.factor(data[[name]])) {
+                levels(data[[name]]) <- fromb64(levels(data[[name]]))
+            }
+        }
+
+        decoded_model <- stats::glm(formula = formula, data = data, family = model$family)
+        results <- try_hard(marginaleffects::avg_slopes(decoded_model))
+        params <- results$obj
+    }
     if (!isFALSE(results$error)) {
         obj$error <- list(topic = "main_marginals", message = "Marginal effects cannot be computed for this model")
         return()

@@ -1,5 +1,4 @@
 library(GAMLj3)
-testthat::context("model comparisons")
 tol <- .001
 data("clustermanymodels")
 data <- clustermanymodels
@@ -32,7 +31,7 @@ mod1 <- GAMLj3::gamlj_glm(
 
 
 testthat::test_that("test glm robust SE", {
-  testthat::expect_equal(mod1$main$coefficients$asDF[2,4], 0.0098, tolerance = tol)
+  testthat::expect_equal(mod1$main$coefficients$asDF[2,4], 0.00982, tolerance = tol)
   testthat::expect_gt(mod1$main$coefficients$asDF[2, 4],mod0$main$coefficients$asDF[2, 4])
 })
 

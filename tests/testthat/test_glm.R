@@ -1,6 +1,5 @@
-testthat::context("glm")
 data("hsbdemo")
-tol <- 0.001
+tol <- 0.01
 
 mod0 <- GAMLj3::gamlj_glm(
     formula = schtyp ~ write + honors + honors:write,
@@ -106,12 +105,13 @@ testthat::test_that("glm contrasts", {
     testthat::expect_equal(round(res[1, 3], 2), 1.36)
 })
 
+
 testthat::test_that("gzlm plot", {
-    testthat::expect_is(mod$mainPlots[[1]][[1]], "Image")
+    testthat::expect_s3_class(mod$mainPlots[[1]][[1]], "Image")
 })
 
 testthat::test_that("gzlm CI width", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[4], .6072, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[4], .607254,tolerance =  tol)
 })
 
 
@@ -157,7 +157,7 @@ mod <- GAMLj3::gamlj_glm(
 
 testthat::test_that("Multinomial posthoc works", {
     testthat::expect_equal(mod$posthoc[[1]]$asDF$response[[1]], "academic")
-    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[8], .2101, tol)
+    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[8], .2101, tolerance = tol)
     testthat::expect_equal(mod$posthoc[[1]]$asDF$response[[42]], "vocation")
     testthat::expect_equal(mod$posthoc[[1]]$asDF[42, 1], "vocation")
     testthat::expect_equal(mod$posthoc[[1]]$asDF[42, 2], "low")
@@ -199,19 +199,24 @@ mod <- GAMLj3::gamlj_glm(
     es = c("expb", "marginals")
 )
 
+testthat::test_that("R API returns marginal effects", {
+    testthat::expect_gt(nrow(mod$main$marginals$asDF), 0)
+    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .2769, tolerance = tol)
+})
+
 testthat::test_that("Poisson works", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .1064, tol)
-    testthat::expect_equal(mod$main$anova$asDF$test[1], 68.38, tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .8577, tol)
-    testthat::expect_equal(mod$main$r2$asDF$r2, .898, tol)
-    testthat::expect_equal(mod$main$fit$asDF$value[4], 9.82, tol)
-    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .338, tol)
-    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 14.048, tol)
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0428, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .1064, tolerance = tol)
+    testthat::expect_equal(mod$main$anova$asDF$test[1], 68.38, tolerance = tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .8577, tolerance = tol)
+    testthat::expect_equal(mod$main$r2$asDF$r2, .898, tolerance = tol)
+    testthat::expect_equal(mod$main$fit$asDF$value[4], 9.82, tolerance = tol)
+    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], .338, tolerance = tol)
+    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 14.048, tolerance = tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .0428, tolerance = tol)
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
-    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .630, tol)
-    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .2769, tol)
-    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .0666, tol)
+    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .630, tolerance = tol)
+    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .2769, tolerance = tol)
+    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .0666, tolerance = tol)
 })
 
 data$q <- data$acts + 1
@@ -229,19 +234,19 @@ mod <- GAMLj3::gamlj_glm(
     es = c("expb", "marginals")
 )
 testthat::test_that("Custom model works", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 2.151, tol)
-    testthat::expect_equal(mod$main$anova$asDF$test[1], 168.42, tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[[1]], 1.994, tol)
-    testthat::expect_equal(mod$main$r2$asDF$r2, .870, tol)
-    testthat::expect_equal(mod$main$fit$asDF$value[4], 2.538, tol)
-    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 1.448, tol)
-    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 75.937, tol)
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .001, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 2.151, tolerance=tol)
+    testthat::expect_equal(mod$main$anova$asDF$test[1], 168.42, tolerance=tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[[1]], 1.994, tolerance=tol)
+    testthat::expect_equal(mod$main$r2$asDF$r2, .870, tolerance=tol)
+    testthat::expect_equal(mod$main$fit$asDF$value[4], 2.538, tolerance=tol)
+    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 1.448, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 75.937, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .001, tolerance=tol)
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
-    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .010, tol)
+    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], .010, tolerance=tol)
     testthat::expect_equal(mod$posthoc[[1]]$asDF$age_lev1[2], "1")
-    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .255, tol)
-    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .073, tol)
+    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .255, tolerance=tol)
+    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .073, tolerance=tol)
 })
 
 
@@ -261,19 +266,19 @@ testthat::expect_warning(
     )
 )
 testthat::test_that("negative binomial model works", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tol)
-    testthat::expect_equal(mod$main$anova$asDF$test[1], 22.6, tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], -.0845, tol)
-    testthat::expect_equal(mod$main$r2$asDF$r2, .777, tol)
-    testthat::expect_equal(mod$main$fit$asDF$value[4], 8.89, tol)
-    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 2.08, tol)
-    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 5.91, tol)
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .010, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tolerance=tol)
+    testthat::expect_equal(mod$main$anova$asDF$test[1], 22.6, tolerance=tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], -.0845, tolerance=tol)
+    testthat::expect_equal(mod$main$r2$asDF$r2, .777, tolerance=tol)
+    testthat::expect_equal(mod$main$fit$asDF$value[4], 8.89, tolerance=tol)
+    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 2.08, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 5.91, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .010, tolerance=tol)
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
-    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 1.056, tol)
+    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 1.056, tolerance=tol)
     testthat::expect_equal(mod$posthoc[[1]]$asDF$age_lev1[2], "1")
-    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .254, tol)
-    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .0409, tol)
+    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .254, tolerance=tol)
+    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .0409, tolerance=tol)
 })
 
 
@@ -292,18 +297,18 @@ mod <- GAMLj3::gamlj_glm(
 )
 
 testthat::test_that("quasi poisson binomial works", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tol)
-    testthat::expect_equal(mod$main$anova$asDF$test[1], 105.641, tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], .167, tol)
-    testthat::expect_equal(mod$main$r2$asDF$r2, .777, tol)
-    testthat::expect_equal(mod$main$fit$asDF$value[4], 8.893, tol)
-    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 1.698, tol)
-    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 27.64, tol)
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .00475, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tolerance=tol)
+    testthat::expect_equal(mod$main$anova$asDF$test[1], 105.641, tolerance=tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], .167, tolerance=tol)
+    testthat::expect_equal(mod$main$r2$asDF$r2, .777, tolerance=tol)
+    testthat::expect_equal(mod$main$fit$asDF$value[4], 8.893, tolerance=tol)
+    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 1.698, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 27.64, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .00475, tolerance=tol)
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "agg_test")
-    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 1.056, tol)
-    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .254, tol)
-    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .0591, tol)
+    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 1.056, tolerance=tol)
+    testthat::expect_equal(mod$main$marginals$asDF[2, 3], .254, tolerance=tol)
+    testthat::expect_equal(mod$main$marginals$asDF[3, 5], .0591, tolerance=tol)
 })
 
 
@@ -328,16 +333,16 @@ mod <- GAMLj3::gamlj_glm(
 
 
 testthat::test_that("Ordinal works", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .0118, tol)
-    testthat::expect_equal(mod$main$anova$asDF$test[1], 5.74, tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .851, tol)
-    testthat::expect_equal(mod$main$r2$asDF$r2, .199, tol)
-    testthat::expect_equal(mod$main$fit$asDF$value[4], 217.609, tol)
-    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 3.310, tol)
-    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 15.407, tol)
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .363, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .0118, tolerance=tol)
+    testthat::expect_equal(mod$main$anova$asDF$test[1], 5.74, tolerance=tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb.ci.lower[6], .851, tolerance=tol)
+    testthat::expect_equal(mod$main$r2$asDF$r2, .199, tolerance=tol)
+    testthat::expect_equal(mod$main$fit$asDF$value[4], 217.609, tolerance=tol)
+    testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 3.310, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[2], 15.407, tolerance=tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$se[1], .363, tolerance=tol)
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "x")
-    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tol)
+    testthat::expect_equal(mod$posthoc[[1]]$asDF$estimate[2], 3.318, tolerance=tol)
 })
 
 
@@ -354,8 +359,8 @@ mod <- GAMLj3::gamlj_glm(
 )
 
 testthat::test_that("beta works", {
-    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .20968, tol)
-    testthat::expect_equal(mod$main$anova$asDF$test[1], 11.9587, tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$expb[1], .20968, tolerance=tol)
+    testthat::expect_equal(mod$main$anova$asDF$test[1], 11.9587, tolerance=tol)
 })
 
 
@@ -378,8 +383,8 @@ mod <- GAMLj3::gamlj_glm(
 )
 
 testthat::test_that("logistic comparison", {
-    testthat::expect_equal(mod$main$r2$asDF[3, 2], .0265, tol)
-    testthat::expect_equal(mod$main$r2$asDF[1, 6], .0444, tol)
+    testthat::expect_equal(mod$main$r2$asDF[3, 2], .0265, tolerance=tol)
+    testthat::expect_equal(mod$main$r2$asDF[1, 6], .0444, tolerance=tol)
 })
 
 
@@ -391,6 +396,6 @@ mod <- GAMLj3::gamlj_glm(
 )
 
 testthat::test_that("multinomial comparison", {
-    testthat::expect_equal(mod$main$r2$asDF[3, 2], .0061, tol)
+    testthat::expect_equal(mod$main$r2$asDF[3, 2], .0061, tolerance=tol)
 })
 

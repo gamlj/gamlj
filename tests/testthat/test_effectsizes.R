@@ -1,4 +1,3 @@
-testthat::context("effectsizes")
 tol <- .0001
 N <- dim(iris)[1]
 form <- Sepal.Length~Sepal.Width + Petal.Width + Species
@@ -50,7 +49,7 @@ testthat::test_that("eta", {
 omega <- (ganeff$ss - (resss * df / edf)) / (modss + (resss * (edf + 1) / edf))
 
 testthat::test_that("omega", {
-    testthat::expect_equal(omega, ganeff$omegaSq, tol = tol)
+    testthat::expect_equal(omega, ganeff$omegaSq, tolerance = tol)
 })
 
 omegap <- (ganeff$ss - (resss * df / edf)) / (ganeff$ss + (resss * (N - df) / edf))

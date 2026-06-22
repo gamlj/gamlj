@@ -100,11 +100,9 @@ mf.update <- function(x, ...) UseMethod(".update")
         .data <- model$data
     }
 
-    .random <- (lapply(.random, function(x) formula(paste("~", deparse(x)))))
+    .random <- lapply(.random, function(x) stats::as.formula(paste("~", deparse(x))))
 
     if (!is.something(.random)) {
-        .fixed <- formula(paste(deparse(.fixed)))
-
         ### mclogit requires the data to be matrix
         warning("No random coefficients in the nested model. A fixed effects multinomial model is used for comparison. The validity of the tests may be questionnable.")
         ##  we do not use  because it does not accept intercept only models

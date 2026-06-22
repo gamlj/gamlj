@@ -16,8 +16,21 @@ Imports: jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car,
          effectsize, insight, parameters ,performance,
          lme4, lmerTest, sandwich
 VignetteBuilder: knitr
-Suggests: ordinal , nnet, statmod, betareg, knitr, rmarkdown,  mclogit (>= 0.9.6), 
-          boot, MASS, marginaleffects, nlme,lmtest
+Suggests: 
+    ordinal,
+    nnet,
+    statmod,
+    betareg,
+    knitr,
+    rmarkdown,
+    mclogit (>= 0.9.6),
+    boot,
+    MASS,
+    marginaleffects,
+    nlme,
+    lmtest,
+    testthat (>= 3.0.0)
 Depends: 
     R (>= 3.00)
 Config/roxygen2/version: 8.0.0
+Config/testthat/edition: 3

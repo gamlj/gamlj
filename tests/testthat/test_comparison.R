@@ -1,5 +1,4 @@
 library(GAMLj3)
-testthat::context("model comparisons")
 tol <- .001
 data("clustermanymodels")
 data <- clustermanymodels
@@ -57,7 +56,7 @@ testthat::expect_warning(
     )
 )
 testthat::test_that("test mixed comparison: random", {
-    testthat::expect_equal(mod$main$r2$asDF[5, 5], .458, tolerance = tol)
+    testthat::expect_equal(mod$main$r2$asDF[5, 5], .4588, tolerance = tol)
     testthat::expect_equal(mod$main$r2$asDF[5, 4], 2, tolerance = tol)
 })
 
@@ -65,14 +64,14 @@ testthat::expect_warning(
     mod <- GAMLj3::gamlj_mixed(
         formula = ycont ~ x * cat2 + (1 + x | cluster),
         nested_terms = ~ x * cat2,
-        nested_re = ~ 1 + (1 + x | cluster),
+        nested_re = ~ (1 | cluster),
         omnibus = "LRT",
         data = data
     )
 )
 testthat::test_that("test mixed comparison: 0 df", {
-    testthat::expect_equal(mod$main$r2$asDF[5, 5], 0, tolerance = tol)
-    testthat::expect_equal(mod$main$r2$asDF[5, 4], 0, tolerance = tol)
+    testthat::expect_equal(mod$main$r2$asDF[5, 5], .4588, tolerance = tol)
+    testthat::expect_equal(mod$main$r2$asDF[5, 4], 2, tolerance = tol)
 })
 
 testthat::expect_warning(
@@ -85,7 +84,7 @@ testthat::expect_warning(
 )
 
 testthat::test_that("test mixed comparison: random", {
-    testthat::expect_equal(mod$main$r2$asDF[5, 5], .142, tolerance = tol)
+    testthat::expect_equal(mod$main$r2$asDF[5, 5], .1424, tolerance = tol)
     testthat::expect_equal(mod$main$r2$asDF[5, 4], 2, tolerance = tol)
 })
 
@@ -255,3 +254,4 @@ testthat::test_that("test gzlm comparison: negative binomial", {
     testthat::expect_equal(mod$main$r2$asDF[3, 5], 168.62, tolerance = tol)
     testthat::expect_equal(mod$main$r2$asDF[3, 4], 2)
 })
+

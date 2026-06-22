@@ -90,10 +90,14 @@ Datamatic <- R6::R6Class(
             if (length(dots) == 0) {
                 return()
             }
-            atest <- paste(paste0("x$", names(dots)), paste0("'", dots, "'"), sep = "==", collapse = " && ")
-            results <- lapply(self$variables, function(x) if (eval(parse(text = atest))) {
-                return(x)
-            } else {
+            results <- lapply(self$variables, function(x) {
+                keep <- all(mapply(function(name, value) {
+                    isTRUE(x[[name]] == value)
+                }, names(dots), dots, SIMPLIFY = TRUE))
+
+                if (keep) {
+                    return(x)
+                }
                 NULL
             })
             return(results[!sapply(results, is.null)])

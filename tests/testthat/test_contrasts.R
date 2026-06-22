@@ -1,4 +1,3 @@
-testthat::context("contrasts")
 tol <- .001
 
 data("clustermanymodels")
@@ -35,7 +34,7 @@ testthat::test_that("constrast in glm makes sense", {
     testthat::expect_equal(mod$main$contrasts$asDF[["se"]][1], 0.03414783, tolerance = tol)
     testthat::expect_equal(mod$main$contrasts$asDF[["label"]][1], "{ 2*-1, -1*0, -1*1 }")
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "{ 2*-1, -1*0, -1*1 }")
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$estimate[1], 0.07203, tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$estimate[1], 0.07203, tolerance=tol)
 })
 
 

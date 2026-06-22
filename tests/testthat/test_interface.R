@@ -1,4 +1,3 @@
-testthat::context("R interface")
 tol <- 0.001
 data("qsport")
 
@@ -14,7 +13,7 @@ reds <- residuals(obj)
 testthat::test_that("test glm", {
     testthat::expect_equal(round(mean(preds), 2), 37.88)
     testthat::expect_equal(length(preds), 100)
-    testthat::expect_equal(mean(reds), 0, tol)
+    testthat::expect_equal(mean(reds), 0, tolerance = tol)
 })
 
 sums <- summary(obj)
@@ -22,7 +21,7 @@ sums <- summary(obj)
 
 testthat::test_that("summary glm", {
     testthat::expect_equal(sums[[1]]$info[2], "Model")
-    testthat::expect_equal(sums[[2]]$ar2, .408, tol)
+    testthat::expect_equal(sums[[2]]$ar2, .408, tolerance = tol)
     testthat::expect_equal(sums[[3]]$df[4], 97)
 })
 
@@ -40,7 +39,7 @@ zobj <- GAMLj3::gamlj_lm(
 
 cc <- zobj$main$coefficients$asDF
 testthat::test_that("standardizing", {
-    testthat::expect_equal(cc$estimate[2], .1942, tol)
+    testthat::expect_equal(cc$estimate[2], .1942, tolerance = tol)
 })
 
 upd <- update(obj, covs_scale = newopt, es = c("beta", "etap", "omega"))
@@ -48,8 +47,8 @@ res1 <- upd$main$coefficients$asDF
 res2 <- upd$main$anova$asDF
 
 testthat::test_that("updating", {
-    testthat::expect_equal(res1$estimate[2], 1.4073, tol)
-    testthat::expect_equal(res2$etaSqP[2], 0.4147, tol)
+    testthat::expect_equal(res1$estimate[2], 1.4073, tolerance = tol)
+    testthat::expect_equal(res2$etaSqP[2], 0.4147, tolerance = tol)
 })
 
 
@@ -94,8 +93,8 @@ p1 <- predict(mod, random.only = T)
 
 
 testthat::test_that("Mixed dots work", {
-    testthat::expect_equal(mean(p0), 19.6043, tol = tol)
-    testthat::expect_equal(mean(p1), 0, tol = tol)
+    testthat::expect_equal(mean(p0), 19.6043, tolerance = tol)
+    testthat::expect_equal(mean(p1), 0, tolerance = tol)
 })
 
 
@@ -183,7 +182,7 @@ preds <- predict(mod)
 n1 <- dim(GAMLj3::get_data(mod))[1]
 n2 <- length(preds)
 testthat::test_that("mixed predict", {
-    testthat::expect_equal(mean(preds), 19.6, tol)
+    testthat::expect_equal(mean(preds), 19.6, tolerance = tol)
     testthat::expect_equal(n1, n2)
 })
 
@@ -231,7 +230,7 @@ mod1 <- GAMLj3::gamlj_glm(
 preds <- predict(mod1)
 
 testthat::test_that("gzlm predict ", {
-    testthat::expect_equal(mean(preds), mean(preds0), tol)
+    testthat::expect_equal(mean(preds), mean(preds0), tolerance = tol)
 })
 
 rmod <- mod1$model
@@ -264,7 +263,7 @@ mod <- GAMLj3::gamlj_glm(
 
 res <- mod$main$coefficients$asDF[2, 3]
 testthat::test_that("test scaling works ", {
-    testthat::expect_equal(res, -0.214873, tol = .001)
+    testthat::expect_equal(res, -0.214873, tolerance = .001)
 })
 
 
@@ -299,7 +298,7 @@ cont <- GAMLj3::test_contrasts(mod, contrasts = list(cat2 = c(-1, 1)))
 
 testthat::test_that("test_contrasts works ", {
     testthat::expect_equal(cont$cat2$asDF$label, "{ -1*-1, 1*1 }")
-    testthat::expect_equal(cont$cat2$asDF$estimate, 1.58198, tol)
+    testthat::expect_equal(cont$cat2$asDF$estimate, 1.58198, tolerance = tol)
 })
 
 
