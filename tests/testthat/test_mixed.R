@@ -140,7 +140,11 @@ testthat::test_that("mixed plot works", {
 
 
 adddata <- subjects_by_stimuli
-adddata$x <- rnorm(length(adddata$nrow))
+### seed the covariate so the model (and cond's SE below) is deterministic;
+### nrow() rather than length(adddata$nrow), which only worked by accident
+### because subjects_by_stimuli happens to have a column named `nrow`
+set.seed(42)
+adddata$x <- rnorm(nrow(adddata))
 adddata$subj <- factor(adddata$subj)
 adddata$stimulus <- factor(adddata$stimulus)
 
@@ -259,6 +263,9 @@ data("wicksell")
 data <- wicksell
 data$subj <- factor(data$subj)
 data$time <- factor(data$time)
+### group is a treatment factor (1,2); it must be a factor for the "simple"
+### contrast and the time:group posthoc/emmeans below to resolve group levels
+data$group <- factor(data$group)
 
 
 gobj <- GAMLj3::gamlj_mixed(
@@ -272,7 +279,7 @@ gobj <- GAMLj3::gamlj_mixed(
 testthat::test_that("simple effects", {
     testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[1]), "linear")
     testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[2]), "quadratic")
-    testthat::expect_equal(gobj$simpleEffects$coefficients$asDF$estimate[3], -7.2168, tolerance=tol)
+    testthat::expect_equal(gobj$simpleEffects$coefficients$asDF$estimate[3], -7.3231, tolerance=tol)
 })
 
 

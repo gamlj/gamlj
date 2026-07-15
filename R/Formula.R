@@ -302,7 +302,7 @@ rFormula <- R6::R6Class(
         clusters = list(),
         initialize = function(aformula, data = NULL) {
             aformula <- as.formula(aformula)
-            bars <- lme4::findbars(aformula)
+            bars <- .findbars(aformula)
             if (!is.null(bars)) {
                 test <- (length(grep("^1", bars)) + length(grep("^0", bars))) == length(bars)
                 if (!test) stop("The random intercept should be explicitly defined for each component with either `1` (present) or `0` (absent)")
@@ -319,7 +319,7 @@ rFormula <- R6::R6Class(
                 })
             }
 
-            fformula <- lme4::nobars(aformula)
+            fformula <- .nobars(aformula)
             if (!is.null(data)) {
                 if (!is.data.frame(data)) {
                     stop("The input data is not a dataframe or it does not exist.")

@@ -89,7 +89,7 @@ Dispatch <- R6::R6Class(
                     )
                 } else {
                     content <- private$.process_html(table$content, obj)
-                    content <- table$setContent(content)
+                    .setContent(table, content)
                     table$setVisible(TRUE)
                     return()
                 }
@@ -137,7 +137,7 @@ Dispatch <- R6::R6Class(
 
             if (inherits(table, "Html")) {
                 obj$head <- "error"
-                table$setContent(private$.process_html(NULL, obj))
+                .setContent(table, private$.process_html(NULL, obj))
             } else {
                 table$setError(obj$message)
             }
@@ -222,5 +222,5 @@ Dispatch <- R6::R6Class(
 ### this is for cleaning all html message widgets otherwise some message sticks
 
 dispatch_message_cleaner <- function(jmvobj) {
-    lapply(jmvobj$results$items, function(x) if ("Html" %in% class(x)) x$setContent(" "))
+    lapply(jmvobj$results$items, function(x) if ("Html" %in% class(x)) .setContent(x, " "))
 }

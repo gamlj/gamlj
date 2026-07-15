@@ -314,6 +314,145 @@ get_data.gamlj <- function(object, ...) {
     .data
 }
 
+
+#' Extract underlying R model
+#'
+#' Returns the fitted R model stored in a GAMLj results object with encoded
+#' variable names and factor levels restored to their original values. The
+#' model is refitted on its decoded model frame so that its formula, terms,
+#' coefficients, contrasts, and data remain internally consistent.
+#'
+#' @name get_model
+#' @param object a gamlj results object of class \code{gamlj*Results}
+#' @param ... additional arguments passed to \code{\link[stats:update]{stats::update()}}
+#' @return the underlying fitted R model with decoded names and factor levels
+#' @author Marcello Gallucci
+#' @examples
+#' data("qsport")
+#' gmod <- GAMLj3::gamlj_lm(
+#'     formula = performance ~ hours,
+#'     data = qsport
+#' )
+#'
+#' rmodel <- get_model(gmod)
+#' @export
+#' @importFrom methods slot slotNames
+get_model <- function(object, ...) UseMethod("get_model")
+
+#' @export
+get_model.gamlj <- function(object, ...) {
+    model <- object$model
+    if (is.null(model)) {
+        stop("No underlying R model is stored in this GAMLj results object", call. = FALSE)
+    }
+
+    data <- .model_data_for_decode(model)
+    weights <- tryCatch(
+        stats::model.weights(stats::model.frame(model)),
+        error = function(e) NULL
+    )
+    data <- .decode_model_component(data)
+    formula <- .decode_model_component(stats::formula(model))
+    model <- .decode_model_call(model)
+
+    if (inherits(model, "lme")) {
+        update_args <- list(
+            object = model,
+            fixed = formula,
+            data = data,
+            weights = NULL
+        )
+    } else {
+        update_args <- list(
+            object = model,
+            formula = formula,
+            data = data,
+            weights = weights
+        )
+    }
+
+    update_args <- utils::modifyList(update_args, list(...))
+    do.call(stats::update, update_args)
+}
+
+.model_data_for_decode <- function(model) {
+    if (inherits(model, "lme") && is.data.frame(model$data)) {
+        return(model$data)
+    }
+
+    if (isS4(model) && "frame" %in% methods::slotNames(model)) {
+        data <- methods::slot(model, "frame")
+        if (is.data.frame(data)) {
+            return(data)
+        }
+    }
+
+    if (!isS4(model) && !is.null(model$model) && is.data.frame(model$model)) {
+        return(model$model)
+    }
+
+    data <- tryCatch(stats::model.frame(model), error = function(e) NULL)
+    if (!is.data.frame(data)) {
+        stop("The data used to fit the underlying R model could not be extracted", call. = FALSE)
+    }
+    data
+}
+
+.decode_model_call <- function(model) {
+    model_call <- tryCatch(stats::getCall(model), error = function(e) NULL)
+    if (is.null(model_call)) {
+        return(model)
+    }
+
+    model_call <- .decode_model_component(model_call)
+    if (isS4(model) && "call" %in% methods::slotNames(model)) {
+        methods::slot(model, "call") <- model_call
+    } else if (is.list(model) && !is.null(model$call)) {
+        model$call <- model_call
+    }
+    model
+}
+
+.decode_model_component <- function(x) {
+    if (is.null(x) || is.environment(x) || is.function(x) || typeof(x) == "externalptr") {
+        return(x)
+    }
+
+    if (inherits(x, "formula") && !inherits(x, "terms")) {
+        env <- environment(x)
+        decoded <- as.call(lapply(x, .decode_model_component))
+        return(stats::as.formula(decoded, env = env))
+    }
+
+    if (is.symbol(x)) {
+        return(as.name(fromb64(as.character(x))))
+    }
+
+    if (is.call(x)) {
+        attrs <- attributes(x)
+        decoded <- as.call(lapply(x, .decode_model_component))
+        if (length(attrs) > 0) {
+            attributes(decoded) <- lapply(attrs, .decode_model_component)
+        }
+        return(decoded)
+    }
+
+    attrs <- attributes(x)
+    if (is.character(x)) {
+        decoded <- fromb64(x)
+    } else if (is.list(x)) {
+        decoded <- lapply(x, .decode_model_component)
+    } else {
+        decoded <- x
+    }
+
+    if (length(attrs) > 0) {
+        attributes(decoded) <- lapply(attrs, .decode_model_component)
+    }
+    decoded
+}
+
+
 #' Predicted values from GAMLj models
 #'
 #' Returns predicted values from the estimated model

@@ -303,3 +303,46 @@ testthat::test_that("test_contrasts works ", {
 
 
 
+
+
+decoded_data <- data.frame(
+    check.names = FALSE,
+    "out come" = seq_len(40) + rep(c(0, 2), 20),
+    "x value" = rep(-4:5, 4),
+    "group name" = factor(
+        rep(c("level one", "level/two"), 20),
+        levels = c("level one", "level/two")
+    )
+)
+
+encoded_object <- GAMLj3::gamlj_lm(
+    formula = `out come` ~ `x value` * `group name`,
+    data = decoded_data
+)
+decoded_model <- GAMLj3::get_model(encoded_object)
+
+testthat::test_that("get_model decodes model names and factor levels", {
+    model_data <- stats::model.frame(decoded_model)
+
+    testthat::expect_s3_class(decoded_model, "lm")
+    testthat::expect_equal(
+        names(model_data),
+        c("out come", "x value", "group name")
+    )
+    testthat::expect_equal(
+        levels(model_data[["group name"]]),
+        c("level one", "level/two")
+    )
+    testthat::expect_equal(
+        all.vars(stats::formula(decoded_model)),
+        c("out come", "x value", "group name")
+    )
+    testthat::expect_false(
+        any(grepl("..b_b_b..", names(stats::coef(decoded_model)), fixed = TRUE))
+    )
+    testthat::expect_equal(
+        unname(stats::coef(decoded_model)),
+        unname(stats::coef(encoded_object$model)),
+        tolerance = tol
+    )
+})

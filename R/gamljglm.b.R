@@ -188,7 +188,7 @@ gamljglmClass <- R6::R6Class(
             plotter_machine <- Plotter$new(self, runner_machine)
             plotter_machine$initPlots()
             private$.plotter_machine <- plotter_machine
-            self$results$plotnotes$setContent("")
+            .setContent(self$results$plotnotes, "")
 
             now <- Sys.time()
             jinfo("INIT TIME:", now - private$.time, " secs")

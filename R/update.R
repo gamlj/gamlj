@@ -27,11 +27,11 @@ mf.update <- function(x, ...) UseMethod(".update")
 
     if (utils::hasName(.args, "formula")) {
         .formula <- stats::as.formula(.args$formula)
-        test <- lme4::findbars(.formula)
+        test <- .findbars(.formula)
 
         if (!is.something(test)) {
             warning("No random coefficients specified in the reduced model. A linear model is used for comparison.")
-            .formula <- lme4::nobars(.formula)
+            .formula <- .nobars(.formula)
             return(stats::lm(formula = .formula, data = .args$data))
         }
     }
@@ -47,10 +47,10 @@ mf.update <- function(x, ...) UseMethod(".update")
 
     if (utils::hasName(.args, "formula")) {
         .formula <- stats::as.formula(.args$formula)
-        test <- lme4::findbars(.formula)
+        test <- .findbars(.formula)
 
         if (!is.something(test)) {
-            .formula <- lme4::nobars(.formula)
+            .formula <- .nobars(.formula)
             warning("No random coefficients in the reduced model. A generalized linear model is used for comparison.")
             data <- model@frame
             mod <- stats::glm(formula = .formula, data = data, family = stats::family(model))
@@ -75,11 +75,11 @@ mf.update <- function(x, ...) UseMethod(".update")
     #  .formula<-stats::as.formula(.args$formula)
     .formula <- stats::as.formula(.args$formula)
 
-    test <- lme4::findbars(.formula)
+    test <- .findbars(.formula)
 
     if (!is.something(test)) {
         warning("No random coefficients in the nested model. A fixed effects ordinal model is used for comparison")
-        .formula <- lme4::nobars(.formula)
+        .formula <- .nobars(.formula)
         return(ordinal::clm(formula = .formula, data = data))
     }
     ordinal::clmm(.formula, data = data)
@@ -91,8 +91,8 @@ mf.update <- function(x, ...) UseMethod(".update")
     .args <- list(...)
     ### mclogit is quite unflexible with the class of formulas.
     ### we should deparse them and reset as formulas
-    .fixed <- lme4::nobars(stats::formula(formula))
-    .random <- lme4::findbars(stats::formula(formula))
+    .fixed <- .nobars(stats::formula(formula))
+    .random <- .findbars(stats::formula(formula))
 
     if (utils::hasName(.args, "data")) {
         .data <- .args$data
@@ -100,7 +100,9 @@ mf.update <- function(x, ...) UseMethod(".update")
         .data <- model$data
     }
 
-    .random <- lapply(.random, function(x) stats::as.formula(paste("~", deparse(x))))
+    ### build the one-sided formula straight from the language object: avoids a
+    ### string round-trip and the multi-line deparse() truncation bug for long terms
+    .random <- lapply(.random, function(x) eval(call("~", x)))
 
     if (!is.something(.random)) {
         ### mclogit requires the data to be matrix
@@ -115,8 +117,8 @@ mf.update <- function(x, ...) UseMethod(".update")
 .update.lme <- function(model, formula, ...) {
     jinfo("lme update is used")
     form <- formula(formula)
-    fixed <- lme4::nobars(form)
-    .random <- lme4::findbars(form)
+    fixed <- .nobars(form)
+    .random <- .findbars(form)
     .args <- list(...)
     if (utils::hasName(.args, "data")) {
         data <- .args$data
@@ -124,7 +126,9 @@ mf.update <- function(x, ...) UseMethod(".update")
         data <- model$data
     }
 
-    random <- lapply(.random, function(x) formula(paste("~", as.character(x)[2], "|", as.character(x)[3])))
+    ### `~ a | g` parses as `~ (a | g)`, which is exactly the bar call findbars() returns,
+    ### so build the formula directly instead of splitting/re-pasting the term as strings
+    random <- lapply(.random, function(x) eval(call("~", x)))
     if (!is.something(random)) {
         warning("No random coefficients in the nested model. A fixed effects linear model is used for comparison. The validity of the tests may be questionnable.")
         return(stats::lm(fixed, data = data))
