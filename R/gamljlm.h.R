@@ -42,6 +42,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             covs_scale_labels = "labels",
             export_emm = FALSE,
             export_plot = FALSE,
+            export = FALSE,
             omnibus = "F",
             estimates_ci = TRUE,
             betas_ci = FALSE,
@@ -308,7 +309,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                FALSE)
+                export)
             private$..omnibus <- jmvcore::OptionList$new(
                 "omnibus",
                 omnibus,

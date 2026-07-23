@@ -41,6 +41,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             export_emm = FALSE,
             export_re = FALSE,
             export_plot = FALSE,
+            export = FALSE,
             es = list(
                 "expb"),
             expb_ci = TRUE,
@@ -296,7 +297,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                FALSE)
+                export)
             private$..es <- jmvcore::OptionNMXList$new(
                 "es",
                 es,

@@ -644,21 +644,24 @@ Plotter <- R6::R6Class(
 
             if (is.number(image$state$y_range$ticks)) {
                 if (self$option("plot_y_ticks_exact")) {
-                    if (any(sapply(image$state$y_range[c("min", "max", "ticks")], is.na))) {
+                    if (any(vapply(image$state$y_range[c("min", "max", "ticks")], is.na, logical(1)))) {
                         self$warning <- list(
                             topic = "plotnotes",
                             message = paste("Exact ticking requires to set min and max and number of ticks"),
                             head = "warning"
                         )
-                        p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range))
+                        p <- p + ggplot2::scale_y_continuous()
                     } else {
-                        p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range), breaks = seq(image$state$y_range$min, image$state$y_range$max, length.out = image$state$y_range$ticks))
+                        p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range[c("min", "max")]),
+                                                             breaks = seq(image$state$y_range$min, image$state$y_range$max,
+                                                                          length.out = image$state$y_range$ticks))
                     }
                 } else {
-                    p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range), n.breaks = image$state$y_range$ticks)
+                    p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range[c("min", "max")]),
+                                                         n.breaks = image$state$y_range$ticks)
                 }
             } else {
-                p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range))
+                p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range[c("min", "max")]))
             }
 
 
