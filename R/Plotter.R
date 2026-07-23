@@ -754,7 +754,7 @@ Plotter <- R6::R6Class(
                 )
             } else {
                 # give a scale to the Z axis
-                p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range))
+                p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range[c("min", "max")]))
 
                 if (is.number(image$state$x_range$ticks)) {
                     if (self$option("plot_x_ticks_exact")) {
@@ -765,10 +765,13 @@ Plotter <- R6::R6Class(
                                 head = "warning"
                             )
                         } else {
-                            p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range), breaks = seq(image$state$x_range$min, image$state$x_range$max, length.out = image$state$x_range$ticks))
+                            p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range[c("min", "max")]),
+                                                                 breaks = seq(image$state$x_range$min, image$state$x_range$max,
+                                                                              length.out = image$state$x_range$ticks))
                         }
                     } else {
-                        p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range), n.breaks = image$state$x_range$ticks)
+                        p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range[c("min", "max")]),
+                                                             n.breaks = image$state$x_range$ticks)
                     }
                 }
             }
