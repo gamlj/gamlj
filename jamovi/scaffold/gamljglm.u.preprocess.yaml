@@ -178,16 +178,20 @@ children:
                 margin: large
                 style: list-inline
                 children:
-                    -   name: expb_ci
-                        type: CheckBox
                     -   name: estimates_ci
                         type: CheckBox
+                    -   name: expb_ci
+                        type: CheckBox
+                        enable: (es_expb)
+                    -   name: eta_ci
+                        type: CheckBox
+                        enable: (es_eta)
                     -   type: TextBox
                         name: ci_width
                         label: Interval
                         suffix: '%'
                         format: number
-                        enable: (estimates_ci || expb_ci)
+                        enable: (estimates_ci || expb_ci || eta_ci)
             -   type: Label
                 label: Estimation
                 margin: large

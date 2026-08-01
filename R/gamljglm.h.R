@@ -72,6 +72,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             input_method = "standard",
             ci_method = "wald",
             expb_ci = TRUE,
+            eta_ci = FALSE,
             es = list(
                 "expb",
                 "eta"),
@@ -453,6 +454,10 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "expb_ci",
                 expb_ci,
                 default=TRUE)
+            private$..eta_ci <- jmvcore::OptionBool$new(
+                "eta_ci",
+                eta_ci,
+                default=FALSE)
             private$..es <- jmvcore::OptionNMXList$new(
                 "es",
                 es,
@@ -584,6 +589,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..input_method)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..expb_ci)
+            self$.addOption(private$..eta_ci)
             self$.addOption(private$..es)
             self$.addOption(private$..model_type)
             self$.addOption(private$..custom_family)
@@ -659,6 +665,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         input_method = function() private$..input_method$value,
         ci_method = function() private$..ci_method$value,
         expb_ci = function() private$..expb_ci$value,
+        eta_ci = function() private$..eta_ci$value,
         es = function() private$..es$value,
         model_type = function() private$..model_type$value,
         custom_family = function() private$..custom_family$value,
@@ -733,6 +740,7 @@ gamljglmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..input_method = NA,
         ..ci_method = NA,
         ..expb_ci = NA,
+        ..eta_ci = NA,
         ..es = NA,
         ..model_type = NA,
         ..custom_family = NA,

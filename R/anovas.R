@@ -54,6 +54,9 @@ ganova <- function(x, ...) UseMethod(".anova")
 
     d0 <- null.deviance(model)
     .anova$etaSq <- .anova$test / d0
+    if (obj$options$eta_ci) {
+    }
+    ### return the table
     .anova
 }
 

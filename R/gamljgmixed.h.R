@@ -2438,6 +2438,6 @@ gamljgmixedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 pause = NULL,
                 completeWhenFilled = TRUE,
                 requiresMissings = FALSE,
-                weightsSupport = 'full')
+                weightsSupport = 'none')
         }))
 

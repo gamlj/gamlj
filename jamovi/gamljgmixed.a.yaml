@@ -5,7 +5,6 @@ version: 3.0.0
 jas: '1.2'
 completeWhenFilled: true
 export: false
-weightsSupport: full
 description:
     main: |
         Generalized Mixed  Model

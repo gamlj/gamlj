@@ -646,6 +646,13 @@ options:
         description:
             R: |
                 `TRUE` (default) or `FALSE` , exp(B) CI in table
+    -   name: eta_ci
+        title: For η²
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , eta-squared CI in table
     -   name: es
         title: Effect Size
         type: NMXList
