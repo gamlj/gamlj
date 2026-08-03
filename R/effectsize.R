@@ -573,6 +573,10 @@ ci_effectsize_glm <- function(eta2, u, D0 , conf.level = 0.95) {
 ### bootstrap ####
 
 es.var_boot_fun <- function(data, indices, model = NULL) {
+    UseMethod(".var_boot_fun", model)
+}
+
+.var_boot_fun.lm <- function(data, indices, model = NULL) {
     .data <- data[indices, ]
     .model <- stats::update(model, data = .data)
     .anova <- car::Anova(.model, type = "III", singular.ok = T)
@@ -586,7 +590,19 @@ es.var_boot_fun <- function(data, indices, model = NULL) {
     unlist(c(ss, ssmod, ssres))
 }
 
-## computes bootstrap conf int for variances effect size indices
+.var_boot_fun.glm <- function(data, indices, model = NULL) {
+    .data <- data[indices, , drop = FALSE]
+    .model <- stats::update(model, data = .data)
+    .anova <- car::Anova(.model, type = 3, test = "LR", singular.ok = TRUE)
+    .anova <- as.data.frame(.anova)
+    .anova <- .anova[rownames(.anova) != "(Intercept)", , drop = FALSE]
+
+    test <- .anova[["LR Chisq"]]
+    d0 <- null.deviance(.model)
+    unname(c(test, d0))
+}
+
+
 get_boot_ci <- function(effsize, terms, bootresults, type, width, df, dfres, N) {
     type <- switch(type,
         quantile = "perc",
