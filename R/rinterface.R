@@ -193,7 +193,16 @@ jnplot <- function(x, formula = NULL, ...) {
     
     for (i in 1:length(object)) {
         title <- (object[[i]]$title)
-        gplot <- object[[i]]$plot$fun() + ggplot2::ggtitle(title)
+        gplot <- withCallingHandlers(
+            object[[i]]$plot$fun() + ggplot2::ggtitle(title),
+            warning = function(w) {
+                if (inherits(w, "lifecycle_warning_deprecated") &&
+                    grepl("element_line", conditionMessage(w), fixed = TRUE) &&
+                    grepl("linewidth", conditionMessage(w), fixed = TRUE)) {
+                    invokeRestart("muffleWarning")
+                }
+            }
+        )
         alist[[i]] <- gplot
     }
     return(alist)

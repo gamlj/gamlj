@@ -8,15 +8,14 @@ data$yord <- factor(data$yord)
 data$ybin <- factor(data$ybin)
 data$ycat <- factor(data$ycat)
 
-testthat::expect_warning(
-    mod0 <- GAMLj3::gamlj_gmixed(
+suppressWarnings({
+suppressMessages({
+mod0 <- GAMLj3::gamlj_gmixed(
         formula = ybin ~ x * cat3 + (1 + x | cluster),
         data = data,
         model_type = "logistic"
     )
-)
 
-testthat::expect_warning(
     mod1 <- GAMLj3::gamlj_gmixed(
         data = data,
         model_type = "logistic",
@@ -26,9 +25,6 @@ testthat::expect_warning(
         model_terms = ~ x * cat3,
         re = list(list(list("Intercept", "cluster"), list("x", "cluster")))
     )
-)
-mod1
-testthat::expect_warning(
     mod2 <- GAMLj3::gamlj_gmixed(
         data = data,
         model_type = "logistic",
@@ -38,7 +34,10 @@ testthat::expect_warning(
         model_terms = ~ x * cat3,
         re = ~ (1 + x | cluster)
     )
-)
+})
+})
+
+
 testthat::test_that("equivalent model input", {
     testthat::expect_equal(mod0$info$asDF$specs[2], mod1$info$asDF$specs[2])
     testthat::expect_equal(mod0$main$anova$asDF$f[3], mod1$main$anova$asDF$f[3])

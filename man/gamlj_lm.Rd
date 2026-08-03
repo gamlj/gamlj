@@ -16,6 +16,7 @@ gamlj_lm(
   nested_intercept = NULL,
   omnibus = "F",
   estimates_ci = TRUE,
+  es_ci = FALSE,
   betas_ci = FALSE,
   ci_width = 95,
   ci_method = "wald",
@@ -95,6 +96,9 @@ loglikelihood ration test \code{LRT}.}
 
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI
 in table}
+
+\item{es_ci}{\code{TRUE} or \code{FALSE} (default), effect size indices
+confidence intervals in the effect size table}
 
 \item{betas_ci}{\code{TRUE} (default) or \code{FALSE} , parameters CI in
 table}

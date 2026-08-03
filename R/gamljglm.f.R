@@ -46,6 +46,8 @@
 #' @param omnibus Whether the omnibus test for the model should be \code{wald} or \code{LRT}.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , coefficients CI
 #'   in tables
+#' @param es_ci \code{TRUE} or \code{FALSE} (default), effect size indices
+#'   confidence intervals in the effect size table
 #' @param ci_method   The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
 #'    errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which
 #'    the bounds are chosen based on the percentiles of the chi-square distribution around the maximum likelihood
@@ -129,6 +131,8 @@
 #' @param es Effect size indices. \code{expb} (default) exponentiates the
 #'   coefficients. For dichotomous dependent variables relative risk indices
 #'   (RR) can be obtained. \code{marginals} computes the marginal effects.
+#'   \code{eta} and \code{epsilon} request generalized eta-squared and
+#'   epsilon-squared indices for the ANOVA effects.
 #' @param propodds_test Test parallel lines assumptions in cumulative link
 #'   model (ordinal regression)
 #' @param plot_scale Chi-squared computation method. \code{'lrt'} (default)
@@ -189,6 +193,7 @@ gamlj_glm <- function(
     nested_terms = NULL,
     omnibus = "LRT",
     estimates_ci = FALSE,
+    es_ci = FALSE,
     ci_method = "wald",
     boot_r = 1000,
     ci_width = 95,
@@ -219,7 +224,7 @@ gamlj_glm <- function(
     adjust = list("bonf"),
     covs_scale = NULL,
     expb_ci = TRUE,
-    es = list("expb"),
+    es = list("expb", "eta"),
     propodds_test = FALSE,
     plot_scale = "response",
     se_method = "standard"
@@ -374,6 +379,7 @@ gamlj_glm <- function(
         comparison = comparison,
         omnibus = omnibus,
         estimates_ci = estimates_ci,
+        es_ci = es_ci,
         ci_method = ci_method,
         boot_r = boot_r,
         ci_width = ci_width,
