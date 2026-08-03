@@ -247,8 +247,8 @@ se <- GAMLj3::simple_effects(mod1, simple_x = "write", simple_mods = "honors")
 
 res <- se$anova$asDF
 testthat::test_that("simple effects ", {
-    testthat::expect_equal(round(res[2, 2], 2), 6.64)
-    testthat::expect_equal(round(res[2, 3], 2), 1)
+    testthat::expect_equal(res$test[2], 7.978,tolerance = tol)
+    testthat::expect_equal(res$etaSq[2], 0.0454,tolerance = tol)
 })
 
 
@@ -346,3 +346,4 @@ testthat::test_that("get_model decodes model names and factor levels", {
         tolerance = tol
     )
 })
+

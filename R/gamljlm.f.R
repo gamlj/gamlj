@@ -31,6 +31,8 @@
 #'   loglikelihood ration test \code{LRT}.
 #' @param estimates_ci \code{TRUE} (default) or \code{FALSE} , parameters CI
 #'   in table
+#' @param es_ci \code{TRUE} or \code{FALSE} (default), effect size indices
+#'   confidence intervals in the effect size table
 #' @param betas_ci \code{TRUE} (default) or \code{FALSE} , parameters CI in
 #'   table
 #' @param ci_width a number between 50 and 99.9 (default: 95) specifying the
@@ -199,6 +201,7 @@ gamlj_lm <- function(
     nested_intercept = NULL,
     omnibus = "F",
     estimates_ci = TRUE,
+    es_ci = FALSE,
     betas_ci = FALSE,
     ci_width = 95,
     ci_method = "wald",
@@ -370,6 +373,7 @@ gamlj_lm <- function(
         nested_intercept = nested_intercept,
         omnibus = omnibus,
         estimates_ci = estimates_ci,
+        es_ci = es_ci,
         betas_ci = betas_ci,
         ci_width = ci_width,
         ci_method = ci_method,

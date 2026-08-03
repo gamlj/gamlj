@@ -167,7 +167,7 @@ gFit <- R6::R6Class(
 r2 <- function(model, ...) UseMethod(".r2")
 
 .r2.default <- function(model, obj) {
-    r2 <- performance::r2(model, tolerance = 0)
+    r2 <- performance::r2(model, tolerance = 0, verbose = FALSE)
     return(r2)
 }
 

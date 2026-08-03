@@ -33,7 +33,7 @@ ganova <- function(x, ...) UseMethod(".anova")
     if (!isFALSE(anoobj$error)) {
         opts$test<-"Wald"
         anoobj <- try_hard(do.call(car::Anova,opts))
-        obj$warning <- list(topic = "main_anova", message = "Wald test was used because LRT failed")
+        obj$warning <- list(topic = "main_anova", message = "Wald test was used because LRT failed. Effect size indices may be biased.")
     }
     obj$error <- list(topic = "main_anova", message = anoobj$error)
     obj$warning <- list(topic = "main_anova", message = anoobj$warning)
@@ -62,6 +62,7 @@ ganova <- function(x, ...) UseMethod(".anova")
 }
 
 .anova.clm <- function(model, obj) {
+  
     if (!obj$formulaobj$hasTerms) {
         obj$warning <- list(topic = "main_anova", message = "Omnibus tests cannot be computed")
         return(NULL)
@@ -69,15 +70,15 @@ ganova <- function(x, ...) UseMethod(".anova")
   
     if (obj$options$se_method=="robust") warning(WARNS["norobustanova"])
 
-    anoobj <- try_hard(stats::anova(model, type = 3))
+    anoobj <- try_hard(.clm_anova_lr(model))
     obj$error <- list(topic = "main_anova", message = anoobj$error)
     obj$warning <- list(topic = "main_anova", message = anoobj$warning)
 
     if (!isFALSE(anoobj$error)) {
         return(NULL)
     }
-
     .anova <- as.data.frame(anoobj$obj, stringsAsFactors = F)
+    mark(.anova)
     .transnames <- list("test" = c("Chisq", "LR Chisq"), df = c("Df", "df1"), p = c("Pr(>Chisq)"))
     names(.anova) <- transnames(names(.anova), .transnames)
     class(.anova) <- c("main_anova_clm", class(.anova))
@@ -222,7 +223,7 @@ ganova <- function(x, ...) UseMethod(".anova")
     ## at the moment ordinal::anova.clmm does not work and drop1 tests
     ## only the higher order term. So we go all the way with a custom
     ## drop. We also have to be careful when there is only one predictors,
-    ## because drop1 will not work . This results is Type II testing
+    ## because drop1 will not work . This result is Type II testing
 
     if (!obj$formulaobj$hasTerms) {
         return()
@@ -345,5 +346,51 @@ anovas.ranova <- function(x, ...) UseMethod(".ranova")
         .anova$test <- x
         .anova
     })
+    tab
+}
+
+## Genuine Type-III likelihood-ratio test for `clm` (ordinal::clm) objects. Neither
+## car::Anova() nor ordinal::clm::anova() provides a refit-based per-term LR test
+## for this model class. The reduced fits below use the original model-matrix
+## columns so that dropping a main effect does not re-encode an interaction.
+.clm_anova_lr <- function(object) {
+    full_terms <- attr(stats::terms(object), "term.labels")
+    if (length(full_terms) == 0) {
+        stop("model has no terms to test")
+    }
+
+    model_frame <- stats::model.frame(object)
+    terms_object <- stats::delete.response(stats::terms(object))
+    design <- stats::model.matrix(terms_object, data = model_frame)
+    assignment <- attr(design, "assign")
+    predictor_columns <- which(assignment != 0L)
+    predictor_names <- paste0(".clm_x", seq_along(predictor_columns))
+    response_name <- names(model_frame)[1]
+
+    design_data <- model_frame[1]
+    if (length(predictor_columns) > 0) {
+        predictors <- as.data.frame(design[, predictor_columns, drop = FALSE])
+        names(predictors) <- predictor_names
+        design_data[predictor_names] <- predictors
+    }
+
+    full_ll <- as.numeric(stats::logLik(object))
+    full_df <- length(stats::coef(object))
+    rows <- lapply(seq_along(full_terms), function(term_index) {
+        keep <- assignment[predictor_columns] != term_index
+        reduced_formula <- stats::reformulate(
+            predictor_names[keep],
+            response = response_name,
+            intercept = attr(terms_object, "intercept") == 1L
+        )
+        reduced <- stats::update(object, formula = reduced_formula, data = design_data)
+        df <- full_df - length(stats::coef(reduced))
+        chisq <- 2 * (full_ll - as.numeric(stats::logLik(reduced)))
+        c(Df = df, Chisq = chisq)
+    })
+
+    tab <- as.data.frame(do.call(rbind, rows))
+    rownames(tab) <- full_terms
+    tab[["Pr(>Chisq)"]] <- stats::pchisq(tab$Chisq, tab$Df, lower.tail = FALSE)
     tab
 }

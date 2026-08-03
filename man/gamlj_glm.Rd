@@ -21,6 +21,7 @@ gamlj_glm(
   nested_terms = NULL,
   omnibus = "LRT",
   estimates_ci = FALSE,
+  es_ci = FALSE,
   ci_method = "wald",
   boot_r = 1000,
   ci_width = 95,
@@ -51,7 +52,7 @@ gamlj_glm(
   adjust = list("bonf"),
   covs_scale = NULL,
   expb_ci = TRUE,
-  es = list("expb"),
+  es = list("expb", "eta"),
   propodds_test = FALSE,
   plot_scale = "response",
   se_method = "standard"
@@ -106,6 +107,9 @@ for nested model. It can be passed as right-hand formula.}
 
 \item{estimates_ci}{\code{TRUE} (default) or \code{FALSE} , coefficients CI
 in tables}
+
+\item{es_ci}{\code{TRUE} or \code{FALSE} (default), effect size indices
+confidence intervals in the effect size table}
 
 \item{ci_method}{The method used to compute the confidence intervals. `wald` uses the Wald method to compute standard
 errors and confidence intervals. `profile` computes Profile Likelihood Based Confidence Interval, in which
@@ -214,7 +218,9 @@ var2='type2')} specifying the transformation to apply to covariates, one of
 
 \item{es}{Effect size indices. \code{expb} (default) exponentiates the
 coefficients. For dichotomous dependent variables relative risk indices
-(RR) can be obtained. \code{marginals} computes the marginal effects.}
+(RR) can be obtained. \code{marginals} computes the marginal effects.
+\code{eta} and \code{epsilon} request generalized eta-squared and
+epsilon-squared indices for the ANOVA effects.}
 
 \item{propodds_test}{Test parallel lines assumptions in cumulative link
 model (ordinal regression)}

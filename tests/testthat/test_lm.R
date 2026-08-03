@@ -256,13 +256,13 @@ testthat::test_that("glm posthoc", {
 mod <- GAMLj3::gamlj_lm(
     data = hsbdemo,
     formula = science ~ math + schtyp + math:schtyp,
-    es_info = T
+    es_ci = T
 )
 tab <- mod$main$effectsizes$asDF
 
 testthat::test_that("glm effectsize", {
-    testthat::expect_equal(tab[4, 3], .21724, tolerance = .0001)
-    testthat::expect_equal(tab[10, 5], .0, tolerance = .00001)
+    testthat::expect_equal(tab$estimate[1], .2237, tolerance = tol)
+    testthat::expect_equal(tab$est.ci.lower[2], .0, tolerance = .00001)
 })
 
 
