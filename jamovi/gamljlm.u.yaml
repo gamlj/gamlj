@@ -38,12 +38,12 @@ children:
     -   name: panel_input
         type: LayoutBox
         margin: large
-        style: list
+        style: inline
         children:
             -   type: Label
                 label: Effect Size
                 margin: large
-                style: list-inline
+                style: list
                 children:
                     -   name: es_beta
                         type: CheckBox
@@ -76,11 +76,13 @@ children:
             -   type: Label
                 label: Confidence Intervals
                 margin: large
-                style: list-inline
+                style: list
                 children:
                     -   name: estimates_ci
                         type: CheckBox
                     -   name: betas_ci
+                        type: CheckBox
+                    -   name: es_ci
                         type: CheckBox
                     -   type: TextBox
                         name: ci_width
@@ -673,8 +675,6 @@ children:
                         children:
                             -   type: CheckBox
                                 name: intercept_info
-                            -   type: CheckBox
-                                name: es_info
                             -   type: CheckBox
                                 name: vcov
             -   type: LayoutBox

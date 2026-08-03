@@ -87,6 +87,10 @@ options:
     -   name: posthoc_ci
         type: scaffold
         file: commons.a.yaml
+    -   name: es_ci
+        type: scaffold
+        file: commons.a.yaml
+
     -   name: adjust
         type: scaffold
         file: commons.a.yaml
@@ -318,13 +322,6 @@ options:
         description:
             R: |
                 `TRUE` (default) or `FALSE` , exp(B) CI in table
-    -   name: eta_ci
-        title: For η²
-        type: Bool
-        default: false
-        description:
-            R: |
-                `TRUE` (default) or `FALSE` , eta-squared CI in table
 
     -   name: es
         title: Effect Size
@@ -332,12 +329,15 @@ options:
         options:
             -   name: expb
                 title: Odd Ratios (expB)
-            -   name: eta
-                title: η²
             -   name: RR
                 title: Relative Risk (RR)
             -   name: marginals
                 title: Marginal Effects
+            -   name: eta
+                title: η²
+            -   name: epsilon
+                title: ε²
+
         default:
             - expb
             - eta

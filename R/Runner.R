@@ -161,6 +161,7 @@ Runner <- R6::R6Class("Runner",
             }
             ganova(self$model, self)
         },
+
         run_main_r2 = function() {
             obj <- gFit$new(self)
             obj$r2table()
@@ -235,7 +236,14 @@ Runner <- R6::R6Class("Runner",
                 )
                 jinfo("RUNNER: bootstrapping done")
             }
-            es.glm_variances(self$model, self)
+          
+            atable <- ganova(self$model, self)
+                if (is.null(atable)) {
+                    return(NULL)
+                }
+            newclass<-paste0("main_anova",self$options$.caller)
+            class(atable) <- c(newclass, class(atable))
+            return(fill_effectsize(atable, self$model, self))
         },
         run_main_intercept = function() {
             ss <- summary(self$model)

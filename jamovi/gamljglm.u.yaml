@@ -147,23 +147,18 @@ children:
             enable: (model_type:logistic)
   - type: LayoutBox
     margin: large
-    style: list
+    style: inline
     name: panel_input
     children:
       - type: Label
         label: Effect Size
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: es_expb
             type: CheckBox
             optionPart: expb
             optionName: es
-          - name: es_eta
-            type: CheckBox
-            optionPart: eta
-            optionName: es
-            enable: (!(model_type:ordinal || model_type:poiover ||  model_type:nb))
           - name: es_marginals
             type: CheckBox
             optionPart: marginals
@@ -173,17 +168,27 @@ children:
             optionPart: RR
             optionName: es
             enable: (model_type:logistic)
+          - name: es_eta
+            type: CheckBox
+            optionPart: eta
+            optionName: es
+            enable: (!(model_type:poiover ||  model_type:nb || model_type:beta))
+          - name: es_epsilon
+            type: CheckBox
+            optionPart: epsilon
+            optionName: es
+            enable: (!(model_type:poiover ||  model_type:nb || model_type:beta))
       - type: Label
         label: Confidence Intervals
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: estimates_ci
             type: CheckBox
           - name: expb_ci
             type: CheckBox
             enable: (es_expb)
-          - name: eta_ci
+          - name: es_ci
             type: CheckBox
             enable: (es_eta)
           - type: TextBox
@@ -191,7 +196,7 @@ children:
             label: Interval
             suffix: '%'
             format: number
-            enable: (estimates_ci || expb_ci || eta_ci)
+            enable: (estimates_ci || expb_ci || es_ci)
       - type: Label
         label: Estimation
         margin: large

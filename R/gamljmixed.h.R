@@ -1143,7 +1143,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1215,7 +1216,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1310,7 +1312,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1382,7 +1385,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="groups", 
@@ -1550,6 +1554,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "es_ci",
                         "adjust",
                         "posthoc_ci",
                         "ci_width",
@@ -2027,6 +2032,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             "ci_width",
                             "ci_method",
                             "boot_r",
+                            "es_ci",
                             "plot_x",
                             "plot_z",
                             "plot_by",

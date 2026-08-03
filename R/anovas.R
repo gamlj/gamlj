@@ -51,13 +51,10 @@ ganova <- function(x, ...) UseMethod(".anova")
 
     
     #### effect size
-
-    d0 <- null.deviance(model)
-    .anova$etaSq <- .anova$test / d0
-    if (obj$options$eta_ci) {
-    }
-    ### return the table
-    .anova
+    class(.anova) <- c("main_anova_glm", class(.anova))
+    .anova <- add_effect_size(.anova, model, obj)
+    
+    return(.anova)
 }
 
 .anova.multinom <- function(model, obj) {
@@ -83,9 +80,8 @@ ganova <- function(x, ...) UseMethod(".anova")
     .anova <- as.data.frame(anoobj$obj, stringsAsFactors = F)
     .transnames <- list("test" = c("Chisq", "LR Chisq"), df = c("Df", "df1"), p = c("Pr(>Chisq)"))
     names(.anova) <- transnames(names(.anova), .transnames)
-    d0 <- null.deviance(model)
-    .anova$etaSq <- .anova$test / d0
-    .anova <- .anova[rownames(.anova) != "(Intercept)", ]
+    class(.anova) <- c("main_anova_clm", class(.anova))
+    .anova<-add_effect_size(.anova,model,obj)
     .anova
 }
 
@@ -114,98 +110,62 @@ ganova <- function(x, ...) UseMethod(".anova")
     names(.anova) <- transnames(names(.anova), .transnames)
 
     .anova <- .anova[rownames(.anova) != "(Intercept)", ]
-
+     class(.anova) <- c("main_anova_beta", class(.anova))
+    .anova<-add_effect_size(.anova,model,obj)
+    
     #### effect size
 
     .anova
 }
 
 .anova.lm <- function(model, obj) {
-    opts <- list(mod = model, test = "F", type = 3, singular.ok = T)
+    opts <- list(mod = model, test = "F", type = 3, singular.ok = TRUE)
     .anova <- do.call(car::Anova, opts)
-    .anova <- .anova[!(rownames(.anova) %in% c("(Intercept)")), ]
-    anovatab <- .anova
-    colnames(anovatab) <- c("ss", "df", "f", "p")
-    effss <- anovatab[!(rownames(anovatab) %in% c("Residuals")), ]
-    reds <- list(ss = anovatab$ss[rownames(anovatab) == "Residuals"], df = anovatab$df[rownames(anovatab) == "Residuals"])
-    ## returns if model has no terms
-    if (!obj$formulaobj$hasTerms) {
-        tots <- list(ss = reds$ss, df = reds$df)
-        return(list(reds, tots))
-    }
-    sumr <- summary(model)
+    .anova <- .anova[!(rownames(.anova) %in% c("(Intercept)")), , drop = FALSE]
+    .anova <- as.data.frame(.anova)
+    names(.anova) <- c("ss", "df", "f", "p")
+    mark(.anova)
 
-    ### whole model ###
-    f <- sumr$fstatistic[[1]]
-    edf <- sumr$fstatistic[[3]]
-    mdf <- sumr$fstatistic[[2]]
-    p <- stats::pf(f, mdf, edf, lower.tail = F)
-    modeta <- effectsize::F_to_eta2(f, mdf, edf)
-    modomega <- effectsize::F_to_omega2(f, mdf, edf)
-    modepsilon <- effectsize::F_to_epsilon2(f, mdf, edf)
-    modss <- f * reds$ss * mdf / edf
-    mods <- list(
+    residual_rows <- rownames(.anova) == "Residuals"
+    if (any(residual_rows)) {
+        ssres <- .anova$ss[residual_rows][[1]]
+        dfres <- .anova$df[residual_rows][[1]]
+    } else {
+        dfres <- model$df.residual
+        ssres <- stats::sigma(model)^2 * dfres
+    }
+
+    fstatistic <- summary(model)$fstatistic
+    if (is.null(fstatistic)) {
+        modss <- 0
+        mdf <- 0
+        f <- NA_real_
+        p <- NA_real_
+    } else {
+        f <- fstatistic[[1]]
+        mdf <- fstatistic[[2]]
+        p <- stats::pf(f, mdf, fstatistic[[3]], lower.tail = FALSE)
+        modss <- f * ssres * mdf / fstatistic[[3]]
+    }
+
+    model_row <- data.frame(
         ss = modss,
         df = mdf,
         f = f,
         p = p,
-        etaSq = modeta[[1]],
-        etaSqP = modeta[[1]],
-        omegaSq = modomega[[1]],
-        omegaSqP = modomega[[1]],
-        epsilonSq = modepsilon[[1]],
-        epsilonSqP = modepsilon[[1]]
+        row.names = "Model"
+    )
+    total_row <- data.frame(
+        ss = modss + ssres,
+        df = mdf + dfres,
+        f = NA_real_,
+        p = NA_real_,
+        row.names = "Total"
     )
 
-    tots <- list(ss = mods$ss + reds$ss, df = mdf + edf)
-
-    #####
-    # Here we need a correct to the computation of the effect sizes. To compute the non-partial indexes
-    ## In unbalanced designs, the sum does not necessarily correspond to the model SS (plus residuals)
-    ## so the estimation is biased. Eta-squared does not correspond to semi-partial r^2 any more
-    ## and many properties of the non-partial indices are broken.
-    ## Thus, we fixed it by adding a bogus effect whose SS is exactly the discrepancy betweem
-    ## the table SS and the model+error SS. In this way, the estimation uses the correct total SS
-    #####
-    diff <- mods$ss - sum(effss$ss)
-    add <- data.frame(diff, 1, 1, 0)
-    names(add) <- names(.anova)
-    .canova <- rbind(.anova, add)
-    last <- dim(effss)[1] + 1
-    etap <- effectsize::eta_squared(.anova, partial = T, verbose = F)
-    eta <- effectsize::eta_squared(.canova, partial = F, verbose = F)
-    omegap <- effectsize::omega_squared(.anova, partial = T, verbose = F)
-    omega <- effectsize::omega_squared(.canova, partial = F, verbose = F)
-    epsilonp <- effectsize::epsilon_squared(.anova, partial = T, verbose = F)
-    epsilon <- effectsize::epsilon_squared(.canova, partial = F, verbose = F)
-
-    effss$etaSq <- eta[-last, 2]
-    effss$etaSqP <- etap[, 2]
-
-    effss$omegaSq <- omega[-last, 2]
-    effss$omegaSqP <- omegap[, 2]
-    effss$epsilonSq <- epsilon[-last, 2]
-    effss$epsilonSqP <- epsilonp[, 2]
-
-    if (obj$option("se_method", "robust")) {
-        opts[["white.adjust"]] <- TRUE
-        .anova <- do.call(car::Anova, opts)
-        .anova <- .anova[!(rownames(.anova) %in% c("(Intercept)", "Residuals")), ]
-
-        effss$f <- .anova$F
-        effss$p <- .anova$`Pr(>F)`
-        warning(WARNS[["stde.robust_test"]])
-    }
-
-    opts <- list(mod = model, test = "F", type = 3, singular.ok = T)
-    .anova <- do.call(car::Anova, opts)
-
-    reslist <- listify(effss)
-    ladd(reslist) <- reds
-    ladd(reslist) <- tots
-    padd(reslist) <- mods
-
-    reslist
+    .anova <- rbind(model_row, .anova, total_row)
+    class(.anova) <- c("main_anova_lm", class(.anova))
+    add_effect_size(.anova, model, obj)
 }
 
 .anova.glmerMod <- function(model, obj) {

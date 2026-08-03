@@ -55,6 +55,7 @@
         - ci_width
         - ci_method
         - boot_r
+        - es_ci
 -   type: scaffold
     name: opts_es
     children: 

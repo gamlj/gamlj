@@ -229,6 +229,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: response
                         title: Response
@@ -310,6 +311,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: response
                         title: Response
@@ -413,6 +415,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: response
                         title: Response
@@ -479,6 +482,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: source
                         title: Name
@@ -543,6 +547,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - re_ci
                 columns:
                     -   name: groups
@@ -867,6 +872,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - simple_x
                     - simple_mods
                     - simple_scale
@@ -922,6 +928,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - simple_x
                     - simple_mods
                     - simple_scale
@@ -1071,6 +1078,7 @@ items:
                         - ci_width
                         - ci_method
                         - boot_r
+                        - es_ci
                         - simple_x
                         - simple_mods
                         - simple_scale
@@ -1159,6 +1167,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
                 - simple_x
                 - simple_mods
                 - simple_scale
@@ -1239,6 +1248,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - plot_x
                     - plot_z
                     - plot_by

@@ -447,7 +447,69 @@ procedure.emmeans <- function(obj) {
 
 
 procedure.simpleEffects <- function(x, ...) UseMethod(".simpleEffects")
+.simple_glm_lr <- function(grid, model) {
+    X <- stats::model.matrix(model)
+    beta <- stats::coef(model)
+    keep <- !is.na(beta)
+    coefficient_names <- names(beta)[keep]
 
+    if (length(coefficient_names) < 2 ||
+        !all(coefficient_names %in% colnames(X)) ||
+        is.null(grid@linfct) ||
+        is.null(colnames(grid@linfct)) ||
+        !all(coefficient_names %in% colnames(grid@linfct))) {
+        return(NULL)
+    }
+
+    X <- X[, coefficient_names, drop = FALSE]
+    L <- as.matrix(grid@linfct)[, coefficient_names, drop = FALSE]
+    if (nrow(L) == 0 || any(!is.finite(L))) {
+        return(NULL)
+    }
+
+    y <- model$y
+    if (is.null(y)) {
+        y <- stats::model.response(stats::model.frame(model))
+    }
+
+    full_deviance <- stats::deviance(model)
+    estimates <- lapply(seq_len(nrow(L)), function(i) {
+        l <- L[i, , drop = FALSE]
+        if (all(l == 0)) {
+            return(NULL)
+        }
+
+        null_space <- qr.Q(qr(t(l)), complete = TRUE)[, -1, drop = FALSE]
+        null_model <- tryCatch(
+            stats::glm.fit(
+                x = X %*% null_space,
+                y = y,
+                weights = model$prior.weights,
+                offset = model$offset,
+                family = model$family
+            ),
+            error = function(e) NULL
+        )
+
+        if (is.null(null_model) || !is.finite(null_model$deviance)) {
+            return(NULL)
+        }
+
+        lr <- max(0, null_model$deviance - full_deviance)
+        data.frame(
+            df1 = 1,
+            df2 = Inf,
+            test = lr,
+            p = stats::pchisq(lr, df = 1, lower.tail = FALSE)
+        )
+    })
+
+    if (any(vapply(estimates, is.null, logical(1)))) {
+        return(NULL)
+    }
+
+    do.call(rbind, estimates)
+}
 
 .simpleEffects.default <- function(model, obj) {
     jinfo("PROCEDURE: Simple Effects estimated")
@@ -563,6 +625,19 @@ procedure.simpleEffects <- function(x, ...) UseMethod(".simpleEffects")
     .transnames <- list(test = c("F.ratio"), p = "p.value")
     names(.anova) <- transnames(names(.anova), .transnames)
 
+    if (obj$options$.caller == "glm" && !obj$option("se_method", "robust")) {
+        lr <- .simple_glm_lr(grid, model)
+        if (!is.null(lr) && nrow(lr) == nrow(.anova)) {
+            .anova$df1 <- lr$df1
+            .anova$df2 <- lr$df2
+            .anova$test <- lr$test
+            .anova$p <- lr$p
+            if ("Chisq" %in% names(.anova)) {
+                .anova$Chisq <- lr$test
+            }
+        }
+    }
+
     ### fix labels and make sure they are not factors or stuff
     for (.name in term64) {
         .anova[[.name]] <- factor(.anova[[.name]])
@@ -574,7 +649,8 @@ procedure.simpleEffects <- function(x, ...) UseMethod(".simpleEffects")
     names(.anova)[1:length(.names)] <- .names
 
     ### make fix depending of the type of model ###
-    class(.anova) <- c(paste0("simple_anova_", obj$options$model_type), class(.anova))
+    simple_class <- paste0("simple_anova_",obj$options$.caller)
+    class(.anova) <- c(simple_class, class(.anova))
     .anova <- add_effect_size(.anova, model)
     ### check some stuff
     .all <- c(term64, variable64)
@@ -661,7 +737,7 @@ procedure.simpleEffects <- function(x, ...) UseMethod(".simpleEffects")
         params <- params[params$Parameter %in% varobj$paramsnames64, ]
         params[, .names] <- rows[i, ]
         parameters <- rbind(parameters, params)
-        oneanova <- car::Anova(.model, test = "Wald", type = 3, singular.ok = T)
+        oneanova <- car::Anova(.model, test = "LR", type = 3, singular.ok = T)
         oneanova <- oneanova[rownames(oneanova) %in% varobj$name64, ]
         oneanova[, .names] <- rows[i, ]
         anovas <- rbind(anovas, oneanova)

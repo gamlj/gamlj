@@ -271,6 +271,14 @@
             Adjustment method for posthoc tests. One or more of `'none'`,  `'bonf'`,`'tukey'`  `'holm'`, `'scheffe'` and `'sidak'`; provide no,  Bonferroni, Tukey and Holm Scheffé and Sidak Post Hoc corrections, respectively. See \[emmeans]{summary.emmGrid} for details.
         ui: |
             Adjustment method for posthoc tests. One or more of `'None'`,  `'Bonferroni'`,`'Tukey'`  `'Holm'` `'Scheffe'` and `'Sidak'` Post Hoc corrections. See \[emmeans](https://cran.r-project.org/web/packages/emmeans/emmeans.pdf) for details.
+-   name: es_ci
+    title: For effect size indices
+    type: Bool
+    default: false
+    description:
+            R: |
+                `TRUE` (default) or `FALSE` , anova effect size CI in table
+
 -   name: posthoc_ci
     title: Confidence Intervals
     type: Bool

@@ -23,6 +23,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             mute = FALSE,
             posthoc = NULL,
             posthoc_ci = FALSE,
+            es_ci = FALSE,
             adjust = list(
                 "bonf"),
             contrasts = NULL,
@@ -85,7 +86,6 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             norm_plot = FALSE,
             resid_plot = FALSE,
             intercept_info = FALSE,
-            es_info = FALSE,
             dep_scale = "none",
             ci_method = "wald",
             robust_method = "HC1",
@@ -178,6 +178,10 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             private$..posthoc_ci <- jmvcore::OptionBool$new(
                 "posthoc_ci",
                 posthoc_ci,
+                default=FALSE)
+            private$..es_ci <- jmvcore::OptionBool$new(
+                "es_ci",
+                es_ci,
                 default=FALSE)
             private$..adjust <- jmvcore::OptionNMXList$new(
                 "adjust",
@@ -505,10 +509,6 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "intercept_info",
                 intercept_info,
                 default=FALSE)
-            private$..es_info <- jmvcore::OptionBool$new(
-                "es_info",
-                es_info,
-                default=FALSE)
             private$..dep_scale <- jmvcore::OptionList$new(
                 "dep_scale",
                 dep_scale,
@@ -559,6 +559,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..mute)
             self$.addOption(private$..posthoc)
             self$.addOption(private$..posthoc_ci)
+            self$.addOption(private$..es_ci)
             self$.addOption(private$..adjust)
             self$.addOption(private$..contrasts)
             self$.addOption(private$..show_contrastnames)
@@ -618,7 +619,6 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..norm_plot)
             self$.addOption(private$..resid_plot)
             self$.addOption(private$..intercept_info)
-            self$.addOption(private$..es_info)
             self$.addOption(private$..dep_scale)
             self$.addOption(private$..ci_method)
             self$.addOption(private$..robust_method)
@@ -642,6 +642,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         mute = function() private$..mute$value,
         posthoc = function() private$..posthoc$value,
         posthoc_ci = function() private$..posthoc_ci$value,
+        es_ci = function() private$..es_ci$value,
         adjust = function() private$..adjust$value,
         contrasts = function() private$..contrasts$value,
         show_contrastnames = function() private$..show_contrastnames$value,
@@ -701,7 +702,6 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         norm_plot = function() private$..norm_plot$value,
         resid_plot = function() private$..resid_plot$value,
         intercept_info = function() private$..intercept_info$value,
-        es_info = function() private$..es_info$value,
         dep_scale = function() private$..dep_scale$value,
         ci_method = function() private$..ci_method$value,
         robust_method = function() private$..robust_method$value,
@@ -724,6 +724,7 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..mute = NA,
         ..posthoc = NA,
         ..posthoc_ci = NA,
+        ..es_ci = NA,
         ..adjust = NA,
         ..contrasts = NA,
         ..show_contrastnames = NA,
@@ -783,7 +784,6 @@ gamljlmOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..norm_plot = NA,
         ..resid_plot = NA,
         ..intercept_info = NA,
-        ..es_info = NA,
         ..dep_scale = NA,
         ..ci_method = NA,
         ..robust_method = NA,
@@ -864,7 +864,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "comparison",
                     "ci_width",
                     "ci_method",
-                    "boot_r"),
+                    "boot_r",
+                    "es_ci"),
                 refs="gamlj"))
             self$add(jmvcore::Html$new(
                 options=options,
@@ -916,6 +917,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "omnibus"),
                             columns=list(
                                 list(
@@ -982,6 +984,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "es",
                                 "intercept_info"),
                             rows=1,
@@ -1106,7 +1109,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             options=options,
                             name="effectsizes",
                             title="Effect Size Indices",
-                            visible="(es_info)",
+                            visible="(es_ci)",
                             refs="es",
                             clearWith=list(
                                 "model_type",
@@ -1127,7 +1130,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="effect", 
@@ -1175,6 +1179,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "betas_ci"),
                             columns=list(
                                 list(
@@ -1265,7 +1270,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1340,7 +1346,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "donotrun",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="effect", 
@@ -1445,7 +1452,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "donotrun",
                         "ci_width",
                         "ci_method",
-                        "boot_r"),
+                        "boot_r",
+                        "es_ci"),
                     columns=list(
                         list(
                             `name`="estimate", 
@@ -1542,6 +1550,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "es_ci",
                         "posthoc_es",
                         "d_ci"),
                     columns=list(
@@ -1729,6 +1738,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "ccm_value",
                                 "ccp_value",
                                 "ccra_steps",
@@ -1928,6 +1938,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
+                                    "es_ci",
                                     "ccm_value",
                                     "ccp_value",
                                     "ccra_steps",
@@ -2012,6 +2023,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "es_ci",
                         "ccm_value",
                         "ccp_value",
                         "ccra_steps",
@@ -2085,6 +2097,7 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             "ci_width",
                             "ci_method",
                             "boot_r",
+                            "es_ci",
                             "plot_x",
                             "plot_z",
                             "plot_by",

@@ -84,6 +84,9 @@ options:
     -   name: posthoc_ci
         type: scaffold
         file: commons.a.yaml
+    -   name: es_ci
+        type: scaffold
+        file: commons.a.yaml
     -   name: adjust
         type: scaffold
         file: commons.a.yaml
@@ -409,15 +412,6 @@ options:
                 `TRUE` or `FALSE` (default), provides ìnformation about the intercept (F test, effect size indexes)
             ui: |
                 If selected provides ìnformation about the intercept (F test, effect size indexes)
-    -   name: es_info
-        title: On Effect sizes
-        type: Bool
-        default: false
-        description:
-            R: |
-                `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
-            ui: |
-                If selected, provides ìnformation about the effect size indexes
     -   name: dep_scale
         title: Scale
         type: List
