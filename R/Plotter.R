@@ -824,9 +824,9 @@ Plotter <- R6::R6Class(
             suppressMessages(p <- p + ggtheme)
 
 
-            p <- p + ggplot2::geom_path(data = datalist$cbso1, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend = FALSE)
-            p <- p + ggplot2::geom_path(data = datalist$cbsi, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend = FALSE)
-            p <- p + ggplot2::geom_path(data = datalist$cbso2, ggplot2::aes(x = z, y = slopes, color = Significance), size = .8, show.legend = FALSE)
+            p <- p + ggplot2::geom_path(data = datalist$cbso1, ggplot2::aes(x = z, y = slopes, color = Significance), linewidth = .8, show.legend = FALSE)
+            p <- p + ggplot2::geom_path(data = datalist$cbsi, ggplot2::aes(x = z, y = slopes, color = Significance), linewidth = .8, show.legend = FALSE)
+            p <- p + ggplot2::geom_path(data = datalist$cbso2, ggplot2::aes(x = z, y = slopes, color = Significance), linewidth = .8, show.legend = FALSE)
             p <- p + ggplot2::geom_ribbon(data = datalist$cbso1, ggplot2::aes(x = z, ymin = Lower, ymax = Upper, fill = Significance), alpha = 0.2)
             p <- p + ggplot2::geom_ribbon(data = datalist$cbsi, ggplot2::aes(x = z, ymin = Lower, ymax = Upper, fill = Significance), alpha = 0.2)
             p <- p + ggplot2::geom_ribbon(data = datalist$cbso2, ggplot2::aes(x = z, ymin = Lower, ymax = Upper, fill = Significance), alpha = 0.2)
@@ -842,7 +842,7 @@ Plotter <- R6::R6Class(
                     x = datalist$modrange[1],
                     xend = datalist$modrange[2], y = datalist$intercept, yend = datalist$intercept, linetype = "Range of\nobserved\ndata"
                 ),
-                lineend = "square", size = 1.25
+                lineend = "square", linewidth = 1.25
             )
             p <- p + ggplot2::scale_linetype_discrete(name = " ", guide = ggplot2::guide_legend(order = 1))
 
