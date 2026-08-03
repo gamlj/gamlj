@@ -216,8 +216,9 @@ aPlot <- R6::R6Class(
 
             if (self$option("plot_yscale")) {
                 y_range$min <- self$y$descriptive$min
-                y_range$min <- self$y$descriptive$max
+                y_range$max <- self$y$descriptive$max
             }
+       
 
             min <- as.numeric(self$optionValue("plot_y_min"))
 
