@@ -1,4 +1,3 @@
-testthat::context("mixed")
 tol <- 0.001
 data("subjects_by_stimuli")
 
@@ -30,15 +29,15 @@ testthat::test_that("f-table is ok", {
 ptable <- model$main$coefficients$asDF
 
 testthat::test_that("p-table is ok", {
-    testthat::expect_equal(ptable[1, 4], 0.307, tol)
-    testthat::expect_equal(ptable[2, 5], 0.703, tol)
+    testthat::expect_equal(ptable[1, 4], 0.307, tolerance=tol)
+    testthat::expect_equal(ptable[2, 5], 0.703, tolerance=tol)
     testthat::expect_equal(as.character(ptable[2, 2]), "B - A")
 })
 
 rtable <- model$main$random$asDF
 
 testthat::test_that("p-table is ok", {
-    testthat::expect_equal(rtable[1, 3], 4.49, tol)
+    testthat::expect_equal(rtable[1, 3], 4.49, tolerance=tol)
     testthat::expect_equal(as.character(rtable[1, "groups"]), "subj")
 })
 p <- plot(model)
@@ -141,7 +140,11 @@ testthat::test_that("mixed plot works", {
 
 
 adddata <- subjects_by_stimuli
-adddata$x <- rnorm(length(adddata$nrow))
+### seed the covariate so the model (and cond's SE below) is deterministic;
+### nrow() rather than length(adddata$nrow), which only worked by accident
+### because subjects_by_stimuli happens to have a column named `nrow`
+set.seed(42)
+adddata$x <- rnorm(nrow(adddata))
 adddata$subj <- factor(adddata$subj)
 adddata$stimulus <- factor(adddata$stimulus)
 
@@ -155,7 +158,7 @@ model <- GAMLj3::gamlj_mixed(
 
 testthat::test_that("standardizing with more clusters", {
     testthat::expect_equal(as.character(model$main$coefficients$asDF$source[3]), "x")
-    testthat::expect_equal(model$main$coefficients$asDF$se[2], .3224, tol)
+    testthat::expect_equal(model$main$coefficients$asDF$se[2], .3227, tolerance=tol)
 })
 
 model <- GAMLj3::gamlj_mixed(
@@ -218,7 +221,7 @@ model <- GAMLj3::gamlj_mixed(
 
 
 testthat::test_that("cluster-based-centering", {
-    testthat::expect_equal(model$main$coefficients$asDF$estimate[2], .607, tol)
+    testthat::expect_equal(model$main$coefficients$asDF$estimate[2], .607, tolerance=tol)
 })
 
 
@@ -247,7 +250,7 @@ model <- GAMLj3::gamlj_mixed(
 
 testthat::test_that(
     "ranova works",
-    testthat::expect_equal(model$main$ranova$asDF$AIC[1], 15722.49, tol)
+    testthat::expect_equal(model$main$ranova$asDF$AIC[1], 15722.49, tolerance=tol)
 )
 
 testthat::test_that("plot works", {
@@ -260,7 +263,10 @@ data("wicksell")
 data <- wicksell
 data$subj <- factor(data$subj)
 data$time <- factor(data$time)
+### group is a treatment factor (1,2); it must be a factor for the "simple"
+### contrast and the time:group posthoc/emmeans below to resolve group levels
 data$group <- factor(data$group)
+
 
 gobj <- GAMLj3::gamlj_mixed(
     formula = dv ~ 1 + group + time + group:time + (1 | subj),
@@ -273,7 +279,7 @@ gobj <- GAMLj3::gamlj_mixed(
 testthat::test_that("simple effects", {
     testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[1]), "linear")
     testthat::expect_equal(as.character(gobj$simpleEffects$coefficients$asDF$contrast[2]), "quadratic")
-    testthat::expect_equal(gobj$simpleEffects$coefficients$asDF$estimate[3], -7.3231, tol)
+    testthat::expect_equal(gobj$simpleEffects$coefficients$asDF$estimate[3], -7.3231, tolerance=tol)
 })
 
 
@@ -310,7 +316,7 @@ gobj <- GAMLj3::gamlj_mixed(
 )
 
 testthat::test_that("unstructured covariances", {
-    testthat::expect_equal(gobj$main$anova$asDF$f[2], 27.784, tol)
-    testthat::expect_equal(gobj$main$res_corr$asDF[2, 2], .185, tol)
+    testthat::expect_equal(gobj$main$anova$asDF$f[2], 27.784, tolerance=tol)
+    testthat::expect_equal(gobj$main$res_corr$asDF[2, 2], .1855, tolerance=tol)
 })
 

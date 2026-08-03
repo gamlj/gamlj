@@ -41,6 +41,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             export_emm = FALSE,
             export_re = FALSE,
             export_plot = FALSE,
+            export = FALSE,
             es = list(
                 "expb"),
             expb_ci = TRUE,
@@ -296,7 +297,7 @@ gamljgmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 default=FALSE)
             private$..export <- jmvcore::OptionAction$new(
                 "export",
-                FALSE)
+                export)
             private$..es <- jmvcore::OptionNMXList$new(
                 "es",
                 es,
@@ -778,6 +779,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
         errortable = function() private$.items[["errortable"]],
         info = function() private$.items[["info"]],
         modelnotes = function() private$.items[["modelnotes"]],
+        weightsnotes = function() private$.items[["weightsnotes"]],
         main = function() private$.items[["main"]],
         posthoc = function() private$.items[["posthoc"]],
         simpleEffects = function() private$.items[["simpleEffects"]],
@@ -824,6 +826,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             self$add(jmvcore::Html$new(
                 options=options,
                 name="modelnotes",
+                visible=FALSE))
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="weightsnotes",
                 visible=FALSE))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
@@ -1062,7 +1068,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "robust_method",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -1156,7 +1163,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "robust_method",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -1275,7 +1283,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "robust_method",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="response", 
@@ -1351,7 +1360,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "robust_method",
                                 "ci_width",
                                 "ci_method",
-                                "boot_r"),
+                                "boot_r",
+                                "es_ci"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1425,6 +1435,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "re_ci"),
                             columns=list(
                                 list(
@@ -1795,6 +1806,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -1854,6 +1866,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                 "ci_width",
                                 "ci_method",
                                 "boot_r",
+                                "es_ci",
                                 "simple_x",
                                 "simple_mods",
                                 "simple_scale",
@@ -2028,6 +2041,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     "ci_width",
                                     "ci_method",
                                     "boot_r",
+                                    "es_ci",
                                     "simple_x",
                                     "simple_mods",
                                     "simple_scale",
@@ -2126,6 +2140,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         "ci_width",
                         "ci_method",
                         "boot_r",
+                        "es_ci",
                         "simple_x",
                         "simple_mods",
                         "simple_scale",
@@ -2210,6 +2225,7 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                             "ci_width",
                             "ci_method",
                             "boot_r",
+                            "es_ci",
                             "plot_x",
                             "plot_z",
                             "plot_by",

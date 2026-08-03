@@ -124,7 +124,10 @@ items:
                     -   type: scaffold
                         name: opts_model_z
                         file: clear.yaml
-                    - es
+                    -   type: scaffold
+                        name: opts_es
+                        file: clear.yaml
+                  
                 columns:
                     -   name: source
                         title: ''
@@ -143,6 +146,49 @@ items:
                         title: η²
                         type: number
                         visible: (es:eta)
+                        format: zto
+                    -   name: epsilonSq
+                        title: ε²
+                        type: number
+                        visible: (es:epsilon)
+                        format: zto
+
+            -   name: effectsizes
+                title: Effect Size Indices
+                type: Table
+                visible: (es_ci)
+                description: a table of effect size indeces
+                refs: es
+                clearWith:
+                    -   type: scaffold
+                        name: opts_model
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_ci
+                        file: clear.yaml
+                    -   type: scaffold
+                        name: opts_es
+                        file: clear.yaml
+                        
+                columns:
+                    -   name: effect
+                        title: Effect
+                        combineBelow: true
+                        type: text
+                    -   name: name
+                        title: Statistics
+                        type: text
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        title: Lower
+                        type: number
+                    -   name: est.ci.upper
+                        title: Upper
+                        type: number
+
             -   name: coefficients
                 title: Parameter Estimates (Coefficients)
                 type: Table
@@ -561,6 +607,9 @@ items:
                     -   type: scaffold
                         name: opts_cov_scaling
                         file: clear.yaml
+                    -   type: scaffold
+                        name: opts_es
+                        file: clear.yaml
                 columns:
                     -   name: test
                         title: X²
@@ -572,6 +621,16 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+                    -   name: etaSq
+                        title: η²
+                        type: number
+                        visible: (es:eta)
+                        format: zto
+                    -   name: epsilonSq
+                        title: ε²
+                        type: number
+                        visible: (es:epsilon)
+                        format: zto
             -   name: coefficients
                 title: Parameter Estimates for simple effects of ___key___
                 type: Table

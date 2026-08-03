@@ -289,11 +289,16 @@ r2 <- function(model, ...) UseMethod(".r2")
     llfull <- model$deviance
     llnull <- model$null.deviance
     ss <- mclogit::getSummary.mmblogit(model)
+    ### mclogit >= 0.9.x returns $sumstat as a list (stats vector + $N); older
+    ### versions returned a flat named numeric vector. Handle both, and index by
+    ### name so we never grab the wrong element.
+    sumstat <- ss$sumstat
+    if (is.list(sumstat)) sumstat <- sumstat[[1]]
     alist <- list()
     # mcFadden
     alist$r2 <- as.numeric(1 - (llfull / llnull))
-    alist$test <- ss$sumstat[1]
-    alist$df1 <- ss$sumstat[2]
+    alist$test <- as.numeric(sumstat[["LR"]])
+    alist$df1 <- as.numeric(sumstat[["df"]])
     alist$p <- stats::pchisq(alist$test, df = alist$df1, lower.tail = FALSE)
     list(alist)
 }
@@ -394,7 +399,7 @@ r2 <- function(model, ...) UseMethod(".r2")
         if (int == 0) {
             return(NULL)
         }
-        re <- lme4::findbars(stats::formula(model))
+        re <- .findbars(stats::formula(model))
         re <- paste("(", re, ")", collapse = "+")
         dep <- insight::model_info(model)$model_terms$response
         form <- paste(dep, "~", int, " + ", re)
@@ -424,7 +429,7 @@ r2 <- function(model, ...) UseMethod(".r2")
             return(NULL)
         }
 
-        re <- lme4::findbars(stats::formula(model))
+        re <- .findbars(stats::formula(model))
         re <- paste("(", re, ")", collapse = "+")
         dep <- insight::find_response(model)
         form <- paste(dep, "~", int, " + ", re)
@@ -479,7 +484,7 @@ r2 <- function(model, ...) UseMethod(".r2")
             return(NULL)
         }
 
-        re <- lme4::findbars(stats::formula(model))
+        re <- .findbars(stats::formula(model))
         re <- paste("(", re, ")", collapse = "+")
         form <- stats::as.formula(paste(dep, "~", int, " + ", re))
         model0 <- ordinal::clmm(formula = form, data = data)

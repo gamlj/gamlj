@@ -23,7 +23,7 @@ Infomatic <- R6::R6Class(
         r2 = NULL,
         optimized = FALSE,
         df = NULL,
-        has_weights = FALSE,
+        has_weights = TRUE,
         comparison = "Difference",
         posthoc_adjust = c("bonferroni", "holm", "sidak", "tukey", "scheffe"),
         omnibus_test = NULL,
@@ -76,7 +76,6 @@ Infomatic <- R6::R6Class(
                 self$rcall <- "stats::lm"
                 self$deptype <- c("numeric", "integer")
                 self$r2 <- list(list(model = ""))
-                self$has_weights <- TRUE
             }
 
             if (self$model_type == "linear") {
@@ -87,7 +86,6 @@ Infomatic <- R6::R6Class(
                 self$link <- "identity"
                 self$direction <- c("y", "Dependent variable scores")
                 self$deptype <- c("numeric", "integer")
-                if (self$caller == "glm") self$has_weights <- TRUE
             }
 
             if (self$model_type == "logistic") {
@@ -104,7 +102,6 @@ Infomatic <- R6::R6Class(
                 self$comparison <- "OR"
                 self$deptype <- "factor"
                 self$depnlevels <- 2
-                if (self$caller == "glm") self$has_weights <- TRUE
 
                 ### compute directions ###
                 dlevs <- datamatic$variables[[tob64(options$dep)]]$levels
@@ -165,7 +162,6 @@ Infomatic <- R6::R6Class(
                 self$deptype <- "factor"
                 self$depnlevels <- 2
                 self$comparison <- "OR"
-                if (self$caller == "glm") self$has_weights <- TRUE
                 ### compute direction ###
                 dlevs <- datamatic$variables[[tob64(options$dep)]]$levels
                 theory <- "P(y=1)"
@@ -183,7 +179,6 @@ Infomatic <- R6::R6Class(
                 self$direction <- c("y", "Dependent variable counts")
                 self$deptype <- "integer"
                 self$comparison <- "Ratio"
-                if (self$caller == "glm") self$has_weights <- TRUE
             }
 
 
@@ -245,7 +240,6 @@ Infomatic <- R6::R6Class(
                 ### compute direction ###
                 self$direction <- c("y", "Dependent variable counts")
                 self$deptype <- "integer"
-                if (self$caller == "glm") self$has_weights <- TRUE
             }
             if (self$model_type == "nb") {
                 self$model <- c("Negative Binomial Model", "Model for overdispersed count y")
@@ -286,7 +280,6 @@ Infomatic <- R6::R6Class(
                 if (self$caller == "glmer") {
                     self$calloptions <- list(control = lme4::glmerControl(optimizer = c("bobyqa")))
                 }
-                if (self$caller == "glm") self$has_weights <- TRUE
             }
 
             if (self$model_type == "ordinal") {
@@ -299,7 +292,6 @@ Infomatic <- R6::R6Class(
                 self$emmeans <- "expected class"
                 self$comparison <- "Ratio"
                 self$predict <- "class"
-                if (self$caller == "glm") self$has_weights <- TRUE
                 ### compute direction ###
                 theory <- paste("P(Y", greek_vector["leq"], "j)/P(Y", greek_vector["gt"], " j)")
                 actual <- paste("j=", paste(dlevs, collapse = " | "))
@@ -316,7 +308,7 @@ Infomatic <- R6::R6Class(
                     self$call <- "nnet::multinom"
                     self$rcall <- "nnet::multinom"
                     self$calloptions <- list(model = TRUE, trace = FALSE)
-                    self$has_weights <- TRUE
+                   
                 }
                 if (self$caller == "glmer") {
                     self$call <- "mclogit::mblogit"

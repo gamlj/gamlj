@@ -43,6 +43,7 @@ items:
             - ci_width
             - ci_method
             - boot_r
+            - es_ci
         refs: gamlj
     -   name: modelnotes
         type: Html
@@ -78,6 +79,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - omnibus
                 columns:
                     -   name: model
@@ -136,6 +138,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - es
                     - intercept_info
                 rows: 1
@@ -241,7 +244,7 @@ items:
             -   name: effectsizes
                 title: Effect Size Indices
                 type: Table
-                visible: (es_info)
+                visible: (es_ci)
                 description: a table of effect size indeces
                 refs: es
                 clearWith:
@@ -264,6 +267,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: effect
                         title: Effect
@@ -305,6 +309,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - betas_ci
                 columns:
                     -   name: source
@@ -383,6 +388,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: source
                         title: Variable
@@ -448,6 +454,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: effect
                         title: Contrast
@@ -543,6 +550,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
             columns:
                 -   name: estimate
                     title: Difference
@@ -627,6 +635,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
                 - posthoc_es
                 - d_ci
             columns:
@@ -784,6 +793,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -953,6 +963,7 @@ items:
                         - ci_width
                         - ci_method
                         - boot_r
+                        - es_ci
                         - ccm_value
                         - ccp_value
                         - ccra_steps
@@ -1029,6 +1040,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
                 - ccm_value
                 - ccp_value
                 - ccra_steps
@@ -1098,6 +1110,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - plot_x
                     - plot_z
                     - plot_by

@@ -43,3 +43,7 @@ vignettes/*.pdf
 inst/doc
 /doc/
 /Meta/
+.positai
+# Claude Code (local only)
+.claude/
+CLAUDE*

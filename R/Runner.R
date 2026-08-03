@@ -161,6 +161,7 @@ Runner <- R6::R6Class("Runner",
             }
             ganova(self$model, self)
         },
+
         run_main_r2 = function() {
             obj <- gFit$new(self)
             obj$r2table()
@@ -235,7 +236,14 @@ Runner <- R6::R6Class("Runner",
                 )
                 jinfo("RUNNER: bootstrapping done")
             }
-            es.glm_variances(self$model, self)
+          
+            atable <- ganova(self$model, self)
+                if (is.null(atable)) {
+                    return(NULL)
+                }
+            newclass<-paste0("main_anova",self$options$.caller)
+            class(atable) <- c(newclass, class(atable))
+            return(fill_effectsize(atable, self$model, self))
         },
         run_main_intercept = function() {
             ss <- summary(self$model)
@@ -769,6 +777,7 @@ Runner <- R6::R6Class("Runner",
 estimate_lmer <- function(...) {
   
     opts <- list(...)
+    weights = opts$weights
     data <- opts$data
     reml <- opts$reml
     good <- NULL
@@ -778,6 +787,7 @@ estimate_lmer <- function(...) {
             formula = stats::as.formula(opts$formula),
             data = data,
             REML = reml,
+            weights = weights,
             control = lme4::lmerControl(optimizer = eval(opt), calc.derivs = TRUE,check.nobs.vs.nRE = "warning")
         )
         ladd(tried) <- opt
@@ -794,6 +804,7 @@ estimate_lmer <- function(...) {
             formula = stats::as.formula(opts$formula),
             data = data,
             REML = reml,
+            weights = weights,
             control = lme4::lmerControl(optimizer = eval(good), calc.derivs = TRUE,check.nobs.vs.nRE = "warning")
         )
     }
@@ -809,8 +820,7 @@ estimate_lmer <- function(...) {
 
 estimate_lme <- function(...) {
     opts <- list(...)
-    q<-opts
-    q$data<-NULL
+    weights = opts$weights
     data <- opts$data
     coropts <- list(form = stats::formula(opts$form))
     if (utils::hasName(opts, "coropts")) coropts <- c(coropts, opts$coropts)
@@ -819,6 +829,7 @@ estimate_lme <- function(...) {
         fixed = opts$fixed,
         random = opts$random,
         data = data,
+        weights = weights,
         method = opts$method,
         correlation = cor
     )

@@ -24,6 +24,9 @@ items:
     -   name: modelnotes
         type: Html
         visible: false
+    -   name: weightsnotes
+        type: Html
+        visible: false
     -   name: main
         type: Group
         title: Model Results
@@ -201,6 +204,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: source
                         title: Names
@@ -263,6 +267,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: source
                         title: Names
@@ -345,6 +350,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: groups
                         title: Groups
@@ -407,6 +413,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: groups
                         title: Groups
@@ -556,6 +563,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
                 - adjust
                 - posthoc_ci
                 - ci_width
@@ -973,6 +981,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - plot_x
                     - plot_z
                     - plot_by

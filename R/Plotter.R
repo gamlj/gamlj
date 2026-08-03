@@ -216,8 +216,9 @@ aPlot <- R6::R6Class(
 
             if (self$option("plot_yscale")) {
                 y_range$min <- self$y$descriptive$min
-                y_range$min <- self$y$descriptive$max
+                y_range$max <- self$y$descriptive$max
             }
+       
 
             min <- as.numeric(self$optionValue("plot_y_min"))
 
@@ -353,21 +354,21 @@ aPlot <- R6::R6Class(
                 names(grid)<-.names
                 .names64 <- tob64(.names)
                 selectable <- intersect(.names, self$options$factors)
-                selgrid <- as.data.frame(grid[, selectable])
+                selgrid <- grid[, selectable, drop = FALSE]
                 .sel64 <- tob64(selectable)
 
                 for (i in 1:nrow(grid)) {
                     label <- paste(.names, grid[i, ], sep = "=", collapse = " , ")
                     aplot <- self$plotarray$get(key = i)
                     aplot$setTitle(label)
-                    sel <- paste(paste0("data$", .names64, sep = ""), paste0('"', grid[i, ], '"'), sep = "==", collapse = " & ")
-                    localdata <- data[eval(parse(text = sel)), ]
+                    idx <- private$.match_rows(data, .names64, grid[i, , drop = FALSE])
+                    localdata <- data[idx, , drop = FALSE]
                     state[["plotData"]] <- localdata
 
                     if (self$plot_raw) {
                         if (length(selectable) > 0) {
-                            sel <- paste(paste0("rawData$", .sel64, sep = ""), paste0('"', selgrid[i, ], '"'), sep = "==", collapse = " & ")
-                            raw <- rawData[eval(parse(text = sel)), ]
+                            idx <- private$.match_rows(rawData, .sel64, selgrid[i, , drop = FALSE])
+                            raw <- rawData[idx, , drop = FALSE]
                         } else {
                             raw <- rawData
                         }
@@ -377,8 +378,8 @@ aPlot <- R6::R6Class(
 
                     if (!is.null(randomData)) {
                         if (length(selectable) > 0) {
-                            sel <- paste(paste0("randomData$", .sel64, sep = ""), paste0('"', selgrid[i, ], '"'), sep = "==", collapse = " & ")
-                            rdata <- randomData[eval(parse(text = sel)), ]
+                            idx <- private$.match_rows(randomData, .sel64, selgrid[i, , drop = FALSE])
+                            rdata <- randomData[idx, , drop = FALSE]
                         } else {
                             rdata <- randomData
                         }
@@ -535,6 +536,15 @@ aPlot <- R6::R6Class(
             }
             tableData
         },
+        .match_rows = function(data, cols, values) {
+            if (length(cols) == 0) {
+                return(rep(TRUE, nrow(data)))
+            }
+
+            values <- as.list(values)
+            matches <- Map(function(col, val) data[[col]] == val, cols, values)
+            Reduce(`&`, matches)
+        },
         .fix_clusters = function(data) {
           
             test <- grep("[\\:\\/]", self$operator$formulaobj$clusters)
@@ -542,9 +552,7 @@ aPlot <- R6::R6Class(
                 cluster <- self$operator$formulaobj$clusters[[test]]
                 .clustervars <- stringr::str_split(cluster, "[\\:\\/]")[[1]]
                 name64 <- tob64(cluster)
-                sel <- paste0("data$", name64, "=", "paste0(", paste0("data$", tob64(.clustervars), collapse = ","), ",sep='_')")
-                eval(parse(text = sel))
-                data[[name64]] <- factor(data[[name64]])
+                data[[name64]] <- factor(do.call(paste0, c(data[tob64(.clustervars)], sep = "_")))
                 self$cluster <- list(name = cluster, name64 = name64, nlevels = nlevels(data[[name64]]))
             } else {
                 self$cluster <- self$datamatic$variables[[tob64(self$operator$formulaobj$clusters[[1]])]]
@@ -650,15 +658,15 @@ Plotter <- R6::R6Class(
                             message = paste("Exact ticking requires to set min and max and number of ticks"),
                             head = "warning"
                         )
-                        p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range))
+                        p <- p + ggplot2::scale_y_continuous(limits = c(image$state$y_range$min, image$state$y_range$max))
                     } else {
-                        p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range), breaks = seq(image$state$y_range$min, image$state$y_range$max, length.out = image$state$y_range$ticks))
+                        p <- p + ggplot2::scale_y_continuous(limits = c(image$state$y_range$min, image$state$y_range$max), breaks = seq(image$state$y_range$min, image$state$y_range$max, length.out = image$state$y_range$ticks))
                     }
                 } else {
-                    p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range), n.breaks = image$state$y_range$ticks)
+                    p <- p + ggplot2::scale_y_continuous(limits = c(image$state$y_range$min, image$state$y_range$max), n.breaks = image$state$y_range$ticks)
                 }
             } else {
-                p <- p + ggplot2::scale_y_continuous(limits = as.numeric(image$state$y_range))
+                p <- p + ggplot2::scale_y_continuous(limits = c(image$state$y_range$min, image$state$y_range$max))
             }
 
 
@@ -751,7 +759,7 @@ Plotter <- R6::R6Class(
                 )
             } else {
                 # give a scale to the Z axis
-                p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range))
+                p <- p + ggplot2::scale_x_continuous(limits = c(image$state$x_range$min, image$state$x_range$max))
 
                 if (is.number(image$state$x_range$ticks)) {
                     if (self$option("plot_x_ticks_exact")) {
@@ -762,10 +770,10 @@ Plotter <- R6::R6Class(
                                 head = "warning"
                             )
                         } else {
-                            p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range), breaks = seq(image$state$x_range$min, image$state$x_range$max, length.out = image$state$x_range$ticks))
+                            p <- p + ggplot2::scale_x_continuous(limits = c(image$state$x_range$min, image$state$x_range$max), breaks = seq(image$state$x_range$min, image$state$x_range$max, length.out = image$state$x_range$ticks))
                         }
                     } else {
-                        p <- p + ggplot2::scale_x_continuous(limits = as.numeric(image$state$x_range), n.breaks = image$state$x_range$ticks)
+                        p <- p + ggplot2::scale_x_continuous(limits = c(image$state$x_range$min, image$state$x_range$max), n.breaks = image$state$x_range$ticks)
                     }
                 }
             }

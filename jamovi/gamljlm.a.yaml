@@ -150,6 +150,13 @@ options:
         description:
             R: |
                 `TRUE`  or `FALSE` (default), coefficients CI in tables
+    -   name: es_ci
+        title: For effect size indices
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , anova effect size CI in table
     -   name: adjust
         title: Correction
         type: NMXList
@@ -733,15 +740,6 @@ options:
                 `TRUE` or `FALSE` (default), provides ìnformation about the intercept (F test, effect size indexes)
             ui: |
                 If selected provides ìnformation about the intercept (F test, effect size indexes)
-    -   name: es_info
-        title: On Effect sizes
-        type: Bool
-        default: false
-        description:
-            R: |
-                `TRUE` or `FALSE` (default), provide ìnformation about the effect size indexes
-            ui: |
-                If selected, provides ìnformation about the effect size indexes
     -   name: dep_scale
         title: Scale
         type: List

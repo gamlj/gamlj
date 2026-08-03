@@ -152,6 +152,13 @@ options:
         description:
             R: |
                 `TRUE`  or `FALSE` (default), coefficients CI in tables
+    -   name: es_ci
+        title: For effect size indices
+        type: Bool
+        default: false
+        description:
+            R: |
+                `TRUE` (default) or `FALSE` , anova effect size CI in table
     -   name: adjust
         title: Correction
         type: NMXList
@@ -652,12 +659,14 @@ options:
         options:
             -   name: expb
                 title: Odd Ratios (expB)
-            -   name: eta
-                title: η²
             -   name: RR
                 title: Relative Risk (RR)
             -   name: marginals
                 title: Marginal Effects
+            -   name: eta
+                title: η²
+            -   name: epsilon
+                title: ε²
         default:
             - expb
             - eta

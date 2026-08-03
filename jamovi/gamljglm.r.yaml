@@ -207,6 +207,58 @@ items:
                         title: η²
                         type: number
                         visible: (es:eta)
+                        format: zto
+                    -   name: epsilonSq
+                        title: ε²
+                        type: number
+                        visible: (es:epsilon)
+                        format: zto
+            -   name: effectsizes
+                title: Effect Size Indices
+                type: Table
+                visible: (es_ci)
+                description: a table of effect size indeces
+                refs: es
+                clearWith:
+                    - model_type
+                    - dep
+                    - factors
+                    - covs
+                    - covs_scale
+                    - dep_scale
+                    - scale_missing
+                    - model_terms
+                    - fixed_intercept
+                    - se_method
+                    - mute
+                    - df_method
+                    - contrasts
+                    - covs_scale
+                    - contrast_custom_values
+                    - donotrun
+                    - ci_width
+                    - ci_method
+                    - boot_r
+                    - es_ci
+                    - es
+                columns:
+                    -   name: effect
+                        title: Effect
+                        combineBelow: true
+                        type: text
+                    -   name: name
+                        title: Statistics
+                        type: text
+                    -   name: estimate
+                        title: Estimate
+                        type: number
+                        format: zto
+                    -   name: est.ci.lower
+                        title: Lower
+                        type: number
+                    -   name: est.ci.upper
+                        title: Upper
+                        type: number
             -   name: coefficients
                 title: Parameter Estimates (Coefficients)
                 type: Table
@@ -236,6 +288,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: response
                         title: Response
@@ -312,6 +365,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: response
                         title: Response
@@ -387,6 +441,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                 columns:
                     -   name: source
                         title: Name
@@ -675,6 +730,7 @@ items:
             - ci_width
             - ci_method
             - boot_r
+            - es_ci
             - posthoc
             - adjust
         template:
@@ -706,6 +762,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
                 - posthoc
                 - adjust
             columns:
@@ -798,6 +855,7 @@ items:
                     - covs_scale_labels
                     - covs_conditioning
                     - contrast_custom_focus
+                    - es
                 columns:
                     -   name: test
                         title: X²
@@ -809,6 +867,16 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+                    -   name: etaSq
+                        title: η²
+                        type: number
+                        visible: (es:eta)
+                        format: zto
+                    -   name: epsilonSq
+                        title: ε²
+                        type: number
+                        visible: (es:epsilon)
+                        format: zto
             -   name: coefficients
                 title: Parameter Estimates for simple effects of ___key___
                 type: Table
@@ -1025,6 +1093,7 @@ items:
                 - ci_width
                 - ci_method
                 - boot_r
+                - es_ci
                 - ccm_value
                 - ccp_value
                 - ccra_steps
@@ -1097,6 +1166,7 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
+                    - es_ci
                     - plot_x
                     - plot_z
                     - plot_by

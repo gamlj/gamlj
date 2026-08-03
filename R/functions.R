@@ -1,3 +1,39 @@
+########### formula helpers ###########
+
+### thin wrappers around lme4::findbars/nobars that muffle the one-per-session
+### "moved to the reformulas package" deprecation warning, so it does not leak
+### into user output (e.g. Quarto/knitr chunks). Only that specific warning is
+### swallowed; any other warning is passed through untouched.
+.muffle_reformulas <- function(expr) {
+    withCallingHandlers(
+        expr,
+        warning = function(w) {
+            if (grepl("reformulas", conditionMessage(w), fixed = TRUE)) {
+                invokeRestart("muffleWarning")
+            }
+        }
+    )
+}
+
+.findbars <- function(x) .muffle_reformulas(lme4::findbars(x))
+
+.nobars <- function(x) .muffle_reformulas(lme4::nobars(x))
+
+### jmvcore::Html$setContent() knits its content with knitr::knit(text = ...),
+### and that nested knit prints knitr's chunk progress bar when the analysis
+### runs inside a knitr/quarto chunk, leaking "|....| 100%" (or "1/1") lines
+### into the user's document. Disable knitr's progress around the call; the
+### enclosing document's own progress bar is created before chunks run, so it
+### is unaffected.
+.setContent <- function(element, value) {
+    if (requireNamespace("knitr", quietly = TRUE)) {
+        old <- knitr::opts_knit$get("progress")
+        knitr::opts_knit$set(progress = FALSE)
+        on.exit(knitr::opts_knit$set(progress = old))
+    }
+    element$setContent(value)
+}
+
 ########### names ###########
 
 tob64 <- function(x, ...) UseMethod(".tob64")

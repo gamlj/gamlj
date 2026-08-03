@@ -225,18 +225,19 @@ Initier <- R6::R6Class(
             }
         },
         init_main_effectsizes = function() {
-            alist <- NULL
-            if (self$option("es_info")) {
-                alist <- list()
-                for (term in self$options$model_terms) {
-                    ladd(alist) <- list(effect = jmvcore::stringifyTerm(term, raise = TRUE), name = letter_eta2)
-                    ladd(alist) <- list(effect = jmvcore::stringifyTerm(term, raise = TRUE), name = letter_peta2)
-                    ladd(alist) <- list(effect = jmvcore::stringifyTerm(term, raise = TRUE), name = letter_omega2)
-                    ladd(alist) <- list(effect = jmvcore::stringifyTerm(term, raise = TRUE), name = letter_pomega2)
-                    ladd(alist) <- list(effect = jmvcore::stringifyTerm(term, raise = TRUE), name = letter_epsilon2)
-                    ladd(alist) <- list(effect = jmvcore::stringifyTerm(term, raise = TRUE), name = letter_pepsilon2)
+            specs <- initialize_effectsize(self)
+            if (length(specs) == 0) {
+                return(NULL)
+            }
+
+            alist <- list()
+            for (term in self$options$model_terms) {
+                effect <- jmvcore::stringifyTerm(term, raise = TRUE)
+                for (spec in specs) {
+                    ladd(alist) <- list(effect = effect, name = spec$name)
                 }
             }
+
             alist
         },
         # custom contrast effect sizes

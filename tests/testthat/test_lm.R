@@ -1,4 +1,3 @@
-testthat::context("lm")
 tol <- .001
 
 
@@ -39,8 +38,8 @@ testthat::test_that("equivalent model input (2)", {
 testthat::test_that("glm estimates are correct", {
     testthat::expect_equal(mod0$main$coefficients$asDF$estimate[3], -3.70, tolerance = tol)
     testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.upper[2], 11.45, tolerance = tol)
-    testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[3], -5.811, tol)
-    testthat::expect_equal(mod0$main$coefficients$asDF$p[3], 0.00089, tol)
+    testthat::expect_equal(mod0$main$coefficients$asDF$est.ci.lower[3], -5.811, tolerance = tol)
+    testthat::expect_equal(mod0$main$coefficients$asDF$p[3], 0.00089, tolerance = tol)
 })
 
 a <- mod0$main$anova$asDF
@@ -124,14 +123,96 @@ mod <- GAMLj3::gamlj_lm(
 
 testthat::test_that("SE multiple moderators iv=categorical", {
     testthat::expect_equal(mod$simpleEffects$coefficients$asDF$contrast[1], "public - private")
-    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[1], 1.469, tol)
+    testthat::expect_equal(mod$simpleEffects$anova$asDF$test[1], 1.469, tolerance = tol)
 })
+
+mod_plot_two_moderators <- GAMLj3::gamlj_lm(
+    data = hsbdemo,
+    formula = science ~ math * schtyp * female * ses,
+    plot_x = "math",
+    plot_z = "schtyp",
+    plot_by = c("female", "ses")
+)
+
+testthat::test_that("plot prepare handles two moderators", {
+    plot_items <- mod_plot_two_moderators$mainPlots[[1]]
+    expected_titles <- c(
+        "female=female , ses=high",
+        "female=male , ses=high",
+        "female=female , ses=low",
+        "female=male , ses=low",
+        "female=female , ses=middle",
+        "female=male , ses=middle"
+    )
+
+    testthat::expect_length(plot_items, length(expected_titles))
+    actual_titles <- vapply(seq_along(plot_items), function(i) plot_items[[i]]$title, character(1))
+    testthat::expect_equal(actual_titles, expected_titles)
+
+    for (i in seq_along(plot_items)) {
+        plot_state <- plot_items[[i]]$state
+        plot_data <- plot_state$plotData
+
+        testthat::expect_equal(plot_state$key, 1)
+        testthat::expect_s3_class(plot_data, "data.frame")
+        testthat::expect_gt(nrow(plot_data), 0)
+
+        title_parts <- strsplit(expected_titles[[i]], " , ")[[1]]
+        expected_female <- sub("^female=", "", title_parts[[1]])
+        expected_ses <- sub("^ses=", "", title_parts[[2]])
+
+        testthat::expect_equal(unique(as.character(plot_data[[3]])), expected_female)
+        testthat::expect_equal(unique(as.character(plot_data[[4]])), expected_ses)
+    }
+})
+
+testthat::test_that("plot prepare treats moderator labels as data", {
+    marker <- tempfile("gamlj-plotter-")
+    on.exit(unlink(marker), add = TRUE)
+
+    marker_label <- gsub("\\", "/", marker, fixed = TRUE)
+    injected_label <- paste0("safe\" | file.create(\"", marker_label, "\") #")
+    plot_data <- hsbdemo
+    levels(plot_data$female)[1] <- injected_label
+
+    mod <- GAMLj3::gamlj_lm(
+        data = plot_data,
+        formula = science ~ math * schtyp * female,
+        plot_x = "math",
+        plot_z = "schtyp",
+        plot_by = "female"
+    )
+
+    testthat::expect_false(file.exists(marker))
+    testthat::expect_length(mod$mainPlots[[1]], 2)
+})
+
+mod_plot_x_only <- GAMLj3::gamlj_lm(
+    data = hsbdemo,
+    formula = science ~ 1 + prog + math + math:prog,
+    plot_x = "math"
+)
+
+testthat::test_that("plot prepare handles x-axis only", {
+    plot_state <- mod_plot_x_only$mainPlots[[1]][[1]]$state
+
+    testthat::expect_s3_class(plot_state$plotData, "data.frame")
+    testthat::expect_gt(nrow(plot_state$plotData), 0)
+    y_limits <- c(plot_state$y_range$min, plot_state$y_range$max)
+    x_limits <- c(plot_state$x_range$min, plot_state$x_range$max)
+
+    testthat::expect_length(y_limits, 2)
+    testthat::expect_true(all(is.na(y_limits)))
+    testthat::expect_length(x_limits, 2)
+    testthat::expect_true(all(is.na(x_limits)))
+})
+
 
 testthat::test_that("simple interaction", {
     testthat::expect_equal(mod$simpleInteractions[[1]]$anova$asDF$effect[1], "schtyp:math")
-    testthat::expect_equal(mod$simpleInteractions[[1]]$anova$asDF$test[3], .911, tol)
+    testthat::expect_equal(mod$simpleInteractions[[1]]$anova$asDF$test[3], .911, tolerance = tol)
     testthat::expect_equal(mod$simpleInteractions[[1]]$coefficients$asDF$effect[1], "(public-private):math")
-    testthat::expect_equal(mod$simpleInteractions[[1]]$coefficients$asDF$estimate[2], -.0543, tol)
+    testthat::expect_equal(mod$simpleInteractions[[1]]$coefficients$asDF$estimate[2], -.0543, tolerance = tol)
 })
 
 hsbdemo$c1 <- factor(rep(c(1, 0), length(hsbdemo$id) / 2))
@@ -180,8 +261,8 @@ mod <- GAMLj3::gamlj_lm(
 tab <- mod$main$effectsizes$asDF
 
 testthat::test_that("glm effectsize", {
-    testthat::expect_equal(tab[4, 3], .21724, tol = .0001)
-    testthat::expect_equal(tab[10, 5], .0, tol = .00001)
+    testthat::expect_equal(tab[4, 3], .21724, tolerance = .0001)
+    testthat::expect_equal(tab[10, 5], .0, tolerance = .00001)
 })
 
 
@@ -200,7 +281,7 @@ mod <- GAMLj3::gamlj_lm(
 testthat::test_that("glm weird names", {
     testthat::expect_equal(as.character(mod$main$coefficients$asDF[3, 1]), "Gender (test ?)1")
     testthat::expect_equal(as.character(mod$simpleEffects$coefficients$asDF[2, 1]), "Mean")
-    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$estimate[3], 2.4591, tol)
+    testthat::expect_equal(mod$simpleEffects$coefficients$asDF$estimate[3], 2.4591, tolerance = tol)
 })
 
 data$sex <- factor(data$`Gender (test ?)`, levels = c("female", "male"))
@@ -378,8 +459,8 @@ mod <- GAMLj3::gamlj_lm(
     emmeans = ~prog
 )
 testthat::test_that("glm zero-intercept model", {
-    testthat::expect_equal(abs(mod$main$coefficients$asDF$estimate[1]), .72, tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$se[4], 1.3814, tol)
+    testthat::expect_equal(abs(mod$main$coefficients$asDF$estimate[1]), .72, tolerance = tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$se[4], 1.3814, tolerance = tol)
 })
 
 mod <- GAMLj3::gamlj_lm(
@@ -391,7 +472,7 @@ mod <- GAMLj3::gamlj_lm(
 testthat::test_that("model comparison", {
     testthat::expect_equal(
         sum(mod$main$r2$asDF$r2), .41604,
-        tol
+        tolerance = tol
     )
 })
 
@@ -405,7 +486,7 @@ mod <- GAMLj3::gamlj_lm(
 testthat::test_that("model comparison", {
     testthat::expect_equal(
         mod$main$r2$asDF$ar[1] - mod$main$r2$asDF$ar[2], mod$main$r2$asDF$ar[3],
-        tol
+        tolerance = tol
     )
 })
 
@@ -419,8 +500,7 @@ mod <- GAMLj3::gamlj_lm(
 testthat::test_that("intercept model comparison", {
     testthat::expect_equal(
         mod$main$r2$asDF$ar[1] - mod$main$r2$asDF$ar[2], mod$main$r2$asDF$ar[3],
-        tol
+        tolerance = tol
     )
 })
-
 

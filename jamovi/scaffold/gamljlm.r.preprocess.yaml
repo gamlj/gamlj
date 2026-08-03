@@ -193,7 +193,7 @@ items:
             -   name: effectsizes
                 title: Effect Size Indices
                 type: Table
-                visible: (es_info)
+                visible: (es_ci)
                 description: a table of effect size indeces
                 refs: es
                 clearWith:

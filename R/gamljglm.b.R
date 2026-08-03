@@ -59,6 +59,13 @@ gamljglmClass <- R6::R6Class(
             aSmartObj <- SmartTable$new(self$results$main$anova, runner_machine)
             ladd(private$.smartObjs) <- aSmartObj
 
+            ### effectsizes table ###
+            
+            aSmartObj <- SmartTable$new(self$results$main$effectsizes, runner_machine)
+            aSmartObj$ci("est", self$options$ci_width)
+            aSmartObj$spaceBy <- "effect"
+            ladd(private$.smartObjs) <- aSmartObj
+            
             ### estimates table ###
             aSmartObj <- SmartTable$new(self$results$main$coefficients, runner_machine)
             aSmartObj$ci("est", self$options$ci_width)
@@ -100,6 +107,7 @@ gamljglmClass <- R6::R6Class(
 
             ### marginal effects tables
             aSmartObj <- SmartTable$new(self$results$main$marginals, runner_machine)
+            aSmartObj$activated <- "marginals" %in% self$options$es
             aSmartObj$ci("est", width = self$options$ci_width)
             aSmartObj$spaceBy <- "response"
             ladd(private$.smartObjs) <- aSmartObj
@@ -187,7 +195,7 @@ gamljglmClass <- R6::R6Class(
             plotter_machine <- Plotter$new(self, runner_machine)
             plotter_machine$initPlots()
             private$.plotter_machine <- plotter_machine
-            self$results$plotnotes$setContent("")
+            .setContent(self$results$plotnotes, "")
 
             now <- Sys.time()
             jinfo("INIT TIME:", now - private$.time, " secs")

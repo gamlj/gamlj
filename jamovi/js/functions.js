@@ -478,12 +478,13 @@ fixRandomEffects: function(ui, context) {
                ui.expb_ci.setValue(true);
         }
 
-       if (["ordinal","poiover","nb"].includes(ui.model_type.getValue())) {
-            const es =   ui.es.value();
-            const newes = es.filter(e => e !== "eta");
+        if (["beta", "poiover", "nb"].includes(ui.model_type.getValue())) {
+            const es = ui.es.value();
+            const newes = es.filter(e =>
+                  !["eta", "etap", "epsilon", "epsilonp"].includes(e)
+            );
             ui.es.setValue(newes);
-       }        
-    
+        }    
         if (typeof ui.es_expb !== 'undefined' ) {
           
             var odds=["logistic","probit","multinomial","ordinal"]

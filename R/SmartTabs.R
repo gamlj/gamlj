@@ -625,8 +625,6 @@ SmartArray <- R6::R6Class("SmartArray",
 
 
             if (!is.something(self$table$items)) {
-                library(jmvcore)
-
                 for (i in seq_along(rtables)) {
                     if (is.something(.keys)) {
                         .key <- .keys[[i]]

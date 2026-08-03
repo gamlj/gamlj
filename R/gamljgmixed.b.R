@@ -189,7 +189,7 @@ gamljgmixedClass <- R6::R6Class(
             plotter_machine <- Plotter$new(self, runner_machine)
             plotter_machine$initPlots()
             private$.plotter_machine <- plotter_machine
-            self$results$plotnotes$setContent("")
+            .setContent(self$results$plotnotes, "")
         },
         .run = function() {
             jinfo("MODULE:  #### phase run ####")
@@ -217,7 +217,7 @@ gamljgmixedClass <- R6::R6Class(
 
 
             ### save the model if we are in R ###
-            if (self$options$.interface == "r") {
+            if (self$options$.interface == "R") {
                 self$results$.setModel(private$.runner_machine$model)
             }
 
@@ -236,8 +236,8 @@ gamljgmixedClass <- R6::R6Class(
             return(plot)
         },
         .marshalFormula = function(formula, data, name) {
-            fixed <- lme4::nobars(formula)
-            bars <- lme4::findbars(formula)
+            fixed <- .nobars(formula)
+            bars <- .findbars(formula)
             rterms <- lapply(bars, all.vars)
             rvars <- unlist(sapply(rterms, function(a) if (length(a) > 1) a[[length(a) - 1]]))
             if (name == "dep") {
@@ -261,7 +261,7 @@ gamljgmixedClass <- R6::R6Class(
                 return(sapply(rterms, function(a) a[[length(a)]]))
             }
             if (name == "randomTerms") {
-                bars <- lme4::findbars(formula)
+                bars <- .findbars(formula)
                 fullist <- list()
                 for (b in seq_along(bars)) {
                     cluster <- bars[[b]][[3]]
