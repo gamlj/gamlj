@@ -32,6 +32,7 @@ testthat::test_that("test glm anova comparison option", {
     testthat::expect_equal(mod$main$r2$asDF[3, 4], 0, tolerance = tol)
 })
 
+suppressMessages({
 testthat::expect_warning(
     mod <- GAMLj3::gamlj_mixed(
         formula = ycont ~ x * cat2 + (1 + x | cluster),
@@ -40,13 +41,15 @@ testthat::expect_warning(
         data = data
     )
 )
+})
 
 testthat::test_that("test mixed comparison: fixed", {
     testthat::expect_equal(mod$main$r2$asDF[5, 5], 279.86, tolerance = tol)
     testthat::expect_equal(mod$main$r2$asDF[5, 4], 5, tolerance = tol)
 })
 
-testthat::expect_warning(
+suppressWarnings({
+suppressMessages({
     mod <- GAMLj3::gamlj_mixed(
         formula = ycont ~ x * cat2 + (1 + x | cluster),
         nested_terms = ~ x * cat2,
@@ -54,13 +57,16 @@ testthat::expect_warning(
         omnibus = "LRT",
         data = data
     )
-)
+})
+})
+
 testthat::test_that("test mixed comparison: random", {
     testthat::expect_equal(mod$main$r2$asDF[5, 5], .4588, tolerance = tol)
     testthat::expect_equal(mod$main$r2$asDF[5, 4], 2, tolerance = tol)
 })
 
-testthat::expect_warning(
+suppressWarnings({
+  suppressMessages({
     mod <- GAMLj3::gamlj_mixed(
         formula = ycont ~ x * cat2 + (1 + x | cluster),
         nested_terms = ~ x * cat2,
@@ -68,20 +74,23 @@ testthat::expect_warning(
         omnibus = "LRT",
         data = data
     )
-)
+  })
+})
 testthat::test_that("test mixed comparison: 0 df", {
     testthat::expect_equal(mod$main$r2$asDF[5, 5], .4588, tolerance = tol)
     testthat::expect_equal(mod$main$r2$asDF[5, 4], 2, tolerance = tol)
 })
-
-testthat::expect_warning(
+suppressWarnings({
+  suppressMessages({
+    
     mod <- GAMLj3::gamlj_gmixed(
         formula = ybin ~ x * cat2 + (1 + x | cluster),
         nested_terms = ~ x * cat2,
         nested_re = ~ 1 + (1 | cluster),
         data = data
     )
-)
+  })
+})
 
 testthat::test_that("test mixed comparison: random", {
     testthat::expect_equal(mod$main$r2$asDF[5, 5], .1424, tolerance = tol)
@@ -92,15 +101,17 @@ testthat::test_that("test mixed comparison: random", {
 formula <- ybin~x * cat2 + (1 + x | cluster)
 suppressWarnings(rmod <- lme4::glmer(formula, data = data, family = binomial()))
 
-
-testthat::expect_warning(
+suppressWarnings({
+  suppressMessages({
+    
     mod <- GAMLj3::gamlj_gmixed(
         formula = ybin ~ x * cat2 + (1 + x | cluster),
         nested_terms = ~ x * cat2,
         nested_re = ~ 1 + (1 + x | cluster),
         data = data
     )
-)
+})
+  })
 
 testthat::test_that("test mixed comparison: 0 df", {
     testthat::expect_equal(mod$main$r2$asDF[5, 5], 0, tolerance = tol)
