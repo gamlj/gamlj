@@ -124,8 +124,6 @@ ganova <- function(x, ...) UseMethod(".anova")
     .anova <- .anova[!(rownames(.anova) %in% c("(Intercept)")), , drop = FALSE]
     .anova <- as.data.frame(.anova)
     names(.anova) <- c("ss", "df", "f", "p")
-    mark(.anova)
-
     residual_rows <- rownames(.anova) == "Residuals"
     if (any(residual_rows)) {
         ssres <- .anova$ss[residual_rows][[1]]
