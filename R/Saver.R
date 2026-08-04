@@ -49,16 +49,16 @@ Saver <- R6::R6Class(
          
             if (is.null(option$perform)) {
               ## old style
-              .saverfun <- function(data,title,msg) {
+              .saverfun <- function(data,title,msg = NULL) {
                 jinfo("SAVER: saving old style")
                 jmvReadWrite:::jmvOpn(dtaFrm = data, dtaTtl = title)
               }
               .failfun <- function(msg) {
-                self$warning=list(topic="modelnotes",message=msg,head="warning")
+                self$warning=list(topic="savenotes",message=msg,head="warning")
               }
             } else {
               # new style
-              .saverfun <- function(data,title,msg) {
+              .saverfun <- function(data,title,msg = NULL) {
                   jinfo("SAVER: saving new style")
                   option$perform(function(action) {
                     list(

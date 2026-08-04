@@ -28,7 +28,7 @@ items:
                 name: opts_nested
                 file: clear.yaml
             -   type: scaffold
-                name: opts_ci
+                name: opts_ci_glm
                 file: clear.yaml
         refs: gamlj
     -   name: modelnotes
@@ -50,7 +50,7 @@ items:
                         name: opts_nested
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                     - omnibus
                 columns:
@@ -95,7 +95,7 @@ items:
                         name: opts_model
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                     -   type: scaffold
                         name: opts_es
@@ -194,14 +194,14 @@ items:
                 title: Effect Size Indices
                 type: Table
                 visible: (es_ci)
-                description: a table of effect size indeces
-                refs: es
+                description: a table of effect size indices
+                refs: effectsize
                 clearWith:
                     -   type: scaffold
                         name: opts_model
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                 columns:
                     -   name: effect
@@ -229,7 +229,7 @@ items:
                         name: opts_model
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                     - betas_ci
                 columns:
@@ -294,7 +294,7 @@ items:
                         name: opts_model
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                 columns:
                     -   name: source
@@ -340,13 +340,13 @@ items:
                 title: Custom Contrasts effect size indices
                 type: Table
                 visible: false
-                description: a table of effect size indeces
+                description: a table of effect size indices
                 clearWith:
                     -   type: scaffold
                         name: opts_model
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                 columns:
                     -   name: effect
@@ -414,7 +414,7 @@ items:
                     name: opts_model
                     file: clear.yaml
                 -   type: scaffold
-                    name: opts_ci
+                    name: opts_ci_glm
                     file: clear.yaml
             columns:
                 -   name: estimate
@@ -485,7 +485,7 @@ items:
                     name: opts_model
                     file: clear.yaml
                 -   type: scaffold
-                    name: opts_ci
+                    name: opts_ci_glm
                     file: clear.yaml
                 - posthoc_es
                 - d_ci
@@ -562,6 +562,8 @@ items:
                     -   type: scaffold
                         name: opts_cov_scaling
                         file: clear.yaml
+                    -   simple_x
+                    -   simple_mods
                 columns:
                     -   name: test
                         title: F
@@ -617,7 +619,7 @@ items:
                         name: opts_model_lm
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                     -   type: scaffold
                         name: opts_cov_scaling
@@ -746,7 +748,7 @@ items:
                             name: opts_model_lm
                             file: clear.yaml
                         -   type: scaffold
-                            name: opts_ci
+                            name: opts_ci_glm
                             file: clear.yaml
                         -   type: scaffold
                             name: opts_cov_scaling
@@ -802,7 +804,7 @@ items:
                     name: opts_model_lm
                     file: clear.yaml
                 -   type: scaffold
-                    name: opts_ci
+                    name: opts_ci_glm
                     file: clear.yaml
                 -   type: scaffold
                     name: opts_cov_scaling
@@ -850,7 +852,7 @@ items:
                                     name: opts_simple_effects
                                     file: clear.yaml
                                 -   type: scaffold
-                                    name: opts_ci
+                                    name: opts_ci_glm
                                     file: clear.yaml
                                 -   type: scaffold
                                     name: opts_plots
@@ -1021,7 +1023,7 @@ items:
                         file: clear.yaml
                     - plot_extremes
     -   name: predicted
-        title: Predicted Vales
+        title: Predicted Values
         type: Output
         varTitle: '`LM_${ dep }_PRED`'
         varDescription: Predicted values
@@ -1030,7 +1032,7 @@ items:
                 name: opts_model
                 file: clear.yaml
     -   name: residuals
-        title: Residuals Vales
+        title: Residuals Values
         type: Output
         varTitle: '`LM_${ dep }_RES`'
         varDescription: Residuals values

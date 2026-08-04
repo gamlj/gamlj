@@ -42,23 +42,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - nested_terms
                     - nested_intercept
                     - comparison
@@ -94,23 +91,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                 columns:
                     -   name: info
                         type: text
@@ -140,23 +134,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                 columns:
                     -   name: obs
                         title: Observed
@@ -171,23 +162,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - es
                 columns:
                     -   name: source
@@ -217,21 +205,18 @@ items:
                 title: Effect Size Indices
                 type: Table
                 visible: (es_ci)
-                description: a table of effect size indeces
-                refs: es
+                description: a table of effect size indices
+                refs: effectsize
                 clearWith:
                     - model_type
                     - dep
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -268,23 +253,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - ci_width
                     - ci_method
                     - boot_r
@@ -345,23 +327,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - ci_width
                     - ci_method
                     - boot_r
@@ -421,23 +400,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - ci_width
                     - ci_method
                     - boot_r
@@ -479,23 +455,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                 columns:
                     -   name: source
                         title: Coefficient
@@ -534,26 +507,22 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -604,24 +573,21 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - es
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                 columns:
                     -   name: source
                         title: Name
@@ -661,23 +627,20 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - propodds_test
                 columns:
                     -   name: source
@@ -710,23 +673,20 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
             - donotrun
             - offset
-            - omnibus
             - custom_family
             - custom_link
             - dep2
             - robust_method
+            - se_method
             - ci_width
             - ci_method
             - boot_r
@@ -742,23 +702,20 @@ items:
                 - factors
                 - covs
                 - covs_scale
-                - dep_scale
                 - scale_missing
                 - model_terms
                 - fixed_intercept
-                - se_method
                 - mute
-                - df_method
                 - contrasts
                 - covs_scale
                 - contrast_custom_values
                 - donotrun
                 - offset
-                - omnibus
                 - custom_family
                 - custom_link
                 - dep2
                 - robust_method
+                - se_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -819,30 +776,26 @@ items:
                 visible: false
                 clearWith:
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - model_type
                     - dep
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -887,26 +840,22 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -966,26 +915,22 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
             - donotrun
             - offset
-            - omnibus
             - custom_family
             - custom_link
             - dep2
             - robust_method
+            - se_method
             - simple_x
             - simple_mods
-            - simple_scale
             - ccm_value
             - ccp_value
             - ccra_steps
@@ -1073,23 +1018,20 @@ items:
                 - factors
                 - covs
                 - covs_scale
-                - dep_scale
                 - scale_missing
                 - model_terms
                 - fixed_intercept
-                - se_method
                 - mute
-                - df_method
                 - contrasts
                 - covs_scale
                 - contrast_custom_values
                 - donotrun
                 - offset
-                - omnibus
                 - custom_family
                 - custom_link
                 - dep2
                 - robust_method
+                - se_method
                 - ci_width
                 - ci_method
                 - boot_r
@@ -1137,26 +1079,22 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - offset
-                    - omnibus
                     - custom_family
                     - custom_link
                     - dep2
                     - robust_method
+                    - se_method
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -1197,29 +1135,26 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
             - donotrun
             - offset
-            - omnibus
             - custom_family
             - custom_link
             - dep2
             - robust_method
+            - se_method
             - offset
-            - omnibus
             - custom_family
             - custom_link
             - dep2
             - robust_method
+            - se_method
             - ccm_value
             - ccp_value
             - ccra_steps
@@ -1239,23 +1174,20 @@ items:
                 - factors
                 - covs
                 - covs_scale
-                - dep_scale
                 - scale_missing
                 - model_terms
                 - fixed_intercept
-                - se_method
                 - mute
-                - df_method
                 - contrasts
                 - covs_scale
                 - contrast_custom_values
                 - donotrun
                 - offset
-                - omnibus
                 - custom_family
                 - custom_link
                 - dep2
                 - robust_method
+                - se_method
                 - plot_x
                 - plot_z
                 - plot_by
@@ -1270,7 +1202,7 @@ items:
         type: Html
         visible: false
     -   name: predicted
-        title: Predicted Vales
+        title: Predicted Values
         type: Output
         varTitle: '`GLM_${ dep }_PRED`'
         varDescription: Predicted values
@@ -1280,25 +1212,22 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
             - donotrun
             - offset
-            - omnibus
             - custom_family
             - custom_link
             - dep2
             - robust_method
+            - se_method
     -   name: residuals
-        title: Residuals Vales
+        title: Residuals Values
         type: Output
         varTitle: '`GLM_${ dep }_RES`'
         varDescription: Residuals values
@@ -1308,23 +1237,20 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
             - donotrun
             - offset
-            - omnibus
             - custom_family
             - custom_link
             - dep2
             - robust_method
+            - se_method
     -   name: savenotes
         type: Html
         visible: false

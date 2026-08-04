@@ -881,7 +881,7 @@ items:
                     width: 700
                     height: 500
     -   name: predicted
-        title: Predicted Vales
+        title: Predicted Values
         type: Output
         varTitle: '`MIXED_PRED_${ dep }`'
         varDescription: Predicted values
@@ -893,7 +893,7 @@ items:
                 name: opts_model_r
                 file: clear.yaml
     -   name: residuals
-        title: Residuals Vales
+        title: Residuals Values
         type: Output
         varTitle: '`MIXED_RES_${ dep }`'
         varDescription: Residuals values

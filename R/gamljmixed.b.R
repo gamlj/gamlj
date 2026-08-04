@@ -21,7 +21,6 @@ gamljmixedClass <- R6::R6Class(
                 return()
             }
 
-            emmeans::emm_options(lmerTest.limit = 20000)
             ### set up the R6 workhorse class
             dispatch_message_cleaner(self)
             data_machine <- Datamatic$new(self)
@@ -183,6 +182,7 @@ gamljmixedClass <- R6::R6Class(
             if (!private$.ready$ready) {
                 return()
             }
+            emmeans::emm_options(lmerTest.limit = 20000)
             data <- private$.data_machine$cleandata(self$data)
             private$.runner_machine$estimate(data)
 

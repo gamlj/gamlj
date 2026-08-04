@@ -123,6 +123,7 @@
 -   name: plot_y_max
     title: Y-axis max
     type: String
+    default: ''
     description:
         R: |
             set the max value of the Y-axis

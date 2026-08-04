@@ -6,7 +6,6 @@ const events = {
   
     update: function(ui) {
       
-        console.log("Updating analysis")
         this.setCustomVariable("Intercept", "none", "");
         
         if (fun.isCloud(window)) {
@@ -264,11 +263,9 @@ const events = {
 
     onEvent_re_block_add: function(ui) {
       
-      //  console.log("re_block_add does nothing");
 
     },
     onEvent_re_block_remove: function(ui) {
-        // console.log("re_block_remove does nothing");
 
     },
 

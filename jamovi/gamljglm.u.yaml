@@ -14,7 +14,7 @@ children:
         margin: large
         children:
           - type: Label
-            label: Continuous dependent variable
+            label: Continuous Dependent Variable
             children:
               - type: RadioButton
                 name: model_type_linear
@@ -56,7 +56,7 @@ children:
         margin: large
         children:
           - type: Label
-            label: Categorical dependent variable
+            label: Categorical Dependent Variable
             children:
               - type: RadioButton
                 name: model_type_logistic
@@ -259,7 +259,7 @@ children:
         style: inline
         children:
           - type: Label
-            label: Model comparison
+            label: Model Comparison
             children:
               - type: CheckBox
                 name: comparison
@@ -342,7 +342,7 @@ children:
         style: inline
         children:
           - type: Label
-            label: Covariates conditioning
+            label: Covariates Conditioning
             children:
               - type: LayoutBox
                 margin: large
@@ -382,15 +382,15 @@ children:
             style: list
             children:
               - type: Label
-                label: Covariates labeling
+                label: Covariates Labeling
                 children:
                   - type: ComboBox
                     name: covs_scale_labels
               - type: Label
-                label: Dependent variable
+                label: Dependent Variable
                 children: []
               - type: Label
-                label: Scaling on
+                label: Scaling On
                 children:
                   - type: ComboBox
                     name: scale_missing
@@ -551,7 +551,7 @@ children:
                 optionName: plot_around
                 optionPart: se
           - type: Label
-            label: Plot type
+            label: Plot Type
             children:
               - type: RadioButton
                 name: plot_scale_response
@@ -570,7 +570,7 @@ children:
                 optionPart: mean.class
                 enable: (model_type_ordinal)
           - type: Label
-            label: Plot options
+            label: Plot Options
             children:
               - type: CheckBox
                 name: plot_raw
@@ -657,7 +657,7 @@ children:
         children:
           - type: CheckBox
             name: simple_interactions
-            label: Simple interactions
+            label: Simple Interactions
           - type: LayoutBox
             name: contrast_focus_box
             margin: large
@@ -735,7 +735,7 @@ children:
                 enable: (se_method_robust)
           - type: Label
             name: add_info
-            label: Additional info
+            label: Additional Info
             children:
               - type: CheckBox
                 name: vcov

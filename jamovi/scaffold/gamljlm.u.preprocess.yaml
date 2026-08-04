@@ -148,14 +148,14 @@ children:
                 style: inline
                 children:
                     -   type: Label
-                        label: Model comparison
+                        label: Model Comparison
                         children:
                             -   type: CheckBox
                                 name: comparison
                                 events:
                                     change: ./gamlj.events::onEvent_comparison
                     -   type: Label
-                        label: Omnibus test
+                        label: Omnibus Test
                         children:
                             -   name: omnibus_F
                                 type: RadioButton
@@ -271,7 +271,7 @@ children:
                                 optionName: adjust
                                 optionPart: sidak
                     -   type: Label
-                        label: Effect size
+                        label: Effect Size
                         children:
                             -   name: posthoc_es_dm
                                 type: CheckBox
@@ -407,7 +407,7 @@ children:
                         label: Homogeneity tests
                     -   type: CheckBox
                         name: norm_test
-                        label: Test normality of residuals
+                        label: Normality of residuals
                     -   type: CheckBox
                         name: colli_test
                         label: Collinearity statistics

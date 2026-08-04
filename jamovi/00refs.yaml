@@ -9,19 +9,53 @@ refs:
         versioning: 'GAMLj: General analyses for linear models'
     effectsize:
         type: software
-        author: Ben-Shachar, Makowski & Lüdecke
+        author: Ben-Shachar, M. S.; Makowski, D.; Lüdecke, D.
         year: 2020
-        title: Compute and interpret indices of effect size
+        title: 'effectsize: Indices of Effect Size'
         publisher: CRAN
-        url: https://github.com/easystats/effectsize
+        url: https://CRAN.R-project.org/package=effectsize
     parameters:
         type: software
-        author: Lüdecke, Ben-Shachar, Patil &  Makowski
+        author: Lüdecke, D.; Ben-Shachar, M. S.; Patil, I.; Makowski, D.
         year: 2020
-        title: Extracting, Computing and Exploring the Parameters of Statistical Models
-            using R
+        title: 'parameters: Processing of Model Parameters'
         publisher: CRAN
-        url: https://github.com/easystats/parameters
+        url: https://CRAN.R-project.org/package=parameters
+    emmeans:
+        type: software
+        author: Lenth, R. V.
+        year: 2024
+        title: 'emmeans: Estimated Marginal Means, aka Least-Squares Means'
+        publisher: CRAN
+        url: https://CRAN.R-project.org/package=emmeans
+    lme4:
+        type: software
+        author: Bates, D.; Maechler, M.; Bolker, B.; Walker, S.
+        year: 2015
+        title: 'lme4: Linear Mixed-Effects Models using Eigen and S4'
+        publisher: CRAN
+        url: https://CRAN.R-project.org/package=lme4
+    lmerTest:
+        type: software
+        author: Kuznetsova, A.; Brockhoff, P. B.; Christensen, R. H. B.
+        year: 2017
+        title: 'lmerTest: Tests in Linear Mixed Effects Models'
+        publisher: CRAN
+        url: https://CRAN.R-project.org/package=lmerTest
+    car:
+        type: software
+        author: Fox, J.; Weisberg, S.
+        year: 2019
+        title: 'car: Companion to Applied Regression'
+        publisher: CRAN
+        url: https://CRAN.R-project.org/package=car
+    sandwich:
+        type: software
+        author: Zeileis, A.; Lumley, T.; Berger, S.; Graham, N.
+        year: 2020
+        title: 'sandwich: Robust Covariance Matrix Estimators'
+        publisher: CRAN
+        url: https://CRAN.R-project.org/package=sandwich
     goodness:
         type: software
         author: Gallucci, M.

@@ -26,7 +26,6 @@ const fun = {
         } else {
             detectedEnvironment = 'no_browser_context'; // 'window' or 'window.origin' not available
         }
-        console.log('Detect Environment:', detectedEnvironment);
         return(detectedEnvironment === "cloud")
 
       },
@@ -318,7 +317,6 @@ fixRandomEffects: function(ui, context) {
             var option=ui.re_corr.value();
             var oldOption = context.workspace.re_corr;
             context.workspace.re_corr=option;
-            console.log("in fun.fixRandomEffects");
             if (ui.re_corr.value()=="block") {
                   if (oldOption==="corr" || oldOption==="nocorr")
                         ui.re.setValue(Array([]));
@@ -601,7 +599,6 @@ fixRandomEffects: function(ui, context) {
     },
     fix_plots: function(ui, context) {
       
-        console.log("fixing plots");
         if (typeof ui.plot_more_options == 'undefined')
            return;
           
@@ -630,7 +627,6 @@ fixRandomEffects: function(ui, context) {
 
     },
     mark: function(obj) {
-               console.log(obj);
          }
 
     }
@@ -638,7 +634,6 @@ fixRandomEffects: function(ui, context) {
 module.exports=fun
 
 var mark = function(obj) {
-  console.log(obj);
 };
 
 var unique = function(avec) {

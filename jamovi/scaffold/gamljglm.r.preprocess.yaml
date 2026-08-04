@@ -157,14 +157,14 @@ items:
                 title: Effect Size Indices
                 type: Table
                 visible: (es_ci)
-                description: a table of effect size indeces
-                refs: es
+                description: a table of effect size indices
+                refs: effectsize
                 clearWith:
                     -   type: scaffold
                         name: opts_model
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                     -   type: scaffold
                         name: opts_es
@@ -200,7 +200,7 @@ items:
                         name: opts_model_z
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                 columns:
                     -   name: response
@@ -260,7 +260,7 @@ items:
                         name: opts_model_z
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                 columns:
                     -   name: response
@@ -319,7 +319,7 @@ items:
                         name: opts_model_z
                         file: clear.yaml
                     -   type: scaffold
-                        name: opts_ci
+                        name: opts_ci_glm
                         file: clear.yaml
                 columns:
                     -   name: source
@@ -523,7 +523,7 @@ items:
                 name: opts_model_z
                 file: clear.yaml
             -   type: scaffold
-                name: opts_ci
+                name: opts_ci_glm
                 file: clear.yaml
             - posthoc
             - adjust
@@ -538,7 +538,7 @@ items:
                     name: opts_model_z
                     file: clear.yaml
                 -   type: scaffold
-                    name: opts_ci
+                    name: opts_ci_glm
                     file: clear.yaml
                 - posthoc
                 - adjust
@@ -785,7 +785,7 @@ items:
                     name: opts_model_z
                     file: clear.yaml
                 -   type: scaffold
-                    name: opts_ci
+                    name: opts_ci_glm
                     file: clear.yaml
                 -   type: scaffold
                     name: opts_cov_scaling
@@ -834,10 +834,10 @@ items:
                                     name: opts_simple_effects
                                     file: clear.yaml
                                 -   type: scaffold
-                                    name: opts_ci
+                                    name: opts_ci_glm
                                     file: clear.yaml
                                 -   type: scaffold
-                                    name: opts_plots
+                                    name: opts_plots_z
                                     file: clear.yaml
                                 -   type: scaffold
                                     name: opts_plots_more_x
@@ -882,13 +882,13 @@ items:
                     name: opts_model_z
                     file: clear.yaml
                 -   type: scaffold
-                    name: opts_plots
+                    name: opts_plots_z
                     file: clear.yaml
     -   name: jnplotnotes
         type: Html
         visible: false
     -   name: predicted
-        title: Predicted Vales
+        title: Predicted Values
         type: Output
         varTitle: '`GLM_${ dep }_PRED`'
         varDescription: Predicted values
@@ -900,7 +900,7 @@ items:
                 name: opts_model_z
                 file: clear.yaml
     -   name: residuals
-        title: Residuals Vales
+        title: Residuals Values
         type: Output
         varTitle: '`GLM_${ dep }_RES`'
         varDescription: Residuals values
