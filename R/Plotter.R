@@ -875,7 +875,7 @@ Plotter <- R6::R6Class(
 
             residuals <- image$state$residuals
             #              residuals <- as.numeric(scale(stats::residuals(private$.operator$model)))
-            df <- as.data.frame(qqnorm(residuals, plot.it = FALSE))
+            df <- as.data.frame(stats::qqnorm(residuals, plot.it = FALSE))
             plot <- ggplot2::ggplot(data = df, ggplot2::aes(y = y, x = x)) +
                 ggplot2::geom_abline(slope = 1, intercept = 0, colour = theme$color[1]) +
                 ggplot2::geom_point(ggplot2::aes(x = x, y = y), linewidth = 2, colour = theme$color[1]) +

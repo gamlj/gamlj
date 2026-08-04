@@ -72,7 +72,7 @@ children:
                         name: ci_width
                         format: number
             -   type: Label
-                label: Model comparison
+                label: Model Comparison
                 children:
                     -   type: CheckBox
                         name: comparison
@@ -206,7 +206,7 @@ children:
                 style: inline
                 children:
                     -   type: Label
-                        label: List components
+                        label: List Components
                         children:
                             -   type: CheckBox
                                 name: re_modelterms
@@ -225,7 +225,7 @@ children:
                                 events:
                                     change: ./gamlj.events::onEvent_re_list
                     -   type: Label
-                        label: Effects correlation
+                        label: Effects Correlation
                         children:
                             -   type: LayoutBox
                                 margin: large
@@ -360,7 +360,7 @@ children:
                 style: inline
                 children:
                     -   type: Label
-                        label: Covariates conditioning
+                        label: Covariates Conditioning
                         children:
                             -   type: LayoutBox
                                 margin: large
@@ -400,17 +400,17 @@ children:
                         style: list
                         children:
                             -   type: Label
-                                label: Covariates labeling
+                                label: Covariates Labeling
                                 children:
                                     -   type: ComboBox
                                         name: covs_scale_labels
                             -   type: Label
-                                label: Dependent variable
+                                label: Dependent Variable
                                 children:
                                     -   type: ComboBox
                                         name: dep_scale
                             -   type: Label
-                                label: Scaling on
+                                label: Scaling On
                                 children:
                                     -   type: ComboBox
                                         name: scale_missing
@@ -680,7 +680,7 @@ children:
                 children:
                     -   type: CheckBox
                         name: simple_interactions
-                        label: Simple interactions
+                        label: Simple Interactions
                     -   type: LayoutBox
                         name: contrast_focus_box
                         margin: large

@@ -14,7 +14,7 @@ children:
                 margin: large
                 children:
                     -   type: Label
-                        label: Continuous dependent variable
+                        label: Continuous Dependent Variable
                         children:
                             -   type: RadioButton
                                 name: model_type_linear
@@ -56,7 +56,7 @@ children:
                 margin: large
                 children:
                     -   type: Label
-                        label: Categorical dependent variable
+                        label: Categorical Dependent Variable
                         children:
                             -   type: RadioButton
                                 name: model_type_logistic
@@ -260,7 +260,7 @@ children:
                 style: inline
                 children:
                     -   type: Label
-                        label: Model comparison
+                        label: Model Comparison
                         children:
                             -   type: CheckBox
                                 name: comparison
@@ -371,7 +371,7 @@ children:
                                 optionName: plot_around
                                 optionPart: se
                     -   type: Label
-                        label: Plot type
+                        label: Plot Type
                         children:
                             -   type: RadioButton
                                 name: plot_scale_response
@@ -389,7 +389,7 @@ children:
                                 optionPart: mean.class
                                 enable: (model_type_ordinal)
                     -   type: Label
-                        label: Plot options
+                        label: Plot Options
                         children:
                             -   type: CheckBox
                                 name: plot_raw
@@ -483,7 +483,7 @@ children:
                         file: commons.u.yaml                                
                     -   type: Label
                         name: add_info
-                        label: Additional info
+                        label: Additional Info
                         children:
                             -   type: CheckBox
                                 name: vcov

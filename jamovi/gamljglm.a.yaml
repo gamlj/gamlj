@@ -113,8 +113,9 @@ options:
                 a number between 50 and 99.9 (default: 95) specifying the confidence interval width for the plots.
     -   name: boot_r
         title: Bootstrap rep.
-        type: Number
+        type: Integer
         min: 1
+        max: 10000
         default: 1000
         description:
             R: |
@@ -289,6 +290,8 @@ options:
     -   name: ccm_value
         type: Number
         default: 1
+        min: 0.1
+        max: 10
         description:
             R: |
                 how many st.deviations around the means used to condition simple effects and plots. Used if `simpleScale`=`'mean_sd'`

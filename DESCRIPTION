@@ -11,10 +11,10 @@ Description: A suite for estimating linear models, such as the general linear mo
 License: GPL (>=2) 
 Encoding: UTF-8
 LazyData: true
-Imports: methods, jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, 
+Imports: R6, methods, jmvcore (>= 0.9.5.2), emmeans (>= 1.2.0),  car, 
          rlang, stringr, ggplot2, 
          effectsize, insight, parameters ,performance,
-         lme4, lmerTest, sandwich
+         lme4, lmerTest, sandwich, stats, utils, graphics, parallel
 VignetteBuilder: knitr
 Suggests: 
     ordinal,

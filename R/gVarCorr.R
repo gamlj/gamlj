@@ -111,17 +111,15 @@ gVarCorr <- function(model, ...) UseMethod(".VarCorr")
 
     if (obj$option("re_ci")) {
       
-        check <- switch(obj$options$ci_method,
-            quantile = {
-                obj$warning <- list(topic = "main_random", message = "bootstrap method for C.I is not available for this type of model.")
-            }
-           )
+        if (identical(obj$options$ci_method, "quantile")) {
+            obj$warning <- list(topic = "main_random", message = "bootstrap method for C.I is not available for this type of model.")
+        }
 
         results <- try_hard(nlme::intervals(model,which="var-cov"))
 
         if (!isFALSE(results$error)) {
             obj$warning <- list(topic = "main_random", message = "C.I cannot be computed.")
-            if (grep("Non-positive definite approximate",results$error)>0)
+            if (isTRUE(grepl("Non-positive definite approximate", results$error, fixed = TRUE)))
                       obj$warning <- list(topic = "main_random", message = "Random-effects are probably unidentifiable")
               
             

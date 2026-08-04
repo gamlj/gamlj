@@ -130,10 +130,6 @@ var rtermFormat = new Format ({
     },
   
   _itemToString: function(item, level, power) {
-    
-//    console.log("rterm itemToString format used")
-
-         
     if (typeof item === 'string')
          return item + (power > 1 ? this.getSuperscript(power) : '');
 

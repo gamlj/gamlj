@@ -32,7 +32,7 @@ children:
                 margin: large
                 children:
                     -   type: Label
-                        label: Categorical dependent variable
+                        label: Categorical Dependent Variable
                         children:
                             -   type: RadioButton
                                 name: model_type_logistic
@@ -126,7 +126,7 @@ children:
                             -   name: donotrun
                                 type: CheckBox
                     -   type: Label
-                        label: Model comparison
+                        label: Model Comparison
                         children:
                             -   type: CheckBox
                                 name: comparison
@@ -293,7 +293,7 @@ children:
                 style: inline
                 children:
                     -   type: Label
-                        label: List components
+                        label: List Components
                         children:
                             -   type: CheckBox
                                 name: re_modelterms
@@ -304,7 +304,7 @@ children:
                                 events:
                                     change: ./gamlj.events::onEvent_re_list
                     -   type: Label
-                        label: Effects correlation
+                        label: Effects Correlation
                         children:
                             -   type: LayoutBox
                                 margin: large
@@ -429,7 +429,7 @@ children:
                                 optionName: plot_around
                                 optionPart: se
                     -   type: Label
-                        label: Plot type
+                        label: Plot Type
                         children:
                             -   type: RadioButton
                                 name: plot_scale_response
@@ -446,7 +446,7 @@ children:
                                 optionPart: mean.class
                                 enable: (model_type_ordinal)
                     -   type: Label
-                        label: Plot options
+                        label: Plot Options
                         children:
                             -   type: CheckBox
                                 name: plot_raw

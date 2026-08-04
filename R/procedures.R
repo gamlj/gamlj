@@ -133,7 +133,7 @@ procedure.posthoc <- function(obj) {
 procedure.posthoc_effsize <- function(obj) {
     terms <- obj$options$posthoc
     dep <- obj$options$dep
-    ### at the moment (version 3.0.0), no bootstrap for d indeces
+    ### at the moment (version 3.0.0), no bootstrap for d indices
     model <- obj$model
 
     ### check if we need robust standard error

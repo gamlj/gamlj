@@ -27,7 +27,7 @@
             style: inline
             children:
                 -   type: Label
-                    label: Covariates conditioning
+                    label: Covariates Conditioning
                     children:
                         -   type: LayoutBox
                             margin: large
@@ -68,17 +68,17 @@
                     style: list
                     children:
                         -   type: Label
-                            label: Covariates labeling
+                            label: Covariates Labeling
                             children:
                                 -   type: ComboBox
                                     name: covs_scale_labels
                         -   type: Label
-                            label: Dependent variable
+                            label: Dependent Variable
                             children:
                                 -   type: ComboBox
                                     name: dep_scale
                         -   type: Label
-                            label: Scaling on
+                            label: Scaling On
                             children:
                                 -   type: ComboBox
                                     name: scale_missing
@@ -162,7 +162,7 @@
             children:
                 -   type: CheckBox
                     name: simple_interactions
-                    label: Simple interactions
+                    label: Simple Interactions
                 -   type: LayoutBox
                     name: contrast_focus_box
                     margin: large

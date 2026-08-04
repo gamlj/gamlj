@@ -41,13 +41,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -57,6 +54,8 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - nested_terms
                     - nested_intercept
                     - comparison
@@ -94,13 +93,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -110,6 +106,8 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - nested_terms
                     - nested_intercept
                     - comparison
@@ -143,13 +141,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -159,6 +154,8 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                 columns:
                     -   name: source
                         title: ''
@@ -185,13 +182,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -201,10 +195,11 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - ci_width
                     - ci_method
                     - boot_r
-                    - es_ci
                 columns:
                     -   name: source
                         title: Names
@@ -248,13 +243,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -264,10 +256,11 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - ci_width
                     - ci_method
                     - boot_r
-                    - es_ci
                 columns:
                     -   name: source
                         title: Names
@@ -331,13 +324,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -347,10 +337,11 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - ci_width
                     - ci_method
                     - boot_r
-                    - es_ci
                 columns:
                     -   name: groups
                         title: Groups
@@ -394,13 +385,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -410,10 +398,11 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - ci_width
                     - ci_method
                     - boot_r
-                    - es_ci
                 columns:
                     -   name: groups
                         title: Groups
@@ -451,13 +440,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -467,6 +453,8 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                 columns:
                     -   name: test
                         title: Test
@@ -510,13 +498,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -526,6 +511,8 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                 columns:
                     -   name: index
                         title: Index
@@ -544,13 +531,10 @@ items:
                 - factors
                 - covs
                 - covs_scale
-                - dep_scale
                 - scale_missing
                 - model_terms
                 - fixed_intercept
-                - se_method
                 - mute
-                - df_method
                 - contrasts
                 - covs_scale
                 - contrast_custom_values
@@ -560,10 +544,11 @@ items:
                 - re
                 - re_corr
                 - res_struct
+                - dep_scale
+                - df_method
                 - ci_width
                 - ci_method
                 - boot_r
-                - es_ci
                 - adjust
                 - posthoc_ci
                 - ci_width
@@ -634,25 +619,23 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - model_type
                     - dep
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -689,25 +672,23 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - model_type
                     - dep
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
                     - donotrun
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -767,25 +748,23 @@ items:
                         - re
                         - re_corr
                         - res_struct
+                        - dep_scale
+                        - df_method
                         - model_type
                         - dep
                         - factors
                         - covs
                         - covs_scale
-                        - dep_scale
                         - scale_missing
                         - model_terms
                         - fixed_intercept
-                        - se_method
                         - mute
-                        - df_method
                         - contrasts
                         - covs_scale
                         - contrast_custom_values
                         - donotrun
                         - simple_x
                         - simple_mods
-                        - simple_scale
                         - ccm_value
                         - ccp_value
                         - ccra_steps
@@ -824,25 +803,23 @@ items:
                         - re
                         - re_corr
                         - res_struct
+                        - dep_scale
+                        - df_method
                         - model_type
                         - dep
                         - factors
                         - covs
                         - covs_scale
-                        - dep_scale
                         - scale_missing
                         - model_terms
                         - fixed_intercept
-                        - se_method
                         - mute
-                        - df_method
                         - contrasts
                         - covs_scale
                         - contrast_custom_values
                         - donotrun
                         - simple_x
                         - simple_mods
-                        - simple_scale
                         - ccm_value
                         - ccp_value
                         - ccra_steps
@@ -896,18 +873,17 @@ items:
                 - re
                 - re_corr
                 - res_struct
+                - dep_scale
+                - df_method
                 - model_type
                 - dep
                 - factors
                 - covs
                 - covs_scale
-                - dep_scale
                 - scale_missing
                 - model_terms
                 - fixed_intercept
-                - se_method
                 - mute
-                - df_method
                 - contrasts
                 - covs_scale
                 - contrast_custom_values
@@ -953,13 +929,10 @@ items:
                     - factors
                     - covs
                     - covs_scale
-                    - dep_scale
                     - scale_missing
                     - model_terms
                     - fixed_intercept
-                    - se_method
                     - mute
-                    - df_method
                     - contrasts
                     - covs_scale
                     - contrast_custom_values
@@ -969,9 +942,10 @@ items:
                     - re
                     - re_corr
                     - res_struct
+                    - dep_scale
+                    - df_method
                     - simple_x
                     - simple_mods
-                    - simple_scale
                     - ccm_value
                     - ccp_value
                     - ccra_steps
@@ -981,7 +955,6 @@ items:
                     - ci_width
                     - ci_method
                     - boot_r
-                    - es_ci
                     - plot_x
                     - plot_z
                     - plot_by
@@ -990,7 +963,6 @@ items:
                     - plot_xoriginal
                     - plot_black
                     - plot_around
-                    - plot_scale
                     - plot_terms
                     - plot_x_min
                     - plot_x_max
@@ -1018,13 +990,10 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
@@ -1034,6 +1003,8 @@ items:
             - re
             - re_corr
             - res_struct
+            - dep_scale
+            - df_method
             - plot_x
             - plot_z
             - plot_by
@@ -1042,7 +1013,6 @@ items:
             - plot_xoriginal
             - plot_black
             - plot_around
-            - plot_scale
             - plot_terms
             - plot_re
             - plot_re_method
@@ -1058,13 +1028,10 @@ items:
                 - factors
                 - covs
                 - covs_scale
-                - dep_scale
                 - scale_missing
                 - model_terms
                 - fixed_intercept
-                - se_method
                 - mute
-                - df_method
                 - contrasts
                 - covs_scale
                 - contrast_custom_values
@@ -1074,6 +1041,8 @@ items:
                 - re
                 - re_corr
                 - res_struct
+                - dep_scale
+                - df_method
                 - plot_x
                 - plot_z
                 - plot_by
@@ -1082,7 +1051,6 @@ items:
                 - plot_xoriginal
                 - plot_black
                 - plot_around
-                - plot_scale
                 - plot_terms
                 - plot_re
                 - plot_re_method
@@ -1218,7 +1186,7 @@ items:
                     width: 700
                     height: 500
     -   name: predicted
-        title: Predicted Vales
+        title: Predicted Values
         type: Output
         varTitle: '`MIXED_PRED_${ dep }`'
         varDescription: Predicted values
@@ -1228,13 +1196,10 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
@@ -1244,8 +1209,10 @@ items:
             - re
             - re_corr
             - res_struct
+            - dep_scale
+            - df_method
     -   name: residuals
-        title: Residuals Vales
+        title: Residuals Values
         type: Output
         varTitle: '`MIXED_RES_${ dep }`'
         varDescription: Residuals values
@@ -1255,13 +1222,10 @@ items:
             - factors
             - covs
             - covs_scale
-            - dep_scale
             - scale_missing
             - model_terms
             - fixed_intercept
-            - se_method
             - mute
-            - df_method
             - contrasts
             - covs_scale
             - contrast_custom_values
@@ -1271,6 +1235,8 @@ items:
             - re
             - re_corr
             - res_struct
+            - dep_scale
+            - df_method
     -   name: savenotes
         type: Html
         visible: false
