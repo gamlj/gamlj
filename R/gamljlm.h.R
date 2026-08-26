@@ -1096,7 +1096,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="\u03B5\u00B2p", 
                                     `type`="number", 
                                     `visible`="(es:epsilonp)", 
-                                    `format`="zto"))))
+                                    `format`="zto")),
+                            refs="car"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="effectsizes",
@@ -1231,7 +1232,9 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue")),
-                            refs="parameters"))
+                            refs=list(
+                                "parameters",
+                                "sandwich")))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="contrasts",
@@ -1494,7 +1497,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="p<sub>sidak</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(adjust:sidak)")))))
+                            `visible`="(adjust:sidak)")),
+                    refs="emmeans")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="posthocEffectSize",
@@ -1684,7 +1688,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="\u03B5\u00B2p", 
                                     `type`="number", 
                                     `visible`="(es:epsilonp)", 
-                                    `format`="zto"))))
+                                    `format`="zto")),
+                            refs="car"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
@@ -1772,7 +1777,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))}))$new(options=options))
+                                    `format`="zto,pvalue")),
+                            refs="emmeans"))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleInteractions",
@@ -1883,7 +1889,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `title`="\u03B5\u00B2p", 
                                         `type`="number", 
                                         `visible`="(es:epsilonp)", 
-                                        `format`="zto"))))
+                                        `format`="zto")),
+                                refs="car"))
                             self$add(jmvcore::Table$new(
                                 options=options,
                                 name="coefficients",
@@ -1962,7 +1969,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="p", 
                                         `title`="p", 
                                         `type`="number", 
-                                        `format`="zto,pvalue"))))}))$new(options=options)))
+                                        `format`="zto,pvalue")),
+                                refs="emmeans"))}))$new(options=options)))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="emmeans",
@@ -2025,7 +2033,8 @@ gamljlmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `name`="est.ci.upper", 
                             `title`="Upper", 
                             `type`="number", 
-                            `format`="zto")))))
+                            `format`="zto")),
+                    refs="emmeans")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="mainPlots",

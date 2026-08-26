@@ -1024,7 +1024,10 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="\u03B5\u00B2", 
                                     `type`="number", 
                                     `visible`="(es:epsilon)", 
-                                    `format`="zto"))))
+                                    `format`="zto")),
+                            refs=list(
+                                "car",
+                                "sandwich")))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="effectsizes",
@@ -1158,7 +1161,10 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))
+                                    `format`="zto,pvalue")),
+                            refs=list(
+                                "parameters",
+                                "sandwich")))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="contrasts",
@@ -1669,7 +1675,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             `title`="p<sub>holm</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(adjust:holm)")))))
+                            `visible`="(adjust:holm)")),
+                    refs="emmeans")))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1747,7 +1754,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `title`="\u03B5\u00B2", 
                                     `type`="number", 
                                     `visible`="(es:epsilon)", 
-                                    `format`="zto"))))
+                                    `format`="zto")),
+                            refs="car"))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
@@ -1833,7 +1841,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))}))$new(options=options))
+                                    `format`="zto,pvalue")),
+                            refs="emmeans"))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleInteractions",
@@ -1901,7 +1910,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `name`="p", 
                                         `title`="p", 
                                         `type`="number", 
-                                        `format`="zto,pvalue"))))
+                                        `format`="zto,pvalue")),
+                                refs="car"))
                             self$add(jmvcore::Table$new(
                                 options=options,
                                 name="coefficients",
@@ -1957,7 +1967,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                         `type`="number", 
                                         `title`="Upper", 
                                         `visible`="(expb_ci)", 
-                                        `superTitle`="Exp(B) Confidence Intervals"))))}))$new(options=options)))
+                                        `superTitle`="Exp(B) Confidence Intervals")),
+                                refs="emmeans"))}))$new(options=options)))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="emmeans",
@@ -2019,7 +2030,8 @@ gamljglmResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         list(
                             `name`="est.ci.upper", 
                             `title`="Upper", 
-                            `type`="number")))))
+                            `type`="number")),
+                    refs="emmeans")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="mainPlots",

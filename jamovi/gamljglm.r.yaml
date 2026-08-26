@@ -201,6 +201,9 @@ items:
                         type: number
                         visible: (es:epsilon)
                         format: zto
+                refs:
+                    - car
+                    - sandwich
             -   name: effectsizes
                 title: Effect Size Indices
                 type: Table
@@ -317,6 +320,9 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+                refs:
+                    - parameters
+                    - sandwich
             -   name: contrasts
                 title: Custom Contrast Tests
                 type: Table
@@ -765,6 +771,7 @@ items:
                     type: number
                     format: zto,pvalue
                     visible: (adjust:holm)
+            refs: emmeans
     -   name: simpleEffects
         title: Simple Effects
         type: Group
@@ -830,6 +837,7 @@ items:
                         type: number
                         visible: (es:epsilon)
                         format: zto
+                refs: car
             -   name: coefficients
                 title: Parameter Estimates for simple effects of ___key___
                 type: Table
@@ -904,6 +912,7 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+                refs: emmeans
     -   name: simpleInteractions
         title: Simple Interactions
         type: Array
@@ -959,6 +968,7 @@ items:
                             title: p
                             type: number
                             format: zto,pvalue
+                    refs: car
                 -   type: Table
                     name: coefficients
                     title: Parameter Estimates for -  $key
@@ -1003,6 +1013,7 @@ items:
                             title: Upper
                             visible: (expb_ci)
                             superTitle: Exp(B) Confidence Intervals
+                    refs: emmeans
     -   name: emmeans
         title: Estimated Marginal Means
         type: Array
@@ -1060,6 +1071,7 @@ items:
                 -   name: est.ci.upper
                     title: Upper
                     type: number
+            refs: emmeans
     -   name: mainPlots
         title: Results Plots
         type: Array
