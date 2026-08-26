@@ -837,6 +837,14 @@ estimate_lme <- function(...) {
     model$call$fixed <- opts$fixed
     model$call$random <- opts$random
     model$call$method <- opts$method
+    ### nlme::lme()'s own match.call() stores `weights` as the bare symbol
+    ### `weights`, pointing at this function's local variable. If left as-is,
+    ### a later stats::update() on this model (e.g. gfit.R's null-model
+    ### comparison) re-evaluates that symbol in a different environment,
+    ### where it resolves to the stats::weights() generic instead of this
+    ### value, and nlme's internal varFunc(weights) then fails. Embed the
+    ### actual value so update() always uses it, regardless of environment.
+    model$call$weights <- weights
     model$call[[1]] <- quote(nlme::lme.formula)
     if ("character" %in% class(model$apVar))
        warning("Random-effects parameters and residual variance are probably unidentifiable.")

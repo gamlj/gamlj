@@ -268,7 +268,7 @@ A results object containing:
   \code{results$main$r2} \tab \tab \tab \tab \tab a table of R \cr
   \code{results$main$intercept} \tab \tab \tab \tab \tab a table of information for the model intercept \cr
   \code{results$main$anova} \tab \tab \tab \tab \tab a table of ANOVA results \cr
-  \code{results$main$effectsizes} \tab \tab \tab \tab \tab a table of effect size indeces \cr
+  \code{results$main$effectsizes} \tab \tab \tab \tab \tab a table of effect size indices \cr
   \code{results$main$coefficients} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$vcov} \tab \tab \tab \tab \tab a table \cr
   \code{results$main$contrastCodeTables} \tab \tab \tab \tab \tab an array of contrast coefficients tables \cr

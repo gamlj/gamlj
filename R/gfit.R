@@ -310,7 +310,7 @@ r2 <- function(model, ...) UseMethod(".r2")
     #  if (is.null(r2) || is.na(r2)) {
     #    r2 <- list(R2_conditional = NA, R2_marginal = NA)
     #  }
-
+mark("R2 lmer",r2)
     cond <- .gfit.compare_null_model(model, type = "c")
     cond$type <- "Conditional"
     cond$r2 <- r2$R2_conditional
@@ -446,6 +446,7 @@ r2 <- function(model, ...) UseMethod(".r2")
 }
 
 .compare_null_model.lme <- function(model, type = "c") {
+    mark("Compare null lme start")
     data <- model$data
 
     int <- attr(stats::terms(model), "intercept")
@@ -457,14 +458,21 @@ r2 <- function(model, ...) UseMethod(".r2")
         if (int == 0) {
             return(NULL)
         }
+      mark("Compare null update")
+      mark(model,form)
         model0 <- stats::update(model, fixed = form)
+        mark("Compare null update end")
+        
     }
 
     ### please note that here we compute the LRT
     ### on the estimated models, no matter what REML is. If one compares the results with
     ### lmerTest::anova() they are slightly different because the latter re-estimate the models
     ### with ML, not REML. We do not see why re-estimaing is necessary, given these results: .https://www.jstor.org/stable/2533680
+   
     results <- .gfit.lrt(model, model0)
+    mark("Compare null lme end")
+    
     results
 }
 

@@ -1,7 +1,7 @@
 Package: GAMLj3
 Type: Package
 Title: GAMLj Suite for Linear Models
-Version: 3.7.0
+Version: 3.7.1
 Author: Marcello Gallucci
 Maintainer: Marcello Gallucci <mcfanda@gmail.com>
 URL: https://gamlj.github.io/, https://github.com/gamlj/gamlj
