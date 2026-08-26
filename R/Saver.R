@@ -36,7 +36,7 @@ Saver <- R6::R6Class(
                 jinfo("Saving residuals")
                 p <- stats::residuals(private$.runner$model, type = "response")
                 # we need the rownames in case there are missing in the datasheet
-                pdf <- data.frame(residuals = p, row.names = rownames(insight::get_data(self$model, source = "frame")))
+                pdf <- data.frame(residuals = p, row.names = rownames(insight::get_data(private$.runner$model, source = "frame")))
                 results$residuals$setValues(pdf)
             }
         },

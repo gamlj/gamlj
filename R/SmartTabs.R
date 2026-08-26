@@ -45,7 +45,7 @@ SmartTable <- R6::R6Class("SmartTable",
             self$name <- table$name
             self$table <- table
             self$nickname <- gsub('"', "", gsub("/", "_", table$path, fixed = TRUE), fixed = TRUE)
-            self$nickname <- stringr::str_replace_all(self$nickname, '[\\]"\\[]', "")
+            self$nickname <- gsub("\\[|\\]", "", self$nickname)
             self$nickname <- make.names(self$nickname)
             private$.init_source <- paste0("init_", self$nickname)
             private$.run_source <- paste0("run_", self$nickname)
@@ -572,7 +572,7 @@ SmartTable <- R6::R6Class("SmartTable",
             obj
         },
         .nice_name = function(aname) {
-            a <- stringr::str_replace_all(aname, '[\\]"\\[]', "")
+            a <- gsub("\\[|\\]", "", aname)
             a <- strsplit(a, ".", fixed = T)
             a <- make.names(a)
             paste(a, collapse = ".")

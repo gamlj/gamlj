@@ -29,7 +29,7 @@ aPlot <- R6::R6Class(
         x_range      = list(),
         plot_bars    = FALSE,
         plot_raw     = FALSE,
-        plot_dodge   = NULL,
+        plot_dodge_width = 0,
         plot_label   = NULL,
         largedata    = NULL,
         title        = NULL,
@@ -86,10 +86,10 @@ aPlot <- R6::R6Class(
 
             if (self$options$plot_around != "none") {
                 self$plot_bars <- TRUE
-                self$plot_dodge <- ggplot2::position_dodge(0.2)
+                self$plot_dodge_width <- 0.2
                 self$plot_label <- paste(self$z$name, paste0("(", toupper(self$options$plot_around), ")"), sep = "\n")
             } else {
-                self$plot_dodge <- ggplot2::position_dodge(0)
+                self$plot_dodge_width <- 0
             }
             
             self$plot_label <- self$z$name
@@ -732,7 +732,7 @@ Plotter <- R6::R6Class(
             ######### fix the bars ##########
             if (plotobj$plot_bars) {
                 if (plotobj$x$type == "factor") {
-                    p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width = .3, position = plotobj$plot_dodge, show.legend = FALSE)
+                    p <- p + ggplot2::geom_errorbar(data = data, .aesbar, linewidth = .9, width = .3, position = ggplot2::position_dodge(plotobj$plot_dodge_width), show.legend = FALSE)
                 } else {
                     p <- p + ggplot2::geom_ribbon(data = data, .aesbar, linetype = 0, show.legend = F, alpha = 0.2)
                 }
@@ -745,7 +745,7 @@ Plotter <- R6::R6Class(
                 data = data,
                 .aestetics,
                 linewidth = 1.2,
-                position = plotobj$plot_dodge
+                position = ggplot2::position_dodge(plotobj$plot_dodge_width)
             )
 
 
@@ -755,7 +755,7 @@ Plotter <- R6::R6Class(
                     data = data,
                     .aestetics,
                     shape = 21, size = 4, fill = "white",
-                    position = plotobj$plot_dodge, show.legend = FALSE
+                    position = ggplot2::position_dodge(plotobj$plot_dodge_width), show.legend = FALSE
                 )
             } else {
                 # give a scale to the Z axis

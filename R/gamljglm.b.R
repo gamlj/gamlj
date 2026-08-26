@@ -135,57 +135,11 @@ gamljglmClass <- R6::R6Class(
             ladd(private$.smartObjs) <- aSmartObj
 
 
-            ### estimate marginal means
-
-            aSmartObj <- SmartArray$new(self$results$emmeans, runner_machine)
-            aSmartObj$activated <- is.something(self$options$emmeans)
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandFrom <- 2
-            aSmartObj$combineBelow <- "new!"
-            aSmartObj$spaceBy <- "new!"
-            aSmartObj$ci("est", self$options$ci_width)
-            ladd(private$.smartObjs) <- aSmartObj
-
-            ### simple effects
-            ##### anova
-            aSmartObj <- SmartTable$new(self$results$simpleEffects$anova, runner_machine)
-            aSmartObj$activated <- (is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandSuperTitle <- "Moderator"
-            aSmartObj$key <- self$options$simple_x
-            aSmartObj$combineBelow <- 1:(length(self$options$simple_mods) - 1)
-            aSmartObj$spaceBy <- (length(self$options$simple_mods) - 1)
-
-            ladd(private$.smartObjs) <- aSmartObj
-
-            ##### coefficients
-            aSmartObj <- SmartTable$new(self$results$simpleEffects$coefficients, runner_machine)
-            aSmartObj$activated <- (is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandFrom <- 2
-            aSmartObj$expandSuperTitle <- "Moderator"
-            aSmartObj$key <- self$options$simple_x
-            aSmartObj$ci("est", self$options$ci_width)
-            aSmartObj$ci("expb", width = self$options$ci_width, format = "Exp(B) {}% Confidence Intervals")
-            aSmartObj$combineBelow <- 1:(length(self$options$simple_mods) - 1)
-            aSmartObj$spaceBy <- (length(self$options$simple_mods) - 1)
-            ladd(private$.smartObjs) <- aSmartObj
-
-            ### simple interaction
-            aSmartObj <- SmartArray$new(self$results$simpleInteractions, runner_machine)
-            aSmartObj$activated <- (self$options$simple_interactions & is.something(self$options$simple_x) & length(self$options$simple_mods) > 1)
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandSuperTitle <- "Moderator"
-            aSmartObj$ci("est", self$options$ci_width)
-            aSmartObj$combineBelow <- "new!"
-            aSmartObj$spaceBy <- "new!"
-            ladd(private$.smartObjs) <- aSmartObj
+            private$.smartObjs <- init_smart_emmeans(private$.smartObjs, self$results, runner_machine, self$options)
+            private$.smartObjs <- init_smart_simple_effects(private$.smartObjs, self$results, runner_machine, self$options)
 
             ### init all ####
-            for (tab in private$.smartObjs) {
-                tab$initTable()
-                tab$mutenotes <- self$options$mute
-            }
+            private$.smartObjs <- init_smart_tables(private$.smartObjs, self$options$mute)
 
 
             private$.data_machine <- data_machine
