@@ -96,51 +96,8 @@ gamljmixedClass <- R6::R6Class(
             aSmartObj$expandFrom <- 2
             ladd(private$.smartObjs) <- aSmartObj
 
-            ### estimate marginal means
-
-            aSmartObj <- SmartArray$new(self$results$emmeans, runner_machine)
-            aSmartObj$ci("est", self$options$ci_width)
-            aSmartObj$activated <- is.something(self$options$emmeans)
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$combineBelow <- "new!"
-            aSmartObj$spaceBy <- "new!"
-            aSmartObj$hideOn <- list(df = Inf)
-
-            ladd(private$.smartObjs) <- aSmartObj
-
-            ### simple effects
-            ##### anova
-            aSmartObj <- SmartTable$new(self$results$simpleEffects$anova, runner_machine)
-            aSmartObj$activated <- (is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandSuperTitle <- "Moderator"
-            aSmartObj$key <- self$options$simple_x
-            aSmartObj$combineBelow <- 1:(length(self$options$simple_mods) - 1)
-            aSmartObj$spaceBy <- (length(self$options$simple_mods) - 1)
-            aSmartObj$hideOn <- list(df2 = Inf)
-            ladd(private$.smartObjs) <- aSmartObj
-
-            ##### coefficients
-            aSmartObj <- SmartTable$new(self$results$simpleEffects$coefficients, runner_machine)
-            aSmartObj$activated <- (is.something(self$options$simple_x) & is.something(self$options$simple_mods))
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandSuperTitle <- "Moderator"
-            aSmartObj$key <- self$options$simple_x
-            aSmartObj$ci("est", self$options$ci_width)
-            aSmartObj$combineBelow <- 1:(length(self$options$simple_mods) - 1)
-            aSmartObj$spaceBy <- (length(self$options$simple_mods) - 1)
-            aSmartObj$hideOn <- list(df = Inf)
-            ladd(private$.smartObjs) <- aSmartObj
-
-            ### simple interaction
-            aSmartObj <- SmartArray$new(self$results$simpleInteractions, runner_machine)
-            aSmartObj$activated <- (self$options$simple_interactions & is.something(self$options$simple_x) & length(self$options$simple_mods) > 1)
-            aSmartObj$expandOnInit <- TRUE
-            aSmartObj$expandSuperTitle <- "Moderator"
-            aSmartObj$ci("est", self$options$ci_width)
-            aSmartObj$combineBelow <- "new!"
-            aSmartObj$spaceBy <- "new!"
-            ladd(private$.smartObjs) <- aSmartObj
+            private$.smartObjs <- init_smart_emmeans(private$.smartObjs, self$results, runner_machine, self$options)
+            private$.smartObjs <- init_smart_simple_effects(private$.smartObjs, self$results, runner_machine, self$options)
 
             ### assumptions nromtest
             aSmartObj <- SmartTable$new(self$results$assumptions$normtest, runner_machine)
@@ -161,10 +118,7 @@ gamljmixedClass <- R6::R6Class(
 
 
 
-            for (tab in private$.smartObjs) {
-                tab$initTable()
-                tab$mutenotes <- self$options$mute
-            }
+            private$.smartObjs <- init_smart_tables(private$.smartObjs, self$options$mute)
 
 
             private$.data_machine <- data_machine

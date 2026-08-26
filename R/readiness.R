@@ -1,43 +1,25 @@
 readiness <- function(options) {
-    if (options$.interface == "R") {
-        if (!check_package(options, "nlme", c(model_type = "lmer", res_struct = "!id"), "structured error covariances")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
+    package_checks <- list(
+        list(pkg = "nlme", conditions = c(model_type = "lmer", res_struct = "!id"), aim = "structured error covariances"),
+        list(pkg = "boot", conditions = c(ci_method = "!wald"), aim = "bootstrap confidence intervals"),
+        list(pkg = "marginaleffects", conditions = c(es = "marginals"), aim = "marginal effects"),
+        list(pkg = "nnet", conditions = c(model_type = "multinomial", .caller = "glm"), aim = "multinomial models"),
+        list(pkg = "mclogit", conditions = c(model_type = "multinomial", .caller = "glmer"), aim = "multinomial models"),
+        list(pkg = "betareg", conditions = c(model_type = "beta", .caller = "glm"), aim = "beta models"),
+        list(pkg = "ordinal", conditions = c(model_type = "ordinal"), aim = "ordinal models"),
+        list(pkg = "MASS", conditions = c(model_type = "nb", .caller = "glm"), aim = "negative binomial models"),
+        list(pkg = "lme4", conditions = c(model_type = "nb", .caller = "glmer"), aim = "negative binomial models"),
+        list(pkg = "sandwich", conditions = c(se_method = "robust"), aim = "robust standard errors")
+    )
 
-        if (!check_package(options, "boot", c(ci_method = "!wald"), "for bootstrap confidence intervals")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "marginaleffects", c(es = "marginals"), "marginals effects")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "nnet", c(model_type = "multinomial", .caller = "glm"), "multinomial models")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "mclogit", c(model_type = "multinomial", .caller = "glmer"), "multinomial models")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "betareg", c(model_type = "beta", .caller = "glm"), "beta models")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "ordinal", c(model_type = "ordinal"), "ordinal models")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "MASS", c(model_type = "nb", .caller = "glm"), "negative binomial models")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "lme4", c(model_type = "nb", .caller = "glmer"), "negative binomial models")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
-        }
-
-        if (!check_package(options, "sandwich", c(se_method = "robust"), "robust standard errors")) {
-            return(list(ready = FALSE, reason = FALSE, report = FALSE))
+    for (check in package_checks) {
+        available <- check_package(options, check$pkg, check$conditions, check$aim)
+        if (!available) {
+            return(list(
+                ready = FALSE,
+                reason = attr(available, "message"),
+                report = TRUE
+            ))
         }
     }
 
@@ -102,13 +84,13 @@ readiness <- function(options) {
 
 
 check_package <- function(options, pkg, conditions, aim) {
-    neg <- grep("!", conditions)
+    neg <- grep("!", conditions, fixed = TRUE)
     names <- names(conditions)
-    conditions <- stringr::str_remove(conditions, "!")
+    conditions <- sub("^!", "", conditions)
     names(conditions) <- names
     str1 <- paste0("is.joption(options,", paste0("'", names(conditions), "'"), ")", collapse = " && ")
     str2 <- paste("(", paste(paste0("'", conditions, "' "), paste0("options$", names(conditions)), sep = " %in% "), ")")
-    if (length(neg) > 0) str2[[neg]] <- paste0("!", str2[[neg]])
+    if (length(neg) > 0) str2[neg] <- paste0("!", str2[neg])
     str2 <- paste(str2, collapse = " && ")
     str <- str2lang(paste(str1, str2, sep = " && "))
     test <- eval(str)
@@ -116,8 +98,7 @@ check_package <- function(options, pkg, conditions, aim) {
     if (test) {
         if (!requireNamespace(pkg, quietly = T)) {
             msg <- paste0("Package ", pkg, " is required for ", aim, ". Please install it and re-run the model.")
-            cat(paste0("\033[0;31m", msg, "\033[0m", "\n"))
-            return(FALSE)
+            return(structure(FALSE, message = msg))
         }
     }
     return(TRUE)
