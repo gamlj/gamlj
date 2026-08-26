@@ -229,6 +229,7 @@ items:
                         type: number
                         visible: (es:epsilonp)
                         format: zto
+                refs: car
             -   name: effectsizes
                 title: Effect Size Indices
                 type: Table
@@ -345,7 +346,9 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
-                refs: parameters
+                refs:
+                    - parameters
+                    - sandwich
             -   name: contrasts
                 title: Custom Contrast Tests
                 type: Table
@@ -576,6 +579,7 @@ items:
                     type: number
                     format: zto,pvalue
                     visible: (adjust:sidak)
+            refs: emmeans
     -   name: posthocEffectSize
         title: Comparisons effect size
         type: Array
@@ -737,6 +741,7 @@ items:
                         type: number
                         visible: (es:epsilonp)
                         format: zto
+                refs: car
             -   name: coefficients
                 title: Parameter Estimates for simple effects of ___key___
                 type: Table
@@ -815,6 +820,7 @@ items:
                         title: p
                         type: number
                         format: zto,pvalue
+                refs: emmeans
     -   name: simpleInteractions
         title: Simple Interactions
         type: Array
@@ -906,6 +912,7 @@ items:
                             type: number
                             visible: (es:epsilonp)
                             format: zto
+                    refs: car
                 -   type: Table
                     name: coefficients
                     title: Parameter Estimates
@@ -976,6 +983,7 @@ items:
                             title: p
                             type: number
                             format: zto,pvalue
+                    refs: emmeans
     -   name: emmeans
         title: Estimated Marginal Means
         type: Array
@@ -1034,6 +1042,7 @@ items:
                     title: Upper
                     type: number
                     format: zto
+            refs: emmeans
     -   name: mainPlots
         title: Results Plots
         type: Array

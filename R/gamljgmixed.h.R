@@ -1009,7 +1009,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))
+                                    `format`="zto,pvalue")),
+                            refs=list(
+                                "car",
+                                "emmeans")))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
@@ -1093,7 +1096,9 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `title`="p", 
                                     `type`="number", 
                                     `format`="zto,pvalue")),
-                            refs="parameters"))
+                            refs=list(
+                                "parameters",
+                                "lme4")))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="contrasts",
@@ -1647,7 +1652,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                             `title`="p<sub>sidak</sub>", 
                             `type`="number", 
                             `format`="zto,pvalue", 
-                            `visible`="(adjust:sidak)")))))
+                            `visible`="(adjust:sidak)")),
+                    refs="emmeans")))
             self$add(R6::R6Class(
                 inherit = jmvcore::Group,
                 active = list(
@@ -1708,7 +1714,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))
+                                    `format`="zto,pvalue")),
+                            refs=list(
+                                "car",
+                                "emmeans")))
                         self$add(jmvcore::Table$new(
                             options=options,
                             name="coefficients",
@@ -1796,7 +1805,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                     `name`="p", 
                                     `title`="p", 
                                     `type`="number", 
-                                    `format`="zto,pvalue"))))}))$new(options=options))
+                                    `format`="zto,pvalue")),
+                            refs="emmeans"))}))$new(options=options))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="simpleInteractions",
@@ -1863,7 +1873,10 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                         `name`="p", 
                                         `title`="p", 
                                         `type`="number", 
-                                        `format`="zto,pvalue"))))
+                                        `format`="zto,pvalue")),
+                                refs=list(
+                                    "car",
+                                    "emmeans")))
                             self$add(jmvcore::Table$new(
                                 options=options,
                                 name="coefficients",
@@ -1946,7 +1959,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                                         `name`="p", 
                                         `title`="p", 
                                         `type`="number", 
-                                        `format`="zto,pvalue"))))}))$new(options=options)))
+                                        `format`="zto,pvalue")),
+                                refs="emmeans"))}))$new(options=options)))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="emmeans",
@@ -2008,7 +2022,8 @@ gamljgmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         list(
                             `name`="est.ci.upper", 
                             `title`="Upper", 
-                            `type`="number")))))
+                            `type`="number")),
+                    refs="emmeans")))
             self$add(jmvcore::Array$new(
                 options=options,
                 name="mainPlots",
