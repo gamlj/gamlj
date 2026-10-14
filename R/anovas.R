@@ -78,7 +78,6 @@ ganova <- function(x, ...) UseMethod(".anova")
         return(NULL)
     }
     .anova <- as.data.frame(anoobj$obj, stringsAsFactors = F)
-    mark(.anova)
     .transnames <- list("test" = c("Chisq", "LR Chisq"), df = c("Df", "df1"), p = c("Pr(>Chisq)"))
     names(.anova) <- transnames(names(.anova), .transnames)
     class(.anova) <- c("main_anova_clm", class(.anova))

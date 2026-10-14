@@ -127,8 +127,26 @@ gparameters <- function(x, ...) UseMethod(".parameters")
     )
     names(.coefficients) <- transnames(names(.coefficients), .transnames)
 
-    cidata <- parameters::ci(.model, method = .ci_method, ci = .ci_width)
-    cidata <- cidata[1:nrow(.coefficients), ]
+    ## Robust covariance matrices can be used by ci.glm() only for Wald-like
+    ## intervals.  Keep bootstrap intervals independent of the SE option and
+    ## leave the non-glm methods handled by this function unchanged.
+    .ci_vcov <- NULL
+    if (!.bootstrap && inherits(model, "glm")) {
+        .ci_vcov <- .se_method
+        if (!is.null(.ci_vcov) && identical(.ci_method, "profile")) {
+            warning("Profile confidence intervals are not available with robust standard errors. Wald confidence intervals based on the robust covariance matrix were used.")
+            .ci_method <- "wald"
+        }
+    }
+
+    .ci_args <- list(
+        x = .model,
+        method = .ci_method,
+        ci = .ci_width
+    )
+    if (!is.null(.ci_vcov)) .ci_args$vcov <- .ci_vcov
+    cidata <- do.call(parameters::ci, .ci_args)
+    cidata <- cidata[seq_len(nrow(.coefficients)), , drop = FALSE]
     .coefficients$est.ci.lower <- cidata$CI_low
     .coefficients$est.ci.upper <- cidata$CI_high
 
@@ -145,7 +163,7 @@ gparameters <- function(x, ...) UseMethod(".parameters")
             attributes(x) <- .attributes
             class(x) <- .classes
             cidata <- parameters::ci(x, method = .ci_method, ci = .ci_width)
-            cidata <- cidata[1:nrow(.coefficients), ]
+            cidata <- cidata[seq_len(nrow(.coefficients)), , drop = FALSE]
             .coefficients$expb.ci.lower <- cidata$CI_low
             .coefficients$expb.ci.upper <- cidata$CI_high
         } else {
@@ -154,22 +172,32 @@ gparameters <- function(x, ...) UseMethod(".parameters")
         }
     }
 
-    if (obj$option("estimates_ci")) {
+    ## Keep the existing CI path for models that reuse this method but are
+    ## not glm objects (for example multinom, betareg, and clm).
+    if (obj$option("estimates_ci") && !inherits(model, "glm")) {
         cidata <- as.data.frame(parameters::ci(.model,
             ci = .ci_width,
             ci_method = .ci_method,
-            vcov=.se_method
+            vcov = .se_method
         ))
 
         .coefficients$est.ci.lower <- cidata$CI_low
         .coefficients$est.ci.upper <- cidata$CI_high
     }
+
     .coefficients
 }
 
 .parameters.multinom <- function(model, obj) {
     .coefficients <- .parameters.glm(model, obj)
     names(.coefficients) <- tolower(names(.coefficients))
+    ### fix the names
+    dep<-all.vars(formula(model))[[1]]
+    levs<-tob64(obj$datamatic$variables[[dep]]$levels)
+    dummies<-gsub(LEVEL_SYMBOL,"",unique(.coefficients$response))
+    ref<-setdiff(levs,dummies)
+    dummies<-paste(dummies,ref,sep=" - ")
+    .coefficients$response<-dummies
     .coefficients
 }
 
@@ -204,13 +232,14 @@ gparameters <- function(x, ...) UseMethod(".parameters")
         .coefficients$expb.ci.upper <- exp(.coefficients$est.ci.upper)
     }
     ## clean names
-
     for (var in obj$datamatic$variables) {
         for (name in var$paramsnames64) {
             test <- grep(name, .coefficients$source)
             if (length(test) > 0) .coefficients$source[test] <- name
         }
     }
+    ## fix response labels
+    .coefficients$response <- sub("/", " - ", .coefficients$response, fixed = TRUE)
     .coefficients
 }
 
@@ -219,6 +248,7 @@ gparameters <- function(x, ...) UseMethod(".parameters")
     params$label <- params$source
     check <- grep(LEVEL_SYMBOL, params$source, fixed = TRUE)
     params$source[check] <- "(Threshold)"
+    params$label <- sub("|", " - ", params$label, fixed = TRUE)
     params
 }
 
