@@ -31,6 +31,7 @@
         - res_struct
         - dep_scale
         - df_method
+        - order_var
 -   type: scaffold
     name: opts_model_gmixed_r
     children:

@@ -10,6 +10,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             .interface = "jamovi",
             model_type = "lmer",
             dep = NULL,
+            order_var = NULL,
             factors = NULL,
             covs = NULL,
             model_terms = NULL,
@@ -129,6 +130,13 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "continuous"),
                 permitted=list(
                     "numeric"))
+            private$..order_var <- jmvcore::OptionVariable$new(
+                "order_var",
+                order_var,
+                suggested=list(
+                    "nominal"),
+                permitted=list(
+                    "factor"))
             private$..factors <- jmvcore::OptionVariables$new(
                 "factors",
                 factors,
@@ -604,6 +612,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$...interface)
             self$.addOption(private$..model_type)
             self$.addOption(private$..dep)
+            self$.addOption(private$..order_var)
             self$.addOption(private$..factors)
             self$.addOption(private$..covs)
             self$.addOption(private$..model_terms)
@@ -696,6 +705,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         .interface = function() private$...interface$value,
         model_type = function() private$..model_type$value,
         dep = function() private$..dep$value,
+        order_var = function() private$..order_var$value,
         factors = function() private$..factors$value,
         covs = function() private$..covs$value,
         model_terms = function() private$..model_terms$value,
@@ -787,6 +797,7 @@ gamljmixedOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ...interface = NA,
         ..model_type = NA,
         ..dep = NA,
+        ..order_var = NA,
         ..factors = NA,
         ..covs = NA,
         ..model_terms = NA,
@@ -982,6 +993,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison",
@@ -1041,6 +1053,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "nested_terms",
                                 "nested_intercept",
                                 "comparison",
@@ -1093,7 +1106,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "re_corr",
                                 "res_struct",
                                 "dep_scale",
-                                "df_method"),
+                                "df_method",
+                                "order_var"),
                             columns=list(
                                 list(
                                     `name`="source", 
@@ -1145,6 +1159,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1219,6 +1234,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1313,6 +1329,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1384,6 +1401,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "ci_width",
                                 "ci_method",
                                 "boot_r"),
@@ -1446,7 +1464,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "re_corr",
                                 "res_struct",
                                 "dep_scale",
-                                "df_method"),
+                                "df_method",
+                                "order_var"),
                             columns=list(
                                 list(
                                     `name`="test", 
@@ -1513,7 +1532,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "re_corr",
                                 "res_struct",
                                 "dep_scale",
-                                "df_method"),
+                                "df_method",
+                                "order_var"),
                             columns=list(
                                 list(
                                     `name`="index", 
@@ -1548,6 +1568,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "res_struct",
                         "dep_scale",
                         "df_method",
+                        "order_var",
                         "ci_width",
                         "ci_method",
                         "boot_r",
@@ -1644,6 +1665,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "model_type",
                                 "dep",
                                 "factors",
@@ -1706,6 +1728,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                 "res_struct",
                                 "dep_scale",
                                 "df_method",
+                                "order_var",
                                 "model_type",
                                 "dep",
                                 "factors",
@@ -1800,6 +1823,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "res_struct",
                                     "dep_scale",
                                     "df_method",
+                                    "order_var",
                                     "model_type",
                                     "dep",
                                     "factors",
@@ -1865,6 +1889,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                                     "res_struct",
                                     "dep_scale",
                                     "df_method",
+                                    "order_var",
                                     "model_type",
                                     "dep",
                                     "factors",
@@ -1944,6 +1969,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "res_struct",
                         "dep_scale",
                         "df_method",
+                        "order_var",
                         "model_type",
                         "dep",
                         "factors",
@@ -2018,6 +2044,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                             "res_struct",
                             "dep_scale",
                             "df_method",
+                            "order_var",
                             "simple_x",
                             "simple_mods",
                             "ccm_value",
@@ -2080,6 +2107,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "res_struct",
                     "dep_scale",
                     "df_method",
+                    "order_var",
                     "plot_x",
                     "plot_z",
                     "plot_by",
@@ -2118,6 +2146,7 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         "res_struct",
                         "dep_scale",
                         "df_method",
+                        "order_var",
                         "plot_x",
                         "plot_z",
                         "plot_by",
@@ -2304,7 +2333,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "re_corr",
                     "res_struct",
                     "dep_scale",
-                    "df_method")))
+                    "df_method",
+                    "order_var")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="residuals",
@@ -2331,7 +2361,8 @@ gamljmixedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "re_corr",
                     "res_struct",
                     "dep_scale",
-                    "df_method")))
+                    "df_method",
+                    "order_var")))
             self$add(jmvcore::Html$new(
                 options=options,
                 name="savenotes",

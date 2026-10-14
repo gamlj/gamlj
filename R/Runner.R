@@ -828,6 +828,7 @@ estimate_lme <- function(...) {
     coropts <- list(form = stats::formula(opts$form))
     if (utils::hasName(opts, "coropts")) coropts <- c(coropts, opts$coropts)
     cor <- do.call(opts$cor, coropts)
+   
     model <- nlme::lme(
         fixed = opts$fixed,
         random = opts$random,

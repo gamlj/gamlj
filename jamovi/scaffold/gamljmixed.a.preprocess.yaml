@@ -43,6 +43,16 @@ options:
         description:
             R: |
                 a string naming the dependent variable from `data`; the variable must be numeric. Not needed if `formula` is used.
+    -   name: order_var
+        title: Ordering Variable
+        type: Variable
+        default: ~
+        suggested: nominal
+        permitted: factor        
+        description:
+            R: |
+                a string naming the ordering variable (such as time) used for residual structures.
+                
     -   name: factors
         type: scaffold
         file: commons.a.yaml
