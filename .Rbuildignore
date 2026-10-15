@@ -11,3 +11,11 @@ docs$
 ^Meta$
 ^\.positai$
 ^\.claude$
+^AI$
+^\.git$
+^.*\.gitignore$
+^.*\.Rhistory$
+^.*\.RData$
+^\.Rcheck$
+^\.\.Rcheck$
+^\.codex$

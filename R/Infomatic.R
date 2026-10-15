@@ -361,7 +361,12 @@ Infomatic <- R6::R6Class(
                 self$distribution <- "gaussian"
                 self$call <- "lme"
                 self$rcall <- "estimate_lme"
-                form <- paste("~1|", tob64(options$cluster[1]))
+                order_var<- tob64(options$order_var)
+                if (is.something(order_var))
+                   form <- paste("~ as.numeric(", order_var, ") |", tob64(options$cluster[1]))
+                else
+                   form <- paste("~1|", tob64(options$cluster[1]))
+                mark(form)
                 coropts <- NULL
                 if (options$res_struct == "cs") cor <- nlme::corCompSymm
                 if (options$res_struct == "un") cor <- nlme::corSymm

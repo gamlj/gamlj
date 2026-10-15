@@ -281,7 +281,7 @@ options:
             ui: |
                 Produces a classification table (predicted vs observed)
     -   name: input_method
-        title: Input Method
+        title: Input
         type: List
         default: standard
         options:

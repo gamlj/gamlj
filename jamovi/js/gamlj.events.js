@@ -11,7 +11,7 @@ const events = {
         if (fun.isCloud(window)) {
           ui.panel_save.$el[0].style.display='none';
         }
-
+        fun.res_struct(ui,this);
         fun.calcModelTerms(ui, this);
         fun.filterModelTerms(ui, this);
         fun.updatePostHocSupplier(ui, this);
@@ -66,7 +66,12 @@ const events = {
       }
 
     },
-    
+    update_ordervar: function(ui) {
+      
+      fun.res_struct(ui,this);
+      
+      
+    },
     onChange_factors: function(ui) {
       
         fun.calcModelTerms(ui, this);

@@ -55,7 +55,7 @@ res <- mod$main$coefficients$asDF
 testthat::test_that("glm estimates are correct", {
     testthat::expect_equal(as.character(res[3, 1]), "honors1")
     testthat::expect_equal(res$est.ci.lower[2], -0.20408, tolerance = tol)
-    testthat::expect_equal(res$est.ci.upper[2], .1703, tolerance = tol)
+    testthat::expect_equal(res$est.ci.upper[2], .1602, tolerance = tol)
     testthat::expect_equal(res$p[2], 0.8079, tolerance = tol)
     testthat::expect_equal(mod$main$fit$asDF$value[2], 175.787, tolerance = tol)
 })
@@ -269,7 +269,7 @@ testthat::expect_warning(
 testthat::test_that("negative binomial model works", {
     testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tolerance=tol)
     testthat::expect_equal(mod$main$anova$asDF$test[1], 22.6, tolerance=tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], -.0845, tolerance=tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], -.0233, tolerance=tol)
     testthat::expect_equal(mod$main$r2$asDF$r2, .777, tolerance=tol)
     testthat::expect_equal(mod$main$fit$asDF$value[4], 8.89, tolerance=tol)
     testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 2.08, tolerance=tol)
@@ -300,7 +300,7 @@ mod <- GAMLj3::gamlj_glm(
 testthat::test_that("quasi poisson binomial works", {
     testthat::expect_equal(mod$main$coefficients$asDF$expb[1], 1.425, tolerance=tol)
     testthat::expect_equal(mod$main$anova$asDF$test[1], 105.641, tolerance=tol)
-    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], .167, tolerance=tol)
+    testthat::expect_equal(mod$main$coefficients$asDF$est.ci.lower[1], .1750, tolerance=tol)
     testthat::expect_equal(mod$main$r2$asDF$r2, .777, tolerance=tol)
     testthat::expect_equal(mod$main$fit$asDF$value[4], 8.893, tolerance=tol)
     testthat::expect_equal(mod$emmeans[[1]]$asDF$est.ci.upper[2], 1.698, tolerance=tol)

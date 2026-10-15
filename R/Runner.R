@@ -172,9 +172,9 @@ Runner <- R6::R6Class("Runner",
             }
 
             tab <- NULL
+
             if (self$formulaobj$isProper) {
                 tab <- gparameters(self$model, self)
-                
                 tab <- private$.fix_names(tab)
             }
             private$.coefficientstab <- tab
@@ -748,9 +748,12 @@ Runner <- R6::R6Class("Runner",
             }
 
             if ("response" %in% names(atable)) {
+                # this a bug fix for order of response levels for mixed multinomial. Monitor if 
+                # interferes with other models
+              
                 atable$response <- fromb64(atable$response)
-                atable$response <- factor(atable$response)
-                levels(atable$response) <- unlist(self$datamatic$dep$contrast_labels)
+                #atable$response <- factor(atable$response,labels = unlist(self$datamatic$dep$contrast_labels))
+ #                levels(atable$response) <- unlist(self$datamatic$dep$contrast_labels)
                 atable$response <- as.character(atable$response)
             }
             if ("level" %in% names(atable)) {
@@ -825,6 +828,7 @@ estimate_lme <- function(...) {
     coropts <- list(form = stats::formula(opts$form))
     if (utils::hasName(opts, "coropts")) coropts <- c(coropts, opts$coropts)
     cor <- do.call(opts$cor, coropts)
+   
     model <- nlme::lme(
         fixed = opts$fixed,
         random = opts$random,

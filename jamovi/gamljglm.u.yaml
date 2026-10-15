@@ -200,7 +200,7 @@ children:
       - type: Label
         label: Estimation
         margin: large
-        style: list-inline
+        style: list
         children:
           - name: donotrun
             type: CheckBox

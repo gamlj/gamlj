@@ -626,6 +626,36 @@ fixRandomEffects: function(ui, context) {
         }
 
     },
+    res_struct: function(ui,context) {
+
+      if (["lmer"].includes(ui.model_type.getValue())) {
+         var structure = ui.res_struct.getValue();
+         var uiobj = ui.order_var_box;
+         var covsElement = ui.covs.$el[0];
+         var htall = covsElement.getBoundingClientRect().height;
+         var orderVarBox = uiobj.container.$el[0].parentElement;
+         var labelHeight = 15;
+         if (["un","ar1","arma"].includes(structure)) {
+                uiobj.$buttons[0].style.display = '';
+                uiobj.$label[0].style.display = '';
+                uiobj.container.$el[0].style.display = '';
+                orderVarBox.style.display = '';
+                var hc = orderVarBox.getBoundingClientRect().height;
+                var hshort = htall - hc - labelHeight;
+                ui.cluster.$el[0].style.height = hshort + 'px'
+         } else {
+
+           uiobj.$buttons[0].style.display = 'none';
+           uiobj.$label[0].style.display = 'none';
+           uiobj.container.$el[0].style.display = 'none';
+           orderVarBox.style.display = 'none';
+           if (ui.order_var.getValue() !== null)
+               ui.order_var.setValue(null);
+           ui.cluster.$el[0].style.height = htall + 'px'
+         }
+      }
+
+    },
     mark: function(obj) {
          }
 

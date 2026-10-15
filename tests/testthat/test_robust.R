@@ -35,6 +35,26 @@ testthat::test_that("test glm robust SE", {
   testthat::expect_gt(mod1$main$coefficients$asDF[2, 4],mod0$main$coefficients$asDF[2, 4])
 })
 
+testthat::test_that("GLM robust CIs use the robust covariance matrix", {
+  mod <- suppressWarnings(GAMLj3::gamlj_glm(
+    formula = ybin ~ x,
+    data = data,
+    model_type = "logistic",
+    se_method = "HC3",
+    estimates_ci = TRUE,
+    es = "expb",
+    ci_method = "wald"
+  ))
+
+  tab <- mod$main$coefficients$asDF
+  ci <- parameters::ci(mod$model, method = "wald", ci = .95, vcov = "HC3")
+
+  testthat::expect_equal(tab$est.ci.lower, ci$CI_low, tolerance = 1e-10)
+  testthat::expect_equal(tab$est.ci.upper, ci$CI_high, tolerance = 1e-10)
+  testthat::expect_equal(tab$expb.ci.lower, exp(ci$CI_low), tolerance = 1e-10)
+  testthat::expect_equal(tab$expb.ci.upper, exp(ci$CI_high), tolerance = 1e-10)
+})
+
 
 data$ybeta<-data$ypoi/55
 mod0 <- GAMLj3::gamlj_glm(

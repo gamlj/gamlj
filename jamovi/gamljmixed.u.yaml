@@ -44,6 +44,14 @@ children:
                         isTarget: true
                         events:
                             change: ./gamlj.events::onChange_cluster
+            -   type: TargetLayoutBox
+                name: order_var_box
+                label: Ordering variable
+                children:
+                    -   type: VariablesListBox
+                        name: order_var
+                        maxItemCount: 1
+                        isTarget: true
     -   name: panel_input
         type: LayoutBox
         margin: large
@@ -270,14 +278,20 @@ children:
                                 name: res_struct_id
                                 optionName: res_struct
                                 optionPart: id
+                                events:
+                                    change: ./gamlj.events::update_ordervar
                             -   type: RadioButton
                                 name: res_struct_cs
                                 optionName: res_struct
                                 optionPart: cs
+                                events:
+                                    change: ./gamlj.events::update_ordervar
                             -   type: RadioButton
                                 name: res_struct_un
                                 optionName: res_struct
                                 optionPart: un
+                                events:
+                                    change: ./gamlj.events::update_ordervar
                     -   type: Label
                         label: Autoregressive
                         children:
@@ -285,10 +299,14 @@ children:
                                 name: res_struct_ar1
                                 optionName: res_struct
                                 optionPart: ar1
+                                events:
+                                    change: ./gamlj.events::update_ordervar
                             -   type: RadioButton
                                 name: res_struct_arma
                                 optionName: res_struct
                                 optionPart: arma
+                                events:
+                                    change: ./gamlj.events::update_ordervar
     -   name: panel_factors
         type: CollapseBox
         label: Factors Coding
